@@ -186,6 +186,28 @@ class TableStructMetadata:
         """
         return self.flat_variant.has_public_column()
 
+    def get_public_column(self) -> str:
+        """Returns the name of the public column."""
+        return self.flat_variant.get_public_column()
+
+    def may_be_hidden(self) -> bool:
+        """Returns whether the table may be hidden.
+        
+        Implementation details
+        -----------------------
+        A table may be hidden if it has a column that is a boolean
+        and that is named "hidden".
+        """
+        return self.flat_variant.may_be_hidden()
+
+    def get_foreign_key_flat_variant(self, column_name: AttributeMetadata) -> StructMetadata:
+        """Returns the flat variant of the foreign key."""
+        return self.flat_variant.get_foreign_key_flat_variant(column_name)
+
+    def has_column(self, column_name: str) -> bool:
+        """Returns whether the table has a column with the given name."""
+        return column_name in self.flat_variant.table_metadata.get_columns(self.name)
+
     def has_filter_variant(self) -> bool:
         """Returns whether the table has a filter variant."""
         return self.flat_variant.has_filter_variant()
@@ -201,3 +223,54 @@ class TableStructMetadata:
     def editability_always_depend_on_parent_column(self) -> bool:
         """Returns whether the editability of the table depends on the parent column."""
         return self.flat_variant.editability_always_depend_on_parent_column()
+
+    def editability_may_depend_on_parent_columns(self) -> bool:
+        """Returns whether the editability of the table may depend on the parent column."""
+        return self.flat_variant.editability_may_depend_on_parent_columns()
+
+    def get_editability_determinant_columns(self) -> List[AttributeMetadata]:
+        """Returns the columns that determine the editability of the table."""
+        return self.flat_variant.get_editability_determinant_columns()
+
+    def get_can_edit_function_name(self) -> str:
+        """Returns the name of the can_edit function."""
+        return self.flat_variant.get_can_edit_function_name()
+
+    def has_can_edit_function(self) -> bool:
+        """Returns whether the table has a can_edit function."""
+        return self.flat_variant.has_can_edit_function()
+
+    def get_can_view_function_name(self) -> str:
+        """Returns the name of the can_view function."""
+        return self.flat_variant.get_can_view_function_name()
+
+    def get_can_delete_function_name(self) -> str:
+        """Returns the name of the can_delete function."""
+        return self.flat_variant.get_can_delete_function_name()
+
+    def get_can_edit_trigger_name(self) -> str:
+        """Returns the name of the can_edit trigger."""
+        return self.flat_variant.get_can_edit_trigger_name()
+
+    def has_can_edit_trigger(self) -> bool:
+        """Returns whether the table has a can_edit trigger."""
+        return self.flat_variant.has_can_edit_trigger()
+
+    def has_can_view_function(self) -> bool:
+        """Returns whether the table has a can_view function."""
+        return self.flat_variant.has_can_view_function()
+
+    def has_can_delete_function(self) -> bool:
+        """Returns whether the table has a can_delete function."""
+        return self.flat_variant.has_can_delete_function()
+
+    def get_foreign_key_table_name(self, column_name: str) -> str:
+        """Returns the table name of the foreign key."""
+        return self.flat_variant.table_metadata.get_foreign_key_table_name(self.name, column_name)
+
+    def get_function_primary_key_where_clause(self) -> str:
+        """Returns the WHERE clause for the primary key."""
+        return " AND ".join(
+            f"{self.name}.{column.name} = {column.name}"
+            for column in self.get_primary_keys()
+        )

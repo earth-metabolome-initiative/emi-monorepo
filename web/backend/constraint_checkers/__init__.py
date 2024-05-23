@@ -82,7 +82,10 @@ from constraint_checkers.derive_webcommon_update_variants import (
 from constraint_checkers.write_web_common_search_trait_implementations import (
     write_web_common_search_trait_implementations,
 )
-
+from constraint_checkers.ensure_can_x_function_existance import ensure_can_x_function_existance
+from constraint_checkers.ensure_no_dead_python_code import ensure_no_dead_python_code
+from constraint_checkers.write_diesel_sql_function_bindings import write_diesel_sql_function_bindings
+from constraint_checkers.ensures_no_duplicated_migrations import ensures_no_duplicated_migrations
 
 __all__ = [
     "ensures_all_update_at_trigger_exists",
@@ -127,4 +130,8 @@ __all__ = [
     "derive_frontend_builders",
     "derive_webcommon_new_variants",
     "derive_webcommon_update_variants",
+    "ensure_can_x_function_existance",
+    "ensure_no_dead_python_code",
+    "write_diesel_sql_function_bindings",
+    "ensures_no_duplicated_migrations"
 ]

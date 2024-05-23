@@ -244,8 +244,8 @@ pub(super) struct IntermediateNewSampledIndividual {
     updated_by: i32,
     id: Uuid,
     notes: Option<String>,
+    barcode: Option<String>,
     project_id: i32,
-    tagged: bool,
     picture: Vec<u8>,
 }
 
@@ -258,8 +258,8 @@ impl UpdateRow for web_common::database::NewSampledIndividual {
             updated_by: user_id,
             id: self.id,
             notes: self.notes,
+            barcode: self.barcode,
             project_id: self.project_id,
-            tagged: self.tagged,
             picture: self.picture,
         }
     }

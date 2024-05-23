@@ -9,6 +9,7 @@ from insert_migration import insert_migration
 def handle_update_at_trigger_creation(
     table_name: str,
 ):
+    """Handle the creation of the `updated_at` trigger for the table."""
     trigger_name = f"{table_name}_updated_at_trigger"
     print(
         f"The table {table_name} has an `updated_at` column, but it does not have an `{trigger_name}` trigger. "

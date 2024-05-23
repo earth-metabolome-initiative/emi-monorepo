@@ -23,10 +23,6 @@ class PGIndex:
         """Returns whether the index is of type `gist_trgm_ops`."""
         return self.index_type == "gist_trgm_ops"
 
-    def is_btree(self) -> bool:
-        """Returns whether the index is of type `btree`."""
-        return self.index_type == "btree"
-
     def __repr__(self) -> str:
         return f"PGIndex(name={self.name}, table_name={self.table_name}, arguments={self.arguments}, index_type={self.index_type})"
 
@@ -104,9 +100,7 @@ def find_search_indices(
         WHERE
             indexdef ILIKE '%using gin%'
             OR
-            indexdef ILIKE '%using gist%'
-            OR
-            indexdef ILIKE '%using btree%';
+            indexdef ILIKE '%using gist%';
         """
     )
     indices = cursor.fetchall()
@@ -118,7 +112,6 @@ def find_search_indices(
         for possible_index_type in (
             "gin_trgm_ops",
             "gist_trgm_ops",
-            "btree",
         ):
             if possible_index_type in index[2]:
                 index_type = possible_index_type
@@ -126,13 +119,10 @@ def find_search_indices(
         
         arguments = arguments.replace(f" {index_type}", "")
 
-        # If there is already an index for the table, we only replace it if it is
-        # a btree index, since it is the most restrictive one
         if index[1] in pg_indices:
-            if pg_indices[index[1]].is_btree():
-                pg_indices[index[1]] = PGIndex(
-                    index[0], index[1], arguments, index_type
-                )
+            pg_indices[index[1]] = PGIndex(
+                index[0], index[1], arguments, index_type
+            )
         else:
             pg_indices[index[1]] = PGIndex(
                 index[0], index[1], arguments, index_type

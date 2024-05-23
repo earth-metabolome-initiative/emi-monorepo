@@ -25,8 +25,8 @@ use chrono::NaiveDateTime;
 
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = bio_ott_ranks)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct BioOttRank {
     pub id: i32,
@@ -61,16 +61,18 @@ impl From<web_common::database::tables::BioOttRank> for BioOttRank {
 }
 
 impl BioOttRank {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::BioOttRankFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -78,11 +80,11 @@ impl BioOttRank {
         use crate::schema::bio_ott_ranks;
         let mut query = bio_ott_ranks::dsl::bio_ott_ranks
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(bio_ott_ranks::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(bio_ott_ranks::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(bio_ott_ranks::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_ranks::dsl::color_id.eq(color_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -119,14 +121,16 @@ impl BioOttRank {
             .filter(bio_ott_ranks::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -136,7 +140,7 @@ impl BioOttRank {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM bio_ott_ranks ",
@@ -146,16 +150,19 @@ impl BioOttRank {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -165,7 +172,7 @@ impl BioOttRank {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM bio_ott_ranks ",
@@ -175,16 +182,19 @@ impl BioOttRank {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -194,7 +204,7 @@ impl BioOttRank {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM bio_ott_ranks ",
@@ -204,15 +214,16 @@ impl BioOttRank {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = bio_ott_taxon_items)]
-#[diesel(belongs_to(BioOttRank, foreign_key = ott_rank_id))]
-#[diesel(belongs_to(BioOttTaxonItem, foreign_key = domain_id))]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb4f9890>, foreign_key = ott_rank_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb51b910>, foreign_key = domain_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct BioOttTaxonItem {
     pub id: i32,
@@ -289,16 +300,18 @@ impl From<web_common::database::tables::BioOttTaxonItem> for BioOttTaxonItem {
 }
 
 impl BioOttTaxonItem {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::BioOttTaxonItemFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -306,38 +319,38 @@ impl BioOttTaxonItem {
         use crate::schema::bio_ott_taxon_items;
         let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.ott_rank_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(value));
+        if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(ott_rank_id));
         }
-        if let Some(value) = filter.and_then(|f| f.domain_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(value));
+        if let Some(domain_id) = filter.and_then(|f| f.domain_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(domain_id));
         }
-        if let Some(value) = filter.and_then(|f| f.kingdom_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(value));
+        if let Some(kingdom_id) = filter.and_then(|f| f.kingdom_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(kingdom_id));
         }
-        if let Some(value) = filter.and_then(|f| f.phylum_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(value));
+        if let Some(phylum_id) = filter.and_then(|f| f.phylum_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(phylum_id));
         }
-        if let Some(value) = filter.and_then(|f| f.class_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(value));
+        if let Some(class_id) = filter.and_then(|f| f.class_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(class_id));
         }
-        if let Some(value) = filter.and_then(|f| f.order_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(value));
+        if let Some(order_id) = filter.and_then(|f| f.order_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(order_id));
         }
-        if let Some(value) = filter.and_then(|f| f.family_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(value));
+        if let Some(family_id) = filter.and_then(|f| f.family_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(family_id));
         }
-        if let Some(value) = filter.and_then(|f| f.genus_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(value));
+        if let Some(genus_id) = filter.and_then(|f| f.genus_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(genus_id));
         }
-        if let Some(value) = filter.and_then(|f| f.parent_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(value));
+        if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id));
         }
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(color_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -374,14 +387,16 @@ impl BioOttTaxonItem {
             .filter(bio_ott_taxon_items::dsl::ott_id.eq(ott_id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -391,7 +406,7 @@ impl BioOttTaxonItem {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id FROM bio_ott_taxon_items ",
@@ -401,16 +416,19 @@ impl BioOttTaxonItem {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -420,7 +438,7 @@ impl BioOttTaxonItem {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id FROM bio_ott_taxon_items ",
@@ -430,16 +448,19 @@ impl BioOttTaxonItem {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -449,7 +470,7 @@ impl BioOttTaxonItem {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id FROM bio_ott_taxon_items ",
@@ -459,6 +480,7 @@ impl BioOttTaxonItem {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
@@ -495,14 +517,16 @@ impl From<web_common::database::tables::Color> for Color {
 }
 
 impl Color {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -558,14 +582,16 @@ impl Color {
             .filter(colors::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -575,7 +601,7 @@ impl Color {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, hexadecimal_value, description FROM colors ",
@@ -585,16 +611,19 @@ impl Color {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -604,7 +633,7 @@ impl Color {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, hexadecimal_value, description FROM colors ",
@@ -614,16 +643,19 @@ impl Color {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -633,7 +665,7 @@ impl Color {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, hexadecimal_value, description FROM colors ",
@@ -643,6 +675,7 @@ impl Color {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
@@ -682,14 +715,16 @@ impl From<web_common::database::tables::Country> for Country {
 }
 
 impl Country {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -775,14 +810,16 @@ impl Country {
             .filter(countries::dsl::unicode.eq(unicode))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -792,7 +829,7 @@ impl Country {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, iso, emoji, unicode, name FROM countries ",
@@ -802,16 +839,19 @@ impl Country {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -821,7 +861,7 @@ impl Country {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, iso, emoji, unicode, name FROM countries ",
@@ -831,16 +871,19 @@ impl Country {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -850,7 +893,7 @@ impl Country {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, iso, emoji, unicode, name FROM countries ",
@@ -860,13 +903,14 @@ impl Country {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = derived_samples)]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(Sample, foreign_key = parent_sample_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32f6d0>, foreign_key = parent_sample_id))]
 #[diesel(primary_key(parent_sample_id, child_sample_id))]
 pub struct DerivedSample {
     pub created_by: i32,
@@ -898,7 +942,40 @@ impl From<web_common::database::tables::DerivedSample> for DerivedSample {
 }
 
 impl DerivedSample {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::DerivedSampleFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::derived_samples;
+        let mut query = derived_samples::dsl::derived_samples
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(derived_samples::dsl::created_by.eq(created_by));
+        }
+        if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
+            query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
+        }
+        if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
+            query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -906,7 +983,7 @@ impl DerivedSample {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::DerivedSampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -925,6 +1002,7 @@ impl DerivedSample {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(value));
         }
         query
+            .order_by(derived_samples::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -948,8 +1026,8 @@ impl DerivedSample {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = document_formats)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct DocumentFormat {
     pub id: i32,
@@ -987,16 +1065,18 @@ impl From<web_common::database::tables::DocumentFormat> for DocumentFormat {
 }
 
 impl DocumentFormat {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::DocumentFormatFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1004,11 +1084,11 @@ impl DocumentFormat {
         use crate::schema::document_formats;
         let mut query = document_formats::dsl::document_formats
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(document_formats::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(document_formats::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(document_formats::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(document_formats::dsl::color_id.eq(color_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -1045,14 +1125,16 @@ impl DocumentFormat {
             .filter(document_formats::dsl::extension.eq(extension))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1062,7 +1144,7 @@ impl DocumentFormat {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, extension, mime_type, description, icon_id, color_id FROM document_formats ",
@@ -1072,16 +1154,19 @@ impl DocumentFormat {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1091,7 +1176,7 @@ impl DocumentFormat {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, extension, mime_type, description, icon_id, color_id FROM document_formats ",
@@ -1101,16 +1186,19 @@ impl DocumentFormat {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1120,7 +1208,7 @@ impl DocumentFormat {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, extension, mime_type, description, icon_id, color_id FROM document_formats ",
@@ -1130,6 +1218,7 @@ impl DocumentFormat {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
@@ -1163,14 +1252,16 @@ impl From<web_common::database::tables::FontAwesomeIcon> for FontAwesomeIcon {
 }
 
 impl FontAwesomeIcon {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1211,14 +1302,16 @@ impl FontAwesomeIcon {
             .filter(font_awesome_icons::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1228,7 +1321,7 @@ impl FontAwesomeIcon {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description FROM font_awesome_icons ",
@@ -1238,16 +1331,19 @@ impl FontAwesomeIcon {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1257,7 +1353,7 @@ impl FontAwesomeIcon {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description FROM font_awesome_icons ",
@@ -1267,16 +1363,19 @@ impl FontAwesomeIcon {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1286,7 +1385,7 @@ impl FontAwesomeIcon {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description FROM font_awesome_icons ",
@@ -1296,13 +1395,14 @@ impl FontAwesomeIcon {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = login_providers)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct LoginProvider {
     pub id: i32,
@@ -1346,16 +1446,18 @@ impl From<web_common::database::tables::LoginProvider> for LoginProvider {
 }
 
 impl LoginProvider {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::LoginProviderFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1363,11 +1465,11 @@ impl LoginProvider {
         use crate::schema::login_providers;
         let mut query = login_providers::dsl::login_providers
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(login_providers::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(login_providers::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(login_providers::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(login_providers::dsl::color_id.eq(color_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -1437,7 +1539,7 @@ impl LoginProvider {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = notifications)]
-#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
 #[diesel(primary_key(id))]
 pub struct Notification {
     pub id: i32,
@@ -1475,16 +1577,18 @@ impl From<web_common::database::tables::Notification> for Notification {
 }
 
 impl Notification {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::NotificationFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1492,8 +1596,8 @@ impl Notification {
         use crate::schema::notifications;
         let mut query = notifications::dsl::notifications
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(notifications::dsl::user_id.eq(value));
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(notifications::dsl::user_id.eq(user_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -1518,9 +1622,9 @@ impl Notification {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = observations)]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(Project, foreign_key = project_id))]
-#[diesel(belongs_to(SampledIndividual, foreign_key = individual_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = project_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32ec10>, foreign_key = individual_id))]
 #[diesel(primary_key(id))]
 pub struct Observation {
     pub id: Uuid,
@@ -1567,16 +1671,18 @@ impl From<web_common::database::tables::Observation> for Observation {
 }
 
 impl Observation {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::ObservationFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1584,24 +1690,24 @@ impl Observation {
         use crate::schema::observations;
         let mut query = observations::dsl::observations
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(observations::dsl::created_by.eq(value));
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(observations::dsl::created_by.eq(created_by));
         }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(observations::dsl::updated_by.eq(value));
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(observations::dsl::updated_by.eq(updated_by));
         }
-        if let Some(value) = filter.and_then(|f| f.project_id) {
-            query = query.filter(observations::dsl::project_id.eq(value));
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(observations::dsl::project_id.eq(project_id));
         }
-        if let Some(value) = filter.and_then(|f| f.individual_id) {
-            query = query.filter(observations::dsl::individual_id.eq(value));
+        if let Some(individual_id) = filter.and_then(|f| f.individual_id) {
+            query = query.filter(observations::dsl::individual_id.eq(individual_id));
         }
         query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Get all of the structs from the database ordered by the updated_at column.
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -1609,7 +1715,7 @@ impl Observation {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all_by_updated_at(
+    pub fn all_by_update(
         filter: Option<&web_common::database::ObservationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -1651,97 +1757,10 @@ impl Observation {
             .filter(observations::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture FROM observations ",
-            "WHERE id LIKE $1% ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture FROM observations ",
-            "WHERE id LIKE $1% ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture FROM observations ",
-            "WHERE id LIKE $1% ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = organizations)]
-#[diesel(belongs_to(Country, foreign_key = country_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520e50>, foreign_key = country_id))]
 #[diesel(primary_key(id))]
 pub struct Organization {
     pub id: i32,
@@ -1779,16 +1798,18 @@ impl From<web_common::database::tables::Organization> for Organization {
 }
 
 impl Organization {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::OrganizationFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1796,8 +1817,8 @@ impl Organization {
         use crate::schema::organizations;
         let mut query = organizations::dsl::organizations
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.country_id) {
-            query = query.filter(organizations::dsl::country_id.eq(value));
+        if let Some(country_id) = filter.and_then(|f| f.country_id) {
+            query = query.filter(organizations::dsl::country_id.eq(country_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -1870,14 +1891,16 @@ impl Organization {
             .filter(organizations::dsl::url.eq(url))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1887,7 +1910,7 @@ impl Organization {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, url, country_id, state_province, domain FROM organizations ",
@@ -1897,16 +1920,19 @@ impl Organization {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1916,7 +1942,7 @@ impl Organization {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, url, country_id, state_province, domain FROM organizations ",
@@ -1926,16 +1952,19 @@ impl Organization {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -1945,7 +1974,7 @@ impl Organization {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, url, country_id, state_province, domain FROM organizations ",
@@ -1955,13 +1984,14 @@ impl Organization {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = project_states)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct ProjectState {
     pub id: i32,
@@ -1996,16 +2026,18 @@ impl From<web_common::database::tables::ProjectState> for ProjectState {
 }
 
 impl ProjectState {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::ProjectStateFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2013,11 +2045,11 @@ impl ProjectState {
         use crate::schema::project_states;
         let mut query = project_states::dsl::project_states
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(project_states::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(project_states::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(project_states::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(project_states::dsl::color_id.eq(color_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -2084,14 +2116,16 @@ impl ProjectState {
             .filter(project_states::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2101,7 +2135,7 @@ impl ProjectState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM project_states ",
@@ -2111,16 +2145,19 @@ impl ProjectState {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2130,7 +2167,7 @@ impl ProjectState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM project_states ",
@@ -2140,16 +2177,19 @@ impl ProjectState {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2159,7 +2199,7 @@ impl ProjectState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM project_states ",
@@ -2169,16 +2209,17 @@ impl ProjectState {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects)]
-#[diesel(belongs_to(ProjectState, foreign_key = state_id))]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
-#[diesel(belongs_to(Project, foreign_key = parent_project_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3289d0>, foreign_key = state_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = parent_project_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct Project {
     pub id: i32,
@@ -2397,16 +2438,18 @@ impl Project {
             connection,
         )
     }
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::ProjectFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2414,23 +2457,23 @@ impl Project {
         use crate::schema::projects;
         let mut query = projects::dsl::projects
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.state_id) {
-            query = query.filter(projects::dsl::state_id.eq(value));
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
         }
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(projects::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(projects::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
         }
-        if let Some(value) = filter.and_then(|f| f.parent_project_id) {
-            query = query.filter(projects::dsl::parent_project_id.eq(value));
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(projects::dsl::created_by.eq(value));
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
         }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(projects::dsl::updated_by.eq(value));
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -2440,15 +2483,15 @@ impl Project {
     /// Get all of the editable structs from the database.
     ///
     /// # Arguments
-    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_editables(
-        author_user_id: i32,
         filter: Option<&web_common::database::ProjectFilter>,
+        author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2477,30 +2520,30 @@ impl Project {
                    ),
             )
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.state_id) {
-            query = query.filter(projects::dsl::state_id.eq(value));
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
         }
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(projects::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(projects::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
         }
-        if let Some(value) = filter.and_then(|f| f.parent_project_id) {
-            query = query.filter(projects::dsl::parent_project_id.eq(value));
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(projects::dsl::created_by.eq(value));
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
         }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(projects::dsl::updated_by.eq(value));
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Get all of the structs from the database ordered by the updated_at column.
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -2508,7 +2551,7 @@ impl Project {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all_by_updated_at(
+    pub fn all_by_update(
         filter: Option<&web_common::database::ProjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -2603,14 +2646,16 @@ impl Project {
             .filter(projects::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2620,19 +2665,20 @@ impl Project {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
-            "WHERE $1 % f_concat_projects_name_description(name, description) ",
+            "WHERE $1 % f_concat_projects_name_description(name, description) AND can_view_projects($3, projects.id) ",
             "ORDER BY similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the editable struct by a given string by Postgres's `similarity`.
+    /// Search for the editable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -2641,7 +2687,7 @@ impl Project {
     /// * `connection` - The connection to the database.
     ///
     pub fn similarity_search_editables(
-        author_user_id: i32,
+       author_user_id: i32,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2655,17 +2701,7 @@ impl Project {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
-            "WHERE $1 % f_concat_projects_name_description(name, description) ",
-"AND ",
-             "projects.created_by = $3 ",
-            "OR projects.id IN ",
-            "(SELECT projects_users_roles.table FROM projects_users_roles ",
-            "WHERE projects_users_roles.user_id = $3 AND projects_users_roles.role_id <= 2) ",
-            "OR projects.id IN ",
-            "(SELECT projects_teams_roles.table_id FROM projects_teams_roles ",
-            "WHERE projects_teams_roles.role_id <= 2 AND projects_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "WHERE $1 % f_concat_projects_name_description(name, description) AND can_edit_projects($3, projects.id) ",
             "ORDER BY similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
@@ -2674,14 +2710,16 @@ impl Project {
             .bind::<diesel::sql_types::Integer, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2691,19 +2729,20 @@ impl Project {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
-            "WHERE $1 <% f_concat_projects_name_description(name, description) ",
+            "WHERE $1 <% f_concat_projects_name_description(name, description) AND can_view_projects($3, projects.id) ",
             "ORDER BY word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the editable struct by a given string by Postgres's `word_similarity`.
+    /// Search for the editable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -2712,7 +2751,7 @@ impl Project {
     /// * `connection` - The connection to the database.
     ///
     pub fn word_similarity_search_editables(
-        author_user_id: i32,
+       author_user_id: i32,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2726,17 +2765,7 @@ impl Project {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
-            "WHERE $1 <% f_concat_projects_name_description(name, description) ",
-"AND ",
-             "projects.created_by = $3 ",
-            "OR projects.id IN ",
-            "(SELECT projects_users_roles.table FROM projects_users_roles ",
-            "WHERE projects_users_roles.user_id = $3 AND projects_users_roles.role_id <= 2) ",
-            "OR projects.id IN ",
-            "(SELECT projects_teams_roles.table_id FROM projects_teams_roles ",
-            "WHERE projects_teams_roles.role_id <= 2 AND projects_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "WHERE $1 <% f_concat_projects_name_description(name, description) AND can_edit_projects($3, projects.id) ",
             "ORDER BY word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
@@ -2745,14 +2774,16 @@ impl Project {
             .bind::<diesel::sql_types::Integer, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2762,19 +2793,20 @@ impl Project {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
-            "WHERE $1 <<% f_concat_projects_name_description(name, description) ",
+            "WHERE $1 <<% f_concat_projects_name_description(name, description) AND can_view_projects($3, projects.id) ",
             "ORDER BY strict_word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the editable struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the editable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -2783,7 +2815,7 @@ impl Project {
     /// * `connection` - The connection to the database.
     ///
     pub fn strict_word_similarity_search_editables(
-        author_user_id: i32,
+       author_user_id: i32,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -2797,17 +2829,7 @@ impl Project {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, public, state_id, icon_id, color_id, parent_project_id, budget, expenses, created_by, created_at, updated_by, updated_at, expected_end_date, end_date FROM projects ",
-            "WHERE $1 <<% f_concat_projects_name_description(name, description) ",
-"AND ",
-             "projects.created_by = $3 ",
-            "OR projects.id IN ",
-            "(SELECT projects_users_roles.table FROM projects_users_roles ",
-            "WHERE projects_users_roles.user_id = $3 AND projects_users_roles.role_id <= 2) ",
-            "OR projects.id IN ",
-            "(SELECT projects_teams_roles.table_id FROM projects_teams_roles ",
-            "WHERE projects_teams_roles.role_id <= 2 AND projects_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "WHERE $1 <<% f_concat_projects_name_description(name, description) AND can_edit_projects($3, projects.id) ",
             "ORDER BY strict_word_similarity($1, f_concat_projects_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
@@ -2819,10 +2841,10 @@ impl Project {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_role_invitations)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = team_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRoleInvitation {
     pub table_id: i32,
@@ -2857,7 +2879,43 @@ impl From<web_common::database::tables::ProjectsTeamsRoleInvitation> for Project
 }
 
 impl ProjectsTeamsRoleInvitation {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::ProjectsTeamsRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects_teams_role_invitations;
+        let mut query = projects_teams_role_invitations::dsl::projects_teams_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -2865,7 +2923,7 @@ impl ProjectsTeamsRoleInvitation {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::ProjectsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -2887,6 +2945,7 @@ impl ProjectsTeamsRoleInvitation {
             query = query.filter(projects_teams_role_invitations::dsl::created_by.eq(value));
         }
         query
+            .order_by(projects_teams_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -2910,10 +2969,10 @@ impl ProjectsTeamsRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_role_requests)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = team_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRoleRequest {
     pub table_id: i32,
@@ -2948,7 +3007,43 @@ impl From<web_common::database::tables::ProjectsTeamsRoleRequest> for ProjectsTe
 }
 
 impl ProjectsTeamsRoleRequest {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::ProjectsTeamsRoleRequestFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects_teams_role_requests;
+        let mut query = projects_teams_role_requests::dsl::projects_teams_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_role_requests::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -2956,7 +3051,7 @@ impl ProjectsTeamsRoleRequest {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::ProjectsTeamsRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -2978,6 +3073,7 @@ impl ProjectsTeamsRoleRequest {
             query = query.filter(projects_teams_role_requests::dsl::created_by.eq(value));
         }
         query
+            .order_by(projects_teams_role_requests::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3001,10 +3097,10 @@ impl ProjectsTeamsRoleRequest {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_roles)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = team_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRole {
     pub table_id: i32,
@@ -3039,7 +3135,43 @@ impl From<web_common::database::tables::ProjectsTeamsRole> for ProjectsTeamsRole
 }
 
 impl ProjectsTeamsRole {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::ProjectsTeamsRoleFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects_teams_roles;
+        let mut query = projects_teams_roles::dsl::projects_teams_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_roles::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -3047,7 +3179,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::ProjectsTeamsRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -3069,6 +3201,7 @@ impl ProjectsTeamsRole {
             query = query.filter(projects_teams_roles::dsl::created_by.eq(value));
         }
         query
+            .order_by(projects_teams_roles::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3092,9 +3225,9 @@ impl ProjectsTeamsRole {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_role_invitations)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRoleInvitation {
     pub table_id: i32,
@@ -3129,7 +3262,43 @@ impl From<web_common::database::tables::ProjectsUsersRoleInvitation> for Project
 }
 
 impl ProjectsUsersRoleInvitation {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::ProjectsUsersRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects_users_role_invitations;
+        let mut query = projects_users_role_invitations::dsl::projects_users_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_role_invitations::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -3137,7 +3306,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::ProjectsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -3159,6 +3328,7 @@ impl ProjectsUsersRoleInvitation {
             query = query.filter(projects_users_role_invitations::dsl::created_by.eq(value));
         }
         query
+            .order_by(projects_users_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3182,9 +3352,9 @@ impl ProjectsUsersRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_role_requests)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRoleRequest {
     pub table_id: i32,
@@ -3219,7 +3389,43 @@ impl From<web_common::database::tables::ProjectsUsersRoleRequest> for ProjectsUs
 }
 
 impl ProjectsUsersRoleRequest {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::ProjectsUsersRoleRequestFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects_users_role_requests;
+        let mut query = projects_users_role_requests::dsl::projects_users_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_role_requests::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -3227,7 +3433,7 @@ impl ProjectsUsersRoleRequest {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::ProjectsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -3249,6 +3455,7 @@ impl ProjectsUsersRoleRequest {
             query = query.filter(projects_users_role_requests::dsl::created_by.eq(value));
         }
         query
+            .order_by(projects_users_role_requests::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3272,9 +3479,9 @@ impl ProjectsUsersRoleRequest {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_roles)]
-#[diesel(belongs_to(Project, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRole {
     pub table_id: i32,
@@ -3309,7 +3516,43 @@ impl From<web_common::database::tables::ProjectsUsersRole> for ProjectsUsersRole
 }
 
 impl ProjectsUsersRole {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::ProjectsUsersRoleFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::projects_users_roles;
+        let mut query = projects_users_roles::dsl::projects_users_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -3317,7 +3560,7 @@ impl ProjectsUsersRole {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::ProjectsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -3339,6 +3582,7 @@ impl ProjectsUsersRole {
             query = query.filter(projects_users_roles::dsl::created_by.eq(value));
         }
         query
+            .order_by(projects_users_roles::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3362,8 +3606,8 @@ impl ProjectsUsersRole {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = roles)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct Role {
     pub id: i32,
@@ -3398,16 +3642,18 @@ impl From<web_common::database::tables::Role> for Role {
 }
 
 impl Role {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::RoleFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3415,11 +3661,11 @@ impl Role {
         use crate::schema::roles;
         let mut query = roles::dsl::roles
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(roles::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(roles::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(roles::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(roles::dsl::color_id.eq(color_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -3501,14 +3747,16 @@ impl Role {
             .filter(roles::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3518,7 +3766,7 @@ impl Role {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM roles ",
@@ -3528,16 +3776,19 @@ impl Role {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3547,7 +3798,7 @@ impl Role {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM roles ",
@@ -3557,16 +3808,19 @@ impl Role {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3576,7 +3830,7 @@ impl Role {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM roles ",
@@ -3586,14 +3840,15 @@ impl Role {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_bio_ott_taxon_items)]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(Sample, foreign_key = sample_id))]
-#[diesel(belongs_to(BioOttTaxonItem, foreign_key = taxon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32f6d0>, foreign_key = sample_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb51b910>, foreign_key = taxon_id))]
 #[diesel(primary_key(sample_id, taxon_id))]
 pub struct SampleBioOttTaxonItem {
     pub created_by: i32,
@@ -3625,7 +3880,40 @@ impl From<web_common::database::tables::SampleBioOttTaxonItem> for SampleBioOttT
 }
 
 impl SampleBioOttTaxonItem {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::SampleBioOttTaxonItemFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sample_bio_ott_taxon_items;
+        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+        }
+        if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::sample_id.eq(sample_id));
+        }
+        if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -3633,7 +3921,7 @@ impl SampleBioOttTaxonItem {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::SampleBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -3652,6 +3940,7 @@ impl SampleBioOttTaxonItem {
             query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(value));
         }
         query
+            .order_by(sample_bio_ott_taxon_items::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3675,8 +3964,8 @@ impl SampleBioOttTaxonItem {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_container_categories)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct SampleContainerCategory {
     pub id: i32,
@@ -3714,16 +4003,18 @@ impl From<web_common::database::tables::SampleContainerCategory> for SampleConta
 }
 
 impl SampleContainerCategory {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::SampleContainerCategoryFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3731,11 +4022,11 @@ impl SampleContainerCategory {
         use crate::schema::sample_container_categories;
         let mut query = sample_container_categories::dsl::sample_container_categories
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(sample_container_categories::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_container_categories::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(sample_container_categories::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_container_categories::dsl::color_id.eq(color_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -3802,14 +4093,16 @@ impl SampleContainerCategory {
             .filter(sample_container_categories::dsl::icon_id.eq(icon_id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3819,7 +4112,7 @@ impl SampleContainerCategory {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, brand, volume, description, icon_id, color_id FROM sample_container_categories ",
@@ -3829,16 +4122,19 @@ impl SampleContainerCategory {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3848,7 +4144,7 @@ impl SampleContainerCategory {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, brand, volume, description, icon_id, color_id FROM sample_container_categories ",
@@ -3858,16 +4154,19 @@ impl SampleContainerCategory {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -3877,7 +4176,7 @@ impl SampleContainerCategory {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, brand, volume, description, icon_id, color_id FROM sample_container_categories ",
@@ -3887,13 +4186,14 @@ impl SampleContainerCategory {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_containers)]
-#[diesel(belongs_to(SampleContainerCategory, foreign_key = category_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32d2d0>, foreign_key = category_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SampleContainer {
     pub id: i32,
@@ -3928,7 +4228,37 @@ impl From<web_common::database::tables::SampleContainer> for SampleContainer {
 }
 
 impl SampleContainer {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::SampleContainerFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sample_containers;
+        let mut query = sample_containers::dsl::sample_containers
+            .into_boxed();
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -3936,7 +4266,7 @@ impl SampleContainer {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::SampleContainerFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -3952,6 +4282,7 @@ impl SampleContainer {
             query = query.filter(sample_containers::dsl::created_by.eq(value));
         }
         query
+            .order_by(sample_containers::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -3986,14 +4317,16 @@ impl SampleContainer {
             .filter(sample_containers::dsl::barcode.eq(barcode))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4003,26 +4336,29 @@ impl SampleContainer {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, barcode, category_id, created_by, created_at FROM sample_containers ",
-            "WHERE $1 % barcode ",
+            "WHERE $1 % barcode AND can_view_sample_containers($3, sample_containers.id) ",
             "ORDER BY similarity($1, barcode) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4032,26 +4368,29 @@ impl SampleContainer {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, barcode, category_id, created_by, created_at FROM sample_containers ",
-            "WHERE $1 <% barcode ",
+            "WHERE $1 <% barcode AND can_view_sample_containers($3, sample_containers.id) ",
             "ORDER BY word_similarity($1, barcode) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4061,23 +4400,24 @@ impl SampleContainer {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, barcode, category_id, created_by, created_at FROM sample_containers ",
-            "WHERE $1 <<% barcode ",
+            "WHERE $1 <<% barcode AND can_view_sample_containers($3, sample_containers.id) ",
             "ORDER BY strict_word_similarity($1, barcode) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_states)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct SampleState {
     pub id: i32,
@@ -4112,16 +4452,18 @@ impl From<web_common::database::tables::SampleState> for SampleState {
 }
 
 impl SampleState {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::SampleStateFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4129,11 +4471,11 @@ impl SampleState {
         use crate::schema::sample_states;
         let mut query = sample_states::dsl::sample_states
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(sample_states::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_states::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(sample_states::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_states::dsl::color_id.eq(color_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -4185,14 +4527,16 @@ impl SampleState {
             .filter(sample_states::dsl::icon_id.eq(icon_id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4202,7 +4546,7 @@ impl SampleState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM sample_states ",
@@ -4212,16 +4556,19 @@ impl SampleState {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4231,7 +4578,7 @@ impl SampleState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM sample_states ",
@@ -4241,16 +4588,19 @@ impl SampleState {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4260,7 +4610,7 @@ impl SampleState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM sample_states ",
@@ -4270,14 +4620,15 @@ impl SampleState {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individual_bio_ott_taxon_items)]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(SampledIndividual, foreign_key = sampled_individual_id))]
-#[diesel(belongs_to(BioOttTaxonItem, foreign_key = taxon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32ec10>, foreign_key = sampled_individual_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb51b910>, foreign_key = taxon_id))]
 #[diesel(primary_key(sampled_individual_id, taxon_id))]
 pub struct SampledIndividualBioOttTaxonItem {
     pub created_by: i32,
@@ -4309,7 +4660,40 @@ impl From<web_common::database::tables::SampledIndividualBioOttTaxonItem> for Sa
 }
 
 impl SampledIndividualBioOttTaxonItem {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::SampledIndividualBioOttTaxonItemFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::sampled_individual_bio_ott_taxon_items;
+        let mut query = sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+        }
+        if let Some(sampled_individual_id) = filter.and_then(|f| f.sampled_individual_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id.eq(sampled_individual_id));
+        }
+        if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -4317,7 +4701,7 @@ impl SampledIndividualBioOttTaxonItem {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::SampledIndividualBioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -4336,6 +4720,7 @@ impl SampledIndividualBioOttTaxonItem {
             query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(value));
         }
         query
+            .order_by(sampled_individual_bio_ott_taxon_items::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -4359,18 +4744,18 @@ impl SampledIndividualBioOttTaxonItem {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
-#[diesel(belongs_to(Project, foreign_key = project_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = project_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SampledIndividual {
     pub id: Uuid,
     pub notes: Option<String>,
+    pub barcode: Option<String>,
     pub project_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
-    pub tagged: bool,
     pub picture: Vec<u8>,
 }
 
@@ -4379,12 +4764,12 @@ impl From<SampledIndividual> for web_common::database::tables::SampledIndividual
         Self {
             id: item.id,
             notes: item.notes,
+            barcode: item.barcode,
             project_id: item.project_id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
-            tagged: item.tagged,
             picture: item.picture,
         }
     }
@@ -4395,28 +4780,30 @@ impl From<web_common::database::tables::SampledIndividual> for SampledIndividual
         Self {
             id: item.id,
             notes: item.notes,
+            barcode: item.barcode,
             project_id: item.project_id,
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
-            tagged: item.tagged,
             picture: item.picture,
         }
     }
 }
 
 impl SampledIndividual {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::SampledIndividualFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4424,21 +4811,21 @@ impl SampledIndividual {
         use crate::schema::sampled_individuals;
         let mut query = sampled_individuals::dsl::sampled_individuals
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.project_id) {
-            query = query.filter(sampled_individuals::dsl::project_id.eq(value));
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sampled_individuals::dsl::project_id.eq(project_id));
         }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sampled_individuals::dsl::created_by.eq(value));
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individuals::dsl::created_by.eq(created_by));
         }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(sampled_individuals::dsl::updated_by.eq(value));
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sampled_individuals::dsl::updated_by.eq(updated_by));
         }
         query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Get all of the structs from the database ordered by the updated_at column.
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -4446,7 +4833,7 @@ impl SampledIndividual {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all_by_updated_at(
+    pub fn all_by_update(
         filter: Option<&web_common::database::SampledIndividualFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -4485,14 +4872,16 @@ impl SampledIndividual {
             .filter(sampled_individuals::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4502,26 +4891,29 @@ impl SampledIndividual {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, notes, project_id, created_by, created_at, updated_by, updated_at, tagged, picture FROM sampled_individuals ",
-            "WHERE id LIKE $1% ",
-            "LIMIT $2;"
+            "SELECT id, notes, barcode, project_id, created_by, created_at, updated_by, updated_at, picture FROM sampled_individuals ",
+            "WHERE $1 % f_concat_sampled_individuals_notes_barcode(notes, barcode) AND can_view_sampled_individuals($3, sampled_individuals.id) ",
+            "ORDER BY similarity($1, f_concat_sampled_individuals_notes_barcode(notes, barcode)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4531,26 +4923,29 @@ impl SampledIndividual {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, notes, project_id, created_by, created_at, updated_by, updated_at, tagged, picture FROM sampled_individuals ",
-            "WHERE id LIKE $1% ",
-            "LIMIT $2;"
+            "SELECT id, notes, barcode, project_id, created_by, created_at, updated_by, updated_at, picture FROM sampled_individuals ",
+            "WHERE $1 <% f_concat_sampled_individuals_notes_barcode(notes, barcode) AND can_view_sampled_individuals($3, sampled_individuals.id) ",
+            "ORDER BY word_similarity($1, f_concat_sampled_individuals_notes_barcode(notes, barcode)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -4560,24 +4955,25 @@ impl SampledIndividual {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, notes, project_id, created_by, created_at, updated_by, updated_at, tagged, picture FROM sampled_individuals ",
-            "WHERE id LIKE $1% ",
-            "LIMIT $2;"
+            "SELECT id, notes, barcode, project_id, created_by, created_at, updated_by, updated_at, picture FROM sampled_individuals ",
+            "WHERE $1 <<% f_concat_sampled_individuals_notes_barcode(notes, barcode) AND can_view_sampled_individuals($3, sampled_individuals.id) ",
+            "ORDER BY strict_word_similarity($1, f_concat_sampled_individuals_notes_barcode(notes, barcode)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = samples)]
-#[diesel(belongs_to(SampleContainer, foreign_key = container_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(SampleState, foreign_key = state))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32da10>, foreign_key = container_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32e0d0>, foreign_key = state))]
 #[diesel(primary_key(id))]
 pub struct Sample {
     pub id: Uuid,
@@ -4624,255 +5020,46 @@ impl From<web_common::database::tables::Sample> for Sample {
 }
 
 impl Sample {
-    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `role_id` - The role_id to check against.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn has_role_by_id(
-        id: Uuid,
-        author_user_id: i32,
-        role_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        diesel::select(diesel::dsl::exists(samples::dsl::samples
-            .filter(samples::dsl::id.eq(id))
-           .filter(samples::dsl::created_by.eq(author_user_id))
-            .or_filter(
-               samples::dsl::id.eq(id)
-                   .and(samples::dsl::id.eq_any(
-                       samples_users_roles::table
-                           .select(samples_users_roles::dsl::table_id)
-                           .filter(samples_users_roles::dsl::user_id.eq(author_user_id)
-                           .and(samples_users_roles::dsl::role_id.le(role_id)),
-                    )),
-               )
-         )
-                    .or_filter(
-                       samples::dsl::id.eq(id)
-                           .and(samples::dsl::id.eq_any(
-                               samples_teams_roles::table
-                                   .select(samples_teams_roles::dsl::table_id)
-                                   .filter(samples_teams_roles::dsl::role_id.le(role_id))
-                                   .inner_join(teams_users_roles::table.on(
-                                       samples_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
-                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))
-                                           .and(teams_users_roles::dsl::role_id.le(role_id)),
-                                   )),
-                              ))
-                       )
-            ))
-         .get_result::<bool>(connection)
-    }
-    /// Check whether the user is a Viewer (role_id >= 3).
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_viewer(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::is_viewer_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
-    }
-    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_viewer_by_id(
-        id: Uuid,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::has_role_by_id(
-            id,
-            author_user_id,
-            3,
-            connection,
-        )
-    }
-    /// Check whether the user is an Editor (role_id >= 2).
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_editor(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::is_editor_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
-    }
-    /// Check whether the user is an Editor (role_id >= 2).
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_editor_by_id(
-        id: Uuid,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::has_role_by_id(
-            id,
-            author_user_id,
-            2,
-            connection,
-        )
-    }
-    /// Check whether the user is an Admin (role_id == 1).
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_admin(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::is_admin_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
-    }
-    /// Check whether the user is an Admin (role_id == 1).
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_admin_by_id(
-        id: Uuid,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::has_role_by_id(
-            id,
-            author_user_id,
-            1,
-            connection,
-        )
-    }
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SampleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::samples;
-        let mut query = samples::dsl::samples
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.container_id) {
-            query = query.filter(samples::dsl::container_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(samples::dsl::created_by.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.sampled_by) {
-            query = query.filter(samples::dsl::sampled_by.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(samples::dsl::updated_by.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.state) {
-            query = query.filter(samples::dsl::state.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get all of the editable structs from the database.
-    ///
-    /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all_editables(
-        author_user_id: i32,
+    pub fn all_viewables(
         filter: Option<&web_common::database::SampleFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::samples;
         let mut query = samples::dsl::samples
-           .filter(samples::dsl::created_by.eq(author_user_id))
-            .or_filter(
-               samples::dsl::id.eq_any(
-                   samples_users_roles::table
-                       .select(samples_users_roles::dsl::table_id)
-                       .filter(samples_users_roles::dsl::user_id.eq(author_user_id)
-                       .and(samples_users_roles::dsl::role_id.le(2)),
-               )),
-            )
-                .or_filter(
-                   samples::dsl::id.eq_any(
-                       samples_teams_roles::table
-                           .select(samples_teams_roles::dsl::table_id)
-                           .filter(samples_teams_roles::dsl::role_id.le(2))
-                           .inner_join(teams_users_roles::table.on(
-                               samples_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
-                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))
-                                   .and(teams_users_roles::dsl::role_id.le(2)),
-                           )),
-                   ),
-            )
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.container_id) {
-            query = query.filter(samples::dsl::container_id.eq(value));
+        if let Some(container_id) = filter.and_then(|f| f.container_id) {
+            query = query.filter(samples::dsl::container_id.eq(container_id));
         }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(samples::dsl::created_by.eq(value));
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(samples::dsl::created_by.eq(created_by));
         }
-        if let Some(value) = filter.and_then(|f| f.sampled_by) {
-            query = query.filter(samples::dsl::sampled_by.eq(value));
+        if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+            query = query.filter(samples::dsl::sampled_by.eq(sampled_by));
         }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(samples::dsl::updated_by.eq(value));
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(samples::dsl::updated_by.eq(updated_by));
         }
-        if let Some(value) = filter.and_then(|f| f.state) {
-            query = query.filter(samples::dsl::state.eq(value));
+        if let Some(state) = filter.and_then(|f| f.state) {
+            query = query.filter(samples::dsl::state.eq(state));
         }
         query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Get all of the structs from the database ordered by the updated_at column.
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -4880,7 +5067,7 @@ impl Sample {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all_by_updated_at(
+    pub fn all_by_update(
         filter: Option<&web_common::database::SampleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -4910,38 +5097,6 @@ impl Sample {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is deleting the struct.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, author_user_id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user who is deleting the struct.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: Uuid,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        if !Self::is_admin_by_id(id, author_user_id, connection)? {
-            return Err(diesel::result::Error::NotFound);
-        }
-        diesel::delete(samples::dsl::samples
-            .filter(samples::dsl::id.eq(id))
-        ).execute(connection)
-    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -4957,766 +5112,10 @@ impl Sample {
             .filter(samples::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE id LIKE $1% ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
-    /// Search for the editable struct by a given string by Postgres's `similarity`.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE id LIKE $1% ",
-"AND ",
-             "samples.created_by = $3 ",
-            "OR samples.id IN ",
-            "(SELECT samples_users_roles.table FROM samples_users_roles ",
-            "WHERE samples_users_roles.user_id = $3 AND samples_users_roles.role_id <= 2) ",
-            "OR samples.id IN ",
-            "(SELECT samples_teams_roles.table_id FROM samples_teams_roles ",
-            "WHERE samples_teams_roles.role_id <= 2 AND samples_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .bind::<diesel::sql_types::Integer, _>(author_user_id)
-            .load(connection)
-}
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE id LIKE $1% ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
-    /// Search for the editable struct by a given string by Postgres's `word_similarity`.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn word_similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE id LIKE $1% ",
-"AND ",
-             "samples.created_by = $3 ",
-            "OR samples.id IN ",
-            "(SELECT samples_users_roles.table FROM samples_users_roles ",
-            "WHERE samples_users_roles.user_id = $3 AND samples_users_roles.role_id <= 2) ",
-            "OR samples.id IN ",
-            "(SELECT samples_teams_roles.table_id FROM samples_teams_roles ",
-            "WHERE samples_teams_roles.role_id <= 2 AND samples_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .bind::<diesel::sql_types::Integer, _>(author_user_id)
-            .load(connection)
-}
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
-    ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE id LIKE $1% ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .load(connection)
-}
-    /// Search for the editable struct by a given string by Postgres's `strict_word_similarity`.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn strict_word_similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        let limit = limit.unwrap_or(10);
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);
-        }
-        let similarity_query = concat!(
-            "SELECT id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state FROM samples ",
-            "WHERE id LIKE $1% ",
-"AND ",
-             "samples.created_by = $3 ",
-            "OR samples.id IN ",
-            "(SELECT samples_users_roles.table FROM samples_users_roles ",
-            "WHERE samples_users_roles.user_id = $3 AND samples_users_roles.role_id <= 2) ",
-            "OR samples.id IN ",
-            "(SELECT samples_teams_roles.table_id FROM samples_teams_roles ",
-            "WHERE samples_teams_roles.role_id <= 2 AND samples_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
-            "LIMIT $2;"
-        );
-        diesel::sql_query(similarity_query)
-            .bind::<diesel::sql_types::Text, _>(query)
-            .bind::<diesel::sql_types::Integer, _>(limit)
-            .bind::<diesel::sql_types::Integer, _>(author_user_id)
-            .load(connection)
-}
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = samples_teams_role_invitations)]
-#[diesel(belongs_to(Sample, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(primary_key(table_id, team_id))]
-pub struct SamplesTeamsRoleInvitation {
-    pub table_id: Uuid,
-    pub team_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SamplesTeamsRoleInvitation> for web_common::database::tables::SamplesTeamsRoleInvitation {
-    fn from(item: SamplesTeamsRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SamplesTeamsRoleInvitation> for SamplesTeamsRoleInvitation {
-    fn from(item: web_common::database::tables::SamplesTeamsRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SamplesTeamsRoleInvitation {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SamplesTeamsRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::samples_teams_role_invitations;
-        let mut query = samples_teams_role_invitations::dsl::samples_teams_role_invitations
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(samples_teams_role_invitations::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.team_id) {
-            query = query.filter(samples_teams_role_invitations::dsl::team_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(samples_teams_role_invitations::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(samples_teams_role_invitations::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::samples_teams_role_invitations;
-        samples_teams_role_invitations::dsl::samples_teams_role_invitations
-            .filter(samples_teams_role_invitations::dsl::table_id.eq(table_id))
-            .filter(samples_teams_role_invitations::dsl::team_id.eq(team_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = samples_teams_role_requests)]
-#[diesel(belongs_to(Sample, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(primary_key(table_id, team_id))]
-pub struct SamplesTeamsRoleRequest {
-    pub table_id: Uuid,
-    pub team_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SamplesTeamsRoleRequest> for web_common::database::tables::SamplesTeamsRoleRequest {
-    fn from(item: SamplesTeamsRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SamplesTeamsRoleRequest> for SamplesTeamsRoleRequest {
-    fn from(item: web_common::database::tables::SamplesTeamsRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SamplesTeamsRoleRequest {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SamplesTeamsRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::samples_teams_role_requests;
-        let mut query = samples_teams_role_requests::dsl::samples_teams_role_requests
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(samples_teams_role_requests::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.team_id) {
-            query = query.filter(samples_teams_role_requests::dsl::team_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(samples_teams_role_requests::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(samples_teams_role_requests::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::samples_teams_role_requests;
-        samples_teams_role_requests::dsl::samples_teams_role_requests
-            .filter(samples_teams_role_requests::dsl::table_id.eq(table_id))
-            .filter(samples_teams_role_requests::dsl::team_id.eq(team_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = samples_teams_roles)]
-#[diesel(belongs_to(Sample, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(primary_key(table_id, team_id))]
-pub struct SamplesTeamsRole {
-    pub table_id: Uuid,
-    pub team_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SamplesTeamsRole> for web_common::database::tables::SamplesTeamsRole {
-    fn from(item: SamplesTeamsRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SamplesTeamsRole> for SamplesTeamsRole {
-    fn from(item: web_common::database::tables::SamplesTeamsRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SamplesTeamsRole {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SamplesTeamsRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::samples_teams_roles;
-        let mut query = samples_teams_roles::dsl::samples_teams_roles
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(samples_teams_roles::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.team_id) {
-            query = query.filter(samples_teams_roles::dsl::team_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(samples_teams_roles::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(samples_teams_roles::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, team_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::samples_teams_roles;
-        samples_teams_roles::dsl::samples_teams_roles
-            .filter(samples_teams_roles::dsl::table_id.eq(table_id))
-            .filter(samples_teams_roles::dsl::team_id.eq(team_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = samples_users_role_invitations)]
-#[diesel(belongs_to(Sample, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(primary_key(table_id, user_id))]
-pub struct SamplesUsersRoleInvitation {
-    pub table_id: Uuid,
-    pub user_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SamplesUsersRoleInvitation> for web_common::database::tables::SamplesUsersRoleInvitation {
-    fn from(item: SamplesUsersRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SamplesUsersRoleInvitation> for SamplesUsersRoleInvitation {
-    fn from(item: web_common::database::tables::SamplesUsersRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SamplesUsersRoleInvitation {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SamplesUsersRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::samples_users_role_invitations;
-        let mut query = samples_users_role_invitations::dsl::samples_users_role_invitations
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(samples_users_role_invitations::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(samples_users_role_invitations::dsl::user_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(samples_users_role_invitations::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(samples_users_role_invitations::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::samples_users_role_invitations;
-        samples_users_role_invitations::dsl::samples_users_role_invitations
-            .filter(samples_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(samples_users_role_invitations::dsl::user_id.eq(user_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = samples_users_role_requests)]
-#[diesel(belongs_to(Sample, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(primary_key(table_id, user_id))]
-pub struct SamplesUsersRoleRequest {
-    pub table_id: Uuid,
-    pub user_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SamplesUsersRoleRequest> for web_common::database::tables::SamplesUsersRoleRequest {
-    fn from(item: SamplesUsersRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SamplesUsersRoleRequest> for SamplesUsersRoleRequest {
-    fn from(item: web_common::database::tables::SamplesUsersRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SamplesUsersRoleRequest {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SamplesUsersRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::samples_users_role_requests;
-        let mut query = samples_users_role_requests::dsl::samples_users_role_requests
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(samples_users_role_requests::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(samples_users_role_requests::dsl::user_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(samples_users_role_requests::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(samples_users_role_requests::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::samples_users_role_requests;
-        samples_users_role_requests::dsl::samples_users_role_requests
-            .filter(samples_users_role_requests::dsl::table_id.eq(table_id))
-            .filter(samples_users_role_requests::dsl::user_id.eq(user_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = samples_users_roles)]
-#[diesel(belongs_to(Sample, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(primary_key(table_id, user_id))]
-pub struct SamplesUsersRole {
-    pub table_id: Uuid,
-    pub user_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SamplesUsersRole> for web_common::database::tables::SamplesUsersRole {
-    fn from(item: SamplesUsersRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SamplesUsersRole> for SamplesUsersRole {
-    fn from(item: web_common::database::tables::SamplesUsersRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SamplesUsersRole {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SamplesUsersRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::samples_users_roles;
-        let mut query = samples_users_roles::dsl::samples_users_roles
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(samples_users_roles::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(samples_users_roles::dsl::user_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(samples_users_roles::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(samples_users_roles::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, user_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::samples_users_roles;
-        samples_users_roles::dsl::samples_users_roles
-            .filter(samples_users_roles::dsl::table_id.eq(table_id))
-            .filter(samples_users_roles::dsl::user_id.eq(user_id))
-            .first::<Self>(connection)
-    }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = spectra_collection_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb330750>, foreign_key = spectra_collection_id))]
 #[diesel(primary_key(id))]
 pub struct Spectra {
     pub id: i32,
@@ -5745,16 +5144,18 @@ impl From<web_common::database::tables::Spectra> for Spectra {
 }
 
 impl Spectra {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::SpectraFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -5762,8 +5163,8 @@ impl Spectra {
         use crate::schema::spectra;
         let mut query = spectra::dsl::spectra
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.spectra_collection_id) {
-            query = query.filter(spectra::dsl::spectra_collection_id.eq(value));
+        if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
+            query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -5788,8 +5189,8 @@ impl Spectra {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections)]
-#[diesel(belongs_to(Sample, foreign_key = sample_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32f6d0>, foreign_key = sample_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SpectraCollection {
     pub id: i32,
@@ -5830,243 +5231,40 @@ impl From<web_common::database::tables::SpectraCollection> for SpectraCollection
 }
 
 impl SpectraCollection {
-    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `role_id` - The role_id to check against.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn has_role_by_id(
-        id: i32,
-        author_user_id: i32,
-        role_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        diesel::select(diesel::dsl::exists(spectra_collections::dsl::spectra_collections
-            .filter(spectra_collections::dsl::id.eq(id))
-           .filter(spectra_collections::dsl::created_by.eq(author_user_id))
-            .or_filter(
-               spectra_collections::dsl::id.eq(id)
-                   .and(spectra_collections::dsl::id.eq_any(
-                       spectra_collections_users_roles::table
-                           .select(spectra_collections_users_roles::dsl::table_id)
-                           .filter(spectra_collections_users_roles::dsl::user_id.eq(author_user_id)
-                           .and(spectra_collections_users_roles::dsl::role_id.le(role_id)),
-                    )),
-               )
-         )
-                    .or_filter(
-                       spectra_collections::dsl::id.eq(id)
-                           .and(spectra_collections::dsl::id.eq_any(
-                               spectra_collections_teams_roles::table
-                                   .select(spectra_collections_teams_roles::dsl::table_id)
-                                   .filter(spectra_collections_teams_roles::dsl::role_id.le(role_id))
-                                   .inner_join(teams_users_roles::table.on(
-                                       spectra_collections_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
-                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))
-                                           .and(teams_users_roles::dsl::role_id.le(role_id)),
-                                   )),
-                              ))
-                       )
-            ))
-         .get_result::<bool>(connection)
-    }
-    /// Check whether the user is a Viewer (role_id >= 3).
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_viewer(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::is_viewer_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
-    }
-    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_viewer_by_id(
-        id: i32,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::has_role_by_id(
-            id,
-            author_user_id,
-            3,
-            connection,
-        )
-    }
-    /// Check whether the user is an Editor (role_id >= 2).
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_editor(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::is_editor_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
-    }
-    /// Check whether the user is an Editor (role_id >= 2).
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_editor_by_id(
-        id: i32,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::has_role_by_id(
-            id,
-            author_user_id,
-            2,
-            connection,
-        )
-    }
-    /// Check whether the user is an Admin (role_id == 1).
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_admin(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::is_admin_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
-    }
-    /// Check whether the user is an Admin (role_id == 1).
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn is_admin_by_id(
-        id: i32,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<bool, diesel::result::Error> {
-        Self::has_role_by_id(
-            id,
-            author_user_id,
-            1,
-            connection,
-        )
-    }
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SpectraCollectionFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::spectra_collections;
-        let mut query = spectra_collections::dsl::spectra_collections
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.sample_id) {
-            query = query.filter(spectra_collections::dsl::sample_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(spectra_collections::dsl::created_by.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(spectra_collections::dsl::updated_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get all of the editable structs from the database.
-    ///
-    /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all_editables(
-        author_user_id: i32,
+    pub fn all_viewables(
         filter: Option<&web_common::database::SpectraCollectionFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::spectra_collections;
         let mut query = spectra_collections::dsl::spectra_collections
-           .filter(spectra_collections::dsl::created_by.eq(author_user_id))
-            .or_filter(
-               spectra_collections::dsl::id.eq_any(
-                   spectra_collections_users_roles::table
-                       .select(spectra_collections_users_roles::dsl::table_id)
-                       .filter(spectra_collections_users_roles::dsl::user_id.eq(author_user_id)
-                       .and(spectra_collections_users_roles::dsl::role_id.le(2)),
-               )),
-            )
-                .or_filter(
-                   spectra_collections::dsl::id.eq_any(
-                       spectra_collections_teams_roles::table
-                           .select(spectra_collections_teams_roles::dsl::table_id)
-                           .filter(spectra_collections_teams_roles::dsl::role_id.le(2))
-                           .inner_join(teams_users_roles::table.on(
-                               spectra_collections_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)
-                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))
-                                   .and(teams_users_roles::dsl::role_id.le(2)),
-                           )),
-                   ),
-            )
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.sample_id) {
-            query = query.filter(spectra_collections::dsl::sample_id.eq(value));
+        if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
+            query = query.filter(spectra_collections::dsl::sample_id.eq(sample_id));
         }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(spectra_collections::dsl::created_by.eq(value));
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra_collections::dsl::created_by.eq(created_by));
         }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(spectra_collections::dsl::updated_by.eq(value));
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra_collections::dsl::updated_by.eq(updated_by));
         }
         query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Get all of the structs from the database ordered by the updated_at column.
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -6074,7 +5272,7 @@ impl SpectraCollection {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all_by_updated_at(
+    pub fn all_by_update(
         filter: Option<&web_common::database::SpectraCollectionFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -6098,38 +5296,6 @@ impl SpectraCollection {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Delete the struct from the database.
-    ///
-    /// # Arguments
-    /// * `author_user_id` - The ID of the user who is deleting the struct.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete(
-        &self,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        Self::delete_by_id(self.id, author_user_id, connection)
-    }
-    /// Delete the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user who is deleting the struct.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn delete_by_id(
-       id: i32,
-        author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<usize, diesel::result::Error> {
-        if !Self::is_admin_by_id(id, author_user_id, connection)? {
-            return Err(diesel::result::Error::NotFound);
-        }
-        diesel::delete(spectra_collections::dsl::spectra_collections
-            .filter(spectra_collections::dsl::id.eq(id))
-        ).execute(connection)
-    }
     /// Get the struct from the database by its ID.
     ///
     /// # Arguments
@@ -6147,552 +5313,9 @@ impl SpectraCollection {
     }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = spectra_collections_teams_role_invitations)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(primary_key(table_id, team_id))]
-pub struct SpectraCollectionsTeamsRoleInvitation {
-    pub table_id: i32,
-    pub team_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SpectraCollectionsTeamsRoleInvitation> for web_common::database::tables::SpectraCollectionsTeamsRoleInvitation {
-    fn from(item: SpectraCollectionsTeamsRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SpectraCollectionsTeamsRoleInvitation> for SpectraCollectionsTeamsRoleInvitation {
-    fn from(item: web_common::database::tables::SpectraCollectionsTeamsRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SpectraCollectionsTeamsRoleInvitation {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SpectraCollectionsTeamsRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::spectra_collections_teams_role_invitations;
-        let mut query = spectra_collections_teams_role_invitations::dsl::spectra_collections_teams_role_invitations
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(spectra_collections_teams_role_invitations::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.team_id) {
-            query = query.filter(spectra_collections_teams_role_invitations::dsl::team_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(spectra_collections_teams_role_invitations::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(spectra_collections_teams_role_invitations::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::spectra_collections_teams_role_invitations;
-        spectra_collections_teams_role_invitations::dsl::spectra_collections_teams_role_invitations
-            .filter(spectra_collections_teams_role_invitations::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_teams_role_invitations::dsl::team_id.eq(team_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = spectra_collections_teams_role_requests)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(primary_key(table_id, team_id))]
-pub struct SpectraCollectionsTeamsRoleRequest {
-    pub table_id: i32,
-    pub team_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SpectraCollectionsTeamsRoleRequest> for web_common::database::tables::SpectraCollectionsTeamsRoleRequest {
-    fn from(item: SpectraCollectionsTeamsRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SpectraCollectionsTeamsRoleRequest> for SpectraCollectionsTeamsRoleRequest {
-    fn from(item: web_common::database::tables::SpectraCollectionsTeamsRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SpectraCollectionsTeamsRoleRequest {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SpectraCollectionsTeamsRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::spectra_collections_teams_role_requests;
-        let mut query = spectra_collections_teams_role_requests::dsl::spectra_collections_teams_role_requests
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(spectra_collections_teams_role_requests::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.team_id) {
-            query = query.filter(spectra_collections_teams_role_requests::dsl::team_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(spectra_collections_teams_role_requests::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(spectra_collections_teams_role_requests::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::spectra_collections_teams_role_requests;
-        spectra_collections_teams_role_requests::dsl::spectra_collections_teams_role_requests
-            .filter(spectra_collections_teams_role_requests::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_teams_role_requests::dsl::team_id.eq(team_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = spectra_collections_teams_roles)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(Team, foreign_key = team_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(primary_key(table_id, team_id))]
-pub struct SpectraCollectionsTeamsRole {
-    pub table_id: i32,
-    pub team_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SpectraCollectionsTeamsRole> for web_common::database::tables::SpectraCollectionsTeamsRole {
-    fn from(item: SpectraCollectionsTeamsRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SpectraCollectionsTeamsRole> for SpectraCollectionsTeamsRole {
-    fn from(item: web_common::database::tables::SpectraCollectionsTeamsRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            team_id: item.team_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SpectraCollectionsTeamsRole {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SpectraCollectionsTeamsRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::spectra_collections_teams_roles;
-        let mut query = spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(spectra_collections_teams_roles::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.team_id) {
-            query = query.filter(spectra_collections_teams_roles::dsl::team_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(spectra_collections_teams_roles::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(spectra_collections_teams_roles::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::spectra_collections_teams_roles;
-        spectra_collections_teams_roles::dsl::spectra_collections_teams_roles
-            .filter(spectra_collections_teams_roles::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_teams_roles::dsl::team_id.eq(team_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = spectra_collections_users_role_invitations)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(primary_key(table_id, user_id))]
-pub struct SpectraCollectionsUsersRoleInvitation {
-    pub table_id: i32,
-    pub user_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SpectraCollectionsUsersRoleInvitation> for web_common::database::tables::SpectraCollectionsUsersRoleInvitation {
-    fn from(item: SpectraCollectionsUsersRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SpectraCollectionsUsersRoleInvitation> for SpectraCollectionsUsersRoleInvitation {
-    fn from(item: web_common::database::tables::SpectraCollectionsUsersRoleInvitation) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SpectraCollectionsUsersRoleInvitation {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SpectraCollectionsUsersRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::spectra_collections_users_role_invitations;
-        let mut query = spectra_collections_users_role_invitations::dsl::spectra_collections_users_role_invitations
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(spectra_collections_users_role_invitations::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(spectra_collections_users_role_invitations::dsl::user_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(spectra_collections_users_role_invitations::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(spectra_collections_users_role_invitations::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::spectra_collections_users_role_invitations;
-        spectra_collections_users_role_invitations::dsl::spectra_collections_users_role_invitations
-            .filter(spectra_collections_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_users_role_invitations::dsl::user_id.eq(user_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = spectra_collections_users_role_requests)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(primary_key(table_id, user_id))]
-pub struct SpectraCollectionsUsersRoleRequest {
-    pub table_id: i32,
-    pub user_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SpectraCollectionsUsersRoleRequest> for web_common::database::tables::SpectraCollectionsUsersRoleRequest {
-    fn from(item: SpectraCollectionsUsersRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SpectraCollectionsUsersRoleRequest> for SpectraCollectionsUsersRoleRequest {
-    fn from(item: web_common::database::tables::SpectraCollectionsUsersRoleRequest) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SpectraCollectionsUsersRoleRequest {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SpectraCollectionsUsersRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::spectra_collections_users_role_requests;
-        let mut query = spectra_collections_users_role_requests::dsl::spectra_collections_users_role_requests
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(spectra_collections_users_role_requests::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(spectra_collections_users_role_requests::dsl::user_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(spectra_collections_users_role_requests::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(spectra_collections_users_role_requests::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::spectra_collections_users_role_requests;
-        spectra_collections_users_role_requests::dsl::spectra_collections_users_role_requests
-            .filter(spectra_collections_users_role_requests::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_users_role_requests::dsl::user_id.eq(user_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
-#[diesel(table_name = spectra_collections_users_roles)]
-#[diesel(belongs_to(SpectraCollection, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(primary_key(table_id, user_id))]
-pub struct SpectraCollectionsUsersRole {
-    pub table_id: i32,
-    pub user_id: i32,
-    pub role_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-}
-
-impl From<SpectraCollectionsUsersRole> for web_common::database::tables::SpectraCollectionsUsersRole {
-    fn from(item: SpectraCollectionsUsersRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl From<web_common::database::tables::SpectraCollectionsUsersRole> for SpectraCollectionsUsersRole {
-    fn from(item: web_common::database::tables::SpectraCollectionsUsersRole) -> Self {
-        Self {
-            table_id: item.table_id,
-            user_id: item.user_id,
-            role_id: item.role_id,
-            created_by: item.created_by,
-            created_at: item.created_at,
-        }
-    }
-}
-
-impl SpectraCollectionsUsersRole {
-    /// Get all of the structs from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
-    /// * `offset` - The number of structs to skip. By default, this is 0.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn all(
-        filter: Option<&web_common::database::SpectraCollectionsUsersRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::spectra_collections_users_roles;
-        let mut query = spectra_collections_users_roles::dsl::spectra_collections_users_roles
-            .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.table_id) {
-            query = query.filter(spectra_collections_users_roles::dsl::table_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.user_id) {
-            query = query.filter(spectra_collections_users_roles::dsl::user_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.role_id) {
-            query = query.filter(spectra_collections_users_roles::dsl::role_id.eq(value));
-        }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(spectra_collections_users_roles::dsl::created_by.eq(value));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-    }
-    /// Get the struct from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn get(
-       ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::spectra_collections_users_roles;
-        spectra_collections_users_roles::dsl::spectra_collections_users_roles
-            .filter(spectra_collections_users_roles::dsl::table_id.eq(table_id))
-            .filter(spectra_collections_users_roles::dsl::user_id.eq(user_id))
-            .first::<Self>(connection)
-    }
-}
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = team_states)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct TeamState {
     pub id: i32,
@@ -6727,16 +5350,18 @@ impl From<web_common::database::tables::TeamState> for TeamState {
 }
 
 impl TeamState {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::TeamStateFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -6744,11 +5369,11 @@ impl TeamState {
         use crate::schema::team_states;
         let mut query = team_states::dsl::team_states
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(team_states::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(team_states::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(team_states::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(team_states::dsl::color_id.eq(color_id));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -6815,14 +5440,16 @@ impl TeamState {
             .filter(team_states::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -6832,7 +5459,7 @@ impl TeamState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM team_states ",
@@ -6842,16 +5469,19 @@ impl TeamState {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -6861,7 +5491,7 @@ impl TeamState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM team_states ",
@@ -6871,16 +5501,19 @@ impl TeamState {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -6890,7 +5523,7 @@ impl TeamState {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id FROM team_states ",
@@ -6900,15 +5533,16 @@ impl TeamState {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams)]
-#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
-#[diesel(belongs_to(Color, foreign_key = color_id))]
-#[diesel(belongs_to(Team, foreign_key = parent_team_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = parent_team_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct Team {
     pub id: i32,
@@ -7096,16 +5730,18 @@ impl Team {
             connection,
         )
     }
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
         filter: Option<&web_common::database::TeamFilter>,
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7113,20 +5749,20 @@ impl Team {
         use crate::schema::teams;
         let mut query = teams::dsl::teams
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(teams::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(teams::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
         }
-        if let Some(value) = filter.and_then(|f| f.parent_team_id) {
-            query = query.filter(teams::dsl::parent_team_id.eq(value));
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(teams::dsl::created_by.eq(value));
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
         }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(teams::dsl::updated_by.eq(value));
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
         }
         query
             .offset(offset.unwrap_or(0))
@@ -7136,15 +5772,15 @@ impl Team {
     /// Get all of the editable structs from the database.
     ///
     /// # Arguments
-    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
     pub fn all_editables(
-        author_user_id: i32,
         filter: Option<&web_common::database::TeamFilter>,
+        author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7161,27 +5797,27 @@ impl Team {
                )),
             )
             .into_boxed();
-        if let Some(value) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(teams::dsl::icon_id.eq(value));
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
         }
-        if let Some(value) = filter.and_then(|f| f.color_id) {
-            query = query.filter(teams::dsl::color_id.eq(value));
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
         }
-        if let Some(value) = filter.and_then(|f| f.parent_team_id) {
-            query = query.filter(teams::dsl::parent_team_id.eq(value));
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
-        if let Some(value) = filter.and_then(|f| f.created_by) {
-            query = query.filter(teams::dsl::created_by.eq(value));
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
         }
-        if let Some(value) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(teams::dsl::updated_by.eq(value));
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
         }
         query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Get all of the structs from the database ordered by the updated_at column.
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -7189,7 +5825,7 @@ impl Team {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all_by_updated_at(
+    pub fn all_by_update(
         filter: Option<&web_common::database::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -7281,14 +5917,16 @@ impl Team {
             .filter(teams::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7298,19 +5936,20 @@ impl Team {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
-            "WHERE $1 % f_concat_teams_name_description(name, description) ",
+            "WHERE $1 % f_concat_teams_name_description(name, description) AND can_view_teams($3, teams.id) ",
             "ORDER BY similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the editable struct by a given string by Postgres's `similarity`.
+    /// Search for the editable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -7319,7 +5958,7 @@ impl Team {
     /// * `connection` - The connection to the database.
     ///
     pub fn similarity_search_editables(
-        author_user_id: i32,
+       author_user_id: i32,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7333,17 +5972,7 @@ impl Team {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
-            "WHERE $1 % f_concat_teams_name_description(name, description) ",
-"AND ",
-             "teams.created_by = $3 ",
-            "OR teams.id IN ",
-            "(SELECT teams_users_roles.table FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2) ",
-            "OR teams.id IN ",
-            "(SELECT teams_teams_roles.table_id FROM teams_teams_roles ",
-            "WHERE teams_teams_roles.role_id <= 2 AND teams_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "WHERE $1 % f_concat_teams_name_description(name, description) AND can_edit_teams($3, teams.id) ",
             "ORDER BY similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
@@ -7352,14 +5981,16 @@ impl Team {
             .bind::<diesel::sql_types::Integer, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7369,19 +6000,20 @@ impl Team {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
-            "WHERE $1 <% f_concat_teams_name_description(name, description) ",
+            "WHERE $1 <% f_concat_teams_name_description(name, description) AND can_view_teams($3, teams.id) ",
             "ORDER BY word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the editable struct by a given string by Postgres's `word_similarity`.
+    /// Search for the editable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -7390,7 +6022,7 @@ impl Team {
     /// * `connection` - The connection to the database.
     ///
     pub fn word_similarity_search_editables(
-        author_user_id: i32,
+       author_user_id: i32,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7404,17 +6036,7 @@ impl Team {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
-            "WHERE $1 <% f_concat_teams_name_description(name, description) ",
-"AND ",
-             "teams.created_by = $3 ",
-            "OR teams.id IN ",
-            "(SELECT teams_users_roles.table FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2) ",
-            "OR teams.id IN ",
-            "(SELECT teams_teams_roles.table_id FROM teams_teams_roles ",
-            "WHERE teams_teams_roles.role_id <= 2 AND teams_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "WHERE $1 <% f_concat_teams_name_description(name, description) AND can_edit_teams($3, teams.id) ",
             "ORDER BY word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
@@ -7423,14 +6045,16 @@ impl Team {
             .bind::<diesel::sql_types::Integer, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7440,19 +6064,20 @@ impl Team {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(None, Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
-            "WHERE $1 <<% f_concat_teams_name_description(name, description) ",
+            "WHERE $1 <<% f_concat_teams_name_description(name, description) AND can_view_teams($3, teams.id) ",
             "ORDER BY strict_word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the editable struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the editable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -7461,7 +6086,7 @@ impl Team {
     /// * `connection` - The connection to the database.
     ///
     pub fn strict_word_similarity_search_editables(
-        author_user_id: i32,
+       author_user_id: i32,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7475,17 +6100,7 @@ impl Team {
         }
         let similarity_query = concat!(
             "SELECT id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at FROM teams ",
-            "WHERE $1 <<% f_concat_teams_name_description(name, description) ",
-"AND ",
-             "teams.created_by = $3 ",
-            "OR teams.id IN ",
-            "(SELECT teams_users_roles.table FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2) ",
-            "OR teams.id IN ",
-            "(SELECT teams_teams_roles.table_id FROM teams_teams_roles ",
-            "WHERE teams_teams_roles.role_id <= 2 AND teams_teams_roles.table_id IN ",
-            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",
-            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",
+            "WHERE $1 <<% f_concat_teams_name_description(name, description) AND can_edit_teams($3, teams.id) ",
             "ORDER BY strict_word_similarity($1, f_concat_teams_name_description(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
@@ -7497,9 +6112,9 @@ impl Team {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams_teams_role_invitations)]
-#[diesel(belongs_to(Team, foreign_key = table_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
-#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct TeamsTeamsRoleInvitation {
     pub table_id: i32,
@@ -7534,7 +6149,43 @@ impl From<web_common::database::tables::TeamsTeamsRoleInvitation> for TeamsTeams
 }
 
 impl TeamsTeamsRoleInvitation {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::TeamsTeamsRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::teams_teams_role_invitations;
+        let mut query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -7542,7 +6193,7 @@ impl TeamsTeamsRoleInvitation {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::TeamsTeamsRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -7564,6 +6215,7 @@ impl TeamsTeamsRoleInvitation {
             query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(value));
         }
         query
+            .order_by(teams_teams_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -7587,9 +6239,9 @@ impl TeamsTeamsRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams_users_role_invitations)]
-#[diesel(belongs_to(Team, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct TeamsUsersRoleInvitation {
     pub table_id: i32,
@@ -7624,7 +6276,43 @@ impl From<web_common::database::tables::TeamsUsersRoleInvitation> for TeamsUsers
 }
 
 impl TeamsUsersRoleInvitation {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::TeamsUsersRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::teams_users_role_invitations;
+        let mut query = teams_users_role_invitations::dsl::teams_users_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_role_invitations::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -7632,7 +6320,7 @@ impl TeamsUsersRoleInvitation {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::TeamsUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -7654,6 +6342,7 @@ impl TeamsUsersRoleInvitation {
             query = query.filter(teams_users_role_invitations::dsl::created_by.eq(value));
         }
         query
+            .order_by(teams_users_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -7677,9 +6366,9 @@ impl TeamsUsersRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams_users_role_requests)]
-#[diesel(belongs_to(Team, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct TeamsUsersRoleRequest {
     pub table_id: i32,
@@ -7714,7 +6403,43 @@ impl From<web_common::database::tables::TeamsUsersRoleRequest> for TeamsUsersRol
 }
 
 impl TeamsUsersRoleRequest {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::TeamsUsersRoleRequestFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::teams_users_role_requests;
+        let mut query = teams_users_role_requests::dsl::teams_users_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_role_requests::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -7722,7 +6447,7 @@ impl TeamsUsersRoleRequest {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::TeamsUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -7744,6 +6469,7 @@ impl TeamsUsersRoleRequest {
             query = query.filter(teams_users_role_requests::dsl::created_by.eq(value));
         }
         query
+            .order_by(teams_users_role_requests::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -7767,9 +6493,9 @@ impl TeamsUsersRoleRequest {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams_users_roles)]
-#[diesel(belongs_to(Team, foreign_key = table_id))]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct TeamsUsersRole {
     pub table_id: i32,
@@ -7804,7 +6530,43 @@ impl From<web_common::database::tables::TeamsUsersRole> for TeamsUsersRole {
 }
 
 impl TeamsUsersRole {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::TeamsUsersRoleFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::teams_users_roles;
+        let mut query = teams_users_roles::dsl::teams_users_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -7812,7 +6574,7 @@ impl TeamsUsersRole {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::TeamsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -7834,6 +6596,7 @@ impl TeamsUsersRole {
             query = query.filter(teams_users_roles::dsl::created_by.eq(value));
         }
         query
+            .order_by(teams_users_roles::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -7888,14 +6651,16 @@ impl From<web_common::database::tables::Unit> for Unit {
 }
 
 impl Unit {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7936,14 +6701,16 @@ impl Unit {
             .filter(units::dsl::name.eq(name))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7953,7 +6720,7 @@ impl Unit {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, symbol FROM units ",
@@ -7963,16 +6730,19 @@ impl Unit {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -7982,7 +6752,7 @@ impl Unit {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, symbol FROM units ",
@@ -7992,16 +6762,19 @@ impl Unit {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -8011,7 +6784,7 @@ impl Unit {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, name, description, symbol FROM units ",
@@ -8021,13 +6794,14 @@ impl Unit {
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = user_emails)]
-#[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(LoginProvider, foreign_key = login_provider_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522690>, foreign_key = login_provider_id))]
 #[diesel(primary_key(id))]
 pub struct UserEmail {
     pub id: i32,
@@ -8065,7 +6839,37 @@ impl From<web_common::database::tables::UserEmail> for UserEmail {
 }
 
 impl UserEmail {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::UserEmailFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::user_emails;
+        let mut query = user_emails::dsl::user_emails
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(user_emails::dsl::created_by.eq(created_by));
+        }
+        if let Some(login_provider_id) = filter.and_then(|f| f.login_provider_id) {
+            query = query.filter(user_emails::dsl::login_provider_id.eq(login_provider_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -8073,7 +6877,7 @@ impl UserEmail {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::UserEmailFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -8089,6 +6893,7 @@ impl UserEmail {
             query = query.filter(user_emails::dsl::login_provider_id.eq(value));
         }
         query
+            .order_by(user_emails::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -8172,14 +6977,16 @@ impl From<web_common::database::tables::User> for User {
 }
 
 impl User {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_viewables(
+        author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -8190,14 +6997,14 @@ impl User {
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
     }
-    /// Get all of the structs from the database ordered by the updated_at column.
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all_by_updated_at(
+    pub fn all_by_update(
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -8224,14 +7031,16 @@ impl User {
             .filter(users::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Search for the struct by a given string by Postgres's `similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn similarity_search(
+    pub fn similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -8241,26 +7050,29 @@ impl User {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at FROM users ",
-            "WHERE $1 % f_concat_users_name(first_name, middle_name, last_name) ",
+            "WHERE $1 % f_concat_users_name(first_name, middle_name, last_name) AND can_view_users($3, users.id) ",
             "ORDER BY similarity($1, f_concat_users_name(first_name, middle_name, last_name)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn word_similarity_search(
+    pub fn word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -8270,26 +7082,29 @@ impl User {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at FROM users ",
-            "WHERE $1 <% f_concat_users_name(first_name, middle_name, last_name) ",
+            "WHERE $1 <% f_concat_users_name(first_name, middle_name, last_name) AND can_view_users($3, users.id) ",
             "ORDER BY word_similarity($1, f_concat_users_name(first_name, middle_name, last_name)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
-    /// Search for the struct by a given string by Postgres's `strict_word_similarity`.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// # Arguments
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `connection` - The connection to the database.
     ///
-    pub fn strict_word_similarity_search(
+    pub fn strict_word_similarity_search_viewables(
+       author_user_id: Option<i32>,
         query: &str,
         limit: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
@@ -8299,23 +7114,24 @@ impl User {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all(Some(limit as i64), None, connection);
+            return Self::all_viewables(author_user_id, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
             "SELECT id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at FROM users ",
-            "WHERE $1 <<% f_concat_users_name(first_name, middle_name, last_name) ",
+            "WHERE $1 <<% f_concat_users_name(first_name, middle_name, last_name) AND can_view_users($3, users.id) ",
             "ORDER BY strict_word_similarity($1, f_concat_users_name(first_name, middle_name, last_name)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
             .bind::<diesel::sql_types::Integer, _>(limit)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Integer>, _>(author_user_id)
             .load(connection)
 }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = users_users_role_invitations)]
-#[diesel(belongs_to(User, foreign_key = table_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct UsersUsersRoleInvitation {
     pub table_id: i32,
@@ -8350,7 +7166,43 @@ impl From<web_common::database::tables::UsersUsersRoleInvitation> for UsersUsers
 }
 
 impl UsersUsersRoleInvitation {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::UsersUsersRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::users_users_role_invitations;
+        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_role_invitations::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -8358,7 +7210,7 @@ impl UsersUsersRoleInvitation {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::UsersUsersRoleInvitationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -8380,6 +7232,7 @@ impl UsersUsersRoleInvitation {
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(value));
         }
         query
+            .order_by(users_users_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -8403,8 +7256,8 @@ impl UsersUsersRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = users_users_role_requests)]
-#[diesel(belongs_to(User, foreign_key = table_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct UsersUsersRoleRequest {
     pub table_id: i32,
@@ -8439,7 +7292,43 @@ impl From<web_common::database::tables::UsersUsersRoleRequest> for UsersUsersRol
 }
 
 impl UsersUsersRoleRequest {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::UsersUsersRoleRequestFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::users_users_role_requests;
+        let mut query = users_users_role_requests::dsl::users_users_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_role_requests::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -8447,7 +7336,7 @@ impl UsersUsersRoleRequest {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::UsersUsersRoleRequestFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -8469,6 +7358,7 @@ impl UsersUsersRoleRequest {
             query = query.filter(users_users_role_requests::dsl::created_by.eq(value));
         }
         query
+            .order_by(users_users_role_requests::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -8492,8 +7382,8 @@ impl UsersUsersRoleRequest {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = users_users_roles)]
-#[diesel(belongs_to(User, foreign_key = table_id))]
-#[diesel(belongs_to(Role, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct UsersUsersRole {
     pub table_id: i32,
@@ -8528,7 +7418,43 @@ impl From<web_common::database::tables::UsersUsersRole> for UsersUsersRole {
 }
 
 impl UsersUsersRole {
-    /// Get all of the structs from the database.
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::UsersUsersRoleFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::users_users_roles;
+        let mut query = users_users_roles::dsl::users_users_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get all of the structs from the database ordered by update time.
     ///
     /// # Arguments
     /// * `filter` - The optional filter to apply to the query.
@@ -8536,7 +7462,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of structs to skip. By default, this is 0.
     /// * `connection` - The connection to the database.
     ///
-    pub fn all(
+    pub fn all_by_update(
         filter: Option<&web_common::database::UsersUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -8558,6 +7484,7 @@ impl UsersUsersRole {
             query = query.filter(users_users_roles::dsl::created_by.eq(value));
         }
         query
+            .order_by(users_users_roles::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)

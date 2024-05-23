@@ -75,7 +75,7 @@ def extract_structs(path: str) -> List[StructMetadata]:
             if "}" in line:
                 inside_struct = False
                 struct_metadata.table_metadata.register_flat_variant(
-                    struct_metadata.table_name, struct_metadata.name
+                    struct_metadata.table_name, struct_metadata
                 )
                 struct_metadatas.append(struct_metadata)
 

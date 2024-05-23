@@ -293,12 +293,12 @@ diesel::table! {
     sampled_individuals (id) {
         id -> Uuid,
         notes -> Nullable<Text>,
+        barcode -> Nullable<Text>,
         project_id -> Int4,
         created_by -> Int4,
         created_at -> Timestamp,
         updated_by -> Int4,
         updated_at -> Timestamp,
-        tagged -> Bool,
         picture -> Bytea,
     }
 }
@@ -314,66 +314,6 @@ diesel::table! {
         updated_by -> Int4,
         updated_at -> Timestamp,
         state -> Int4,
-    }
-}
-
-diesel::table! {
-    samples_teams_role_invitations (table_id, team_id) {
-        table_id -> Uuid,
-        team_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    samples_teams_role_requests (table_id, team_id) {
-        table_id -> Uuid,
-        team_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    samples_teams_roles (table_id, team_id) {
-        table_id -> Uuid,
-        team_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    samples_users_role_invitations (table_id, user_id) {
-        table_id -> Uuid,
-        user_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    samples_users_role_requests (table_id, user_id) {
-        table_id -> Uuid,
-        user_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    samples_users_roles (table_id, user_id) {
-        table_id -> Uuid,
-        user_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
     }
 }
 
@@ -394,66 +334,6 @@ diesel::table! {
         created_at -> Timestamp,
         updated_by -> Int4,
         updated_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    spectra_collections_teams_role_invitations (table_id, team_id) {
-        table_id -> Int4,
-        team_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    spectra_collections_teams_role_requests (table_id, team_id) {
-        table_id -> Int4,
-        team_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    spectra_collections_teams_roles (table_id, team_id) {
-        table_id -> Int4,
-        team_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    spectra_collections_users_role_invitations (table_id, user_id) {
-        table_id -> Int4,
-        user_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    spectra_collections_users_role_requests (table_id, user_id) {
-        table_id -> Int4,
-        user_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-    }
-}
-
-diesel::table! {
-    spectra_collections_users_roles (table_id, user_id) {
-        table_id -> Int4,
-        user_id -> Int4,
-        role_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
     }
 }
 
@@ -640,44 +520,8 @@ diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(sampled_individuals -> projects (project_id));
 diesel::joinable!(samples -> sample_containers (container_id));
 diesel::joinable!(samples -> sample_states (state));
-diesel::joinable!(samples_teams_role_invitations -> roles (role_id));
-diesel::joinable!(samples_teams_role_invitations -> samples (table_id));
-diesel::joinable!(samples_teams_role_invitations -> teams (team_id));
-diesel::joinable!(samples_teams_role_invitations -> users (created_by));
-diesel::joinable!(samples_teams_role_requests -> roles (role_id));
-diesel::joinable!(samples_teams_role_requests -> samples (table_id));
-diesel::joinable!(samples_teams_role_requests -> teams (team_id));
-diesel::joinable!(samples_teams_role_requests -> users (created_by));
-diesel::joinable!(samples_teams_roles -> roles (role_id));
-diesel::joinable!(samples_teams_roles -> samples (table_id));
-diesel::joinable!(samples_teams_roles -> teams (team_id));
-diesel::joinable!(samples_teams_roles -> users (created_by));
-diesel::joinable!(samples_users_role_invitations -> roles (role_id));
-diesel::joinable!(samples_users_role_invitations -> samples (table_id));
-diesel::joinable!(samples_users_role_requests -> roles (role_id));
-diesel::joinable!(samples_users_role_requests -> samples (table_id));
-diesel::joinable!(samples_users_roles -> roles (role_id));
-diesel::joinable!(samples_users_roles -> samples (table_id));
 diesel::joinable!(spectra -> spectra_collections (spectra_collection_id));
 diesel::joinable!(spectra_collections -> samples (sample_id));
-diesel::joinable!(spectra_collections_teams_role_invitations -> roles (role_id));
-diesel::joinable!(spectra_collections_teams_role_invitations -> spectra_collections (table_id));
-diesel::joinable!(spectra_collections_teams_role_invitations -> teams (team_id));
-diesel::joinable!(spectra_collections_teams_role_invitations -> users (created_by));
-diesel::joinable!(spectra_collections_teams_role_requests -> roles (role_id));
-diesel::joinable!(spectra_collections_teams_role_requests -> spectra_collections (table_id));
-diesel::joinable!(spectra_collections_teams_role_requests -> teams (team_id));
-diesel::joinable!(spectra_collections_teams_role_requests -> users (created_by));
-diesel::joinable!(spectra_collections_teams_roles -> roles (role_id));
-diesel::joinable!(spectra_collections_teams_roles -> spectra_collections (table_id));
-diesel::joinable!(spectra_collections_teams_roles -> teams (team_id));
-diesel::joinable!(spectra_collections_teams_roles -> users (created_by));
-diesel::joinable!(spectra_collections_users_role_invitations -> roles (role_id));
-diesel::joinable!(spectra_collections_users_role_invitations -> spectra_collections (table_id));
-diesel::joinable!(spectra_collections_users_role_requests -> roles (role_id));
-diesel::joinable!(spectra_collections_users_role_requests -> spectra_collections (table_id));
-diesel::joinable!(spectra_collections_users_roles -> roles (role_id));
-diesel::joinable!(spectra_collections_users_roles -> spectra_collections (table_id));
 diesel::joinable!(team_states -> colors (color_id));
 diesel::joinable!(team_states -> font_awesome_icons (icon_id));
 diesel::joinable!(teams -> colors (color_id));
@@ -724,20 +568,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     sampled_individual_bio_ott_taxon_items,
     sampled_individuals,
     samples,
-    samples_teams_role_invitations,
-    samples_teams_role_requests,
-    samples_teams_roles,
-    samples_users_role_invitations,
-    samples_users_role_requests,
-    samples_users_roles,
     spectra,
     spectra_collections,
-    spectra_collections_teams_role_invitations,
-    spectra_collections_teams_role_requests,
-    spectra_collections_teams_roles,
-    spectra_collections_users_role_invitations,
-    spectra_collections_users_role_requests,
-    spectra_collections_users_roles,
     team_states,
     teams,
     teams_teams_role_invitations,

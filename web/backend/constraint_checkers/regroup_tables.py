@@ -10,6 +10,10 @@ in such a way that all the migrations relative to a table are grouped together.
 
 import os
 from typing import Dict, List
+import shutil
+from jaro import jaro_winkler_metric
+from userinput import userinput
+from userinput.utils import set_validator
 
 WHITE_LISTED_MIGRATIONS = [
     "00000000000000_diesel_initial_setup",
@@ -85,9 +89,9 @@ def get_desinences(table_name: str) -> List[str]:
         f"create_{table_name}_sequential_index",
         f"create_{table_name}_updated_at_trigger",
         f"create_{table_name}_parent_circularity_trigger",
+        f"create_{table_name}_can_x_trigger",
         f"populate_{table_name}_table",
         f"create_{table_name}_gin_index",
-        f"create_{table_name}_btree_index",
     ]
 
 
@@ -131,20 +135,81 @@ def table_dependencies() -> Dict[str, List[str]]:
         if migration in WHITE_LISTED_MIGRATIONS:
             continue
 
-        _, desinence = migration.split("_", 1)
+        _, migration_desinence = migration.split("_", 1)
         current_table = None
 
         # We identify the table associated to this migration.
         for table in tables:
             desinences = get_desinences(table)
-            if desinence in desinences:
+            if migration_desinence in desinences:
                 current_table = table
                 break
 
-        assert (
-            current_table is not None
-        ), f"Could not find the table associated to the migration {migration}"
+        if current_table is None:
 
+            matches_and_scores = [
+                (desinence, jaro_winkler_metric(migration_desinence, desinence))
+                for table in tables
+                for desinence in get_desinences(table)
+            ]
+
+            sorted_matches_and_scores = sorted(
+                matches_and_scores, key=lambda x: x[1], reverse=True
+            )
+
+            print(
+                f"Could not find the table associated to the migration {migration}. "
+                "Maybe it is not a valid migration name or the table name is misspelled. "
+                "Here are the closest matches:"
+            )
+            for number, (match, score) in enumerate(sorted_matches_and_scores[:10]):
+                print(f"{number}) {match} - {score}")
+
+            should_delete = userinput(
+                name=f"delete_migration_{migration}",
+                label="Do you want to delete this migration?",
+                default="no",
+                validator="human_bool",
+                sanitizer="human_bool",
+            )
+
+            if should_delete:
+                # First, we rollback the migrations
+                status = os.system("diesel migration revert --all")
+                if status != 0:
+                    raise RuntimeError("Could not revert the migrations.")
+                shutil.rmtree(f"migrations/{migration}")
+                raise RuntimeError("Migration deleted. Please re-run the script.")
+            
+            should_rename = userinput(
+                name=f"should_rename_migration_{migration}",
+                label="Do you want to rename this migration?",
+                validator="human_bool",
+                sanitizer="human_bool",
+            )
+
+            if should_rename:
+                renaming_target = userinput(
+                    name=f"rename_migration_{migration}",
+                    label="Which of the top 10 do you want to use?",
+                    validator=set_validator([str(i) for i in range(10)]),
+                    sanitizer="integer",
+                )
+
+                assert isinstance(renaming_target, int)
+                assert renaming_target < 10
+
+                new_migration_name = sorted_matches_and_scores[renaming_target][0]
+                new_migration_name = f"{migration.split('_')[0]}_{new_migration_name}"
+
+                os.rename(f"migrations/{migration}", f"migrations/{new_migration_name}")
+
+                raise RuntimeError(
+                    f"Migration renamed to {new_migration_name}. Please re-run the script."
+                )
+
+            raise RuntimeError("Migration not associated to any table.")
+            
         # We identify the tables that are being referenced in the migration.
         with open(f"migrations/{migration}/up.sql", "r", encoding="utf-8") as f:
             for line in f.readlines():
@@ -212,6 +277,35 @@ def regroup_tables():
 
             if table_name not in migration:
                 continue
+
+            # We check if the directory contains an up.sql and a down.sql file.
+            # If not, we ask the user what to do with it.
+            if not os.path.exists(f"migrations/{migration}/up.sql") or not os.path.exists(
+                f"migrations/{migration}/down.sql"
+            ):
+                print(
+                    f"Migration {migration} does not contain both up.sql and down.sql files."
+                )
+
+                should_delete = userinput(
+                    name=f"delete_migration_{migration}",
+                    label="Do you want to delete this migration?",
+                    default="no",
+                    validator="human_bool",
+                    sanitizer="human_bool",
+                )
+
+                if should_delete:
+                    # First, we rollback the migrations
+                    status = os.system("diesel migration revert --all")
+                    if status != 0:
+                        raise RuntimeError("Could not revert the migrations.")
+                    shutil.rmtree(f"migrations/{migration}")
+                    continue
+
+                raise RuntimeError(
+                    f"Migration {migration} does not contain both up.sql and down.sql files."
+                )
 
             _number, desinence = migration.split("_", 1)
 

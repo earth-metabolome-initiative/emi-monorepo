@@ -6,6 +6,45 @@ from functools import cache
 from constraint_checkers.find_foreign_keys import TableMetadata, find_foreign_keys
 from constraint_checkers.indices import PGIndices, find_search_indices
 
+def rust_type_to_diesel_type(rust_type: str) -> str:
+    """Converts a Rust type to a diesel type, including full crate path.
+    
+    Parameters
+    ----------
+    rust_type : str
+        The Rust type to convert.
+
+    Returns
+    -------
+    str
+        The converted diesel type.
+
+    Examples
+    --------
+    >>> rust_type_to_diesel_type("i32")
+    "diesel::sql_types::Integer"
+    >>> rust_type_to_diesel_type("Uuid")
+    "diesel::sql_types::Uuid"
+    """
+    if rust_type == "i32":
+        return "diesel::sql_types::Integer"
+    if rust_type == "Uuid":
+        return "diesel::sql_types::Uuid"
+    if rust_type == "String":
+        return "diesel::sql_types::Text"
+    if rust_type == "bool":
+        return "diesel::sql_types::Bool"
+    if rust_type == "f32":
+        return "diesel::sql_types::Float4"
+    if rust_type == "f64":
+        return "diesel::sql_types::Float8"
+    if rust_type == "NaiveDateTime":
+        return "diesel::sql_types::Timestamp"
+    if rust_type == "Vec<u8>":
+        return "diesel::sql_types::Binary"
+
+    raise ValueError(f"Unsupported Rust type: {rust_type}")
+    
 
 class AttributeMetadata:
     """Class representing the metadata of an attribute."""
@@ -60,14 +99,30 @@ class AttributeMetadata:
         """Returns whether the attribute has a struct data type."""
         return isinstance(self._data_type, StructMetadata)
 
-    def format_data_type(self) -> str:
+    def format_data_type(self, diesel: bool = False) -> str:
+        """Returns the formatted data type of the attribute.
+
+        Parameters
+        ----------
+        diesel : bool
+            Whether to format the data type for the diesel crate.
+        """
+        if diesel:
+            assert not self.has_struct_data_type()
+
         data_type = self.data_type()
+
+        if diesel:
+            data_type = rust_type_to_diesel_type(data_type)
 
         if self.reference:
             data_type = f"&{data_type}"
 
         if self.optional:
-            data_type = f"Option<{data_type}>"
+            if diesel:
+                data_type = f"diesel::sql_types::Nullable<{data_type}>"
+            else:
+                data_type = f"Option<{data_type}>"
 
         return data_type
 
@@ -82,31 +137,48 @@ class AttributeMetadata:
 
         raise ValueError("The data type must be either a string or a StructMetadata.")
 
+    def sql_data_type(self) -> str:
+        """Returns the SQL data type of the attribute."""
+        if self.has_struct_data_type():
+            raise ValueError(
+                "The attribute does not have a SQL data type as it is a struct."
+            )
+        assert isinstance(self._data_type, str)
+        if self._data_type == "i32":
+            return "INTEGER"
+        if self._data_type == "Uuid":
+            return "UUID"
+
+        raise ValueError(
+            f"The data type {self._data_type} is not supported for SQL data types."
+        )
+
     def human_readable_name(self) -> str:
         return " ".join(self.name.split("_")).lower().capitalize()
 
-    def capitalized_name(self) -> str:
-        return "".join(word.capitalize() for word in self.name.split("_"))
-
     def implements_serialize(self) -> bool:
+        """Returns whether the attribute implements the Serialize trait."""
         return (
             not isinstance(self._data_type, StructMetadata)
             or self._data_type.can_implement_serialize()
         )
 
     def implements_deserialize(self) -> bool:
+        """Returns whether the attribute implements the Deserialize trait."""
         return (
             not isinstance(self._data_type, StructMetadata)
             or self._data_type.can_implement_deserialize()
         )
 
     def implements_default(self) -> bool:
+        """Returns whether the attribute implements the Default trait."""
         return (
             not isinstance(self._data_type, StructMetadata)
             or self._data_type.can_implement_default()
         )
 
     def implements_eq(self) -> bool:
+        """Returns whether the attribute implements the Eq trait."""
         return (
             isinstance(self._data_type, StructMetadata)
             and self._data_type.can_implement_eq()
@@ -115,15 +187,19 @@ class AttributeMetadata:
         )
 
     def is_creator_user_id(self) -> bool:
-        return self.name in ("inserted_by", "created_by")
+        """Returns whether the attribute is the creator user ID."""
+        return self.name in ("created_by")
 
     def is_creation_timestamp(self) -> bool:
-        return self.name in ("inserted_at", "created_at")
+        """Returns whether the attribute is the creation timestamp."""
+        return self.name in ("created_at", )
 
     def is_updater_user_id(self) -> bool:
+        """Returns whether the attribute is the updater user ID."""
         return self.name in ("updated_by",)
 
     def is_update_timestamp(self) -> bool:
+        """Returns whether the attribute is the update timestamp."""
         return self.name in ("updated_at",)
 
     def is_automatically_determined_column(self) -> bool:
@@ -271,9 +347,6 @@ class StructMetadata:
         if self._flat_variant is not None:
             return self._flat_variant.human_readable_name()
         return " ".join(re.findall(r"[A-Z][a-z]*", self.name)).lower().capitalize()
-
-    def capitalized_human_readable_table_name(self) -> str:
-        return self.table_name.replace("_", " ").capitalize()
 
     def requires_authentication(self) -> bool:
         """Returns whether the struct requires authentication.
@@ -806,7 +879,7 @@ class StructMetadata:
         """
         return len(self.get_primary_keys()) > 1
 
-    def get_editability_determinant_column(self) -> Optional[AttributeMetadata]:
+    def get_editability_determinant_columns(self) -> Optional[List[AttributeMetadata]]:
         """Returns the column that determines the editability of the struct.
 
         Implementation details
@@ -815,22 +888,41 @@ class StructMetadata:
         column that is a foreign key to the users table.
         """
         if self._flat_variant is not None:
-            return self._flat_variant.get_editability_determinant_column()
+            return self._flat_variant.get_editability_determinant_columns()
 
         if not self.has_foreign_keys():
             return None
-        
-        for attribute in self.get_foreign_keys():
-            # We retrieve the table name associated to the foreign key.
-            foreign_key_table = StructMetadata.table_metadata.get_foreign_key_table_name(
-                self.table_name, attribute.name
-            )
-            if foreign_key_table in ("projects",):
-                return attribute
-        
-        return None
 
-    def editability_may_depend_on_parent_column(self) -> bool:
+        columns = []
+
+        for attribute in self.get_foreign_keys():
+            if attribute.is_automatically_determined_column():
+                continue
+            # We retrieve the table name associated to the foreign key.
+            foreign_key_table = (
+                StructMetadata.table_metadata.get_foreign_key_table_name(
+                    self.table_name, attribute.name
+                )
+            )
+            foreign_key_table_struct = StructMetadata.table_metadata.get_flat_variant(
+                foreign_key_table
+            )
+
+            if foreign_key_table_struct.has_associated_roles():
+                columns.append(attribute)
+                continue
+
+            if self.table_name == foreign_key_table:
+                continue
+
+            if foreign_key_table_struct.editability_always_depend_on_parent_column():
+                columns.append(attribute)
+
+        if len(columns) == 0:
+            return None
+        return columns
+
+    def editability_may_depend_on_parent_columns(self) -> bool:
         """Returns whether the editability of the struct may depend on the parent column.
 
         Implementation details
@@ -839,9 +931,14 @@ class StructMetadata:
         struct is a child variant and the parent variant is a new variant.
         """
         if self._flat_variant is not None:
-            return self._flat_variant.editability_may_depend_on_parent_column()
+            return self._flat_variant.editability_may_depend_on_parent_columns()
 
-        return self.get_editability_determinant_column() is not None
+        columns = self.get_editability_determinant_columns()
+
+        return columns is not None and all(
+            column.optional
+            for column in columns
+        )
 
     def editability_always_depend_on_parent_column(self) -> bool:
         """Returns whether the editability of the struct depends on the parent column.
@@ -854,12 +951,15 @@ class StructMetadata:
         if self._flat_variant is not None:
             return self._flat_variant.editability_always_depend_on_parent_column()
 
-        determinant_column = self.get_editability_determinant_column()
+        determinant_columns = self.get_editability_determinant_columns()
 
-        if determinant_column is None:
+        if determinant_columns is None:
             return False
 
-        return not determinant_column.optional
+        return any(
+            not attribute.optional
+            for attribute in determinant_columns
+        )
 
     def get_formatted_primary_keys(
         self,
@@ -918,13 +1018,54 @@ class StructMetadata:
 
     def has_public_column(self) -> bool:
         """Returns whether the struct has a public column."""
-        if self._flat_variant is not None:
-            return self._flat_variant.has_public_column()
+        return self.get_public_column() is not None
 
-        return any(
-            attribute.data_type() == "bool" and attribute.name == "public"
-            for attribute in self.attributes
+    def get_public_column(self) -> Optional[AttributeMetadata]:
+        """Returns the public column of the struct."""
+        if self._flat_variant is not None:
+            return self._flat_variant.get_public_column()
+
+        for attribute in self.attributes:
+            if attribute.data_type() == "bool" and attribute.name == "public":
+                return attribute
+
+        return None
+
+    def may_be_hidden(self) -> bool:
+        """Returns whether the struct may be hidden.
+
+        Implementation details
+        -----------------------
+        A struct may be hidden if it has a public column or if it has
+        its editability fully defined by the parent column, and the parent
+        table associated with the struct may be hidden.
+        """
+        if self.has_public_column():
+            return True
+        if self.editability_always_depend_on_parent_column():
+            editability_parent_columns = self.get_editability_determinant_columns()
+            assert editability_parent_columns is not None
+            return any(
+                self.get_foreign_key_flat_variant(
+                    editability_parent_column
+                ).may_be_hidden()
+                for editability_parent_column in editability_parent_columns
+            )
+
+        return False
+
+    def get_foreign_key_flat_variant(self, foreign_key: AttributeMetadata) -> "StructMetadata":
+        """Returns the flat variant associated with the foreign key.
+
+        Parameters
+        ----------
+        foreign_key : AttributeMetadata
+            The foreign key to get the flat variant from.
+        """
+        foreign_key_table = StructMetadata.table_metadata.get_foreign_key_table_name(
+            self.table_name, foreign_key.name
         )
+        return StructMetadata.table_metadata.get_flat_variant(foreign_key_table)
 
     def set_filter_variant(self, struct: "StructMetadata"):
         """Sets the filter variant of the struct.
@@ -981,43 +1122,60 @@ class StructMetadata:
         -----------------------
         A struct is searchable if it has a trigram index on the table.
         """
-        if StructMetadata.pg_indices.has_table(self.table_name):
-            index = StructMetadata.pg_indices.get_table(self.table_name)
-            if index.is_btree():
-                return self.has_uuid_primary_key()
-            return True
-        else:
-            return False
+        return StructMetadata.pg_indices.has_table(self.table_name)
 
+    def get_can_edit_function_name(self) -> str:
+        """Returns the name of the can_edit function."""
+        return f"can_edit_{self.table_name}"
 
-    def get_opaque_foreign_keys(self) -> List[AttributeMetadata]:
-        """Returns list of foreign keys that are not searchable.
+    def has_can_edit_function(self) -> bool:
+        """Returns whether the table has a can_edit function."""
+        return self.table_metadata.has_postgres_function(
+            self.get_can_edit_function_name()
+        )
 
-        Implementation details
-        -----------------------
-        This method returns the foreign keys that are not searchable,
-        i.e. that do not implement a trigram index in the database.
-        """
-        return [
-            attribute
-            for attribute in self.get_foreign_keys()
-            if not StructMetadata.pg_indices.has_table(
-                StructMetadata.table_metadata.get_foreign_key_table_name(
-                    self.table_name, attribute.name
-                )
-            )
-        ]
+    def get_can_view_function_name(self) -> str:
+        """Returns the name of the can_view function."""
+        return f"can_view_{self.table_name}"
 
-    def has_opaque_foreign_keys(self) -> bool:
-        """Returns whether the struct has opaque foreign keys.
+    def get_can_delete_function_name(self) -> str:
+        """Returns the name of the can_delete function."""
+        return f"can_delete_{self.table_name}"
 
-        Implementation details
-        -----------------------
-        This method returns whether the struct has foreign keys that
-        are not searchable, i.e. that do not implement a trigram index
-        in the database.
-        """
-        return len(self.get_opaque_foreign_keys()) > 0
+    def get_can_edit_trigger_name(self) -> str:
+        """Returns the name of the can_edit trigger."""
+        return f"can_edit_{self.table_name}"
+
+    def has_can_edit_trigger(self) -> bool:
+        """Returns whether the table has a can_edit trigger."""
+        return self.table_metadata.has_trigger_by_name(
+            self.table_name,
+            self.get_can_edit_trigger_name()
+        )
+
+    def has_can_view_function(self) -> bool:
+        """Returns whether the table has a can_view function."""
+        return self.table_metadata.has_postgres_function(
+            self.get_can_view_function_name()
+        )
+
+    def has_can_delete_function(self) -> bool:
+        """Returns whether the table has a can_delete function."""
+        return self.table_metadata.has_postgres_function(
+            self.get_can_delete_function_name()
+        )
+
+    def has_created_at(self) -> bool:
+        """Returns whether the struct has a created at attribute."""
+        if self._flat_variant is not None:
+            return self._flat_variant.has_created_at()
+        return any(attribute.is_creation_timestamp() for attribute in self.attributes)
+
+    def has_updated_at(self) -> bool:
+        """Returns whether the struct has an updated at attribute."""
+        if self._flat_variant is not None:
+            return self._flat_variant.has_updated_at()
+        return any(attribute.is_update_timestamp() for attribute in self.attributes)
 
     def get_unique_constraints(self) -> List[List[AttributeMetadata]]:
         """Returns the unique constraints of the struct.

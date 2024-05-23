@@ -2,7 +2,7 @@
 
 from typing import List
 from tqdm.auto import tqdm
-from constraint_checkers.struct_metadata import StructMetadata
+from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
 from constraint_checkers.indices import PGIndex, PGIndices
 
 
@@ -320,18 +320,23 @@ def write_backend_flat_variants(
             # the rows in the table structured as a vector of the struct.
 
             for editable_variant in editable_variants:
+
+                author_user_id = AttributeMetadata(
+                    original_name="author_user_id",
+                    name="author_user_id", data_type="i32", optional=not editable_variant
+                )
+
                 if editable_variant:
                     file.write(
                         "    /// Get all of the editable structs from the database.\n"
                     )
                 else:
-                    file.write("    /// Get all of the structs from the database.\n")
-                file.write("    ///\n    /// # Arguments\n")
-
-                if editable_variant:
                     file.write(
-                        "    /// * `author_user_id` - The ID of the user who is performing the search.\n"
+                        "    /// Get all of the viewable structs from the database.\n"
                     )
+                file.write(
+                    "    ///\n    /// # Arguments\n"
+                )
 
                 if struct.has_filter_variant():
                     file.write(
@@ -339,6 +344,7 @@ def write_backend_flat_variants(
                     )
 
                 file.write(
+                    f"    /// * `{author_user_id.name}` - The ID of the user who is performing the search.\n"
                     "    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.\n"
                     "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
                     "    /// * `connection` - The connection to the database.\n"
@@ -346,10 +352,10 @@ def write_backend_flat_variants(
                 )
                 if editable_variant:
                     file.write(
-                        "    pub fn all_editables(\n        author_user_id: i32,\n"
+                        "    pub fn all_editables(\n"
                     )
                 else:
-                    file.write("    pub fn all(\n")
+                    file.write("    pub fn all_viewables(\n")
 
                 if struct.has_filter_variant():
                     filter_struct = struct.get_filter_variant()
@@ -357,6 +363,7 @@ def write_backend_flat_variants(
                         f"        filter: Option<&web_common::database::{filter_struct.name}>,\n"
                     )
                 file.write(
+                    f"        {author_user_id.name}: {author_user_id.format_data_type()},\n"
                     "        limit: Option<i64>,\n"
                     "        offset: Option<i64>,\n"
                     "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
@@ -387,12 +394,12 @@ def write_backend_flat_variants(
                     primary_key = primary_keys[0]
 
                     file.write(
-                        f"           .filter({struct.table_name}::dsl::created_by.eq(author_user_id))\n"
+                        f"           .filter({struct.table_name}::dsl::created_by.eq({author_user_id.name}))\n"
                         "            .or_filter(\n"
                         f"               {struct.table_name}::dsl::{primary_key.name}.eq_any(\n"
                         f"                   {struct.table_name}_users_roles::table\n"
                         f"                       .select({struct.table_name}_users_roles::dsl::table_id)\n"
-                        f"                       .filter({struct.table_name}_users_roles::dsl::user_id.eq(author_user_id)\n"
+                        f"                       .filter({struct.table_name}_users_roles::dsl::user_id.eq({author_user_id.name})\n"
                         f"                       .and({struct.table_name}_users_roles::dsl::role_id.le(2)),\n"
                         "               )),\n"
                         "            )\n"
@@ -424,8 +431,8 @@ def write_backend_flat_variants(
 
                     for filter_attribute in filter_struct.attributes:
                         file.write(
-                            f"        if let Some(value) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
-                            f"            query = query.filter({filter_struct.table_name}::dsl::{filter_attribute.name}.eq(value));\n"
+                            f"        if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                            f"            query = query.filter({filter_struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
                             "        }\n"
                         )
 
@@ -443,9 +450,9 @@ def write_backend_flat_variants(
             # table structured as a vector of the struct ordered by the updated_at
             # column in descending order.
 
-            if struct.table_metadata.has_updated_at_column(struct.table_name):
+            if struct.has_updated_at() or struct.has_created_at():
                 file.write(
-                    "    /// Get all of the structs from the database ordered by the updated_at column.\n"
+                    "    /// Get all of the structs from the database ordered by update time.\n"
                     "    ///\n"
                     "    /// # Arguments\n"
                 )
@@ -460,7 +467,7 @@ def write_backend_flat_variants(
                     "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
                     "    /// * `connection` - The connection to the database.\n"
                     "    ///\n"
-                    "    pub fn all_by_updated_at(\n"
+                    "    pub fn all_by_update(\n"
                 )
                 if struct.has_filter_variant():
                     filter_struct = struct.get_filter_variant()
@@ -500,8 +507,17 @@ def write_backend_flat_variants(
                         f"        {struct.table_name}::dsl::{struct.table_name}\n"
                     )
 
+                if struct.has_updated_at():
+                    file.write(
+                        f"            .order_by({struct.table_name}::dsl::updated_at.desc())\n"
+                    )
+                elif struct.has_created_at():
+                    file.write(
+                        f"            .order_by({struct.table_name}::dsl::created_at.desc())\n"
+                    )
+                else:
+                    assert False, "The all_by_update method is only implemented for tables with an updated_at column."
                 file.write(
-                    f"            .order_by({struct.table_name}::dsl::updated_at.desc())\n"
                     "            .offset(offset.unwrap_or(0))\n"
                     "            .limit(limit.unwrap_or(10))\n"
                     "            .load::<Self>(connection)\n"
@@ -641,18 +657,6 @@ def write_backend_flat_variants(
                     struct.table_name
                 )
 
-                editable_where_clause = (
-                    f'            "{struct.table_name}.created_by = $3 ",\n'
-                    f'            "OR {struct.table_name}.id IN ",\n'
-                    f'            "(SELECT {struct.table_name}_users_roles.table FROM {struct.table_name}_users_roles ",\n'
-                    f'            "WHERE {struct.table_name}_users_roles.user_id = $3 AND {struct.table_name}_users_roles.role_id <= 2) ",\n'
-                    f'            "OR {struct.table_name}.id IN ",\n'
-                    f'            "(SELECT {struct.table_name}_teams_roles.table_id FROM {struct.table_name}_teams_roles ",\n'
-                    f'            "WHERE {struct.table_name}_teams_roles.role_id <= 2 AND {struct.table_name}_teams_roles.table_id IN ",\n'
-                    '            "(SELECT teams_users_roles.table_id FROM teams_users_roles ",\n'
-                    '            "WHERE teams_users_roles.user_id = $3 AND teams_users_roles.role_id <= 2)) ",\n'
-                )
-
                 for (
                     method_name,
                     similarity_operator,
@@ -661,23 +665,42 @@ def write_backend_flat_variants(
 
                     for editable_filter in editable_variants:
 
-                        if editable_filter:
-                            file.write(
-                                f"    /// Search for the editable struct by a given string by Postgres's `{method_name}`.\n"
-                            )
-                        else:
-                            file.write(
-                                f"    /// Search for the struct by a given string by Postgres's `{method_name}`.\n"
-                            )
-                        file.write("    ///\n    /// # Arguments\n")
+                        author_user_id = AttributeMetadata(
+                            original_name="author_user_id",
+                            name="author_user_id",
+                            data_type="i32",
+                            optional=not editable_filter
+                        )
 
                         if editable_filter:
-                            # In the editable filter version we also receive in input the author_user_id
-                            # of the user who is performing the search.
                             file.write(
-                                "    /// * `author_user_id` - The ID of the user who is performing the search.\n"
+                                f"    /// Search for the editable structs by a given string by Postgres's `{method_name}`.\n"
                             )
+                            assert struct.has_can_edit_function(), "The struct must have a can_edit function to implement the search editables method."
+                            where_clause = f"{struct.get_can_edit_function_name()}($3, {struct.get_formatted_primary_keys(include_prefix=True, prefix=struct.table_name)})"
+                        else:
+                            file.write(
+                                f"    /// Search for the viewable structs by a given string by Postgres's `{method_name}`.\n"
+                            )
+                            if struct.is_insertable():
+                                assert struct.has_can_view_function(), f"The struct {struct.name} must have a can_view function to implement the search viewables method."
+                                where_clause = f"{struct.get_can_view_function_name()}($3, {struct.get_formatted_primary_keys(include_prefix=True, prefix=struct.table_name)})"
+                            else:
+                                where_clause = None
+
+                        if where_clause is not None:
+                            if similarity_index.is_gin():
+                                where_clause = f"AND {where_clause} "
+                            elif similarity_index.is_gist():
+                                where_clause = f'            "WHERE {where_clause} ",\n'
+                            else:
+                                assert False, "The similarity index must be either GIN or GIST."
+                        else:
+                            where_clause = ""
+
                         file.write(
+                            "    ///\n    /// # Arguments\n"
+                            f"    /// * `{author_user_id.name}` - The ID of the user who is performing the search.\n"
                             "    /// * `query` - The string to search for.\n"
                             "    /// * `limit` - The maximum number of results, by default `10`.\n"
                             "    /// * `connection` - The connection to the database.\n"
@@ -686,12 +709,10 @@ def write_backend_flat_variants(
                         if editable_filter:
                             file.write(f"    pub fn {method_name}_search_editables(\n")
                         else:
-                            file.write(f"    pub fn {method_name}_search(\n")
-
-                        if editable_filter:
-                            file.write("        author_user_id: i32,\n")
+                            file.write(f"    pub fn {method_name}_search_viewables(\n")
 
                         file.write(
+                            f"       {author_user_id.name}: {author_user_id.format_data_type()},\n"
                             "        query: &str,\n"
                             "        limit: Option<i32>,\n"
                             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
@@ -708,20 +729,20 @@ def write_backend_flat_variants(
                         if editable_filter:
                             if struct.has_filter_variant():
                                 file.write(
-                                    "            return Self::all_editables(author_user_id, None, Some(limit as i64), None, connection);\n"
+                                    f"            return Self::all_editables({author_user_id.name}, None, Some(limit as i64), None, connection);\n"
                                 )
                             else:
                                 file.write(
-                                    "            return Self::all_editables(author_user_id, Some(limit as i64), None, connection);\n"
+                                    f"            return Self::all_editables({author_user_id.name}, Some(limit as i64), None, connection);\n"
                                 )
                         else:
                             if struct.has_filter_variant():
                                 file.write(
-                                    "            return Self::all(None, Some(limit as i64), None, connection);\n"
+                                    f"            return Self::all_viewables({author_user_id.name}, None, Some(limit as i64), None, connection);\n"
                                 )
                             else:
                                 file.write(
-                                    "            return Self::all(Some(limit as i64), None, connection);\n"
+                                    f"            return Self::all_viewables({author_user_id.name}, Some(limit as i64), None, connection);\n"
                                 )
                         file.write("        }\n")
 
@@ -737,29 +758,13 @@ def write_backend_flat_variants(
                             )
                             if similarity_index.is_gin():
                                 file.write(
-                                    f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} ",\n'
-                                )
-                                if editable_filter:
-                                    file.write(f'"AND ",\n {editable_where_clause}')
-                                file.write(
+                                    f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} {where_clause}",\n'
                                     f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
                                 )
                             elif similarity_index.is_gist():
-                                if editable_filter:
-                                    file.write(
-                                        f'            "WHERE {editable_where_clause} ",\n'
-                                    )
                                 file.write(
-                                    f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2",\n'
+                                    f'{where_clause}            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2",\n'
                                 )
-                            elif similarity_index.is_btree():
-                                # In the case of a btree, we simply search the prefix of the string.
-                                file.write(
-                                    f'            "WHERE {similarity_index.arguments} LIKE $1% ",\n'
-                                )
-                                if editable_filter:
-                                    file.write(f'"AND ",\n {editable_where_clause}')
-                                file.write('            "LIMIT $2",\n')
                             else:
                                 raise RuntimeError(
                                     "The similarity index must be either GIN or GIST."
@@ -777,30 +782,18 @@ def write_backend_flat_variants(
                             )
                             if similarity_index.is_gin():
                                 file.write(
-                                    f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} ",\n'
-                                )
-                                if editable_filter:
-                                    file.write(f'"AND ",\n {editable_where_clause}')
-
-                                file.write(
+                                    f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} {where_clause}",\n'
                                     f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
                                 )
                             elif similarity_index.is_gist():
-                                if editable_filter:
-                                    file.write(
-                                        f'            "WHERE {editable_where_clause} ",\n'
-                                    )
                                 file.write(
-                                    f'            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2;"\n'
+                                    f'{where_clause}            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2;"\n'
                                 )
                             elif similarity_index.is_btree():
                                 # In the case of a btree, we simply search the prefix of the string.
                                 file.write(
-                                    f'            "WHERE {similarity_index.arguments} LIKE $1% ",\n'
-                                )
-                                if editable_filter:
-                                    file.write(f'"AND ",\n {editable_where_clause}')
-                                file.write('            "LIMIT $2;"\n')
+                                    f'            "WHERE {similarity_index.arguments} LIKE $1%{where_clause}",\n'
+                                    '            "LIMIT $2;"\n')
                             else:
                                 raise RuntimeError(
                                     "The similarity index must be either GIN or GIST."
@@ -812,10 +805,9 @@ def write_backend_flat_variants(
                             "            .bind::<diesel::sql_types::Text, _>(query)\n"
                             "            .bind::<diesel::sql_types::Integer, _>(limit)\n"
                         )
-                        if editable_filter:
-                            file.write(
-                                "            .bind::<diesel::sql_types::Integer, _>(author_user_id)\n"
-                            )
+                        file.write(
+                            f"            .bind::<{author_user_id.format_data_type(diesel=True)}, _>({author_user_id.name})\n"
+                        )
                         file.write("            .load(connection)\n}\n")
 
             # Finally, we cluse the struct implementation.

@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from retrieve_taxons import retrieve_taxons
 from constraint_checkers import (
     find_foreign_keys,
+    ensure_no_dead_python_code,
     ensures_all_update_at_trigger_exists,
 )
 from constraint_checkers import ensure_created_at_columns, ensure_updated_at_columns
@@ -50,13 +51,20 @@ from constraint_checkers import (
     derive_frontend_builders,
     derive_webcommon_new_variants,
     derive_webcommon_update_variants,
-    write_web_common_search_trait_implementations
+    write_web_common_search_trait_implementations,
+    write_diesel_sql_function_bindings
+)
+from constraint_checkers import (
+    ensure_can_x_function_existance,
+    ensures_no_duplicated_migrations
 )
 
 
 if __name__ == "__main__":
     # Load dotenv file
     load_dotenv()
+    ensure_no_dead_python_code()
+    ensures_no_duplicated_migrations()
     regroup_tables()
 
     # If there is a "__pycache__" directory, we remove it as Diesel
@@ -96,6 +104,8 @@ if __name__ == "__main__":
     generate_view_structs()
     print("Generated view structs.")
 
+    write_diesel_sql_function_bindings(tables_metadata)
+
     table_structs: List[StructMetadata] = extract_structs("src/models.rs")
     view_structs: List[StructMetadata] = extract_structs("src/views/views.rs")
 
@@ -108,21 +118,10 @@ if __name__ == "__main__":
     )
     print(f"Generated {len(filter_structs)} filter structs.")
 
-    write_backend_flat_variants("src/models.rs", "tables", table_structs)
-    write_backend_flat_variants("src/views/views.rs", "views", view_structs)
-    print(
-        f"Generated {len(table_structs)} tables and {len(view_structs)} views implementations for backend."
-    )
-
-    write_web_common_flat_variants(table_structs, "tables")
-    write_web_common_flat_variants(view_structs, "views")
-    print("Generated web common structs.")
-
     nested_structs: List[StructMetadata] = derive_nested_structs(
         table_structs + view_structs
     )
-    write_backend_nested_structs(nested_structs)
-    print(f"Generated {len(nested_structs)} nested structs for backend.")
+    print(f"Derived {len(nested_structs)} nested structs.")
 
     new_model_structs = derive_webcommon_new_variants(table_structs)
     print(f"Derived {len(new_model_structs)} structs for the New versions")
@@ -136,8 +135,22 @@ if __name__ == "__main__":
         update_model_structs,
     )
     ensure_updatable_tables_have_roles_tables(tables, tables_metadata)
+    ensure_can_x_function_existance(tables)
     ensure_tables_have_creation_notification_trigger(tables, tables_metadata)
     print("Generated table names enumeration for web_common.")
+
+    write_backend_flat_variants("src/models.rs", "tables", table_structs)
+    write_backend_flat_variants("src/views/views.rs", "views", view_structs)
+    print(
+        f"Generated {len(table_structs)} tables and {len(view_structs)} views implementations for backend."
+    )
+
+    write_web_common_flat_variants(table_structs, "tables")
+    write_web_common_flat_variants(view_structs, "views")
+    print("Generated web common structs.")
+
+    write_backend_nested_structs(nested_structs)
+    print(f"Generated {len(nested_structs)} nested structs for backend.")
 
     write_backend_table_names_enumeration(tables)
     print("Generated table names enumeration for diesel.")

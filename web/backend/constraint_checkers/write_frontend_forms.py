@@ -880,7 +880,6 @@ def handle_missing_gin_index(
                 up_index_migration.write(
                     f"-- Create index to run approximate search queries on the {attribute.raw_data_type().table_name} table.\n"
                     f"-- The search will be case insensitive and will use the trigram index.\n\n"
-                    "CREATE EXTENSION IF NOT EXISTS pg_trgm;\n\n"
                 )
 
                 if len(textual_columns) > 1:
@@ -1063,16 +1062,6 @@ def handle_missing_row_to_searchable_badge_implementation(
                 )
                 if column.data_type() in TEXTUAL_DATA_TYPES
                 and column.name in index.arguments
-            ]
-        elif index.is_btree():
-            search_columns = [
-                column
-                for column in (
-                    struct.get_attribute_by_name("inner").raw_data_type().attributes
-                    if struct.is_nested()
-                    else struct.attributes
-                )
-                if column.data_type() in TEXTUAL_DATA_TYPES or column in struct.get_primary_keys()
             ]
         else:
             raise RuntimeError(
@@ -1347,12 +1336,9 @@ def write_frontend_yew_form(
                         )
                         properties_attributes.append(foreign_key.as_option())
                     else:
-                        assert not foreign_key.optional, (
-                            f"The foreign key attribute {foreign_key.name} is optional, "
-                            "but it does not have a trigram index associated with it. "
-                            "Please make the attribute non-optional or create a trigram index "
-                            "for it."
-                        )
+                        if foreign_key.optional:
+                            handle_missing_gin_index(builder.get_attribute_by_name(foreign_key.normalized_name()), builder)
+
                         document.write(
                             f"    pub {foreign_key.name}: {foreign_key.data_type()},\n"
                         )

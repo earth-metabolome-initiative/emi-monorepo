@@ -34,15 +34,6 @@ impl Searchable<false> for NestedDocumentFormat {
         )
     }
 }
-impl Searchable<false> for NestedObservation {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::Observations,
-              query,
-              limit,
-        )
-    }
-}
 impl Searchable<false> for NestedOrganization {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -119,33 +110,6 @@ impl Searchable<false> for NestedSampledIndividual {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::SampledIndividuals,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable<false> for NestedSample {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::Samples,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable<true> for NestedSample {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search_editables(
-             Table::Samples,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable<true> for NestedSpectraCollection {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search_editables(
-             Table::SpectraCollections,
               query,
               limit,
         )
@@ -232,15 +196,6 @@ impl Searchable<false> for FontAwesomeIcon {
         )
     }
 }
-impl Searchable<false> for Observation {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::Observations,
-              query,
-              limit,
-        )
-    }
-}
 impl Searchable<false> for Organization {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
@@ -317,33 +272,6 @@ impl Searchable<false> for SampledIndividual {
     fn search_task(query: String, limit: u32) -> super::Select {
         super::Select::search(
              Table::SampledIndividuals,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable<false> for Sample {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search(
-             Table::Samples,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable<true> for Sample {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search_editables(
-             Table::Samples,
-              query,
-              limit,
-        )
-    }
-}
-impl Searchable<true> for SpectraCollection {
-    fn search_task(query: String, limit: u32) -> super::Select {
-        super::Select::search_editables(
-             Table::SpectraCollections,
               query,
               limit,
         )

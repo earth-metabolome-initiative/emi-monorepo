@@ -9,3 +9,4 @@ polars
 pyarrow
 userinput
 lxml
+jaro-winkler

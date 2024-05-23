@@ -21,14 +21,56 @@ class ViewColumn:
         self.table_name = table_name
         self.nullable = nullable
 
+def postgres_type_to_diesel_type(postgres_type: str) -> str:
+    """Converts a Postgres type to a Diesel type."""
+    if postgres_type == "integer":
+        return "diesel::sql_types::Integer"
+    if postgres_type == "text":
+        return "diesel::sql_types::Text"
+    if postgres_type == "timestamp with time zone":
+        return "diesel::sql_types::Timestamp"
+    if postgres_type == "uuid":
+        return "diesel::sql_types::Uuid"
+    if postgres_type == "boolean":
+        return "diesel::sql_types::Bool"
+    
+    raise ValueError(f"Unknown Postgres type: {postgres_type}")
+
+class SQLFunction:
+    """Class providing metadata for a SQL function."""
+
+    def __init__(self, function_name: str):
+        self.function_name = function_name
+        self.arguments: List[str] = []
+        self.argument_types: List[str] = []
+        self.return_type: Optional[str] = None
+
+    def add_argument(self, argument: str, argument_type: str):
+        """Adds an argument to the SQL function."""
+        self.arguments.append(argument)
+        self.argument_types.append(argument_type)
+
+    def set_return_type(self, return_type: str):
+        """Sets the return type of the SQL function."""
+        self.return_type = return_type
+
+    def write_diesel_binding_to_file(self, f):
+        """Writes the Diesel binding for the SQL function to a file."""
+        f.write("define_sql_function! {\n")
+        f.write(f"   fn {self.function_name}(\n")
+        for argument, argument_type in zip(self.arguments, self.argument_types):
+            f.write(f"        {argument}: diesel::sql_types::Nullable<{postgres_type_to_diesel_type(argument_type)}>,\n")
+        f.write(f"    ) -> {postgres_type_to_diesel_type(self.return_type)},\n")
+        f.write("}\n\n")
 
 class TableMetadata:
+    """Class for table metadata."""
 
     def __init__(self, table_metadata: pd.DataFrame):
         self.table_metadata = table_metadata
         self._view_names: List[str] = []
         self._table_names: List[str] = []
-        self._flat_variants: Dict[str, str] = {}
+        self._flat_variants: Dict[str, "StructMetadata"] = {}
 
     def tables(self) -> List[str]:
         return self.table_metadata["referencing_table"].unique().tolist()
@@ -60,7 +102,7 @@ class TableMetadata:
 
         return is_table
 
-    def register_flat_variant(self, table_name: str, flat_variant: str):
+    def register_flat_variant(self, table_name: str, flat_variant: "StructMetadata"):
         """Registers a flat variant for a table.
 
         Parameters
@@ -72,10 +114,11 @@ class TableMetadata:
         """
         if table_name in self._flat_variants:
             raise ValueError(f"The table {table_name} already has a flat variant.")
-        
+        assert not isinstance(flat_variant, str)
+
         self._flat_variants[table_name] = flat_variant
 
-    def get_flat_variant(self, table_name: str) -> str:
+    def get_flat_variant(self, table_name: str) -> "StructMetadata":
         """Returns the flat variant of the table.
 
         Parameters
@@ -342,43 +385,6 @@ class TableMetadata:
                 )
 
         return table_columns["referenced_table"].values[0]
-
-    @cache
-    def foreign_key_table_has_foreign_keys(
-        self, table_name: str, foreign_key_column: str
-    ) -> bool:
-        """Returns whether the foreign key table has foreign keys.
-
-        Parameters
-        ----------
-        table_name : str
-            The name of the table.
-        foreign_key_column : str
-            The name of the foreign key column.
-
-        Implementation details
-        ----------------------
-        This method checks if the foreign key table has foreign keys.
-        """
-        return self.has_foreign_keys(
-            self.get_foreign_key_table_name(table_name, foreign_key_column)
-        )
-
-    @cache
-    def has_primary_key(self, table_name: str) -> bool:
-        """Returns whether the table has a primary key.
-
-        Parameters
-        ----------
-        table_name : str
-            The name of the table.
-
-        Implementation details
-        ----------------------
-        This method returns whether the table metadata associated with
-        the table name has a non-null value in the `column_key` column.
-        """
-        return self.get_primary_key_names_and_types(table_name) is not None
 
     def is_primary_key(self, table_name: str, candidate_key: str) -> bool:
         """Returns whether the candidate key is the primary key of the table.
@@ -796,6 +802,86 @@ class TableMetadata:
             self.is_table(f"{table_name}_{reference}_roles")
             for reference in ("users", "teams")
         )
+
+    def get_all_postgres_functions(self) -> List[SQLFunction]:
+        """Returns the list of all Postgres functions."""
+        _conn, cursor = get_cursor()
+        cursor.execute(
+            """
+            SELECT
+                p.proname AS function_name,
+                pg_catalog.pg_get_function_result(p.oid) AS return_type,
+                pg_catalog.pg_get_function_arguments(p.oid) AS arguments
+            FROM pg_catalog.pg_proc p
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+            WHERE pg_catalog.pg_function_is_visible(p.oid)
+            AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+            AND p.proname NOT LIKE 'diesel_%'
+            AND p.proname NOT LIKE 'uuid_%'
+            AND p.proname NOT LIKE 'set_%'
+            AND p.proname NOT LIKE 'show_%'
+            AND p.proname NOT LIKE 'gtrgm_%'
+            AND p.proname NOT LIKE 'gin_%'
+            AND p.proname NOT LIKE 'word_similarity%'
+            AND p.proname NOT LIKE 'strict_word_similarity%'
+            AND p.proname NOT LIKE 'similarity%'
+            AND pg_catalog.pg_get_function_result(p.oid) != 'trigger';
+            """
+        )
+
+        postgres_functions = cursor.fetchall()
+        cursor.close()
+
+        assert len(postgres_functions) > 0, (
+            "There are no Postgres functions in the database. "
+            "We expect the database to contain several functions, such "
+            "as the can_view and can_edit functions."
+        )
+
+        sql_functions = []
+
+        for function in postgres_functions:
+            function_name = function[0]
+            sql_function = SQLFunction(function_name)
+            arguments = function[2].split(", ")
+            for argument in arguments:
+                argument_name, argument_type = argument.split(" ")
+                sql_function.add_argument(argument_name, argument_type)
+            sql_function.set_return_type(function[1])
+            sql_functions.append(sql_function)
+
+        return sql_functions
+
+    def has_postgres_function(self, function_name: str) -> bool:
+        """Returns whether the table has a Postgres function.
+
+        Parameters
+        ----------
+        function_name : str
+            The name of the function.
+
+        Implementation details
+        ----------------------
+        This method returns whether the table metadata associated with
+        the table name has a function named `function_name`.
+        """
+        _conn, cursor = get_cursor()
+        cursor.execute(
+            f"""
+            SELECT
+                proname
+            FROM
+                pg_proc
+            WHERE
+                proname = '{function_name}';
+            """
+        )
+
+        has_function = cursor.fetchone() is not None
+        cursor.close()
+
+        return has_function
+    
 
 
 def find_foreign_keys() -> TableMetadata:

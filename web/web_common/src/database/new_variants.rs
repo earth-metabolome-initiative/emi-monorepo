@@ -224,8 +224,8 @@ impl Tabular for NewSampledIndividualBioOttTaxonItem {
 pub struct NewSampledIndividual {
     pub id: Uuid,
     pub notes: Option<String>,
+    pub barcode: Option<String>,
     pub project_id: i32,
-    pub tagged: bool,
     pub picture: Vec<u8>,
 }
 
@@ -242,8 +242,11 @@ impl NewSampledIndividual {
                 Some(notes) => gluesql::core::ast_builder::text(notes),
                 None => gluesql::core::ast_builder::null(),
             },
+            match self.barcode {
+                Some(barcode) => gluesql::core::ast_builder::text(barcode),
+                None => gluesql::core::ast_builder::null(),
+            },
             gluesql::core::ast_builder::num(self.project_id),
-            (self.tagged.into()),
             gluesql::core::ast_builder::bytea(self.picture),
             gluesql::core::ast_builder::num(created_by),
         ]
@@ -268,7 +271,7 @@ impl NewSampledIndividual {
         let id = self.id;
         table("sampled_individuals")
             .insert()
-            .columns("created_by,id,notes,project_id,tagged,picture,updated_by")
+            .columns("created_by,id,notes,barcode,project_id,picture,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -299,11 +302,13 @@ impl NewSampledIndividual {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
-.set("tagged", self.tagged)        
 .set("picture", gluesql::core::ast_builder::bytea(self.picture))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(notes) = self.notes {
             update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
+        }
+        if let Some(barcode) = self.barcode {
+            update_row = update_row.set("barcode", gluesql::core::ast_builder::text(barcode));
         }
             update_row.execute(connection)
             .await
@@ -409,66 +414,6 @@ impl NewSample {
 
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSamplesTeamsRoleInvitation {
-    pub table_id: Uuid,
-    pub team_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSamplesTeamsRoleInvitation {
-    const TABLE: Table = Table::SamplesTeamsRoleInvitations;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSamplesTeamsRoleRequest {
-    pub table_id: Uuid,
-    pub team_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSamplesTeamsRoleRequest {
-    const TABLE: Table = Table::SamplesTeamsRoleRequests;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSamplesTeamsRole {
-    pub table_id: Uuid,
-    pub team_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSamplesTeamsRole {
-    const TABLE: Table = Table::SamplesTeamsRoles;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSamplesUsersRoleInvitation {
-    pub table_id: Uuid,
-    pub user_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSamplesUsersRoleInvitation {
-    const TABLE: Table = Table::SamplesUsersRoleInvitations;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSamplesUsersRoleRequest {
-    pub table_id: Uuid,
-    pub user_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSamplesUsersRoleRequest {
-    const TABLE: Table = Table::SamplesUsersRoleRequests;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSamplesUsersRole {
-    pub table_id: Uuid,
-    pub user_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSamplesUsersRole {
-    const TABLE: Table = Table::SamplesUsersRoles;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSpectraCollection {
     pub notes: Option<String>,
     pub sample_id: Uuid,
@@ -476,66 +421,6 @@ pub struct NewSpectraCollection {
 
 impl Tabular for NewSpectraCollection {
     const TABLE: Table = Table::SpectraCollections;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSpectraCollectionsTeamsRoleInvitation {
-    pub table_id: i32,
-    pub team_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSpectraCollectionsTeamsRoleInvitation {
-    const TABLE: Table = Table::SpectraCollectionsTeamsRoleInvitations;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSpectraCollectionsTeamsRoleRequest {
-    pub table_id: i32,
-    pub team_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSpectraCollectionsTeamsRoleRequest {
-    const TABLE: Table = Table::SpectraCollectionsTeamsRoleRequests;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSpectraCollectionsTeamsRole {
-    pub table_id: i32,
-    pub team_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSpectraCollectionsTeamsRole {
-    const TABLE: Table = Table::SpectraCollectionsTeamsRoles;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSpectraCollectionsUsersRoleInvitation {
-    pub table_id: i32,
-    pub user_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSpectraCollectionsUsersRoleInvitation {
-    const TABLE: Table = Table::SpectraCollectionsUsersRoleInvitations;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSpectraCollectionsUsersRoleRequest {
-    pub table_id: i32,
-    pub user_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSpectraCollectionsUsersRoleRequest {
-    const TABLE: Table = Table::SpectraCollectionsUsersRoleRequests;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSpectraCollectionsUsersRole {
-    pub table_id: i32,
-    pub user_id: i32,
-    pub role_id: i32,
-}
-
-impl Tabular for NewSpectraCollectionsUsersRole {
-    const TABLE: Table = Table::SpectraCollectionsUsersRoles;
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewTeam {
