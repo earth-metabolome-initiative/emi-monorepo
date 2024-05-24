@@ -1966,6 +1966,244 @@ impl LoginProvider {
     }
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct Material {
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+impl Tabular for Material {
+    const TABLE: Table = Table::Materials;
+}
+
+impl Filtrable for Material {
+    type Filter = MaterialFilter;
+}
+#[cfg(feature = "frontend")]
+impl Material {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::text(self.description),
+            match self.icon_id {
+                Some(icon_id) => gluesql::core::ast_builder::num(icon_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.color_id {
+                Some(color_id) => gluesql::core::ast_builder::num(color_id),
+                None => gluesql::core::ast_builder::null(),
+            },
+        ]
+    }
+
+    /// Insert the Material into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table Material
+    pub async fn insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("materials")
+            .insert()
+            .columns("id, name, description, icon_id, color_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get Material from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("materials")
+            .select()
+            .filter(col("id").eq(id.to_string()))
+            .project("id, name, description, icon_id, color_id")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete Material from the database.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("materials")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of Material from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(self.id, connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("materials")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("description", gluesql::core::ast_builder::text(self.description));
+        if let Some(icon_id) = self.icon_id {
+            update_row = update_row.set("icon_id", gluesql::core::ast_builder::num(icon_id));
+        }
+        if let Some(color_id) = self.color_id {
+            update_row = update_row.set("color_id", gluesql::core::ast_builder::num(color_id));
+        }
+            update_row.execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all Material from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        filter: Option<&MaterialFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("materials")
+            .select()
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, description, icon_id, color_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            id: match row.get("id").unwrap() {
+                gluesql::prelude::Value::I32(id) => id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            description: match row.get("description").unwrap() {
+                gluesql::prelude::Value::Str(description) => description.clone(),
+                _ => unreachable!("Expected Str")
+            },
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(icon_id) => Some(icon_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+            color_id: match row.get("color_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(color_id) => Some(color_id.clone()),
+                _ => unreachable!("Expected I32")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct Notification {
     pub id: i32,
     pub user_id: i32,
@@ -5145,11 +5383,13 @@ impl SampleBioOttTaxonItem {
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampleContainerCategory {
     pub id: i32,
-    pub brand: String,
-    pub volume: String,
+    pub name: String,
+    pub volume: f64,
+    pub unit: String,
+    pub material_id: i32,
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
@@ -5167,8 +5407,10 @@ impl SampleContainerCategory {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(self.id),
-            gluesql::core::ast_builder::text(self.brand),
-            gluesql::core::ast_builder::text(self.volume),
+            gluesql::core::ast_builder::text(self.name),
+            gluesql::core::ast_builder::num(self.volume),
+            gluesql::core::ast_builder::text(self.unit),
+            gluesql::core::ast_builder::num(self.material_id),
             gluesql::core::ast_builder::text(self.description),
             gluesql::core::ast_builder::num(self.icon_id),
             gluesql::core::ast_builder::num(self.color_id),
@@ -5191,7 +5433,7 @@ impl SampleContainerCategory {
         use gluesql::core::ast_builder::*;
         table("sample_container_categories")
             .insert()
-            .columns("id, brand, volume, description, icon_id, color_id")
+            .columns("id, name, volume, unit, material_id, description, icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5217,7 +5459,7 @@ impl SampleContainerCategory {
         let select_row = table("sample_container_categories")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, brand, volume, description, icon_id, color_id")
+            .project("id, name, volume, unit, material_id, description, icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5286,8 +5528,10 @@ impl SampleContainerCategory {
         table("sample_container_categories")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
-.set("brand", gluesql::core::ast_builder::text(self.brand))        
-.set("volume", gluesql::core::ast_builder::text(self.volume))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("volume", gluesql::core::ast_builder::num(self.volume))        
+.set("unit", gluesql::core::ast_builder::text(self.unit))        
+.set("material_id", gluesql::core::ast_builder::num(self.material_id))        
 .set("description", gluesql::core::ast_builder::text(self.description))        
 .set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
@@ -5338,7 +5582,7 @@ impl SampleContainerCategory {
         let select_row = table("sample_container_categories")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, brand, volume, description, icon_id, color_id")
+           .project("id, name, volume, unit, material_id, description, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5354,13 +5598,21 @@ impl SampleContainerCategory {
                 gluesql::prelude::Value::I32(id) => id.clone(),
                 _ => unreachable!("Expected I32")
             },
-            brand: match row.get("brand").unwrap() {
-                gluesql::prelude::Value::Str(brand) => brand.clone(),
+            name: match row.get("name").unwrap() {
+                gluesql::prelude::Value::Str(name) => name.clone(),
                 _ => unreachable!("Expected Str")
             },
             volume: match row.get("volume").unwrap() {
-                gluesql::prelude::Value::Str(volume) => volume.clone(),
+                gluesql::prelude::Value::F64(volume) => volume.clone(),
+                _ => unreachable!("Expected F64")
+            },
+            unit: match row.get("unit").unwrap() {
+                gluesql::prelude::Value::Str(unit) => unit.clone(),
                 _ => unreachable!("Expected Str")
+            },
+            material_id: match row.get("material_id").unwrap() {
+                gluesql::prelude::Value::I32(material_id) => material_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             description: match row.get("description").unwrap() {
                 gluesql::prelude::Value::Str(description) => description.clone(),

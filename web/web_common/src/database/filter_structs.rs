@@ -175,6 +175,30 @@ impl LoginProviderFilter {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct MaterialFilter {
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl MaterialFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(icon_id) = &self.icon_id {
+            filter = filter.and(gluesql::core::ast_builder::col("materials.icon_id").eq(icon_id.to_string()));
+        }
+
+        if let Some(color_id) = &self.color_id {
+            filter = filter.and(gluesql::core::ast_builder::col("materials.color_id").eq(color_id.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NotificationFilter {
     pub user_id: Option<i32>,
 }
@@ -571,8 +595,9 @@ impl SampleBioOttTaxonItemFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default, Eq)]
 pub struct SampleContainerCategoryFilter {
+    pub material_id: Option<i32>,
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
 }
@@ -583,6 +608,10 @@ impl SampleContainerCategoryFilter {
 
     pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(material_id) = &self.material_id {
+            filter = filter.and(gluesql::core::ast_builder::col("sample_container_categories.material_id").eq(material_id.to_string()));
+        }
+
         if let Some(icon_id) = &self.icon_id {
             filter = filter.and(gluesql::core::ast_builder::col("sample_container_categories.icon_id").eq(icon_id.to_string()));
         }

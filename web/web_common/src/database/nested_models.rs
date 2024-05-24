@@ -216,7 +216,7 @@ impl NestedBioOttTaxonItem {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
     pub created_by: User,
@@ -468,6 +468,94 @@ impl NestedLoginProvider {
         self.inner.update_or_insert(connection).await?;
         self.icon.update_or_insert(connection).await?;
         self.color.update_or_insert(connection).await?;
+        Ok(())
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedMaterial {
+    pub inner: Material,
+    pub icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
+}
+
+impl Tabular for NestedMaterial {
+    const TABLE: Table = Table::Materials;
+}
+impl Filtrable for NestedMaterial {
+    type Filter = MaterialFilter;
+}
+#[cfg(feature = "frontend")]
+impl NestedMaterial {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub async fn from_flat(
+        flat_variant: Material,
+        connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
+    ) -> Result<Self, gluesql::prelude::Error> {
+        Ok(Self {
+            icon: if let Some(icon_id) = flat_variant.icon_id { FontAwesomeIcon::get(icon_id, connection).await? } else { None },
+            color: if let Some(color_id) = flat_variant.color_id { Color::get(color_id, connection).await? } else { None },
+            inner: flat_variant,
+        })
+    }
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+       let flat_variant = Material::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
+            None => Ok(None),
+        }
+    }
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all<C>(
+        filter: Option<&MaterialFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = Material::all(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        if let Some(icon) = self.icon {
+            icon.update_or_insert(connection).await?;
+        }
+        if let Some(color) = self.color {
+            color.update_or_insert(connection).await?;
+        }
         Ok(())
     }
 }
@@ -1575,7 +1663,7 @@ impl NestedRole {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
     pub created_by: User,
@@ -1662,9 +1750,10 @@ impl NestedSampleBioOttTaxonItem {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleContainerCategory {
     pub inner: SampleContainerCategory,
+    pub material: NestedMaterial,
     pub icon: FontAwesomeIcon,
     pub color: Color,
 }
@@ -1687,6 +1776,7 @@ impl NestedSampleContainerCategory {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
+            material: NestedMaterial::get(flat_variant.material_id, connection).await?.unwrap(),
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
             color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
             inner: flat_variant,
@@ -1741,12 +1831,13 @@ impl NestedSampleContainerCategory {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
+        self.material.update_or_insert(connection).await?;
         self.icon.update_or_insert(connection).await?;
         self.color.update_or_insert(connection).await?;
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleContainer {
     pub inner: SampleContainer,
     pub category: NestedSampleContainerCategory,
@@ -2110,7 +2201,7 @@ impl NestedSampledIndividual {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSample {
     pub inner: Sample,
     pub container: NestedSampleContainer,
@@ -2225,7 +2316,7 @@ impl NestedSample {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSpectra {
     pub inner: Spectra,
     pub spectra_collection: NestedSpectraCollection,
@@ -2306,7 +2397,7 @@ impl NestedSpectra {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSpectraCollection {
     pub inner: SpectraCollection,
     pub sample: NestedSample,

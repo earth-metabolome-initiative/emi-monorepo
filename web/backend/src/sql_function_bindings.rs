@@ -12,21 +12,6 @@
 use diesel::prelude::*;
 
 define_sql_function! {
-   fn can_view_derived_samples(
-        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        parent_sample_id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
-        child_sample_id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
-    ) -> diesel::sql_types::Bool,
-}
-
-define_sql_function! {
-   fn f_concat_team_states_name_description(
-        name: diesel::sql_types::Nullable<diesel::sql_types::Text>,
-        description: diesel::sql_types::Nullable<diesel::sql_types::Text>,
-    ) -> diesel::sql_types::Text,
-}
-
-define_sql_function! {
    fn f_concat_colors_name(
         name: diesel::sql_types::Nullable<diesel::sql_types::Text>,
         description: diesel::sql_types::Nullable<diesel::sql_types::Text>,
@@ -42,7 +27,7 @@ define_sql_function! {
 
 define_sql_function! {
    fn f_concat_sample_container_categories_brand(
-        brand: diesel::sql_types::Nullable<diesel::sql_types::Text>,
+        name: diesel::sql_types::Nullable<diesel::sql_types::Text>,
         description: diesel::sql_types::Nullable<diesel::sql_types::Text>,
     ) -> diesel::sql_types::Text,
 }
@@ -80,6 +65,13 @@ define_sql_function! {
         first_value: diesel::sql_types::Nullable<diesel::sql_types::Text>,
         middle_value: diesel::sql_types::Nullable<diesel::sql_types::Text>,
         last_value: diesel::sql_types::Nullable<diesel::sql_types::Text>,
+    ) -> diesel::sql_types::Text,
+}
+
+define_sql_function! {
+   fn f_concat_team_states_name_description(
+        name: diesel::sql_types::Nullable<diesel::sql_types::Text>,
+        description: diesel::sql_types::Nullable<diesel::sql_types::Text>,
     ) -> diesel::sql_types::Text,
 }
 
@@ -147,6 +139,48 @@ define_sql_function! {
 }
 
 define_sql_function! {
+   fn can_delete_projects(
+        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+    ) -> diesel::sql_types::Bool,
+}
+
+define_sql_function! {
+   fn can_view_projects(
+        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+    ) -> diesel::sql_types::Bool,
+}
+
+define_sql_function! {
+   fn f_concat_projects_name_description(
+        name: diesel::sql_types::Nullable<diesel::sql_types::Text>,
+        description: diesel::sql_types::Nullable<diesel::sql_types::Text>,
+    ) -> diesel::sql_types::Text,
+}
+
+define_sql_function! {
+   fn can_edit_sample_containers(
+        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+    ) -> diesel::sql_types::Bool,
+}
+
+define_sql_function! {
+   fn can_delete_sample_containers(
+        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+    ) -> diesel::sql_types::Bool,
+}
+
+define_sql_function! {
+   fn can_view_sample_containers(
+        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+    ) -> diesel::sql_types::Bool,
+}
+
+define_sql_function! {
    fn can_edit_samples(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         barcode_id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
@@ -177,6 +211,14 @@ define_sql_function! {
 
 define_sql_function! {
    fn can_delete_derived_samples(
+        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        parent_sample_id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
+        child_sample_id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
+    ) -> diesel::sql_types::Bool,
+}
+
+define_sql_function! {
+   fn can_view_derived_samples(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         parent_sample_id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
         child_sample_id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
@@ -227,44 +269,37 @@ define_sql_function! {
 }
 
 define_sql_function! {
-   fn can_delete_projects(
+   fn can_view_sampled_individuals(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
     ) -> diesel::sql_types::Bool,
 }
 
 define_sql_function! {
-   fn can_view_projects(
-        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-    ) -> diesel::sql_types::Bool,
-}
-
-define_sql_function! {
-   fn f_concat_projects_name_description(
-        name: diesel::sql_types::Nullable<diesel::sql_types::Text>,
-        description: diesel::sql_types::Nullable<diesel::sql_types::Text>,
+   fn f_concat_sampled_individuals_notes_barcode(
+        notes: diesel::sql_types::Nullable<diesel::sql_types::Text>,
+        barcode: diesel::sql_types::Nullable<diesel::sql_types::Text>,
     ) -> diesel::sql_types::Text,
 }
 
 define_sql_function! {
-   fn can_edit_sample_containers(
+   fn can_edit_observations(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
     ) -> diesel::sql_types::Bool,
 }
 
 define_sql_function! {
-   fn can_delete_sample_containers(
+   fn can_delete_observations(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
     ) -> diesel::sql_types::Bool,
 }
 
 define_sql_function! {
-   fn can_view_sample_containers(
+   fn can_view_observations(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
     ) -> diesel::sql_types::Bool,
 }
 
@@ -313,41 +348,6 @@ define_sql_function! {
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         sampled_individual_id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
         taxon_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-    ) -> diesel::sql_types::Bool,
-}
-
-define_sql_function! {
-   fn can_view_sampled_individuals(
-        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
-    ) -> diesel::sql_types::Bool,
-}
-
-define_sql_function! {
-   fn f_concat_sampled_individuals_notes_barcode(
-        notes: diesel::sql_types::Nullable<diesel::sql_types::Text>,
-        barcode: diesel::sql_types::Nullable<diesel::sql_types::Text>,
-    ) -> diesel::sql_types::Text,
-}
-
-define_sql_function! {
-   fn can_edit_observations(
-        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
-    ) -> diesel::sql_types::Bool,
-}
-
-define_sql_function! {
-   fn can_delete_observations(
-        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
-    ) -> diesel::sql_types::Bool,
-}
-
-define_sql_function! {
-   fn can_view_observations(
-        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        id: diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
     ) -> diesel::sql_types::Bool,
 }
 

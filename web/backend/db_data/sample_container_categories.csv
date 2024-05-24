@@ -1,3 +1,12 @@
-brand,volume,description,icon,color
-Falcon,50,"A Falcon tube is a clear plastic laboratory container, typically 15 or 50 mL in volume, with a conical bottom and screw cap for secure sealing. It is used for storing and centrifuging biological samples.",prescription-bottle,red
-Eppendorf,2,"An Eppendorf tube is a small plastic laboratory container, usually 0.5 to 2 mL in volume, with a conical bottom and a snap cap. It is used for storing and centrifuging small volumes of biological samples.",vial,blue
+name,volume,unit,material,description,icon,color
+Falcon,50,mL,polypropylene (PP),"A plastic laboratory container, typically 15 or 50 mL in volume, with a conical bottom and screw cap for secure sealing. It is used for storing and centrifuging biological samples.",prescription-bottle,red
+Eppendorf,2,mL,polypropylene (PP),"An small plastic laboratory container, usually 0.5 to 2 mL in volume, with a conical bottom and a snap cap. It is used for storing and centrifuging small volumes of biological samples.",vial,orange
+Ziplock (large),3000,mL,plastic,"A large plastic bag with a ziplock seal, used for storing and transporting biological samples.",bag-shopping,green
+Ziplock (small),1000,mL,plastic,"A small plastic bag with a ziplock seal, used for storing and transporting biological samples.",bag-shopping,green
+Ziplock (medium),2000,mL,plastic,"A medium plastic bag with a ziplock seal, used for storing and transporting biological samples.",bag-shopping,green
+Vial,1.5,mL,glass,"A small glass container, usually 1.5 to 2 mL in volume, with a screw cap. It is used for storing and transporting small volumes of biological samples.",vial,blue
+Vial,2,mL,glass,"A small glass container, usually 1.5 to 2 mL in volume, with a screw cap. It is used for storing and transporting small volumes of biological samples.",vial,blue
+Insert,0.25,mL,glass,"A small funnel shaped glass insertable in vials for mass spec injection.",vials,purple
+Paper bag (small),1000,mL,paper,"A paper bag used for storing and transporting biological samples.",sack-xmark,brown
+Paper bag (medium),2000,mL,paper,"A paper bag used for storing and transporting biological samples.",sack-xmark,brown
+Paper bag (large),3000,mL,paper,"A paper bag used for storing and transporting biological samples.",sack-xmark,brown

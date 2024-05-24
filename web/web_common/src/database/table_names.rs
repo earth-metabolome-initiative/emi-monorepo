@@ -15,6 +15,7 @@ pub enum Table {
     DocumentFormats,
     FontAwesomeIcons,
     LoginProviders,
+    Materials,
     Notifications,
     Observations,
     Organizations,
@@ -61,6 +62,7 @@ impl AsRef<str> for Table {
             Table::DocumentFormats => "document_formats",
             Table::FontAwesomeIcons => "font_awesome_icons",
             Table::LoginProviders => "login_providers",
+            Table::Materials => "materials",
             Table::Notifications => "notifications",
             Table::Observations => "observations",
             Table::Organizations => "organizations",
@@ -119,6 +121,7 @@ impl std::convert::TryFrom<&str> for Table {
             "document_formats" => Ok(Table::DocumentFormats),
             "font_awesome_icons" => Ok(Table::FontAwesomeIcons),
             "login_providers" => Ok(Table::LoginProviders),
+            "materials" => Ok(Table::Materials),
             "notifications" => Ok(Table::Notifications),
             "observations" => Ok(Table::Observations),
             "organizations" => Ok(Table::Organizations),
@@ -203,6 +206,9 @@ impl Table {
             },
             Table::LoginProviders => {
                 crate::database::LoginProvider::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Materials => {
+                crate::database::Material::delete_from_id(primary_key.into(), connection).await
             },
             Table::Notifications => {
                 crate::database::Notification::delete_from_id(primary_key.into(), connection).await
@@ -329,6 +335,7 @@ impl Table {
             Table::DocumentFormats => crate::database::NestedDocumentFormat::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::FontAwesomeIcons => crate::database::FontAwesomeIcon::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::LoginProviders => crate::database::NestedLoginProvider::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Materials => crate::database::NestedMaterial::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Notifications => crate::database::NestedNotification::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Observations => crate::database::NestedObservation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Organizations => crate::database::NestedOrganization::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -415,6 +422,10 @@ impl Table {
             Table::LoginProviders => {
                 let filter: Option<LoginProviderFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedLoginProvider::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+            },
+            Table::Materials => {
+                let filter: Option<MaterialFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedMaterial::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::Notifications => {
                 let filter: Option<NotificationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
@@ -578,6 +589,7 @@ impl Table {
             Table::DocumentFormats => unimplemented!("all_by_updated_at not implemented for document_formats."),
             Table::FontAwesomeIcons => unimplemented!("all_by_updated_at not implemented for font_awesome_icons."),
             Table::LoginProviders => unimplemented!("all_by_updated_at not implemented for login_providers."),
+            Table::Materials => unimplemented!("all_by_updated_at not implemented for materials."),
             Table::Notifications => unimplemented!("all_by_updated_at not implemented for notifications."),
             Table::Observations => {
                 let filter: Option<ObservationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
@@ -660,6 +672,7 @@ impl Table {
             Table::DocumentFormats => unimplemented!("Insert not implemented for document_formats."),
             Table::FontAwesomeIcons => unimplemented!("Insert not implemented for font_awesome_icons."),
             Table::LoginProviders => unimplemented!("Insert not implemented for login_providers."),
+            Table::Materials => unimplemented!("Insert not implemented for materials."),
             Table::Notifications => unimplemented!("Insert not implemented for notifications."),
             Table::Observations => {
                 let new_row: super::NewObservation = bincode::deserialize::<super::NewObservation>(&new_row).map_err(crate::api::ApiError::from)?;
@@ -736,6 +749,7 @@ impl Table {
             Table::DocumentFormats => unimplemented!("Update not implemented for document_formats."),
             Table::FontAwesomeIcons => unimplemented!("Update not implemented for font_awesome_icons."),
             Table::LoginProviders => unimplemented!("Update not implemented for login_providers."),
+            Table::Materials => unimplemented!("Update not implemented for materials."),
             Table::Notifications => unimplemented!("Update not implemented for notifications."),
             Table::Observations => {
                 let update_row: super::NewObservation = bincode::deserialize::<super::NewObservation>(&update_row).map_err(crate::api::ApiError::from)?;
@@ -879,6 +893,12 @@ impl Table {
             Table::LoginProviders => {
                 for row in rows {
                     let row: super::NestedLoginProvider = bincode::deserialize::<super::NestedLoginProvider>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Materials => {
+                for row in rows {
+                    let row: super::NestedMaterial = bincode::deserialize::<super::NestedMaterial>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },

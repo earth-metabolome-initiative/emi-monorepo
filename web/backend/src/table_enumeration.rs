@@ -126,6 +126,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => NestedDocumentFormat::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
+            web_common::database::Table::Materials => unimplemented!("Table `materials` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
             web_common::database::Table::Observations => unimplemented!("Table `observations` does not have a GIN similarity index."),
             web_common::database::Table::Organizations => NestedOrganization::similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -171,6 +172,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => unimplemented!("Table `document_formats` does not have associated roles."),
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Table `font_awesome_icons` does not have associated roles."),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
+            web_common::database::Table::Materials => unimplemented!("Table `materials` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
             web_common::database::Table::Observations => unimplemented!("Table `observations` does not have a GIN similarity index."),
             web_common::database::Table::Organizations => unimplemented!("Table `organizations` does not have associated roles."),
@@ -216,6 +218,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => NestedDocumentFormat::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
+            web_common::database::Table::Materials => unimplemented!("Table `materials` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
             web_common::database::Table::Observations => unimplemented!("Table `observations` does not have a GIN similarity index."),
             web_common::database::Table::Organizations => NestedOrganization::word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -261,6 +264,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => unimplemented!("Table `document_formats` does not have associated roles."),
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Table `font_awesome_icons` does not have associated roles."),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
+            web_common::database::Table::Materials => unimplemented!("Table `materials` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
             web_common::database::Table::Observations => unimplemented!("Table `observations` does not have a GIN similarity index."),
             web_common::database::Table::Organizations => unimplemented!("Table `organizations` does not have associated roles."),
@@ -306,6 +310,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => NestedDocumentFormat::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
+            web_common::database::Table::Materials => unimplemented!("Table `materials` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
             web_common::database::Table::Observations => unimplemented!("Table `observations` does not have a GIN similarity index."),
             web_common::database::Table::Organizations => NestedOrganization::strict_word_similarity_search(query, limit, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect(),
@@ -351,6 +356,7 @@ impl SearchableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => unimplemented!("Table `document_formats` does not have associated roles."),
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Table `font_awesome_icons` does not have associated roles."),
             web_common::database::Table::LoginProviders => unimplemented!("Table `login_providers` does not have a GIN similarity index."),
+            web_common::database::Table::Materials => unimplemented!("Table `materials` does not have a GIN similarity index."),
             web_common::database::Table::Notifications => unimplemented!("Table `notifications` does not have a GIN similarity index."),
             web_common::database::Table::Observations => unimplemented!("Table `observations` does not have a GIN similarity index."),
             web_common::database::Table::Organizations => unimplemented!("Table `organizations` does not have associated roles."),
@@ -420,6 +426,7 @@ impl IdentifiableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => bincode::serialize(&NestedDocumentFormat::get(primary_key.into(), connection)?)?,
             web_common::database::Table::FontAwesomeIcons => bincode::serialize(&FontAwesomeIcon::get(primary_key.into(), connection)?)?,
             web_common::database::Table::LoginProviders => bincode::serialize(&NestedLoginProvider::get(primary_key.into(), connection)?)?,
+            web_common::database::Table::Materials => bincode::serialize(&NestedMaterial::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Notifications => bincode::serialize(&NestedNotification::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Observations => bincode::serialize(&NestedObservation::get(primary_key.into(), connection)?)?,
             web_common::database::Table::Organizations => bincode::serialize(&NestedOrganization::get(primary_key.into(), connection)?)?,
@@ -492,6 +499,7 @@ impl ViewableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => true,
             web_common::database::Table::FontAwesomeIcons => true,
             web_common::database::Table::LoginProviders => true,
+            web_common::database::Table::Materials => true,
             web_common::database::Table::Notifications => true,
             web_common::database::Table::Observations => true,
             web_common::database::Table::Organizations => true,
@@ -567,6 +575,7 @@ impl EditableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => false,
             web_common::database::Table::FontAwesomeIcons => false,
             web_common::database::Table::LoginProviders => false,
+            web_common::database::Table::Materials => false,
             web_common::database::Table::Notifications => false,
             web_common::database::Table::Observations => false,
             web_common::database::Table::Organizations => false,
@@ -658,6 +667,7 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => false,
             web_common::database::Table::FontAwesomeIcons => false,
             web_common::database::Table::LoginProviders => false,
+            web_common::database::Table::Materials => false,
             web_common::database::Table::Notifications => false,
             web_common::database::Table::Observations => false,
             web_common::database::Table::Organizations => false,
@@ -711,6 +721,7 @@ impl DeletableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => unimplemented!("Delete not implemented for document_formats."),
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Delete not implemented for font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Delete not implemented for login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Delete not implemented for materials."),
             web_common::database::Table::Notifications => unimplemented!("Delete not implemented for notifications."),
             web_common::database::Table::Observations => unimplemented!("Delete not implemented for observations."),
             web_common::database::Table::Organizations => unimplemented!("Delete not implemented for organizations."),
@@ -801,6 +812,9 @@ FontAwesomeIcon::all(limit, offset, connection)?.iter().map(|row| bincode::seria
 },
             web_common::database::Table::LoginProviders => {let filter: Option<web_common::database::LoginProviderFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::LoginProviderFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedLoginProvider::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
+},
+            web_common::database::Table::Materials => {let filter: Option<web_common::database::MaterialFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::MaterialFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
+NestedMaterial::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
 },
             web_common::database::Table::Notifications => {let filter: Option<web_common::database::NotificationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::NotificationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedNotification::all(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
@@ -943,6 +957,7 @@ impl AllByUpdatedAtTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => unimplemented!("all_by_updated_at not implemented for document_formats."),
             web_common::database::Table::FontAwesomeIcons => unimplemented!("all_by_updated_at not implemented for font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("all_by_updated_at not implemented for login_providers."),
+            web_common::database::Table::Materials => unimplemented!("all_by_updated_at not implemented for materials."),
             web_common::database::Table::Notifications => unimplemented!("all_by_updated_at not implemented for notifications."),
             web_common::database::Table::Observations => {let filter: Option<web_common::database::ObservationFilter> = filter.map(|filter| bincode::deserialize::<web_common::database::ObservationFilter>(&filter).map_err(web_common::api::ApiError::from)).transpose()?;
 NestedObservation::all_by_updated_at(filter.as_ref(), limit, offset, connection)?.iter().map(|row| bincode::serialize(row).map_err(web_common::api::ApiError::from)).collect()
@@ -1029,6 +1044,7 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => unreachable!("Table `document_formats` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::LoginProviders => unreachable!("Table `login_providers` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Materials => unreachable!("Table `materials` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Observations => {
                 let row: web_common::database::NewObservation = bincode::deserialize::<web_common::database::NewObservation>(&row).map_err(web_common::api::ApiError::from)?;
@@ -1145,6 +1161,7 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::DocumentFormats => unreachable!("Table `document_formats` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::LoginProviders => unreachable!("Table `login_providers` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::Materials => unreachable!("Table `materials` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Observations => {
                 let row: web_common::database::NewObservation = bincode::deserialize::<web_common::database::NewObservation>(&row).map_err(web_common::api::ApiError::from)?;
@@ -1266,6 +1283,11 @@ impl FromFlatStrTable for web_common::database::Table {
             web_common::database::Table::LoginProviders => {
                 let flat_row: crate::models::LoginProvider = serde_json::from_str::<crate::models::LoginProvider>(row).map_err(web_common::api::ApiError::from)?;
                 let richest_row = crate::nested_models::NestedLoginProvider::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
+            },
+            web_common::database::Table::Materials => {
+                let flat_row: crate::models::Material = serde_json::from_str::<crate::models::Material>(row).map_err(web_common::api::ApiError::from)?;
+                let richest_row = crate::nested_models::NestedMaterial::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row).map_err(web_common::api::ApiError::from)?
             },
             web_common::database::Table::Notifications => {

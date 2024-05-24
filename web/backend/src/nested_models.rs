@@ -303,7 +303,7 @@ impl From<NestedBioOttTaxonItem> for web_common::database::nested_models::Nested
         }
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
     pub created_by: User,
@@ -621,6 +621,93 @@ impl From<NestedLoginProvider> for web_common::database::nested_models::NestedLo
             inner: item.inner.into(),
             icon: item.icon.into(),
             color: item.color.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedMaterial {
+    pub inner: Material,
+    pub icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
+}
+
+impl NestedMaterial {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_variant: Material,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error> {
+        Ok(Self {
+            icon: flat_variant.icon_id.map(|flat_variant| FontAwesomeIcon::get(flat_variant, connection)).transpose()?,
+            color: flat_variant.color_id.map(|flat_variant| Color::get(flat_variant, connection)).transpose()?,
+                inner: flat_variant,
+        })
+    }
+}
+impl NestedMaterial {
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return. By default `10`.
+    /// * `offset` - The offset of the rows to return. By default `0`.
+    /// * `connection` - The database connection.
+    pub fn all(
+        filter: Option<&web_common::database::MaterialFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        Material::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+    }
+}
+impl NestedMaterial {
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub fn get(
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+       Material::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+}
+impl NestedMaterial {
+    /// Get the nested struct from the provided name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the row.
+    /// * `connection` - The database connection.
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, diesel::result::Error>
+    {
+        Material::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+}
+impl From<web_common::database::nested_models::NestedMaterial> for NestedMaterial {
+    fn from(item: web_common::database::nested_models::NestedMaterial) -> Self {
+        Self {
+            inner: item.inner.into(),
+            icon: item.icon.map(|item| item.into()),
+            color: item.color.map(|item| item.into()),
+        }
+    }
+}
+impl From<NestedMaterial> for web_common::database::nested_models::NestedMaterial {
+    fn from(item: NestedMaterial) -> Self {
+        Self {
+            inner: item.inner.into(),
+            icon: item.icon.map(|item| item.into()),
+            color: item.color.map(|item| item.into()),
         }
     }
 }
@@ -1991,7 +2078,7 @@ impl From<NestedRole> for web_common::database::nested_models::NestedRole {
         }
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
     pub created_by: User,
@@ -2068,9 +2155,10 @@ impl From<NestedSampleBioOttTaxonItem> for web_common::database::nested_models::
         }
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleContainerCategory {
     pub inner: SampleContainerCategory,
+    pub material: NestedMaterial,
     pub icon: FontAwesomeIcon,
     pub color: Color,
 }
@@ -2086,6 +2174,7 @@ impl NestedSampleContainerCategory {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, diesel::result::Error> {
         Ok(Self {
+            material: NestedMaterial::get(flat_variant.material_id, connection)?,
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
@@ -2121,48 +2210,6 @@ impl NestedSampleContainerCategory {
     ) -> Result<Self, diesel::result::Error>
     {
        SampleContainerCategory::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
-}
-impl NestedSampleContainerCategory {
-    /// Get the nested struct from the provided color_id.
-    ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the row.
-    /// * `connection` - The database connection.
-    pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        SampleContainerCategory::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
-}
-impl NestedSampleContainerCategory {
-    /// Get the nested struct from the provided description.
-    ///
-    /// # Arguments
-    /// * `description` - The description of the row.
-    /// * `connection` - The database connection.
-    pub fn from_description(
-        description: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        SampleContainerCategory::from_description(description, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
-}
-impl NestedSampleContainerCategory {
-    /// Get the nested struct from the provided icon_id.
-    ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the row.
-    /// * `connection` - The database connection.
-    pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        SampleContainerCategory::from_icon_id(icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
 }
 impl NestedSampleContainerCategory {
@@ -2211,6 +2258,7 @@ impl From<web_common::database::nested_models::NestedSampleContainerCategory> fo
     fn from(item: web_common::database::nested_models::NestedSampleContainerCategory) -> Self {
         Self {
             inner: item.inner.into(),
+            material: item.material.into(),
             icon: item.icon.into(),
             color: item.color.into(),
         }
@@ -2220,12 +2268,13 @@ impl From<NestedSampleContainerCategory> for web_common::database::nested_models
     fn from(item: NestedSampleContainerCategory) -> Self {
         Self {
             inner: item.inner.into(),
+            material: item.material.into(),
             icon: item.icon.into(),
             color: item.color.into(),
         }
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleContainer {
     pub inner: SampleContainer,
     pub category: NestedSampleContainerCategory,
@@ -2710,7 +2759,7 @@ impl From<NestedSampledIndividual> for web_common::database::nested_models::Nest
         }
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSample {
     pub inner: Sample,
     pub container: NestedSampleContainer,
@@ -2812,7 +2861,7 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
         }
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSpectra {
     pub inner: Spectra,
     pub spectra_collection: NestedSpectraCollection,
@@ -2881,7 +2930,7 @@ impl From<NestedSpectra> for web_common::database::nested_models::NestedSpectra 
         }
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSpectraCollection {
     pub inner: SpectraCollection,
     pub sample: NestedSample,

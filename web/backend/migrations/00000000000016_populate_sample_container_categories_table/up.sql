@@ -1,8 +1,10 @@
 -- This is a no-op SQL statement
 CREATE TEMPORARY TABLE tmp_sample_container_categories(
-    brand TEXT NOT NULL,
-    volume INTEGER NOT NULL,
-    description TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    volume FLOAT NOT NULL,
+    unit TEXT NOT NULL,
+    material TEXT NOT NULL,
+    description TEXT NOT NULL,
     icon TEXT NOT NULL,
     color TEXT NOT NULL
 );
@@ -13,22 +15,27 @@ FROM
 
 INSERT INTO
     sample_container_categories(
-        brand,
+        name,
         volume,
+        unit,
+        material_id,
         description,
         icon_id,
         color_id
     )
 SELECT
-    tmp_sample_container_categories.brand,
+    tmp_sample_container_categories.name,
     tmp_sample_container_categories.volume,
+    tmp_sample_container_categories.unit,
+    materials.id,
     tmp_sample_container_categories.description,
     font_awesome_icons.id,
     colors.id
 FROM
     tmp_sample_container_categories
     JOIN font_awesome_icons ON tmp_sample_container_categories.icon = font_awesome_icons.name
-    JOIN colors ON tmp_sample_container_categories.color = colors.name;
+    JOIN colors ON tmp_sample_container_categories.color = colors.name
+    JOIN materials ON tmp_sample_container_categories.material = materials.name;
 
 -- now we want to assert that the number of lines in the sample_container_categories table is the same as the number
 -- of lines in the tmp_sample_container_categories table

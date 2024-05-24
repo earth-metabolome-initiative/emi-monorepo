@@ -3,5 +3,5 @@
 
 DROP INDEX sampled_individuals_notes_barcode_trgm_idx;
 DROP FUNCTION f_concat_sampled_individuals_notes_barcode(notes text,
-barcode text,
+barcode text
 );

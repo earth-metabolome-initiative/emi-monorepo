@@ -25,8 +25,8 @@ use chrono::NaiveDateTime;
 
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = bio_ott_ranks)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct BioOttRank {
     pub id: i32,
@@ -220,10 +220,10 @@ impl BioOttRank {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = bio_ott_taxon_items)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb4f9890>, foreign_key = ott_rank_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb51b910>, foreign_key = domain_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709839158ec0>, foreign_key = ott_rank_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa1760>, foreign_key = domain_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct BioOttTaxonItem {
     pub id: i32,
@@ -909,8 +909,8 @@ impl Country {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = derived_samples)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32f6d0>, foreign_key = parent_sample_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a96b10>, foreign_key = parent_sample_id))]
 #[diesel(primary_key(parent_sample_id, child_sample_id))]
 pub struct DerivedSample {
     pub created_by: i32,
@@ -1026,8 +1026,8 @@ impl DerivedSample {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = document_formats)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct DocumentFormat {
     pub id: i32,
@@ -1401,8 +1401,8 @@ impl FontAwesomeIcon {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = login_providers)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct LoginProvider {
     pub id: i32,
@@ -1538,8 +1538,107 @@ impl LoginProvider {
     }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = materials)]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
+#[diesel(primary_key(id))]
+pub struct Material {
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+impl From<Material> for web_common::database::tables::Material {
+    fn from(item: Material) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Material> for Material {
+    fn from(item: web_common::database::tables::Material) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
+        }
+    }
+}
+
+impl Material {
+    /// Get all of the viewable structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.
+    /// * `offset` - The number of structs to skip. By default, this is 0.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewables(
+        filter: Option<&web_common::database::MaterialFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use crate::schema::materials;
+        let mut query = materials::dsl::materials
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(materials::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(materials::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+       id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::materials;
+        materials::dsl::materials
+            .filter(materials::dsl::id.eq(id))
+            .first::<Self>(connection)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// # Arguments
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+        name: &str,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self, diesel::result::Error> {
+        use crate::schema::materials;
+        materials::dsl::materials
+            .filter(materials::dsl::name.eq(name))
+            .first::<Self>(connection)
+    }
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = notifications)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = user_id))]
 #[diesel(primary_key(id))]
 pub struct Notification {
     pub id: i32,
@@ -1622,9 +1721,9 @@ impl Notification {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = observations)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = project_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32ec10>, foreign_key = individual_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a94140>, foreign_key = project_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a966c0>, foreign_key = individual_id))]
 #[diesel(primary_key(id))]
 pub struct Observation {
     pub id: Uuid,
@@ -1760,7 +1859,7 @@ impl Observation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = organizations)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520e50>, foreign_key = country_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa22a0>, foreign_key = country_id))]
 #[diesel(primary_key(id))]
 pub struct Organization {
     pub id: i32,
@@ -1990,8 +2089,8 @@ impl Organization {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = project_states)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct ProjectState {
     pub id: i32,
@@ -2215,11 +2314,11 @@ impl ProjectState {
 }
 #[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3289d0>, foreign_key = state_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = parent_project_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa3e30>, foreign_key = state_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a94140>, foreign_key = parent_project_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct Project {
     pub id: i32,
@@ -2841,10 +2940,10 @@ impl Project {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_role_invitations)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = team_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a94140>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a97770>, foreign_key = team_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRoleInvitation {
     pub table_id: i32,
@@ -2969,10 +3068,10 @@ impl ProjectsTeamsRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_role_requests)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = team_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a94140>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a97770>, foreign_key = team_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRoleRequest {
     pub table_id: i32,
@@ -3097,10 +3196,10 @@ impl ProjectsTeamsRoleRequest {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_teams_roles)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = team_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a94140>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a97770>, foreign_key = team_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct ProjectsTeamsRole {
     pub table_id: i32,
@@ -3225,9 +3324,9 @@ impl ProjectsTeamsRole {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_role_invitations)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a94140>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRoleInvitation {
     pub table_id: i32,
@@ -3352,9 +3451,9 @@ impl ProjectsUsersRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_role_requests)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a94140>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRoleRequest {
     pub table_id: i32,
@@ -3479,9 +3578,9 @@ impl ProjectsUsersRoleRequest {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects_users_roles)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a94140>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct ProjectsUsersRole {
     pub table_id: i32,
@@ -3606,8 +3705,8 @@ impl ProjectsUsersRole {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = roles)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct Role {
     pub id: i32,
@@ -3846,9 +3945,9 @@ impl Role {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_bio_ott_taxon_items)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32f6d0>, foreign_key = sample_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb51b910>, foreign_key = taxon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a96b10>, foreign_key = sample_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa1760>, foreign_key = taxon_id))]
 #[diesel(primary_key(sample_id, taxon_id))]
 pub struct SampleBioOttTaxonItem {
     pub created_by: i32,
@@ -3962,15 +4061,18 @@ impl SampleBioOttTaxonItem {
             .first::<Self>(connection)
     }
 }
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_container_categories)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa30b0>, foreign_key = material_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct SampleContainerCategory {
     pub id: i32,
-    pub brand: String,
-    pub volume: String,
+    pub name: String,
+    pub volume: f64,
+    pub unit: String,
+    pub material_id: i32,
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
@@ -3980,8 +4082,10 @@ impl From<SampleContainerCategory> for web_common::database::tables::SampleConta
     fn from(item: SampleContainerCategory) -> Self {
         Self {
             id: item.id,
-            brand: item.brand,
+            name: item.name,
             volume: item.volume,
+            unit: item.unit,
+            material_id: item.material_id,
             description: item.description,
             icon_id: item.icon_id,
             color_id: item.color_id,
@@ -3993,8 +4097,10 @@ impl From<web_common::database::tables::SampleContainerCategory> for SampleConta
     fn from(item: web_common::database::tables::SampleContainerCategory) -> Self {
         Self {
             id: item.id,
-            brand: item.brand,
+            name: item.name,
             volume: item.volume,
+            unit: item.unit,
+            material_id: item.material_id,
             description: item.description,
             icon_id: item.icon_id,
             color_id: item.color_id,
@@ -4022,6 +4128,9 @@ impl SampleContainerCategory {
         use crate::schema::sample_container_categories;
         let mut query = sample_container_categories::dsl::sample_container_categories
             .into_boxed();
+        if let Some(material_id) = filter.and_then(|f| f.material_id) {
+            query = query.filter(sample_container_categories::dsl::material_id.eq(material_id));
+        }
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(sample_container_categories::dsl::icon_id.eq(icon_id));
         }
@@ -4048,51 +4157,6 @@ impl SampleContainerCategory {
             .filter(sample_container_categories::dsl::id.eq(id))
             .first::<Self>(connection)
     }
-    /// Get the struct from the database by its color_id.
-    ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sample_container_categories;
-        sample_container_categories::dsl::sample_container_categories
-            .filter(sample_container_categories::dsl::color_id.eq(color_id))
-            .first::<Self>(connection)
-    }
-    /// Get the struct from the database by its description.
-    ///
-    /// # Arguments
-    /// * `description` - The description of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn from_description(
-        description: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sample_container_categories;
-        sample_container_categories::dsl::sample_container_categories
-            .filter(sample_container_categories::dsl::description.eq(description))
-            .first::<Self>(connection)
-    }
-    /// Get the struct from the database by its icon_id.
-    ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
-    ) -> Result<Self, diesel::result::Error> {
-        use crate::schema::sample_container_categories;
-        sample_container_categories::dsl::sample_container_categories
-            .filter(sample_container_categories::dsl::icon_id.eq(icon_id))
-            .first::<Self>(connection)
-    }
     /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// # Arguments
@@ -4115,9 +4179,9 @@ impl SampleContainerCategory {
             return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, brand, volume, description, icon_id, color_id FROM sample_container_categories ",
-            "WHERE $1 % f_concat_sample_container_categories_brand(brand, description) ",
-            "ORDER BY similarity($1, f_concat_sample_container_categories_brand(brand, description)) DESC LIMIT $2",
+            "SELECT id, name, volume, unit, material_id, description, icon_id, color_id FROM sample_container_categories ",
+            "WHERE $1 % f_concat_sample_container_categories_brand(name, description) ",
+            "ORDER BY similarity($1, f_concat_sample_container_categories_brand(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -4147,9 +4211,9 @@ impl SampleContainerCategory {
             return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, brand, volume, description, icon_id, color_id FROM sample_container_categories ",
-            "WHERE $1 <% f_concat_sample_container_categories_brand(brand, description) ",
-            "ORDER BY word_similarity($1, f_concat_sample_container_categories_brand(brand, description)) DESC LIMIT $2",
+            "SELECT id, name, volume, unit, material_id, description, icon_id, color_id FROM sample_container_categories ",
+            "WHERE $1 <% f_concat_sample_container_categories_brand(name, description) ",
+            "ORDER BY word_similarity($1, f_concat_sample_container_categories_brand(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -4179,9 +4243,9 @@ impl SampleContainerCategory {
             return Self::all_viewables(author_user_id, None, Some(limit as i64), None, connection);
         }
         let similarity_query = concat!(
-            "SELECT id, brand, volume, description, icon_id, color_id FROM sample_container_categories ",
-            "WHERE $1 <<% f_concat_sample_container_categories_brand(brand, description) ",
-            "ORDER BY strict_word_similarity($1, f_concat_sample_container_categories_brand(brand, description)) DESC LIMIT $2",
+            "SELECT id, name, volume, unit, material_id, description, icon_id, color_id FROM sample_container_categories ",
+            "WHERE $1 <<% f_concat_sample_container_categories_brand(name, description) ",
+            "ORDER BY strict_word_similarity($1, f_concat_sample_container_categories_brand(name, description)) DESC LIMIT $2",
         );
         diesel::sql_query(similarity_query)
             .bind::<diesel::sql_types::Text, _>(query)
@@ -4192,8 +4256,8 @@ impl SampleContainerCategory {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_containers)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32d2d0>, foreign_key = category_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a95b80>, foreign_key = category_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SampleContainer {
     pub id: i32,
@@ -4416,8 +4480,8 @@ impl SampleContainer {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_states)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct SampleState {
     pub id: i32,
@@ -4626,9 +4690,9 @@ impl SampleState {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individual_bio_ott_taxon_items)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32ec10>, foreign_key = sampled_individual_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb51b910>, foreign_key = taxon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a966c0>, foreign_key = sampled_individual_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa1760>, foreign_key = taxon_id))]
 #[diesel(primary_key(sampled_individual_id, taxon_id))]
 pub struct SampledIndividualBioOttTaxonItem {
     pub created_by: i32,
@@ -4744,8 +4808,8 @@ impl SampledIndividualBioOttTaxonItem {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb329050>, foreign_key = project_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a94140>, foreign_key = project_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SampledIndividual {
     pub id: Uuid,
@@ -4971,9 +5035,9 @@ impl SampledIndividual {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = samples)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32da10>, foreign_key = container_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32e0d0>, foreign_key = state))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a95fd0>, foreign_key = container_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a96240>, foreign_key = state))]
 #[diesel(primary_key(id))]
 pub struct Sample {
     pub id: Uuid,
@@ -5115,7 +5179,7 @@ impl Sample {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb330750>, foreign_key = spectra_collection_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a97170>, foreign_key = spectra_collection_id))]
 #[diesel(primary_key(id))]
 pub struct Spectra {
     pub id: i32,
@@ -5189,8 +5253,8 @@ impl Spectra {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra_collections)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32f6d0>, foreign_key = sample_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a96b10>, foreign_key = sample_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SpectraCollection {
     pub id: i32,
@@ -5314,8 +5378,8 @@ impl SpectraCollection {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = team_states)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct TeamState {
     pub id: i32,
@@ -5539,10 +5603,10 @@ impl TeamState {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522210>, foreign_key = icon_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb520910>, foreign_key = color_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = parent_team_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2ab0>, foreign_key = icon_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2030>, foreign_key = color_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a97770>, foreign_key = parent_team_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct Team {
     pub id: i32,
@@ -6112,9 +6176,9 @@ impl Team {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams_teams_role_invitations)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a97770>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
 #[diesel(primary_key(table_id, team_id))]
 pub struct TeamsTeamsRoleInvitation {
     pub table_id: i32,
@@ -6239,9 +6303,9 @@ impl TeamsTeamsRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams_users_role_invitations)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a97770>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct TeamsUsersRoleInvitation {
     pub table_id: i32,
@@ -6366,9 +6430,9 @@ impl TeamsUsersRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams_users_role_requests)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a97770>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct TeamsUsersRoleRequest {
     pub table_id: i32,
@@ -6493,9 +6557,9 @@ impl TeamsUsersRoleRequest {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams_users_roles)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb3317d0>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = user_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a97770>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = user_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct TeamsUsersRole {
     pub table_id: i32,
@@ -6800,8 +6864,8 @@ impl Unit {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = user_emails)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = created_by))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb522690>, foreign_key = login_provider_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = created_by))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838aa2c90>, foreign_key = login_provider_id))]
 #[diesel(primary_key(id))]
 pub struct UserEmail {
     pub id: i32,
@@ -7130,8 +7194,8 @@ impl User {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = users_users_role_invitations)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct UsersUsersRoleInvitation {
     pub table_id: i32,
@@ -7256,8 +7320,8 @@ impl UsersUsersRoleInvitation {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = users_users_role_requests)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct UsersUsersRoleRequest {
     pub table_id: i32,
@@ -7382,8 +7446,8 @@ impl UsersUsersRoleRequest {
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = users_users_roles)]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb338f10>, foreign_key = table_id))]
-#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x7f95eb32c710>, foreign_key = role_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a68290>, foreign_key = table_id))]
+#[diesel(belongs_to(<constraint_checkers.struct_metadata.StructMetadata object at 0x709838a956d0>, foreign_key = role_id))]
 #[diesel(primary_key(table_id, user_id))]
 pub struct UsersUsersRole {
     pub table_id: i32,

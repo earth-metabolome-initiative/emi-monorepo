@@ -18,7 +18,7 @@ use crate::workers::ws_worker::ComponentMessage;
 use web_common::custom_validators::Image;
 use web_common::file_formats::GenericFileFormat;
 
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct DerivedSampleBuilder {
     pub parent_sample: Option<NestedSample>,
@@ -40,7 +40,7 @@ impl Default for DerivedSampleBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum DerivedSampleActions {
     SetParentSample(Option<NestedSample>),
     SetChildSample(Option<NestedSample>),
@@ -1994,7 +1994,7 @@ pub fn create_projects_users_role_form(props: &CreateProjectsUsersRoleFormProp) 
         </BasicForm<NewProjectsUsersRole>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBioOttTaxonItemBuilder {
     pub sample: Option<NestedSample>,
@@ -2016,7 +2016,7 @@ impl Default for SampleBioOttTaxonItemBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleBioOttTaxonItemActions {
     SetSample(Option<NestedSample>),
     SetTaxon(Option<NestedBioOttTaxonItem>),
@@ -2146,7 +2146,7 @@ if let Some(sample) = builder_store.sample.as_ref() {
         </BasicForm<NewSampleBioOttTaxonItem>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleContainerBuilder {
     pub id: Option<i32>,
@@ -2170,7 +2170,7 @@ impl Default for SampleContainerBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleContainerActions {
     SetBarcode(Option<String>),
     SetCategory(Option<NestedSampleContainerCategory>),
@@ -2680,7 +2680,7 @@ pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -
         </BasicForm<NewSampledIndividual>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBuilder {
     pub id: Option<Uuid>,
@@ -2712,7 +2712,7 @@ impl Default for SampleBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleActions {
     SetNotes(Option<String>),
     SetContainer(Option<NestedSampleContainer>),
@@ -2918,7 +2918,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
         </BasicForm<NewSample>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SpectraCollectionBuilder {
     pub id: Option<i32>,
@@ -2942,7 +2942,7 @@ impl Default for SpectraCollectionBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SpectraCollectionActions {
     SetNotes(Option<String>),
     SetSample(Option<NestedSample>),
