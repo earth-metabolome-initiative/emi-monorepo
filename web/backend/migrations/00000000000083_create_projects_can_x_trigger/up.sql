@@ -138,10 +138,6 @@ BEGIN
     IF canary IS NULL THEN
         RETURN TRUE;
     END IF;
--- If the row is public, we return TRUE.
-    IF this_public THEN
-        RETURN TRUE;
-    END IF;
 -- We check whether the user is the created_by of the row.
     IF author_user_id = this_created_by THEN
         RETURN TRUE;
@@ -153,6 +149,10 @@ BEGIN
 -- We check whether the user is in the projects_users_roles table with an appropriate role id.
     IF EXISTS (SELECT 1 FROM projects_users_roles WHERE projects_users_roles.user_id = author_user_id AND projects_users_roles.role_id <= 3 AND projects_users_roles.table_id = this_projects_id) THEN
         RETURN TRUE;
+    END IF;
+    -- If the row is public, we return TRUE.
+    IF NOT this_public THEN
+        RETURN FALSE;
     END IF;
 -- If the parent column is not NULL, we call the can_view function of the parent column to determine whether the user can edit the row.
     IF this_parent_project_id IS NOT NULL THEN

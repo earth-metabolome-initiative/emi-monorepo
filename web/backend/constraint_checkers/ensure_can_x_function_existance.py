@@ -160,13 +160,6 @@ def handle_missing_can_x_function(
                 "    END IF;\n"
             )
 
-        if table.has_public_column() and operation == "view":
-            up_index_migration.write(
-                "-- If the row is public, we return TRUE.\n"
-                f"    IF this_{table.get_public_column().name} THEN\n"
-                "        RETURN TRUE;\n"
-                "    END IF;\n"
-            )
         for user_column_name in user_column_names:
             if table.has_column(user_column_name):
                 up_index_migration.write(
@@ -197,6 +190,14 @@ def handle_missing_can_x_function(
                     "        RETURN TRUE;\n"
                     "    END IF;\n"
                 )
+
+        if table.has_public_column() and operation == "view":
+            up_index_migration.write(
+                "-- If the row is public, we return TRUE.\n"
+                f"    IF NOT this_{table.get_public_column().name} THEN\n"
+                "        RETURN FALSE;\n"
+                "    END IF;\n"
+            )
 
         if is_role_table(table.name):
             for parent_column in parent_columns:
