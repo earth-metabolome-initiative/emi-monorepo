@@ -40,7 +40,7 @@ LANGUAGE plpgsql;
 -- The function `can_admin_projects_teams_role_requests` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
--- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
+-- and calls the parent column's can_admin function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the projects_teams_role_requests_users_roles table or
 -- the projects_teams_role_requests_teams_users table with an appropriate role id.
 CREATE FUNCTION can_admin_projects_teams_role_requests(author_user_id INTEGER, table_id INTEGER, team_id INTEGER)
@@ -65,10 +65,10 @@ BEGIN
     IF author_user_id = created_by THEN
         RETURN TRUE;
     END IF;
-        IF can_delete_projects(author_user_id, table_id) THEN
+        IF can_admin_projects(author_user_id, table_id) THEN
             RETURN TRUE;
         END IF;
-        IF can_delete_teams(author_user_id, team_id) THEN
+        IF can_admin_teams(author_user_id, team_id) THEN
             RETURN TRUE;
         END IF;
     RETURN FALSE;

@@ -141,16 +141,22 @@ impl FormBuildable for NewDerivedSample {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateDerivedSampleFormProp {
-    pub parent_sample_id: Uuid,
-    pub child_sample_id: Uuid,
+     #[prop_or_default]
+    pub parent_sample_id: Option<Uuid>,
+     #[prop_or_default]
+    pub child_sample_id: Option<Uuid>,
 }
 
 #[function_component(CreateDerivedSampleForm)]
 pub fn create_derived_sample_form(props: &CreateDerivedSampleFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<DerivedSampleBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("parent_sample", props.parent_sample_id.into()));
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("child_sample", props.child_sample_id.into()));
+   if let Some(parent_sample_id) = props.parent_sample_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("parent_sample", parent_sample_id.into()));
+    }
+   if let Some(child_sample_id) = props.child_sample_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("child_sample", child_sample_id.into()));
+    }
     let set_parent_sample = builder_dispatch.apply_callback(|parent_sample: Option<NestedSample>| DerivedSampleActions::SetParentSample(parent_sample));
     let set_child_sample = builder_dispatch.apply_callback(|child_sample: Option<NestedSample>| DerivedSampleActions::SetChildSample(child_sample));
     html! {
@@ -158,16 +164,8 @@ pub fn create_derived_sample_form(props: &CreateDerivedSampleFormProp) -> Html {
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(parent_sample) = builder_store.parent_sample.as_ref() {
-    <span>{"TODO Selected parent_sample"}</span>
-} else {
-    <></>
-}
-if let Some(child_sample) = builder_store.child_sample.as_ref() {
-    <span>{"TODO Selected child_sample"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, false> builder={set_parent_sample} optional={false} errors={builder_store.errors_parent_sample.clone()} value={builder_store.parent_sample.clone()} label="Parent sample" />
+            <Datalist<NestedSample, false> builder={set_child_sample} optional={false} errors={builder_store.errors_child_sample.clone()} value={builder_store.child_sample.clone()} label="Child sample" />
         </BasicForm<NewDerivedSample>>
     }
 }
@@ -2117,7 +2115,8 @@ impl FormBuildable for NewSampleBioOttTaxonItem {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampleBioOttTaxonItemFormProp {
-    pub sample_id: Uuid,
+     #[prop_or_default]
+    pub sample_id: Option<Uuid>,
      #[prop_or_default]
     pub taxon_id: Option<i32>,
 }
@@ -2126,7 +2125,9 @@ pub struct CreateSampleBioOttTaxonItemFormProp {
 pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItemFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampleBioOttTaxonItemBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", props.sample_id.into()));
+   if let Some(sample_id) = props.sample_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", sample_id.into()));
+    }
    if let Some(taxon_id) = props.taxon_id {
          named_requests.push(ComponentMessage::get_named::<&str, BioOttTaxonItem>("taxon", taxon_id.into()));
     }
@@ -2137,11 +2138,7 @@ pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItem
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-if let Some(sample) = builder_store.sample.as_ref() {
-    <span>{"TODO Selected sample"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, false> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" />
             <Datalist<NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" />
         </BasicForm<NewSampleBioOttTaxonItem>>
     }
@@ -3131,14 +3128,17 @@ impl FormBuildable for UpdateSpectraCollection {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSpectraCollectionFormProp {
-    pub sample_id: Uuid,
+     #[prop_or_default]
+    pub sample_id: Option<Uuid>,
 }
 
 #[function_component(CreateSpectraCollectionForm)]
 pub fn create_spectra_collection_form(props: &CreateSpectraCollectionFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SpectraCollectionBuilder>();
-    named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", props.sample_id.into()));
+   if let Some(sample_id) = props.sample_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Sample>("sample", sample_id.into()));
+    }
     let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SpectraCollectionActions::SetNotes(notes));
     let set_sample = builder_dispatch.apply_callback(|sample: Option<NestedSample>| SpectraCollectionActions::SetSample(sample));
     html! {
@@ -3147,11 +3147,7 @@ pub fn create_spectra_collection_form(props: &CreateSpectraCollectionFormProp) -
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-if let Some(sample) = builder_store.sample.as_ref() {
-    <span>{"TODO Selected sample"}</span>
-} else {
-    <></>
-}
+            <Datalist<NestedSample, false> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" />
         </BasicForm<NewSpectraCollection>>
     }
 }
@@ -3175,7 +3171,7 @@ pub fn update_spectra_collection_form(props: &UpdateSpectraCollectionFormProp) -
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-<p>{"Sample id has to be selected with a ScannerInput, which is not yet available."}</p>
+            <Datalist<NestedSample, false> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" />
         </BasicForm<UpdateSpectraCollection>>
     }
 }

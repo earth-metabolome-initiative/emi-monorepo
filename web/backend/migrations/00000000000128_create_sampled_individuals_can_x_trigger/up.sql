@@ -66,7 +66,7 @@ EXECUTE FUNCTION can_update_sampled_individuals_trigger();
 -- The function `can_admin_sampled_individuals` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
--- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
+-- and calls the parent column's can_admin function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the sampled_individuals_users_roles table or
 -- the sampled_individuals_teams_users table with an appropriate role id.
 CREATE FUNCTION can_admin_sampled_individuals(author_user_id INTEGER, id UUID)
@@ -95,7 +95,7 @@ BEGIN
     IF author_user_id = updated_by THEN
         RETURN TRUE;
     END IF;
-        IF NOT can_delete_projects(author_user_id, project_id) THEN
+        IF NOT can_admin_projects(author_user_id, project_id) THEN
             RETURN FALSE;
         END IF;
     RETURN TRUE;

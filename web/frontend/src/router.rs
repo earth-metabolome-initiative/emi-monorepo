@@ -192,7 +192,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <SpectraCollectionPage id = {id} /> }
         }
         AppRoute::SpectraCollectionsNew => {
-            html! { "<CreateSpectraCollectionForm />" }
+            html! { <CreateSpectraCollectionForm /> }
         }
         AppRoute::SpectraCollectionsNewWithSample{sample_id} => {
             html! { <CreateSpectraCollectionForm sample_id={sample_id} /> }

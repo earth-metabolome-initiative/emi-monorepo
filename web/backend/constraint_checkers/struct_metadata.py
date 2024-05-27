@@ -627,7 +627,7 @@ class StructMetadata:
         """Initializes the search indices."""
         if StructMetadata.pg_indices is None:
             StructMetadata.pg_indices = find_search_indices(
-                tables_metadata=StructMetadata.table_metadata
+                table_metadata=StructMetadata.table_metadata
             )
 
     @staticmethod

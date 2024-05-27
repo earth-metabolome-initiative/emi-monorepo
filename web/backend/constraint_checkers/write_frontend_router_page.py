@@ -326,18 +326,11 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         ])
 
         if flat_variant.is_insertable():
-            if flat_variant.name == "SpectraCollection":
-                document.write(
-                    f"        AppRoute::{builder.get_capitalized_table_name()}New => {{\n"
-                    f"            html! {{ \"<Create{flat_variant.name}Form />\" }}\n"
-                    f"        }}\n"
-                )
-            else:
-                document.write(
-                    f"        AppRoute::{builder.get_capitalized_table_name()}New => {{\n"
-                    f"            html! {{ <Create{flat_variant.name}Form /> }}\n"
-                    f"        }}\n"
-                )
+            document.write(
+                f"        AppRoute::{builder.get_capitalized_table_name()}New => {{\n"
+                f"            html! {{ <Create{flat_variant.name}Form /> }}\n"
+                f"        }}\n"
+            )
 
             covered_variants.append(f"{builder.get_capitalized_table_name()}New")
 

@@ -1,6 +1,6 @@
 -- Create the index to search approximately the composite columns of
 -- taxonomic ranks, including name and description.
-CREATE FUNCTION concat_bio_ott_ranks_name_description(
+CREATE OR REPLACE FUNCTION concat_bio_ott_ranks_name_description(
   name text,
   description text
 ) RETURNS text AS $$

@@ -998,7 +998,14 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::LoginProviders => unimplemented!("Method similarity_search_viewable not implemented for table login_providers."),
+            web_common::database::Table::LoginProviders => {
+bincode::serialize(&NestedLoginProvider::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Materials => unimplemented!("Method similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::Notifications => unimplemented!("Method similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method similarity_search_viewable not implemented for table observations."),
@@ -1077,7 +1084,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method similarity_search_viewable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method similarity_search_viewable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method similarity_search_viewable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => {
@@ -1186,7 +1201,14 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::LoginProviders => unimplemented!("Method word_similarity_search_viewable not implemented for table login_providers."),
+            web_common::database::Table::LoginProviders => {
+bincode::serialize(&NestedLoginProvider::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method word_similarity_search_viewable not implemented for table observations."),
@@ -1265,7 +1287,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method word_similarity_search_viewable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_viewable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method word_similarity_search_viewable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => {
@@ -1374,7 +1404,14 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::LoginProviders => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table login_providers."),
+            web_common::database::Table::LoginProviders => {
+bincode::serialize(&NestedLoginProvider::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table observations."),
@@ -1453,7 +1490,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => {
@@ -3031,7 +3076,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method similarity_search_updatable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method similarity_search_updatable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method similarity_search_updatable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method similarity_search_updatable not implemented for table team_states."),
@@ -3126,7 +3179,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method word_similarity_search_updatable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_updatable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method word_similarity_search_updatable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method word_similarity_search_updatable not implemented for table team_states."),
@@ -3221,7 +3282,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table team_states."),
@@ -3324,7 +3393,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method similarity_search_administrable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method similarity_search_administrable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method similarity_search_administrable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method similarity_search_administrable not implemented for table team_states."),
@@ -3427,7 +3504,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method word_similarity_search_administrable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_administrable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method word_similarity_search_administrable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method word_similarity_search_administrable not implemented for table team_states."),
@@ -3530,7 +3615,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table team_states."),

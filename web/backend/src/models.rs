@@ -152,7 +152,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return bio_ott_ranks::dsl::bio_ott_ranks
             .filter(bio_ott_ranks::dsl::color_id.eq(color_id))
@@ -161,14 +161,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         bio_ott_ranks::dsl::bio_ott_ranks
             .filter(similarity_op(concat_bio_ott_ranks_name_description(bio_ott_ranks::dsl::name, bio_ott_ranks::dsl::description), query))
             .order_by(similarity_dist(concat_bio_ott_ranks_name_description(bio_ott_ranks::dsl::name, bio_ott_ranks::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -202,7 +202,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return bio_ott_ranks::dsl::bio_ott_ranks
             .filter(bio_ott_ranks::dsl::color_id.eq(color_id))
@@ -211,14 +211,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         bio_ott_ranks::dsl::bio_ott_ranks
             .filter(word_similarity_op(concat_bio_ott_ranks_name_description(bio_ott_ranks::dsl::name, bio_ott_ranks::dsl::description), query))
             .order_by(word_similarity_dist_op(concat_bio_ott_ranks_name_description(bio_ott_ranks::dsl::name, bio_ott_ranks::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -252,7 +252,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return bio_ott_ranks::dsl::bio_ott_ranks
             .filter(bio_ott_ranks::dsl::color_id.eq(color_id))
@@ -261,14 +261,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         bio_ott_ranks::dsl::bio_ott_ranks
             .filter(strict_word_similarity_op(concat_bio_ott_ranks_name_description(bio_ott_ranks::dsl::name, bio_ott_ranks::dsl::description), query))
             .order_by(strict_word_similarity_dist_op(concat_bio_ott_ranks_name_description(bio_ott_ranks::dsl::name, bio_ott_ranks::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = bio_ott_taxon_items)]
@@ -475,7 +475,7 @@ if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
         return bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id))
@@ -491,7 +491,7 @@ if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::icon_id.eq(icon_id))
@@ -507,7 +507,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::color_id.eq(color_id))
@@ -523,7 +523,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::domain_id.eq(filter.and_then(|f| f.domain_id)))
             .filter(bio_ott_taxon_items::dsl::kingdom_id.eq(filter.and_then(|f| f.kingdom_id)))
@@ -537,7 +537,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -578,7 +578,7 @@ if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
         return bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id))
@@ -594,7 +594,7 @@ if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::icon_id.eq(icon_id))
@@ -610,7 +610,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::color_id.eq(color_id))
@@ -626,7 +626,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::domain_id.eq(filter.and_then(|f| f.domain_id)))
             .filter(bio_ott_taxon_items::dsl::kingdom_id.eq(filter.and_then(|f| f.kingdom_id)))
@@ -640,7 +640,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -681,7 +681,7 @@ if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
         return bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id))
@@ -697,7 +697,7 @@ if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::icon_id.eq(icon_id))
@@ -713,7 +713,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::color_id.eq(color_id))
@@ -729,7 +729,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .filter(bio_ott_taxon_items::dsl::domain_id.eq(filter.and_then(|f| f.domain_id)))
             .filter(bio_ott_taxon_items::dsl::kingdom_id.eq(filter.and_then(|f| f.kingdom_id)))
@@ -743,7 +743,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = colors)]
@@ -865,7 +865,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -892,7 +892,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -919,7 +919,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = countries)]
@@ -1074,7 +1074,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -1101,7 +1101,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -1128,7 +1128,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = derived_samples)]
@@ -1541,7 +1541,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return document_formats::dsl::document_formats
             .filter(document_formats::dsl::color_id.eq(color_id))
@@ -1550,14 +1550,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         document_formats::dsl::document_formats
             .filter(similarity_op(concat_document_formats_extension_mime_type(document_formats::dsl::extension, document_formats::dsl::mime_type), query))
             .order_by(similarity_dist(concat_document_formats_extension_mime_type(document_formats::dsl::extension, document_formats::dsl::mime_type), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1591,7 +1591,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return document_formats::dsl::document_formats
             .filter(document_formats::dsl::color_id.eq(color_id))
@@ -1600,14 +1600,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         document_formats::dsl::document_formats
             .filter(word_similarity_op(concat_document_formats_extension_mime_type(document_formats::dsl::extension, document_formats::dsl::mime_type), query))
             .order_by(word_similarity_dist_op(concat_document_formats_extension_mime_type(document_formats::dsl::extension, document_formats::dsl::mime_type), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1641,7 +1641,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return document_formats::dsl::document_formats
             .filter(document_formats::dsl::color_id.eq(color_id))
@@ -1650,14 +1650,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         document_formats::dsl::document_formats
             .filter(strict_word_similarity_op(concat_document_formats_extension_mime_type(document_formats::dsl::extension, document_formats::dsl::mime_type), query))
             .order_by(strict_word_similarity_dist_op(concat_document_formats_extension_mime_type(document_formats::dsl::extension, document_formats::dsl::mime_type), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = font_awesome_icons)]
@@ -1761,7 +1761,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -1788,7 +1788,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -1815,7 +1815,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = login_providers)]
@@ -1950,6 +1950,174 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .first::<Self>(connection)?;
         Ok(flat_variant)
     }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&LoginProviderFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, limit, offset, connection);
+        }
+        use crate::schema::login_providers;
+ if filter.map(|f| f.icon_id.is_some()&&f.color_id.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+        return login_providers::dsl::login_providers
+            .filter(login_providers::dsl::icon_id.eq(icon_id))
+            .select(LoginProvider::as_select())
+            .inner_join(colors::dsl::colors.on(login_providers::dsl::color_id.eq(colors::dsl::id)))
+            .filter(similarity_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .order_by(similarity_dist(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(color_id) = filter.and_then(|f| f.color_id) {
+        return login_providers::dsl::login_providers
+            .filter(login_providers::dsl::color_id.eq(color_id))
+            .select(LoginProvider::as_select())
+            .inner_join(colors::dsl::colors.on(login_providers::dsl::color_id.eq(colors::dsl::id)))
+            .filter(similarity_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .order_by(similarity_dist(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        login_providers::dsl::login_providers
+            .select(LoginProvider::as_select())
+            .inner_join(colors::dsl::colors.on(login_providers::dsl::color_id.eq(colors::dsl::id)))
+            .filter(similarity_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .order_by(similarity_dist(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&LoginProviderFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, limit, offset, connection);
+        }
+        use crate::schema::login_providers;
+ if filter.map(|f| f.icon_id.is_some()&&f.color_id.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+        return login_providers::dsl::login_providers
+            .filter(login_providers::dsl::icon_id.eq(icon_id))
+            .select(LoginProvider::as_select())
+            .inner_join(colors::dsl::colors.on(login_providers::dsl::color_id.eq(colors::dsl::id)))
+            .filter(word_similarity_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .order_by(word_similarity_dist_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(color_id) = filter.and_then(|f| f.color_id) {
+        return login_providers::dsl::login_providers
+            .filter(login_providers::dsl::color_id.eq(color_id))
+            .select(LoginProvider::as_select())
+            .inner_join(colors::dsl::colors.on(login_providers::dsl::color_id.eq(colors::dsl::id)))
+            .filter(word_similarity_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .order_by(word_similarity_dist_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        login_providers::dsl::login_providers
+            .select(LoginProvider::as_select())
+            .inner_join(colors::dsl::colors.on(login_providers::dsl::color_id.eq(colors::dsl::id)))
+            .filter(word_similarity_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .order_by(word_similarity_dist_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&LoginProviderFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, limit, offset, connection);
+        }
+        use crate::schema::login_providers;
+ if filter.map(|f| f.icon_id.is_some()&&f.color_id.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+        return login_providers::dsl::login_providers
+            .filter(login_providers::dsl::icon_id.eq(icon_id))
+            .select(LoginProvider::as_select())
+            .inner_join(colors::dsl::colors.on(login_providers::dsl::color_id.eq(colors::dsl::id)))
+            .filter(strict_word_similarity_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .order_by(strict_word_similarity_dist_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(color_id) = filter.and_then(|f| f.color_id) {
+        return login_providers::dsl::login_providers
+            .filter(login_providers::dsl::color_id.eq(color_id))
+            .select(LoginProvider::as_select())
+            .inner_join(colors::dsl::colors.on(login_providers::dsl::color_id.eq(colors::dsl::id)))
+            .filter(strict_word_similarity_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .order_by(strict_word_similarity_dist_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        login_providers::dsl::login_providers
+            .select(LoginProvider::as_select())
+            .inner_join(colors::dsl::colors.on(login_providers::dsl::color_id.eq(colors::dsl::id)))
+            .filter(strict_word_similarity_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .order_by(strict_word_similarity_dist_op(concat_colors_name(colors::dsl::name, colors::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = materials)]
@@ -2694,14 +2862,14 @@ if let Some(country_id) = filter.and_then(|f| f.country_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         organizations::dsl::organizations
             .filter(similarity_op(organizations::dsl::name, query))
             .order_by(similarity_dist(organizations::dsl::name, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -2732,14 +2900,14 @@ if let Some(country_id) = filter.and_then(|f| f.country_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         organizations::dsl::organizations
             .filter(word_similarity_op(organizations::dsl::name, query))
             .order_by(word_similarity_dist_op(organizations::dsl::name, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -2770,14 +2938,14 @@ if let Some(country_id) = filter.and_then(|f| f.country_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         organizations::dsl::organizations
             .filter(strict_word_similarity_op(organizations::dsl::name, query))
             .order_by(strict_word_similarity_dist_op(organizations::dsl::name, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = project_states)]
@@ -2936,7 +3104,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return project_states::dsl::project_states
             .filter(project_states::dsl::color_id.eq(color_id))
@@ -2945,14 +3113,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         project_states::dsl::project_states
             .filter(similarity_op(concat_project_states_name_description(project_states::dsl::name, project_states::dsl::description), query))
             .order_by(similarity_dist(concat_project_states_name_description(project_states::dsl::name, project_states::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -2986,7 +3154,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return project_states::dsl::project_states
             .filter(project_states::dsl::color_id.eq(color_id))
@@ -2995,14 +3163,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         project_states::dsl::project_states
             .filter(word_similarity_op(concat_project_states_name_description(project_states::dsl::name, project_states::dsl::description), query))
             .order_by(word_similarity_dist_op(concat_project_states_name_description(project_states::dsl::name, project_states::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3036,7 +3204,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return project_states::dsl::project_states
             .filter(project_states::dsl::color_id.eq(color_id))
@@ -3045,14 +3213,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         project_states::dsl::project_states
             .filter(strict_word_similarity_op(concat_project_states_name_description(project_states::dsl::name, project_states::dsl::description), query))
             .order_by(strict_word_similarity_dist_op(concat_project_states_name_description(project_states::dsl::name, project_states::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = projects)]
@@ -3319,7 +3487,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return projects::dsl::projects
             .filter(projects::dsl::icon_id.eq(icon_id))
@@ -3330,7 +3498,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return projects::dsl::projects
             .filter(projects::dsl::color_id.eq(color_id))
@@ -3341,7 +3509,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return projects::dsl::projects
             .filter(projects::dsl::created_by.eq(created_by))
@@ -3352,7 +3520,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return projects::dsl::projects
             .filter(projects::dsl::updated_by.eq(updated_by))
@@ -3363,7 +3531,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_view_projects(author_user_id, projects::dsl::id))
@@ -3372,7 +3540,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3410,7 +3578,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return projects::dsl::projects
             .filter(projects::dsl::icon_id.eq(icon_id))
@@ -3421,7 +3589,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return projects::dsl::projects
             .filter(projects::dsl::color_id.eq(color_id))
@@ -3432,7 +3600,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return projects::dsl::projects
             .filter(projects::dsl::created_by.eq(created_by))
@@ -3443,7 +3611,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return projects::dsl::projects
             .filter(projects::dsl::updated_by.eq(updated_by))
@@ -3454,7 +3622,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_view_projects(author_user_id, projects::dsl::id))
@@ -3463,7 +3631,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3501,7 +3669,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return projects::dsl::projects
             .filter(projects::dsl::icon_id.eq(icon_id))
@@ -3512,7 +3680,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return projects::dsl::projects
             .filter(projects::dsl::color_id.eq(color_id))
@@ -3523,7 +3691,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return projects::dsl::projects
             .filter(projects::dsl::created_by.eq(created_by))
@@ -3534,7 +3702,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return projects::dsl::projects
             .filter(projects::dsl::updated_by.eq(updated_by))
@@ -3545,7 +3713,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_view_projects(author_user_id, projects::dsl::id))
@@ -3554,7 +3722,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -3707,7 +3875,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return projects::dsl::projects
             .filter(projects::dsl::icon_id.eq(icon_id))
@@ -3718,7 +3886,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return projects::dsl::projects
             .filter(projects::dsl::color_id.eq(color_id))
@@ -3729,7 +3897,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return projects::dsl::projects
             .filter(projects::dsl::created_by.eq(created_by))
@@ -3740,7 +3908,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return projects::dsl::projects
             .filter(projects::dsl::updated_by.eq(updated_by))
@@ -3751,7 +3919,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_update_projects(author_user_id, projects::dsl::id))
@@ -3760,7 +3928,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3798,7 +3966,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return projects::dsl::projects
             .filter(projects::dsl::icon_id.eq(icon_id))
@@ -3809,7 +3977,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return projects::dsl::projects
             .filter(projects::dsl::color_id.eq(color_id))
@@ -3820,7 +3988,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return projects::dsl::projects
             .filter(projects::dsl::created_by.eq(created_by))
@@ -3831,7 +3999,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return projects::dsl::projects
             .filter(projects::dsl::updated_by.eq(updated_by))
@@ -3842,7 +4010,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_update_projects(author_user_id, projects::dsl::id))
@@ -3851,7 +4019,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3889,7 +4057,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return projects::dsl::projects
             .filter(projects::dsl::icon_id.eq(icon_id))
@@ -3900,7 +4068,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return projects::dsl::projects
             .filter(projects::dsl::color_id.eq(color_id))
@@ -3911,7 +4079,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return projects::dsl::projects
             .filter(projects::dsl::created_by.eq(created_by))
@@ -3922,7 +4090,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return projects::dsl::projects
             .filter(projects::dsl::updated_by.eq(updated_by))
@@ -3933,7 +4101,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_update_projects(author_user_id, projects::dsl::id))
@@ -3942,7 +4110,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4095,7 +4263,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return projects::dsl::projects
             .filter(projects::dsl::icon_id.eq(icon_id))
@@ -4106,7 +4274,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return projects::dsl::projects
             .filter(projects::dsl::color_id.eq(color_id))
@@ -4117,7 +4285,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return projects::dsl::projects
             .filter(projects::dsl::created_by.eq(created_by))
@@ -4128,7 +4296,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return projects::dsl::projects
             .filter(projects::dsl::updated_by.eq(updated_by))
@@ -4139,7 +4307,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_admin_projects(author_user_id, projects::dsl::id))
@@ -4148,7 +4316,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -4186,7 +4354,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return projects::dsl::projects
             .filter(projects::dsl::icon_id.eq(icon_id))
@@ -4197,7 +4365,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return projects::dsl::projects
             .filter(projects::dsl::color_id.eq(color_id))
@@ -4208,7 +4376,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return projects::dsl::projects
             .filter(projects::dsl::created_by.eq(created_by))
@@ -4219,7 +4387,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return projects::dsl::projects
             .filter(projects::dsl::updated_by.eq(updated_by))
@@ -4230,7 +4398,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_admin_projects(author_user_id, projects::dsl::id))
@@ -4239,7 +4407,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -4277,7 +4445,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return projects::dsl::projects
             .filter(projects::dsl::icon_id.eq(icon_id))
@@ -4288,7 +4456,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return projects::dsl::projects
             .filter(projects::dsl::color_id.eq(color_id))
@@ -4299,7 +4467,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return projects::dsl::projects
             .filter(projects::dsl::created_by.eq(created_by))
@@ -4310,7 +4478,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return projects::dsl::projects
             .filter(projects::dsl::updated_by.eq(updated_by))
@@ -4321,7 +4489,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_admin_projects(author_user_id, projects::dsl::id))
@@ -4330,7 +4498,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.
@@ -6319,7 +6487,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return roles::dsl::roles
             .filter(roles::dsl::color_id.eq(color_id))
@@ -6328,14 +6496,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         roles::dsl::roles
             .filter(similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
             .order_by(similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -6369,7 +6537,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return roles::dsl::roles
             .filter(roles::dsl::color_id.eq(color_id))
@@ -6378,14 +6546,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         roles::dsl::roles
             .filter(word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
             .order_by(word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -6419,7 +6587,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return roles::dsl::roles
             .filter(roles::dsl::color_id.eq(color_id))
@@ -6428,14 +6596,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         roles::dsl::roles
             .filter(strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
             .order_by(strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_bio_ott_taxon_items)]
@@ -6844,7 +7012,7 @@ if let Some(material_id) = filter.and_then(|f| f.material_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return sample_container_categories::dsl::sample_container_categories
             .filter(sample_container_categories::dsl::icon_id.eq(icon_id))
@@ -6853,7 +7021,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return sample_container_categories::dsl::sample_container_categories
             .filter(sample_container_categories::dsl::color_id.eq(color_id))
@@ -6862,14 +7030,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_container_categories::dsl::sample_container_categories
             .filter(similarity_op(concat_sample_container_categories_brand(sample_container_categories::dsl::name, sample_container_categories::dsl::description), query))
             .order_by(similarity_dist(concat_sample_container_categories_brand(sample_container_categories::dsl::name, sample_container_categories::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -6903,7 +7071,7 @@ if let Some(material_id) = filter.and_then(|f| f.material_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return sample_container_categories::dsl::sample_container_categories
             .filter(sample_container_categories::dsl::icon_id.eq(icon_id))
@@ -6912,7 +7080,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return sample_container_categories::dsl::sample_container_categories
             .filter(sample_container_categories::dsl::color_id.eq(color_id))
@@ -6921,14 +7089,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_container_categories::dsl::sample_container_categories
             .filter(word_similarity_op(concat_sample_container_categories_brand(sample_container_categories::dsl::name, sample_container_categories::dsl::description), query))
             .order_by(word_similarity_dist_op(concat_sample_container_categories_brand(sample_container_categories::dsl::name, sample_container_categories::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -6962,7 +7130,7 @@ if let Some(material_id) = filter.and_then(|f| f.material_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
         return sample_container_categories::dsl::sample_container_categories
             .filter(sample_container_categories::dsl::icon_id.eq(icon_id))
@@ -6971,7 +7139,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return sample_container_categories::dsl::sample_container_categories
             .filter(sample_container_categories::dsl::color_id.eq(color_id))
@@ -6980,14 +7148,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_container_categories::dsl::sample_container_categories
             .filter(strict_word_similarity_op(concat_sample_container_categories_brand(sample_container_categories::dsl::name, sample_container_categories::dsl::description), query))
             .order_by(strict_word_similarity_dist_op(concat_sample_container_categories_brand(sample_container_categories::dsl::name, sample_container_categories::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sample_containers)]
@@ -7203,7 +7371,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(category_id) = filter.and_then(|f| f.category_id) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::category_id.eq(category_id))
@@ -7213,7 +7381,7 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
@@ -7223,7 +7391,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_containers::dsl::sample_containers
             .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(similarity_op(sample_containers::dsl::barcode, query))
@@ -7231,7 +7399,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -7268,7 +7436,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(category_id) = filter.and_then(|f| f.category_id) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::category_id.eq(category_id))
@@ -7278,7 +7446,7 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
@@ -7288,7 +7456,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_containers::dsl::sample_containers
             .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(word_similarity_op(sample_containers::dsl::barcode, query))
@@ -7296,7 +7464,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -7333,7 +7501,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(category_id) = filter.and_then(|f| f.category_id) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::category_id.eq(category_id))
@@ -7343,7 +7511,7 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
@@ -7353,7 +7521,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_containers::dsl::sample_containers
             .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
@@ -7361,7 +7529,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -7495,7 +7663,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(category_id) = filter.and_then(|f| f.category_id) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::category_id.eq(category_id))
@@ -7505,7 +7673,7 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
@@ -7515,7 +7683,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_containers::dsl::sample_containers
             .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(similarity_op(sample_containers::dsl::barcode, query))
@@ -7523,7 +7691,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -7560,7 +7728,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(category_id) = filter.and_then(|f| f.category_id) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::category_id.eq(category_id))
@@ -7570,7 +7738,7 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
@@ -7580,7 +7748,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_containers::dsl::sample_containers
             .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(word_similarity_op(sample_containers::dsl::barcode, query))
@@ -7588,7 +7756,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -7625,7 +7793,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(category_id) = filter.and_then(|f| f.category_id) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::category_id.eq(category_id))
@@ -7635,7 +7803,7 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
@@ -7645,7 +7813,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_containers::dsl::sample_containers
             .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
@@ -7653,7 +7821,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.
@@ -7827,7 +7995,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return sample_states::dsl::sample_states
             .filter(sample_states::dsl::color_id.eq(color_id))
@@ -7836,14 +8004,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_states::dsl::sample_states
             .filter(similarity_op(concat_sample_states_name_description(sample_states::dsl::name, sample_states::dsl::description), query))
             .order_by(similarity_dist(concat_sample_states_name_description(sample_states::dsl::name, sample_states::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -7877,7 +8045,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return sample_states::dsl::sample_states
             .filter(sample_states::dsl::color_id.eq(color_id))
@@ -7886,14 +8054,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_states::dsl::sample_states
             .filter(word_similarity_op(concat_sample_states_name_description(sample_states::dsl::name, sample_states::dsl::description), query))
             .order_by(word_similarity_dist_op(concat_sample_states_name_description(sample_states::dsl::name, sample_states::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -7927,7 +8095,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return sample_states::dsl::sample_states
             .filter(sample_states::dsl::color_id.eq(color_id))
@@ -7936,14 +8104,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sample_states::dsl::sample_states
             .filter(strict_word_similarity_op(concat_sample_states_name_description(sample_states::dsl::name, sample_states::dsl::description), query))
             .order_by(strict_word_similarity_dist_op(concat_sample_states_name_description(sample_states::dsl::name, sample_states::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individual_bio_ott_taxon_items)]
@@ -8429,7 +8597,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
@@ -8439,7 +8607,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
@@ -8449,7 +8617,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sampled_individuals::dsl::sampled_individuals
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
             .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
@@ -8457,7 +8625,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -8494,7 +8662,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
@@ -8504,7 +8672,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
@@ -8514,7 +8682,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sampled_individuals::dsl::sampled_individuals
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
             .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
@@ -8522,7 +8690,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -8559,7 +8727,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
@@ -8569,7 +8737,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
@@ -8579,7 +8747,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sampled_individuals::dsl::sampled_individuals
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
             .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
@@ -8587,7 +8755,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -8721,7 +8889,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
@@ -8731,7 +8899,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
@@ -8741,7 +8909,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sampled_individuals::dsl::sampled_individuals
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
             .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
@@ -8749,7 +8917,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -8786,7 +8954,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
@@ -8796,7 +8964,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
@@ -8806,7 +8974,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sampled_individuals::dsl::sampled_individuals
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
             .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
@@ -8814,7 +8982,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -8851,7 +9019,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
@@ -8861,7 +9029,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
@@ -8871,7 +9039,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sampled_individuals::dsl::sampled_individuals
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
             .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
@@ -8879,7 +9047,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -9013,7 +9181,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
@@ -9023,7 +9191,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
@@ -9033,7 +9201,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sampled_individuals::dsl::sampled_individuals
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
             .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
@@ -9041,7 +9209,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -9078,7 +9246,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
@@ -9088,7 +9256,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
@@ -9098,7 +9266,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sampled_individuals::dsl::sampled_individuals
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
             .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
@@ -9106,7 +9274,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -9143,7 +9311,7 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
@@ -9153,7 +9321,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
@@ -9163,7 +9331,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         sampled_individuals::dsl::sampled_individuals
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
             .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
@@ -9171,7 +9339,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.
@@ -9412,6 +9580,333 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         }
         Ok(flat_variant)
     }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&SampleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::samples;
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(container_id) = filter.and_then(|f| f.container_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::container_id.eq(container_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::project_id.eq(project_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::created_by.eq(created_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::sampled_by.eq(sampled_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::updated_by.eq(updated_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(state) = filter.and_then(|f| f.state) {
+        return samples::dsl::samples
+            .filter(samples::dsl::state.eq(state))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        samples::dsl::samples
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&SampleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::samples;
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(container_id) = filter.and_then(|f| f.container_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::container_id.eq(container_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::project_id.eq(project_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::created_by.eq(created_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::sampled_by.eq(sampled_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::updated_by.eq(updated_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(state) = filter.and_then(|f| f.state) {
+        return samples::dsl::samples
+            .filter(samples::dsl::state.eq(state))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        samples::dsl::samples
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&SampleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::samples;
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(container_id) = filter.and_then(|f| f.container_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::container_id.eq(container_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::project_id.eq(project_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::created_by.eq(created_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::sampled_by.eq(sampled_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::updated_by.eq(updated_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(state) = filter.and_then(|f| f.state) {
+        return samples::dsl::samples
+            .filter(samples::dsl::state.eq(state))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        samples::dsl::samples
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_view_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -9527,6 +10022,333 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::samples;
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(container_id) = filter.and_then(|f| f.container_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::container_id.eq(container_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::project_id.eq(project_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::created_by.eq(created_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::sampled_by.eq(sampled_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::updated_by.eq(updated_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(state) = filter.and_then(|f| f.state) {
+        return samples::dsl::samples
+            .filter(samples::dsl::state.eq(state))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        samples::dsl::samples
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::samples;
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(container_id) = filter.and_then(|f| f.container_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::container_id.eq(container_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::project_id.eq(project_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::created_by.eq(created_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::sampled_by.eq(sampled_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::updated_by.eq(updated_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(state) = filter.and_then(|f| f.state) {
+        return samples::dsl::samples
+            .filter(samples::dsl::state.eq(state))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        samples::dsl::samples
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::samples;
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(container_id) = filter.and_then(|f| f.container_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::container_id.eq(container_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::project_id.eq(project_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::created_by.eq(created_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::sampled_by.eq(sampled_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::updated_by.eq(updated_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(state) = filter.and_then(|f| f.state) {
+        return samples::dsl::samples
+            .filter(samples::dsl::state.eq(state))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        samples::dsl::samples
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_update_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -9642,6 +10464,333 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::samples;
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(container_id) = filter.and_then(|f| f.container_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::container_id.eq(container_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::project_id.eq(project_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::created_by.eq(created_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::sampled_by.eq(sampled_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::updated_by.eq(updated_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(state) = filter.and_then(|f| f.state) {
+        return samples::dsl::samples
+            .filter(samples::dsl::state.eq(state))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        samples::dsl::samples
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::samples;
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(container_id) = filter.and_then(|f| f.container_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::container_id.eq(container_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::project_id.eq(project_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::created_by.eq(created_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::sampled_by.eq(sampled_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::updated_by.eq(updated_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(state) = filter.and_then(|f| f.state) {
+        return samples::dsl::samples
+            .filter(samples::dsl::state.eq(state))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        samples::dsl::samples
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::samples;
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(container_id) = filter.and_then(|f| f.container_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::container_id.eq(container_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return samples::dsl::samples
+            .filter(samples::dsl::project_id.eq(project_id))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::created_by.eq(created_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(sampled_by) = filter.and_then(|f| f.sampled_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::sampled_by.eq(sampled_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return samples::dsl::samples
+            .filter(samples::dsl::updated_by.eq(updated_by))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(state) = filter.and_then(|f| f.state) {
+        return samples::dsl::samples
+            .filter(samples::dsl::state.eq(state))
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        samples::dsl::samples
+            .select(Sample::as_select())
+            .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
+            .filter(can_admin_samples(author_user_id, samples::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.
@@ -10323,7 +11472,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return team_states::dsl::team_states
             .filter(team_states::dsl::color_id.eq(color_id))
@@ -10332,14 +11481,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         team_states::dsl::team_states
             .filter(similarity_op(concat_team_states_name_description(team_states::dsl::name, team_states::dsl::description), query))
             .order_by(similarity_dist(concat_team_states_name_description(team_states::dsl::name, team_states::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -10373,7 +11522,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return team_states::dsl::team_states
             .filter(team_states::dsl::color_id.eq(color_id))
@@ -10382,14 +11531,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         team_states::dsl::team_states
             .filter(word_similarity_op(concat_team_states_name_description(team_states::dsl::name, team_states::dsl::description), query))
             .order_by(word_similarity_dist_op(concat_team_states_name_description(team_states::dsl::name, team_states::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -10423,7 +11572,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return team_states::dsl::team_states
             .filter(team_states::dsl::color_id.eq(color_id))
@@ -10432,14 +11581,14 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         team_states::dsl::team_states
             .filter(strict_word_similarity_op(concat_team_states_name_description(team_states::dsl::name, team_states::dsl::description), query))
             .order_by(strict_word_similarity_dist_op(concat_team_states_name_description(team_states::dsl::name, team_states::dsl::description), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = teams)]
@@ -10642,7 +11791,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return teams::dsl::teams
             .filter(teams::dsl::color_id.eq(color_id))
@@ -10652,7 +11801,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return teams::dsl::teams
             .filter(teams::dsl::state_id.eq(state_id))
@@ -10662,7 +11811,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return teams::dsl::teams
             .filter(teams::dsl::created_by.eq(created_by))
@@ -10672,7 +11821,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return teams::dsl::teams
             .filter(teams::dsl::updated_by.eq(updated_by))
@@ -10682,7 +11831,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(similarity_op(concat_teams_name_description(teams::dsl::name, teams::dsl::description), query))
@@ -10690,7 +11839,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -10725,7 +11874,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return teams::dsl::teams
             .filter(teams::dsl::color_id.eq(color_id))
@@ -10735,7 +11884,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return teams::dsl::teams
             .filter(teams::dsl::state_id.eq(state_id))
@@ -10745,7 +11894,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return teams::dsl::teams
             .filter(teams::dsl::created_by.eq(created_by))
@@ -10755,7 +11904,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return teams::dsl::teams
             .filter(teams::dsl::updated_by.eq(updated_by))
@@ -10765,7 +11914,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(word_similarity_op(concat_teams_name_description(teams::dsl::name, teams::dsl::description), query))
@@ -10773,7 +11922,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -10808,7 +11957,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return teams::dsl::teams
             .filter(teams::dsl::color_id.eq(color_id))
@@ -10818,7 +11967,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return teams::dsl::teams
             .filter(teams::dsl::state_id.eq(state_id))
@@ -10828,7 +11977,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return teams::dsl::teams
             .filter(teams::dsl::created_by.eq(created_by))
@@ -10838,7 +11987,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return teams::dsl::teams
             .filter(teams::dsl::updated_by.eq(updated_by))
@@ -10848,7 +11997,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(strict_word_similarity_op(concat_teams_name_description(teams::dsl::name, teams::dsl::description), query))
@@ -10856,7 +12005,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -11009,7 +12158,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return teams::dsl::teams
             .filter(teams::dsl::color_id.eq(color_id))
@@ -11020,7 +12169,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return teams::dsl::teams
             .filter(teams::dsl::state_id.eq(state_id))
@@ -11031,7 +12180,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return teams::dsl::teams
             .filter(teams::dsl::created_by.eq(created_by))
@@ -11042,7 +12191,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return teams::dsl::teams
             .filter(teams::dsl::updated_by.eq(updated_by))
@@ -11053,7 +12202,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(can_update_teams(author_user_id, teams::dsl::id))
@@ -11062,7 +12211,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -11100,7 +12249,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return teams::dsl::teams
             .filter(teams::dsl::color_id.eq(color_id))
@@ -11111,7 +12260,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return teams::dsl::teams
             .filter(teams::dsl::state_id.eq(state_id))
@@ -11122,7 +12271,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return teams::dsl::teams
             .filter(teams::dsl::created_by.eq(created_by))
@@ -11133,7 +12282,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return teams::dsl::teams
             .filter(teams::dsl::updated_by.eq(updated_by))
@@ -11144,7 +12293,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(can_update_teams(author_user_id, teams::dsl::id))
@@ -11153,7 +12302,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -11191,7 +12340,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return teams::dsl::teams
             .filter(teams::dsl::color_id.eq(color_id))
@@ -11202,7 +12351,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return teams::dsl::teams
             .filter(teams::dsl::state_id.eq(state_id))
@@ -11213,7 +12362,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return teams::dsl::teams
             .filter(teams::dsl::created_by.eq(created_by))
@@ -11224,7 +12373,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return teams::dsl::teams
             .filter(teams::dsl::updated_by.eq(updated_by))
@@ -11235,7 +12384,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(can_update_teams(author_user_id, teams::dsl::id))
@@ -11244,7 +12393,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -11397,7 +12546,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return teams::dsl::teams
             .filter(teams::dsl::color_id.eq(color_id))
@@ -11408,7 +12557,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return teams::dsl::teams
             .filter(teams::dsl::state_id.eq(state_id))
@@ -11419,7 +12568,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return teams::dsl::teams
             .filter(teams::dsl::created_by.eq(created_by))
@@ -11430,7 +12579,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return teams::dsl::teams
             .filter(teams::dsl::updated_by.eq(updated_by))
@@ -11441,7 +12590,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(can_admin_teams(author_user_id, teams::dsl::id))
@@ -11450,7 +12599,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -11488,7 +12637,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return teams::dsl::teams
             .filter(teams::dsl::color_id.eq(color_id))
@@ -11499,7 +12648,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return teams::dsl::teams
             .filter(teams::dsl::state_id.eq(state_id))
@@ -11510,7 +12659,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return teams::dsl::teams
             .filter(teams::dsl::created_by.eq(created_by))
@@ -11521,7 +12670,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return teams::dsl::teams
             .filter(teams::dsl::updated_by.eq(updated_by))
@@ -11532,7 +12681,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(can_admin_teams(author_user_id, teams::dsl::id))
@@ -11541,7 +12690,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -11579,7 +12728,7 @@ if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(color_id) = filter.and_then(|f| f.color_id) {
         return teams::dsl::teams
             .filter(teams::dsl::color_id.eq(color_id))
@@ -11590,7 +12739,7 @@ if let Some(color_id) = filter.and_then(|f| f.color_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return teams::dsl::teams
             .filter(teams::dsl::state_id.eq(state_id))
@@ -11601,7 +12750,7 @@ if let Some(state_id) = filter.and_then(|f| f.state_id) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return teams::dsl::teams
             .filter(teams::dsl::created_by.eq(created_by))
@@ -11612,7 +12761,7 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return teams::dsl::teams
             .filter(teams::dsl::updated_by.eq(updated_by))
@@ -11623,7 +12772,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-    }
+}
         teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(can_admin_teams(author_user_id, teams::dsl::id))
@@ -11632,7 +12781,7 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.
@@ -12916,7 +14065,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -12943,7 +14092,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -12970,7 +14119,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = user_emails)]
@@ -13388,7 +14537,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -13415,7 +14564,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `query` - The string to search for.
@@ -13442,7 +14591,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -13543,7 +14692,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -13573,7 +14722,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -13603,7 +14752,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -13704,7 +14853,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -13734,7 +14883,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -13764,7 +14913,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-    }
+}
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.

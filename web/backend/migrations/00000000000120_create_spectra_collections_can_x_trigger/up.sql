@@ -63,7 +63,7 @@ EXECUTE FUNCTION can_update_spectra_collections_trigger();
 -- The function `can_admin_spectra_collections` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
--- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
+-- and calls the parent column's can_admin function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the spectra_collections_users_roles table or
 -- the spectra_collections_teams_users table with an appropriate role id.
 CREATE OR REPLACE FUNCTION can_admin_spectra_collections(author_user_id INTEGER, id INTEGER)
