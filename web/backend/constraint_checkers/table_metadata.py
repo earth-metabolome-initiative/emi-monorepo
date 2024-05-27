@@ -232,37 +232,37 @@ class TableStructMetadata:
         """Returns the columns that determine the editability of the table."""
         return self.flat_variant.get_editability_determinant_columns()
 
-    def get_can_edit_function_name(self) -> str:
-        """Returns the name of the can_edit function."""
-        return self.flat_variant.get_can_edit_function_name()
+    def get_can_update_function_name(self) -> str:
+        """Returns the name of the can_update function."""
+        return self.flat_variant.get_can_update_function_name()
 
-    def has_can_edit_function(self) -> bool:
-        """Returns whether the table has a can_edit function."""
-        return self.flat_variant.has_can_edit_function()
+    def has_can_update_function(self) -> bool:
+        """Returns whether the table has a can_update function."""
+        return self.flat_variant.has_can_update_function()
 
     def get_can_view_function_name(self) -> str:
         """Returns the name of the can_view function."""
         return self.flat_variant.get_can_view_function_name()
 
-    def get_can_delete_function_name(self) -> str:
-        """Returns the name of the can_delete function."""
-        return self.flat_variant.get_can_delete_function_name()
+    def get_can_admin_function_name(self) -> str:
+        """Returns the name of the can_admin function."""
+        return self.flat_variant.get_can_admin_function_name()
 
-    def get_can_edit_trigger_name(self) -> str:
-        """Returns the name of the can_edit trigger."""
-        return self.flat_variant.get_can_edit_trigger_name()
+    def get_can_update_trigger_name(self) -> str:
+        """Returns the name of the can_update trigger."""
+        return self.flat_variant.get_can_update_trigger_name()
 
-    def has_can_edit_trigger(self) -> bool:
-        """Returns whether the table has a can_edit trigger."""
-        return self.flat_variant.has_can_edit_trigger()
+    def has_can_update_trigger(self) -> bool:
+        """Returns whether the table has a can_update trigger."""
+        return self.flat_variant.has_can_update_trigger()
 
     def has_can_view_function(self) -> bool:
         """Returns whether the table has a can_view function."""
         return self.flat_variant.has_can_view_function()
 
-    def has_can_delete_function(self) -> bool:
-        """Returns whether the table has a can_delete function."""
-        return self.flat_variant.has_can_delete_function()
+    def has_can_admin_function(self) -> bool:
+        """Returns whether the table has a can_admin function."""
+        return self.flat_variant.has_can_admin_function()
 
     def get_foreign_key_table_name(self, column_name: str) -> str:
         """Returns the table name of the foreign key."""

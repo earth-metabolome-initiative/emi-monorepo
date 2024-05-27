@@ -2,19 +2,20 @@
 
 from typing import List
 from tqdm.auto import tqdm
-from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
+from constraint_checkers.struct_metadata import (
+    StructMetadata,
+    AttributeMetadata,
+    MethodDefinition,
+)
 from constraint_checkers.indices import PGIndex, PGIndices
 
 
 def write_backend_flat_variants(
     path: str,
     table_type: str,
-    struct_metadatas: List[StructMetadata],
+    flat_variants: List[StructMetadata],
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` file."""
-
-    if len(struct_metadatas) == 0:
-        return
 
     # After each struct ends, as defined by the `}` character, after
     # we have found a `struct` keyword, we write the `From` implementation
@@ -30,12 +31,14 @@ def write_backend_flat_variants(
         "use diesel::Identifiable;",
         "use diesel::Insertable;",
         "use crate::schema::*;",
+        "use crate::sql_function_bindings::*;",
         "use diesel::Selectable;",
         "use serde::Deserialize;",
         "use serde::Serialize;",
         "use diesel::r2d2::ConnectionManager;",
         "use diesel::r2d2::PooledConnection;",
         "use diesel::prelude::*;",
+        "use web_common::database::filter_structs::*;",
         "use uuid::Uuid;",
         "use chrono::NaiveDateTime;",
     ]
@@ -63,19 +66,49 @@ def write_backend_flat_variants(
 
         # Then, we write the structs.
 
+        connection_argument_and_description = (
+            AttributeMetadata(
+                original_name="connection",
+                name="connection",
+                data_type="PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>",
+                optional=False,
+                reference=True,
+                mutable=True,
+            ),
+            "The connection to the database.",
+        )
+
+        limit_and_offset_arguments_and_description = [
+            (
+                AttributeMetadata(
+                    original_name="limit",
+                    name="limit",
+                    data_type="i64",
+                    optional=True,
+                    reference=False,
+                ),
+                "The maximum number of results to return.",
+            ),
+            (
+                AttributeMetadata(
+                    original_name="offset",
+                    name="offset",
+                    data_type="i64",
+                    optional=True,
+                    reference=False,
+                ),
+                "The number of results to skip.",
+            ),
+        ]
+
         for struct in tqdm(
-            struct_metadatas,
+            flat_variants,
             desc=f"Writing {table_type} to backend",
             unit="struct",
             leave=False,
         ):
 
             primary_keys = struct.get_primary_keys()
-
-            editable_variants = [False]
-
-            if struct.has_associated_roles() and struct.table_name != "users":
-                editable_variants.append(True)
 
             # First of all, we write out the struct.
             struct.write_to(file, diesel=table_type)
@@ -121,694 +154,631 @@ def write_backend_flat_variants(
             # For all the tables that have an associated roles table, we implement methods
             # to determine whetheer a provided user id is a Viewer (role_id >= 3), Editor (role_id >= 2), or Admin (role_id == 1),
             # or the user is the creator of the struct (i.e. the created_by field is equal to the user_id).
-            if struct.has_associated_roles() and struct.table_name != "users":
-                # We start by creating the more general method that checks whether the user has a role
-                # with a role_id less than or equal to the provided role_id.
-                file.write(
-                    "    /// Check whether the user has a role with a role_id less than or equal to the provided role_id.\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
-                    "    /// * `author_user_id` - The ID of the user to check.\n"
-                    "    /// * `role_id` - The role_id to check against.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn has_role_by_id(\n"
-                    f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
-                    "        author_user_id: i32,\n"
-                    "        role_id: i32,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<bool, diesel::result::Error> {\n"
-                    f"        diesel::select(diesel::dsl::exists({struct.table_name}::dsl::{struct.table_name}\n"
-                )
-                assert (
-                    len(primary_keys) == 1
-                ), "The has_role_by_id method is only implemented for tables with a single primary key."
-                primary_key = primary_keys[0]
-                file.write(
-                    f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
-                    f"           .filter({struct.table_name}::dsl::created_by.eq(author_user_id))\n"
-                    "            .or_filter(\n"
-                    f"               {struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name})\n"
-                    f"                   .and({struct.table_name}::dsl::{primary_key.name}.eq_any(\n"
-                    f"                       {struct.table_name}_users_roles::table\n"
-                    f"                           .select({struct.table_name}_users_roles::dsl::table_id)\n"
-                    f"                           .filter({struct.table_name}_users_roles::dsl::user_id.eq(author_user_id)\n"
-                    f"                           .and({struct.table_name}_users_roles::dsl::role_id.le(role_id)),\n"
-                    "                    )),\n"
-                    "               )\n"
-                    "         )\n"
-                )
-                if struct.table_name != "teams":
-                    file.write(
-                        "                    .or_filter(\n"
-                        f"                       {struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name})\n"
-                        f"                           .and({struct.table_name}::dsl::{primary_key.name}.eq_any(\n"
-                        f"                               {struct.table_name}_teams_roles::table\n"
-                        f"                                   .select({struct.table_name}_teams_roles::dsl::table_id)\n"
-                        f"                                   .filter({struct.table_name}_teams_roles::dsl::role_id.le(role_id))\n"
-                        "                                   .inner_join(teams_users_roles::table.on(\n"
-                        f"                                       {struct.table_name}_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)\n"
-                        "                                           .and(teams_users_roles::dsl::user_id.eq(author_user_id))\n"
-                        "                                           .and(teams_users_roles::dsl::role_id.le(role_id)),\n"
-                        "                                   )),\n"
-                        "                              ))\n"
-                        "                       )\n"
-                    )
-                file.write(
-                    "            ))\n"
-                    "         .get_result::<bool>(connection)\n"
-                    "    }\n"
-                )
+            for operation, operation_able, can_x_function_name in (
+                ("view", "viewable", struct.get_can_view_function_name()),
+                ("update", "updatable", struct.get_can_update_function_name()),
+                ("admin", "administrable", struct.get_can_admin_function_name()),
+            ):
+                if struct.is_immutable() and operation in ["update", "admin"]:
+                    continue
 
-                # We now create the more specific methods that check whether the user has a role
-                # with a role_id less than or equal to the provided role_id. We start with the Viewer role.
-
-                file.write(
-                    "    /// Check whether the user is a Viewer (role_id >= 3).\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    "    /// * `author_user_id` - The ID of the user to check.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn is_viewer(\n"
-                    "        &self,\n"
-                    "        author_user_id: i32,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<bool, diesel::result::Error> {\n"
-                    "        Self::is_viewer_by_id(\n"
-                    f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
-                    "            author_user_id,\n"
-                    "            connection,\n"
-                    "        )\n"
-                    "    }\n"
-                )
-
-                file.write(
-                    "    /// Check whether the user is a Viewer (role_id >= 3) for the provided primary key(s).\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
-                    "    /// * `author_user_id` - The ID of the user to check.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn is_viewer_by_id(\n"
-                    f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
-                    "        author_user_id: i32,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<bool, diesel::result::Error> {\n"
-                    "        Self::has_role_by_id(\n"
-                    f"            {struct.get_formatted_primary_keys(include_prefix=False)},\n"
-                    "            author_user_id,\n"
-                    "            3,\n"
-                    "            connection,\n"
-                    "        )\n"
-                    "    }\n"
-                )
-
-                # We now create the more specific methods that check whether the user has a role
-                # with a role_id less than or equal to the provided role_id. We continue with the Editor role.
-
-                file.write(
-                    "    /// Check whether the user is an Editor (role_id >= 2).\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    "    /// * `author_user_id` - The ID of the user to check.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn is_editor(\n"
-                    "        &self,\n"
-                    "        author_user_id: i32,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<bool, diesel::result::Error> {\n"
-                    "        Self::is_editor_by_id(\n"
-                    f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
-                    "            author_user_id,\n"
-                    "            connection,\n"
-                    "        )\n"
-                    "    }\n"
-                )
-
-                file.write(
-                    "    /// Check whether the user is an Editor (role_id >= 2).\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
-                    "    /// * `author_user_id` - The ID of the user to check.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn is_editor_by_id(\n"
-                    f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
-                    "        author_user_id: i32,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<bool, diesel::result::Error> {\n"
-                    "        Self::has_role_by_id(\n"
-                    f"            {struct.get_formatted_primary_keys(include_prefix=False)},\n"
-                    "            author_user_id,\n"
-                    "            2,\n"
-                    "            connection,\n"
-                    "        )\n"
-                    "    }\n"
-                )
-
-                # We now create the more specific methods that check whether the user has a role
-                # with a role_id less than or equal to the provided role_id. We finish with the Admin role.
-
-                file.write(
-                    "    /// Check whether the user is an Admin (role_id == 1).\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    "    /// * `author_user_id` - The ID of the user to check.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn is_admin(\n"
-                    "        &self,\n"
-                    "        author_user_id: i32,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<bool, diesel::result::Error> {\n"
-                    "        Self::is_admin_by_id(\n"
-                    f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
-                    "            author_user_id,\n"
-                    "            connection,\n"
-                    "        )\n"
-                    "    }\n"
-                )
-
-                file.write(
-                    "    /// Check whether the user is an Admin (role_id == 1).\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
-                    "    /// * `author_user_id` - The ID of the user to check.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn is_admin_by_id(\n"
-                    f"        {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
-                    "        author_user_id: i32,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<bool, diesel::result::Error> {\n"
-                    "        Self::has_role_by_id(\n"
-                    f"            {struct.get_formatted_primary_keys(include_prefix=False)},\n"
-                    "            author_user_id,\n"
-                    "            1,\n"
-                    "            connection,\n"
-                    "        )\n"
-                    "    }\n"
-                )
-
-            # For all tables we implement a `all` method that retrieves all of
-            # the rows in the table structured as a vector of the struct.
-
-            for editable_variant in editable_variants:
+                if operation == "update" and not struct.is_updatable():
+                    continue
+                
+                if operation == "view":
+                    requires_author = struct.may_be_hidden()
+                else:
+                    requires_author = not struct.is_immutable()
 
                 author_user_id = AttributeMetadata(
                     original_name="author_user_id",
-                    name="author_user_id", data_type="i32", optional=not editable_variant
+                    name="author_user_id",
+                    data_type="i32",
+                    optional=operation == "view",
                 )
 
-                if editable_variant:
-                    file.write(
-                        "    /// Get all of the editable structs from the database.\n"
-                    )
-                else:
-                    file.write(
-                        "    /// Get all of the viewable structs from the database.\n"
-                    )
-                file.write(
-                    "    ///\n    /// # Arguments\n"
-                )
-
-                if struct.has_filter_variant():
-                    file.write(
-                        "    /// * `filter` - The optional filter to apply to the query.\n"
+                if operation == "view" and struct.may_be_hidden():
+                    assert struct.has_can_view_function(), (
+                        f"The {struct.name} struct has the may_be_hidden attribute set to True, but it does not have the can_view function. "
+                        "Please add the can_view function to the struct."
                     )
 
-                file.write(
-                    f"    /// * `{author_user_id.name}` - The ID of the user who is performing the search.\n"
-                    "    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.\n"
-                    "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                )
-                if editable_variant:
-                    file.write(
-                        "    pub fn all_editables(\n"
+                if struct.table_metadata.has_postgres_function(can_x_function_name):
+                    # We now create the more specific methods that check whether the user has a role
+                    # with a role_id less than or equal to the provided role_id. We start with the Viewer role.
+                    method: MethodDefinition = struct.add_backend_method(
+                        MethodDefinition(
+                            name=f"can_{operation}",
+                            summary=f"Check whether the user can {operation} the struct.",
+                        )
                     )
-                else:
-                    file.write("    pub fn all_viewables(\n")
-
-                if struct.has_filter_variant():
-                    filter_struct = struct.get_filter_variant()
-                    file.write(
-                        f"        filter: Option<&web_common::database::{filter_struct.name}>,\n"
+                    method.include_self_ref()
+                    method.add_argument(
+                        author_user_id, description="The ID of the user to check."
                     )
-                file.write(
-                    f"        {author_user_id.name}: {author_user_id.format_data_type()},\n"
-                    "        limit: Option<i64>,\n"
-                    "        offset: Option<i64>,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                )
-                file.write("    ) -> Result<Vec<Self>, diesel::result::Error> {\n")
-                if table_type == "tables":
-                    file.write(f"        use crate::schema::{struct.table_name};\n")
-                else:
-                    file.write(
-                        f"        use crate::views::schema::{struct.table_name};\n"
-                    )
-                # If the limit is None, we do not apply any limit to the query.
-
-                if struct.has_filter_variant():
-                    file.write(
-                        f"        let mut query = {struct.table_name}::dsl::{struct.table_name}\n"
-                    )
-                else:
-                    file.write(
-                        f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                    method.add_argument(*connection_argument_and_description)
+                    method.set_return_type(
+                        AttributeMetadata(
+                            original_name="_",
+                            name="_",
+                            data_type="Result<bool, web_common::api::ApiError>",
+                            optional=False,
+                        )
                     )
 
-                if editable_variant:
-                    primary_keys = struct.get_primary_keys()
-                    assert (
-                        len(primary_keys) == 1
-                    ), "The all_editables method is only implemented for tables with a single primary key."
-                    primary_key = primary_keys[0]
+                    method.write_header_to(file)
 
                     file.write(
-                        f"           .filter({struct.table_name}::dsl::created_by.eq({author_user_id.name}))\n"
-                        "            .or_filter(\n"
-                        f"               {struct.table_name}::dsl::{primary_key.name}.eq_any(\n"
-                        f"                   {struct.table_name}_users_roles::table\n"
-                        f"                       .select({struct.table_name}_users_roles::dsl::table_id)\n"
-                        f"                       .filter({struct.table_name}_users_roles::dsl::user_id.eq({author_user_id.name})\n"
-                        f"                       .and({struct.table_name}_users_roles::dsl::role_id.le(2)),\n"
-                        "               )),\n"
-                        "            )\n"
+                        " {\n"
+                        f"        Self::can_{operation}_by_id(\n"
+                        f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
+                        f"            {author_user_id.name},\n"
+                        "            connection,\n"
+                        "        )\n"
+                        "    }\n"
                     )
-                    if struct.table_name != "teams":
-                        file.write(
-                            "                .or_filter(\n"
-                            f"                   {struct.table_name}::dsl::{primary_key.name}.eq_any(\n"
-                            f"                       {struct.table_name}_teams_roles::table\n"
-                            f"                           .select({struct.table_name}_teams_roles::dsl::table_id)\n"
-                            f"                           .filter({struct.table_name}_teams_roles::dsl::role_id.le(2))\n"
-                            "                           .inner_join(teams_users_roles::table.on(\n"
-                            f"                               {struct.table_name}_teams_roles::dsl::team_id.eq(teams_users_roles::dsl::table_id)\n"
-                            "                                   .and(teams_users_roles::dsl::user_id.eq(author_user_id))\n"
-                            "                                   .and(teams_users_roles::dsl::role_id.le(2)),\n"
-                            "                           )),\n"
-                            "                   ),\n"
-                            "            )\n"
+
+                    method: MethodDefinition = struct.add_backend_method(
+                        MethodDefinition(
+                            name=f"can_{operation}_by_id",
+                            summary=f"Check whether the user can {operation} the struct associated to the provided ids.",
+                        )
+                    )
+                    method.add_argument(
+                        AttributeMetadata(
+                            original_name=struct.get_formatted_primary_keys(
+                                include_prefix=False
+                            ),
+                            name=struct.get_formatted_primary_keys(
+                                include_prefix=False
+                            ),
+                            data_type=struct.get_formatted_primary_key_data_types(),
+                            optional=False,
+                            reference=False,
+                            mutable=False,
+                        ),
+                        description="The primary key(s) of the struct to check.",
+                    )
+                    method.add_argument(
+                        author_user_id, description="The ID of the user to check."
+                    )
+                    method.add_argument(*connection_argument_and_description)
+                    method.set_return_type(
+                        AttributeMetadata(
+                            original_name="_",
+                            name="_",
+                            data_type="Result<bool, web_common::api::ApiError>",
+                            optional=False,
+                        )
+                    )
+
+                    method.write_header_to(file)
+
+                    file.write(
+                        "{\n"
+                        f"       diesel::select({can_x_function_name}({author_user_id.name}, {struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))\n"
+                        "            .get_result(connection).map_err(web_common::api::ApiError::from)\n"
+                        "}\n"
+                    )
+
+                sorted_variants = [False]
+
+                if struct.has_updated_at() or struct.has_created_at():
+                    sorted_variants.append(True)
+
+                for sorted_variant in sorted_variants:
+
+                    sorted_desinence = " sorted" if sorted_variant else ""
+                    sorted_desinence_underscored = sorted_desinence.replace(" ", "_")
+
+                    method = struct.add_backend_method(
+                        MethodDefinition(
+                            name=f"all_{operation_able}{sorted_desinence_underscored}",
+                            summary=f"Get all of the{sorted_desinence} {operation_able} structs from the database.",
+                        )
+                    )
+
+                    if struct.has_filter_variant():
+                        method.add_argument(
+                            AttributeMetadata(
+                                original_name="filter",
+                                name="filter",
+                                data_type=struct.get_filter_variant(),
+                                optional=True,
+                                reference=True,
+                            ),
+                            description="The optional filter to apply to the query.",
                         )
 
-                if struct.has_filter_variant():
-                    # We need to filter the query by the filter struct,
-                    # but these filters are composed by several optional fields
-                    # and therefore we need to box the query and apply the filters
-                    # only if they are not None.
-                    file.write("            .into_boxed();\n")
+                    if requires_author:
+                        method.add_argument(
+                            author_user_id, description="The ID of the user who is performing the search."
+                        )
 
-                    filter_struct = struct.get_filter_variant()
+                    for arg_and_desc in limit_and_offset_arguments_and_description:
+                        method.add_argument(*arg_and_desc)
 
-                    for filter_attribute in filter_struct.attributes:
+                    method.add_argument(*connection_argument_and_description)
+
+                    method.set_return_type(
+                        AttributeMetadata(
+                            original_name="_",
+                            name="_",
+                            data_type="Result<Vec<Self>, web_common::api::ApiError>",
+                            optional=False,
+                        )
+                    )
+
+                    method.write_header_to(file)
+
+                    file.write(
+                        "{\n"
+                    )
+                    if table_type == "tables":
+                        file.write(f"        use crate::schema::{struct.table_name};\n")
+                    else:
                         file.write(
-                            f"        if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
-                            f"            query = query.filter({filter_struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
+                            f"        use crate::views::schema::{struct.table_name};\n"
+                        )
+                    # If the limit is None, we do not apply any limit to the query.
+
+                    if struct.has_filter_variant():
+                        file.write(
+                            f"        let mut query = {struct.table_name}::dsl::{struct.table_name}\n"
+                        )
+                    else:
+                        file.write(
+                            f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                        )
+
+                    if struct.has_filter_variant():
+                        # We need to filter the query by the filter struct,
+                        # but these filters are composed by several optional fields
+                        # and therefore we need to box the query and apply the filters
+                        # only if they are not None.
+                        file.write("            .into_boxed();\n")
+
+                        filter_struct = struct.get_filter_variant()
+
+                        for filter_attribute in filter_struct.attributes:
+                            file.write(
+                                f"        if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                                f"            query = query.filter({filter_struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
+                                "        }\n"
+                            )
+
+                        file.write("        query\n")
+
+                    if struct.table_metadata.has_postgres_function(can_x_function_name):
+                        diesel_primary_keys = ", ".join(
+                            f"{struct.table_name}::dsl::{primary_key.name}"
+                            for primary_key in struct.get_primary_keys()
+                        )
+                        file.write(
+                            f"            .filter({can_x_function_name}({author_user_id.name}, {diesel_primary_keys}))\n"
+                        )
+
+                    if sorted_variant:
+                        if struct.has_updated_at():
+                            file.write(
+                                f"            .order_by({struct.table_name}::dsl::updated_at.desc())\n"
+                            )
+                        elif struct.has_created_at():
+                            file.write(
+                                f"            .order_by({struct.table_name}::dsl::created_at.desc())\n"
+                            )
+                        else:
+                            assert (
+                                False
+                            ), "The all_by_update method is only implemented for tables with an updated_at column."
+
+                    file.write(
+                        "            .offset(offset.unwrap_or(0))\n"
+                        "            .limit(limit.unwrap_or(10))\n"
+                        "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)\n"
+                        "    }\n"
+                    )
+
+                if operation == "view":
+
+                    get_method = struct.add_backend_method(
+                        MethodDefinition(
+                            name="get",
+                            summary="Get the struct from the database by its ID.",
+                        )
+                    )
+
+                    get_method.add_argument(
+                        AttributeMetadata(
+                            original_name=struct.get_formatted_primary_keys(
+                                include_prefix=False
+                            ),
+                            name=struct.get_formatted_primary_keys(include_prefix=False),
+                            data_type=struct.get_formatted_primary_key_data_types(),
+                            optional=False,
+                            reference=False,
+                            mutable=False,
+                        ),
+                        description="The primary key(s) of the struct to get.",
+                    )
+
+                    if requires_author:
+                        get_method.add_argument(
+                            author_user_id, description="The ID of the user who is performing the search."
+                        )
+
+                    get_method.add_argument(*connection_argument_and_description)
+
+                    get_method.set_return_type(
+                        AttributeMetadata(
+                            original_name="_",
+                            name="_",
+                            data_type="Result<Self, web_common::api::ApiError>",
+                            optional=False,
+                        )
+                    )
+
+                    get_method.write_header_to(file)
+
+                    file.write(
+                        "{\n"
+                    )
+                    if struct.may_be_hidden():
+                        file.write(
+                            f"        if !Self::can_view_by_id({struct.get_formatted_primary_keys(include_prefix=False)}, {author_user_id.name}, connection)? {{\n"
+                            "            return Err(web_common::api::ApiError::Unauthorized);\n"
                             "        }\n"
                         )
-
-                    file.write("        query\n")
-
-                file.write(
-                    "            .offset(offset.unwrap_or(0))\n"
-                    "            .limit(limit.unwrap_or(10))\n"
-                    "            .load::<Self>(connection)\n"
-                    "    }\n"
-                )
-
-            # For the tables that have an updated_at column, we implement the
-            # `all_by_updated_at` method that retrieves all of the rows in the
-            # table structured as a vector of the struct ordered by the updated_at
-            # column in descending order.
-
-            if struct.has_updated_at() or struct.has_created_at():
-                file.write(
-                    "    /// Get all of the structs from the database ordered by update time.\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                )
-
-                if struct.has_filter_variant():
-                    file.write(
-                        "    /// * `filter` - The optional filter to apply to the query.\n"
-                    )
-
-                file.write(
-                    "    /// * `limit` - The maximum number of structs to retrieve. By default, this is 10.\n"
-                    "    /// * `offset` - The number of structs to skip. By default, this is 0.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn all_by_update(\n"
-                )
-                if struct.has_filter_variant():
-                    filter_struct = struct.get_filter_variant()
-                    file.write(
-                        f"        filter: Option<&web_common::database::{filter_struct.name}>,\n"
-                    )
-
-                file.write(
-                    "        limit: Option<i64>,\n"
-                    "        offset: Option<i64>,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                )
-                if table_type == "tables":
-                    file.write(f"        use crate::schema::{struct.table_name};\n")
-                else:
-                    file.write(
-                        f"        use crate::views::schema::{struct.table_name};\n"
-                    )
-                if struct.has_filter_variant():
-                    filter_struct = struct.get_filter_variant()
-                    file.write(
-                        f"        let mut query = {struct.table_name}::dsl::{struct.table_name}\n"
-                        "            .into_boxed();\n"
-                    )
-
-                    for filter_attribute in filter_struct.attributes:
+                    if table_type == "tables":
+                        file.write(f"        use crate::schema::{struct.table_name};\n")
+                    else:
                         file.write(
-                            f"        if let Some(value) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
-                            f"            query = query.filter({filter_struct.table_name}::dsl::{filter_attribute.name}.eq(value));\n"
-                            "        }\n"
+                            f"        use crate::views::schema::{struct.table_name};\n"
                         )
-
-                    file.write("        query\n")
-                else:
                     file.write(
                         f"        {struct.table_name}::dsl::{struct.table_name}\n"
                     )
-
-                if struct.has_updated_at():
-                    file.write(
-                        f"            .order_by({struct.table_name}::dsl::updated_at.desc())\n"
-                    )
-                elif struct.has_created_at():
-                    file.write(
-                        f"            .order_by({struct.table_name}::dsl::created_at.desc())\n"
-                    )
-                else:
-                    assert False, "The all_by_update method is only implemented for tables with an updated_at column."
-                file.write(
-                    "            .offset(offset.unwrap_or(0))\n"
-                    "            .limit(limit.unwrap_or(10))\n"
-                    "            .load::<Self>(connection)\n"
-                    "    }\n"
-                )
-
-            if struct.has_associated_roles() and struct.table_name != "users":
-                file.write(
-                    "    /// Delete the struct from the database.\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    "    /// * `author_user_id` - The ID of the user who is deleting the struct.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn delete(\n"
-                    "        &self,\n"
-                    "        author_user_id: i32,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<usize, diesel::result::Error> {\n"
-                    f"        Self::delete_by_id({struct.get_formatted_primary_keys(include_prefix=True)}, author_user_id, connection)\n"
-                    "    }\n"
-                )
-
-                file.write(
-                    "    /// Delete the struct from the database by its ID.\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to delete.\n"
-                    "    /// * `author_user_id` - The ID of the user who is deleting the struct.\n"
-                    "    /// * `connection` - The connection to the database.\n"
-                    "    ///\n"
-                    "    pub fn delete_by_id(\n"
-                    f"       {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
-                    "        author_user_id: i32,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                    "    ) -> Result<usize, diesel::result::Error> {\n"
-                    f"        if !Self::is_admin_by_id({struct.get_formatted_primary_keys(include_prefix=False)}, author_user_id, connection)? {{\n"
-                    "            return Err(diesel::result::Error::NotFound);\n"
-                    "        }\n"
-                    f"        diesel::delete({struct.table_name}::dsl::{struct.table_name}\n"
-                )
-                for primary_key in primary_keys:
-                    file.write(
-                        f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
-                    )
-                file.write("        ).execute(connection)\n    }\n")
-
-            file.write(
-                "    /// Get the struct from the database by its ID.\n"
-                "    ///\n"
-                "    /// # Arguments\n"
-                f"    /// * `{struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the struct to get.\n"
-                "    /// * `connection` - The connection to the database.\n"
-                "    ///\n"
-                "    pub fn get(\n"
-                f"       {struct.get_formatted_primary_keys(include_prefix=False)}: {struct.get_formatted_primary_key_data_types()},\n"
-                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                "    ) -> Result<Self, diesel::result::Error> {\n"
-            )
-            if table_type == "tables":
-                file.write(f"        use crate::schema::{struct.table_name};\n")
-            else:
-                file.write(f"        use crate::views::schema::{struct.table_name};\n")
-            file.write(f"        {struct.table_name}::dsl::{struct.table_name}\n")
-            for primary_key in primary_keys:
-                file.write(
-                    f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
-                )
-            file.write("            .first::<Self>(connection)\n    }\n")
-
-            # For each of the columns in the struct that are required to be UNIQUE
-            # in the SQL, as defined by the get_unique_constraint_columns method, we
-            # implement methods of the form `from_{column_name}` that retrieves the
-            # struct by the unique column. In the case of a view, we first retrieve
-            # the associated base table and secondarily we execute with a get the
-            # struct by the id column from the obtained base table.
-            for unique_columns in struct.get_unique_constraints():
-                reference_unique_columns = [
-                    unique_column.as_ref() for unique_column in unique_columns
-                ]
-
-                if len(reference_unique_columns) == 1:
-                    human_readable_unique_columns = reference_unique_columns[0].name
-                else:
-                    human_readable_unique_columns = (
-                        ", ".join(
-                            [column.name for column in reference_unique_columns[:-1]]
-                        )
-                        + f" and {reference_unique_columns[-1].name}"
-                    )
-
-                from_method_name = f"from_{'_and_'.join([column.name for column in reference_unique_columns])}"
-
-                if table_type == "views":
-                    raise NotImplementedError(
-                        "The `from_{column_name}` method is not implemented for views."
-                    )
-                else:
-                    file.write(
-                        f"    /// Get the struct from the database by its {human_readable_unique_columns}.\n"
-                        "    ///\n"
-                        "    /// # Arguments\n"
-                    )
-                    for unique_column in reference_unique_columns:
+                    for primary_key in primary_keys:
                         file.write(
-                            f"    /// * `{unique_column.name}` - The {unique_column.name} of the struct to get.\n"
+                            f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
                         )
-
                     file.write(
-                        "    /// * `connection` - The connection to the database.\n"
-                        "    ///\n"
-                        f"    pub fn {from_method_name}(\n"
+                        "            .first::<Self>(connection).map_err(web_common::api::ApiError::from)\n    }\n"
                     )
-                    for unique_column in reference_unique_columns:
-                        file.write(
-                            f"        {unique_column.name}: {unique_column.format_data_type()},\n"
-                        )
 
-                    file.write(
-                        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
-                        "    ) -> Result<Self, diesel::result::Error> {\n"
-                        f"        use crate::schema::{struct.table_name};\n"
-                        f"        {struct.table_name}::dsl::{struct.table_name}\n"
-                    )
-                    for unique_column in reference_unique_columns:
-                        file.write(
-                            f"            .filter({struct.table_name}::dsl::{unique_column.name}.eq({unique_column.name}))\n"
-                        )
-                    file.write("            .first::<Self>(connection)\n    }\n")
+                    # For each of the columns in the struct that are required to be UNIQUE
+                    # in the SQL, as defined by the get_unique_constraint_columns method, we
+                    # implement methods of the form `from_{column_name}` that retrieves the
+                    # struct by the unique column. In the case of a view, we first retrieve
+                    # the associated base table and secondarily we execute with a get the
+                    # struct by the id column from the obtained base table.
+                    for unique_columns in struct.get_unique_constraints():
+                        reference_unique_columns = [
+                            unique_column.as_ref() for unique_column in unique_columns
+                        ]
 
-            # If this table implements the `pg_trgm` index, we also
-            # provide the `search` method to search for the struct
-            # by a given string. The method also receives a limit
-            # parameter to limit the number of results.
-            if struct.is_searchable():
-                similarity_index: PGIndex = struct.pg_indices.get_table(
-                    struct.table_name
-                )
-
-                for (
-                    method_name,
-                    similarity_operator,
-                    distance_operator,
-                ) in PGIndices.SIMILARITY_METHODS:
-
-                    for editable_filter in editable_variants:
-
-                        author_user_id = AttributeMetadata(
-                            original_name="author_user_id",
-                            name="author_user_id",
-                            data_type="i32",
-                            optional=not editable_filter
-                        )
-
-                        if editable_filter:
-                            file.write(
-                                f"    /// Search for the editable structs by a given string by Postgres's `{method_name}`.\n"
+                        if len(reference_unique_columns) == 1:
+                            human_readable_unique_columns = reference_unique_columns[
+                                0
+                            ].name
+                        else:
+                            human_readable_unique_columns = (
+                                ", ".join(
+                                    [
+                                        column.name
+                                        for column in reference_unique_columns[:-1]
+                                    ]
+                                )
+                                + f" and {reference_unique_columns[-1].name}"
                             )
-                            assert struct.has_can_edit_function(), "The struct must have a can_edit function to implement the search editables method."
-                            where_clause = f"{struct.get_can_edit_function_name()}($3, {struct.get_formatted_primary_keys(include_prefix=True, prefix=struct.table_name)})"
-                        else:
-                            file.write(
-                                f"    /// Search for the viewable structs by a given string by Postgres's `{method_name}`.\n"
+
+                        from_method_name = f"from_{'_and_'.join([column.name for column in reference_unique_columns])}"
+
+                        if table_type == "views":
+                            raise NotImplementedError(
+                                f"The `{from_method_name}` method is not implemented for views."
                             )
-                            if struct.is_insertable():
-                                assert struct.has_can_view_function(), f"The struct {struct.name} must have a can_view function to implement the search viewables method."
-                                where_clause = f"{struct.get_can_view_function_name()}($3, {struct.get_formatted_primary_keys(include_prefix=True, prefix=struct.table_name)})"
-                            else:
-                                where_clause = None
 
-                        if where_clause is not None:
-                            if similarity_index.is_gin():
-                                where_clause = f"AND {where_clause} "
-                            elif similarity_index.is_gist():
-                                where_clause = f'            "WHERE {where_clause} ",\n'
-                            else:
-                                assert False, "The similarity index must be either GIN or GIST."
-                        else:
-                            where_clause = ""
-
-                        file.write(
-                            "    ///\n    /// # Arguments\n"
-                            f"    /// * `{author_user_id.name}` - The ID of the user who is performing the search.\n"
-                            "    /// * `query` - The string to search for.\n"
-                            "    /// * `limit` - The maximum number of results, by default `10`.\n"
-                            "    /// * `connection` - The connection to the database.\n"
-                            "    ///\n"
-                        )
-                        if editable_filter:
-                            file.write(f"    pub fn {method_name}_search_editables(\n")
-                        else:
-                            file.write(f"    pub fn {method_name}_search_viewables(\n")
-
-                        file.write(
-                            f"       {author_user_id.name}: {author_user_id.format_data_type()},\n"
-                            "        query: &str,\n"
-                            "        limit: Option<i32>,\n"
-                            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+                        from_method = struct.add_backend_method(
+                            MethodDefinition(
+                                name=from_method_name,
+                                summary=f"Get the struct from the database by its {human_readable_unique_columns}.",
+                            )
                         )
 
+                        for unique_column in reference_unique_columns:
+                            from_method.add_argument(
+                                unique_column,
+                                description=f"The {unique_column.name} of the struct to get.",
+                            )
+
+                        if requires_author:
+                            from_method.add_argument(
+                                author_user_id,
+                                description="The ID of the user who is performing the search.",
+                            )
+
+                        from_method.add_argument(*connection_argument_and_description)
+
+                        from_method.set_return_type(
+                            AttributeMetadata(
+                                original_name="_",
+                                name="_",
+                                data_type="Result<Self, web_common::api::ApiError>",
+                                optional=False,
+                            )
+                        )
+                        
+                        from_method.write_header_to(file)
+
+                        file.write("{\n"
+                            f"        use crate::schema::{struct.table_name};\n"
+                            f"        let flat_variant = {struct.table_name}::dsl::{struct.table_name}\n"
+                        )
+                        for unique_column in reference_unique_columns:
+                            file.write(
+                                f"            .filter({struct.table_name}::dsl::{unique_column.name}.eq({unique_column.name}))\n"
+                            )
+                        file.write("            .first::<Self>(connection)?;\n")
+                        if struct.may_be_hidden():
+                            file.write(
+                                f"        if !flat_variant.can_view({author_user_id.name}, connection)? {{\n"
+                                "            return Err(web_common::api::ApiError::Unauthorized);\n"
+                                "        }\n"
+                            )
+                        file.write("        Ok(flat_variant)\n    }\n")
+
+                # If this table implements the `pg_trgm` index, we also
+                # provide the `search` method to search for the struct
+                # by a given string. The method also receives a limit
+                # parameter to limit the number of results.
+                if struct.is_searchable():
+                    similarity_index: PGIndex = struct.pg_indices.get_table(
+                        struct.table_name
+                    )
+
+                    for similarity_method_name in PGIndices.SIMILARITY_METHODS:
+
+                        similarity_method = struct.add_backend_method(
+                            MethodDefinition(
+                                name=f"{similarity_method_name}_search_{operation_able}",
+                                summary=f"Search for the {operation_able} structs by a given string by Postgres's `{similarity_method_name}`.",
+                            )
+                        )
+
+                        if struct.has_filter_variant():
+                            similarity_method.add_argument(
+                                AttributeMetadata(
+                                    original_name="filter",
+                                    name="filter",
+                                    data_type=struct.get_filter_variant(),
+                                    optional=True,
+                                    reference=True,
+                                ),
+                                description="The optional filter to apply to the query.",
+                            )
+
+                        if requires_author:
+                            similarity_method.add_argument(
+                                author_user_id,
+                                description="The ID of the user who is performing the search.",
+                            )
+
+                        similarity_method.add_argument(
+                            AttributeMetadata(
+                                original_name="query",
+                                name="query",
+                                data_type="str",
+                                optional=False,
+                                reference=True,
+                            ),
+                            description="The string to search for.",
+                        )
+
+                        for arg_and_desc in limit_and_offset_arguments_and_description:
+                            similarity_method.add_argument(*arg_and_desc)
+
+                        similarity_method.add_argument(*connection_argument_and_description)
+
+                        similarity_method.set_return_type(
+                            AttributeMetadata(
+                                original_name="_",
+                                name="_",
+                                data_type="Result<Vec<Self>, web_common::api::ApiError>",
+                                optional=False,
+                            )
+                        )
+
+                        similarity_method.write_header_to(file)
+
                         file.write(
-                            "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                            "        let limit = limit.unwrap_or(10);\n"
+                            "{\n"
                             "        // If the query string is empty, we run an all query with the\n"
                             "        // limit parameter provided instead of a more complex similarity\n"
                             "        // search.\n"
                             "        if query.is_empty() {\n"
+                            f"            return Self::all_{operation_able}("
                         )
-                        if editable_filter:
-                            if struct.has_filter_variant():
-                                file.write(
-                                    f"            return Self::all_editables({author_user_id.name}, None, Some(limit as i64), None, connection);\n"
-                                )
-                            else:
-                                file.write(
-                                    f"            return Self::all_editables({author_user_id.name}, Some(limit as i64), None, connection);\n"
-                                )
-                        else:
-                            if struct.has_filter_variant():
-                                file.write(
-                                    f"            return Self::all_viewables({author_user_id.name}, None, Some(limit as i64), None, connection);\n"
-                                )
-                            else:
-                                file.write(
-                                    f"            return Self::all_viewables({author_user_id.name}, Some(limit as i64), None, connection);\n"
-                                )
-                        file.write("        }\n")
+                        if struct.has_filter_variant():
+                            file.write("filter, ")
 
-                        joined_field_names = ", ".join(
-                            attribute.name for attribute in struct.attributes
-                        )
+                        if requires_author:
+                            file.write(f"{author_user_id.name}, ")
 
-                        if table_type == "views":
+                        file.write("limit, offset, connection);\n        }\n")
+
+                        # We start a query using the diesel query builder.
+                        if table_type == "tables":
                             file.write(
-                                "        let similarity_query = concat!(\n"
-                                '            "WITH selected_ids AS (",\n'
-                                f'            "SELECT {similarity_index.table_name}.{primary_key.name} AS id FROM {similarity_index.table_name} ",\n'
-                            )
-                            if similarity_index.is_gin():
-                                file.write(
-                                    f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} {where_clause}",\n'
-                                    f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
-                                )
-                            elif similarity_index.is_gist():
-                                file.write(
-                                    f'{where_clause}            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2",\n'
-                                )
-                            else:
-                                raise RuntimeError(
-                                    "The similarity index must be either GIN or GIST."
-                                )
-                            file.write(
-                                '         ")",\n'
-                                f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
-                                f'            "JOIN selected_ids ON selected_ids.id = {struct.table_name}.id"\n'
-                                "        );\n"
+                                f"        use crate::schema::{struct.table_name};\n"
                             )
                         else:
-                            file.write(
-                                "        let similarity_query = concat!(\n"
-                                f'            "SELECT {joined_field_names} FROM {struct.table_name} ",\n'
+                            raise NotImplementedError(
+                                "The search method is not implemented for views."
                             )
-                            if similarity_index.is_gin():
+
+                        optional_filter_attributes = []
+
+                        if struct.has_filter_variant():
+                            optional_filter_attributes = [
+                                filter_attribute
+                                for filter_attribute in struct.get_filter_variant().attributes
+                                if struct.get_attribute_by_name(
+                                    filter_attribute.name
+                                ).optional
+                            ]
+                            non_optional_filter_attributes = [
+                                filter_attribute
+                                for filter_attribute in struct.get_filter_variant().attributes
+                                if not struct.get_attribute_by_name(
+                                    filter_attribute.name
+                                ).optional
+                            ]
+                            # If more than one of the non-optional filter is Some in the filter struct,
+                            # we raise an unimplemented! macro panic, as I have no idea how to cleanly
+                            # handle this case in Diesel and for a while it should cover all the cases.
+                            if len(non_optional_filter_attributes) > 1:
                                 file.write(
-                                    f'            "WHERE $1 {similarity_operator} {similarity_index.arguments} {where_clause}",\n'
-                                    f'            "ORDER BY {method_name}($1, {similarity_index.arguments}) DESC LIMIT $2",\n'
+                                    f" if filter.map(|f| {'&&'.join(f'f.{filter_attribute.name}.is_some()' for filter_attribute in non_optional_filter_attributes)}).unwrap_or(false) {{\n"
+                                    "       unimplemented!();\n"
+                                    " }\n"
                                 )
-                            elif similarity_index.is_gist():
+
+                            for filter_attribute in non_optional_filter_attributes:
                                 file.write(
-                                    f'{where_clause}            "ORDER BY $1 {distance_operator} {similarity_index.arguments} LIMIT $2;"\n'
+                                    f"if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                                    f"        return {struct.table_name}::dsl::{struct.table_name}\n"
+                                    f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}))\n"
                                 )
-                            elif similarity_index.is_btree():
-                                # In the case of a btree, we simply search the prefix of the string.
+
+                                for filter_attribute in optional_filter_attributes:
+                                    file.write(
+                                        f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq(filter.and_then(|f| f.{filter_attribute.name})))\n"
+                                    )
+
+                                if struct.table_metadata.has_postgres_function(can_x_function_name):
+                                    primary_keys = ", ".join(
+                                        f"{struct.table_name}::dsl::{primary_key.name}"
+                                        for primary_key in struct.get_primary_keys()
+                                    )
+                                    file.write(
+                                        f"            .filter({can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
+                                    )
+
                                 file.write(
-                                    f'            "WHERE {similarity_index.arguments} LIKE $1%{where_clause}",\n'
-                                    '            "LIMIT $2;"\n')
-                            else:
-                                raise RuntimeError(
-                                    "The similarity index must be either GIN or GIST."
+                                    f"            .filter({similarity_index.format_operator_diesel('query', similarity_method_name)})\n"
                                 )
-                            file.write("        );\n")
+
+                                file.write(
+                                    f"            .order_by({similarity_index.format_distance_operator_diesel('query', similarity_method_name)})\n"
+                                    "            .limit(limit.unwrap_or(10))\n"
+                                    "            .offset(offset.unwrap_or(0))\n"
+                                    "            .load::<Self>(connection).map_err(web_common::api::ApiError::from);\n"
+                                    "    }\n"
+                                )
+                        file.write(
+                            f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                        )
+
+                        for filter_attribute in optional_filter_attributes:
+                            file.write(
+                                f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq(filter.and_then(|f| f.{filter_attribute.name})))\n"
+                            )
+
+                        if struct.table_metadata.has_postgres_function(can_x_function_name):
+                            primary_keys = ", ".join(
+                                f"{struct.table_name}::dsl::{primary_key.name}"
+                                for primary_key in struct.get_primary_keys()
+                            )
+                            file.write(
+                                f"            .filter({can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
+                            )
 
                         file.write(
-                            "        diesel::sql_query(similarity_query)\n"
-                            "            .bind::<diesel::sql_types::Text, _>(query)\n"
-                            "            .bind::<diesel::sql_types::Integer, _>(limit)\n"
+                            f"            .filter({similarity_index.format_operator_diesel('query', similarity_method_name)})\n"
                         )
+
                         file.write(
-                            f"            .bind::<{author_user_id.format_data_type(diesel=True)}, _>({author_user_id.name})\n"
+                            f"            .order_by({similarity_index.format_distance_operator_diesel('query', similarity_method_name)})\n"
+                            "            .limit(limit.unwrap_or(10))\n"
+                            "            .offset(offset.unwrap_or(0))\n"
+                            "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)\n"
+                            "    }\n"
                         )
-                        file.write("            .load(connection)\n}\n")
+
+            if struct.is_insertable():
+                delete_method = struct.add_backend_method(
+                    MethodDefinition(
+                        name="delete",
+                        summary="Delete the struct from the database.",
+                    )
+                )
+
+                delete_method.include_self_ref()
+                delete_method.add_argument(
+                    author_user_id, description="The ID of the user who is deleting the struct."
+                )
+                delete_method.add_argument(*connection_argument_and_description)
+
+                delete_method.set_return_type(
+                    AttributeMetadata(
+                        original_name="_",
+                        name="_",
+                        data_type="Result<usize, web_common::api::ApiError>",
+                        optional=False,
+                    )
+                )
+
+                delete_method.write_header_to(file)
+                
+                file.write(
+                    "{\n"
+                    f"        Self::delete_by_id({struct.get_formatted_primary_keys(include_prefix=True)}, {author_user_id.name}, connection)\n"
+                    "}\n"
+                )
+
+                delete_by_id_method = struct.add_backend_method(
+                    MethodDefinition(
+                        name="delete_by_id",
+                        summary="Delete the struct from the database by its ID.",
+                    )
+                )
+
+                delete_by_id_method.add_argument(
+                    AttributeMetadata(
+                        original_name=struct.get_formatted_primary_keys(include_prefix=False),
+                        name=struct.get_formatted_primary_keys(include_prefix=False),
+                        data_type=struct.get_formatted_primary_key_data_types(),
+                        optional=False,
+                        reference=False,
+                        mutable=False,
+                    ),
+                    description="The primary key(s) of the struct to delete.",
+                )
+
+                delete_by_id_method.add_argument(
+                    author_user_id, description="The ID of the user who is deleting the struct."
+                )
+
+                delete_by_id_method.add_argument(*connection_argument_and_description)
+                delete_by_id_method.set_return_type(delete_method.get_return_type())
+
+                delete_by_id_method.write_header_to(file)
+
+                file.write(
+                    "{\n"
+                    f"        if !Self::can_admin_by_id({struct.get_formatted_primary_keys(include_prefix=False)}, author_user_id, connection)? {{\n"
+                    "            return Err(web_common::api::ApiError::Unauthorized);\n"
+                    "        }\n"
+                    f"        diesel::delete({struct.table_name}::dsl::{struct.table_name}\n"
+                )
+                for primary_key in struct.get_primary_keys():
+                    file.write(
+                        f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
+                    )
+                file.write(
+                    "        ).execute(connection).map_err(web_common::api::ApiError::from)\n    }\n"
+                )
 
             # Finally, we cluse the struct implementation.
             file.write("}\n")

@@ -39,6 +39,8 @@ pub enum AppRoute {
     SampleContainersView{id: i32},
     #[at("/sample_containers/new")]
     SampleContainersNew,
+    #[at("/sample_containers/new/project/:project_id")]
+    SampleContainersNewWithProject{project_id: i32},
     #[at("/sampled_individuals")]
     SampledIndividuals,
     #[at("/sampled_individuals/:id")]
@@ -55,6 +57,8 @@ pub enum AppRoute {
     SamplesView{id: Uuid},
     #[at("/samples/new")]
     SamplesNew,
+    #[at("/samples/new/project/:project_id")]
+    SamplesNewWithProject{project_id: i32},
     #[at("/samples/new/sampled_by/:sampled_by")]
     SamplesNewWithSampledBy{sampled_by: i32},
     #[at("/samples/:id/update")]
@@ -145,6 +149,9 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::SampleContainersNew => {
             html! { <CreateSampleContainerForm /> }
         }
+        AppRoute::SampleContainersNewWithProject{project_id} => {
+            html! { <CreateSampleContainerForm project_id={project_id} /> }
+        }
         AppRoute::SampledIndividuals => {
             html! { <BasicList<NestedSampledIndividual> /> }
         }
@@ -169,6 +176,9 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::SamplesNew => {
             html! { <CreateSampleForm /> }
         }
+        AppRoute::SamplesNewWithProject{project_id} => {
+            html! { <CreateSampleForm project_id={project_id} /> }
+        }
         AppRoute::SamplesNewWithSampledBy{sampled_by} => {
             html! { <CreateSampleForm sampled_by={sampled_by} /> }
         }
@@ -182,7 +192,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <SpectraCollectionPage id = {id} /> }
         }
         AppRoute::SpectraCollectionsNew => {
-            html! { <CreateSpectraCollectionForm /> }
+            html! { "<CreateSpectraCollectionForm />" }
         }
         AppRoute::SpectraCollectionsNewWithSample{sample_id} => {
             html! { <CreateSpectraCollectionForm sample_id={sample_id} /> }

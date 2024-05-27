@@ -38,7 +38,7 @@ def handle_update_at_trigger_creation(
         ) as up_index_migration:
             up_index_migration.write(
                 f"-- Create the `{trigger_name}` trigger on the {table_name} table.\n\n"
-                f"CREATE OR REPLACE FUNCTION {trigger_name}()\n"
+                f"CREATE FUNCTION {trigger_name}()\n"
                 "RETURNS TRIGGER AS $$\n"
                 "BEGIN\n"
                 "    NEW.updated_at = NOW();\n"

@@ -1840,6 +1840,7 @@ impl NestedSampleContainerCategory {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleContainer {
     pub inner: SampleContainer,
+    pub project: NestedProject,
     pub category: NestedSampleContainerCategory,
     pub created_by: User,
 }
@@ -1862,6 +1863,7 @@ impl NestedSampleContainer {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
+            project: NestedProject::get(flat_variant.project_id, connection).await?.unwrap(),
             category: NestedSampleContainerCategory::get(flat_variant.category_id, connection).await?.unwrap(),
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
             inner: flat_variant,
@@ -1916,6 +1918,7 @@ impl NestedSampleContainer {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
+        self.project.update_or_insert(connection).await?;
         self.category.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
         Ok(())
@@ -2205,6 +2208,7 @@ impl NestedSampledIndividual {
 pub struct NestedSample {
     pub inner: Sample,
     pub container: NestedSampleContainer,
+    pub project: NestedProject,
     pub created_by: User,
     pub sampled_by: User,
     pub updated_by: User,
@@ -2230,6 +2234,7 @@ impl NestedSample {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             container: NestedSampleContainer::get(flat_variant.container_id, connection).await?.unwrap(),
+            project: NestedProject::get(flat_variant.project_id, connection).await?.unwrap(),
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
             sampled_by: User::get(flat_variant.sampled_by, connection).await?.unwrap(),
             updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
@@ -2309,6 +2314,7 @@ impl NestedSample {
     {
         self.inner.update_or_insert(connection).await?;
         self.container.update_or_insert(connection).await?;
+        self.project.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
         self.sampled_by.update_or_insert(connection).await?;
         self.updated_by.update_or_insert(connection).await?;
@@ -2595,6 +2601,7 @@ pub struct NestedTeam {
     pub inner: Team,
     pub icon: FontAwesomeIcon,
     pub color: Color,
+    pub state: NestedTeamState,
     pub parent_team: Option<Team>,
     pub created_by: User,
     pub updated_by: User,
@@ -2620,6 +2627,7 @@ impl NestedTeam {
         Ok(Self {
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
             color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
+            state: NestedTeamState::get(flat_variant.state_id, connection).await?.unwrap(),
             parent_team: if let Some(parent_team_id) = flat_variant.parent_team_id { Team::get(parent_team_id, connection).await? } else { None },
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
             updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
@@ -2699,6 +2707,7 @@ impl NestedTeam {
         self.inner.update_or_insert(connection).await?;
         self.icon.update_or_insert(connection).await?;
         self.color.update_or_insert(connection).await?;
+        self.state.update_or_insert(connection).await?;
         if let Some(parent_team) = self.parent_team {
             parent_team.update_or_insert(connection).await?;
         }

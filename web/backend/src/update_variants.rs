@@ -128,6 +128,7 @@ pub(super) struct IntermediateUpdateTeam {
     description: String,
     icon_id: i32,
     color_id: i32,
+    state_id: i32,
     parent_team_id: Option<i32>,
 }
 
@@ -143,6 +144,7 @@ impl UpdateRow for web_common::database::UpdateTeam {
             description: self.description,
             icon_id: self.icon_id,
             color_id: self.color_id,
+            state_id: self.state_id,
             parent_team_id: self.parent_team_id,
         }
     }
@@ -284,6 +286,7 @@ pub(super) struct IntermediateNewSample {
     id: Uuid,
     container_id: i32,
     notes: Option<String>,
+    project_id: i32,
     sampled_by: i32,
     state: i32,
 }
@@ -298,6 +301,7 @@ impl UpdateRow for web_common::database::NewSample {
             id: self.id,
             container_id: self.container_id,
             notes: self.notes,
+            project_id: self.project_id,
             sampled_by: self.sampled_by,
             state: self.state,
         }

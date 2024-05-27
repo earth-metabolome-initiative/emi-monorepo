@@ -6,7 +6,6 @@ from typing import List
 from dotenv import load_dotenv
 from retrieve_taxons import retrieve_taxons
 from constraint_checkers import (
-    find_foreign_keys,
     ensure_no_dead_python_code,
     ensures_all_update_at_trigger_exists,
 )
@@ -79,7 +78,7 @@ if __name__ == "__main__":
     if not os.path.exists("./db_data/bio_ott_taxons.csv.gz"):
         retrieve_taxons()
 
-    tables_metadata = find_foreign_keys()
+    StructMetadata.init_table_metadata()
 
     enforce_migration_naming_convention()
     replace_serial_indices()
@@ -92,19 +91,17 @@ if __name__ == "__main__":
     generate_table_schema()
     print("Generated models.")
 
-    ensures_all_update_at_trigger_exists(tables_metadata)
-    ensure_created_at_columns(tables_metadata)
-    ensure_updated_at_columns(tables_metadata)
-    check_parent_circularity_trigger(tables_metadata)
+    ensures_all_update_at_trigger_exists(StructMetadata.table_metadata)
+    ensure_created_at_columns(StructMetadata.table_metadata)
+    ensure_updated_at_columns(StructMetadata.table_metadata)
+    check_parent_circularity_trigger(StructMetadata.table_metadata)
 
-    generate_view_schema(tables_metadata)
+    generate_view_schema(StructMetadata.table_metadata)
     print("Generated view schema.")
     check_schema_completion()
     print("Checked schema completion.")
     generate_view_structs()
     print("Generated view structs.")
-
-    write_diesel_sql_function_bindings(tables_metadata)
 
     table_structs: List[StructMetadata] = extract_structs("src/models.rs")
     view_structs: List[StructMetadata] = extract_structs("src/views/views.rs")
@@ -134,9 +131,11 @@ if __name__ == "__main__":
         new_model_structs,
         update_model_structs,
     )
-    ensure_updatable_tables_have_roles_tables(tables, tables_metadata)
+
+    write_diesel_sql_function_bindings(StructMetadata.table_metadata)
+    ensure_updatable_tables_have_roles_tables(tables, StructMetadata.table_metadata)
     ensure_can_x_function_existance(tables)
-    ensure_tables_have_creation_notification_trigger(tables, tables_metadata)
+    ensure_tables_have_creation_notification_trigger(tables, StructMetadata.table_metadata)
     print("Generated table names enumeration for web_common.")
 
     write_backend_flat_variants("src/models.rs", "tables", table_structs)

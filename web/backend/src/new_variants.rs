@@ -404,6 +404,7 @@ impl InsertRow for web_common::database::NewSampleBioOttTaxonItem {
 pub(super) struct IntermediateNewSampleContainer {
     created_by: i32,
     barcode: String,
+    project_id: i32,
     category_id: i32,
 }
 
@@ -415,6 +416,7 @@ impl InsertRow for web_common::database::NewSampleContainer {
         IntermediateNewSampleContainer {
             created_by: user_id,
             barcode: self.barcode,
+            project_id: self.project_id,
             category_id: self.category_id,
         }
     }
@@ -513,6 +515,7 @@ pub(super) struct IntermediateNewSample {
     id: Uuid,
     container_id: i32,
     notes: Option<String>,
+    project_id: i32,
     sampled_by: i32,
     state: i32,
     updated_by: i32,
@@ -528,6 +531,7 @@ impl InsertRow for web_common::database::NewSample {
             id: self.id,
             container_id: self.container_id,
             notes: self.notes,
+            project_id: self.project_id,
             sampled_by: self.sampled_by,
             state: self.state,
             updated_by: user_id,
@@ -590,6 +594,7 @@ pub(super) struct IntermediateNewTeam {
     description: String,
     icon_id: i32,
     color_id: i32,
+    state_id: i32,
     parent_team_id: Option<i32>,
     updated_by: i32,
 }
@@ -605,6 +610,7 @@ impl InsertRow for web_common::database::NewTeam {
             description: self.description,
             icon_id: self.icon_id,
             color_id: self.color_id,
+            state_id: self.state_id,
             parent_team_id: self.parent_team_id,
             updated_by: user_id,
         }

@@ -1,8 +1,8 @@
 """Write the nested structs to the backend crate."""
 
 from typing import List
+from tqdm.auto import tqdm
 from constraint_checkers.struct_metadata import StructMetadata
-from constraint_checkers.indices import PGIndices
 
 
 def write_backend_nested_structs(nested_structs: List[StructMetadata]):
@@ -11,6 +11,9 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
     assert all(
         isinstance(nested_struct, StructMetadata) for nested_struct in nested_structs
     ), "All the nested structs must be of type StructMetadata."
+    assert all(
+        nested_struct.is_nested() for nested_struct in nested_structs
+    ), "All the nested structs must be nested. "
     assert len(nested_structs) > 0, "No nested structs to write."
 
     # We open the file to write the nested structs
@@ -34,12 +37,18 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
         "use diesel::r2d2::PooledConnection;",
         "use uuid::Uuid;",
         "use crate::models::*;",
+        "use web_common::database::filter_structs::*;",
         # "use crate::views::views::*;",
     ]
 
     document.write("\n".join(imports) + "\n\n")
 
-    for nested_struct in nested_structs:
+    for nested_struct in tqdm(
+        nested_structs,
+        desc="Writing nested structs",
+        unit="nested struct",
+        leave=False,
+    ):
         nested_struct.write_to(document)
         flat_variant = nested_struct.get_flat_variant()
 
@@ -54,273 +63,114 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
             "    ///\n"
             "    /// # Arguments\n"
             "    /// * `flat_variant` - The flat struct.\n"
+        )
+
+        contains_struct_that_may_be_hidden = nested_struct.has_attribute_that_may_be_hidden()
+        
+        if contains_struct_that_may_be_hidden:
+            document.write(
+            "    /// * `author_user_id` - The author user id.\n"
+            )
+        document.write(
             "    /// * `connection` - The database connection.\n"
             "    pub fn from_flat(\n"
             f"        flat_variant: {flat_variant.name},\n"
+        )
+
+        if contains_struct_that_may_be_hidden:
+            document.write(
+                "        author_user_id: Option<i32>,\n"
+            )
+        document.write(
             "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-            "    ) -> Result<Self, diesel::result::Error> {\n"
+            "    ) -> Result<Self, web_common::api::ApiError> {\n"
             "        Ok(Self {\n"
         )
         for attribute in nested_struct.attributes:
-            if attribute.name == "inner":
+            assert (
+                not attribute.data_type() == nested_struct.name
+            ), "The data type of the attribute cannot be the same as the nested struct."
+            if attribute.is_inner():
                 continue
-            if (
-                attribute.data_type() == nested_struct.name
-                or flat_variant.has_attribute(attribute)
-            ):
+            if flat_variant.has_attribute(attribute):
                 document.write(
                     f"            {attribute.name}: flat_variant.{attribute.name},\n"
                 )
                 continue
+
+            assert attribute.has_struct_data_type()
+            if attribute.raw_data_type().may_be_hidden():
+                author_user_id_argument = "author_user_id, "
+            else:
+                author_user_id_argument = ""
+
             if attribute.optional:
                 document.write(
-                    f"            {attribute.name}: flat_variant.{attribute.original_name}.map(|flat_variant| {attribute.data_type()}::get(flat_variant, connection)).transpose()?,\n"
+                    f"            {attribute.name}: flat_variant.{attribute.original_name}.map(|{attribute.original_name}| {attribute.data_type()}::get({attribute.original_name}, {author_user_id_argument}connection)).transpose()?,\n"
                 )
             else:
                 document.write(
-                    f"            {attribute.name}: {attribute.data_type()}::get(flat_variant.{attribute.original_name}, connection)?,\n"
+                    f"            {attribute.name}: {attribute.data_type()}::get(flat_variant.{attribute.original_name}, {author_user_id_argument}connection)?,\n"
                 )
 
-        document.write("                inner: flat_variant,\n        })\n    }\n}\n")
+        document.write("                inner: flat_variant,\n        })\n    }\n")
 
-        # Then we implement the all query.
+        for method in flat_variant.backend_methods():
+            return_type = method.get_return_type()
+            nested_struct.add_backend_method(method.into_new_owner(nested_struct))
+            author_user_id = method.get_argument_by_name("author_user_id")
+            this_author_user_id_argument = ""
 
-        document.write(
-            f"impl {nested_struct.name} {{\n"
-            "    /// Get all the nested structs from the database.\n"
-            "    ///\n"
-            "    /// # Arguments\n"
-        )
-        if nested_struct.has_filter_variant():
-            document.write("    /// * `filter` - The filter to apply to the results.\n")
-        document.write(
-            "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
-            "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
-            "    /// * `connection` - The database connection.\n"
-            "    pub fn all(\n"
-        )
-        if nested_struct.has_filter_variant():
-            filter_variant = nested_struct.get_filter_variant()
-            document.write(
-                f"        filter: Option<&web_common::database::{filter_variant.name}>,\n"
-            )
-        document.write(
-            "        limit: Option<i64>,\n"
-            "        offset: Option<i64>,\n"
-            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-            "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-        )
-        if nested_struct.has_filter_variant():
-            document.write(
-                f"        {flat_variant.name}::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-            )
-        else:
-            document.write(
-                f"        {flat_variant.name}::all(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-            )
-        document.write("    }\n}\n")
-
-        if nested_struct.has_associated_roles() and nested_struct.table_name != "users":
-            document.write(
-                f"impl {nested_struct.name} {{\n"
-                "    /// Get all the editables nested structs from the database.\n"
-                "    ///\n"
-                "    /// # Arguments\n"
-                "    /// * `author_user_id` - The user id.\n"
-            )
-            if nested_struct.has_filter_variant():
-                document.write(
-                    "    /// * `filter` - The filter to apply to the results.\n"
+            if contains_struct_that_may_be_hidden:
+                assert author_user_id is not None, (
+                    f" In the struct {nested_struct.name}, the author_user_id argument must be present in all methods or in none of them. "
+                    f"The method {method.name} does not have the author_user_id argument. "
                 )
-            document.write(
-                "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
-                "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
-                "    /// * `connection` - The database connection.\n"
-                "    pub fn all_editables(\n"
-                "        author_user_id: i32,\n"
-            )
-            if nested_struct.has_filter_variant():
-                filter_variant = nested_struct.get_filter_variant()
+
+            if author_user_id is None:
+                assert not contains_struct_that_may_be_hidden
+                assert author_user_id_argument == ""
+            elif contains_struct_that_may_be_hidden:
+                if author_user_id.optional:
+                    this_author_user_id_argument = f"{author_user_id.name}, "
+                else:
+                    this_author_user_id_argument = f"Some({author_user_id.name}), "
+
+            if return_type.format_data_type() == "Result<Vec<Self>, web_common::api::ApiError>":
+                method.write_header_to(document)
                 document.write(
-                    f"        filter: Option<&web_common::database::{filter_variant.name}>,\n"
+                    "{\n"
+                    f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)})?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, {this_author_user_id_argument}connection)).collect()\n"
+                    "}\n"
                 )
-            document.write(
-                "        limit: Option<i64>,\n"
-                "        offset: Option<i64>,\n"
-                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-                "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-            )
-            if nested_struct.has_filter_variant():
+            elif return_type.format_data_type() == "Result<Self, web_common::api::ApiError>":
+                method.write_header_to(document)
                 document.write(
-                    f"        {flat_variant.name}::all_editables(author_user_id, filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
+                    "{\n"
+                    f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)}).and_then(|flat_variant| Self::from_flat(flat_variant, {this_author_user_id_argument}connection))\n"
+                    "}\n"
+                )
+            elif method.has_self_reference():
+                assert any(attr.is_inner() for attr in nested_struct.attributes), (
+                    "The struct must have at least one inner attribute, which is the flat struct. "
+                    f"The struct {nested_struct.name} has the following attributes: {nested_struct.attributes}."
+                )
+                method.write_header_to(document)
+                document.write(
+                    "{\n"
+                    f"        self.inner.{method.name}({', '.join(arg.name for arg in method.arguments if arg.name != 'self')})\n"
+                    "}\n"
                 )
             else:
+                method.write_header_to(document)
                 document.write(
-                    f"        {flat_variant.name}::all_editables(author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-                )
-            document.write("    }\n}\n")
-
-        # Then, for all the tables that have an updated_at column, we implement the
-        # `all_by_updated_at` method, which returns all of the nested structs ordered
-        # by the `updated_at` column.
-        if flat_variant.table_metadata.has_updated_at_column(flat_variant.table_name):
-            document.write(
-                f"impl {nested_struct.name} {{\n"
-                "    /// Get all the nested structs from the database ordered by the `updated_at` column.\n"
-                "    ///\n"
-                "    /// # Arguments\n"
-            )
-            if nested_struct.has_filter_variant():
-                document.write(
-                    "    /// * `filter` - The filter to apply to the results.\n"
-                )
-            document.write(
-                "    /// * `limit` - The maximum number of rows to return. By default `10`.\n"
-                "    /// * `offset` - The offset of the rows to return. By default `0`.\n"
-                "    /// * `connection` - The database connection.\n"
-                "    pub fn all_by_updated_at(\n"
-            )
-            if nested_struct.has_filter_variant():
-                filter_variant = nested_struct.get_filter_variant()
-                document.write(
-                    f"        filter: Option<&web_common::database::{filter_variant.name}>,\n"
-                )
-            document.write(
-                "        limit: Option<i64>,\n"
-                "        offset: Option<i64>,\n"
-                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-                "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-            )
-            if nested_struct.has_filter_variant():
-                document.write(
-                    f"        {flat_variant.name}::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-                )
-            else:
-                document.write(
-                    f"        {flat_variant.name}::all_by_updated_at(limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-                )
-            document.write("    }\n}\n")
-
-        document.write(
-            f"impl {nested_struct.name} {{\n"
-            "    /// Get the nested struct from the provided primary key.\n"
-            "    ///\n"
-            "    /// # Arguments\n"
-            f"    /// * `{nested_struct.get_formatted_primary_keys(include_prefix=False)}` - The primary key(s) of the row.\n"
-            "    /// * `connection` - The database connection.\n"
-            "    pub fn get(\n"
-            f"        {nested_struct.get_formatted_primary_keys(include_prefix=False)}: {nested_struct.get_formatted_primary_key_data_types()},\n"
-            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-            "    ) -> Result<Self, diesel::result::Error>\n"
-            "    {\n"
-            f"       {flat_variant.name}::get({nested_struct.get_formatted_primary_keys(include_prefix=False)}, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))\n"
-            "    }\n"
-            "}\n"
-        )
-
-        # For each of the columns in the struct that have a UNIQUE constraint,
-        # we implement the methods `from_{column_name}` by employing the method
-        # of the same name available for the main struct associated to this struct
-        for unique_columns in flat_variant.get_unique_constraints():
-
-            unique_column_references = [
-                unique_column.as_ref() for unique_column in unique_columns
-            ]
-
-            joined = "_and_".join(
-                [unique_column.name for unique_column in unique_column_references]
-            )
-            from_method_name = f"from_{joined}"
-
-            if len(unique_column_references) == 1:
-                human_readable_column_names = unique_column_references[0].name
-            else:
-                human_readable_column_names = (
-                    ", ".join(
-                        [
-                            unique_column.name
-                            for unique_column in unique_column_references[:-1]
-                        ]
-                    )
-                    + f" and {unique_column_references[-1].name}"
-                )
-
-            comma_separated_column_names = ", ".join(
-                [unique_column.name for unique_column in unique_column_references]
-            )
-
-            document.write(
-                f"impl {nested_struct.name} {{\n"
-                f"    /// Get the nested struct from the provided {human_readable_column_names}.\n"
-                "    ///\n"
-                f"    /// # Arguments\n"
-            )
-            for unique_column in unique_column_references:
-                document.write(
-                    f"    /// * `{unique_column.name}` - The {unique_column.name} of the row.\n"
-                )
-            document.write(
-                "    /// * `connection` - The database connection.\n"
-                f"    pub fn {from_method_name}(\n"
-            )
-            for unique_column in unique_column_references:
-                document.write(
-                    f"        {unique_column.name}: {unique_column.format_data_type()},\n"
-                )
-            document.write(
-                "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-                "    ) -> Result<Self, diesel::result::Error>\n"
-                "    {\n"
-                f"        {flat_variant.name}::{from_method_name}({comma_separated_column_names}, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))\n"
-                "    }\n"
-                "}\n"
-            )
-
-        # If there is an index on the table, we implement the search method that
-        # calls search on the flat version of the struct and then iterates on the
-        # primary keys of the results and constructs the nested structs by calling
-        # the `get` method several times.
-        if flat_variant.is_searchable():
-            for method_name, _, _ in PGIndices.SIMILARITY_METHODS:
-                document.write(
-                    f"impl {nested_struct.name} {{\n"
-                    "    /// Search the table by the query.\n"
-                    "    ///\n"
-                    "    /// # Arguments\n"
-                    "    /// * `query` - The string to search for.\n"
-                    "    /// * `limit` - The maximum number of results, by default `10`.\n"
-                    f"    pub fn {method_name}_search(\n"
-                    "        query: &str,\n"
-                    "        limit: Option<i32>,\n"
-                    "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-                    "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                    f"       {flat_variant.name}::{method_name}_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-                    "    }\n"
+                    "{\n"
+                    f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)})\n"
                     "}\n"
                 )
 
-                if (
-                    nested_struct.has_associated_roles()
-                    and nested_struct.table_name != "users"
-                ):
-                    document.write(
-                        f"impl {nested_struct.name} {{\n"
-                        "    /// Search the table by the query.\n"
-                        "    ///\n"
-                        "    /// # Arguments\n"
-                        "    /// * `author_user_id` - The user id.\n"
-                        "    /// * `query` - The string to search for.\n"
-                        "    /// * `limit` - The maximum number of results, by default `10`.\n"
-                        f"    pub fn {method_name}_search_editables(\n"
-                        "        author_user_id: i32,\n"
-                        "        query: &str,\n"
-                        "        limit: Option<i32>,\n"
-                        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
-                        "    ) -> Result<Vec<Self>, diesel::result::Error> {\n"
-                        f"       {flat_variant.name}::{method_name}_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()\n"
-                        "    }\n"
-                        "}\n"
-                    )
+        document.write("}\n")
+    
 
         # We implement the bidirectional From methods for the nested struct
         # present in the web_common crate, which does not use Diesel or its

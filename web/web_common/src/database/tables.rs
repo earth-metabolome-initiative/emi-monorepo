@@ -43,17 +43,12 @@ impl BioOttRank {
 
     /// Insert the BioOttRank into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table BioOttRank
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: BioOttRank,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("bio_ott_ranks")
             .insert()
@@ -332,17 +327,12 @@ impl BioOttTaxonItem {
 
     /// Insert the BioOttTaxonItem into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table BioOttTaxonItem
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: BioOttTaxonItem,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("bio_ott_taxon_items")
             .insert()
@@ -645,6 +635,10 @@ pub struct Color {
 impl Tabular for Color {
     const TABLE: Table = Table::Colors;
 }
+
+impl Filtrable for Color {
+    type Filter = EmptyFilter;
+}
 #[cfg(feature = "frontend")]
 impl Color {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
@@ -658,17 +652,12 @@ impl Color {
 
     /// Insert the Color into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Color
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Color,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("colors")
             .insert()
@@ -857,6 +846,10 @@ pub struct Country {
 impl Tabular for Country {
     const TABLE: Table = Table::Countries;
 }
+
+impl Filtrable for Country {
+    type Filter = EmptyFilter;
+}
 #[cfg(feature = "frontend")]
 impl Country {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
@@ -871,17 +864,12 @@ impl Country {
 
     /// Insert the Country into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Country
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Country,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("countries")
             .insert()
@@ -1091,17 +1079,12 @@ impl DerivedSample {
 
     /// Insert the DerivedSample into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table DerivedSample
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: DerivedSample,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("derived_samples")
             .insert()
@@ -1315,17 +1298,12 @@ impl DocumentFormat {
 
     /// Insert the DocumentFormat into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table DocumentFormat
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: DocumentFormat,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("document_formats")
             .insert()
@@ -1525,6 +1503,10 @@ pub struct FontAwesomeIcon {
 impl Tabular for FontAwesomeIcon {
     const TABLE: Table = Table::FontAwesomeIcons;
 }
+
+impl Filtrable for FontAwesomeIcon {
+    type Filter = EmptyFilter;
+}
 #[cfg(feature = "frontend")]
 impl FontAwesomeIcon {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
@@ -1537,17 +1519,12 @@ impl FontAwesomeIcon {
 
     /// Insert the FontAwesomeIcon into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table FontAwesomeIcon
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: FontAwesomeIcon,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("font_awesome_icons")
             .insert()
@@ -1755,17 +1732,12 @@ impl LoginProvider {
 
     /// Insert the LoginProvider into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table LoginProvider
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: LoginProvider,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("login_providers")
             .insert()
@@ -2001,17 +1973,12 @@ impl Material {
 
     /// Insert the Material into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Material
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Material,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("materials")
             .insert()
@@ -2235,17 +2202,12 @@ impl Notification {
 
     /// Insert the Notification into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Notification
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Notification,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("notifications")
             .insert()
@@ -2489,17 +2451,12 @@ impl Observation {
 
     /// Insert the Observation into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Observation
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Observation,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("observations")
             .insert()
@@ -2783,17 +2740,12 @@ impl Organization {
 
     /// Insert the Organization into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Organization
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Organization,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("organizations")
             .insert()
@@ -3017,17 +2969,12 @@ impl ProjectState {
 
     /// Insert the ProjectState into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table ProjectState
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: ProjectState,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("project_states")
             .insert()
@@ -3279,17 +3226,12 @@ impl Project {
 
     /// Insert the Project into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Project
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Project,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("projects")
             .insert()
@@ -3606,17 +3548,12 @@ impl ProjectsTeamsRoleInvitation {
 
     /// Insert the ProjectsTeamsRoleInvitation into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table ProjectsTeamsRoleInvitation
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: ProjectsTeamsRoleInvitation,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("projects_teams_role_invitations")
             .insert()
@@ -3833,17 +3770,12 @@ impl ProjectsTeamsRoleRequest {
 
     /// Insert the ProjectsTeamsRoleRequest into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table ProjectsTeamsRoleRequest
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: ProjectsTeamsRoleRequest,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("projects_teams_role_requests")
             .insert()
@@ -4060,17 +3992,12 @@ impl ProjectsTeamsRole {
 
     /// Insert the ProjectsTeamsRole into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table ProjectsTeamsRole
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: ProjectsTeamsRole,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("projects_teams_roles")
             .insert()
@@ -4287,17 +4214,12 @@ impl ProjectsUsersRoleInvitation {
 
     /// Insert the ProjectsUsersRoleInvitation into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table ProjectsUsersRoleInvitation
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: ProjectsUsersRoleInvitation,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("projects_users_role_invitations")
             .insert()
@@ -4514,17 +4436,12 @@ impl ProjectsUsersRoleRequest {
 
     /// Insert the ProjectsUsersRoleRequest into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table ProjectsUsersRoleRequest
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: ProjectsUsersRoleRequest,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("projects_users_role_requests")
             .insert()
@@ -4741,17 +4658,12 @@ impl ProjectsUsersRole {
 
     /// Insert the ProjectsUsersRole into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table ProjectsUsersRole
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: ProjectsUsersRole,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("projects_users_roles")
             .insert()
@@ -4968,17 +4880,12 @@ impl Role {
 
     /// Insert the Role into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Role
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Role,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("roles")
             .insert()
@@ -5191,17 +5098,12 @@ impl SampleBioOttTaxonItem {
 
     /// Insert the SampleBioOttTaxonItem into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table SampleBioOttTaxonItem
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: SampleBioOttTaxonItem,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("sample_bio_ott_taxon_items")
             .insert()
@@ -5419,17 +5321,12 @@ impl SampleContainerCategory {
 
     /// Insert the SampleContainerCategory into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table SampleContainerCategory
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: SampleContainerCategory,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("sample_container_categories")
             .insert()
@@ -5633,6 +5530,7 @@ impl SampleContainerCategory {
 pub struct SampleContainer {
     pub id: i32,
     pub barcode: String,
+    pub project_id: i32,
     pub category_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -5651,6 +5549,7 @@ impl SampleContainer {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.barcode),
+            gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.category_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
@@ -5659,21 +5558,16 @@ impl SampleContainer {
 
     /// Insert the SampleContainer into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table SampleContainer
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: SampleContainer,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("sample_containers")
             .insert()
-            .columns("id, barcode, category_id, created_by, created_at")
+            .columns("id, barcode, project_id, category_id, created_by, created_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -5699,7 +5593,7 @@ impl SampleContainer {
         let select_row = table("sample_containers")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, barcode, category_id, created_by, created_at")
+            .project("id, barcode, project_id, category_id, created_by, created_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -5769,6 +5663,7 @@ impl SampleContainer {
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("barcode", gluesql::core::ast_builder::text(self.barcode))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("category_id", gluesql::core::ast_builder::num(self.category_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))            .execute(connection)
@@ -5819,7 +5714,7 @@ impl SampleContainer {
         let select_row = table("sample_containers")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, barcode, category_id, created_by, created_at")
+           .project("id, barcode, project_id, category_id, created_by, created_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -5838,6 +5733,10 @@ impl SampleContainer {
             barcode: match row.get("barcode").unwrap() {
                 gluesql::prelude::Value::Str(barcode) => barcode.clone(),
                 _ => unreachable!("Expected Str")
+            },
+            project_id: match row.get("project_id").unwrap() {
+                gluesql::prelude::Value::I32(project_id) => project_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             category_id: match row.get("category_id").unwrap() {
                 gluesql::prelude::Value::I32(category_id) => category_id.clone(),
@@ -5884,17 +5783,12 @@ impl SampleState {
 
     /// Insert the SampleState into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table SampleState
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: SampleState,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("sample_states")
             .insert()
@@ -6107,17 +6001,12 @@ impl SampledIndividualBioOttTaxonItem {
 
     /// Insert the SampledIndividualBioOttTaxonItem into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table SampledIndividualBioOttTaxonItem
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: SampledIndividualBioOttTaxonItem,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("sampled_individual_bio_ott_taxon_items")
             .insert()
@@ -6347,17 +6236,12 @@ impl SampledIndividual {
 
     /// Insert the SampledIndividual into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table SampledIndividual
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: SampledIndividual,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("sampled_individuals")
             .insert()
@@ -6605,6 +6489,7 @@ pub struct Sample {
     pub id: Uuid,
     pub container_id: i32,
     pub notes: Option<String>,
+    pub project_id: i32,
     pub created_by: i32,
     pub sampled_by: i32,
     pub created_at: NaiveDateTime,
@@ -6630,6 +6515,7 @@ impl Sample {
                 Some(notes) => gluesql::core::ast_builder::text(notes),
                 None => gluesql::core::ast_builder::null(),
             },
+            gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::num(self.sampled_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
@@ -6641,21 +6527,16 @@ impl Sample {
 
     /// Insert the Sample into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Sample
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Sample,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("samples")
             .insert()
-            .columns("id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state")
+            .columns("id, container_id, notes, project_id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -6681,7 +6562,7 @@ impl Sample {
         let select_row = table("samples")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state")
+            .project("id, container_id, notes, project_id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .limit(1)
             .execute(connection)
             .await?;
@@ -6751,6 +6632,7 @@ impl Sample {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("container_id", gluesql::core::ast_builder::num(self.container_id))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
@@ -6808,7 +6690,7 @@ impl Sample {
         let select_row = table("samples")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state")
+           .project("id, container_id, notes, project_id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -6838,7 +6720,7 @@ impl Sample {
         let select_row = table("samples")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, container_id, notes, created_by, sampled_by, created_at, updated_by, updated_at, state")
+           .project("id, container_id, notes, project_id, created_by, sampled_by, created_at, updated_by, updated_at, state")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -6863,6 +6745,10 @@ impl Sample {
                 gluesql::prelude::Value::Null => None,
                 gluesql::prelude::Value::Str(notes) => Some(notes.clone()),
                 _ => unreachable!("Expected Str")
+            },
+            project_id: match row.get("project_id").unwrap() {
+                gluesql::prelude::Value::I32(project_id) => project_id.clone(),
+                _ => unreachable!("Expected I32")
             },
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
@@ -6920,17 +6806,12 @@ impl Spectra {
 
     /// Insert the Spectra into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Spectra
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Spectra,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("spectra")
             .insert()
@@ -7146,17 +7027,12 @@ impl SpectraCollection {
 
     /// Insert the SpectraCollection into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table SpectraCollection
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: SpectraCollection,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("spectra_collections")
             .insert()
@@ -7416,17 +7292,12 @@ impl TeamState {
 
     /// Insert the TeamState into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table TeamState
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: TeamState,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("team_states")
             .insert()
@@ -7618,6 +7489,7 @@ pub struct Team {
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
+    pub state_id: i32,
     pub parent_team_id: Option<i32>,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -7641,6 +7513,7 @@ impl Team {
             gluesql::core::ast_builder::text(self.description),
             gluesql::core::ast_builder::num(self.icon_id),
             gluesql::core::ast_builder::num(self.color_id),
+            gluesql::core::ast_builder::num(self.state_id),
             match self.parent_team_id {
                 Some(parent_team_id) => gluesql::core::ast_builder::num(parent_team_id),
                 None => gluesql::core::ast_builder::null(),
@@ -7654,21 +7527,16 @@ impl Team {
 
     /// Insert the Team into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Team
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Team,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("teams")
             .insert()
-            .columns("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .columns("id, name, description, icon_id, color_id, state_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -7694,7 +7562,7 @@ impl Team {
         let select_row = table("teams")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
+            .project("id, name, description, icon_id, color_id, state_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -7767,6 +7635,7 @@ impl Team {
 .set("description", gluesql::core::ast_builder::text(self.description))        
 .set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
 .set("color_id", gluesql::core::ast_builder::num(self.color_id))        
+.set("state_id", gluesql::core::ast_builder::num(self.state_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
 .set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
@@ -7822,7 +7691,7 @@ impl Team {
         let select_row = table("teams")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
+           .project("id, name, description, icon_id, color_id, state_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -7852,7 +7721,7 @@ impl Team {
         let select_row = table("teams")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, name, description, icon_id, color_id, parent_team_id, created_by, created_at, updated_by, updated_at")
+           .project("id, name, description, icon_id, color_id, state_id, parent_team_id, created_by, created_at, updated_by, updated_at")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -7883,6 +7752,10 @@ impl Team {
             },
             color_id: match row.get("color_id").unwrap() {
                 gluesql::prelude::Value::I32(color_id) => color_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            state_id: match row.get("state_id").unwrap() {
+                gluesql::prelude::Value::I32(state_id) => state_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             parent_team_id: match row.get("parent_team_id").unwrap() {
@@ -7939,17 +7812,12 @@ impl TeamsTeamsRoleInvitation {
 
     /// Insert the TeamsTeamsRoleInvitation into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table TeamsTeamsRoleInvitation
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: TeamsTeamsRoleInvitation,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("teams_teams_role_invitations")
             .insert()
@@ -8166,17 +8034,12 @@ impl TeamsUsersRoleInvitation {
 
     /// Insert the TeamsUsersRoleInvitation into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table TeamsUsersRoleInvitation
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: TeamsUsersRoleInvitation,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("teams_users_role_invitations")
             .insert()
@@ -8393,17 +8256,12 @@ impl TeamsUsersRoleRequest {
 
     /// Insert the TeamsUsersRoleRequest into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table TeamsUsersRoleRequest
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: TeamsUsersRoleRequest,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("teams_users_role_requests")
             .insert()
@@ -8620,17 +8478,12 @@ impl TeamsUsersRole {
 
     /// Insert the TeamsUsersRole into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table TeamsUsersRole
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: TeamsUsersRole,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("teams_users_roles")
             .insert()
@@ -8828,6 +8681,10 @@ pub struct Unit {
 impl Tabular for Unit {
     const TABLE: Table = Table::Units;
 }
+
+impl Filtrable for Unit {
+    type Filter = EmptyFilter;
+}
 #[cfg(feature = "frontend")]
 impl Unit {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
@@ -8841,17 +8698,12 @@ impl Unit {
 
     /// Insert the Unit into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table Unit
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Unit,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("units")
             .insert()
@@ -9060,17 +8912,12 @@ impl UserEmail {
 
     /// Insert the UserEmail into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table UserEmail
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: UserEmail,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("user_emails")
             .insert()
@@ -9306,17 +9153,12 @@ impl User {
 
     /// Insert the User into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table User
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: User,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("users")
             .insert()
@@ -9578,17 +9420,12 @@ impl UsersUsersRoleInvitation {
 
     /// Insert the UsersUsersRoleInvitation into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table UsersUsersRoleInvitation
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: UsersUsersRoleInvitation,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("users_users_role_invitations")
             .insert()
@@ -9805,17 +9642,12 @@ impl UsersUsersRoleRequest {
 
     /// Insert the UsersUsersRoleRequest into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table UsersUsersRoleRequest
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: UsersUsersRoleRequest,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("users_users_role_requests")
             .insert()
@@ -10032,17 +9864,12 @@ impl UsersUsersRole {
 
     /// Insert the UsersUsersRole into the database.
     ///
-    /// # Arguments
     /// * `connection` - The connection to the database.
     ///
-    /// # Returns
-    /// The number of rows inserted in table UsersUsersRole
-    pub async fn insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: UsersUsersRole,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("users_users_roles")
             .insert()

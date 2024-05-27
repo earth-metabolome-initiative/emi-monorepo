@@ -43,8 +43,18 @@ impl ProjectPageProp {
         filter.parent_project_id = Some(self.id);
         filter
     }
+    fn filter_sample_containers_by_project_id(&self) -> SampleContainerFilter {
+        let mut filter = SampleContainerFilter::default();
+        filter.project_id = Some(self.id);
+        filter
+    }
     fn filter_sampled_individuals_by_project_id(&self) -> SampledIndividualFilter {
         let mut filter = SampledIndividualFilter::default();
+        filter.project_id = Some(self.id);
+        filter
+    }
+    fn filter_samples_by_project_id(&self) -> SampleFilter {
+        let mut filter = SampleFilter::default();
         filter.project_id = Some(self.id);
         filter
     }
@@ -61,8 +71,12 @@ pub fn project_page(props: &ProjectPageProp) -> Html {
         <BasicPage<NestedProject> id={PrimaryKey::from(props)}>
             // Linked with foreign key projects.parent_project_id
             <BasicList<NestedProject> filters={props.filter_projects_by_parent_project_id()}/>
+            // Linked with foreign key sample_containers.project_id
+            <BasicList<NestedSampleContainer> filters={props.filter_sample_containers_by_project_id()}/>
             // Linked with foreign key sampled_individuals.project_id
             <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_project_id()}/>
+            // Linked with foreign key samples.project_id
+            <BasicList<NestedSample> filters={props.filter_samples_by_project_id()}/>
             // Linked with foreign key observations.project_id
             <BasicList<NestedObservation> filters={props.filter_observations_by_project_id()}/>
         </BasicPage<NestedProject>>

@@ -3,12 +3,13 @@
 from typing import List, Optional, Union, Tuple, Dict
 import re
 from functools import cache
-from constraint_checkers.find_foreign_keys import TableMetadata, find_foreign_keys
+from constraint_checkers.find_foreign_keys import TableMetadata, find_foreign_keys, is_role_invitation_table, is_role_request_table
 from constraint_checkers.indices import PGIndices, find_search_indices
+
 
 def rust_type_to_diesel_type(rust_type: str) -> str:
     """Converts a Rust type to a diesel type, including full crate path.
-    
+
     Parameters
     ----------
     rust_type : str
@@ -44,7 +45,7 @@ def rust_type_to_diesel_type(rust_type: str) -> str:
         return "diesel::sql_types::Binary"
 
     raise ValueError(f"Unsupported Rust type: {rust_type}")
-    
+
 
 class AttributeMetadata:
     """Class representing the metadata of an attribute."""
@@ -54,14 +55,33 @@ class AttributeMetadata:
         original_name: str,
         name: str,
         data_type: Union[str, "StructMetadata"],
-        optional: bool,
+        optional: bool = False,
         reference: bool = False,
+        mutable: bool = False,
+        lifetime: Optional[str] = None,
     ):
         self.original_name = original_name
         self.name = name
         self._data_type = data_type
         self.optional = optional
         self.reference = reference
+        self.mutable = mutable
+        self.lifetime = lifetime
+
+        if self.lifetime is not None and not self.reference:
+            raise ValueError("The lifetime must be set only for references.")
+
+        if self.lifetime is not None:
+            assert "'" not in self.lifetime, (
+                "The lifetime must not contain the ' character. "
+                f"The provided lifetime is {self.lifetime}."
+            )
+            assert " " not in self.lifetime, (
+                "The lifetime must not contain the space character. "
+                f"The provided lifetime is '{self.lifetime}'."
+            )
+
+        self.owner: "StructMetadata" = None
 
     def as_ref(self) -> "AttributeMetadata":
         """Returns the attribute as a reference."""
@@ -114,6 +134,12 @@ class AttributeMetadata:
 
         if diesel:
             data_type = rust_type_to_diesel_type(data_type)
+
+        if self.mutable:
+            data_type = f"mut {data_type}"
+
+        if self.lifetime is not None:
+            data_type = f"'{self.lifetime} {data_type}"
 
         if self.reference:
             data_type = f"&{data_type}"
@@ -192,7 +218,7 @@ class AttributeMetadata:
 
     def is_creation_timestamp(self) -> bool:
         """Returns whether the attribute is the creation timestamp."""
-        return self.name in ("created_at", )
+        return self.name in ("created_at",)
 
     def is_updater_user_id(self) -> bool:
         """Returns whether the attribute is the updater user ID."""
@@ -202,7 +228,49 @@ class AttributeMetadata:
         """Returns whether the attribute is the update timestamp."""
         return self.name in ("updated_at",)
 
+    def is_inner(self) -> bool:
+        """Returns whether the attribute is the inner attribute."""
+        return (
+            self.name == "inner"
+            and self.has_struct_data_type()
+            and self.owner.is_nested()
+            and self.raw_data_type() == self.owner.get_flat_variant()
+        )
+
+    def into_new_owner(self, owner: "StructMetadata") -> "AttributeMetadata":
+        """Creates a new attribute with a new owner.
+
+        Parameters
+        ----------
+        owner : StructMetadata
+            The new owner of the attribute.
+        """
+        new_attribute = AttributeMetadata(
+            self.original_name,
+            self.name,
+            self._data_type,
+            self.optional,
+            self.reference,
+            self.mutable,
+            self.lifetime,
+        )
+        new_attribute.set_owner(owner)
+        return new_attribute
+
+    def set_owner(self, owner: "StructMetadata"):
+        """Sets the owner of the attribute."""
+        assert isinstance(owner, StructMetadata), (
+            "The owner must be a StructMetadata. "
+            f"The provided owner is a {type(owner)}."
+        )
+        assert self.owner is None or self.owner == owner, (
+            f"The attribute {self.name} already has an owner. "
+            f"The owner is {self.owner.name}, and the new owner would be {owner.name}."
+        )
+        self.owner = owner
+
     def is_automatically_determined_column(self) -> bool:
+        """Returns whether the attribute is an automatically determined column."""
         return any(
             [
                 self.is_creator_user_id(),
@@ -310,20 +378,265 @@ class AttributeMetadata:
         )
 
 
+class MethodDefinition:
+    """Class representing the definition of a method."""
+
+    def __init__(self, name: str, summary: str, visibility: str = "pub", is_async: bool = False):
+        self.name = name
+        self.summary = summary
+        self.visibility = visibility
+        self.arguments: List[AttributeMetadata] = []
+        self.argument_descriptions: Dict[str, str] = {}
+        self.return_type: Optional[AttributeMetadata] = None
+        self.owner: Optional["StructMetadata"] = None
+        self.is_async = is_async
+        self.generics: List[str] = []
+        assert isinstance(summary, str), (
+            "The summary must be a string. "
+            f"The provided summary is a {type(summary)}."
+        )
+        assert len(summary) > 0, "The summary must not be empty."
+        assert " " not in self.name, (
+            "The method name must not contain the space character. "
+            f"The provided method name is {self.name}."
+        )
+
+    def into_new_owner(self, owner: "StructMetadata") -> "MethodDefinition":
+        """Creates a new method definition with a new owner.
+
+        Parameters
+        ----------
+        owner : StructMetadata
+            The new owner of the method.
+        """
+        new_method = MethodDefinition(self.name, self.summary)
+        new_method.set_owner(owner)
+        if self.has_self_reference():
+            new_method.include_self_ref()
+        for argument in self.arguments:
+            if argument.name == "self":
+                continue
+            new_method.add_argument(argument, self.argument_descriptions[argument.name])
+        new_method.return_type = self.return_type
+        return new_method
+
+    def add_generic(self, generic: str):
+        """Adds a generic to the method.
+
+        Parameters
+        ----------
+        generic : str
+            The generic to add to the method.
+        """
+        assert len(generic) > 0, "The generic must not be empty."
+        self.generics.append(generic)
+
+    def set_owner(self, owner: "StructMetadata"):
+        """Sets the owner of the method.
+
+        Parameters
+        ----------
+        owner : StructMetadata
+            The owner of the method.
+        """
+        assert isinstance(owner, StructMetadata), (
+            "The owner must be a StructMetadata. "
+            f"The provided owner is a {type(owner)}."
+        )
+        assert self.owner is None or self.owner == owner, (
+            f"The method {self.name} already has an owner. "
+            f"The owner is {self.owner.name}."
+        )
+        self.owner = owner
+
+    def include_self_ref(self):
+        """Whether to include the self argument in the method."""
+        assert len(self.arguments) == 0
+        self.arguments.append(
+            AttributeMetadata("self", "self", self.owner, False, reference=True)
+        )
+
+    def include_self(self):
+        """Whether to include the self argument in the method."""
+        assert len(self.arguments) == 0
+        self.arguments.append(
+            AttributeMetadata("self", "self", self.owner, False, reference=False)
+        )
+
+    def get_argument_description(self, argument: AttributeMetadata) -> str:
+        """Returns the description of the argument.
+
+        Parameters
+        ----------
+        argument : AttributeMetadata
+            The argument to get the description of.
+        """
+        assert argument in self.arguments, (
+            "The argument must be in the method. "
+            f"The provided argument is {argument}."
+        )
+        if argument.name not in self.argument_descriptions:
+            raise ValueError(
+                f"The argument {argument.name} does not have a description in the method {self.name}."
+            )
+        return self.argument_descriptions[argument.name]
+
+    def add_argument(self, argument: AttributeMetadata, description: str):
+        """Adds an argument to the method.
+
+        Parameters
+        ----------
+        argument : AttributeMetadata
+            The argument to add to the method.
+        """
+        if argument in self.arguments:
+            raise ValueError(
+                f"The argument {argument.name} is already in the method {self.name}."
+            )
+
+        assert isinstance(description, str), (
+            "The description must be a string. "
+            f"The provided description is a {type(description)}."
+        )
+        assert len(description) > 0, "The description must not be empty."
+
+        assert argument.name != "self", (
+            "The argument name must not be 'self'. "
+        )
+
+        self.arguments.append(argument)
+        self.argument_descriptions[argument.name] = description
+
+    def set_return_type(self, return_type: AttributeMetadata):
+        """Sets the return type of the method.
+
+        Parameters
+        ----------
+        return_type : AttributeMetadata
+            The return type of the method.
+        """
+        if self.return_type is not None:
+            raise ValueError(
+                f"The return type of the method {self.name} has already been set."
+            )
+        self.return_type = return_type
+
+    def get_return_type(self) -> AttributeMetadata:
+        """Returns the return type of the method."""
+        if self.return_type is None:
+            raise ValueError(
+                f"The return type of the method '{self.name}' has not been set. "
+                f"The owner of the method is {self.owner.name}."
+            )
+        return self.return_type
+
+    def get_argument_by_name(self, argument_name: str) -> Optional[AttributeMetadata]:
+        """Returns the argument by name.
+
+        Parameters
+        ----------
+        argument_name : str
+            The name of the argument to retrieve.
+        """
+        assert isinstance(argument_name, str), (
+            "The argument name must be a string. "
+            f"The provided argument name is a {type(argument_name)}."
+        )
+        for argument in self.arguments:
+            if argument.name == argument_name:
+                return argument
+        return None
+
+    def has_self_reference(self) -> bool:
+        """Returns whether the method has a reference to self."""
+        result = any(
+            argument.name == "self"
+            and argument.reference
+            and argument.data_type() == self.owner.name
+            for argument in self.arguments
+        )
+        if not result:
+            for argument in self.arguments:
+                if argument.name == "self" and argument.reference:
+                    raise RuntimeError(
+                        f"The method has a reference to self, but the owner is {self.owner.name} "
+                        f"while the argument data type is {argument.data_type()}."
+                        f"The method is {self.name}."
+                    )
+
+        return result
+
+    def __eq__(self, other: "MethodDefinition") -> bool:
+        if not isinstance(other, MethodDefinition):
+            return False
+
+        return self.name == other.name
+
+    def __hash__(self) -> int:
+        return hash(self.name)
+
+    def __repr__(self) -> str:
+        return f"Method({self.name})"
+
+    def write_header_to(self, document: "File"):
+        """Writes the method header to the document.
+
+        Parameters
+        ----------
+        document : File
+            The document to write the method header to.
+        """
+        document.write(f"    /// {self.summary}\n")
+
+        if self.argument_descriptions:
+            document.write("    ///\n")
+            for argument in self.arguments:
+                if argument.name in self.argument_descriptions:
+                    document.write(
+                        f"    /// * `{argument.name}` - {self.argument_descriptions[argument.name]}\n"
+                    )
+            document.write("    ///\n")
+
+        async_name = ""
+        if self.is_async:
+            async_name = "async "
+
+        generics = ""
+        if len(self.generics) > 0:
+            generics = "<" + ", ".join(self.generics) + "> "
+
+        document.write(f"    {self.visibility} {async_name}fn {self.name}{generics}(\n")
+        for argument in self.arguments:
+            if argument.name == "self" and argument.reference:
+                document.write("        &self,\n")
+                continue
+            document.write(f"{argument.name}: {argument.format_data_type()},\n")
+        document.write(")")
+        if self.return_type is not None:
+            document.write(f" -> {self.return_type.format_data_type()}")
+
+
 class StructMetadata:
     """Class representing the metadata of a struct."""
 
     table_metadata: TableMetadata = None
     pg_indices: PGIndices = None
 
-    def __init__(self, struct_name: str, table_name: str):
-        if StructMetadata.table_metadata is None:
-            StructMetadata.table_metadata = find_foreign_keys()
+    @staticmethod
+    def _init_indices():
+        """Initializes the search indices."""
         if StructMetadata.pg_indices is None:
             StructMetadata.pg_indices = find_search_indices(
                 tables_metadata=StructMetadata.table_metadata
             )
 
+    @staticmethod
+    def init_table_metadata():
+        """Initializes the table metadata."""
+        if StructMetadata.table_metadata is None:
+            StructMetadata.table_metadata = find_foreign_keys()
+
+    def __init__(self, struct_name: str, table_name: str):
         self.name = struct_name
         self.table_name = table_name
         self.attributes: List[AttributeMetadata] = []
@@ -334,7 +647,13 @@ class StructMetadata:
         self._new_variant: Optional[StructMetadata] = None
         self._update_variant: Optional[StructMetadata] = None
         self._filter_variant: Optional[StructMetadata] = None
+        self._backend_methods: List[MethodDefinition] = []
+        self._webcommon_methods: List[MethodDefinition] = []
         self._child_variants: Dict[(str, AttributeMetadata), StructMetadata] = {}
+
+    def backend_methods(self) -> List[MethodDefinition]:
+        """Returns the methods of the struct."""
+        return self._backend_methods
 
     def human_readable_name(self) -> str:
         """Returns the human readable name of the struct.
@@ -393,6 +712,16 @@ class StructMetadata:
             or self.table_name == "users"
         )
 
+    def is_immutable(self) -> bool:
+        """Returns whether the struct is immutable.
+
+        Implementation details
+        -----------------------
+        A struct is immutable if it does not contain any field that is
+        either the creator user ID or the updater user ID.
+        """
+        return not self.is_insertable() and not self.is_updatable()
+
     def write_to(
         self,
         file: "File",
@@ -447,7 +776,7 @@ class StructMetadata:
                     "is not defined."
                 )
                 file.write(
-                    f"#[diesel(belongs_to({foreign_key_flat_variant}, foreign_key = {attribute.name}))]\n"
+                    f"#[diesel(belongs_to({foreign_key_flat_variant.name}, foreign_key = {attribute.name}))]\n"
                 )
 
         if diesel is not None:
@@ -563,6 +892,14 @@ class StructMetadata:
         )
 
     def get_attribute_by_name(self, attribute_name: str) -> Optional[AttributeMetadata]:
+        """Returns the attribute by name.
+
+        Parameters
+        ----------
+        attribute_name : str
+            The name of the attribute to retrieve.
+
+        """
         assert isinstance(attribute_name, str), (
             "The attribute name must be a string. "
             f"The provided attribute name is a {type(attribute_name)}."
@@ -620,17 +957,85 @@ class StructMetadata:
                 foreign_struct.register_child_variant(inner_attribute, self)
 
         self.attributes.append(attribute_metadata)
+        attribute_metadata.set_owner(self)
+
+    def add_backend_method(self, method: MethodDefinition) -> MethodDefinition:
+        """Adds a method to the struct.
+
+        Parameters
+        ----------
+        method : MethodDefinition
+            The method to add to the struct.
+        """
+        if method in self._backend_methods:
+            raise ValueError(
+                f"The method {method.name} is already in the struct {self.name}."
+            )
+
+        self._backend_methods.append(method)
+        method.set_owner(self)
+        return method
+
+    def add_webcommon_method(self, method: MethodDefinition) -> MethodDefinition:
+        """Adds a method to the struct.
+
+        Parameters
+        ----------
+        method : MethodDefinition
+            The method to add to the struct.
+        """
+        if method in self._webcommon_methods:
+            raise ValueError(
+                f"The method {method.name} is already in the struct {self.name}."
+            )
+
+        self._webcommon_methods.append(method)
+        method.set_owner(self)
+        return method
+
+    def get_method_by_name(self, method_name: str) -> Optional[MethodDefinition]:
+        """Returns the method by name.
+
+        Parameters
+        ----------
+        method_name : str
+            The name of the method to retrieve.
+        """
+        assert isinstance(method_name, str), (
+            "The method name must be a string. "
+            f"The provided method name is a {type(method_name)}."
+        )
+        for method in self._backend_methods:
+            if method.name == method_name:
+                return method
+        return None
 
     def add_derive(self, derive: str):
+        """Adds a derive to the struct.
+
+        Parameters
+        ----------
+        derive : str
+            The derive to add to the struct.
+        """
         self._derives.append(derive)
 
     def add_decorator(self, decorator: str):
+        """Adds a decorator to the struct.
+
+        Parameters
+        ----------
+        decorator : str
+            The decorator to add to the struct.
+        """
         self._decorators.append(decorator)
 
     def contains_optional_fields(self) -> bool:
+        """Returns whether the struct contains optional fields."""
         return any(attribute.optional for attribute in self.attributes)
 
     def contains_only_optional_fields(self) -> bool:
+        """Returns whether the struct contains only optional fields."""
         return all(attribute.optional for attribute in self.attributes)
 
     @cache
@@ -935,10 +1340,7 @@ class StructMetadata:
 
         columns = self.get_editability_determinant_columns()
 
-        return columns is not None and all(
-            column.optional
-            for column in columns
-        )
+        return columns is not None and all(column.optional for column in columns)
 
     def editability_always_depend_on_parent_column(self) -> bool:
         """Returns whether the editability of the struct depends on the parent column.
@@ -956,10 +1358,7 @@ class StructMetadata:
         if determinant_columns is None:
             return False
 
-        return any(
-            not attribute.optional
-            for attribute in determinant_columns
-        )
+        return any(not attribute.optional for attribute in determinant_columns)
 
     def get_formatted_primary_keys(
         self,
@@ -1040,6 +1439,10 @@ class StructMetadata:
         its editability fully defined by the parent column, and the parent
         table associated with the struct may be hidden.
         """
+        if self.table_name in ("user_emails", ):
+            return True
+        if is_role_invitation_table(self.table_name) or is_role_request_table(self.table_name):
+            return True
         if self.has_public_column():
             return True
         if self.editability_always_depend_on_parent_column():
@@ -1054,7 +1457,24 @@ class StructMetadata:
 
         return False
 
-    def get_foreign_key_flat_variant(self, foreign_key: AttributeMetadata) -> "StructMetadata":
+    def has_attribute_that_may_be_hidden(self) -> bool:
+        """Returns whether the struct has an attribute that may be hidden.
+
+        Implementation details
+        -----------------------
+        A struct has an attribute that may be hidden if the attribute
+        is a foreign key and the associated table may be hidden.
+        """
+        return any(
+            attribute.has_struct_data_type()
+            and attribute.raw_data_type().may_be_hidden()
+            for attribute in self.attributes
+            if not attribute.is_inner()
+        )
+
+    def get_foreign_key_flat_variant(
+        self, foreign_key: AttributeMetadata
+    ) -> "StructMetadata":
         """Returns the flat variant associated with the foreign key.
 
         Parameters
@@ -1122,35 +1542,35 @@ class StructMetadata:
         -----------------------
         A struct is searchable if it has a trigram index on the table.
         """
+        StructMetadata._init_indices()
         return StructMetadata.pg_indices.has_table(self.table_name)
 
-    def get_can_edit_function_name(self) -> str:
-        """Returns the name of the can_edit function."""
-        return f"can_edit_{self.table_name}"
+    def get_can_update_function_name(self) -> str:
+        """Returns the name of the can_update function."""
+        return f"can_update_{self.table_name}"
 
-    def has_can_edit_function(self) -> bool:
-        """Returns whether the table has a can_edit function."""
+    def has_can_update_function(self) -> bool:
+        """Returns whether the table has a can_update function."""
         return self.table_metadata.has_postgres_function(
-            self.get_can_edit_function_name()
+            self.get_can_update_function_name()
         )
 
     def get_can_view_function_name(self) -> str:
         """Returns the name of the can_view function."""
         return f"can_view_{self.table_name}"
 
-    def get_can_delete_function_name(self) -> str:
-        """Returns the name of the can_delete function."""
-        return f"can_delete_{self.table_name}"
+    def get_can_admin_function_name(self) -> str:
+        """Returns the name of the can_admin function."""
+        return f"can_admin_{self.table_name}"
 
-    def get_can_edit_trigger_name(self) -> str:
-        """Returns the name of the can_edit trigger."""
-        return f"can_edit_{self.table_name}"
+    def get_can_update_trigger_name(self) -> str:
+        """Returns the name of the can_update trigger."""
+        return f"can_update_{self.table_name}"
 
-    def has_can_edit_trigger(self) -> bool:
-        """Returns whether the table has a can_edit trigger."""
+    def has_can_update_trigger(self) -> bool:
+        """Returns whether the table has a can_update trigger."""
         return self.table_metadata.has_trigger_by_name(
-            self.table_name,
-            self.get_can_edit_trigger_name()
+            self.table_name, self.get_can_update_trigger_name()
         )
 
     def has_can_view_function(self) -> bool:
@@ -1159,10 +1579,10 @@ class StructMetadata:
             self.get_can_view_function_name()
         )
 
-    def has_can_delete_function(self) -> bool:
-        """Returns whether the table has a can_delete function."""
+    def has_can_admin_function(self) -> bool:
+        """Returns whether the table has a can_admin function."""
         return self.table_metadata.has_postgres_function(
-            self.get_can_delete_function_name()
+            self.get_can_admin_function_name()
         )
 
     def has_created_at(self) -> bool:

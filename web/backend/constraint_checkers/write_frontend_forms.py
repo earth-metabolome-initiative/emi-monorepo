@@ -883,7 +883,7 @@ def handle_missing_gin_index(
                 )
 
                 if len(textual_columns) > 1:
-                    function_name = f"f_concat_{attribute.raw_data_type().table_name}_{concatenate_columns}"
+                    function_name = f"concat_{attribute.raw_data_type().table_name}_{concatenate_columns}"
 
                     up_index_migration.write(f"CREATE FUNCTION {function_name}(\n")
                     for inner_attribute in textual_columns:
@@ -1533,14 +1533,14 @@ def write_frontend_yew_form(
                         f"The struct {attribute.raw_data_type().name} does not implement the RowToSearchableBadge trait."
                     )
 
-                editables = (
+                updatables = (
                     "true"
                     if struct.has_associated_roles() and struct.table_name != "users"
                     else "false"
                 )
 
                 document.write(
-                    f'            <Datalist<{attribute.data_type()}, {editables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" />\n'
+                    f'            <Datalist<{attribute.data_type()}, {updatables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" />\n'
                 )
                 continue
 

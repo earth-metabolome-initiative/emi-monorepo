@@ -55,7 +55,7 @@ def handle_missing_parent_circularity_trigger(
         ) as up_migration:
             up_migration.write(
                 f"-- Create the `{trigger_name}` trigger on the {table_name} table.\n\n"
-                f"CREATE OR REPLACE FUNCTION {trigger_name}()\n"
+                f"CREATE FUNCTION {trigger_name}()\n"
                 "RETURNS TRIGGER AS $$\n"
                 "BEGIN\n"
             )

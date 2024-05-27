@@ -1,22 +1,22 @@
 -- Since the operation needs to be immutable, we need to create a postgresql
 -- function that concatenates the three columns with spaces, and that handles
--- the case where the middle_value is null.
-CREATE FUNCTION f_concat_users_name(
-  first_value text,
-  middle_value text,
-  last_value text
+-- the case where the middle_name is null.
+CREATE FUNCTION concat_users_name(
+  first_name text,
+  middle_name text,
+  last_name text
 ) RETURNS text AS $$
 BEGIN
   CASE
-    WHEN middle_value IS NULL THEN
-      RETURN first_value || ' ' || last_value;
+    WHEN middle_name IS NULL THEN
+      RETURN first_name || ' ' || last_name;
     ELSE
-      RETURN first_value || ' ' || middle_value || ' ' || last_value;
+      RETURN first_name || ' ' || middle_name || ' ' || last_name;
   END CASE;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
 
 
 CREATE INDEX users_name_trgm_idx ON users USING gin (
-  f_concat_users_name(first_name, middle_name, last_name) gin_trgm_ops
+  concat_users_name(first_name, middle_name, last_name) gin_trgm_ops
 );

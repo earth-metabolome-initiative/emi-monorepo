@@ -1,4 +1,4 @@
-CREATE FUNCTION f_concat_roles_name(
+CREATE FUNCTION concat_roles_name(
   name text,
   description text
 ) RETURNS text AS $$
@@ -9,5 +9,5 @@ $$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
 
 
 CREATE INDEX roles_name_trgm_idx ON roles USING gin (
-  f_concat_roles_name(name, description) gin_trgm_ops
+  concat_roles_name(name, description) gin_trgm_ops
 );

@@ -77,13 +77,11 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
             PagesMessage::Backend(message) => match message {
                 WebsocketMessage::AllTable(rows) => {
                     log::info!("Received {} rows", rows.len());
-                    let new_pages: Vec<Page> = rows
-                        .into_iter()
-                        .map(|row| bincode::deserialize(&row).unwrap())
-                        .filter(|page: &Page| {
+                    let mut new_pages: Vec<Page> = bincode::deserialize(&rows).unwrap();
+                    new_pages
+                        .retain(|page| {
                             self.pages.iter().all(|old_page| old_page.id() != page.id())
-                        })
-                        .collect();
+                        });
 
                     self.no_more_pages = new_pages.is_empty();
                     self.request_is_ongoing = false;

@@ -22,12 +22,6 @@ def write_diesel_sql_function_bindings(table_metadata: TableMetadata):
             "//! parameter is null or not is done in the postgres function itself.\n\n"
         )
 
-        imports = [
-            "use diesel::prelude::*;",
-        ]
-        
-        f.write("\n".join(imports) + "\n\n")
-
         for sql_function in sql_functions:
             sql_function.write_diesel_binding_to_file(f)
 

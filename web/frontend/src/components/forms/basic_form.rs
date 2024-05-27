@@ -215,7 +215,7 @@ where
                     //             }
                     //             FormMethod::DELETE => {
                     //                 ctx.link()
-                    //                     .send_message(ComponentMessage::can_delete::<Data>(id));
+                    //                     .send_message(ComponentMessage::can_admin::<Data>(id));
                     //             }
                     //         }
                     //     }

@@ -36,14 +36,18 @@ pub enum Select {
         offset: i64,
     },
     SearchTable {
+        filter: Option<Vec<u8>>,
         table_name: String,
         query: String,
-        number_of_results: u32,
+        limit: i64,
+        offset: i64,
     },
     SearchEditableTable {
+        filter: Option<Vec<u8>>,
         table_name: String,
         query: String,
-        number_of_results: u32,
+        limit: i64,
+        offset: i64,
     },
 }
 
@@ -97,13 +101,17 @@ impl Select {
     ///
     /// # Arguments
     /// * `table` - The table to select from.
+    /// * `filter` - The filter to apply to the query.
     /// * `query` - The query to search for.
-    /// * `number_of_results` - The number of results to return.
-    pub fn search(table: super::Table, query: String, number_of_results: u32) -> Self {
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    pub fn search<F: Serialize>(table: super::Table, filter: Option<&F>, query: String, limit: i64, offset: i64) -> Self {
         Self::SearchTable {
             table_name: table.into(),
+            filter: filter.map(|f| bincode::serialize(f).unwrap()),
             query,
-            number_of_results,
+            limit,
+            offset,
         }
     }
 
@@ -111,13 +119,16 @@ impl Select {
     ///
     /// # Arguments
     /// * `table` - The table to select from.
+    /// * `filter` - The filter to apply to the query.
     /// * `query` - The query to search for.
-    /// * `number_of_results` - The number of results to return.
-    pub fn search_editables(table: super::Table, query: String, number_of_results: u32) -> Self {
+    /// * `limit` - The maximum number of results to return.
+    pub fn search_updatables<F: Serialize>(table: super::Table, filter: Option<&F>, query: String, limit: i64, offset: i64) -> Self {
         Self::SearchEditableTable {
             table_name: table.into(),
+            filter: filter.map(|f| bincode::serialize(f).unwrap()),
             query,
-            number_of_results,
+            limit,
+            offset,
         }
     }
 
@@ -150,7 +161,7 @@ impl Select {
     /// # Arguments
     /// * `table` - The table to select from.
     /// * `primary_key` - The primary key to search for.
-    pub fn can_delete(table: super::Table, primary_key: PrimaryKey) -> Self {
+    pub fn can_admin(table: super::Table, primary_key: PrimaryKey) -> Self {
         Self::CanDelete {
             table_name: table.into(),
             primary_key,

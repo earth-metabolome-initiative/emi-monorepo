@@ -56,13 +56,13 @@ def derive_webcommon_new_variants(
 
             if attribute in primary_keys:
                 if attribute.is_uuid():
-                    new_struct.add_attribute(attribute)
+                    new_struct.add_attribute(attribute.into_new_owner(new_struct))
                     continue
                 if len(primary_keys) == 1:
                     continue
-                new_struct.add_attribute(attribute)
+                new_struct.add_attribute(attribute.into_new_owner(new_struct))
                 continue
-            new_struct.add_attribute(attribute)
+            new_struct.add_attribute(attribute.into_new_owner(new_struct))
 
         assert (
             len(new_struct.attributes) > 0

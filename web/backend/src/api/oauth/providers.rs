@@ -15,7 +15,7 @@ async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -
     dotenvy::dotenv().ok();
 
     let mut conn = pool.get().expect("couldn't get db connection from pool");
-    let providers = NestedLoginProvider::all(None, None, None, &mut conn);
+    let providers = NestedLoginProvider::all_viewable(None, None, None, &mut conn);
 
     if providers.is_err() {
         return HttpResponse::InternalServerError().json(ApiError::internal_server_error());

@@ -92,8 +92,8 @@ impl ComponentMessage {
         Self::Operation(Operation::Select(Select::can_update(R::TABLE, primary_key)))
     }
 
-    pub(crate) fn can_delete<R: Tabular>(primary_key: PrimaryKey) -> Self {
-        Self::Operation(Operation::Select(Select::can_delete(R::TABLE, primary_key)))
+    pub(crate) fn can_admin<R: Tabular>(primary_key: PrimaryKey) -> Self {
+        Self::Operation(Operation::Select(Select::can_admin(R::TABLE, primary_key)))
     }
 }
 
@@ -101,9 +101,9 @@ impl ComponentMessage {
 /// Messages from the websocket web-worker to the frontend.
 pub enum WebsocketMessage {
     Notification(NotificationMessage),
-    SearchTable(Vec<Vec<u8>>),
+    SearchTable(Vec<u8>),
     GetTable(Option<String>, Vec<u8>),
-    AllTable(Vec<Vec<u8>>),
+    AllTable(Vec<u8>),
     CanView(bool),
     CanUpdate(bool),
     CanDelete(bool),
@@ -186,13 +186,7 @@ impl WebsocketWorker {
                             } => {
                                 let table: Table = table_name.try_into().unwrap();
 
-                                match table
-                                    .all(filter, Some(limit), Some(offset), &mut database)
-                                    .await
-                                {
-                                    Ok(rows) => BackendMessage::AllTable(task_id, rows),
-                                    Err(err) => BackendMessage::Error(task_id, err),
-                                }
+                                todo!()
                             }
                             Select::AllByUpdatedAt {
                                 table_name,
@@ -202,40 +196,25 @@ impl WebsocketWorker {
                             } => {
                                 let table: Table = table_name.try_into().unwrap();
 
-                                match table
-                                    .all_by_updated_at(
-                                        filter,
-                                        Some(limit),
-                                        Some(offset),
-                                        &mut database,
-                                    )
-                                    .await
-                                {
-                                    Ok(rows) => BackendMessage::AllTable(task_id, rows),
-                                    Err(err) => BackendMessage::Error(task_id, err),
-                                }
+                                todo!()
                             }
                             Select::SearchTable {
+                                filter,
                                 table_name,
                                 query,
-                                number_of_results,
+                                limit,
+                                offset
                             } => {
                                 let table: Table = table_name.try_into().unwrap();
 
-                                // Since GlueSQL does not support search queries, and we do not expect for the
-                                // frontend side to ever need to search a very large table, we always return all
-                                // of the rows in the table and then we let the datalist UI component handle the
-                                // search directly. Still, just in case something unexpected happens, we limit the
-                                // number of rows returned to 1_000.
-                                match table.all(None, Some(1_000), None, &mut database).await {
-                                    Ok(rows) => BackendMessage::SearchTable(task_id, rows),
-                                    Err(err) => BackendMessage::Error(task_id, err),
-                                }
+                                todo!()
                             }
                             Select::SearchEditableTable {
+                                filter,
                                 table_name,
                                 query,
-                                number_of_results,
+                                limit,
+                                offset
                             } => {
                                 let table: Table = table_name.try_into().unwrap();
 
@@ -387,10 +366,10 @@ impl Worker for WebsocketWorker {
                             scope.respond(subscriber_id, WebsocketMessage::CanUpdate(can_update));
                         }
                     }
-                    BackendMessage::CanDelete(task_id, can_delete) => {
+                    BackendMessage::CanDelete(task_id, can_admin) => {
                         // We can remove this task from the queue.
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::CanDelete(can_delete));
+                            scope.respond(subscriber_id, WebsocketMessage::CanDelete(can_admin));
                         }
                     }
                     BackendMessage::Notification(notification) => {

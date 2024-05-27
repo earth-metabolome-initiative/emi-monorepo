@@ -68,20 +68,7 @@ class UnexpectedRoleRequestsTable(Exception):
             f"Table {table_name}_{referring_table_name}_role_requests is unexpected."
         )
 
-def is_role_table(table_name: str) -> bool:
-    """Check if a table is a role table.
 
-    Parameters
-    ----------
-    table_name : str
-        The table name.
-
-    Returns
-    -------
-    bool
-        Whether the table is a role table.
-    """
-    return table_name.endswith("_role_invitations") or table_name.endswith("_role_requests") or table_name.endswith("_roles")
 
 def handle_unexpected_roles_table(
     table_name: str,

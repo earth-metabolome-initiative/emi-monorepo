@@ -38,7 +38,7 @@ where
     #[prop_or(1)]
     pub maximum_number_of_choices: usize,
     #[prop_or(10)]
-    pub number_of_candidates: u32,
+    pub number_of_candidates: i64,
 }
 
 impl<Data, const EDIT: bool> MultiDatalistProp<Data, EDIT>
@@ -130,12 +130,7 @@ where
                 WebsocketMessage::SearchTable(results) => {
                     self.number_of_search_queries -= 1;
                     ctx.link().send_message(DatalistMessage::UpdateCandidates(
-                        results
-                            .iter()
-                            .map(|row| {
-                                bincode::deserialize(row).expect("Failed to convert row to data")
-                            })
-                            .collect(),
+                        bincode::deserialize(&results).expect("Failed to convert row to data"),
                     ));
 
                     true
@@ -167,7 +162,7 @@ where
                 // }
                 let query = self.current_value.clone().unwrap_or_else(|| "".to_string());
                 self.websocket.send(ComponentMessage::Operation(
-                    Data::search_task(query, ctx.props().number_of_candidates).into(),
+                    Data::search_task(None, query, ctx.props().number_of_candidates, 0).into(),
                 ));
                 self.number_of_search_queries += 1;
                 false
@@ -463,7 +458,7 @@ where
     #[prop_or(false)]
     pub optional: bool,
     #[prop_or(10)]
-    pub number_of_candidates: u32,
+    pub number_of_candidates: i64,
 }
 
 #[function_component(Datalist)]

@@ -144,7 +144,7 @@ fn insert_user_emails(
     for email in emails {
         // If the email is not associated with the user, we insert it.
         let user_email =
-            UserEmail::from_email_and_login_provider_id(email, &provider_id, &mut conn);
+            UserEmail::from_email_and_login_provider_id(email, &provider_id, Some(user.id), &mut conn);
 
         if user_email.is_err() {
             let new_user_email = NewUserEmail {

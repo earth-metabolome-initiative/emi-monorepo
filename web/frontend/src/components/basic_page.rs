@@ -344,7 +344,7 @@ pub struct InnerBasicPage<Page> {
     user_state: Rc<UserState>,
     _dispatcher: Dispatch<UserState>,
     can_update: bool,
-    can_delete: bool,
+    can_admin: bool,
 }
 
 pub enum PageMessage {
@@ -370,7 +370,7 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
             })),
             page: None,
             can_update: false,
-            can_delete: false,
+            can_admin: false,
             user_state,
             _dispatcher: user_dispatch,
         }
@@ -382,7 +382,7 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
                 .send(ComponentMessage::can_view::<Page>(ctx.props().id));
             if self.user_state.has_user() {
                 self.websocket
-                    .send(ComponentMessage::can_delete::<Page>(ctx.props().id));
+                    .send(ComponentMessage::can_admin::<Page>(ctx.props().id));
                 self.websocket
                     .send(ComponentMessage::can_update::<Page>(ctx.props().id));
             }
@@ -394,7 +394,7 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
             PageMessage::UserState(user_state) => {
                 if user_state.has_user() {
                     self.websocket
-                        .send(ComponentMessage::can_delete::<Page>(ctx.props().id));
+                        .send(ComponentMessage::can_admin::<Page>(ctx.props().id));
                     self.websocket
                         .send(ComponentMessage::can_update::<Page>(ctx.props().id));
                 }
@@ -418,8 +418,8 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
                     }
                     true
                 }
-                WebsocketMessage::CanDelete(can_delete) => {
-                    self.can_delete = can_delete;
+                WebsocketMessage::CanDelete(can_admin) => {
+                    self.can_admin = can_admin;
                     true
                 }
                 WebsocketMessage::CanUpdate(can_update) => {
@@ -458,7 +458,7 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
                             <span>{"Update"}</span>
                         </Link<AppRoute>>
                     }
-                    if self.can_delete {
+                    if self.can_admin {
                         <Link<AppRoute> classes={"button-like delete"} to={page.update_path().unwrap()}>
                             <i class={FormMethod::DELETE.font_awesome_icon()}></i>
                             {'\u{00a0}'}

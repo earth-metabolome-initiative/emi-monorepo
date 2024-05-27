@@ -626,6 +626,7 @@ impl SampleContainerCategoryFilter {
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampleContainerFilter {
+    pub project_id: Option<i32>,
     pub category_id: Option<i32>,
     pub created_by: Option<i32>,
 }
@@ -636,6 +637,10 @@ impl SampleContainerFilter {
 
     pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(project_id) = &self.project_id {
+            filter = filter.and(gluesql::core::ast_builder::col("sample_containers.project_id").eq(project_id.to_string()));
+        }
+
         if let Some(category_id) = &self.category_id {
             filter = filter.and(gluesql::core::ast_builder::col("sample_containers.category_id").eq(category_id.to_string()));
         }
@@ -733,6 +738,7 @@ impl SampledIndividualFilter {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampleFilter {
     pub container_id: Option<i32>,
+    pub project_id: Option<i32>,
     pub created_by: Option<i32>,
     pub sampled_by: Option<i32>,
     pub updated_by: Option<i32>,
@@ -747,6 +753,10 @@ impl SampleFilter {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
         if let Some(container_id) = &self.container_id {
             filter = filter.and(gluesql::core::ast_builder::col("samples.container_id").eq(container_id.to_string()));
+        }
+
+        if let Some(project_id) = &self.project_id {
+            filter = filter.and(gluesql::core::ast_builder::col("samples.project_id").eq(project_id.to_string()));
         }
 
         if let Some(created_by) = &self.created_by {
@@ -845,6 +855,7 @@ impl TeamStateFilter {
 pub struct TeamFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
+    pub state_id: Option<i32>,
     pub parent_team_id: Option<i32>,
     pub created_by: Option<i32>,
     pub updated_by: Option<i32>,
@@ -862,6 +873,10 @@ impl TeamFilter {
 
         if let Some(color_id) = &self.color_id {
             filter = filter.and(gluesql::core::ast_builder::col("teams.color_id").eq(color_id.to_string()));
+        }
+
+        if let Some(state_id) = &self.state_id {
+            filter = filter.and(gluesql::core::ast_builder::col("teams.state_id").eq(state_id.to_string()));
         }
 
         if let Some(parent_team_id) = &self.parent_team_id {

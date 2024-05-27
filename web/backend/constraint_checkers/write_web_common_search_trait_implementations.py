@@ -43,8 +43,8 @@ def write_web_common_search_trait_implementations(
     # that are searchable.
 
     document.write(
-        "pub trait Searchable<const EDIT: bool> {\n"
-        "    fn search_task(query: String, limit: u32) -> super::Select;\n"
+        "pub trait Searchable<const EDIT: bool>: Filtrable {\n"
+        "    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select;\n"
         "}\n"
     )
 
@@ -52,28 +52,32 @@ def write_web_common_search_trait_implementations(
         if struct.is_searchable():
             document.write(
                 f"impl Searchable<false> for {struct.name} {{\n"
-                "    fn search_task(query: String, limit: u32) -> super::Select {\n"
+                "    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {\n"
                 "        super::Select::search(\n"
                 f"             Table::{struct.capitalized_table_name()},\n"
+                "              filter,\n"
                 "              query,\n"
                 "              limit,\n"
+                "              offset,\n"
                 "        )\n"
                 "    }\n"
                 "}\n"
             )
 
-        if struct.has_associated_roles() and struct.table_name != "users":
-            document.write(
-                f"impl Searchable<true> for {struct.name} {{\n"
-                "    fn search_task(query: String, limit: u32) -> super::Select {\n"
-                "        super::Select::search_editables(\n"
-                f"             Table::{struct.capitalized_table_name()},\n"
-                "              query,\n"
-                "              limit,\n"
-                "        )\n"
-                "    }\n"
-                "}\n"
-            )
+            if struct.is_updatable():
+                document.write(
+                    f"impl Searchable<true> for {struct.name} {{\n"
+                    "    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {\n"
+                    "        super::Select::search_updatables(\n"
+                    f"             Table::{struct.capitalized_table_name()},\n"
+                    "              filter,\n"
+                    "              query,\n"
+                    "              limit,\n"
+                    "              offset,\n"
+                    "        )\n"
+                    "    }\n"
+                    "}\n"
+                )
 
     document.flush()
     document.close()

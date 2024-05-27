@@ -56,15 +56,15 @@ fn check_authorization(
     // If the ID associated to the provided authorization does not exist in the database,
     // we return false. It is possible that the row in question has been deleted by another
     // user, or that the provided ID is incorrect. The ID, if it exists, is stored in the
-    // editables table.
+    // updatables table.
     let id = authorization.id;
 
     {
-        use crate::schema::editables;
+        use crate::schema::updatables;
         use diesel::dsl::sql;
 
-        let exists: bool = editables::dsl::editables
-            .filter(editables::dsl::id.eq(id))
+        let exists: bool = updatables::dsl::updatables
+            .filter(updatables::dsl::id.eq(id))
             .select(sql::<diesel::sql_types::Bool>("true"))
             .get_result(conn)?;
 
@@ -78,12 +78,12 @@ fn check_authorization(
     // column of the table is equal to the provided user ID. If the user is the author,
     // and among the provided roles is the Creator role, we return true.
     if roles.contains(&Role::Creator) {
-        use crate::schema::editables;
+        use crate::schema::updatables;
         use diesel::dsl::sql;
 
-        let is_author: bool = editables::dsl::editables
-            .filter(editables::dsl::id.eq(id))
-            .filter(editables::dsl::created_by.eq(user_id))
+        let is_author: bool = updatables::dsl::updatables
+            .filter(updatables::dsl::id.eq(id))
+            .filter(updatables::dsl::created_by.eq(user_id))
             .select(sql::<diesel::sql_types::Bool>("true"))
             .get_result(conn)?;
 
@@ -139,7 +139,7 @@ fn check_authorization(
 
     // We first need to get the ids of the teams where the user is a member. Teams are defined in the
     // teams table, and the membership is defined in the user_authorizations table. We join the teams
-    // and the user_authorizations tables on the editables_id column, and we filter the user_authorizations
+    // and the user_authorizations tables on the updatables_id column, and we filter the user_authorizations
     // table on the user_id column and the role_id column. We then select the id column of the teams table.
     let team_ids = {
         use crate::schema::teams;
@@ -183,7 +183,7 @@ fn check_authorization(
 
     // First, we need to get the ids of the organizations where the user is a member. Organizations are
     // defined in the organizations table, and the membership is defined in the user_authorizations table.
-    // We join the organizations and the user_authorizations tables on the editables_id column, and we filter
+    // We join the organizations and the user_authorizations tables on the updatables_id column, and we filter
     // the user_authorizations table on the user_id column and the role_id column. We then select the id column
     // of the organizations table.
     let organization_ids = {

@@ -205,6 +205,7 @@ impl Tabular for NewSampleBioOttTaxonItem {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSampleContainer {
     pub barcode: String,
+    pub project_id: i32,
     pub category_id: i32,
 }
 
@@ -324,6 +325,7 @@ pub struct NewSample {
     pub id: Uuid,
     pub container_id: i32,
     pub notes: Option<String>,
+    pub project_id: i32,
     pub sampled_by: i32,
     pub state: i32,
 }
@@ -342,6 +344,7 @@ impl NewSample {
                 Some(notes) => gluesql::core::ast_builder::text(notes),
                 None => gluesql::core::ast_builder::null(),
             },
+            gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.sampled_by),
             gluesql::core::ast_builder::num(self.state),
             gluesql::core::ast_builder::num(created_by),
@@ -367,7 +370,7 @@ impl NewSample {
         let id = self.id;
         table("samples")
             .insert()
-            .columns("created_by,id,container_id,notes,sampled_by,state,updated_by")
+            .columns("created_by,id,container_id,notes,project_id,sampled_by,state,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -398,6 +401,7 @@ impl NewSample {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("container_id", gluesql::core::ast_builder::num(self.container_id))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
 .set("state", gluesql::core::ast_builder::num(self.state))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));
@@ -428,6 +432,7 @@ pub struct NewTeam {
     pub description: String,
     pub icon_id: i32,
     pub color_id: i32,
+    pub state_id: i32,
     pub parent_team_id: Option<i32>,
 }
 

@@ -2,14 +2,18 @@
 
 from typing import List
 from tqdm import tqdm
-from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
+from constraint_checkers.struct_metadata import (
+    StructMetadata,
+    AttributeMetadata,
+    MethodDefinition,
+)
 from constraint_checkers.gluesql_types_mapping import GLUESQL_TYPES_MAPPING
-from constraint_checkers.write_update_method_for_gluesql import write_update_method_for_gluesql
+from constraint_checkers.write_update_method_for_gluesql import (
+    write_update_method_for_gluesql,
+)
 
-def write_image_as_url_getter_method(
-    attribute: AttributeMetadata,
-    document: "TextIO"
-):
+
+def write_image_as_url_getter_method(attribute: AttributeMetadata, document: "TextIO"):
     """Writes the method to get the image contained in the provided attribute as a URL.
 
     Parameters
@@ -58,7 +62,7 @@ def write_web_common_flat_variants(
         "use uuid::Uuid;",
         "use chrono::NaiveDateTime;",
         "use crate::database::*;",
-        "use crate::traits::GuessImageFormat;"
+        "use crate::traits::GuessImageFormat;",
     ]
 
     document = open(f"../web_common/src/database/{target}.rs", "w", encoding="utf8")
@@ -78,6 +82,17 @@ def write_web_common_flat_variants(
             "}\n\n"
         )
 
+    description = {
+        "argument": AttributeMetadata(
+            original_name="connection",
+            name="connection",
+            data_type="gluesql::prelude::Glue<C>",
+            reference=True,
+            mutable=True,
+        ),
+        "description": "The connection to the database.",
+    }
+
     for struct in tqdm(
         structs,
         desc="Writing frontend structs",
@@ -90,32 +105,35 @@ def write_web_common_flat_variants(
         # We implement the Tabular trait for the struct. This trait
         # is used to convert the struct into a Table variant.
 
-        document.write(f"impl Tabular for {struct.name} {{\n")
         document.write(
+            f"impl Tabular for {struct.name} {{\n"
             f"    const TABLE: Table = Table::{struct.capitalized_table_name()};\n"
+            "}\n"
         )
-        document.write("}\n")
 
         # We implement the Filtrable trait for the struct. This trait
         # is used to provide the informations on the filter struct that
         # can be used to filter the struct in the database.
         if struct.has_filter_variant():
             filter_struct = struct.get_filter_variant()
-            document.write(f"\nimpl Filtrable for {struct.name} {{\n")
-            document.write(f"    type Filter = {filter_struct.name};\n")
-            document.write("}\n")
-        elif struct.table_name == "users":
-            document.write(f"\nimpl Filtrable for {struct.name} {{\n")
-            document.write("    type Filter = EmptyFilter;\n")
-            document.write("}\n")
+            document.write(
+                f"\nimpl Filtrable for {struct.name} {{\n"
+                f"    type Filter = {filter_struct.name};\n"
+                "}\n"
+            )
+        else:
+            document.write(
+                f"\nimpl Filtrable for {struct.name} {{\n"
+                "    type Filter = EmptyFilter;\n"
+                "}\n"
+            )
 
         # This variant of the struct implementation is only
         # available when in the web_common is enabled the frontend
         # feature. It provides several methods including the use
         # of GlueSQL. Fortunately, it does not force us like Diesel
         # to create yet again another duplicate of the struct.
-        document.write('#[cfg(feature = "frontend")]\n')
-        document.write(f"impl {struct.name} {{\n")
+        document.write('#[cfg(feature = "frontend")]\n' f"impl {struct.name} {{\n")
 
         for attribute in struct.attributes:
             if attribute.is_image_blob():
@@ -129,21 +147,18 @@ def write_web_common_flat_variants(
 
         document.write(
             "    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {\n"
+            "        vec![\n"
         )
-
-        document.write("        vec![\n")
         for attribute in struct.attributes:
 
             if attribute.optional:
                 if attribute.data_type() in GLUESQL_TYPES_MAPPING:
-                    document.write(f"            match self.{attribute.name} {{\n")
                     document.write(
+                        f"            match self.{attribute.name} {{\n"
                         f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(attribute.name)},\n"
-                    )
-                    document.write(
                         "                None => gluesql::core::ast_builder::null(),\n"
+                        "            },\n"
                     )
-                    document.write("            },\n")
                 else:
                     raise NotImplementedError(
                         f"The type {attribute.data_type()} is not supported. "
@@ -158,45 +173,51 @@ def write_web_common_flat_variants(
                     f"The type {attribute.data_type()} is not supported."
                 )
 
-        document.write("        ]\n")
-
-        document.write("    }\n\n")
+        document.write("        ]\n" "    }\n\n")
 
         # We implement the `insert` method for the struct. This method
         # receives a connection to the GlueSQL database and inserts the
         # struct into the database.
-        document.write(f"    /// Insert the {struct.name} into the database.\n")
-        document.write("    ///\n")
-        document.write("    /// # Arguments\n")
-        document.write("    /// * `connection` - The connection to the database.\n")
-        document.write("    ///\n")
-        document.write("    /// # Returns\n")
-        document.write(f"    /// The number of rows inserted in table {struct.name}\n")
-        document.write("    pub async fn insert<C>(\n")
-        document.write("        self,\n")
-        document.write("        connection: &mut gluesql::prelude::Glue<C>,\n")
-        document.write("    ) -> Result<usize, gluesql::prelude::Error> where\n")
-        document.write(
-            "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+        insert_method = struct.add_webcommon_method(
+            MethodDefinition(
+                name="insert",
+                summary=f"Insert the {struct.name} into the database.",
+                is_async=True,
+            )
         )
-        document.write("    {\n")
-        document.write("        use gluesql::core::ast_builder::*;\n")
-        # We use the AST builder as much as possible so to avoid SQL injection attacks.
-        document.write(f'        table("{struct.table_name}")\n')
-        document.write("            .insert()\n")
-        document.write(f'            .columns("{columns}")\n')
-        document.write("            .values(vec![self.into_row()])\n")
-        document.write("            .execute(connection)\n")
-        document.write("            .await\n")
-        document.write("             .map(|payload| match payload {\n")
+
+        insert_method.add_generic(
+            "C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut"
+        )
+        insert_method.include_self()
+        insert_method.add_argument(**description)
+
+        insert_method.set_return_type(
+            AttributeMetadata(
+                original_name="_",
+                name="_",
+                data_type="Result<usize, gluesql::prelude::Error>",
+                optional=False,
+            )
+        )
+
+        insert_method.write_header_to(document)
+
         document.write(
+            "    {\n"
+            "        use gluesql::core::ast_builder::*;\n"
+            f'        table("{struct.table_name}")\n'
+            "            .insert()\n"
+            f'            .columns("{columns}")\n'
+            "            .values(vec![self.into_row()])\n"
+            "            .execute(connection)\n"
+            "            .await\n"
+            "             .map(|payload| match payload {\n"
             "                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,\n"
-        )
-        document.write(
             '                 _ => unreachable!("Payload must be an Insert"),\n'
+            "             })\n"
+            "    }\n\n"
         )
-        document.write("             })\n")
-        document.write("    }\n\n")
 
         # We implement the `get` method for the struct. This method
         # receives the ID of the struct and a connection to the GlueSQL

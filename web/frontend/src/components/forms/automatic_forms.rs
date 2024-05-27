@@ -2151,8 +2151,10 @@ if let Some(sample) = builder_store.sample.as_ref() {
 pub struct SampleContainerBuilder {
     pub id: Option<i32>,
     pub barcode: Option<String>,
+    pub project: Option<NestedProject>,
     pub category: Option<NestedSampleContainerCategory>,
     pub errors_barcode: Vec<ApiError>,
+    pub errors_project: Vec<ApiError>,
     pub errors_category: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
@@ -2162,8 +2164,10 @@ impl Default for SampleContainerBuilder {
         Self {
             id: None,
             barcode: None,
+            project: Default::default(),
             category: Default::default(),
             errors_barcode: Default::default(),
+            errors_project: Default::default(),
             errors_category: Default::default(),
             form_updated_at: Default::default(),
         }
@@ -2173,12 +2177,14 @@ impl Default for SampleContainerBuilder {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleContainerActions {
     SetBarcode(Option<String>),
+    SetProject(Option<NestedProject>),
     SetCategory(Option<NestedSampleContainerCategory>),
 }
 
 impl FromOperation for SampleContainerActions {
     fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
         match operation.as_ref() {
+            "project" => SampleContainerActions::SetProject(Some(bincode::deserialize(&row).unwrap())),
             "category" => SampleContainerActions::SetCategory(Some(bincode::deserialize(&row).unwrap())),
             operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
         }
@@ -2212,6 +2218,20 @@ impl Reducer<SampleContainerBuilder> for SampleContainerActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'barcode;
             }
+            SampleContainerActions::SetProject(project) => 'project: {
+                state_mut.errors_project.clear();
+        if project.is_none() {
+            state_mut.errors_project.push(ApiError::BadRequest(vec![
+                "The Project field is required.".to_string()
+             ]));
+            state_mut.project = None;
+             break 'project;
+        }
+                state_mut.project = project;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'project;
+            }
             SampleContainerActions::SetCategory(category) => 'category: {
                 state_mut.errors_category.clear();
         if category.is_none() {
@@ -2236,12 +2256,13 @@ impl FormBuilder for SampleContainerBuilder {
     type RichVariant = NestedSampleContainer;
 
     fn has_errors(&self) -> bool {
-!self.errors_barcode.is_empty() || !self.errors_category.is_empty()
+!self.errors_barcode.is_empty() || !self.errors_project.is_empty() || !self.errors_category.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
     dispatcher.apply(SampleContainerActions::SetBarcode(Some(richest_variant.inner.barcode.to_string())));
+        dispatcher.apply(SampleContainerActions::SetProject(Some(richest_variant.project)));
         dispatcher.apply(SampleContainerActions::SetCategory(Some(richest_variant.category)));
         vec![]
     }
@@ -2249,6 +2270,7 @@ impl FormBuilder for SampleContainerBuilder {
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.barcode.is_some()
+        && self.project.is_some()
         && self.category.is_some()
     }
 
@@ -2258,6 +2280,7 @@ impl From<SampleContainerBuilder> for NewSampleContainer {
     fn from(builder: SampleContainerBuilder) -> Self {
         Self {
             barcode: builder.barcode.unwrap(),
+            project_id: builder.project.unwrap().inner.id,
             category_id: builder.category.unwrap().inner.id,
         }
     }
@@ -2281,6 +2304,8 @@ impl FormBuildable for NewSampleContainer {
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampleContainerFormProp {
      #[prop_or_default]
+    pub project_id: Option<i32>,
+     #[prop_or_default]
     pub category_id: Option<i32>,
 }
 
@@ -2288,10 +2313,14 @@ pub struct CreateSampleContainerFormProp {
 pub fn create_sample_container_form(props: &CreateSampleContainerFormProp) -> Html {
      let mut named_requests: Vec<ComponentMessage> = Vec::new();
     let (builder_store, builder_dispatch) = use_store::<SampleContainerBuilder>();
+   if let Some(project_id) = props.project_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Project>("project", project_id.into()));
+    }
    if let Some(category_id) = props.category_id {
          named_requests.push(ComponentMessage::get_named::<&str, SampleContainerCategory>("category", category_id.into()));
     }
     let set_barcode = builder_dispatch.apply_callback(|barcode: Option<String>| SampleContainerActions::SetBarcode(barcode));
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| SampleContainerActions::SetProject(project));
     let set_category = builder_dispatch.apply_callback(|category: Option<NestedSampleContainerCategory>| SampleContainerActions::SetCategory(category));
     html! {
         <BasicForm<NewSampleContainer>
@@ -2299,6 +2328,7 @@ pub fn create_sample_container_form(props: &CreateSampleContainerFormProp) -> Ht
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone()} />
+            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
             <Datalist<NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" />
         </BasicForm<NewSampleContainer>>
     }
@@ -2686,10 +2716,12 @@ pub struct SampleBuilder {
     pub id: Option<Uuid>,
     pub notes: Option<String>,
     pub container: Option<NestedSampleContainer>,
+    pub project: Option<NestedProject>,
     pub sampled_by: Option<User>,
     pub state: Option<NestedSampleState>,
     pub errors_notes: Vec<ApiError>,
     pub errors_container: Vec<ApiError>,
+    pub errors_project: Vec<ApiError>,
     pub errors_sampled_by: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
@@ -2701,10 +2733,12 @@ impl Default for SampleBuilder {
             id: None,
             notes: None,
             container: Default::default(),
+            project: Default::default(),
             sampled_by: None,
             state: None,
             errors_notes: Default::default(),
             errors_container: Default::default(),
+            errors_project: Default::default(),
             errors_sampled_by: Default::default(),
             errors_state: Default::default(),
             form_updated_at: Default::default(),
@@ -2716,6 +2750,7 @@ impl Default for SampleBuilder {
 pub(super) enum SampleActions {
     SetNotes(Option<String>),
     SetContainer(Option<NestedSampleContainer>),
+    SetProject(Option<NestedProject>),
     SetSampledBy(Option<User>),
     SetState(Option<NestedSampleState>),
 }
@@ -2724,6 +2759,7 @@ impl FromOperation for SampleActions {
     fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
         match operation.as_ref() {
             "container" => SampleActions::SetContainer(Some(bincode::deserialize(&row).unwrap())),
+            "project" => SampleActions::SetProject(Some(bincode::deserialize(&row).unwrap())),
             "sampled_by" => SampleActions::SetSampledBy(Some(bincode::deserialize(&row).unwrap())),
             "state" => SampleActions::SetState(Some(bincode::deserialize(&row).unwrap())),
             operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
@@ -2765,6 +2801,20 @@ impl Reducer<SampleBuilder> for SampleActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'container;
             }
+            SampleActions::SetProject(project) => 'project: {
+                state_mut.errors_project.clear();
+        if project.is_none() {
+            state_mut.errors_project.push(ApiError::BadRequest(vec![
+                "The Project field is required.".to_string()
+             ]));
+            state_mut.project = None;
+             break 'project;
+        }
+                state_mut.project = project;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'project;
+            }
             SampleActions::SetSampledBy(sampled_by) => 'sampled_by: {
                 state_mut.errors_sampled_by.clear();
         if sampled_by.is_none() {
@@ -2803,13 +2853,14 @@ impl FormBuilder for SampleBuilder {
     type RichVariant = NestedSample;
 
     fn has_errors(&self) -> bool {
-!self.errors_notes.is_empty() || !self.errors_container.is_empty() || !self.errors_sampled_by.is_empty() || !self.errors_state.is_empty()
+!self.errors_notes.is_empty() || !self.errors_container.is_empty() || !self.errors_project.is_empty() || !self.errors_sampled_by.is_empty() || !self.errors_state.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
         dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
     dispatcher.apply(SampleActions::SetNotes(richest_variant.inner.notes.map(|notes| notes.to_string())));
         dispatcher.apply(SampleActions::SetContainer(Some(richest_variant.container)));
+        dispatcher.apply(SampleActions::SetProject(Some(richest_variant.project)));
         dispatcher.apply(SampleActions::SetSampledBy(Some(richest_variant.sampled_by)));
         dispatcher.apply(SampleActions::SetState(Some(richest_variant.state)));
         vec![]
@@ -2818,6 +2869,7 @@ impl FormBuilder for SampleBuilder {
     fn can_submit(&self) -> bool {
         !self.has_errors()
         && self.container.is_some()
+        && self.project.is_some()
         && self.sampled_by.is_some()
         && self.state.is_some()
     }
@@ -2830,6 +2882,7 @@ impl From<SampleBuilder> for NewSample {
             id: builder.id.unwrap_or_else(Uuid::new_v4),
             container_id: builder.container.unwrap().inner.id,
             notes: builder.notes,
+            project_id: builder.project.unwrap().inner.id,
             sampled_by: builder.sampled_by.unwrap().id,
             state: builder.state.unwrap().inner.id,
         }
@@ -2856,6 +2909,8 @@ pub struct CreateSampleFormProp {
      #[prop_or_default]
     pub container_id: Option<i32>,
      #[prop_or_default]
+    pub project_id: Option<i32>,
+     #[prop_or_default]
     pub sampled_by: Option<i32>,
      #[prop_or_default]
     pub state: Option<i32>,
@@ -2868,6 +2923,9 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
    if let Some(container_id) = props.container_id {
          named_requests.push(ComponentMessage::get_named::<&str, SampleContainer>("container", container_id.into()));
     }
+   if let Some(project_id) = props.project_id {
+         named_requests.push(ComponentMessage::get_named::<&str, Project>("project", project_id.into()));
+    }
    if let Some(sampled_by) = props.sampled_by {
          named_requests.push(ComponentMessage::get_named::<&str, User>("sampled_by", sampled_by.into()));
     }
@@ -2876,6 +2934,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
     }
     let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
     let set_container = builder_dispatch.apply_callback(|container: Option<NestedSampleContainer>| SampleActions::SetContainer(container));
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| SampleActions::SetProject(project));
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
@@ -2885,6 +2944,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Datalist<NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" />
+            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
@@ -2904,6 +2964,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
    named_requests.push(ComponentMessage::get::<NewSample>(props.id.into()));
     let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
     let set_container = builder_dispatch.apply_callback(|container: Option<NestedSampleContainer>| SampleActions::SetContainer(container));
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| SampleActions::SetProject(project));
     let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch.apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
     html! {
@@ -2913,6 +2974,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Datalist<NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" />
+            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" />
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
         </BasicForm<NewSample>>
@@ -3125,11 +3187,13 @@ pub struct TeamBuilder {
     pub description: Option<String>,
     pub icon: Option<FontAwesomeIcon>,
     pub color: Option<Color>,
+    pub state: Option<NestedTeamState>,
     pub parent_team: Option<NestedTeam>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_icon: Vec<ApiError>,
     pub errors_color: Vec<ApiError>,
+    pub errors_state: Vec<ApiError>,
     pub errors_parent_team: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
@@ -3142,11 +3206,13 @@ impl Default for TeamBuilder {
             description: None,
             icon: Default::default(),
             color: Default::default(),
+            state: Default::default(),
             parent_team: Default::default(),
             errors_name: Default::default(),
             errors_description: Default::default(),
             errors_icon: Default::default(),
             errors_color: Default::default(),
+            errors_state: Default::default(),
             errors_parent_team: Default::default(),
             form_updated_at: Default::default(),
         }
@@ -3159,6 +3225,7 @@ pub(super) enum TeamActions {
     SetDescription(Option<String>),
     SetIcon(Option<FontAwesomeIcon>),
     SetColor(Option<Color>),
+    SetState(Option<NestedTeamState>),
     SetParentTeam(Option<NestedTeam>),
 }
 
@@ -3167,6 +3234,7 @@ impl FromOperation for TeamActions {
         match operation.as_ref() {
             "icon" => TeamActions::SetIcon(Some(bincode::deserialize(&row).unwrap())),
             "color" => TeamActions::SetColor(Some(bincode::deserialize(&row).unwrap())),
+            "state" => TeamActions::SetState(Some(bincode::deserialize(&row).unwrap())),
             "parent_team" => TeamActions::SetParentTeam(Some(bincode::deserialize(&row).unwrap())),
             operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
         }
@@ -3251,6 +3319,20 @@ impl Reducer<TeamBuilder> for TeamActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'color;
             }
+            TeamActions::SetState(state) => 'state: {
+                state_mut.errors_state.clear();
+        if state.is_none() {
+            state_mut.errors_state.push(ApiError::BadRequest(vec![
+                "The State field is required.".to_string()
+             ]));
+            state_mut.state = None;
+             break 'state;
+        }
+                state_mut.state = state;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'state;
+            }
             TeamActions::SetParentTeam(parent_team) => 'parent_team: {
                 state_mut.errors_parent_team.clear();
                 match parent_team.as_ref() {
@@ -3280,7 +3362,7 @@ impl FormBuilder for TeamBuilder {
     type RichVariant = NestedTeam;
 
     fn has_errors(&self) -> bool {
-!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_parent_team.is_empty()
+!self.errors_name.is_empty() || !self.errors_description.is_empty() || !self.errors_icon.is_empty() || !self.errors_color.is_empty() || !self.errors_state.is_empty() || !self.errors_parent_team.is_empty()
     }
 
     fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
@@ -3289,6 +3371,7 @@ impl FormBuilder for TeamBuilder {
     dispatcher.apply(TeamActions::SetDescription(Some(richest_variant.inner.description.to_string())));
         dispatcher.apply(TeamActions::SetIcon(Some(richest_variant.icon)));
         dispatcher.apply(TeamActions::SetColor(Some(richest_variant.color)));
+        dispatcher.apply(TeamActions::SetState(Some(richest_variant.state)));
         let mut named_requests = Vec::new();
         if let Some(parent_team_id) = richest_variant.inner.parent_team_id {
     named_requests.push(ComponentMessage::get_named::<&str, Team>("parent_team", parent_team_id.into()));
@@ -3304,6 +3387,7 @@ impl FormBuilder for TeamBuilder {
         && self.description.is_some()
         && self.icon.is_some()
         && self.color.is_some()
+        && self.state.is_some()
     }
 
 }
@@ -3315,6 +3399,7 @@ impl From<TeamBuilder> for NewTeam {
             description: builder.description.unwrap(),
             icon_id: builder.icon.unwrap().id,
             color_id: builder.color.unwrap().id,
+            state_id: builder.state.unwrap().inner.id,
             parent_team_id: builder.parent_team.map(|parent_team| parent_team.inner.id),
         }
     }
@@ -3327,6 +3412,7 @@ impl From<TeamBuilder> for UpdateTeam {
             description: builder.description.unwrap(),
             icon_id: builder.icon.unwrap().id,
             color_id: builder.color.unwrap().id,
+            state_id: builder.state.unwrap().inner.id,
             parent_team_id: builder.parent_team.map(|parent_team| parent_team.inner.id),
         }
     }
@@ -3369,6 +3455,8 @@ pub struct CreateTeamFormProp {
      pub icon_id: i32,
      #[prop_or(15)]
      pub color_id: i32,
+     #[prop_or(1)]
+     pub state_id: i32,
      #[prop_or_default]
     pub parent_team_id: Option<i32>,
 }
@@ -3379,6 +3467,7 @@ pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
     let (builder_store, builder_dispatch) = use_store::<TeamBuilder>();
     named_requests.push(ComponentMessage::get_named::<&str, FontAwesomeIcon>("icon", props.icon_id.into()));
     named_requests.push(ComponentMessage::get_named::<&str, Color>("color", props.color_id.into()));
+    named_requests.push(ComponentMessage::get_named::<&str, TeamState>("state", props.state_id.into()));
    if let Some(parent_team_id) = props.parent_team_id {
          named_requests.push(ComponentMessage::get_named::<&str, Team>("parent_team", parent_team_id.into()));
     }
@@ -3386,6 +3475,7 @@ pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
     let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedTeamState>| TeamActions::SetState(state));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
         <BasicForm<NewTeam>
@@ -3396,6 +3486,7 @@ pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
+            <Datalist<NestedTeamState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
             <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
         </BasicForm<NewTeam>>
     }
@@ -3416,6 +3507,7 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
     let set_description = builder_dispatch.apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
     let set_icon = builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
     let set_color = builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
+    let set_state = builder_dispatch.apply_callback(|state: Option<NestedTeamState>| TeamActions::SetState(state));
     let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
     html! {
         <BasicForm<UpdateTeam>
@@ -3426,6 +3518,7 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" />
+            <Datalist<NestedTeamState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" />
             <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" />
         </BasicForm<UpdateTeam>>
     }

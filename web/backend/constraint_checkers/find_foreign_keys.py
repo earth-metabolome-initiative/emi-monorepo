@@ -1,8 +1,66 @@
 from typing import List, Optional, Tuple, Union, Dict
 import pandas as pd
 from functools import cache
+import os
 from constraint_checkers.cursor import get_cursor
 import re
+from constraint_checkers.regroup_tables import get_desinences
+
+
+def is_role_table(table_name: str) -> bool:
+    """Check if a table is a role table.
+
+    Parameters
+    ----------
+    table_name : str
+        The table name.
+
+    Returns
+    -------
+    bool
+        Whether the table is a role table.
+    """
+    return (
+        table_name.endswith("_roles")
+        or is_role_invitation_table(table_name)
+        or is_role_request_table(table_name)
+    )
+
+
+def is_role_invitation_table(
+    table_name: str,
+) -> bool:
+    """Check if a table is a role invitation table.
+
+    Parameters
+    ----------
+    table_name : str
+        The table name.
+
+    Returns
+    -------
+    bool
+        Whether the table is a role invitation table.
+    """
+    return table_name.endswith("_role_invitations")
+
+
+def is_role_request_table(
+    table_name: str,
+) -> bool:
+    """Check if a table is a role request table.
+
+    Parameters
+    ----------
+    table_name : str
+        The table name.
+
+    Returns
+    -------
+    bool
+        Whether the table is a role request table.
+    """
+    return table_name.endswith("_role_requests")
 
 
 class ViewColumn:
@@ -21,6 +79,7 @@ class ViewColumn:
         self.table_name = table_name
         self.nullable = nullable
 
+
 def postgres_type_to_diesel_type(postgres_type: str) -> str:
     """Converts a Postgres type to a Diesel type."""
     if postgres_type == "integer":
@@ -33,14 +92,18 @@ def postgres_type_to_diesel_type(postgres_type: str) -> str:
         return "diesel::sql_types::Uuid"
     if postgres_type == "boolean":
         return "diesel::sql_types::Bool"
-    
+    if postgres_type == "real":
+        return "diesel::sql_types::Float"
+
     raise ValueError(f"Unknown Postgres type: {postgres_type}")
+
 
 class SQLFunction:
     """Class providing metadata for a SQL function."""
 
     def __init__(self, function_name: str):
-        self.function_name = function_name
+        self.name = function_name
+        self.flat_variant: Optional["StructMetadata"] = None
         self.arguments: List[str] = []
         self.argument_types: List[str] = []
         self.return_type: Optional[str] = None
@@ -54,14 +117,36 @@ class SQLFunction:
         """Sets the return type of the SQL function."""
         self.return_type = return_type
 
+    def set_flat_variant(self, flat_variant: "StructMetadata"):
+        """Sets the table name of the SQL function."""
+        self.flat_variant = flat_variant
+
+    def __repr__(self):
+        return f"SQLFunction(name={self.name}, arguments={self.arguments}, argument_types={self.argument_types}, return_type={self.return_type})"
+
     def write_diesel_binding_to_file(self, f):
         """Writes the Diesel binding for the SQL function to a file."""
-        f.write("define_sql_function! {\n")
-        f.write(f"   fn {self.function_name}(\n")
+        f.write("diesel::expression::functions::sql_function! {\n")
+        f.write(f"   fn {self.name}(\n")
         for argument, argument_type in zip(self.arguments, self.argument_types):
-            f.write(f"        {argument}: diesel::sql_types::Nullable<{postgres_type_to_diesel_type(argument_type)}>,\n")
-        f.write(f"    ) -> {postgres_type_to_diesel_type(self.return_type)},\n")
+            if self.flat_variant is not None:
+                optional = self.flat_variant.get_attribute_by_name(argument).optional
+            elif "can_view" in self.name and argument == "author_user_id":
+                optional = True
+            else:
+                optional = False
+
+            if optional:
+                f.write(
+                    f"        {argument}: diesel::sql_types::Nullable<{postgres_type_to_diesel_type(argument_type)}>,\n"
+                )
+            else:
+                f.write(
+                    f"        {argument}: {postgres_type_to_diesel_type(argument_type)},\n"
+                )
+        f.write(f"    ) -> {postgres_type_to_diesel_type(self.return_type)};\n")
         f.write("}\n\n")
+
 
 class TableMetadata:
     """Class for table metadata."""
@@ -73,6 +158,7 @@ class TableMetadata:
         self._flat_variants: Dict[str, "StructMetadata"] = {}
 
     def tables(self) -> List[str]:
+        """Returns the list of tables."""
         return self.table_metadata["referencing_table"].unique().tolist()
 
     def is_table(self, table_name: str) -> bool:
@@ -115,6 +201,7 @@ class TableMetadata:
         if table_name in self._flat_variants:
             raise ValueError(f"The table {table_name} already has a flat variant.")
         assert not isinstance(flat_variant, str)
+        assert not flat_variant.is_nested()
 
         self._flat_variants[table_name] = flat_variant
 
@@ -369,6 +456,11 @@ class TableMetadata:
                     )
             raise ValueError(
                 f"The column {column_name} does not exist in the view {table_name}."
+            )
+
+        if column_name not in self.get_foreign_keys(table_name):
+            raise ValueError(
+                f"The column {column_name} is not a foreign key in the table {table_name}."
             )
 
         table_columns = self.table_metadata[
@@ -710,7 +802,9 @@ class TableMetadata:
         if self.is_view(table_name):
             for view_column in self.extract_view_columns(table_name):
                 if view_column.alias_name == column_name:
-                    return self.get_default_column_value(view_column.table_name, column_name)
+                    return self.get_default_column_value(
+                        view_column.table_name, column_name
+                    )
 
         _conn, cursor = get_cursor()
         cursor.execute(
@@ -751,7 +845,8 @@ class TableMetadata:
         return [
             column
             for column in self.get_foreign_keys(table_name)
-            if self.get_foreign_key_table_name(table_name, column) == table_name and column not in primary_key_names
+            if self.get_foreign_key_table_name(table_name, column) == table_name
+            and column not in primary_key_names
         ]
 
     def has_circular_parent_column(self, table_name: str) -> bool:
@@ -768,7 +863,6 @@ class TableMetadata:
         foreign key to the table itself.
         """
         return len(self.get_circular_foreign_keys(table_name)) > 0
-        
 
     def has_parent_circularity_trigger(self, table_name: str) -> bool:
         """Returns whether the table has a parent circularity trigger.
@@ -783,7 +877,9 @@ class TableMetadata:
         This method returns whether the table has a trigger named
         `parent_circularity_trigger`.
         """
-        return self.has_trigger_by_name(table_name, f"{table_name}_parent_circularity_trigger")
+        return self.has_trigger_by_name(
+            table_name, f"{table_name}_parent_circularity_trigger"
+        )
 
     def has_associated_roles(self, table_name: str) -> bool:
         """Returns whether the table has associated roles.
@@ -802,6 +898,76 @@ class TableMetadata:
             self.is_table(f"{table_name}_{reference}_roles")
             for reference in ("users", "teams")
         )
+
+    def _register_flat_variant_associated_with_function(
+        self, sql_function: SQLFunction
+    ):
+        """Searches for a flat struct strictly associated with the function.
+
+        Parameters
+        ----------
+        sql_function : SQLFunction
+            The SQL function.
+
+        Implementation details
+        ----------------------
+        In order to find the flat struct associated with the function, we
+        first search the migration that contains the definition of the function.
+        All functions are defined as "CREATE FUNCTION" in the migration.
+        If we do not find any such migration, the function may be defined automatically
+        by things such as a GIN index (e.g. similarity), in which case there are no associated tables.
+        If we find the migration, we then search the table name that completes a desinence
+        that fully matches the migration name. At this point, we retrieve the associated
+        flat variant and we check that all of the arguments in the sql function are columns
+        of the flat variant. If this is the case, we register the flat variant with the function,
+        otherwise we raise an error.
+        """
+        migration_name = None
+        for migration in os.listdir("migrations"):
+            if not os.path.exists(f"migrations/{migration}/up.sql"):
+                continue
+
+            with open(f"migrations/{migration}/up.sql", "r", encoding="utf8") as f:
+                migration_contents = f.read()
+
+            if not f"CREATE FUNCTION {sql_function.name}" in migration_contents:
+                continue
+
+            migration_name = migration
+            break
+
+        if migration_name is None:
+            return
+
+        assert (
+            len(self._flat_variants) > 0
+        ), "We expect the table metadata to contain at least one flat variant. "
+
+        # We have found the migration that contains the function definition.
+        # We now search for the table name that completes the desinence.
+        desinence = migration_name.split("_", maxsplit=1)[-1]
+        found_table = False
+        for table_name, flat_variant in self._flat_variants.items():
+            if desinence in get_desinences(table_name):
+                found_table = True
+                if all(
+                    flat_variant.get_attribute_by_name(argument) is not None
+                    for argument in sql_function.arguments
+                ):
+                    sql_function.set_flat_variant(flat_variant)
+                    return
+                if "_can_x_" in migration_name:
+                    continue
+                raise ValueError(
+                    f"The function {sql_function.name} is not associated with the table {table_name}, and "
+                    f"yet we found it in the migration {migration_name}, which is associated with the table {table_name}."
+                )
+
+        if not found_table:
+            raise ValueError(
+                f"Could not find a table associated with the function {sql_function.name}, "
+                f"even though we found the migration {migration_name}."
+            )
 
     def get_all_postgres_functions(self) -> List[SQLFunction]:
         """Returns the list of all Postgres functions."""
@@ -822,9 +988,6 @@ class TableMetadata:
             AND p.proname NOT LIKE 'show_%'
             AND p.proname NOT LIKE 'gtrgm_%'
             AND p.proname NOT LIKE 'gin_%'
-            AND p.proname NOT LIKE 'word_similarity%'
-            AND p.proname NOT LIKE 'strict_word_similarity%'
-            AND p.proname NOT LIKE 'similarity%'
             AND pg_catalog.pg_get_function_result(p.oid) != 'trigger';
             """
         )
@@ -835,7 +998,7 @@ class TableMetadata:
         assert len(postgres_functions) > 0, (
             "There are no Postgres functions in the database. "
             "We expect the database to contain several functions, such "
-            "as the can_view and can_edit functions."
+            "as the can_view and can_update functions."
         )
 
         sql_functions = []
@@ -844,14 +1007,22 @@ class TableMetadata:
             function_name = function[0]
             sql_function = SQLFunction(function_name)
             arguments = function[2].split(", ")
-            for argument in arguments:
-                argument_name, argument_type = argument.split(" ")
+            for i, argument in enumerate(arguments):
+                if " " in argument:
+                    argument_name, argument_type = argument.split(" ")
+                else:
+                    argument_name = f"arg_{i}"
+                    argument_type = argument
                 sql_function.add_argument(argument_name, argument_type)
             sql_function.set_return_type(function[1])
             sql_functions.append(sql_function)
 
+        for function in sql_functions:
+            self._register_flat_variant_associated_with_function(function)
+
         return sql_functions
 
+    @cache
     def has_postgres_function(self, function_name: str) -> bool:
         """Returns whether the table has a Postgres function.
 
@@ -881,7 +1052,6 @@ class TableMetadata:
         cursor.close()
 
         return has_function
-    
 
 
 def find_foreign_keys() -> TableMetadata:

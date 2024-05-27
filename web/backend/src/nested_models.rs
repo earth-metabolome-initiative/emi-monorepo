@@ -8,6 +8,7 @@ use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
 use uuid::Uuid;
 use crate::models::*;
+use web_common::database::filter_structs::*;
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttRank {
@@ -25,100 +26,101 @@ impl NestedBioOttRank {
     pub fn from_flat(
         flat_variant: BioOttRank,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedBioOttRank {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::BioOttRankFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        BioOttRank::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedBioOttRank {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&BioOttRankFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttRank::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       BioOttRank::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        BioOttRank::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedBioOttRank {
-    /// Get the nested struct from the provided name.
+    /// Get the struct from the database by its name.
     ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `connection` - The database connection.
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+name: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         BioOttRank::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedBioOttRank {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttRank::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&BioOttRankFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttRank::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedBioOttRank {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttRank::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&BioOttRankFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttRank::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedBioOttRank {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttRank::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&BioOttRankFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttRank::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedBioOttRank> for NestedBioOttRank {
     fn from(item: web_common::database::nested_models::NestedBioOttRank) -> Self {
@@ -163,109 +165,110 @@ impl NestedBioOttTaxonItem {
     pub fn from_flat(
         flat_variant: BioOttTaxonItem,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             ott_rank: NestedBioOttRank::get(flat_variant.ott_rank_id, connection)?,
-            domain: flat_variant.domain_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
-            kingdom: flat_variant.kingdom_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
-            phylum: flat_variant.phylum_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
-            class: flat_variant.class_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
-            order: flat_variant.order_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
-            family: flat_variant.family_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
-            genus: flat_variant.genus_id.map(|flat_variant| BioOttTaxonItem::get(flat_variant, connection)).transpose()?,
+            domain: flat_variant.domain_id.map(|domain_id| BioOttTaxonItem::get(domain_id, connection)).transpose()?,
+            kingdom: flat_variant.kingdom_id.map(|kingdom_id| BioOttTaxonItem::get(kingdom_id, connection)).transpose()?,
+            phylum: flat_variant.phylum_id.map(|phylum_id| BioOttTaxonItem::get(phylum_id, connection)).transpose()?,
+            class: flat_variant.class_id.map(|class_id| BioOttTaxonItem::get(class_id, connection)).transpose()?,
+            order: flat_variant.order_id.map(|order_id| BioOttTaxonItem::get(order_id, connection)).transpose()?,
+            family: flat_variant.family_id.map(|family_id| BioOttTaxonItem::get(family_id, connection)).transpose()?,
+            genus: flat_variant.genus_id.map(|genus_id| BioOttTaxonItem::get(genus_id, connection)).transpose()?,
             parent: BioOttTaxonItem::get(flat_variant.parent_id, connection)?,
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedBioOttTaxonItem {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::BioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        BioOttTaxonItem::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedBioOttTaxonItem {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&BioOttTaxonItemFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttTaxonItem::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       BioOttTaxonItem::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        BioOttTaxonItem::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedBioOttTaxonItem {
-    /// Get the nested struct from the provided ott_id.
+    /// Get the struct from the database by its ott_id.
     ///
-    /// # Arguments
-    /// * `ott_id` - The ott_id of the row.
-    /// * `connection` - The database connection.
+    /// * `ott_id` - The ott_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_ott_id(
-        ott_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+ott_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         BioOttTaxonItem::from_ott_id(ott_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedBioOttTaxonItem {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttTaxonItem::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&BioOttTaxonItemFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttTaxonItem::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedBioOttTaxonItem {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttTaxonItem::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&BioOttTaxonItemFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttTaxonItem::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedBioOttTaxonItem {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       BioOttTaxonItem::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&BioOttTaxonItemFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttTaxonItem::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for NestedBioOttTaxonItem {
     fn from(item: web_common::database::nested_models::NestedBioOttTaxonItem) -> Self {
@@ -316,49 +319,176 @@ impl NestedDerivedSample {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: DerivedSample,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection)?,
-            parent_sample: NestedSample::get(flat_variant.parent_sample_id, connection)?,
-            child_sample: NestedSample::get(flat_variant.child_sample_id, connection)?,
+            parent_sample: NestedSample::get(flat_variant.parent_sample_id, author_user_id, connection)?,
+            child_sample: NestedSample::get(flat_variant.child_sample_id, author_user_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedDerivedSample {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::DerivedSampleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        DerivedSample::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedDerivedSample {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        DerivedSample::can_view_by_id(( parent_sample_id, child_sample_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       DerivedSample::get(( parent_sample_id, child_sample_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        DerivedSample::get(( parent_sample_id, child_sample_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        DerivedSample::can_admin_by_id(( parent_sample_id, child_sample_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        DerivedSample::delete_by_id(( parent_sample_id, child_sample_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedDerivedSample> for NestedDerivedSample {
     fn from(item: web_common::database::nested_models::NestedDerivedSample) -> Self {
@@ -396,100 +526,101 @@ impl NestedDocumentFormat {
     pub fn from_flat(
         flat_variant: DocumentFormat,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedDocumentFormat {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::DocumentFormatFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        DocumentFormat::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedDocumentFormat {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&DocumentFormatFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DocumentFormat::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       DocumentFormat::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        DocumentFormat::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedDocumentFormat {
-    /// Get the nested struct from the provided extension.
+    /// Get the struct from the database by its extension.
     ///
-    /// # Arguments
-    /// * `extension` - The extension of the row.
-    /// * `connection` - The database connection.
+    /// * `extension` - The extension of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_extension(
-        extension: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+extension: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         DocumentFormat::from_extension(extension, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedDocumentFormat {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       DocumentFormat::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&DocumentFormatFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DocumentFormat::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedDocumentFormat {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       DocumentFormat::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&DocumentFormatFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DocumentFormat::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedDocumentFormat {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       DocumentFormat::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&DocumentFormatFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DocumentFormat::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedDocumentFormat> for NestedDocumentFormat {
     fn from(item: web_common::database::nested_models::NestedDocumentFormat) -> Self {
@@ -525,86 +656,72 @@ impl NestedLoginProvider {
     pub fn from_flat(
         flat_variant: LoginProvider,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedLoginProvider {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::LoginProviderFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        LoginProvider::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedLoginProvider {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&LoginProviderFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        LoginProvider::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       LoginProvider::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        LoginProvider::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedLoginProvider {
-    /// Get the nested struct from the provided color_id.
+    /// Get the struct from the database by its color_id.
     ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the row.
-    /// * `connection` - The database connection.
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+color_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         LoginProvider::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedLoginProvider {
-    /// Get the nested struct from the provided icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the row.
-    /// * `connection` - The database connection.
+    /// * `icon_id` - The icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+icon_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         LoginProvider::from_icon_id(icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedLoginProvider {
-    /// Get the nested struct from the provided name.
+    /// Get the struct from the database by its name.
     ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `connection` - The database connection.
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+name: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         LoginProvider::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+}
 }
 impl From<web_common::database::nested_models::NestedLoginProvider> for NestedLoginProvider {
     fn from(item: web_common::database::nested_models::NestedLoginProvider) -> Self {
@@ -640,58 +757,50 @@ impl NestedMaterial {
     pub fn from_flat(
         flat_variant: Material,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            icon: flat_variant.icon_id.map(|flat_variant| FontAwesomeIcon::get(flat_variant, connection)).transpose()?,
-            color: flat_variant.color_id.map(|flat_variant| Color::get(flat_variant, connection)).transpose()?,
+            icon: flat_variant.icon_id.map(|icon_id| FontAwesomeIcon::get(icon_id, connection)).transpose()?,
+            color: flat_variant.color_id.map(|color_id| Color::get(color_id, connection)).transpose()?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedMaterial {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::MaterialFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Material::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedMaterial {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&MaterialFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Material::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Material::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Material::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedMaterial {
-    /// Get the nested struct from the provided name.
+    /// Get the struct from the database by its name.
     ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `connection` - The database connection.
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+name: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         Material::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+}
 }
 impl From<web_common::database::nested_models::NestedMaterial> for NestedMaterial {
     fn from(item: web_common::database::nested_models::NestedMaterial) -> Self {
@@ -726,43 +835,38 @@ impl NestedNotification {
     pub fn from_flat(
         flat_variant: Notification,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             user: User::get(flat_variant.user_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedNotification {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::NotificationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Notification::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedNotification {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&NotificationFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Notification::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Notification::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Notification::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
 }
 impl From<web_common::database::nested_models::NestedNotification> for NestedNotification {
     fn from(item: web_common::database::nested_models::NestedNotification) -> Self {
@@ -794,67 +898,236 @@ impl NestedObservation {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: Observation,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
-            project: NestedProject::get(flat_variant.project_id, connection)?,
-            individual: flat_variant.individual_id.map(|flat_variant| NestedSampledIndividual::get(flat_variant, connection)).transpose()?,
+            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
+            individual: flat_variant.individual_id.map(|individual_id| NestedSampledIndividual::get(individual_id, author_user_id, connection)).transpose()?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedObservation {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::ObservationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Observation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedObservation {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        filter: Option<&web_common::database::ObservationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Observation::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
 }
-impl NestedObservation {
-    /// Get the nested struct from the provided primary key.
+    /// Check whether the user can view the struct associated to the provided ids.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: Uuid,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Observation::can_view_by_id(id, author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&ObservationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ObservationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Observation::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: Uuid,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Observation::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: Uuid,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Observation::can_update_by_id(id, author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: Uuid,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Observation::can_admin_by_id(id, author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: Uuid,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        Observation::delete_by_id(id, author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedObservation> for NestedObservation {
     fn from(item: web_common::database::nested_models::NestedObservation) -> Self {
@@ -893,131 +1166,126 @@ impl NestedOrganization {
     pub fn from_flat(
         flat_variant: Organization,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             country: Country::get(flat_variant.country_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedOrganization {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::OrganizationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Organization::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedOrganization {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&OrganizationFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Organization::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Organization::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Organization::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedOrganization {
-    /// Get the nested struct from the provided domain.
+    /// Get the struct from the database by its domain.
     ///
-    /// # Arguments
-    /// * `domain` - The domain of the row.
-    /// * `connection` - The database connection.
+    /// * `domain` - The domain of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_domain(
-        domain: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+domain: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         Organization::from_domain(domain, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedOrganization {
-    /// Get the nested struct from the provided name, country_id and state_province.
+    /// Get the struct from the database by its name, country_id and state_province.
     ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `country_id` - The country_id of the row.
-    /// * `state_province` - The state_province of the row.
-    /// * `connection` - The database connection.
+    /// * `name` - The name of the struct to get.
+    /// * `country_id` - The country_id of the struct to get.
+    /// * `state_province` - The state_province of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_name_and_country_id_and_state_province(
-        name: &str,
-        country_id: &i32,
-        state_province: Option<&str>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+name: &str,
+country_id: &i32,
+state_province: Option<&str>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         Organization::from_name_and_country_id_and_state_province(name, country_id, state_province, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedOrganization {
-    /// Get the nested struct from the provided url.
+    /// Get the struct from the database by its url.
     ///
-    /// # Arguments
-    /// * `url` - The url of the row.
-    /// * `connection` - The database connection.
+    /// * `url` - The url of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_url(
-        url: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+url: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         Organization::from_url(url, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedOrganization {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Organization::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&OrganizationFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Organization::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedOrganization {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Organization::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&OrganizationFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Organization::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedOrganization {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Organization::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&OrganizationFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Organization::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedOrganization> for NestedOrganization {
     fn from(item: web_common::database::nested_models::NestedOrganization) -> Self {
@@ -1051,128 +1319,123 @@ impl NestedProjectState {
     pub fn from_flat(
         flat_variant: ProjectState,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedProjectState {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::ProjectStateFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectState::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedProjectState {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&ProjectStateFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectState::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ProjectState::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        ProjectState::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedProjectState {
-    /// Get the nested struct from the provided color_id.
+    /// Get the struct from the database by its color_id.
     ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the row.
-    /// * `connection` - The database connection.
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+color_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         ProjectState::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedProjectState {
-    /// Get the nested struct from the provided icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the row.
-    /// * `connection` - The database connection.
+    /// * `icon_id` - The icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+icon_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         ProjectState::from_icon_id(icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedProjectState {
-    /// Get the nested struct from the provided name.
+    /// Get the struct from the database by its name.
     ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `connection` - The database connection.
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+name: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         ProjectState::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedProjectState {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       ProjectState::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&ProjectStateFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectState::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedProjectState {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       ProjectState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&ProjectStateFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectState::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedProjectState {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       ProjectState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&ProjectStateFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectState::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedProjectState> for NestedProjectState {
     fn from(item: web_common::database::nested_models::NestedProjectState) -> Self {
@@ -1208,192 +1471,422 @@ impl NestedProject {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: Project,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             state: NestedProjectState::get(flat_variant.state_id, connection)?,
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
-            parent_project: flat_variant.parent_project_id.map(|flat_variant| Project::get(flat_variant, connection)).transpose()?,
+            parent_project: flat_variant.parent_project_id.map(|parent_project_id| Project::get(parent_project_id, author_user_id, connection)).transpose()?,
             created_by: User::get(flat_variant.created_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedProject {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::ProjectFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedProject {
-    /// Get all the editables nested structs from the database.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `author_user_id` - The user id.
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_editables(
-        author_user_id: i32,
-        filter: Option<&web_common::database::ProjectFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all_editables(author_user_id, filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
 }
-impl NestedProject {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    /// Check whether the user can view the struct associated to the provided ids.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        filter: Option<&web_common::database::ProjectFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Project::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Project::can_view_by_id(id, author_user_id, connection)
 }
-impl NestedProject {
-    /// Get the nested struct from the provided primary key.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&ProjectFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ProjectFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Project::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Project::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
-impl NestedProject {
-    /// Get the nested struct from the provided name.
+    /// Get the struct from the database by its name.
     ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `connection` - The database connection.
+    /// * `name` - The name of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        Project::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+name: &str,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Project::from_name(name, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
-impl NestedProject {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&ProjectFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
 }
-impl NestedProject {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
-    /// * `author_user_id` - The user id.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&ProjectFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
 }
-impl NestedProject {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&ProjectFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
 }
-impl NestedProject {
-    /// Search the table by the query.
+    /// Check whether the user can update the struct.
     ///
-    /// # Arguments
-    /// * `author_user_id` - The user id.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
 }
-impl NestedProject {
-    /// Search the table by the query.
+    /// Check whether the user can update the struct associated to the provided ids.
     ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Project::can_update_by_id(id, author_user_id, connection)
 }
-impl NestedProject {
-    /// Search the table by the query.
+    /// Get all of the updatable structs from the database.
     ///
-    /// # Arguments
-    /// * `author_user_id` - The user id.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Project::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Project::can_admin_by_id(id, author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&ProjectFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Project::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        Project::delete_by_id(id, author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedProject> for NestedProject {
     fn from(item: web_common::database::nested_models::NestedProject) -> Self {
@@ -1435,50 +1928,177 @@ impl NestedProjectsTeamsRoleInvitation {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: ProjectsTeamsRoleInvitation,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: NestedProject::get(flat_variant.table_id, connection)?,
+            table: NestedProject::get(flat_variant.table_id, author_user_id, connection)?,
             team: NestedTeam::get(flat_variant.team_id, connection)?,
             role: NestedRole::get(flat_variant.role_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedProjectsTeamsRoleInvitation {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::ProjectsTeamsRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedProjectsTeamsRoleInvitation {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::can_view_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ProjectsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::can_admin_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::delete_by_id(( table_id, team_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedProjectsTeamsRoleInvitation> for NestedProjectsTeamsRoleInvitation {
     fn from(item: web_common::database::nested_models::NestedProjectsTeamsRoleInvitation) -> Self {
@@ -1516,50 +2136,177 @@ impl NestedProjectsTeamsRoleRequest {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: ProjectsTeamsRoleRequest,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: NestedProject::get(flat_variant.table_id, connection)?,
+            table: NestedProject::get(flat_variant.table_id, author_user_id, connection)?,
             team: NestedTeam::get(flat_variant.team_id, connection)?,
             role: NestedRole::get(flat_variant.role_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedProjectsTeamsRoleRequest {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::ProjectsTeamsRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedProjectsTeamsRoleRequest {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::can_view_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ProjectsTeamsRoleRequest::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::can_admin_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::delete_by_id(( table_id, team_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedProjectsTeamsRoleRequest> for NestedProjectsTeamsRoleRequest {
     fn from(item: web_common::database::nested_models::NestedProjectsTeamsRoleRequest) -> Self {
@@ -1597,50 +2344,177 @@ impl NestedProjectsTeamsRole {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: ProjectsTeamsRole,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: NestedProject::get(flat_variant.table_id, connection)?,
+            table: NestedProject::get(flat_variant.table_id, author_user_id, connection)?,
             team: NestedTeam::get(flat_variant.team_id, connection)?,
             role: NestedRole::get(flat_variant.role_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedProjectsTeamsRole {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::ProjectsTeamsRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsTeamsRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedProjectsTeamsRole {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsTeamsRole::can_view_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ProjectsTeamsRole::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        ProjectsTeamsRole::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsTeamsRole::can_admin_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        ProjectsTeamsRole::delete_by_id(( table_id, team_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedProjectsTeamsRole> for NestedProjectsTeamsRole {
     fn from(item: web_common::database::nested_models::NestedProjectsTeamsRole) -> Self {
@@ -1678,50 +2552,177 @@ impl NestedProjectsUsersRoleInvitation {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: ProjectsUsersRoleInvitation,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: NestedProject::get(flat_variant.table_id, connection)?,
+            table: NestedProject::get(flat_variant.table_id, author_user_id, connection)?,
             user: User::get(flat_variant.user_id, connection)?,
             role: NestedRole::get(flat_variant.role_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedProjectsUsersRoleInvitation {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::ProjectsUsersRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedProjectsUsersRoleInvitation {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::can_view_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ProjectsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::can_admin_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::delete_by_id(( table_id, user_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedProjectsUsersRoleInvitation> for NestedProjectsUsersRoleInvitation {
     fn from(item: web_common::database::nested_models::NestedProjectsUsersRoleInvitation) -> Self {
@@ -1759,50 +2760,177 @@ impl NestedProjectsUsersRoleRequest {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: ProjectsUsersRoleRequest,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: NestedProject::get(flat_variant.table_id, connection)?,
+            table: NestedProject::get(flat_variant.table_id, author_user_id, connection)?,
             user: User::get(flat_variant.user_id, connection)?,
             role: NestedRole::get(flat_variant.role_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedProjectsUsersRoleRequest {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::ProjectsUsersRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedProjectsUsersRoleRequest {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::can_view_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ProjectsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::can_admin_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::delete_by_id(( table_id, user_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedProjectsUsersRoleRequest> for NestedProjectsUsersRoleRequest {
     fn from(item: web_common::database::nested_models::NestedProjectsUsersRoleRequest) -> Self {
@@ -1840,50 +2968,177 @@ impl NestedProjectsUsersRole {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: ProjectsUsersRole,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: NestedProject::get(flat_variant.table_id, connection)?,
+            table: NestedProject::get(flat_variant.table_id, author_user_id, connection)?,
             user: User::get(flat_variant.user_id, connection)?,
             role: NestedRole::get(flat_variant.role_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedProjectsUsersRole {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::ProjectsUsersRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        ProjectsUsersRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedProjectsUsersRole {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsUsersRole::can_view_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       ProjectsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        ProjectsUsersRole::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsUsersRole::can_admin_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        ProjectsUsersRole::delete_by_id(( table_id, user_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedProjectsUsersRole> for NestedProjectsUsersRole {
     fn from(item: web_common::database::nested_models::NestedProjectsUsersRole) -> Self {
@@ -1923,142 +3178,134 @@ impl NestedRole {
     pub fn from_flat(
         flat_variant: Role,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedRole {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::RoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Role::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedRole {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&RoleFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Role::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Role::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Role::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedRole {
-    /// Get the nested struct from the provided color_id.
+    /// Get the struct from the database by its color_id.
     ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the row.
-    /// * `connection` - The database connection.
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+color_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         Role::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedRole {
-    /// Get the nested struct from the provided description.
+    /// Get the struct from the database by its description.
     ///
-    /// # Arguments
-    /// * `description` - The description of the row.
-    /// * `connection` - The database connection.
+    /// * `description` - The description of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_description(
-        description: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+description: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         Role::from_description(description, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedRole {
-    /// Get the nested struct from the provided icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the row.
-    /// * `connection` - The database connection.
+    /// * `icon_id` - The icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+icon_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         Role::from_icon_id(icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedRole {
-    /// Get the nested struct from the provided name.
+    /// Get the struct from the database by its name.
     ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `connection` - The database connection.
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+name: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         Role::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedRole {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Role::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&RoleFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Role::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedRole {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Role::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&RoleFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Role::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedRole {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Role::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&RoleFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Role::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedRole> for NestedRole {
     fn from(item: web_common::database::nested_models::NestedRole) -> Self {
@@ -2091,49 +3338,176 @@ impl NestedSampleBioOttTaxonItem {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: SampleBioOttTaxonItem,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection)?,
-            sample: NestedSample::get(flat_variant.sample_id, connection)?,
+            sample: NestedSample::get(flat_variant.sample_id, author_user_id, connection)?,
             taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedSampleBioOttTaxonItem {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::SampleBioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleBioOttTaxonItem::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSampleBioOttTaxonItem {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( sample_id, taxon_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( sample_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::can_view_by_id(( sample_id, taxon_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( sample_id, taxon_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       SampleBioOttTaxonItem::get(( sample_id, taxon_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( sample_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::get(( sample_id, taxon_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( sample_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::can_admin_by_id(( sample_id, taxon_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( sample_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::delete_by_id(( sample_id, taxon_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedSampleBioOttTaxonItem> for NestedSampleBioOttTaxonItem {
     fn from(item: web_common::database::nested_models::NestedSampleBioOttTaxonItem) -> Self {
@@ -2172,7 +3546,7 @@ impl NestedSampleContainerCategory {
     pub fn from_flat(
         flat_variant: SampleContainerCategory,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             material: NestedMaterial::get(flat_variant.material_id, connection)?,
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
@@ -2180,79 +3554,83 @@ impl NestedSampleContainerCategory {
                 inner: flat_variant,
         })
     }
-}
-impl NestedSampleContainerCategory {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::SampleContainerCategoryFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleContainerCategory::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSampleContainerCategory {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&SampleContainerCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainerCategory::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       SampleContainerCategory::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        SampleContainerCategory::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedSampleContainerCategory {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleContainerCategory::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&SampleContainerCategoryFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainerCategory::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedSampleContainerCategory {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleContainerCategory::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&SampleContainerCategoryFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainerCategory::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedSampleContainerCategory {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleContainerCategory::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&SampleContainerCategoryFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainerCategory::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedSampleContainerCategory> for NestedSampleContainerCategory {
     fn from(item: web_common::database::nested_models::NestedSampleContainerCategory) -> Self {
@@ -2277,6 +3655,7 @@ impl From<NestedSampleContainerCategory> for web_common::database::nested_models
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleContainer {
     pub inner: SampleContainer,
+    pub project: NestedProject,
     pub category: NestedSampleContainerCategory,
     pub created_by: User,
 }
@@ -2286,109 +3665,309 @@ impl NestedSampleContainer {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: SampleContainer,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
+            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
             category: NestedSampleContainerCategory::get(flat_variant.category_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedSampleContainer {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::SampleContainerFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleContainer::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSampleContainer {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampleContainer::can_view_by_id(id, author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SampleContainerFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       SampleContainer::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        SampleContainer::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
-impl NestedSampleContainer {
-    /// Get the nested struct from the provided barcode.
+    /// Get the struct from the database by its barcode.
     ///
-    /// # Arguments
-    /// * `barcode` - The barcode of the row.
-    /// * `connection` - The database connection.
+    /// * `barcode` - The barcode of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_barcode(
-        barcode: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        SampleContainer::from_barcode(barcode, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+barcode: &str,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        SampleContainer::from_barcode(barcode, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
-impl NestedSampleContainer {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleContainer::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
 }
-impl NestedSampleContainer {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleContainer::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
 }
-impl NestedSampleContainer {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleContainer::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampleContainer::can_admin_by_id(id, author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        SampleContainer::delete_by_id(id, author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedSampleContainer> for NestedSampleContainer {
     fn from(item: web_common::database::nested_models::NestedSampleContainer) -> Self {
         Self {
             inner: item.inner.into(),
+            project: item.project.into(),
             category: item.category.into(),
             created_by: item.created_by.into(),
         }
@@ -2398,6 +3977,7 @@ impl From<NestedSampleContainer> for web_common::database::nested_models::Nested
     fn from(item: NestedSampleContainer) -> Self {
         Self {
             inner: item.inner.into(),
+            project: item.project.into(),
             category: item.category.into(),
             created_by: item.created_by.into(),
         }
@@ -2419,114 +3999,112 @@ impl NestedSampleState {
     pub fn from_flat(
         flat_variant: SampleState,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedSampleState {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::SampleStateFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampleState::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSampleState {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&SampleStateFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleState::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       SampleState::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        SampleState::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedSampleState {
-    /// Get the nested struct from the provided color_id.
+    /// Get the struct from the database by its color_id.
     ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the row.
-    /// * `connection` - The database connection.
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+color_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         SampleState::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedSampleState {
-    /// Get the nested struct from the provided icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the row.
-    /// * `connection` - The database connection.
+    /// * `icon_id` - The icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+icon_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         SampleState::from_icon_id(icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedSampleState {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleState::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&SampleStateFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleState::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedSampleState {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&SampleStateFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleState::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedSampleState {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampleState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&SampleStateFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleState::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedSampleState> for NestedSampleState {
     fn from(item: web_common::database::nested_models::NestedSampleState) -> Self {
@@ -2559,49 +4137,176 @@ impl NestedSampledIndividualBioOttTaxonItem {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: SampledIndividualBioOttTaxonItem,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection)?,
-            sampled_individual: NestedSampledIndividual::get(flat_variant.sampled_individual_id, connection)?,
+            sampled_individual: NestedSampledIndividual::get(flat_variant.sampled_individual_id, author_user_id, connection)?,
             taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedSampledIndividualBioOttTaxonItem {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::SampledIndividualBioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividualBioOttTaxonItem::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSampledIndividualBioOttTaxonItem {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::can_view_by_id(( sampled_individual_id, taxon_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       SampledIndividualBioOttTaxonItem::get(( sampled_individual_id, taxon_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::get(( sampled_individual_id, taxon_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::can_admin_by_id(( sampled_individual_id, taxon_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::delete_by_id(( sampled_individual_id, taxon_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedSampledIndividualBioOttTaxonItem> for NestedSampledIndividualBioOttTaxonItem {
     fn from(item: web_common::database::nested_models::NestedSampledIndividualBioOttTaxonItem) -> Self {
@@ -2636,108 +4341,406 @@ impl NestedSampledIndividual {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: SampledIndividual,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            project: NestedProject::get(flat_variant.project_id, connection)?,
+            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedSampledIndividual {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::SampledIndividualFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividual::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSampledIndividual {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        filter: Option<&web_common::database::SampledIndividualFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SampledIndividual::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
 }
-impl NestedSampledIndividual {
-    /// Get the nested struct from the provided primary key.
+    /// Check whether the user can view the struct associated to the provided ids.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: Uuid,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampledIndividual::can_view_by_id(id, author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       SampledIndividual::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: Uuid,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        SampledIndividual::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
-impl NestedSampledIndividual {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampledIndividual::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
 }
-impl NestedSampledIndividual {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampledIndividual::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
 }
-impl NestedSampledIndividual {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       SampledIndividual::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: Uuid,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampledIndividual::can_update_by_id(id, author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: Uuid,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampledIndividual::can_admin_by_id(id, author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&SampledIndividualFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividual::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: Uuid,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        SampledIndividual::delete_by_id(id, author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedSampledIndividual> for NestedSampledIndividual {
     fn from(item: web_common::database::nested_models::NestedSampledIndividual) -> Self {
@@ -2763,6 +4766,7 @@ impl From<NestedSampledIndividual> for web_common::database::nested_models::Nest
 pub struct NestedSample {
     pub inner: Sample,
     pub container: NestedSampleContainer,
+    pub project: NestedProject,
     pub created_by: User,
     pub sampled_by: User,
     pub updated_by: User,
@@ -2774,13 +4778,16 @@ impl NestedSample {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: Sample,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            container: NestedSampleContainer::get(flat_variant.container_id, connection)?,
+            container: NestedSampleContainer::get(flat_variant.container_id, author_user_id, connection)?,
+            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
             sampled_by: User::get(flat_variant.sampled_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
@@ -2788,60 +4795,241 @@ impl NestedSample {
                 inner: flat_variant,
         })
     }
-}
-impl NestedSample {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::SampleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Sample::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSample {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        filter: Option<&web_common::database::SampleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Sample::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
 }
-impl NestedSample {
-    /// Get the nested struct from the provided primary key.
+    /// Check whether the user can view the struct associated to the provided ids.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: Uuid,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Sample::can_view_by_id(id, author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&SampleFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SampleFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: Uuid,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Sample::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: Uuid,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Sample::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Get the struct from the database by its container_id.
+    ///
+    /// * `container_id` - The container_id of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_container_id(
+container_id: &i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Sample::from_container_id(container_id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: Uuid,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Sample::can_update_by_id(id, author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: Uuid,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Sample::can_admin_by_id(id, author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: Uuid,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        Sample::delete_by_id(id, author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedSample> for NestedSample {
     fn from(item: web_common::database::nested_models::NestedSample) -> Self {
         Self {
             inner: item.inner.into(),
             container: item.container.into(),
+            project: item.project.into(),
             created_by: item.created_by.into(),
             sampled_by: item.sampled_by.into(),
             updated_by: item.updated_by.into(),
@@ -2854,6 +5042,7 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
         Self {
             inner: item.inner.into(),
             container: item.container.into(),
+            project: item.project.into(),
             created_by: item.created_by.into(),
             sampled_by: item.sampled_by.into(),
             updated_by: item.updated_by.into(),
@@ -2872,47 +5061,73 @@ impl NestedSpectra {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: Spectra,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            spectra_collection: NestedSpectraCollection::get(flat_variant.spectra_collection_id, connection)?,
+            spectra_collection: NestedSpectraCollection::get(flat_variant.spectra_collection_id, author_user_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedSpectra {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::SpectraFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Spectra::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSpectra {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Spectra::can_view_by_id(id, author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&SpectraFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Spectra::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Spectra::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Spectra::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
 }
 impl From<web_common::database::nested_models::NestedSpectra> for NestedSpectra {
     fn from(item: web_common::database::nested_models::NestedSpectra) -> Self {
@@ -2943,66 +5158,235 @@ impl NestedSpectraCollection {
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub fn from_flat(
         flat_variant: SpectraCollection,
+        author_user_id: Option<i32>,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            sample: NestedSample::get(flat_variant.sample_id, connection)?,
+            sample: NestedSample::get(flat_variant.sample_id, author_user_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedSpectraCollection {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::SpectraCollectionFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollection::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedSpectraCollection {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        filter: Option<&web_common::database::SpectraCollectionFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        SpectraCollection::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
 }
-impl NestedSpectraCollection {
-    /// Get the nested struct from the provided primary key.
+    /// Check whether the user can view the struct associated to the provided ids.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SpectraCollection::can_view_by_id(id, author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       SpectraCollection::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        SpectraCollection::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SpectraCollection::can_update_by_id(id, author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SpectraCollection::can_admin_by_id(id, author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        SpectraCollection::delete_by_id(id, author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedSpectraCollection> for NestedSpectraCollection {
     fn from(item: web_common::database::nested_models::NestedSpectraCollection) -> Self {
@@ -3040,128 +5424,123 @@ impl NestedTeamState {
     pub fn from_flat(
         flat_variant: TeamState,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedTeamState {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::TeamStateFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamState::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedTeamState {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&TeamStateFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamState::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       TeamState::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        TeamState::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedTeamState {
-    /// Get the nested struct from the provided color_id.
+    /// Get the struct from the database by its color_id.
     ///
-    /// # Arguments
-    /// * `color_id` - The color_id of the row.
-    /// * `connection` - The database connection.
+    /// * `color_id` - The color_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_color_id(
-        color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+color_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         TeamState::from_color_id(color_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedTeamState {
-    /// Get the nested struct from the provided icon_id.
+    /// Get the struct from the database by its icon_id.
     ///
-    /// # Arguments
-    /// * `icon_id` - The icon_id of the row.
-    /// * `connection` - The database connection.
+    /// * `icon_id` - The icon_id of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_icon_id(
-        icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+icon_id: &i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         TeamState::from_icon_id(icon_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedTeamState {
-    /// Get the nested struct from the provided name.
+    /// Get the struct from the database by its name.
     ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `connection` - The database connection.
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+name: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         TeamState::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedTeamState {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       TeamState::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&TeamStateFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamState::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedTeamState {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       TeamState::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&TeamStateFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamState::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedTeamState {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       TeamState::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&TeamStateFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamState::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedTeamState> for NestedTeamState {
     fn from(item: web_common::database::nested_models::NestedTeamState) -> Self {
@@ -3186,6 +5565,7 @@ pub struct NestedTeam {
     pub inner: Team,
     pub icon: FontAwesomeIcon,
     pub color: Color,
+    pub state: NestedTeamState,
     pub parent_team: Option<Team>,
     pub created_by: User,
     pub updated_by: User,
@@ -3200,187 +5580,377 @@ impl NestedTeam {
     pub fn from_flat(
         flat_variant: Team,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
             color: Color::get(flat_variant.color_id, connection)?,
-            parent_team: flat_variant.parent_team_id.map(|flat_variant| Team::get(flat_variant, connection)).transpose()?,
+            state: NestedTeamState::get(flat_variant.state_id, connection)?,
+            parent_team: flat_variant.parent_team_id.map(|parent_team_id| Team::get(parent_team_id, connection)).transpose()?,
             created_by: User::get(flat_variant.created_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedTeam {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::TeamFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedTeam {
-    /// Get all the editables nested structs from the database.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `author_user_id` - The user id.
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_editables(
-        author_user_id: i32,
-        filter: Option<&web_common::database::TeamFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all_editables(author_user_id, filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    pub fn all_viewable(
+filter: Option<&TeamFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedTeam {
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    /// Get all of the sorted viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all_by_updated_at(
-        filter: Option<&web_common::database::TeamFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        Team::all_by_updated_at(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&TeamFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedTeam {
-    /// Get the nested struct from the provided primary key.
+    /// Get the struct from the database by its ID.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       Team::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Team::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedTeam {
-    /// Get the nested struct from the provided name.
+    /// Get the struct from the database by its name.
     ///
-    /// # Arguments
-    /// * `name` - The name of the row.
-    /// * `connection` - The database connection.
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_name(
-        name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
+name: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
         Team::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
 }
-impl NestedTeam {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&TeamFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedTeam {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
-    /// # Arguments
-    /// * `author_user_id` - The user id.
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&TeamFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedTeam {
-    /// Search the table by the query.
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
-    /// # Arguments
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&TeamFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
-impl NestedTeam {
-    /// Search the table by the query.
+    /// Check whether the user can update the struct.
     ///
-    /// # Arguments
-    /// * `author_user_id` - The user id.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn word_similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
 }
-impl NestedTeam {
-    /// Search the table by the query.
+    /// Check whether the user can update the struct associated to the provided ids.
     ///
-    /// # Arguments
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search(
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::strict_word_similarity_search(query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Team::can_update_by_id(id, author_user_id, connection)
 }
-impl NestedTeam {
-    /// Search the table by the query.
+    /// Get all of the updatable structs from the database.
     ///
-    /// # Arguments
-    /// * `author_user_id` - The user id.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results, by default `10`.
-    pub fn strict_word_similarity_search_editables(
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-       Team::strict_word_similarity_search_editables(author_user_id, query, limit, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Team::can_admin_by_id(id, author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&TeamFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Team::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        Team::delete_by_id(id, author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
     fn from(item: web_common::database::nested_models::NestedTeam) -> Self {
@@ -3388,6 +5958,7 @@ impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
             inner: item.inner.into(),
             icon: item.icon.into(),
             color: item.color.into(),
+            state: item.state.into(),
             parent_team: item.parent_team.map(|item| item.into()),
             created_by: item.created_by.into(),
             updated_by: item.updated_by.into(),
@@ -3400,6 +5971,7 @@ impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
             inner: item.inner.into(),
             icon: item.icon.into(),
             color: item.color.into(),
+            state: item.state.into(),
             parent_team: item.parent_team.map(|item| item.into()),
             created_by: item.created_by.into(),
             updated_by: item.updated_by.into(),
@@ -3424,7 +5996,7 @@ impl NestedTeamsTeamsRoleInvitation {
     pub fn from_flat(
         flat_variant: TeamsTeamsRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             table: NestedTeam::get(flat_variant.table_id, connection)?,
             team: NestedTeam::get(flat_variant.team_id, connection)?,
@@ -3433,37 +6005,162 @@ impl NestedTeamsTeamsRoleInvitation {
                 inner: flat_variant,
         })
     }
-}
-impl NestedTeamsTeamsRoleInvitation {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::TeamsTeamsRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsTeamsRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedTeamsTeamsRoleInvitation {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, team_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::can_view_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, team_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       TeamsTeamsRoleInvitation::get(( table_id, team_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::can_admin_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::delete_by_id(( table_id, team_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedTeamsTeamsRoleInvitation> for NestedTeamsTeamsRoleInvitation {
     fn from(item: web_common::database::nested_models::NestedTeamsTeamsRoleInvitation) -> Self {
@@ -3505,7 +6202,7 @@ impl NestedTeamsUsersRoleInvitation {
     pub fn from_flat(
         flat_variant: TeamsUsersRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             table: NestedTeam::get(flat_variant.table_id, connection)?,
             user: User::get(flat_variant.user_id, connection)?,
@@ -3514,37 +6211,162 @@ impl NestedTeamsUsersRoleInvitation {
                 inner: flat_variant,
         })
     }
-}
-impl NestedTeamsUsersRoleInvitation {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::TeamsUsersRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedTeamsUsersRoleInvitation {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::can_view_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       TeamsUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::can_admin_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::delete_by_id(( table_id, user_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedTeamsUsersRoleInvitation> for NestedTeamsUsersRoleInvitation {
     fn from(item: web_common::database::nested_models::NestedTeamsUsersRoleInvitation) -> Self {
@@ -3586,7 +6408,7 @@ impl NestedTeamsUsersRoleRequest {
     pub fn from_flat(
         flat_variant: TeamsUsersRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             table: NestedTeam::get(flat_variant.table_id, connection)?,
             user: User::get(flat_variant.user_id, connection)?,
@@ -3595,37 +6417,162 @@ impl NestedTeamsUsersRoleRequest {
                 inner: flat_variant,
         })
     }
-}
-impl NestedTeamsUsersRoleRequest {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::TeamsUsersRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedTeamsUsersRoleRequest {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::can_view_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       TeamsUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::can_admin_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::delete_by_id(( table_id, user_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedTeamsUsersRoleRequest> for NestedTeamsUsersRoleRequest {
     fn from(item: web_common::database::nested_models::NestedTeamsUsersRoleRequest) -> Self {
@@ -3667,7 +6614,7 @@ impl NestedTeamsUsersRole {
     pub fn from_flat(
         flat_variant: TeamsUsersRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             table: NestedTeam::get(flat_variant.table_id, connection)?,
             user: User::get(flat_variant.user_id, connection)?,
@@ -3676,37 +6623,131 @@ impl NestedTeamsUsersRole {
                 inner: flat_variant,
         })
     }
-}
-impl NestedTeamsUsersRole {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::TeamsUsersRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        TeamsUsersRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedTeamsUsersRole {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&TeamsUsersRoleFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&TeamsUsersRoleFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       TeamsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, user_id ): ( i32, i32 ),
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        TeamsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRole::can_admin_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        TeamsUsersRole::delete_by_id(( table_id, user_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedTeamsUsersRole> for NestedTeamsUsersRole {
     fn from(item: web_common::database::nested_models::NestedTeamsUsersRole) -> Self {
@@ -3746,60 +6787,184 @@ impl NestedUserEmail {
     pub fn from_flat(
         flat_variant: UserEmail,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection)?,
             login_provider: NestedLoginProvider::get(flat_variant.login_provider_id, connection)?,
                 inner: flat_variant,
         })
     }
-}
-impl NestedUserEmail {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::UserEmailFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        UserEmail::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedUserEmail {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UserEmail::can_view_by_id(id, author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&UserEmailFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UserEmail::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&UserEmailFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UserEmail::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       UserEmail::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        UserEmail::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
-impl NestedUserEmail {
-    /// Get the nested struct from the provided email and login_provider_id.
+    /// Get the struct from the database by its email and login_provider_id.
     ///
-    /// # Arguments
-    /// * `email` - The email of the row.
-    /// * `login_provider_id` - The login_provider_id of the row.
-    /// * `connection` - The database connection.
+    /// * `email` - The email of the struct to get.
+    /// * `login_provider_id` - The login_provider_id of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn from_email_and_login_provider_id(
-        email: &str,
-        login_provider_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-        UserEmail::from_email_and_login_provider_id(email, login_provider_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+email: &str,
+login_provider_id: &i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        UserEmail::from_email_and_login_provider_id(email, login_provider_id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UserEmail::can_admin_by_id(id, author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&UserEmailFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UserEmail::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&UserEmailFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UserEmail::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        UserEmail::delete_by_id(id, author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedUserEmail> for NestedUserEmail {
     fn from(item: web_common::database::nested_models::NestedUserEmail) -> Self {
@@ -3837,7 +7002,7 @@ impl NestedUsersUsersRoleInvitation {
     pub fn from_flat(
         flat_variant: UsersUsersRoleInvitation,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             table: User::get(flat_variant.table_id, connection)?,
             user: User::get(flat_variant.user_id, connection)?,
@@ -3846,37 +7011,162 @@ impl NestedUsersUsersRoleInvitation {
                 inner: flat_variant,
         })
     }
-}
-impl NestedUsersUsersRoleInvitation {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::UsersUsersRoleInvitationFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        UsersUsersRoleInvitation::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedUsersUsersRoleInvitation {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::can_view_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       UsersUsersRoleInvitation::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::can_admin_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::delete_by_id(( table_id, user_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedUsersUsersRoleInvitation> for NestedUsersUsersRoleInvitation {
     fn from(item: web_common::database::nested_models::NestedUsersUsersRoleInvitation) -> Self {
@@ -3918,7 +7208,7 @@ impl NestedUsersUsersRoleRequest {
     pub fn from_flat(
         flat_variant: UsersUsersRoleRequest,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             table: User::get(flat_variant.table_id, connection)?,
             user: User::get(flat_variant.user_id, connection)?,
@@ -3927,37 +7217,162 @@ impl NestedUsersUsersRoleRequest {
                 inner: flat_variant,
         })
     }
-}
-impl NestedUsersUsersRoleRequest {
-    /// Get all the nested structs from the database.
+    /// Check whether the user can view the struct.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::UsersUsersRoleRequestFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        UsersUsersRoleRequest::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedUsersUsersRoleRequest {
-    /// Get the nested struct from the provided primary key.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRoleRequest::can_view_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       UsersUsersRoleRequest::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        UsersUsersRoleRequest::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRoleRequest::can_admin_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        UsersUsersRoleRequest::delete_by_id(( table_id, user_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedUsersUsersRoleRequest> for NestedUsersUsersRoleRequest {
     fn from(item: web_common::database::nested_models::NestedUsersUsersRoleRequest) -> Self {
@@ -3999,7 +7414,7 @@ impl NestedUsersUsersRole {
     pub fn from_flat(
         flat_variant: UsersUsersRole,
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             table: User::get(flat_variant.table_id, connection)?,
             user: User::get(flat_variant.user_id, connection)?,
@@ -4008,37 +7423,131 @@ impl NestedUsersUsersRole {
                 inner: flat_variant,
         })
     }
-}
-impl NestedUsersUsersRole {
-    /// Get all the nested structs from the database.
+    /// Get all of the viewable structs from the database.
     ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return. By default `10`.
-    /// * `offset` - The offset of the rows to return. By default `0`.
-    /// * `connection` - The database connection.
-    pub fn all(
-        filter: Option<&web_common::database::UsersUsersRoleFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        UsersUsersRole::all(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-    }
-}
-impl NestedUsersUsersRole {
-    /// Get the nested struct from the provided primary key.
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
     ///
-    /// # Arguments
-    /// * `( table_id, user_id )` - The primary key(s) of the row.
-    /// * `connection` - The database connection.
+    pub fn all_viewable(
+filter: Option<&UsersUsersRoleFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&UsersUsersRoleFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
     pub fn get(
-        ( table_id, user_id ): ( i32, i32 ),
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-    ) -> Result<Self, diesel::result::Error>
-    {
-       UsersUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-    }
+( table_id, user_id ): ( i32, i32 ),
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        UsersUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRole::can_admin_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        UsersUsersRole::delete_by_id(( table_id, user_id ), author_user_id, connection)
+}
 }
 impl From<web_common::database::nested_models::NestedUsersUsersRole> for NestedUsersUsersRole {
     fn from(item: web_common::database::nested_models::NestedUsersUsersRole) -> Self {

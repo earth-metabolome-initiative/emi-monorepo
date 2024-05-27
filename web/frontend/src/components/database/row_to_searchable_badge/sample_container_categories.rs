@@ -9,7 +9,7 @@ impl RowToSearchableBadge for NestedSampleContainerCategory {
             <div>
                 <p>
                     <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
-                    <span>{self.inner.brand.format_match(query)}</span>
+                    <span>{self.inner.name.format_match(query)}</span>
                 </p>
                 <p class="description">{self.inner.description.format_match(query)}</p>
             </div>
@@ -20,13 +20,13 @@ impl RowToSearchableBadge for NestedSampleContainerCategory {
         html! {
             <p>
                 <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
-                <span>{&self.inner.brand}</span>
+                <span>{&self.inner.name}</span>
             </p>
         }
     }
 
     fn similarity_score(&self, query: &str) -> isize {
-        self.inner.brand.similarity_score(query) + self.inner.description.similarity_score(query)
+        self.inner.name.similarity_score(query) + self.inner.description.similarity_score(query)
     }
 
     fn primary_color_class(&self) -> &str {

@@ -15,12 +15,15 @@ from jaro import jaro_winkler_metric
 from userinput import userinput
 from userinput.utils import set_validator
 
-WHITE_LISTED_MIGRATIONS = [
+ALLOW_LISTED_MIGRATIONS = [
     "00000000000000_diesel_initial_setup",
     "00000000000001_enable_uuid_extension",
     "00000000000002_enable_pg_trgm_extension",
 ]
 
+ALLOW_LISTED_SINGLETONS = [
+    "units"
+]
 
 def get_best_insertion_point(table_name: str, expected_desinence: str) -> int:
     """Get the best insertion point for a new migration related to a table.
@@ -132,7 +135,7 @@ def table_dependencies() -> Dict[str, List[str]]:
         if not os.path.isdir(f"migrations/{migration}"):
             continue
 
-        if migration in WHITE_LISTED_MIGRATIONS:
+        if migration in ALLOW_LISTED_MIGRATIONS:
             continue
 
         _, migration_desinence = migration.split("_", 1)
@@ -253,8 +256,37 @@ def get_sort_tables_by_dependencies() -> List[str]:
     return sorted_tables
 
 
+def detect_singleton_tables():
+    """Detect singleton tables.
+
+    Implementative details
+    ----------------------
+    A singleton table is a table that is not referenced by any other table.
+    """
+    dependencies = table_dependencies()
+
+    # If a table does not have neither dependencies nor
+    # it appears in the dependencies of other tables, it is a singleton table.
+    singleton_tables = []
+    for table, deps in dependencies.items():
+        if len(deps) == 0 and not any(table in dep for dep in dependencies.values()):
+            if table not in ALLOW_LISTED_SINGLETONS:
+                singleton_tables.append(table)
+    
+    if len(singleton_tables) > 0:
+        raise RuntimeError(
+            f"We found {len(singleton_tables)} singleton tables. "
+            "Please either add them to the allow list or remove them. "
+            "A sigleton table is a table that is not referenced by any other table nor "
+            "it references any other table. The following tables are singleton tables: "
+            f"{singleton_tables}"
+        )
+
+
 def regroup_tables():
     """Regroup the tables."""
+
+    detect_singleton_tables()
 
     associated_tables = {}
     orphan_migrations = []
@@ -269,7 +301,7 @@ def regroup_tables():
             if not os.path.isdir(f"migrations/{migration}"):
                 continue
 
-            if migration in WHITE_LISTED_MIGRATIONS:
+            if migration in ALLOW_LISTED_MIGRATIONS:
                 continue
 
             if migration in mapped_migrations:
@@ -322,7 +354,7 @@ def regroup_tables():
     if len(orphan_migrations) > 0:
         raise RuntimeError(f"Orphaned migrations found {orphan_migrations}")
 
-    starting_number = len(WHITE_LISTED_MIGRATIONS)
+    starting_number = len(ALLOW_LISTED_MIGRATIONS)
 
     for table_name in table_names:
         migrations = associated_tables[table_name]

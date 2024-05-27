@@ -60,7 +60,7 @@ def derive_webcommon_update_variants(
         for attribute in struct.attributes:
             if attribute.is_automatically_determined_column():
                 continue
-            update_struct.add_attribute(attribute)
+            update_struct.add_attribute(attribute.into_new_owner(update_struct))
 
         assert (
             len(update_struct.attributes) > 0
