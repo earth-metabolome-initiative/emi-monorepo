@@ -267,10 +267,3 @@ class TableStructMetadata:
     def get_foreign_key_table_name(self, column_name: str) -> str:
         """Returns the table name of the foreign key."""
         return self.flat_variant.table_metadata.get_foreign_key_table_name(self.name, column_name)
-
-    def get_function_primary_key_where_clause(self) -> str:
-        """Returns the WHERE clause for the primary key."""
-        return " AND ".join(
-            f"{self.name}.{column.name} = {column.name}"
-            for column in self.get_primary_keys()
-        )

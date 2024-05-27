@@ -33,6 +33,17 @@ impl NestedBioOttRank {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        BioOttRank::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -181,6 +192,17 @@ impl NestedBioOttTaxonItem {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        BioOttTaxonItem::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -533,6 +555,17 @@ impl NestedDocumentFormat {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        DocumentFormat::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -663,6 +696,17 @@ impl NestedLoginProvider {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        LoginProvider::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -815,6 +859,17 @@ impl NestedMaterial {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Material::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -892,6 +947,17 @@ impl NestedNotification {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Notification::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1223,6 +1289,17 @@ impl NestedOrganization {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Organization::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1377,6 +1454,17 @@ impl NestedProjectState {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectState::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3236,6 +3324,17 @@ impl NestedRole {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Role::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3605,6 +3704,17 @@ impl NestedSampleContainerCategory {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        SampleContainerCategory::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -4057,6 +4167,17 @@ impl NestedSampleState {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        SampleState::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -5653,6 +5774,17 @@ impl NestedTeamState {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        TeamState::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -5813,6 +5945,17 @@ impl NestedTeam {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Team::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -6845,6 +6988,17 @@ impl NestedTeamsUsersRole {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRole::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -7645,6 +7799,17 @@ impl NestedUsersUsersRole {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRole::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.

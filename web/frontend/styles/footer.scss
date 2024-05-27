@@ -11,7 +11,7 @@
     padding-left: $sidebar-width + 10px; // Add padding to the left to account for the sidebar
     margin-left: -$sidebar-width;
 
-    @media screen and (max-width: $small-screen-width) or (max-height: $small-screen-height){
+    @media screen and (max-width: $small-screen-width) {
         position: relative; // Reset position on small screens
         margin-left: 0; // Reset margin on small screens
         padding-left: 10px; // Reset padding on small screens

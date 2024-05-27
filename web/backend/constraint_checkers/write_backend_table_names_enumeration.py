@@ -97,6 +97,18 @@ def write_backend_table_names_enumeration(
         )
         table_method.set_return_type(return_type)
 
+        if method.has_primary_key_as_argument():
+            argument = method.get_primary_key_argument()
+            table_method.add_argument(
+                AttributeMetadata(
+                    original_name="primary_key",
+                    name="primary_key",
+                    data_type="PrimaryKey",
+                    optional=argument.optional,
+                ),
+                description=method.get_argument_description(argument),
+            )
+
         for argument in method.arguments:
             # If the argument is a struct, we need to convert it to a Vec<u8>
             if argument.has_struct_data_type():
@@ -109,19 +121,8 @@ def write_backend_table_names_enumeration(
                     ),
                     description=method.get_argument_description(argument),
                 )
-            elif (
-                method.owner.get_formatted_primary_keys(include_prefix=False)
-                == argument.name
-            ):
-                table_method.add_argument(
-                    AttributeMetadata(
-                        original_name="primary_key",
-                        name="primary_key",
-                        data_type="PrimaryKey",
-                        optional=argument.optional,
-                    ),
-                    description=method.get_argument_description(argument),
-                )
+            elif method.is_primary_key_argument(argument):
+                continue
             else:
                 table_method.add_argument(
                     argument,
@@ -187,7 +188,7 @@ def write_backend_table_names_enumeration(
                             formatted_argument = f"{formatted_argument}.as_ref()"
 
                         arguments.append(formatted_argument)
-                    elif argument.name == "primary_key":
+                    elif argument.name == "primary_key" and struct_method.has_primary_key_as_argument():
                         if argument.optional:
                             arguments.append("primary_key.map(|pk| pk.into())")
                         else:

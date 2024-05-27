@@ -3,7 +3,12 @@
 from typing import List, Optional, Union, Tuple, Dict
 import re
 from functools import cache
-from constraint_checkers.find_foreign_keys import TableMetadata, find_foreign_keys, is_role_invitation_table, is_role_request_table
+from constraint_checkers.find_foreign_keys import (
+    TableMetadata,
+    find_foreign_keys,
+    is_role_invitation_table,
+    is_role_request_table,
+)
 from constraint_checkers.indices import PGIndices, find_search_indices
 
 
@@ -381,7 +386,9 @@ class AttributeMetadata:
 class MethodDefinition:
     """Class representing the definition of a method."""
 
-    def __init__(self, name: str, summary: str, visibility: str = "pub", is_async: bool = False):
+    def __init__(
+        self, name: str, summary: str, visibility: str = "pub", is_async: bool = False
+    ):
         self.name = name
         self.summary = summary
         self.visibility = visibility
@@ -400,6 +407,27 @@ class MethodDefinition:
             "The method name must not contain the space character. "
             f"The provided method name is {self.name}."
         )
+
+    def has_primary_key_as_argument(self) -> bool:
+        """Returns whether the method has the primary key as an argument."""
+        return self.get_primary_key_argument() is not None
+
+    def is_primary_key_argument(self, argument: AttributeMetadata) -> bool:
+        """Returns whether the argument is the primary key argument.
+
+        Parameters
+        ----------
+        argument : AttributeMetadata
+            The argument to check.
+        """
+        return self.get_primary_key_argument() == argument
+
+    def get_primary_key_argument(self) -> Optional[AttributeMetadata]:
+        """Returns the primary key argument."""
+        for argument in self.arguments:
+            if argument.name == self.owner.get_formatted_primary_keys(include_prefix=False):
+                return argument
+        return None
 
     def into_new_owner(self, owner: "StructMetadata") -> "MethodDefinition":
         """Creates a new method definition with a new owner.
@@ -500,9 +528,7 @@ class MethodDefinition:
         )
         assert len(description) > 0, "The description must not be empty."
 
-        assert argument.name != "self", (
-            "The argument name must not be 'self'. "
-        )
+        assert argument.name != "self", "The argument name must not be 'self'. "
 
         self.arguments.append(argument)
         self.argument_descriptions[argument.name] = description
@@ -1439,9 +1465,11 @@ class StructMetadata:
         its editability fully defined by the parent column, and the parent
         table associated with the struct may be hidden.
         """
-        if self.table_name in ("user_emails", ):
+        if self.table_name in ("user_emails",):
             return True
-        if is_role_invitation_table(self.table_name) or is_role_request_table(self.table_name):
+        if is_role_invitation_table(self.table_name) or is_role_request_table(
+            self.table_name
+        ):
             return True
         if self.has_public_column():
             return True

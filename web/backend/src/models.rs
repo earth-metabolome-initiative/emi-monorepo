@@ -63,6 +63,17 @@ impl From<web_common::database::tables::BioOttRank> for BioOttRank {
 }
 
 impl BioOttRank {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -352,6 +363,17 @@ impl From<web_common::database::tables::BioOttTaxonItem> for BioOttTaxonItem {
 }
 
 impl BioOttTaxonItem {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -778,6 +800,17 @@ impl From<web_common::database::tables::Color> for Color {
 }
 
 impl Color {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `limit` - The maximum number of results to return.
@@ -957,6 +990,17 @@ impl From<web_common::database::tables::Country> for Country {
 }
 
 impl Country {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `limit` - The maximum number of results to return.
@@ -1452,6 +1496,17 @@ impl From<web_common::database::tables::DocumentFormat> for DocumentFormat {
 }
 
 impl DocumentFormat {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1689,6 +1744,17 @@ impl From<web_common::database::tables::FontAwesomeIcon> for FontAwesomeIcon {
 }
 
 impl FontAwesomeIcon {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `limit` - The maximum number of results to return.
@@ -1864,6 +1930,17 @@ impl From<web_common::database::tables::LoginProvider> for LoginProvider {
 }
 
 impl LoginProvider {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -2157,6 +2234,17 @@ impl From<web_common::database::tables::Material> for Material {
 }
 
 impl Material {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -2254,6 +2342,17 @@ impl From<web_common::database::tables::Notification> for Notification {
 }
 
 impl Notification {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -2743,6 +2842,17 @@ impl From<web_common::database::tables::Organization> for Organization {
 }
 
 impl Organization {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -2985,6 +3095,17 @@ impl From<web_common::database::tables::ProjectState> for ProjectState {
 }
 
 impl ProjectState {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -6353,6 +6474,17 @@ impl From<web_common::database::tables::Role> for Role {
 }
 
 impl Role {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -6935,6 +7067,17 @@ impl From<web_common::database::tables::SampleContainerCategory> for SampleConta
 }
 
 impl SampleContainerCategory {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -7891,6 +8034,17 @@ impl From<web_common::database::tables::SampleState> for SampleState {
 }
 
 impl SampleState {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -11353,6 +11507,17 @@ impl From<web_common::database::tables::TeamState> for TeamState {
 }
 
 impl TeamState {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -11649,6 +11814,17 @@ impl From<web_common::database::tables::Team> for Team {
 }
 
 impl Team {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -13743,6 +13919,17 @@ impl From<web_common::database::tables::TeamsUsersRole> for TeamsUsersRole {
 }
 
 impl TeamsUsersRole {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -13993,6 +14180,17 @@ impl From<web_common::database::tables::Unit> for Unit {
 }
 
 impl Unit {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `limit` - The maximum number of results to return.
@@ -14462,6 +14660,17 @@ impl From<web_common::database::tables::User> for User {
 }
 
 impl User {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `limit` - The maximum number of results to return.
@@ -15575,6 +15784,17 @@ impl From<web_common::database::tables::UsersUsersRole> for UsersUsersRole {
 }
 
 impl UsersUsersRole {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
