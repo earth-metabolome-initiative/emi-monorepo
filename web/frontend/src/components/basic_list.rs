@@ -76,7 +76,6 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
             }
             PagesMessage::Backend(message) => match message {
                 WebsocketMessage::AllTable(rows) => {
-                    log::info!("Received {} rows", rows.len());
                     let mut new_pages: Vec<Page> = bincode::deserialize(&rows).unwrap();
                     new_pages
                         .retain(|page| {

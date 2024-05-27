@@ -245,7 +245,7 @@ impl PageLike for NestedObservation {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        None
+        Some(AppRoute::ObservationsUpdate { id: self.inner.id })
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
