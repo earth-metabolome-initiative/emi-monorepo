@@ -105,6 +105,7 @@ if __name__ == "__main__":
 
     table_structs: List[StructMetadata] = extract_structs("src/models.rs")
     view_structs: List[StructMetadata] = extract_structs("src/views/views.rs")
+    flat_variants = table_structs + view_structs
 
     print(
         f"Extracted {len(table_structs)} tables and {len(view_structs)} views from the backend."
@@ -186,11 +187,11 @@ if __name__ == "__main__":
     print("Generated frontend forms.")
 
     write_frontend_pages(
-        builder_structs,
+        flat_variants,
     )
     print("Generated frontend pages.")
 
     write_frontend_router_page(
-        builder_structs,
+        flat_variants,
     )
     print("Generated frontend router page.")

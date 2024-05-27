@@ -44,6 +44,7 @@ def derive_webcommon_new_variants(
         )
 
         new_struct.set_flat_variant(struct)
+        struct.set_new_variant(new_struct)
 
         primary_keys = struct.get_primary_keys()
 

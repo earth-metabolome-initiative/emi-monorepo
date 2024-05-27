@@ -838,6 +838,10 @@ class StructMetadata:
         assert not struct.is_nested()
         self._flat_variant = struct
 
+    def has_flat_variant(self) -> bool:
+        """Returns whether the struct has a flat variant."""
+        return self._flat_variant is not None
+
     def get_flat_variant(self) -> "StructMetadata":
         """Returns the flat variant of the struct."""
         if self._flat_variant is None:
@@ -847,17 +851,59 @@ class StructMetadata:
                     f"The table associated with the struct is {self.table_name}."
                 )
 
-            raise ValueError("The flat variant has not been set.")
+            raise ValueError(f"The flat variant of the struct {self.name} has not been set.")
 
         return self._flat_variant
 
     def set_richest_variant(self, struct: "StructMetadata"):
+        """Sets the richest variant of the struct."""
+        assert isinstance(struct, StructMetadata), (
+            "The struct must be a StructMetadata. "
+            f"The provided struct is a {type(struct)}."
+        )
         assert struct.table_name == self.table_name
-        self._richest_variant = struct
+        assert self.has_foreign_keys(), (
+            "The struct must have foreign keys to set the richest variant. "
+            f"The provided struct is {struct.name}, and "
+            f"the table associated with the struct is {struct.table_name}."
+        )
+        assert struct.is_nested(), (
+            "The richest variant must be a nested struct. "
+            f"The provided struct is {struct.name}, and "
+            f"the table associated with the struct is {struct.table_name}. "
+            f"You are currently trying to set the richest variant of the struct {self.name}."
+        )
+        if self._richest_variant is not None:
+            assert self._richest_variant == struct, (
+                f"The richest variant of the struct {self.name} has already been set. "
+                f"The current richest variant is {self._richest_variant.name}, "
+                f"and the new richest variant would be {struct.name}."
+            )
+
+        if self._flat_variant is not None:
+            self._flat_variant.set_richest_variant(struct)
+        else:
+            self._richest_variant = struct
 
     def get_richest_variant(self) -> "StructMetadata":
+        """Returns the richest variant of the struct."""
         if self._richest_variant is None:
-            raise ValueError("The richest variant has not been set.")
+            if self._flat_variant is not None:
+                return self._flat_variant.get_richest_variant()
+
+            if self.has_foreign_keys():
+                raise ValueError(
+                    f"The richest variant of the struct {self.name} has not been set. "
+                    f"The table associated with the struct is {self.table_name}. "
+                    f"This struct is associated to a table containing foreign keys, "
+                    "and therefore, it must have a richest variant. The foreign keys are "
+                    f"{self.get_foreign_keys()}."
+                )
+
+            assert not self.is_update_variant()
+            assert not self.is_new_variant()
+
+            return self
 
         return self._richest_variant
 
@@ -1158,7 +1204,7 @@ class StructMetadata:
         This method returns the child foreign keys of the struct.
         """
         if self._flat_variant is not None:
-            return self._flat_variant.get_child_foreign_keys()
+            return self._flat_variant.get_child_structs()
 
         return self._child_variants
 

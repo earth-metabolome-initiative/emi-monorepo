@@ -4422,17 +4422,6 @@ impl FormBuilder for UserBuilder {
 
 }
 
-impl From<UserBuilder> for NewUser {
-    fn from(builder: UserBuilder) -> Self {
-        Self {
-            first_name: builder.first_name.unwrap(),
-            middle_name: builder.middle_name,
-            last_name: builder.last_name.unwrap(),
-            description: builder.description,
-            profile_picture: builder.profile_picture.unwrap(),
-        }
-    }
-}
 impl From<UserBuilder> for UpdateUser {
     fn from(builder: UserBuilder) -> Self {
         Self {
@@ -4445,22 +4434,6 @@ impl From<UserBuilder> for UpdateUser {
         }
     }
 }
-impl FormBuildable for NewUser {
-    type Builder = UserBuilder;
-    fn title() -> &'static str {
-        "User"
-    }
-    fn task_target() -> &'static str {
-        "User"
-    }
-    fn requires_authentication() -> bool {
-        true
-    }
-    fn can_operate_offline() -> bool {
-        false
-    }
-}
-
 impl FormBuildable for UpdateUser {
     type Builder = UserBuilder;
     fn title() -> &'static str {
@@ -4477,26 +4450,6 @@ impl FormBuildable for UpdateUser {
     }
 }
 
-#[function_component(CreateUserForm)]
-pub fn create_user_form() -> Html {
-    let (builder_store, builder_dispatch) = use_store::<UserBuilder>();
-    let set_first_name = builder_dispatch.apply_callback(|first_name: Option<String>| UserActions::SetFirstName(first_name));
-    let set_middle_name = builder_dispatch.apply_callback(|middle_name: Option<String>| UserActions::SetMiddleName(middle_name));
-    let set_last_name = builder_dispatch.apply_callback(|last_name: Option<String>| UserActions::SetLastName(last_name));
-    let set_description = builder_dispatch.apply_callback(|description: Option<String>| UserActions::SetDescription(description));
-    let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| UserActions::SetProfilePicture(profile_picture.map(|profile_picture| profile_picture.into())));
-    html! {
-        <BasicForm<NewUser>
-            method={FormMethod::POST}
-            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<String> label="First name" optional={false} errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
-            <BasicInput<String> label="Middle name" optional={true} errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
-            <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
-            <BasicInput<String> label="Description" optional={true} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
-            <FileInput<Image> label="Profile picture" optional={false} errors={builder_store.errors_profile_picture.clone()} builder={set_profile_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.profile_picture.clone().map(|profile_picture| profile_picture.into())} />
-        </BasicForm<NewUser>>
-    }
-}
 #[derive(Clone, PartialEq, Properties)]
 pub struct UpdateUserFormProp {
     pub id: i32,

@@ -183,7 +183,10 @@ def write_backend_flat_variants(
                         "Please add the can_view function to the struct."
                     )
 
-                if struct.table_metadata.has_postgres_function(can_x_function_name) or operation == "view":
+                if (
+                    struct.table_metadata.has_postgres_function(can_x_function_name)
+                    or operation == "view"
+                ):
                     # We now create the more specific methods that check whether the user has a role
                     # with a role_id less than or equal to the provided role_id. We start with the Viewer role.
                     method: MethodDefinition = struct.add_backend_method(
@@ -198,7 +201,7 @@ def write_backend_flat_variants(
                             author_user_id, description="The ID of the user to check."
                         )
                         method.add_argument(*connection_argument_and_description)
-                    
+
                     method.set_return_type(
                         AttributeMetadata(
                             original_name="_",
@@ -221,11 +224,7 @@ def write_backend_flat_variants(
                             "    }\n"
                         )
                     else:
-                        file.write(
-                            "{\n"
-                            "        Ok(true)\n"
-                            "}\n"
-                        )
+                        file.write("{\n" "        Ok(true)\n" "}\n")
 
                     method: MethodDefinition = struct.add_backend_method(
                         MethodDefinition(
@@ -253,9 +252,9 @@ def write_backend_flat_variants(
                         method.add_argument(
                             author_user_id, description="The ID of the user to check."
                         )
-                    
+
                         method.add_argument(*connection_argument_and_description)
-                    
+
                     method.set_return_type(
                         AttributeMetadata(
                             original_name="_",
@@ -275,16 +274,9 @@ def write_backend_flat_variants(
                             "}\n"
                         )
                     else:
-                        file.write(
-                            "{\n"
-                            "        Ok(true)\n"
-                            "}\n"
-                        )
+                        file.write("{\n" "        Ok(true)\n" "}\n")
 
-                sorted_variants = [False]
-
-                if struct.has_updated_at() or struct.has_created_at():
-                    sorted_variants.append(True)
+                sorted_variants = [False, True]
 
                 for sorted_variant in sorted_variants:
 
@@ -386,10 +378,6 @@ def write_backend_flat_variants(
                             file.write(
                                 f"            .order_by({struct.table_name}::dsl::created_at.desc())\n"
                             )
-                        else:
-                            assert (
-                                False
-                            ), "The all_by_update method is only implemented for tables with an updated_at column."
 
                     file.write(
                         "            .offset(offset.unwrap_or(0))\n"
@@ -665,7 +653,7 @@ def write_backend_flat_variants(
                                     filter_attribute.name
                                 ).optional
                             ]
-                        
+
                         # If more than one of the non-optional filter is Some in the filter struct,
                         # we raise an unimplemented! macro panic, as I have no idea how to cleanly
                         # handle this case in Diesel and for a while it should cover all the cases.

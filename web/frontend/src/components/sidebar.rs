@@ -30,11 +30,39 @@ pub fn sidebar(props: &SidebarProps) -> Html {
         <div class={sidebar_class}>
             <div class="sidebar-content">
                 <ul>
+                    <li class={if route == AppRoute::BioOttRanks { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::BioOttRanks}>
+                            <i class={format!("fas fa-{}", NestedBioOttRank::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedBioOttRank::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    <li class={if route == AppRoute::BioOttTaxonItems { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::BioOttTaxonItems}>
+                            <i class={format!("fas fa-{}", NestedBioOttTaxonItem::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedBioOttTaxonItem::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    <li class={if route == AppRoute::Countries { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::Countries}>
+                            <i class={format!("fas fa-{}", Country::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{Country::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
                     <li class={if route == AppRoute::Observations { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Observations}>
                             <i class={format!("fas fa-{}", NestedObservation::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedObservation::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    <li class={if route == AppRoute::Organizations { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::Organizations}>
+                            <i class={format!("fas fa-{}", NestedOrganization::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedOrganization::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::Projects { "active" } else { "" }}>
@@ -51,6 +79,13 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <span>{NestedSampleContainer::section()}</span>
                         </Link<AppRoute>>
                     </li>
+                    <li class={if route == AppRoute::SampleStates { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::SampleStates}>
+                            <i class={format!("fas fa-{}", NestedSampleState::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedSampleState::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
                     <li class={if route == AppRoute::SampledIndividuals { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::SampledIndividuals}>
                             <i class={format!("fas fa-{}", NestedSampledIndividual::icon())}></i>
@@ -63,6 +98,13 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <i class={format!("fas fa-{}", NestedSample::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedSample::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    <li class={if route == AppRoute::Spectra { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::Spectra}>
+                            <i class={format!("fas fa-{}", NestedSpectra::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedSpectra::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::SpectraCollections { "active" } else { "" }}>

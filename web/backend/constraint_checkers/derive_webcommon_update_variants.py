@@ -53,6 +53,7 @@ def derive_webcommon_update_variants(
         )
 
         update_struct.set_flat_variant(struct)
+        struct.set_update_variant(update_struct)
 
         for derive in struct.derives():
             update_struct.add_derive(derive)

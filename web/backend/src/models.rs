@@ -101,6 +101,33 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&BioOttRankFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::bio_ott_ranks;
+        let mut query = bio_ott_ranks::dsl::bio_ott_ranks
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(bio_ott_ranks::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_ranks::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
@@ -382,6 +409,60 @@ impl BioOttTaxonItem {
     /// * `connection` - The connection to the database.
     ///
     pub fn all_viewable(
+filter: Option<&BioOttTaxonItemFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::bio_ott_taxon_items;
+        let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
+            .into_boxed();
+        if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(ott_rank_id));
+        }
+        if let Some(domain_id) = filter.and_then(|f| f.domain_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(domain_id));
+        }
+        if let Some(kingdom_id) = filter.and_then(|f| f.kingdom_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(kingdom_id));
+        }
+        if let Some(phylum_id) = filter.and_then(|f| f.phylum_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(phylum_id));
+        }
+        if let Some(class_id) = filter.and_then(|f| f.class_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(class_id));
+        }
+        if let Some(order_id) = filter.and_then(|f| f.order_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(order_id));
+        }
+        if let Some(family_id) = filter.and_then(|f| f.family_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(family_id));
+        }
+        if let Some(genus_id) = filter.and_then(|f| f.genus_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(genus_id));
+        }
+        if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
 filter: Option<&BioOttTaxonItemFilter>,
 limit: Option<i64>,
 offset: Option<i64>,
@@ -828,6 +909,23 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::colors;
+        colors::dsl::colors
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
@@ -1008,6 +1106,23 @@ impl Country {
     /// * `connection` - The connection to the database.
     ///
     pub fn all_viewable(
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::countries;
+        countries::dsl::countries
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
 limit: Option<i64>,
 offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
@@ -1534,6 +1649,33 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&DocumentFormatFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::document_formats;
+        let mut query = document_formats::dsl::document_formats
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(document_formats::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(document_formats::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
@@ -1772,6 +1914,23 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::font_awesome_icons;
+        font_awesome_icons::dsl::font_awesome_icons
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
@@ -1949,6 +2108,33 @@ impl LoginProvider {
     /// * `connection` - The connection to the database.
     ///
     pub fn all_viewable(
+filter: Option<&LoginProviderFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::login_providers;
+        let mut query = login_providers::dsl::login_providers
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(login_providers::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(login_providers::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
 filter: Option<&LoginProviderFilter>,
 limit: Option<i64>,
 offset: Option<i64>,
@@ -2272,6 +2458,33 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&MaterialFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::materials;
+        let mut query = materials::dsl::materials
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(materials::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(materials::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
@@ -2361,6 +2574,30 @@ impl Notification {
     /// * `connection` - The connection to the database.
     ///
     pub fn all_viewable(
+filter: Option<&NotificationFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::notifications;
+        let mut query = notifications::dsl::notifications
+            .into_boxed();
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(notifications::dsl::user_id.eq(user_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
 filter: Option<&NotificationFilter>,
 limit: Option<i64>,
 offset: Option<i64>,
@@ -2877,6 +3114,30 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&OrganizationFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::organizations;
+        let mut query = organizations::dsl::organizations
+            .into_boxed();
+        if let Some(country_id) = filter.and_then(|f| f.country_id) {
+            query = query.filter(organizations::dsl::country_id.eq(country_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
@@ -3114,6 +3375,33 @@ impl ProjectState {
     /// * `connection` - The connection to the database.
     ///
     pub fn all_viewable(
+filter: Option<&ProjectStateFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::project_states;
+        let mut query = project_states::dsl::project_states
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(project_states::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(project_states::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
 filter: Option<&ProjectStateFilter>,
 limit: Option<i64>,
 offset: Option<i64>,
@@ -6512,6 +6800,33 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&RoleFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::roles;
+        let mut query = roles::dsl::roles
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(roles::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(roles::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
@@ -7086,6 +7401,36 @@ impl SampleContainerCategory {
     /// * `connection` - The connection to the database.
     ///
     pub fn all_viewable(
+filter: Option<&SampleContainerCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::sample_container_categories;
+        let mut query = sample_container_categories::dsl::sample_container_categories
+            .into_boxed();
+        if let Some(material_id) = filter.and_then(|f| f.material_id) {
+            query = query.filter(sample_container_categories::dsl::material_id.eq(material_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_container_categories::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_container_categories::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
 filter: Option<&SampleContainerCategoryFilter>,
 limit: Option<i64>,
 offset: Option<i64>,
@@ -8053,6 +8398,33 @@ impl SampleState {
     /// * `connection` - The connection to the database.
     ///
     pub fn all_viewable(
+filter: Option<&SampleStateFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::sample_states;
+        let mut query = sample_states::dsl::sample_states
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_states::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_states::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
 filter: Option<&SampleStateFilter>,
 limit: Option<i64>,
 offset: Option<i64>,
@@ -11064,6 +11436,33 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SpectraFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::spectra;
+        let mut query = spectra::dsl::spectra
+            .into_boxed();
+        if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
+            query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
+        }
+        query
+            .filter(can_view_spectra(author_user_id, spectra::dsl::id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
@@ -11526,6 +11925,33 @@ impl TeamState {
     /// * `connection` - The connection to the database.
     ///
     pub fn all_viewable(
+filter: Option<&TeamStateFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::team_states;
+        let mut query = team_states::dsl::team_states
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(team_states::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(team_states::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
 filter: Option<&TeamStateFilter>,
 limit: Option<i64>,
 offset: Option<i64>,
@@ -14198,6 +14624,23 @@ impl Unit {
     /// * `connection` - The connection to the database.
     ///
     pub fn all_viewable(
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::units;
+        units::dsl::units
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
 limit: Option<i64>,
 offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,

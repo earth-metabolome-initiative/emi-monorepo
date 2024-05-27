@@ -435,7 +435,7 @@ def write_frontend_form_builder_implementation(
 
     flat_variant = builder.get_flat_variant()
 
-    if flat_variant.is_insertable():
+    if flat_variant.is_insertable() and flat_variant.table_name != "users":
         variants.append(builder.get_new_variant())
 
     # If the new variant is not also used as an update
@@ -1068,9 +1068,9 @@ def handle_missing_row_to_searchable_badge_implementation(
                 f"The index {index.name} is not supported for the {struct.table_name} table."
             )
 
-        assert len(search_columns) > 0, (
-            f"The struct {struct.name} does not contain any searchable columns. "
-        )
+        assert (
+            len(search_columns) > 0
+        ), f"The struct {struct.name} does not contain any searchable columns. "
 
         directory_name = os.path.dirname(path)
         os.makedirs(directory_name, exist_ok=True)
@@ -1264,7 +1264,7 @@ def write_frontend_yew_form(
 
     variants = []
 
-    if flat_variant.is_insertable():
+    if flat_variant.is_insertable() and flat_variant.table_name != "users":
         variants.append((builder.get_new_variant(), "POST"))
 
     if flat_variant.is_updatable():
@@ -1337,7 +1337,12 @@ def write_frontend_yew_form(
                         properties_attributes.append(foreign_key.as_option())
                     else:
                         if foreign_key.optional:
-                            handle_missing_gin_index(builder.get_attribute_by_name(foreign_key.normalized_name()), builder)
+                            handle_missing_gin_index(
+                                builder.get_attribute_by_name(
+                                    foreign_key.normalized_name()
+                                ),
+                                builder,
+                            )
 
                         document.write(
                             f"    pub {foreign_key.name}: {foreign_key.data_type()},\n"
@@ -1575,7 +1580,7 @@ def write_frontend_form_buildable_implementation(
 
     variants: List[StructMetadata] = []
 
-    if flat_variant.is_insertable():
+    if flat_variant.is_insertable() and flat_variant.table_name != "users":
         variants.append(builder.get_new_variant())
 
     if flat_variant.is_updatable():
@@ -1681,7 +1686,7 @@ def write_frontend_forms(
 
         flat_variant = builder.get_flat_variant()
 
-        if flat_variant.is_insertable():
+        if flat_variant.is_insertable() and flat_variant.table_name != "users":
             assert (
                 builder.get_new_variant().name in content
             ), f"New variant {builder.get_new_variant().name} not found in the generated file."
