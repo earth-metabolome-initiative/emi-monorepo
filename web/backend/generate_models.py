@@ -62,6 +62,7 @@ from constraint_checkers import (
 if __name__ == "__main__":
     # Load dotenv file
     load_dotenv()
+    check_for_common_typos_in_migrations()
     ensure_no_dead_python_code()
     ensures_no_duplicated_migrations()
     regroup_tables()
@@ -82,7 +83,6 @@ if __name__ == "__main__":
 
     enforce_migration_naming_convention()
     replace_serial_indices()
-    check_for_common_typos_in_migrations()
     ensures_migrations_simmetry()
     ensures_gluesql_compliance()
     print("Ensured migrations simmetry & GlueSQL compliance.")

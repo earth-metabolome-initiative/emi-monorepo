@@ -20,6 +20,16 @@ def check_for_common_typos_in_migrations():
         ) as down_file:
             down_content = down_file.read()
 
+        if "==" in up_content:
+            raise RuntimeError(
+                f"Migration `{directory}` contains a typo: `==` instead of `=`."
+            )
+
+        if "!=" in up_content:
+            raise RuntimeError(
+                f"Migration `{directory}` contains a typo: `!=` instead of `<>`."
+            )
+
         if "CREATE TABLE IF EXISTS" in up_content:
             raise RuntimeError(
                 f"Migration `{directory}` contains a typo: `CREATE TABLE IF EXISTS` instead of `CREATE TABLE IF NOT EXISTS`."

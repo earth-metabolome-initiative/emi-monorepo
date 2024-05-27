@@ -31,7 +31,7 @@ BEGIN
         RETURN TRUE;
     END IF;
 -- We check whether the user is in the projects_users_roles table with an appropriate role id.
-    IF EXISTS (SELECT 1 FROM projects_users_roles WHERE projects_users_roles.user_id = author_user_id AND projects_users_roles.role_id <= 2 AND projects_users_roles.table_id == this_projects_id) THEN
+    IF EXISTS (SELECT 1 FROM projects_users_roles WHERE projects_users_roles.user_id = author_user_id AND projects_users_roles.role_id <= 2 AND projects_users_roles.table_id = this_projects_id) THEN
         RETURN TRUE;
     END IF;
 -- If the parent column is not NULL, we call the can_update function of the parent column to determine whether the user can edit the row.
@@ -103,7 +103,7 @@ BEGIN
         RETURN TRUE;
     END IF;
 -- We check whether the user is in the projects_users_roles table with an appropriate role id.
-    IF EXISTS (SELECT 1 FROM projects_users_roles WHERE projects_users_roles.user_id = author_user_id AND projects_users_roles.role_id <= 1 AND projects_users_roles.table_id == this_projects_id) THEN
+    IF EXISTS (SELECT 1 FROM projects_users_roles WHERE projects_users_roles.user_id = author_user_id AND projects_users_roles.role_id <= 1 AND projects_users_roles.table_id = this_projects_id) THEN
         RETURN TRUE;
     END IF;
 -- If the parent column is not NULL, we call the can_delete function of the parent column to determine whether the user can edit the row.
@@ -151,7 +151,7 @@ BEGIN
         RETURN TRUE;
     END IF;
 -- We check whether the user is in the projects_users_roles table with an appropriate role id.
-    IF EXISTS (SELECT 1 FROM projects_users_roles WHERE projects_users_roles.user_id = author_user_id AND projects_users_roles.role_id <= 3 AND projects_users_roles.table_id == this_projects_id) THEN
+    IF EXISTS (SELECT 1 FROM projects_users_roles WHERE projects_users_roles.user_id = author_user_id AND projects_users_roles.role_id <= 3 AND projects_users_roles.table_id = this_projects_id) THEN
         RETURN TRUE;
     END IF;
 -- If the parent column is not NULL, we call the can_view function of the parent column to determine whether the user can edit the row.

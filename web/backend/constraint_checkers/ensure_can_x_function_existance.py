@@ -181,7 +181,7 @@ def handle_missing_can_x_function(
             if associated_roles_table == f"{table.name}_users_roles":
                 up_index_migration.write(
                     f"-- We check whether the user is in the {associated_roles_table} table with an appropriate role id.\n"
-                    f"    IF EXISTS (SELECT 1 FROM {associated_roles_table} WHERE {associated_roles_table}.user_id = author_user_id AND {associated_roles_table}.role_id <= {max_role_id} AND {associated_roles_table}.table_id == this_{flat_variant.table_name}_{flat_variant.get_primary_keys()[0].name}) THEN\n"
+                    f"    IF EXISTS (SELECT 1 FROM {associated_roles_table} WHERE {associated_roles_table}.user_id = author_user_id AND {associated_roles_table}.role_id <= {max_role_id} AND {associated_roles_table}.table_id = this_{flat_variant.table_name}_{flat_variant.get_primary_keys()[0].name}) THEN\n"
                     "        RETURN TRUE;\n"
                     "    END IF;\n"
                 )
@@ -246,7 +246,7 @@ def handle_missing_can_x_function(
             up_index_migration.write("    RETURN FALSE;\n")
 
         # Otherwise, we return FALSE.
-        up_index_migration.write("END;\n" "$$\n" "LANGUAGE plpgsql;\n\n")
+        up_index_migration.write("END;\n$$\nLANGUAGE plpgsql;\n\n")
 
         if operation == "update":
             # We then implement the trigger function, which does not receive any arguments as trigger functions
@@ -287,7 +287,7 @@ def handle_missing_can_x_function(
                         "    END IF;\n"
                     )
                 up_index_migration.write(
-                    "    RETURN NEW;\n" "END;\n" "$$\n" "LANGUAGE plpgsql;\n\n"
+                    "    RETURN NEW;\nEND;\n$$\nLANGUAGE plpgsql;\n\n"
                 )
 
         # We then create the trigger that calls the trigger function.

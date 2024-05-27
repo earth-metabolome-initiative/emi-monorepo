@@ -20,7 +20,7 @@ BEGIN
         RETURN FALSE;
     END IF;
 -- We check whether the user is in the users_users_roles table with an appropriate role id.
-    IF EXISTS (SELECT 1 FROM users_users_roles WHERE users_users_roles.user_id = author_user_id AND users_users_roles.role_id <= 2 AND users_users_roles.table_id == this_users_id) THEN
+    IF EXISTS (SELECT 1 FROM users_users_roles WHERE users_users_roles.user_id = author_user_id AND users_users_roles.role_id <= 2 AND users_users_roles.table_id = this_users_id) THEN
         RETURN TRUE;
     END IF;
     RETURN FALSE;
@@ -64,7 +64,7 @@ BEGIN
         RETURN FALSE;
     END IF;
 -- We check whether the user is in the users_users_roles table with an appropriate role id.
-    IF EXISTS (SELECT 1 FROM users_users_roles WHERE users_users_roles.user_id = author_user_id AND users_users_roles.role_id <= 1 AND users_users_roles.table_id == this_users_id) THEN
+    IF EXISTS (SELECT 1 FROM users_users_roles WHERE users_users_roles.user_id = author_user_id AND users_users_roles.role_id <= 1 AND users_users_roles.table_id = this_users_id) THEN
         RETURN TRUE;
     END IF;
     RETURN FALSE;

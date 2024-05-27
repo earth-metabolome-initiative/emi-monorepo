@@ -31,7 +31,7 @@ BEGIN
         RETURN TRUE;
     END IF;
 -- We check whether the user is in the teams_users_roles table with an appropriate role id.
-    IF EXISTS (SELECT 1 FROM teams_users_roles WHERE teams_users_roles.user_id = author_user_id AND teams_users_roles.role_id <= 2 AND teams_users_roles.table_id == this_teams_id) THEN
+    IF EXISTS (SELECT 1 FROM teams_users_roles WHERE teams_users_roles.user_id = author_user_id AND teams_users_roles.role_id <= 2 AND teams_users_roles.table_id = this_teams_id) THEN
         RETURN TRUE;
     END IF;
     RETURN TRUE;
@@ -97,7 +97,7 @@ BEGIN
         RETURN TRUE;
     END IF;
 -- We check whether the user is in the teams_users_roles table with an appropriate role id.
-    IF EXISTS (SELECT 1 FROM teams_users_roles WHERE teams_users_roles.user_id = author_user_id AND teams_users_roles.role_id <= 1 AND teams_users_roles.table_id == this_teams_id) THEN
+    IF EXISTS (SELECT 1 FROM teams_users_roles WHERE teams_users_roles.user_id = author_user_id AND teams_users_roles.role_id <= 1 AND teams_users_roles.table_id = this_teams_id) THEN
         RETURN TRUE;
     END IF;
     RETURN TRUE;
