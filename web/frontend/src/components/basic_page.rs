@@ -459,7 +459,7 @@ impl PageLike for NestedSampleContainer {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        None
+        Some(AppRoute::SampleContainersUpdate { id: self.inner.id })
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
