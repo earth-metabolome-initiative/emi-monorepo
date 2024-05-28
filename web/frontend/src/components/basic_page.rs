@@ -463,7 +463,12 @@ impl PageLike for NestedSampleContainer {
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(AppRoute::SampleContainersNew)
+        filter
+            .and_then(|f| {
+                f.project_id
+                    .map(|project_id| AppRoute::SampleContainersNewWithProject { project_id })
+            })
+            .or(Some(AppRoute::SampleContainersNew))
     }
 
     fn icon() -> &'static str {
