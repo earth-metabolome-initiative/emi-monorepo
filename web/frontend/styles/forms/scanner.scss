@@ -1,0 +1,50 @@
+.active-scanner-ui {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    padding-top: 200px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 5px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 300px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@media screen and (max-width: $small-screen-width) {
+
+    // Mobile version of the scanner
+    .active-scanner-ui {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        z-index: 10000;
+        top: 0;
+        left: 0;
+        background: red;
+    }
+}

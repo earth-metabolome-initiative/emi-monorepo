@@ -4,12 +4,12 @@ import os
 import re
 from time import sleep
 from typing import List
-from tqdm.auto import tqdm
-from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
-from constraint_checkers.indices import PGIndex
-from insert_migration import insert_migration
-from userinput import userinput
 
+from constraint_checkers.indices import PGIndex
+from constraint_checkers.struct_metadata import AttributeMetadata, StructMetadata
+from insert_migration import insert_migration
+from tqdm.auto import tqdm
+from userinput import userinput
 
 TEXTUAL_DATA_TYPES = ["String"]
 
@@ -1068,9 +1068,9 @@ def handle_missing_row_to_searchable_badge_implementation(
                 f"The index {index.name} is not supported for the {struct.table_name} table."
             )
 
-        assert len(search_columns) > 0, (
-            f"The struct {struct.name} does not contain any searchable columns. "
-        )
+        assert (
+            len(search_columns) > 0
+        ), f"The struct {struct.name} does not contain any searchable columns. "
 
         directory_name = os.path.dirname(path)
         os.makedirs(directory_name, exist_ok=True)
@@ -1337,7 +1337,12 @@ def write_frontend_yew_form(
                         properties_attributes.append(foreign_key.as_option())
                     else:
                         if foreign_key.optional:
-                            handle_missing_gin_index(builder.get_attribute_by_name(foreign_key.normalized_name()), builder)
+                            handle_missing_gin_index(
+                                builder.get_attribute_by_name(
+                                    foreign_key.normalized_name()
+                                ),
+                                builder,
+                            )
 
                         document.write(
                             f"    pub {foreign_key.name}: {foreign_key.data_type()},\n"
@@ -1538,9 +1543,10 @@ def write_frontend_yew_form(
                     if struct.has_associated_roles() and struct.table_name != "users"
                     else "false"
                 )
+                scannable = "true" if "barcode" in attribute.name else "false"
 
                 document.write(
-                    f'            <Datalist<{attribute.data_type()}, {updatables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" />\n'
+                    f'            <Datalist<{attribute.data_type()}, {updatables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" scanner={{{scannable}}} />\n'
                 )
                 continue
 

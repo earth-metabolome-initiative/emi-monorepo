@@ -1,4 +1,5 @@
 @import "./button.scss";
+@import "./scanner.scss";
 
 form.standard-form {
     width: 600px;
@@ -619,6 +620,7 @@ form.standard-form {
         }
 
         &.text,
+        &.scanner,
         &.number,
         &.datalist,
         &.datetime-local {
@@ -626,6 +628,30 @@ form.standard-form {
                 display: grid;
                 grid-template-columns: auto 1fr;
                 align-items: center;
+                transition: width 0.2s;
+            }
+        }
+
+        &.scanner {
+            .input-container {
+                grid-template-columns: auto 1fr auto;
+            }
+
+            .start-scanner {
+                border: none;
+                animation: fade-in-right 0.2s;
+
+                i {
+                    font-size: 1.5em;
+                    color: $light_grey;
+                    transition: color 0.2s;
+                }
+
+                &:hover {
+                    i {
+                        color: inherit;
+                    }
+                }
             }
         }
 
@@ -745,6 +771,12 @@ form.standard-form {
             }
         }
 
+        .input-group.scanner {
+            .start-scanner {
+                color: $red;
+            }
+        }
+
         button[type="submit"] {
             border-color: $red;
             color: $red;
@@ -780,6 +812,12 @@ form.standard-form {
             }
         }
 
+        .input-group.scanner {
+            .start-scanner {
+                color: $green;
+            }
+        }
+
         button[type="submit"] {
             border-color: $green;
             color: $green;
@@ -812,6 +850,12 @@ form.standard-form {
             input[type="text"],
             input[type="search"] {
                 border-color: $blue;
+            }
+        }
+
+        .input-group.scanner {
+            .start-scanner {
+                color: $blue;
             }
         }
 

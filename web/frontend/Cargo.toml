@@ -24,11 +24,13 @@ yew = { version = "0.21.0", features = ["csr"] }
 yew-router = "0.18.0"
 # The doc-tests feature is required to avoid errors from the Rust Analyzer,
 # but it is not actually used in the code.
-yewdux = {version="0.10.0", features=["doctests"]}
+yewdux = { version = "0.10.0", features = ["doctests"] }
 web_common = { path = "../web_common", features = ["frontend"] }
 gloo-net = "0.5.0"
 gloo-console = "0.3.0"
-gluesql = { git = "https://github.com/LucaCappelletti94/gluesql.git", features = ["idb-storage"], default-features = false }
+gluesql = { git = "https://github.com/LucaCappelletti94/gluesql.git", features = [
+  "idb-storage",
+], default-features = false }
 wasm-logger = "0.2.0"
 log = "0.4.20"
 validator = { version = "0.16", features = ["derive"] }
@@ -45,6 +47,9 @@ implicit-clone = "0.4.9"
 v = "0.1.0"
 image = "0.25.1"
 base64 = "0.22.1"
+rxing = { version = "0.5.9", features = [
+  "wasm_support",
+], default-features = false }
 # syntect = "5.2.0"
 
 [dependencies.web-sys]
@@ -75,5 +80,15 @@ features = [
   'PositionOptions',
   'PositionError',
   'HtmlAnchorElement',
+  "CanvasRenderingContext2d",
+  "MediaDevices",
+  "MediaStream",
+  "HtmlCanvasElement",
+  "HtmlVideoElement",
+  "MediaStreamConstraints",
+  "MediaTrackConstraints",
+  "VideoFacingModeEnum",
+  "MediaStreamTrack",
+  "Navigator",
+  "ImageData",
 ]
-

@@ -3,11 +3,45 @@
 use std::fmt::Display;
 
 use super::InputErrors;
+use super::Scanner;
 use chrono::NaiveDateTime;
+use gloo::utils::errors::JsError;
 use wasm_bindgen::JsCast;
 use web_common::api::ApiError;
 use yew::html::IntoPropValue;
 use yew::prelude::*;
+#[derive(Clone, PartialEq, Default, Eq, Debug)]
+pub struct BarCode(String);
+
+impl From<String> for BarCode {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
+impl From<BarCode> for String {
+    fn from(value: BarCode) -> Self {
+        value.0
+    }
+}
+
+impl AsRef<str> for BarCode {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl AsMut<str> for BarCode {
+    fn as_mut(&mut self) -> &mut str {
+        &mut self.0
+    }
+}
+
+impl Display for BarCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 #[derive(Clone, PartialEq, Copy, Eq, Debug)]
 pub enum InputType {
@@ -15,6 +49,7 @@ pub enum InputType {
     Number,
     Textarea,
     DateTime,
+    Scanner,
 }
 
 impl Display for InputType {
@@ -24,6 +59,7 @@ impl Display for InputType {
             InputType::Number => write!(f, "number"),
             InputType::Textarea => write!(f, "textarea"),
             InputType::DateTime => write!(f, "datetime-local"),
+            InputType::Scanner => write!(f, "scanner"),
         }
     }
 }
@@ -54,6 +90,9 @@ impl Inputtable for NaiveDateTime {
     const INPUT_TYPE: InputType = InputType::DateTime;
 }
 
+impl Inputtable for BarCode {
+    const INPUT_TYPE: InputType = InputType::Scanner;
+}
 #[derive(Clone, PartialEq, Properties)]
 pub struct InputProp<Data: Inputtable> {
     pub label: String,
@@ -130,6 +169,21 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
         })
     };
 
+    let on_scan: Callback<rxing::RXingResult> = {
+        let props = props.clone();
+        Callback::from(move |result: rxing::RXingResult| {
+            let value = result.getText().to_string();
+            props
+                .builder
+                .emit(if value.is_empty() { None } else { Some(value) });
+        })
+    };
+    let on_scan_error: Callback<JsError> = {
+        Callback::from(move |error: JsError| {
+            let value = error.to_string();
+            log::error!("Error scanning barcode: {}", value);
+        })
+    };
     let value = props
         .value()
         .map_or_else(|| "".to_string(), |value| value.to_string());
@@ -159,16 +213,21 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
                         oninput={on_input}
                     ></textarea>
                 },
-                InputType::Number | InputType::Text => html! {
+                InputType::Number | InputType::Text | InputType::Scanner => html! {
+                    <>
                     <input
                         type={InputType::Text}
-                        class="input-control"
+                        class={format!("input-control {}", Data::INPUT_TYPE)}
                         name={props.normalized_label()}
                         id={props.normalized_label()}
                         value={value}
                         placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
                         oninput={on_input}
                     />
+                    if Data::INPUT_TYPE == InputType::Scanner {
+                        <Scanner onscan={on_scan} onerror={on_scan_error}/>
+                    }
+                    </>
                 },
                 InputType::DateTime => html! {
                     <input

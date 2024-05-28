@@ -8,9 +8,11 @@ use crate::workers::ws_worker::ComponentMessage;
 use crate::workers::ws_worker::WebsocketMessage;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
+use gloo::utils::errors::JsError;
 use serde::de::DeserializeOwned;
 use wasm_bindgen::JsCast;
 
+use super::barcode_scanner::Scanner;
 use web_common::api::ApiError;
 use web_common::database::Searchable;
 use yew::prelude::*;
@@ -39,6 +41,8 @@ where
     pub maximum_number_of_choices: usize,
     #[prop_or(10)]
     pub number_of_candidates: i64,
+    #[prop_or(false)]
+    pub scanner: bool,
 }
 
 impl<Data, const EDIT: bool> MultiDatalistProp<Data, EDIT>
@@ -88,6 +92,7 @@ pub enum DatalistMessage<Data> {
     StartDeleteSelectionTimeout(usize),
     Focus,
     Blur,
+    ScannerError(ApiError),
 }
 
 impl<Data, const EDIT: bool> Component for MultiDatalist<Data, EDIT>
@@ -228,6 +233,16 @@ where
                 self.is_focused = true;
                 true
             }
+            DatalistMessage::ScannerError(error) => {
+                // first we check that the error in not already present
+                // in the list of errors.
+                if !self.errors.contains(&error) {
+                    self.errors.push(error);
+                    true
+                } else {
+                    false
+                }
+            }
         }
     }
 
@@ -262,6 +277,22 @@ where
                 link.send_message(DatalistMessage::UpdateCurrentValue(value.clone()));
             })
         };
+        let on_scan: Callback<rxing::RXingResult> = {
+            let link = ctx.link().clone();
+            Callback::from(move |result: rxing::RXingResult| {
+                let value = result.getText().to_string();
+                link.send_message(DatalistMessage::UpdateCurrentValue(value));
+            })
+        };
+        let on_scan_error: Callback<JsError> = {
+            let link = ctx.link().clone();
+            Callback::from(move |error: JsError| {
+                let value = error.to_string();
+                link.send_message(DatalistMessage::ScannerError(ApiError::BadRequest(vec![
+                    value,
+                ])));
+            })
+        };
 
         let on_focus = {
             let link = ctx.link().clone();
@@ -288,17 +319,12 @@ where
 
         let input_field = html! {
             <>
-                {if props.show_label {
-                    html! {
+                if props.show_label {
                         <label for={props.normalized_label()} class={label_classes}>
                             {props.label()}
                         </label>
-                    }
-                } else {
-                    html! {}
-                }}
-                {if self.is_focused || self.selections.is_empty(){
-                html!{
+                }
+                if self.is_focused || self.selections.is_empty(){
                     <input
                         type="search"
                         class="input-control"
@@ -311,10 +337,10 @@ where
                         id={props.normalized_label()}
                         name={props.normalized_label()}
                     />
+                    if ctx.props().scanner {
+                        <Scanner onscan={on_scan} onerror={on_scan_error}/>
+                    }
                 }
-                } else {
-                    html!{}
-                }}
                 {if !self.selections.is_empty() {
                     html! {
                         <ul class="selected-datalist-badges">
@@ -459,6 +485,8 @@ where
     pub optional: bool,
     #[prop_or(10)]
     pub number_of_candidates: i64,
+    #[prop_or(false)]
+    pub scanner: bool,
 }
 
 #[function_component(Datalist)]

@@ -12,3 +12,5 @@ pub mod datalist;
 pub use datalist::*;
 pub mod checkbox;
 pub use checkbox::*;
+pub mod barcode_scanner;
+pub use barcode_scanner::*;
