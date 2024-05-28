@@ -33,6 +33,17 @@ impl NestedBioOttRank {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        BioOttRank::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -47,6 +58,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         BioOttRank::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&BioOttRankFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttRank::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -181,6 +207,17 @@ impl NestedBioOttTaxonItem {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        BioOttTaxonItem::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -195,6 +232,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         BioOttTaxonItem::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&BioOttTaxonItemFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        BioOttTaxonItem::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -533,6 +585,17 @@ impl NestedDocumentFormat {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        DocumentFormat::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -547,6 +610,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         DocumentFormat::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&DocumentFormatFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DocumentFormat::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -663,6 +741,17 @@ impl NestedLoginProvider {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        LoginProvider::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -677,6 +766,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         LoginProvider::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&LoginProviderFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        LoginProvider::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -722,6 +826,57 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         LoginProvider::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&LoginProviderFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        LoginProvider::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&LoginProviderFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        LoginProvider::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&LoginProviderFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        LoginProvider::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
 }
 impl From<web_common::database::nested_models::NestedLoginProvider> for NestedLoginProvider {
     fn from(item: web_common::database::nested_models::NestedLoginProvider) -> Self {
@@ -764,6 +919,17 @@ impl NestedMaterial {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Material::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -778,6 +944,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         Material::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&MaterialFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Material::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -841,6 +1022,17 @@ impl NestedNotification {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Notification::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -855,6 +1047,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         Notification::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&NotificationFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Notification::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -1172,6 +1379,17 @@ impl NestedOrganization {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Organization::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1186,6 +1404,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         Organization::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&OrganizationFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Organization::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -1326,6 +1559,17 @@ impl NestedProjectState {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectState::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1340,6 +1584,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectState::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ProjectStateFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectState::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -3185,6 +3444,17 @@ impl NestedRole {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Role::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3199,6 +3469,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         Role::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&RoleFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Role::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -3554,6 +3839,17 @@ impl NestedSampleContainerCategory {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        SampleContainerCategory::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3568,6 +3864,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         SampleContainerCategory::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SampleContainerCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainerCategory::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -4006,6 +4317,17 @@ impl NestedSampleState {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        SampleState::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -4020,6 +4342,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         SampleState::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SampleStateFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleState::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -4880,6 +5217,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         Sample::from_container_id(container_id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&SampleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&SampleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&SampleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4939,6 +5333,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         Sample::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4997,6 +5448,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         Sample::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&SampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Sample::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -5114,6 +5622,23 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         Spectra::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&SpectraFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Spectra::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -5431,6 +5956,17 @@ impl NestedTeamState {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        TeamState::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -5445,6 +5981,21 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         TeamState::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&TeamStateFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamState::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Get the struct from the database by its ID.
     ///
@@ -5591,6 +6142,17 @@ impl NestedTeam {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Team::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -6623,6 +7185,17 @@ impl NestedTeamsUsersRole {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRole::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -7423,6 +7996,17 @@ impl NestedUsersUsersRole {
                 inner: flat_variant,
         })
     }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRole::can_view_by_id()
+}
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.

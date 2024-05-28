@@ -96,8 +96,13 @@ def handle_missing_can_x_function(
             f"are {parent_columns}."
         )
 
-    primary_keys = ", ".join(
-        f"{column.name} {column.sql_data_type()}" for column in table.get_primary_keys()
+    primary_key_arguments = ", ".join(
+        f"this_{table.name}_{column.name} {column.sql_data_type()}" for column in table.get_primary_keys()
+    )
+
+    primary_key_where_clause = " AND ".join(
+        f"{table.name}.{column.name} = this_{table.name}_{column.name}"
+        for column in table.get_primary_keys()
     )
 
     for operation in operations:
@@ -114,7 +119,7 @@ def handle_missing_can_x_function(
             f"-- and calls the parent column's can_{operation} function if the parent column is not NULL. Otherwise, the function\n"
             f"-- checks if the row was created by the user or if the user is found in either the {table.name}_users_roles table or\n"
             f"-- the {table.name}_teams_users table with an appropriate role id.\n"
-            f"CREATE FUNCTION {can_x_function}(author_user_id INTEGER, {primary_keys})\n"
+            f"CREATE FUNCTION {can_x_function}(author_user_id INTEGER, {primary_key_arguments})\n"
             "RETURNS BOOLEAN AS $$\n"
             "DECLARE\n"
             f"    canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.\n"
@@ -122,23 +127,23 @@ def handle_missing_can_x_function(
         columns_to_query = []
         for parent_column in parent_columns:
             up_index_migration.write(
-                f"    {parent_column.name} {parent_column.sql_data_type()};\n"
+                f"    this_{parent_column.name} {parent_column.sql_data_type()};\n"
             )
             columns_to_query.append(parent_column.name)
 
         for user_column_name in user_column_names:
             if table.has_column(user_column_name):
-                up_index_migration.write(f"    {user_column_name} INTEGER;\n")
+                up_index_migration.write(f"    this_{user_column_name} INTEGER;\n")
                 columns_to_query.append(user_column_name)
 
         if operation == "view" and table.has_public_column():
-            up_index_migration.write(f"    {table.get_public_column().name} BOOLEAN;\n")
+            up_index_migration.write(f"    this_{table.get_public_column().name} BOOLEAN;\n")
             columns_to_query.append(table.get_public_column().name)
 
         up_index_migration.write(
             "BEGIN\n"
             f"-- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).\n"
-            f"    SELECT {', '.join(columns_to_query + ['1'])} INTO {', '.join(columns_to_query + ['canary'])} FROM {table.name} WHERE {table.get_function_primary_key_where_clause()};\n"
+            f"    SELECT {', '.join(columns_to_query + ['1'])} INTO {', '.join([f'this_{column_to_query}' for column_to_query in columns_to_query] + ['canary'])} FROM {table.name} WHERE {primary_key_where_clause};\n"
             "-- If the row does not exist, we return FALSE.\n"
             "    IF canary IS NULL THEN\n"
             "        RETURN TRUE;\n"
@@ -155,18 +160,11 @@ def handle_missing_can_x_function(
                 "    END IF;\n"
             )
 
-        if table.has_public_column() and operation == "view":
-            up_index_migration.write(
-                "-- If the row is public, we return TRUE.\n"
-                f"    IF {table.get_public_column().name} THEN\n"
-                "        RETURN TRUE;\n"
-                "    END IF;\n"
-            )
         for user_column_name in user_column_names:
             if table.has_column(user_column_name):
                 up_index_migration.write(
                     f"-- We check whether the user is the {user_column_name} of the row.\n"
-                    f"    IF author_user_id = {user_column_name} THEN\n"
+                    f"    IF author_user_id = this_{user_column_name} THEN\n"
                     "        RETURN TRUE;\n"
                     "    END IF;\n"
                 )
@@ -176,7 +174,7 @@ def handle_missing_can_x_function(
             if associated_roles_table == f"{table.name}_users_roles":
                 up_index_migration.write(
                     f"-- We check whether the user is in the {associated_roles_table} table with an appropriate role id.\n"
-                    f"    IF EXISTS (SELECT 1 FROM {associated_roles_table} WHERE {associated_roles_table}.user_id = author_user_id AND {associated_roles_table}.role_id <= {max_role_id} AND {associated_roles_table}.table_id == {flat_variant.get_primary_keys()[0].name}) THEN\n"
+                    f"    IF EXISTS (SELECT 1 FROM {associated_roles_table} WHERE {associated_roles_table}.user_id = author_user_id AND {associated_roles_table}.role_id <= {max_role_id} AND {associated_roles_table}.table_id = this_{flat_variant.table_name}_{flat_variant.get_primary_keys()[0].name}) THEN\n"
                     "        RETURN TRUE;\n"
                     "    END IF;\n"
                 )
@@ -188,10 +186,18 @@ def handle_missing_can_x_function(
                     f"   IF EXISTS (SELECT 1 FROM {table.name}_teams_roles \n"
                     f"       JOIN teams_users_roles ON {table.name}_teams_roles.team_id = teams_users_roles.team_id\n"
                     f"       WHERE teams_users_roles.user_id = author_user_id AND {table.name}_teams_roles.role_id <= {max_role_id}) AND teams_users_roles.role_id <= {max_role_id}\n"
-                    f"             AND {table.name}_teams_roles.table_id = {flat_variant.get_primary_keys()[0].name}) THEN\n"
+                    f"             AND {table.name}_teams_roles.table_id = this_{flat_variant.table_name}_{flat_variant.get_primary_keys()[0].name}) THEN\n"
                     "        RETURN TRUE;\n"
                     "    END IF;\n"
                 )
+
+        if table.has_public_column() and operation == "view":
+            up_index_migration.write(
+                "-- If the row is public, we return TRUE.\n"
+                f"    IF NOT this_{table.get_public_column().name} THEN\n"
+                "        RETURN FALSE;\n"
+                "    END IF;\n"
+            )
 
         if is_role_table(table.name):
             for parent_column in parent_columns:
@@ -202,11 +208,11 @@ def handle_missing_can_x_function(
                 if parent_column.optional:
                     up_index_migration.write(
                         f"-- If the parent column is not NULL, we call the can_{operation} function of the parent column to determine whether the user can {operation} the row.\n"
-                        f"    IF {parent_column.name} IS NOT NULL THEN\n"
+                        f"    IF this_{parent_column.name} IS NOT NULL THEN\n"
                     )
 
                 up_index_migration.write(
-                    f"        IF can_{operation}_{foreign_key_flat_variant.table_name}(author_user_id, {parent_column.name}) THEN\n"
+                    f"        IF can_{operation}_{foreign_key_flat_variant.table_name}(author_user_id, this_{parent_column.name}) THEN\n"
                     "            RETURN TRUE;\n"
                     "        END IF;\n"
                 )
@@ -224,11 +230,11 @@ def handle_missing_can_x_function(
                 if parent_column.optional:
                     up_index_migration.write(
                         f"-- If the parent column is not NULL, we call the can_{operation} function of the parent column to determine whether the user can edit the row.\n"
-                        f"    IF {parent_column.name} IS NOT NULL THEN\n"
+                        f"    IF this_{parent_column.name} IS NOT NULL THEN\n"
                     )
 
                 up_index_migration.write(
-                    f"        IF NOT can_{operation}_{foreign_key_flat_variant.table_name}(author_user_id, {parent_column.name}) THEN\n"
+                    f"        IF NOT can_{operation}_{foreign_key_flat_variant.table_name}(author_user_id, this_{parent_column.name}) THEN\n"
                     "            RETURN FALSE;\n"
                     "        END IF;\n"
                 )
@@ -241,7 +247,7 @@ def handle_missing_can_x_function(
             up_index_migration.write("    RETURN FALSE;\n")
 
         # Otherwise, we return FALSE.
-        up_index_migration.write("END;\n" "$$\n" "LANGUAGE plpgsql;\n\n")
+        up_index_migration.write("END;\n$$\nLANGUAGE plpgsql;\n\n")
 
         if operation == "update":
             # We then implement the trigger function, which does not receive any arguments as trigger functions
@@ -274,7 +280,7 @@ def handle_missing_can_x_function(
                     foreign_table = table.get_foreign_key_table_name(parent_column.name)
 
                     up_index_migration.write(
-                        "-- We check whether the user can {operation} the row.\n"
+                        f"-- We check whether the user can {operation} the row.\n"
                         f"    IF TG_OP = 'INSERT'{null_check} THEN\n"
                         f"        IF NOT can_{operation}_{foreign_table}(NEW.created_by, NEW.{parent_column.name}) THEN\n"
                         f"            RAISE EXCEPTION 'The user does not have the permission to {operation} this row.';\n"
@@ -282,7 +288,7 @@ def handle_missing_can_x_function(
                         "    END IF;\n"
                     )
                 up_index_migration.write(
-                    "    RETURN NEW;\n" "END;\n" "$$\n" "LANGUAGE plpgsql;\n\n"
+                    "    RETURN NEW;\nEND;\n$$\nLANGUAGE plpgsql;\n\n"
                 )
 
         # We then create the trigger that calls the trigger function.
@@ -323,16 +329,13 @@ def handle_missing_can_x_function(
                 f"DROP FUNCTION IF EXISTS {can_x_function}({argument_types});\n"
             )
 
-    raise RuntimeError(
-        f"We have created the can_x function and trigger for the table {table.name}. "
-        "Please run the migration to apply the changes."
-    )
 
 
 def ensure_can_x_function_existance(tables: List[TableStructMetadata]):
     """Returns whether the function exists."""
     assert isinstance(tables, list)
     assert all(isinstance(table, TableStructMetadata) for table in tables)
+    raise_exception = False
 
     for table in tqdm(
         tables,
@@ -360,6 +363,7 @@ def ensure_can_x_function_existance(tables: List[TableStructMetadata]):
                 f"This function is not needed for tables that are not hidden.{visibility_message}"
             )
 
+
         if (
             table.is_insertable()
             and not table.has_can_admin_function()
@@ -369,6 +373,9 @@ def ensure_can_x_function_existance(tables: List[TableStructMetadata]):
             and not table.has_can_view_function()
         ):
             handle_missing_can_x_function(table)
-            raise RuntimeError(
-                f"The table {table.name} has to be updated. Please update it and re-run the script."
-            )
+            raise_exception = True
+        
+    if raise_exception:
+        raise RuntimeError(
+            "The tables have to be updated. Please update it and re-run the script."
+        )

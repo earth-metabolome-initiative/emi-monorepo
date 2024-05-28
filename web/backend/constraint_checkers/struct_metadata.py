@@ -3,7 +3,12 @@
 from typing import List, Optional, Union, Tuple, Dict
 import re
 from functools import cache
-from constraint_checkers.find_foreign_keys import TableMetadata, find_foreign_keys, is_role_invitation_table, is_role_request_table
+from constraint_checkers.find_foreign_keys import (
+    TableMetadata,
+    find_foreign_keys,
+    is_role_invitation_table,
+    is_role_request_table,
+)
 from constraint_checkers.indices import PGIndices, find_search_indices
 
 
@@ -381,7 +386,9 @@ class AttributeMetadata:
 class MethodDefinition:
     """Class representing the definition of a method."""
 
-    def __init__(self, name: str, summary: str, visibility: str = "pub", is_async: bool = False):
+    def __init__(
+        self, name: str, summary: str, visibility: str = "pub", is_async: bool = False
+    ):
         self.name = name
         self.summary = summary
         self.visibility = visibility
@@ -400,6 +407,27 @@ class MethodDefinition:
             "The method name must not contain the space character. "
             f"The provided method name is {self.name}."
         )
+
+    def has_primary_key_as_argument(self) -> bool:
+        """Returns whether the method has the primary key as an argument."""
+        return self.get_primary_key_argument() is not None
+
+    def is_primary_key_argument(self, argument: AttributeMetadata) -> bool:
+        """Returns whether the argument is the primary key argument.
+
+        Parameters
+        ----------
+        argument : AttributeMetadata
+            The argument to check.
+        """
+        return self.get_primary_key_argument() == argument
+
+    def get_primary_key_argument(self) -> Optional[AttributeMetadata]:
+        """Returns the primary key argument."""
+        for argument in self.arguments:
+            if argument.name == self.owner.get_formatted_primary_keys(include_prefix=False):
+                return argument
+        return None
 
     def into_new_owner(self, owner: "StructMetadata") -> "MethodDefinition":
         """Creates a new method definition with a new owner.
@@ -500,9 +528,7 @@ class MethodDefinition:
         )
         assert len(description) > 0, "The description must not be empty."
 
-        assert argument.name != "self", (
-            "The argument name must not be 'self'. "
-        )
+        assert argument.name != "self", "The argument name must not be 'self'. "
 
         self.arguments.append(argument)
         self.argument_descriptions[argument.name] = description
@@ -627,7 +653,7 @@ class StructMetadata:
         """Initializes the search indices."""
         if StructMetadata.pg_indices is None:
             StructMetadata.pg_indices = find_search_indices(
-                tables_metadata=StructMetadata.table_metadata
+                table_metadata=StructMetadata.table_metadata
             )
 
     @staticmethod
@@ -812,6 +838,10 @@ class StructMetadata:
         assert not struct.is_nested()
         self._flat_variant = struct
 
+    def has_flat_variant(self) -> bool:
+        """Returns whether the struct has a flat variant."""
+        return self._flat_variant is not None
+
     def get_flat_variant(self) -> "StructMetadata":
         """Returns the flat variant of the struct."""
         if self._flat_variant is None:
@@ -821,17 +851,59 @@ class StructMetadata:
                     f"The table associated with the struct is {self.table_name}."
                 )
 
-            raise ValueError("The flat variant has not been set.")
+            raise ValueError(f"The flat variant of the struct {self.name} has not been set.")
 
         return self._flat_variant
 
     def set_richest_variant(self, struct: "StructMetadata"):
+        """Sets the richest variant of the struct."""
+        assert isinstance(struct, StructMetadata), (
+            "The struct must be a StructMetadata. "
+            f"The provided struct is a {type(struct)}."
+        )
         assert struct.table_name == self.table_name
-        self._richest_variant = struct
+        assert self.has_foreign_keys(), (
+            "The struct must have foreign keys to set the richest variant. "
+            f"The provided struct is {struct.name}, and "
+            f"the table associated with the struct is {struct.table_name}."
+        )
+        assert struct.is_nested(), (
+            "The richest variant must be a nested struct. "
+            f"The provided struct is {struct.name}, and "
+            f"the table associated with the struct is {struct.table_name}. "
+            f"You are currently trying to set the richest variant of the struct {self.name}."
+        )
+        if self._richest_variant is not None:
+            assert self._richest_variant == struct, (
+                f"The richest variant of the struct {self.name} has already been set. "
+                f"The current richest variant is {self._richest_variant.name}, "
+                f"and the new richest variant would be {struct.name}."
+            )
+
+        if self._flat_variant is not None:
+            self._flat_variant.set_richest_variant(struct)
+        else:
+            self._richest_variant = struct
 
     def get_richest_variant(self) -> "StructMetadata":
+        """Returns the richest variant of the struct."""
         if self._richest_variant is None:
-            raise ValueError("The richest variant has not been set.")
+            if self._flat_variant is not None:
+                return self._flat_variant.get_richest_variant()
+
+            if self.has_foreign_keys():
+                raise ValueError(
+                    f"The richest variant of the struct {self.name} has not been set. "
+                    f"The table associated with the struct is {self.table_name}. "
+                    f"This struct is associated to a table containing foreign keys, "
+                    "and therefore, it must have a richest variant. The foreign keys are "
+                    f"{self.get_foreign_keys()}."
+                )
+
+            assert not self.is_update_variant()
+            assert not self.is_new_variant()
+
+            return self
 
         return self._richest_variant
 
@@ -1132,7 +1204,7 @@ class StructMetadata:
         This method returns the child foreign keys of the struct.
         """
         if self._flat_variant is not None:
-            return self._flat_variant.get_child_foreign_keys()
+            return self._flat_variant.get_child_structs()
 
         return self._child_variants
 
@@ -1439,9 +1511,11 @@ class StructMetadata:
         its editability fully defined by the parent column, and the parent
         table associated with the struct may be hidden.
         """
-        if self.table_name in ("user_emails", ):
+        if self.table_name in ("user_emails",):
             return True
-        if is_role_invitation_table(self.table_name) or is_role_request_table(self.table_name):
+        if is_role_invitation_table(self.table_name) or is_role_request_table(
+            self.table_name
+        ):
             return True
         if self.has_public_column():
             return True

@@ -435,7 +435,7 @@ def write_frontend_form_builder_implementation(
 
     flat_variant = builder.get_flat_variant()
 
-    if flat_variant.is_insertable():
+    if flat_variant.is_insertable() and flat_variant.table_name != "users":
         variants.append(builder.get_new_variant())
 
     # If the new variant is not also used as an update
@@ -1264,7 +1264,7 @@ def write_frontend_yew_form(
 
     variants = []
 
-    if flat_variant.is_insertable():
+    if flat_variant.is_insertable() and flat_variant.table_name != "users":
         variants.append((builder.get_new_variant(), "POST"))
 
     if flat_variant.is_updatable():
@@ -1581,7 +1581,7 @@ def write_frontend_form_buildable_implementation(
 
     variants: List[StructMetadata] = []
 
-    if flat_variant.is_insertable():
+    if flat_variant.is_insertable() and flat_variant.table_name != "users":
         variants.append(builder.get_new_variant())
 
     if flat_variant.is_updatable():
@@ -1687,7 +1687,7 @@ def write_frontend_forms(
 
         flat_variant = builder.get_flat_variant()
 
-        if flat_variant.is_insertable():
+        if flat_variant.is_insertable() and flat_variant.table_name != "users":
             assert (
                 builder.get_new_variant().name in content
             ), f"New variant {builder.get_new_variant().name} not found in the generated file."

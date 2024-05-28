@@ -62,6 +62,7 @@ from constraint_checkers import (
 if __name__ == "__main__":
     # Load dotenv file
     load_dotenv()
+    check_for_common_typos_in_migrations()
     ensure_no_dead_python_code()
     ensures_no_duplicated_migrations()
     regroup_tables()
@@ -82,7 +83,6 @@ if __name__ == "__main__":
 
     enforce_migration_naming_convention()
     replace_serial_indices()
-    check_for_common_typos_in_migrations()
     ensures_migrations_simmetry()
     ensures_gluesql_compliance()
     print("Ensured migrations simmetry & GlueSQL compliance.")
@@ -105,6 +105,7 @@ if __name__ == "__main__":
 
     table_structs: List[StructMetadata] = extract_structs("src/models.rs")
     view_structs: List[StructMetadata] = extract_structs("src/views/views.rs")
+    flat_variants = table_structs + view_structs
 
     print(
         f"Extracted {len(table_structs)} tables and {len(view_structs)} views from the backend."
@@ -186,11 +187,11 @@ if __name__ == "__main__":
     print("Generated frontend forms.")
 
     write_frontend_pages(
-        builder_structs,
+        flat_variants,
     )
     print("Generated frontend pages.")
 
     write_frontend_router_page(
-        builder_structs,
+        flat_variants,
     )
     print("Generated frontend router page.")

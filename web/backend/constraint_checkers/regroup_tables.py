@@ -25,6 +25,20 @@ ALLOW_LISTED_SINGLETONS = [
     "units"
 ]
 
+SUPPORT_TABLE_NAMES = [
+    "units",
+    "user_emails",
+    "colors",
+    "font_awesome_icons",
+    "document_formats",
+    "login_providers",
+    "materials",
+    "notifications",
+    "team_states",
+    "project_states",
+    "sample_container_categories"
+]
+
 def get_best_insertion_point(table_name: str, expected_desinence: str) -> int:
     """Get the best insertion point for a new migration related to a table.
 

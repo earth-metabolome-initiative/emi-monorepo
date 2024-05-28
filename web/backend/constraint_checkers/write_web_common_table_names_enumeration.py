@@ -57,7 +57,9 @@ def write_web_common_table_names_enumeration(
             f"Its flat variant is {struct.get_flat_variant().name}."
         )
         tables[struct.table_name].set_new_flat_variant(struct)
-        struct.set_richest_variant(tables[struct.table_name].get_richest_struct())
+        richest_variant = tables[struct.table_name].get_richest_struct()
+        if richest_variant.is_nested():
+            struct.set_richest_variant(richest_variant)
 
     # We set the update flat model struct variant for each of the tables,
     # when it is available.
@@ -69,7 +71,9 @@ def write_web_common_table_names_enumeration(
             f"Its flat variant is {struct.get_flat_variant().name}."
         )
         tables[struct.table_name].set_update_flat_variant(struct)
-        struct.set_richest_variant(tables[struct.table_name].get_richest_struct())
+        richest_variant = tables[struct.table_name].get_richest_struct()
+        if richest_variant.is_nested():
+            struct.set_richest_variant(richest_variant)
 
     tables: List[TableStructMetadata] = sorted(
         list(tables.values()), key=lambda x: x.name

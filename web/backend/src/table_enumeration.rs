@@ -13,6 +13,19 @@ use crate::update_variants::UpdateRow;
 
 /// Trait providing the backend implementations for the Table enumeration
 pub trait BackendTable {
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `primary_key` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+     fn can_view_by_id(
+        &self,
+primary_key: PrimaryKey,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>;
+
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -22,6 +35,23 @@ pub trait BackendTable {
     /// * `connection` - The connection to the database.
     ///
      fn all_viewable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError>;
+
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn all_viewable_sorted(
         &self,
 filter: Option<Vec<u8>>,
 author_user_id: Option<i32>,
@@ -95,36 +125,6 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 filter: Option<Vec<u8>>,
 author_user_id: Option<i32>,
 query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError>;
-
-    /// Check whether the user can view the struct associated to the provided ids.
-    ///
-    /// * `primary_key` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-     fn can_view_by_id(
-        &self,
-primary_key: PrimaryKey,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>;
-
-    /// Get all of the sorted viewable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn all_viewable_sorted(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: Option<i32>,
 limit: Option<i64>,
 offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
@@ -354,6 +354,192 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 }
 
 impl BackendTable for web_common::database::Table {
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `primary_key` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+     fn can_view_by_id(
+        &self,
+primary_key: PrimaryKey,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => {
+NestedBioOttRank::can_view_by_id(
+)?            },
+            web_common::database::Table::BioOttTaxonItems => {
+NestedBioOttTaxonItem::can_view_by_id(
+)?            },
+            web_common::database::Table::Colors => {
+Color::can_view_by_id(
+)?            },
+            web_common::database::Table::Countries => {
+Country::can_view_by_id(
+)?            },
+            web_common::database::Table::DerivedSamples => {
+NestedDerivedSample::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::DocumentFormats => {
+NestedDocumentFormat::can_view_by_id(
+)?            },
+            web_common::database::Table::FontAwesomeIcons => {
+FontAwesomeIcon::can_view_by_id(
+)?            },
+            web_common::database::Table::LoginProviders => {
+NestedLoginProvider::can_view_by_id(
+)?            },
+            web_common::database::Table::Materials => {
+NestedMaterial::can_view_by_id(
+)?            },
+            web_common::database::Table::Notifications => {
+NestedNotification::can_view_by_id(
+)?            },
+            web_common::database::Table::Observations => {
+NestedObservation::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Organizations => {
+NestedOrganization::can_view_by_id(
+)?            },
+            web_common::database::Table::ProjectStates => {
+NestedProjectState::can_view_by_id(
+)?            },
+            web_common::database::Table::Projects => {
+NestedProject::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+NestedProjectsTeamsRoleInvitation::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+NestedProjectsTeamsRoleRequest::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+NestedProjectsTeamsRole::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+NestedProjectsUsersRoleInvitation::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+NestedProjectsUsersRoleRequest::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsUsersRoles => {
+NestedProjectsUsersRole::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Roles => {
+NestedRole::can_view_by_id(
+)?            },
+            web_common::database::Table::SampleBioOttTaxonItems => {
+NestedSampleBioOttTaxonItem::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::SampleContainerCategories => {
+NestedSampleContainerCategory::can_view_by_id(
+)?            },
+            web_common::database::Table::SampleContainers => {
+NestedSampleContainer::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::SampleStates => {
+NestedSampleState::can_view_by_id(
+)?            },
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => {
+NestedSampledIndividualBioOttTaxonItem::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::SampledIndividuals => {
+NestedSampledIndividual::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Samples => {
+NestedSample::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Spectra => {
+NestedSpectra::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::SpectraCollections => {
+NestedSpectraCollection::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::TeamStates => {
+NestedTeamState::can_view_by_id(
+)?            },
+            web_common::database::Table::Teams => {
+NestedTeam::can_view_by_id(
+)?            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+NestedTeamsTeamsRoleInvitation::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+NestedTeamsUsersRoleInvitation::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+NestedTeamsUsersRoleRequest::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::TeamsUsersRoles => {
+NestedTeamsUsersRole::can_view_by_id(
+)?            },
+            web_common::database::Table::Units => {
+Unit::can_view_by_id(
+)?            },
+            web_common::database::Table::UserEmails => {
+NestedUserEmail::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Users => {
+User::can_view_by_id(
+)?            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+NestedUsersUsersRoleInvitation::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+NestedUsersUsersRoleRequest::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::UsersUsersRoles => {
+NestedUsersUsersRole::can_view_by_id(
+)?            },
+        })
+    }
+
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -685,6 +871,337 @@ connection)?)?
         })
     }
 
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn all_viewable_sorted(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => {
+bincode::serialize(&NestedBioOttRank::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<BioOttRankFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::BioOttTaxonItems => {
+bincode::serialize(&NestedBioOttTaxonItem::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<BioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Colors => {
+bincode::serialize(&Color::all_viewable_sorted(
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Countries => {
+bincode::serialize(&Country::all_viewable_sorted(
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => {
+bincode::serialize(&NestedDocumentFormat::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<DocumentFormatFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::FontAwesomeIcons => {
+bincode::serialize(&FontAwesomeIcon::all_viewable_sorted(
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::LoginProviders => {
+bincode::serialize(&NestedLoginProvider::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Materials => {
+bincode::serialize(&NestedMaterial::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<MaterialFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Notifications => {
+bincode::serialize(&NestedNotification::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<NotificationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => {
+bincode::serialize(&NestedOrganization::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<OrganizationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectStates => {
+bincode::serialize(&NestedProjectState::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectStateFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Projects => {
+bincode::serialize(&NestedProject::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => {
+bincode::serialize(&NestedRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<RoleFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => {
+bincode::serialize(&NestedSampleContainerCategory::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<SampleContainerCategoryFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => {
+bincode::serialize(&NestedSampleState::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<SampleStateFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => {
+bincode::serialize(&NestedSampledIndividualBioOttTaxonItem::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<SampledIndividualBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampledIndividuals => {
+bincode::serialize(&NestedSampledIndividual::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<SampledIndividualFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => {
+bincode::serialize(&NestedSpectra::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<SpectraFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => {
+bincode::serialize(&NestedTeamState::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamStateFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => {
+bincode::serialize(&Unit::all_viewable_sorted(
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UserEmails => {
+bincode::serialize(&NestedUserEmail::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<UserEmailFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Users => {
+bincode::serialize(&User::all_viewable_sorted(
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+        })
+    }
+
     /// Get the struct from the database by its ID.
     ///
     /// * `primary_key` - The primary key(s) of the struct to get.
@@ -998,7 +1515,14 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::LoginProviders => unimplemented!("Method similarity_search_viewable not implemented for table login_providers."),
+            web_common::database::Table::LoginProviders => {
+bincode::serialize(&NestedLoginProvider::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Materials => unimplemented!("Method similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::Notifications => unimplemented!("Method similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method similarity_search_viewable not implemented for table observations."),
@@ -1077,7 +1601,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method similarity_search_viewable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method similarity_search_viewable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method similarity_search_viewable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => {
@@ -1186,7 +1718,14 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::LoginProviders => unimplemented!("Method word_similarity_search_viewable not implemented for table login_providers."),
+            web_common::database::Table::LoginProviders => {
+bincode::serialize(&NestedLoginProvider::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method word_similarity_search_viewable not implemented for table observations."),
@@ -1265,7 +1804,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method word_similarity_search_viewable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_viewable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method word_similarity_search_viewable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => {
@@ -1374,7 +1921,14 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::LoginProviders => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table login_providers."),
+            web_common::database::Table::LoginProviders => {
+bincode::serialize(&NestedLoginProvider::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table observations."),
@@ -1453,7 +2007,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => {
@@ -1494,384 +2056,6 @@ connection)?)?
             web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table users_users_role_invitations."),
             web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table users_users_role_requests."),
             web_common::database::Table::UsersUsersRoles => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table users_users_roles."),
-        })
-    }
-
-    /// Check whether the user can view the struct associated to the provided ids.
-    ///
-    /// * `primary_key` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-     fn can_view_by_id(
-        &self,
-primary_key: PrimaryKey,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method can_view_by_id not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method can_view_by_id not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method can_view_by_id not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method can_view_by_id not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => {
-NestedDerivedSample::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::DocumentFormats => unimplemented!("Method can_view_by_id not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method can_view_by_id not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method can_view_by_id not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method can_view_by_id not implemented for table materials."),
-            web_common::database::Table::Notifications => unimplemented!("Method can_view_by_id not implemented for table notifications."),
-            web_common::database::Table::Observations => {
-NestedObservation::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::Organizations => unimplemented!("Method can_view_by_id not implemented for table organizations."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method can_view_by_id not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-NestedProject::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => {
-NestedProjectsTeamsRoleInvitation::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::ProjectsTeamsRoleRequests => {
-NestedProjectsTeamsRoleRequest::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::ProjectsTeamsRoles => {
-NestedProjectsTeamsRole::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::ProjectsUsersRoleInvitations => {
-NestedProjectsUsersRoleInvitation::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::ProjectsUsersRoleRequests => {
-NestedProjectsUsersRoleRequest::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::ProjectsUsersRoles => {
-NestedProjectsUsersRole::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::Roles => unimplemented!("Method can_view_by_id not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => {
-NestedSampleBioOttTaxonItem::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method can_view_by_id not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => {
-NestedSampleContainer::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::SampleStates => unimplemented!("Method can_view_by_id not implemented for table sample_states."),
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => {
-NestedSampledIndividualBioOttTaxonItem::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::SampledIndividuals => {
-NestedSampledIndividual::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::Samples => {
-NestedSample::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::Spectra => {
-NestedSpectra::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::SpectraCollections => {
-NestedSpectraCollection::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::TeamStates => unimplemented!("Method can_view_by_id not implemented for table team_states."),
-            web_common::database::Table::Teams => unimplemented!("Method can_view_by_id not implemented for table teams."),
-            web_common::database::Table::TeamsTeamsRoleInvitations => {
-NestedTeamsTeamsRoleInvitation::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::TeamsUsersRoleInvitations => {
-NestedTeamsUsersRoleInvitation::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::TeamsUsersRoleRequests => {
-NestedTeamsUsersRoleRequest::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method can_view_by_id not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method can_view_by_id not implemented for table units."),
-            web_common::database::Table::UserEmails => {
-NestedUserEmail::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::Users => unimplemented!("Method can_view_by_id not implemented for table users."),
-            web_common::database::Table::UsersUsersRoleInvitations => {
-NestedUsersUsersRoleInvitation::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::UsersUsersRoleRequests => {
-NestedUsersUsersRoleRequest::can_view_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method can_view_by_id not implemented for table users_users_roles."),
-        })
-    }
-
-    /// Get all of the sorted viewable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn all_viewable_sorted(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: Option<i32>,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method all_viewable_sorted not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_viewable_sorted not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method all_viewable_sorted not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method all_viewable_sorted not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => {
-bincode::serialize(&NestedDerivedSample::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::DocumentFormats => unimplemented!("Method all_viewable_sorted not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_viewable_sorted not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method all_viewable_sorted not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method all_viewable_sorted not implemented for table materials."),
-            web_common::database::Table::Notifications => unimplemented!("Method all_viewable_sorted not implemented for table notifications."),
-            web_common::database::Table::Observations => {
-bincode::serialize(&NestedObservation::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Organizations => unimplemented!("Method all_viewable_sorted not implemented for table organizations."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method all_viewable_sorted not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-bincode::serialize(&NestedProject::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => {
-bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleRequests => {
-bincode::serialize(&NestedProjectsTeamsRoleRequest::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoles => {
-bincode::serialize(&NestedProjectsTeamsRole::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsUsersRoleInvitations => {
-bincode::serialize(&NestedProjectsUsersRoleInvitation::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsUsersRoleRequests => {
-bincode::serialize(&NestedProjectsUsersRoleRequest::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsUsersRoles => {
-bincode::serialize(&NestedProjectsUsersRole::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Roles => unimplemented!("Method all_viewable_sorted not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => {
-bincode::serialize(&NestedSampleBioOttTaxonItem::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_viewable_sorted not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => {
-bincode::serialize(&NestedSampleContainer::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::SampleStates => unimplemented!("Method all_viewable_sorted not implemented for table sample_states."),
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => {
-bincode::serialize(&NestedSampledIndividualBioOttTaxonItem::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<SampledIndividualBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::SampledIndividuals => {
-bincode::serialize(&NestedSampledIndividual::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<SampledIndividualFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Samples => {
-bincode::serialize(&NestedSample::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Spectra => unimplemented!("Method all_viewable_sorted not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => {
-bincode::serialize(&NestedSpectraCollection::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamStates => unimplemented!("Method all_viewable_sorted not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-bincode::serialize(&NestedTeam::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => {
-bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsUsersRoleInvitations => {
-bincode::serialize(&NestedTeamsUsersRoleInvitation::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsUsersRoleRequests => {
-bincode::serialize(&NestedTeamsUsersRoleRequest::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsUsersRoles => {
-bincode::serialize(&NestedTeamsUsersRole::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Units => unimplemented!("Method all_viewable_sorted not implemented for table units."),
-            web_common::database::Table::UserEmails => {
-bincode::serialize(&NestedUserEmail::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<UserEmailFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Users => {
-bincode::serialize(&User::all_viewable_sorted(
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleInvitations => {
-bincode::serialize(&NestedUsersUsersRoleInvitation::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleRequests => {
-bincode::serialize(&NestedUsersUsersRoleRequest::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoles => {
-bincode::serialize(&NestedUsersUsersRole::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
-limit,
-offset,
-connection)?)?
-            },
         })
     }
 
@@ -3031,7 +3215,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method similarity_search_updatable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method similarity_search_updatable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method similarity_search_updatable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method similarity_search_updatable not implemented for table team_states."),
@@ -3126,7 +3318,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method word_similarity_search_updatable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_updatable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method word_similarity_search_updatable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method word_similarity_search_updatable not implemented for table team_states."),
@@ -3221,7 +3421,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table team_states."),
@@ -3324,7 +3532,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method similarity_search_administrable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method similarity_search_administrable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method similarity_search_administrable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method similarity_search_administrable not implemented for table team_states."),
@@ -3427,7 +3643,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method word_similarity_search_administrable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_administrable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method word_similarity_search_administrable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method word_similarity_search_administrable not implemented for table team_states."),
@@ -3530,7 +3754,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Samples => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table samples."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table spectra_collections."),
             web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table team_states."),

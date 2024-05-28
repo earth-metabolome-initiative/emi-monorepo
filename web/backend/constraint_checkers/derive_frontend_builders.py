@@ -22,6 +22,20 @@ def derive_frontend_builders(
     the {struct_name}Builder attribute is not doubly optional (Option<Option<T>>), but simply optional
     as the original attribute (Option<T>).
     """
+    assert isinstance(new_or_update_struct_metadatas, list)
+    assert len(new_or_update_struct_metadatas) > 0
+    assert all(
+        isinstance(struct, StructMetadata) for struct in new_or_update_struct_metadatas
+    )
+    assert all(
+        struct.is_new_variant() or struct.is_update_variant()
+        for struct in new_or_update_struct_metadatas
+    )
+    assert all(
+        struct.has_flat_variant()
+        for struct in new_or_update_struct_metadatas
+    )
+
     builders = []
 
     deny_list_tables = [
@@ -59,7 +73,8 @@ def derive_frontend_builders(
         )
 
         builder.set_flat_variant(flat_variant)
-        builder.set_richest_variant(richest_variant)
+        if richest_variant.is_nested():
+            builder.set_richest_variant(richest_variant)
 
         if struct.is_new_variant():
             builder.set_new_variant(struct)

@@ -40,6 +40,17 @@ impl Searchable<false> for NestedDocumentFormat {
         )
     }
 }
+impl Searchable<false> for NestedLoginProvider {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::LoginProviders,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedOrganization {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -150,6 +161,28 @@ impl Searchable<true> for NestedSampledIndividual {
         )
     }
 }
+impl Searchable<false> for NestedSample {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Samples,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for NestedSample {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::Samples,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedTeamState {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -242,6 +275,17 @@ impl Searchable<false> for FontAwesomeIcon {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
              Table::FontAwesomeIcons,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for LoginProvider {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::LoginProviders,
               filter,
               query,
               limit,
@@ -352,6 +396,28 @@ impl Searchable<true> for SampledIndividual {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search_updatables(
              Table::SampledIndividuals,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for Sample {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Samples,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for Sample {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::Samples,
               filter,
               query,
               limit,

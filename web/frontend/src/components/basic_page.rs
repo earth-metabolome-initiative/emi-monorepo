@@ -43,6 +43,136 @@ pub trait PageLike: DeserializeOwned + Filtrable + PartialEq + Clone + Tabular +
     fn icon() -> &'static str;
 }
 
+impl PageLike for NestedBioOttRank {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        Some(self.inner.description.as_ref())
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        None
+    }
+
+    fn icon() -> &'static str {
+        "dna"
+    }
+}
+
+impl PageLike for NestedBioOttTaxonItem {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        None
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        None
+    }
+
+    fn icon() -> &'static str {
+        "dna"
+    }
+}
+
+impl PageLike for Country {
+    fn title(&self) -> String {
+        self.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        None
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        None
+    }
+
+    fn icon() -> &'static str {
+        "globe"
+    }
+}
+
+impl PageLike for NestedSampleState {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        Some(self.inner.description.as_ref())
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        None
+    }
+
+    fn icon() -> &'static str {
+        "vial"
+    }
+}
+
+impl PageLike for NestedSampleContainerCategory {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        None
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        None
+    }
+
+    fn icon() -> &'static str {
+        "box"
+    }
+}
+
 impl PageLike for NestedProject {
     fn title(&self) -> String {
         self.inner.name.clone()
@@ -75,6 +205,32 @@ impl PageLike for NestedProject {
     }
 }
 
+impl PageLike for NestedOrganization {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        None
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        None
+    }
+
+    fn icon() -> &'static str {
+        "sitemap"
+    }
+}
+
 impl PageLike for NestedObservation {
     fn title(&self) -> String {
         format!("Observation {}", self.inner.id)
@@ -89,7 +245,7 @@ impl PageLike for NestedObservation {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        None
+        Some(AppRoute::ObservationsUpdate { id: self.inner.id })
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {

@@ -164,7 +164,7 @@ def write_backend_flat_variants(
 
                 if operation == "update" and not struct.is_updatable():
                     continue
-                
+
                 if operation == "view":
                     requires_author = struct.may_be_hidden()
                 else:
@@ -183,7 +183,10 @@ def write_backend_flat_variants(
                         "Please add the can_view function to the struct."
                     )
 
-                if struct.table_metadata.has_postgres_function(can_x_function_name):
+                if (
+                    struct.table_metadata.has_postgres_function(can_x_function_name)
+                    or operation == "view"
+                ):
                     # We now create the more specific methods that check whether the user has a role
                     # with a role_id less than or equal to the provided role_id. We start with the Viewer role.
                     method: MethodDefinition = struct.add_backend_method(
@@ -193,10 +196,12 @@ def write_backend_flat_variants(
                         )
                     )
                     method.include_self_ref()
-                    method.add_argument(
-                        author_user_id, description="The ID of the user to check."
-                    )
-                    method.add_argument(*connection_argument_and_description)
+                    if struct.table_metadata.has_postgres_function(can_x_function_name):
+                        method.add_argument(
+                            author_user_id, description="The ID of the user to check."
+                        )
+                        method.add_argument(*connection_argument_and_description)
+
                     method.set_return_type(
                         AttributeMetadata(
                             original_name="_",
@@ -208,15 +213,18 @@ def write_backend_flat_variants(
 
                     method.write_header_to(file)
 
-                    file.write(
-                        " {\n"
-                        f"        Self::can_{operation}_by_id(\n"
-                        f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
-                        f"            {author_user_id.name},\n"
-                        "            connection,\n"
-                        "        )\n"
-                        "    }\n"
-                    )
+                    if struct.table_metadata.has_postgres_function(can_x_function_name):
+                        file.write(
+                            " {\n"
+                            f"        Self::can_{operation}_by_id(\n"
+                            f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
+                            f"            {author_user_id.name},\n"
+                            "            connection,\n"
+                            "        )\n"
+                            "    }\n"
+                        )
+                    else:
+                        file.write("{\n" "        Ok(true)\n" "}\n")
 
                     method: MethodDefinition = struct.add_backend_method(
                         MethodDefinition(
@@ -224,25 +232,29 @@ def write_backend_flat_variants(
                             summary=f"Check whether the user can {operation} the struct associated to the provided ids.",
                         )
                     )
-                    method.add_argument(
-                        AttributeMetadata(
-                            original_name=struct.get_formatted_primary_keys(
-                                include_prefix=False
+
+                    if struct.table_metadata.has_postgres_function(can_x_function_name):
+                        method.add_argument(
+                            AttributeMetadata(
+                                original_name=struct.get_formatted_primary_keys(
+                                    include_prefix=False
+                                ),
+                                name=struct.get_formatted_primary_keys(
+                                    include_prefix=False
+                                ),
+                                data_type=struct.get_formatted_primary_key_data_types(),
+                                optional=False,
+                                reference=False,
+                                mutable=False,
                             ),
-                            name=struct.get_formatted_primary_keys(
-                                include_prefix=False
-                            ),
-                            data_type=struct.get_formatted_primary_key_data_types(),
-                            optional=False,
-                            reference=False,
-                            mutable=False,
-                        ),
-                        description="The primary key(s) of the struct to check.",
-                    )
-                    method.add_argument(
-                        author_user_id, description="The ID of the user to check."
-                    )
-                    method.add_argument(*connection_argument_and_description)
+                            description="The primary key(s) of the struct to check.",
+                        )
+                        method.add_argument(
+                            author_user_id, description="The ID of the user to check."
+                        )
+
+                        method.add_argument(*connection_argument_and_description)
+
                     method.set_return_type(
                         AttributeMetadata(
                             original_name="_",
@@ -254,17 +266,17 @@ def write_backend_flat_variants(
 
                     method.write_header_to(file)
 
-                    file.write(
-                        "{\n"
-                        f"       diesel::select({can_x_function_name}({author_user_id.name}, {struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))\n"
-                        "            .get_result(connection).map_err(web_common::api::ApiError::from)\n"
-                        "}\n"
-                    )
+                    if struct.table_metadata.has_postgres_function(can_x_function_name):
+                        file.write(
+                            "{\n"
+                            f"       diesel::select({can_x_function_name}({author_user_id.name}, {struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))\n"
+                            "            .get_result(connection).map_err(web_common::api::ApiError::from)\n"
+                            "}\n"
+                        )
+                    else:
+                        file.write("{\n" "        Ok(true)\n" "}\n")
 
-                sorted_variants = [False]
-
-                if struct.has_updated_at() or struct.has_created_at():
-                    sorted_variants.append(True)
+                sorted_variants = [False, True]
 
                 for sorted_variant in sorted_variants:
 
@@ -292,7 +304,8 @@ def write_backend_flat_variants(
 
                     if requires_author:
                         method.add_argument(
-                            author_user_id, description="The ID of the user who is performing the search."
+                            author_user_id,
+                            description="The ID of the user who is performing the search.",
                         )
 
                     for arg_and_desc in limit_and_offset_arguments_and_description:
@@ -311,9 +324,7 @@ def write_backend_flat_variants(
 
                     method.write_header_to(file)
 
-                    file.write(
-                        "{\n"
-                    )
+                    file.write("{\n")
                     if table_type == "tables":
                         file.write(f"        use crate::schema::{struct.table_name};\n")
                     else:
@@ -367,10 +378,6 @@ def write_backend_flat_variants(
                             file.write(
                                 f"            .order_by({struct.table_name}::dsl::created_at.desc())\n"
                             )
-                        else:
-                            assert (
-                                False
-                            ), "The all_by_update method is only implemented for tables with an updated_at column."
 
                     file.write(
                         "            .offset(offset.unwrap_or(0))\n"
@@ -393,7 +400,9 @@ def write_backend_flat_variants(
                             original_name=struct.get_formatted_primary_keys(
                                 include_prefix=False
                             ),
-                            name=struct.get_formatted_primary_keys(include_prefix=False),
+                            name=struct.get_formatted_primary_keys(
+                                include_prefix=False
+                            ),
                             data_type=struct.get_formatted_primary_key_data_types(),
                             optional=False,
                             reference=False,
@@ -404,7 +413,8 @@ def write_backend_flat_variants(
 
                     if requires_author:
                         get_method.add_argument(
-                            author_user_id, description="The ID of the user who is performing the search."
+                            author_user_id,
+                            description="The ID of the user who is performing the search.",
                         )
 
                     get_method.add_argument(*connection_argument_and_description)
@@ -420,9 +430,7 @@ def write_backend_flat_variants(
 
                     get_method.write_header_to(file)
 
-                    file.write(
-                        "{\n"
-                    )
+                    file.write("{\n")
                     if struct.may_be_hidden():
                         file.write(
                             f"        if !Self::can_view_by_id({struct.get_formatted_primary_keys(include_prefix=False)}, {author_user_id.name}, connection)? {{\n"
@@ -508,10 +516,11 @@ def write_backend_flat_variants(
                                 optional=False,
                             )
                         )
-                        
+
                         from_method.write_header_to(file)
 
-                        file.write("{\n"
+                        file.write(
+                            "{\n"
                             f"        use crate::schema::{struct.table_name};\n"
                             f"        let flat_variant = {struct.table_name}::dsl::{struct.table_name}\n"
                         )
@@ -578,7 +587,9 @@ def write_backend_flat_variants(
                         for arg_and_desc in limit_and_offset_arguments_and_description:
                             similarity_method.add_argument(*arg_and_desc)
 
-                        similarity_method.add_argument(*connection_argument_and_description)
+                        similarity_method.add_argument(
+                            *connection_argument_and_description
+                        )
 
                         similarity_method.set_return_type(
                             AttributeMetadata(
@@ -618,6 +629,14 @@ def write_backend_flat_variants(
                             )
 
                         optional_filter_attributes = []
+                        non_optional_filter_attributes = []
+                        filter_method_content = ""
+
+                        if similarity_index.is_foreign_table(struct.table_name):
+                            filter_method_content += (
+                                f"            .select({struct.name}::as_select())\n"
+                                f"            {similarity_index.format_diesel_inner_join(struct.table_name)}\n"
+                            )
 
                         if struct.has_filter_variant():
                             optional_filter_attributes = [
@@ -634,76 +653,49 @@ def write_backend_flat_variants(
                                     filter_attribute.name
                                 ).optional
                             ]
-                            # If more than one of the non-optional filter is Some in the filter struct,
-                            # we raise an unimplemented! macro panic, as I have no idea how to cleanly
-                            # handle this case in Diesel and for a while it should cover all the cases.
-                            if len(non_optional_filter_attributes) > 1:
-                                file.write(
-                                    f" if filter.map(|f| {'&&'.join(f'f.{filter_attribute.name}.is_some()' for filter_attribute in non_optional_filter_attributes)}).unwrap_or(false) {{\n"
-                                    "       unimplemented!();\n"
-                                    " }\n"
-                                )
 
-                            for filter_attribute in non_optional_filter_attributes:
-                                file.write(
-                                    f"if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
-                                    f"        return {struct.table_name}::dsl::{struct.table_name}\n"
-                                    f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}))\n"
-                                )
-
-                                for filter_attribute in optional_filter_attributes:
-                                    file.write(
-                                        f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq(filter.and_then(|f| f.{filter_attribute.name})))\n"
-                                    )
-
-                                if struct.table_metadata.has_postgres_function(can_x_function_name):
-                                    primary_keys = ", ".join(
-                                        f"{struct.table_name}::dsl::{primary_key.name}"
-                                        for primary_key in struct.get_primary_keys()
-                                    )
-                                    file.write(
-                                        f"            .filter({can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
-                                    )
-
-                                file.write(
-                                    f"            .filter({similarity_index.format_operator_diesel('query', similarity_method_name)})\n"
-                                )
-
-                                file.write(
-                                    f"            .order_by({similarity_index.format_distance_operator_diesel('query', similarity_method_name)})\n"
-                                    "            .limit(limit.unwrap_or(10))\n"
-                                    "            .offset(offset.unwrap_or(0))\n"
-                                    "            .load::<Self>(connection).map_err(web_common::api::ApiError::from);\n"
-                                    "    }\n"
-                                )
-                        file.write(
-                            f"        {struct.table_name}::dsl::{struct.table_name}\n"
-                        )
-
-                        for filter_attribute in optional_filter_attributes:
+                        # If more than one of the non-optional filter is Some in the filter struct,
+                        # we raise an unimplemented! macro panic, as I have no idea how to cleanly
+                        # handle this case in Diesel and for a while it should cover all the cases.
+                        if len(non_optional_filter_attributes) > 1:
                             file.write(
-                                f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq(filter.and_then(|f| f.{filter_attribute.name})))\n"
+                                f" if filter.map(|f| {'&&'.join(f'f.{filter_attribute.name}.is_some()' for filter_attribute in non_optional_filter_attributes)}).unwrap_or(false) {{\n"
+                                "       unimplemented!();\n"
+                                " }\n"
                             )
 
-                        if struct.table_metadata.has_postgres_function(can_x_function_name):
+                        for filter_attribute in optional_filter_attributes:
+                            filter_method_content += f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq(filter.and_then(|f| f.{filter_attribute.name})))\n"
+
+                        if struct.table_metadata.has_postgres_function(
+                            can_x_function_name
+                        ):
                             primary_keys = ", ".join(
                                 f"{struct.table_name}::dsl::{primary_key.name}"
                                 for primary_key in struct.get_primary_keys()
                             )
-                            file.write(
-                                f"            .filter({can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
-                            )
+                            filter_method_content += f"            .filter({can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
 
-                        file.write(
-                            f"            .filter({similarity_index.format_operator_diesel('query', similarity_method_name)})\n"
-                        )
+                        filter_method_content += f"            .filter({similarity_index.format_operator_diesel('query', similarity_method_name)})\n"
 
-                        file.write(
+                        filter_method_content += (
                             f"            .order_by({similarity_index.format_distance_operator_diesel('query', similarity_method_name)})\n"
                             "            .limit(limit.unwrap_or(10))\n"
                             "            .offset(offset.unwrap_or(0))\n"
-                            "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)\n"
-                            "    }\n"
+                            "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)"
+                        )
+
+                        for filter_attribute in non_optional_filter_attributes:
+                            file.write(
+                                f"if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                                f"        return {struct.table_name}::dsl::{struct.table_name}\n"
+                                f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}))\n"
+                                f"{filter_method_content};\n}}\n"
+                            )
+
+                        file.write(
+                            f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                            f"{filter_method_content}\n}}\n"
                         )
 
             if struct.is_insertable():
@@ -716,7 +708,8 @@ def write_backend_flat_variants(
 
                 delete_method.include_self_ref()
                 delete_method.add_argument(
-                    author_user_id, description="The ID of the user who is deleting the struct."
+                    author_user_id,
+                    description="The ID of the user who is deleting the struct.",
                 )
                 delete_method.add_argument(*connection_argument_and_description)
 
@@ -730,7 +723,7 @@ def write_backend_flat_variants(
                 )
 
                 delete_method.write_header_to(file)
-                
+
                 file.write(
                     "{\n"
                     f"        Self::delete_by_id({struct.get_formatted_primary_keys(include_prefix=True)}, {author_user_id.name}, connection)\n"
@@ -746,7 +739,9 @@ def write_backend_flat_variants(
 
                 delete_by_id_method.add_argument(
                     AttributeMetadata(
-                        original_name=struct.get_formatted_primary_keys(include_prefix=False),
+                        original_name=struct.get_formatted_primary_keys(
+                            include_prefix=False
+                        ),
                         name=struct.get_formatted_primary_keys(include_prefix=False),
                         data_type=struct.get_formatted_primary_key_data_types(),
                         optional=False,
@@ -757,7 +752,8 @@ def write_backend_flat_variants(
                 )
 
                 delete_by_id_method.add_argument(
-                    author_user_id, description="The ID of the user who is deleting the struct."
+                    author_user_id,
+                    description="The ID of the user who is deleting the struct.",
                 )
 
                 delete_by_id_method.add_argument(*connection_argument_and_description)

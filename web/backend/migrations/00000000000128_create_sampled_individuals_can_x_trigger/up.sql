@@ -4,16 +4,16 @@
 -- and calls the parent column's can_update function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the sampled_individuals_users_roles table or
 -- the sampled_individuals_teams_users table with an appropriate role id.
-CREATE FUNCTION can_update_sampled_individuals(author_user_id INTEGER, id UUID)
+CREATE FUNCTION can_update_sampled_individuals(author_user_id INTEGER, this_sampled_individuals_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
-    project_id INTEGER;
-    created_by INTEGER;
-    updated_by INTEGER;
+    this_project_id INTEGER;
+    this_created_by INTEGER;
+    this_updated_by INTEGER;
 BEGIN
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
-    SELECT project_id, created_by, updated_by, 1 INTO project_id, created_by, updated_by, canary FROM sampled_individuals WHERE sampled_individuals.id = id;
+    SELECT project_id, created_by, updated_by, 1 INTO this_project_id, this_created_by, this_updated_by, canary FROM sampled_individuals WHERE sampled_individuals.id = this_sampled_individuals_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
         RETURN TRUE;
@@ -23,14 +23,14 @@ BEGIN
         RETURN FALSE;
     END IF;
 -- We check whether the user is the created_by of the row.
-    IF author_user_id = created_by THEN
+    IF author_user_id = this_created_by THEN
         RETURN TRUE;
     END IF;
 -- We check whether the user is the updated_by of the row.
-    IF author_user_id = updated_by THEN
+    IF author_user_id = this_updated_by THEN
         RETURN TRUE;
     END IF;
-        IF NOT can_update_projects(author_user_id, project_id) THEN
+        IF NOT can_update_projects(author_user_id, this_project_id) THEN
             RETURN FALSE;
         END IF;
     RETURN TRUE;
@@ -38,19 +38,19 @@ END;
 $$
 LANGUAGE plpgsql;
 
--- The function `can_update_sampled_individuals_trigger` is a trigger function that checks whether the user can edit the row.
+-- The function `can_update_sampled_individuals_trigger` is a trigger function that checks whether the user can update the row.
 CREATE FUNCTION can_update_sampled_individuals_trigger()
 RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'UPDATE' THEN
         IF NOT can_update_sampled_individuals(NEW.updated_by, NEW.id) THEN
-            RAISE EXCEPTION 'The user does not have the permission to edit this row.';
+            RAISE EXCEPTION 'The user does not have the permission to update this row.';
         END IF;
     END IF;
--- We check whether the user can {operation} the row.
+-- We check whether the user can update the row.
     IF TG_OP = 'INSERT' THEN
         IF NOT can_update_projects(NEW.created_by, NEW.project_id) THEN
-            RAISE EXCEPTION 'The user does not have the permission to edit this row.';
+            RAISE EXCEPTION 'The user does not have the permission to update this row.';
         END IF;
     END IF;
     RETURN NEW;
@@ -69,16 +69,16 @@ EXECUTE FUNCTION can_update_sampled_individuals_trigger();
 -- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the sampled_individuals_users_roles table or
 -- the sampled_individuals_teams_users table with an appropriate role id.
-CREATE FUNCTION can_admin_sampled_individuals(author_user_id INTEGER, id UUID)
+CREATE FUNCTION can_admin_sampled_individuals(author_user_id INTEGER, this_sampled_individuals_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
-    project_id INTEGER;
-    created_by INTEGER;
-    updated_by INTEGER;
+    this_project_id INTEGER;
+    this_created_by INTEGER;
+    this_updated_by INTEGER;
 BEGIN
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
-    SELECT project_id, created_by, updated_by, 1 INTO project_id, created_by, updated_by, canary FROM sampled_individuals WHERE sampled_individuals.id = id;
+    SELECT project_id, created_by, updated_by, 1 INTO this_project_id, this_created_by, this_updated_by, canary FROM sampled_individuals WHERE sampled_individuals.id = this_sampled_individuals_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
         RETURN TRUE;
@@ -88,14 +88,14 @@ BEGIN
         RETURN FALSE;
     END IF;
 -- We check whether the user is the created_by of the row.
-    IF author_user_id = created_by THEN
+    IF author_user_id = this_created_by THEN
         RETURN TRUE;
     END IF;
 -- We check whether the user is the updated_by of the row.
-    IF author_user_id = updated_by THEN
+    IF author_user_id = this_updated_by THEN
         RETURN TRUE;
     END IF;
-        IF NOT can_delete_projects(author_user_id, project_id) THEN
+        IF NOT can_delete_projects(author_user_id, this_project_id) THEN
             RETURN FALSE;
         END IF;
     RETURN TRUE;
@@ -109,29 +109,29 @@ LANGUAGE plpgsql;
 -- and calls the parent column's can_view function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the sampled_individuals_users_roles table or
 -- the sampled_individuals_teams_users table with an appropriate role id.
-CREATE FUNCTION can_view_sampled_individuals(author_user_id INTEGER, id UUID)
+CREATE FUNCTION can_view_sampled_individuals(author_user_id INTEGER, this_sampled_individuals_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
-    project_id INTEGER;
-    created_by INTEGER;
-    updated_by INTEGER;
+    this_project_id INTEGER;
+    this_created_by INTEGER;
+    this_updated_by INTEGER;
 BEGIN
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
-    SELECT project_id, created_by, updated_by, 1 INTO project_id, created_by, updated_by, canary FROM sampled_individuals WHERE sampled_individuals.id = id;
+    SELECT project_id, created_by, updated_by, 1 INTO this_project_id, this_created_by, this_updated_by, canary FROM sampled_individuals WHERE sampled_individuals.id = this_sampled_individuals_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
         RETURN TRUE;
     END IF;
 -- We check whether the user is the created_by of the row.
-    IF author_user_id = created_by THEN
+    IF author_user_id = this_created_by THEN
         RETURN TRUE;
     END IF;
 -- We check whether the user is the updated_by of the row.
-    IF author_user_id = updated_by THEN
+    IF author_user_id = this_updated_by THEN
         RETURN TRUE;
     END IF;
-        IF NOT can_view_projects(author_user_id, project_id) THEN
+        IF NOT can_view_projects(author_user_id, this_project_id) THEN
             RETURN FALSE;
         END IF;
     RETURN TRUE;

@@ -4,6 +4,152 @@ use web_common::database::*;
 use crate::components::*;
 
 #[derive(Clone, PartialEq, Properties)]
+pub struct BioOttRankPageProp {
+    pub id: i32,
+}
+
+impl From<&BioOttRankPageProp> for PrimaryKey {
+    fn from(prop: &BioOttRankPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl BioOttRankPageProp {
+    fn filter_bio_ott_taxon_items_by_ott_rank_id(&self) -> BioOttTaxonItemFilter {
+        let mut filter = BioOttTaxonItemFilter::default();
+        filter.ott_rank_id = Some(self.id);
+        filter
+    }
+}
+
+#[function_component(BioOttRankPage)]
+pub fn bio_ott_rank_page(props: &BioOttRankPageProp) -> Html {
+    html! {
+        <BasicPage<NestedBioOttRank> id={PrimaryKey::from(props)}>
+            // Linked with foreign key bio_ott_taxon_items.ott_rank_id
+            <BasicList<NestedBioOttTaxonItem> filters={props.filter_bio_ott_taxon_items_by_ott_rank_id()}/>
+        </BasicPage<NestedBioOttRank>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct BioOttTaxonItemPageProp {
+    pub id: i32,
+}
+
+impl From<&BioOttTaxonItemPageProp> for PrimaryKey {
+    fn from(prop: &BioOttTaxonItemPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl BioOttTaxonItemPageProp {
+    fn filter_bio_ott_taxon_items_by_domain_id(&self) -> BioOttTaxonItemFilter {
+        let mut filter = BioOttTaxonItemFilter::default();
+        filter.domain_id = Some(self.id);
+        filter
+    }
+    fn filter_bio_ott_taxon_items_by_kingdom_id(&self) -> BioOttTaxonItemFilter {
+        let mut filter = BioOttTaxonItemFilter::default();
+        filter.kingdom_id = Some(self.id);
+        filter
+    }
+    fn filter_bio_ott_taxon_items_by_phylum_id(&self) -> BioOttTaxonItemFilter {
+        let mut filter = BioOttTaxonItemFilter::default();
+        filter.phylum_id = Some(self.id);
+        filter
+    }
+    fn filter_bio_ott_taxon_items_by_class_id(&self) -> BioOttTaxonItemFilter {
+        let mut filter = BioOttTaxonItemFilter::default();
+        filter.class_id = Some(self.id);
+        filter
+    }
+    fn filter_bio_ott_taxon_items_by_order_id(&self) -> BioOttTaxonItemFilter {
+        let mut filter = BioOttTaxonItemFilter::default();
+        filter.order_id = Some(self.id);
+        filter
+    }
+    fn filter_bio_ott_taxon_items_by_family_id(&self) -> BioOttTaxonItemFilter {
+        let mut filter = BioOttTaxonItemFilter::default();
+        filter.family_id = Some(self.id);
+        filter
+    }
+    fn filter_bio_ott_taxon_items_by_genus_id(&self) -> BioOttTaxonItemFilter {
+        let mut filter = BioOttTaxonItemFilter::default();
+        filter.genus_id = Some(self.id);
+        filter
+    }
+    fn filter_bio_ott_taxon_items_by_parent_id(&self) -> BioOttTaxonItemFilter {
+        let mut filter = BioOttTaxonItemFilter::default();
+        filter.parent_id = Some(self.id);
+        filter
+    }
+    fn filter_sample_bio_ott_taxon_items_by_taxon_id(&self) -> SampleBioOttTaxonItemFilter {
+        let mut filter = SampleBioOttTaxonItemFilter::default();
+        filter.taxon_id = Some(self.id);
+        filter
+    }
+    fn filter_sampled_individual_bio_ott_taxon_items_by_taxon_id(&self) -> SampledIndividualBioOttTaxonItemFilter {
+        let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
+        filter.taxon_id = Some(self.id);
+        filter
+    }
+}
+
+#[function_component(BioOttTaxonItemPage)]
+pub fn bio_ott_taxon_item_page(props: &BioOttTaxonItemPageProp) -> Html {
+    html! {
+        <BasicPage<NestedBioOttTaxonItem> id={PrimaryKey::from(props)}>
+            // Linked with foreign key bio_ott_taxon_items.domain_id
+            <BasicList<NestedBioOttTaxonItem> filters={props.filter_bio_ott_taxon_items_by_domain_id()}/>
+            // Linked with foreign key bio_ott_taxon_items.kingdom_id
+            <BasicList<NestedBioOttTaxonItem> filters={props.filter_bio_ott_taxon_items_by_kingdom_id()}/>
+            // Linked with foreign key bio_ott_taxon_items.phylum_id
+            <BasicList<NestedBioOttTaxonItem> filters={props.filter_bio_ott_taxon_items_by_phylum_id()}/>
+            // Linked with foreign key bio_ott_taxon_items.class_id
+            <BasicList<NestedBioOttTaxonItem> filters={props.filter_bio_ott_taxon_items_by_class_id()}/>
+            // Linked with foreign key bio_ott_taxon_items.order_id
+            <BasicList<NestedBioOttTaxonItem> filters={props.filter_bio_ott_taxon_items_by_order_id()}/>
+            // Linked with foreign key bio_ott_taxon_items.family_id
+            <BasicList<NestedBioOttTaxonItem> filters={props.filter_bio_ott_taxon_items_by_family_id()}/>
+            // Linked with foreign key bio_ott_taxon_items.genus_id
+            <BasicList<NestedBioOttTaxonItem> filters={props.filter_bio_ott_taxon_items_by_genus_id()}/>
+            // Linked with foreign key bio_ott_taxon_items.parent_id
+            <BasicList<NestedBioOttTaxonItem> filters={props.filter_bio_ott_taxon_items_by_parent_id()}/>
+        </BasicPage<NestedBioOttTaxonItem>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CountryPageProp {
+    pub id: i32,
+}
+
+impl From<&CountryPageProp> for PrimaryKey {
+    fn from(prop: &CountryPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl CountryPageProp {
+    fn filter_organizations_by_country_id(&self) -> OrganizationFilter {
+        let mut filter = OrganizationFilter::default();
+        filter.country_id = Some(self.id);
+        filter
+    }
+}
+
+#[function_component(CountryPage)]
+pub fn country_page(props: &CountryPageProp) -> Html {
+    html! {
+        <BasicPage<Country> id={PrimaryKey::from(props)}>
+            // Linked with foreign key organizations.country_id
+            <BasicList<NestedOrganization> filters={props.filter_organizations_by_country_id()}/>
+        </BasicPage<Country>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
 pub struct ObservationPageProp {
     pub id: Uuid,
 }
@@ -23,6 +169,29 @@ pub fn observation_page(props: &ObservationPageProp) -> Html {
         <BasicPage<NestedObservation> id={PrimaryKey::from(props)}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedObservation>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct OrganizationPageProp {
+    pub id: i32,
+}
+
+impl From<&OrganizationPageProp> for PrimaryKey {
+    fn from(prop: &OrganizationPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl OrganizationPageProp {
+}
+
+#[function_component(OrganizationPage)]
+pub fn organization_page(props: &OrganizationPageProp) -> Html {
+    html! {
+        <BasicPage<NestedOrganization> id={PrimaryKey::from(props)}>
+            <span>{"No content available yet."}</span>
+        </BasicPage<NestedOrganization>>
     }
 }
 
@@ -113,6 +282,35 @@ pub fn sample_container_page(props: &SampleContainerPageProp) -> Html {
 }
 
 #[derive(Clone, PartialEq, Properties)]
+pub struct SampleStatePageProp {
+    pub id: i32,
+}
+
+impl From<&SampleStatePageProp> for PrimaryKey {
+    fn from(prop: &SampleStatePageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl SampleStatePageProp {
+    fn filter_samples_by_state(&self) -> SampleFilter {
+        let mut filter = SampleFilter::default();
+        filter.state = Some(self.id);
+        filter
+    }
+}
+
+#[function_component(SampleStatePage)]
+pub fn sample_state_page(props: &SampleStatePageProp) -> Html {
+    html! {
+        <BasicPage<NestedSampleState> id={PrimaryKey::from(props)}>
+            // Linked with foreign key samples.state
+            <BasicList<NestedSample> filters={props.filter_samples_by_state()}/>
+        </BasicPage<NestedSampleState>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
 pub struct SampledIndividualPageProp {
     pub id: Uuid,
 }
@@ -187,6 +385,29 @@ pub fn sample_page(props: &SamplePageProp) -> Html {
             // Linked with foreign key spectra_collections.sample_id
             <BasicList<NestedSpectraCollection> filters={props.filter_spectra_collections_by_sample_id()}/>
         </BasicPage<NestedSample>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct SpectraPageProp {
+    pub id: i32,
+}
+
+impl From<&SpectraPageProp> for PrimaryKey {
+    fn from(prop: &SpectraPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl SpectraPageProp {
+}
+
+#[function_component(SpectraPage)]
+pub fn spectra_page(props: &SpectraPageProp) -> Html {
+    html! {
+        <BasicPage<NestedSpectra> id={PrimaryKey::from(props)}>
+            <span>{"No content available yet."}</span>
+        </BasicPage<NestedSpectra>>
     }
 }
 

@@ -8,7 +8,7 @@ impl RowToBadge for NestedSampleContainer {
         let title_action = format!("View the container {}", self.title());
         yew::html! {
             <div class={format!("badge {}", self.category.color.name)} title={title_action}>
-                <Link<AppRoute> to={AppRoute::ProjectsView{ id: self.inner.id }}>
+                <Link<AppRoute> to={AppRoute::SampleContainersView { id: self.inner.id }}>
                     <p>
                         <i class={format!("fas fa-{}", self.category.icon.name)}></i>
                         {'\u{00a0}'}
@@ -28,7 +28,7 @@ impl RowToBadge for NestedSampleContainer {
         let title_action = format!("View the {} project", self.title());
         yew::html! {
             <div class={format!("badge {}", self.category.color.name)} title={title_action}>
-                <Link<AppRoute> to={AppRoute::ProjectsView{ id: self.inner.id }}>
+                <Link<AppRoute> to={AppRoute::SampleContainersView { id: self.inner.id }}>
                     <p>
                         <i class={format!("fas fa-{}", self.category.icon.name)}></i>
                         {'\u{00a0}'}

@@ -1,15 +1,16 @@
 """Submodule writing frontend router page to the filesystem."""
 
 from typing import List
+from tqdm.auto import tqdm
 from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
+from constraint_checkers.regroup_tables import SUPPORT_TABLE_NAMES
 
-
-def write_frontend_sidebar(builders: List[StructMetadata]):
+def write_frontend_sidebar(flat_variants: List[StructMetadata]):
     """Writes out the frontend sidebar.
 
     Parameters
     ----------
-    builders : List[StructMetadata]
+    flat_variants : List[StructMetadata]
         The list of structs to write out.
 
     Implementative details
@@ -73,27 +74,29 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
         "roles",
         "invitations",
         "requests",
-    ]
+    ] + SUPPORT_TABLE_NAMES
 
-    for builder in builders:
+    for flat_variant in tqdm(
+        flat_variants, desc="Writing frontend sidebar", unit="page", leave=False
+    ):
 
         found_skip = False
         for deny in deny_list:
-            if builder.table_name.endswith(deny):
+            if flat_variant.table_name.endswith(deny):
                 found_skip = True
                 break
         
         if found_skip:
             continue
 
-        if builder.is_junktion_table():
+        if flat_variant.is_junktion_table():
             continue
 
-        rich_variant = builder.get_richest_variant()
+        rich_variant = flat_variant.get_richest_variant()
 
         document.write(
-            f'                    <li class={{if route == AppRoute::{builder.get_capitalized_table_name()} {{ "active" }} else {{ "" }}}}>\n'
-            f"                        <Link<AppRoute> to={{AppRoute::{builder.get_capitalized_table_name()}}}>\n"
+            f'                    <li class={{if route == AppRoute::{flat_variant.get_capitalized_table_name()} {{ "active" }} else {{ "" }}}}>\n'
+            f"                        <Link<AppRoute> to={{AppRoute::{flat_variant.get_capitalized_table_name()}}}>\n"
             f"                            <i class={{format!(\"fas fa-{{}}\", {rich_variant.name}::icon())}}></i>\n"
             "                             {'\\u{00a0}'}\n"
             f'                            <span>{{{rich_variant.name}::section()}}</span>\n'
@@ -128,13 +131,15 @@ def write_frontend_sidebar(builders: List[StructMetadata]):
     document.close()
 
 
-def write_frontend_router_page(builders: List[StructMetadata]):
+def write_frontend_router_page(
+    flat_variants: List[StructMetadata]
+):
     """Writes out the frontend router page.
 
     Parameters
     ----------
-    builders : List[StructMetadata]
-        The list of structs to write out.
+    flat_variants : List[StructMetadata]
+        The list of flat variants to build the frontend pages from.
 
     Implementative details
     ----------------------
@@ -179,23 +184,27 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         "roles",
         "invitations",
         "requests",
-    ]
+    ] + SUPPORT_TABLE_NAMES
 
-    for builder in builders:
-        flat_variant = builder.get_flat_variant()
-        richest_variant = builder.get_richest_variant()
+    for flat_variant in tqdm(
+        flat_variants,
+        desc="Writing frontend router page",
+        unit="page",
+        leave=False,
+    ):
+        richest_variant = flat_variant.get_richest_variant()
         primary_keys = flat_variant.get_primary_keys()
 
         found_skip = False
         for deny in deny_list:
-            if builder.table_name.endswith(deny):
+            if flat_variant.table_name.endswith(deny):
                 found_skip = True
                 break
         
         if found_skip:
             continue
 
-        if builder.is_junktion_table():
+        if flat_variant.is_junktion_table():
             continue
 
         ids_url = "".join([f"/:{primary_key.name}" for primary_key in primary_keys])
@@ -207,25 +216,25 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         )
 
         document.write(
-            f'    #[at("/{builder.table_name}")]\n'
-            f"    {builder.get_capitalized_table_name()},\n"
-            f'    #[at("/{builder.table_name}{ids_url}")]\n'
-            f"    {builder.get_capitalized_table_name()}View{{{ids_struct}}},\n"
+            f'    #[at("/{flat_variant.table_name}")]\n'
+            f"    {flat_variant.get_capitalized_table_name()},\n"
+            f'    #[at("/{flat_variant.table_name}{ids_url}")]\n'
+            f"    {flat_variant.get_capitalized_table_name()}View{{{ids_struct}}},\n"
         )
 
         enum_variants.extend([
-            builder.get_capitalized_table_name(),
-            f"{builder.get_capitalized_table_name()}View",
+            flat_variant.get_capitalized_table_name(),
+            f"{flat_variant.get_capitalized_table_name()}View",
         ])
 
-        if flat_variant.is_insertable():
+        if flat_variant.is_insertable()  and flat_variant.table_name != "users":
             # We also add the /new sub-route
             document.write(
-                f'    #[at("/{builder.table_name}/new")]\n'
-                f"    {builder.get_capitalized_table_name()}New,\n"
+                f'    #[at("/{flat_variant.table_name}/new")]\n'
+                f"    {flat_variant.get_capitalized_table_name()}New,\n"
             )
 
-            enum_variants.append(f"{builder.get_capitalized_table_name()}New")
+            enum_variants.append(f"{flat_variant.get_capitalized_table_name()}New")
 
             for foreign_key in flat_variant.get_foreign_keys():
                 # We retrieve from the rich variant the struct associated with the foreign key.
@@ -246,10 +255,10 @@ def write_frontend_router_page(builders: List[StructMetadata]):
                     word.capitalize() for word in normalized_foreign_key_name.split("_")
                 )
 
-                enum_variant_name = f"{builder.get_capitalized_table_name()}NewWith{capitalized_normalized_foreign_key_name}"
+                enum_variant_name = f"{flat_variant.get_capitalized_table_name()}NewWith{capitalized_normalized_foreign_key_name}"
 
                 document.write(
-                    f'    #[at("/{builder.table_name}/new/{normalized_foreign_key_name}/:{foreign_key.name}")]\n'
+                    f'    #[at("/{flat_variant.table_name}/new/{normalized_foreign_key_name}/:{foreign_key.name}")]\n'
                     f"    {enum_variant_name}{{{foreign_key.name}: {foreign_key.data_type()}}},\n"
                 )
 
@@ -258,11 +267,11 @@ def write_frontend_router_page(builders: List[StructMetadata]):
         if flat_variant.is_updatable():
             # We also add the /update sub-route
             document.write(
-                f'    #[at("/{builder.table_name}{ids_url}/update")]\n'
-                f"    {builder.get_capitalized_table_name()}Update{{{ids_struct}}},\n"
+                f'    #[at("/{flat_variant.table_name}{ids_url}/update")]\n'
+                f"    {flat_variant.get_capitalized_table_name()}Update{{{ids_struct}}},\n"
             )
 
-            enum_variants.append(f"{builder.get_capitalized_table_name()}Update")
+            enum_variants.append(f"{flat_variant.get_capitalized_table_name()}Update")
 
     # Last, we insert the additional pages.
     document.write(
@@ -289,21 +298,20 @@ def write_frontend_router_page(builders: List[StructMetadata]):
 
     covered_variants = []
 
-    for builder in builders:
-        flat_variant = builder.get_flat_variant()
-        richest_variant = builder.get_richest_variant()
+    for flat_variant in flat_variants:
+        richest_variant = flat_variant.get_richest_variant()
         primary_keys = flat_variant.get_primary_keys()
 
         found_skip = False
         for deny in deny_list:
-            if builder.table_name.endswith(deny):
+            if flat_variant.table_name.endswith(deny):
                 found_skip = True
                 break
         
         if found_skip:
             continue
 
-        if builder.is_junktion_table():
+        if flat_variant.is_junktion_table():
             continue
 
         properties = []
@@ -312,34 +320,27 @@ def write_frontend_router_page(builders: List[StructMetadata]):
             properties.append(f"{primary_key.name} = {{{primary_key.name}}}")
 
         document.write(
-            f"        AppRoute::{builder.get_capitalized_table_name()} => {{\n"
+            f"        AppRoute::{flat_variant.get_capitalized_table_name()} => {{\n"
             f"            html! {{ <BasicList<{richest_variant.name}> /> }}\n"
             f"        }}\n"
-            f"        AppRoute::{builder.get_capitalized_table_name()}View{{{flat_variant.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}}} => {{\n"
+            f"        AppRoute::{flat_variant.get_capitalized_table_name()}View{{{flat_variant.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}}} => {{\n"
             f"            html! {{ <{flat_variant.name}Page {' '.join(properties)} /> }}\n"
             f"        }}\n"
         )
 
         covered_variants.extend([
-            builder.get_capitalized_table_name(),
-            f"{builder.get_capitalized_table_name()}View",
+            flat_variant.get_capitalized_table_name(),
+            f"{flat_variant.get_capitalized_table_name()}View",
         ])
 
-        if flat_variant.is_insertable():
-            if flat_variant.name == "SpectraCollection":
-                document.write(
-                    f"        AppRoute::{builder.get_capitalized_table_name()}New => {{\n"
-                    f"            html! {{ \"<Create{flat_variant.name}Form />\" }}\n"
-                    f"        }}\n"
-                )
-            else:
-                document.write(
-                    f"        AppRoute::{builder.get_capitalized_table_name()}New => {{\n"
-                    f"            html! {{ <Create{flat_variant.name}Form /> }}\n"
-                    f"        }}\n"
-                )
+        if flat_variant.is_insertable() and flat_variant.table_name != "users":
+            document.write(
+                f"        AppRoute::{flat_variant.get_capitalized_table_name()}New => {{\n"
+                f"            html! {{ <Create{flat_variant.name}Form /> }}\n"
+                f"        }}\n"
+            )
 
-            covered_variants.append(f"{builder.get_capitalized_table_name()}New")
+            covered_variants.append(f"{flat_variant.get_capitalized_table_name()}New")
 
             for foreign_key in flat_variant.get_foreign_keys():
                 # We retrieve from the rich variant the struct associated with the foreign key.
@@ -360,7 +361,7 @@ def write_frontend_router_page(builders: List[StructMetadata]):
                     word.capitalize() for word in normalized_foreign_key_name.split("_")
                 )
 
-                enum_variant_name = f"{builder.get_capitalized_table_name()}NewWith{capitalized_normalized_foreign_key_name}"
+                enum_variant_name = f"{flat_variant.get_capitalized_table_name()}NewWith{capitalized_normalized_foreign_key_name}"
 
                 document.write(
                 f"        AppRoute::{enum_variant_name}{{{foreign_key.name}}} => {{\n"
@@ -376,12 +377,12 @@ def write_frontend_router_page(builders: List[StructMetadata]):
                 for primary_key in primary_keys
             )
             document.write(
-                f"        AppRoute::{builder.get_capitalized_table_name()}Update{{{flat_variant.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}}} => {{\n"
+                f"        AppRoute::{flat_variant.get_capitalized_table_name()}Update{{{flat_variant.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}}} => {{\n"
                 f"            html! {{ <Update{flat_variant.name}Form {form_primary_key_properties} /> }}\n"
                 f"        }}\n"
             )
 
-            covered_variants.append(f"{builder.get_capitalized_table_name()}Update")
+            covered_variants.append(f"{flat_variant.get_capitalized_table_name()}Update")
 
     
     for expected_variant in enum_variants:
@@ -408,4 +409,4 @@ def write_frontend_router_page(builders: List[StructMetadata]):
     document.close()
 
     # Last, we write the component providing the left-side dashboard content.
-    write_frontend_sidebar(builders)
+    write_frontend_sidebar(flat_variants)

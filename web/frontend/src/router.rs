@@ -11,6 +11,18 @@ use crate::components::forms::automatic_forms::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Routable)]
 pub enum AppRoute {
+    #[at("/bio_ott_ranks")]
+    BioOttRanks,
+    #[at("/bio_ott_ranks/:id")]
+    BioOttRanksView{id: i32},
+    #[at("/bio_ott_taxon_items")]
+    BioOttTaxonItems,
+    #[at("/bio_ott_taxon_items/:id")]
+    BioOttTaxonItemsView{id: i32},
+    #[at("/countries")]
+    Countries,
+    #[at("/countries/:id")]
+    CountriesView{id: i32},
     #[at("/observations")]
     Observations,
     #[at("/observations/:id")]
@@ -23,6 +35,10 @@ pub enum AppRoute {
     ObservationsNewWithIndividual{individual_id: Uuid},
     #[at("/observations/:id/update")]
     ObservationsUpdate{id: Uuid},
+    #[at("/organizations")]
+    Organizations,
+    #[at("/organizations/:id")]
+    OrganizationsView{id: i32},
     #[at("/projects")]
     Projects,
     #[at("/projects/:id")]
@@ -41,6 +57,10 @@ pub enum AppRoute {
     SampleContainersNew,
     #[at("/sample_containers/new/project/:project_id")]
     SampleContainersNewWithProject{project_id: i32},
+    #[at("/sample_states")]
+    SampleStates,
+    #[at("/sample_states/:id")]
+    SampleStatesView{id: i32},
     #[at("/sampled_individuals")]
     SampledIndividuals,
     #[at("/sampled_individuals/:id")]
@@ -63,6 +83,10 @@ pub enum AppRoute {
     SamplesNewWithSampledBy{sampled_by: i32},
     #[at("/samples/:id/update")]
     SamplesUpdate{id: Uuid},
+    #[at("/spectra")]
+    Spectra,
+    #[at("/spectra/:id")]
+    SpectraView{id: i32},
     #[at("/spectra_collections")]
     SpectraCollections,
     #[at("/spectra_collections/:id")]
@@ -87,8 +111,6 @@ pub enum AppRoute {
     Users,
     #[at("/users/:id")]
     UsersView{id: i32},
-    #[at("/users/new")]
-    UsersNew,
     #[at("/users/:id/update")]
     UsersUpdate{id: i32},
     #[at("/")]
@@ -107,6 +129,24 @@ pub enum AppRoute {
 ///
 pub fn switch(route: AppRoute) -> Html {
     match route {
+        AppRoute::BioOttRanks => {
+            html! { <BasicList<NestedBioOttRank> /> }
+        }
+        AppRoute::BioOttRanksView{id} => {
+            html! { <BioOttRankPage id = {id} /> }
+        }
+        AppRoute::BioOttTaxonItems => {
+            html! { <BasicList<NestedBioOttTaxonItem> /> }
+        }
+        AppRoute::BioOttTaxonItemsView{id} => {
+            html! { <BioOttTaxonItemPage id = {id} /> }
+        }
+        AppRoute::Countries => {
+            html! { <BasicList<Country> /> }
+        }
+        AppRoute::CountriesView{id} => {
+            html! { <CountryPage id = {id} /> }
+        }
         AppRoute::Observations => {
             html! { <BasicList<NestedObservation> /> }
         }
@@ -124,6 +164,12 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::ObservationsUpdate{id} => {
             html! { <UpdateObservationForm id={id} /> }
+        }
+        AppRoute::Organizations => {
+            html! { <BasicList<NestedOrganization> /> }
+        }
+        AppRoute::OrganizationsView{id} => {
+            html! { <OrganizationPage id = {id} /> }
         }
         AppRoute::Projects => {
             html! { <BasicList<NestedProject> /> }
@@ -151,6 +197,12 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::SampleContainersNewWithProject{project_id} => {
             html! { <CreateSampleContainerForm project_id={project_id} /> }
+        }
+        AppRoute::SampleStates => {
+            html! { <BasicList<NestedSampleState> /> }
+        }
+        AppRoute::SampleStatesView{id} => {
+            html! { <SampleStatePage id = {id} /> }
         }
         AppRoute::SampledIndividuals => {
             html! { <BasicList<NestedSampledIndividual> /> }
@@ -185,6 +237,12 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::SamplesUpdate{id} => {
             html! { <UpdateSampleForm id={id} /> }
         }
+        AppRoute::Spectra => {
+            html! { <BasicList<NestedSpectra> /> }
+        }
+        AppRoute::SpectraView{id} => {
+            html! { <SpectraPage id = {id} /> }
+        }
         AppRoute::SpectraCollections => {
             html! { <BasicList<NestedSpectraCollection> /> }
         }
@@ -192,7 +250,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <SpectraCollectionPage id = {id} /> }
         }
         AppRoute::SpectraCollectionsNew => {
-            html! { "<CreateSpectraCollectionForm />" }
+            html! { <CreateSpectraCollectionForm /> }
         }
         AppRoute::SpectraCollectionsNewWithSample{sample_id} => {
             html! { <CreateSpectraCollectionForm sample_id={sample_id} /> }
@@ -220,9 +278,6 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::UsersView{id} => {
             html! { <UserPage id = {id} /> }
-        }
-        AppRoute::UsersNew => {
-            html! { <CreateUserForm /> }
         }
         AppRoute::UsersUpdate{id} => {
             html! { <UpdateUserForm id={id} /> }
