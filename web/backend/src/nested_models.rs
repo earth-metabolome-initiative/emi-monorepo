@@ -457,6 +457,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         DerivedSample::get(( parent_sample_id, child_sample_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        DerivedSample::can_update_by_id(( parent_sample_id, child_sample_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -2274,6 +2333,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsTeamsRoleInvitation::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::can_update_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -2481,6 +2599,65 @@ author_user_id: Option<i32>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsTeamsRoleRequest::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::can_update_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///
@@ -2690,6 +2867,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsTeamsRole::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsTeamsRole::can_update_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -2897,6 +3133,65 @@ author_user_id: Option<i32>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsUsersRoleInvitation::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::can_update_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///
@@ -3106,6 +3401,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsUsersRoleRequest::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::can_update_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -3313,6 +3667,65 @@ author_user_id: Option<i32>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsUsersRole::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        ProjectsUsersRole::can_update_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///
@@ -3708,6 +4121,65 @@ author_user_id: Option<i32>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         SampleBioOttTaxonItem::get(( sample_id, taxon_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( sample_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::can_update_by_id(( sample_id, taxon_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///
@@ -4131,6 +4603,122 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         SampleContainer::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampleContainer::can_update_by_id(id, author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleContainer::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///
@@ -4559,6 +5147,65 @@ author_user_id: Option<i32>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         SampledIndividualBioOttTaxonItem::get(( sampled_individual_id, taxon_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::can_update_by_id(( sampled_individual_id, taxon_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampledIndividualBioOttTaxonItem::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///
@@ -6639,6 +7286,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         TeamsTeamsRoleInvitation::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::can_update_by_id(( table_id, team_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -6844,6 +7550,65 @@ author_user_id: Option<i32>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         TeamsUsersRoleInvitation::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::can_update_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///
@@ -7051,6 +7816,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         TeamsUsersRoleRequest::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::can_update_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -7236,6 +8060,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         TeamsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        TeamsUsersRole::can_update_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///
@@ -7454,6 +8337,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         UserEmail::from_email_and_login_provider_id(email, login_provider_id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UserEmail::can_update_by_id(id, author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&UserEmailFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UserEmail::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&UserEmailFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UserEmail::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -7655,6 +8597,65 @@ author_user_id: Option<i32>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         UsersUsersRoleInvitation::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::can_update_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///
@@ -7862,6 +8863,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         UsersUsersRoleRequest::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRoleRequest::can_update_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -8047,6 +9107,65 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         UsersUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        UsersUsersRole::can_update_by_id(( table_id, user_id ), author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Check whether the user can admin the struct.
     ///

@@ -130,6 +130,53 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `primary_key` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+     fn can_update_by_id(
+        &self,
+primary_key: PrimaryKey,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>;
+
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn all_updatable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError>;
+
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn all_updatable_sorted(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError>;
+
     /// Check whether the user can admin the struct associated to the provided ids.
     ///
     /// * `primary_key` - The primary key(s) of the struct to check.
@@ -189,53 +236,6 @@ primary_key: PrimaryKey,
 author_user_id: i32,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<usize, web_common::api::ApiError>;
-
-    /// Check whether the user can update the struct associated to the provided ids.
-    ///
-    /// * `primary_key` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-     fn can_update_by_id(
-        &self,
-primary_key: PrimaryKey,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>;
-
-    /// Get all of the updatable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn all_updatable(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError>;
-
-    /// Get all of the sorted updatable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn all_updatable_sorted(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the updatable structs by a given string by Postgres's `similarity`.
     ///
@@ -2059,6 +2059,636 @@ connection)?)?
         })
     }
 
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `primary_key` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+     fn can_update_by_id(
+        &self,
+primary_key: PrimaryKey,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Method can_update_by_id not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method can_update_by_id not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method can_update_by_id not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method can_update_by_id not implemented for table countries."),
+            web_common::database::Table::DerivedSamples => {
+NestedDerivedSample::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method can_update_by_id not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method can_update_by_id not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method can_update_by_id not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method can_update_by_id not implemented for table materials."),
+            web_common::database::Table::Notifications => unimplemented!("Method can_update_by_id not implemented for table notifications."),
+            web_common::database::Table::Observations => {
+NestedObservation::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Organizations => unimplemented!("Method can_update_by_id not implemented for table organizations."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method can_update_by_id not implemented for table project_states."),
+            web_common::database::Table::Projects => {
+NestedProject::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+NestedProjectsTeamsRoleInvitation::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+NestedProjectsTeamsRoleRequest::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+NestedProjectsTeamsRole::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+NestedProjectsUsersRoleInvitation::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+NestedProjectsUsersRoleRequest::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::ProjectsUsersRoles => {
+NestedProjectsUsersRole::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Roles => unimplemented!("Method can_update_by_id not implemented for table roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+NestedSampleBioOttTaxonItem::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method can_update_by_id not implemented for table sample_container_categories."),
+            web_common::database::Table::SampleContainers => {
+NestedSampleContainer::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::SampleStates => unimplemented!("Method can_update_by_id not implemented for table sample_states."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => {
+NestedSampledIndividualBioOttTaxonItem::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::SampledIndividuals => {
+NestedSampledIndividual::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Samples => {
+NestedSample::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Spectra => unimplemented!("Method can_update_by_id not implemented for table spectra."),
+            web_common::database::Table::SpectraCollections => {
+NestedSpectraCollection::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::TeamStates => unimplemented!("Method can_update_by_id not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+NestedTeam::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+NestedTeamsTeamsRoleInvitation::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+NestedTeamsUsersRoleInvitation::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+NestedTeamsUsersRoleRequest::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::TeamsUsersRoles => {
+NestedTeamsUsersRole::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Units => unimplemented!("Method can_update_by_id not implemented for table units."),
+            web_common::database::Table::UserEmails => {
+NestedUserEmail::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::Users => {
+User::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+NestedUsersUsersRoleInvitation::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+NestedUsersUsersRoleRequest::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+            web_common::database::Table::UsersUsersRoles => {
+NestedUsersUsersRole::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
+        })
+    }
+
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn all_updatable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Method all_updatable not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_updatable not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method all_updatable not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method all_updatable not implemented for table countries."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::all_updatable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method all_updatable not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_updatable not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method all_updatable not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method all_updatable not implemented for table materials."),
+            web_common::database::Table::Notifications => unimplemented!("Method all_updatable not implemented for table notifications."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::all_updatable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method all_updatable not implemented for table organizations."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method all_updatable not implemented for table project_states."),
+            web_common::database::Table::Projects => {
+bincode::serialize(&NestedProject::all_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::all_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::all_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::all_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::all_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method all_updatable not implemented for table roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::all_updatable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_updatable not implemented for table sample_container_categories."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::all_updatable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method all_updatable not implemented for table sample_states."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => {
+bincode::serialize(&NestedSampledIndividualBioOttTaxonItem::all_updatable(
+filter.map(|filter| bincode::deserialize::<SampledIndividualBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampledIndividuals => {
+bincode::serialize(&NestedSampledIndividual::all_updatable(
+filter.map(|filter| bincode::deserialize::<SampledIndividualFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::all_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method all_updatable not implemented for table spectra."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::all_updatable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method all_updatable not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::all_updatable(
+filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::all_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::all_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method all_updatable not implemented for table units."),
+            web_common::database::Table::UserEmails => {
+bincode::serialize(&NestedUserEmail::all_updatable(
+filter.map(|filter| bincode::deserialize::<UserEmailFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Users => {
+bincode::serialize(&User::all_updatable(
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::all_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::all_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+        })
+    }
+
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn all_updatable_sorted(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Method all_updatable_sorted not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_updatable_sorted not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method all_updatable_sorted not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method all_updatable_sorted not implemented for table countries."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method all_updatable_sorted not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_updatable_sorted not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method all_updatable_sorted not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method all_updatable_sorted not implemented for table materials."),
+            web_common::database::Table::Notifications => unimplemented!("Method all_updatable_sorted not implemented for table notifications."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method all_updatable_sorted not implemented for table organizations."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method all_updatable_sorted not implemented for table project_states."),
+            web_common::database::Table::Projects => {
+bincode::serialize(&NestedProject::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method all_updatable_sorted not implemented for table roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_updatable_sorted not implemented for table sample_container_categories."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method all_updatable_sorted not implemented for table sample_states."),
+            web_common::database::Table::SampledIndividualBioOttTaxonItems => {
+bincode::serialize(&NestedSampledIndividualBioOttTaxonItem::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<SampledIndividualBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampledIndividuals => {
+bincode::serialize(&NestedSampledIndividual::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<SampledIndividualFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method all_updatable_sorted not implemented for table spectra."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method all_updatable_sorted not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method all_updatable_sorted not implemented for table units."),
+            web_common::database::Table::UserEmails => {
+bincode::serialize(&NestedUserEmail::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<UserEmailFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Users => {
+bincode::serialize(&User::all_updatable_sorted(
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+        })
+    }
+
     /// Check whether the user can admin the struct associated to the provided ids.
     ///
     /// * `primary_key` - The primary key(s) of the struct to check.
@@ -2847,312 +3477,6 @@ connection)?            },
         })
     }
 
-    /// Check whether the user can update the struct associated to the provided ids.
-    ///
-    /// * `primary_key` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-     fn can_update_by_id(
-        &self,
-primary_key: PrimaryKey,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method can_update_by_id not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method can_update_by_id not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method can_update_by_id not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method can_update_by_id not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => unimplemented!("Method can_update_by_id not implemented for table derived_samples."),
-            web_common::database::Table::DocumentFormats => unimplemented!("Method can_update_by_id not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method can_update_by_id not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method can_update_by_id not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method can_update_by_id not implemented for table materials."),
-            web_common::database::Table::Notifications => unimplemented!("Method can_update_by_id not implemented for table notifications."),
-            web_common::database::Table::Observations => {
-NestedObservation::can_update_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::Organizations => unimplemented!("Method can_update_by_id not implemented for table organizations."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method can_update_by_id not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-NestedProject::can_update_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method can_update_by_id not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method can_update_by_id not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method can_update_by_id not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method can_update_by_id not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method can_update_by_id not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method can_update_by_id not implemented for table projects_users_roles."),
-            web_common::database::Table::Roles => unimplemented!("Method can_update_by_id not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method can_update_by_id not implemented for table sample_bio_ott_taxon_items."),
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method can_update_by_id not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => unimplemented!("Method can_update_by_id not implemented for table sample_containers."),
-            web_common::database::Table::SampleStates => unimplemented!("Method can_update_by_id not implemented for table sample_states."),
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Method can_update_by_id not implemented for table sampled_individual_bio_ott_taxon_items."),
-            web_common::database::Table::SampledIndividuals => {
-NestedSampledIndividual::can_update_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::Samples => {
-NestedSample::can_update_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::Spectra => unimplemented!("Method can_update_by_id not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => {
-NestedSpectraCollection::can_update_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::TeamStates => unimplemented!("Method can_update_by_id not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-NestedTeam::can_update_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method can_update_by_id not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method can_update_by_id not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method can_update_by_id not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method can_update_by_id not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method can_update_by_id not implemented for table units."),
-            web_common::database::Table::UserEmails => unimplemented!("Method can_update_by_id not implemented for table user_emails."),
-            web_common::database::Table::Users => {
-User::can_update_by_id(
-primary_key.into(),
-author_user_id,
-connection)?            },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method can_update_by_id not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method can_update_by_id not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method can_update_by_id not implemented for table users_users_roles."),
-        })
-    }
-
-    /// Get all of the updatable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn all_updatable(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method all_updatable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_updatable not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method all_updatable not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method all_updatable not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => unimplemented!("Method all_updatable not implemented for table derived_samples."),
-            web_common::database::Table::DocumentFormats => unimplemented!("Method all_updatable not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_updatable not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method all_updatable not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method all_updatable not implemented for table materials."),
-            web_common::database::Table::Notifications => unimplemented!("Method all_updatable not implemented for table notifications."),
-            web_common::database::Table::Observations => {
-bincode::serialize(&NestedObservation::all_updatable(
-filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Organizations => unimplemented!("Method all_updatable not implemented for table organizations."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method all_updatable not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-bincode::serialize(&NestedProject::all_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method all_updatable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method all_updatable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method all_updatable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method all_updatable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method all_updatable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method all_updatable not implemented for table projects_users_roles."),
-            web_common::database::Table::Roles => unimplemented!("Method all_updatable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method all_updatable not implemented for table sample_bio_ott_taxon_items."),
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_updatable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => unimplemented!("Method all_updatable not implemented for table sample_containers."),
-            web_common::database::Table::SampleStates => unimplemented!("Method all_updatable not implemented for table sample_states."),
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Method all_updatable not implemented for table sampled_individual_bio_ott_taxon_items."),
-            web_common::database::Table::SampledIndividuals => {
-bincode::serialize(&NestedSampledIndividual::all_updatable(
-filter.map(|filter| bincode::deserialize::<SampledIndividualFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Samples => {
-bincode::serialize(&NestedSample::all_updatable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Spectra => unimplemented!("Method all_updatable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => {
-bincode::serialize(&NestedSpectraCollection::all_updatable(
-filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamStates => unimplemented!("Method all_updatable not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-bincode::serialize(&NestedTeam::all_updatable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method all_updatable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method all_updatable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method all_updatable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method all_updatable not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method all_updatable not implemented for table units."),
-            web_common::database::Table::UserEmails => unimplemented!("Method all_updatable not implemented for table user_emails."),
-            web_common::database::Table::Users => {
-bincode::serialize(&User::all_updatable(
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method all_updatable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method all_updatable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method all_updatable not implemented for table users_users_roles."),
-        })
-    }
-
-    /// Get all of the sorted updatable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn all_updatable_sorted(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method all_updatable_sorted not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_updatable_sorted not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method all_updatable_sorted not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method all_updatable_sorted not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => unimplemented!("Method all_updatable_sorted not implemented for table derived_samples."),
-            web_common::database::Table::DocumentFormats => unimplemented!("Method all_updatable_sorted not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_updatable_sorted not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method all_updatable_sorted not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method all_updatable_sorted not implemented for table materials."),
-            web_common::database::Table::Notifications => unimplemented!("Method all_updatable_sorted not implemented for table notifications."),
-            web_common::database::Table::Observations => {
-bincode::serialize(&NestedObservation::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Organizations => unimplemented!("Method all_updatable_sorted not implemented for table organizations."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method all_updatable_sorted not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-bincode::serialize(&NestedProject::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method all_updatable_sorted not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method all_updatable_sorted not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method all_updatable_sorted not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method all_updatable_sorted not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method all_updatable_sorted not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method all_updatable_sorted not implemented for table projects_users_roles."),
-            web_common::database::Table::Roles => unimplemented!("Method all_updatable_sorted not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method all_updatable_sorted not implemented for table sample_bio_ott_taxon_items."),
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_updatable_sorted not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => unimplemented!("Method all_updatable_sorted not implemented for table sample_containers."),
-            web_common::database::Table::SampleStates => unimplemented!("Method all_updatable_sorted not implemented for table sample_states."),
-            web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Method all_updatable_sorted not implemented for table sampled_individual_bio_ott_taxon_items."),
-            web_common::database::Table::SampledIndividuals => {
-bincode::serialize(&NestedSampledIndividual::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<SampledIndividualFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Samples => {
-bincode::serialize(&NestedSample::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Spectra => unimplemented!("Method all_updatable_sorted not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => {
-bincode::serialize(&NestedSpectraCollection::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamStates => unimplemented!("Method all_updatable_sorted not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-bincode::serialize(&NestedTeam::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method all_updatable_sorted not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method all_updatable_sorted not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method all_updatable_sorted not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method all_updatable_sorted not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method all_updatable_sorted not implemented for table units."),
-            web_common::database::Table::UserEmails => unimplemented!("Method all_updatable_sorted not implemented for table user_emails."),
-            web_common::database::Table::Users => {
-bincode::serialize(&User::all_updatable_sorted(
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method all_updatable_sorted not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method all_updatable_sorted not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method all_updatable_sorted not implemented for table users_users_roles."),
-        })
-    }
-
     /// Search for the updatable structs by a given string by Postgres's `similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -3203,7 +3527,15 @@ connection)?)?
             web_common::database::Table::Roles => unimplemented!("Method similarity_search_updatable not implemented for table roles."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method similarity_search_updatable not implemented for table sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method similarity_search_updatable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => unimplemented!("Method similarity_search_updatable not implemented for table sample_containers."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleStates => unimplemented!("Method similarity_search_updatable not implemented for table sample_states."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Method similarity_search_updatable not implemented for table sampled_individual_bio_ott_taxon_items."),
             web_common::database::Table::SampledIndividuals => {
@@ -3306,7 +3638,15 @@ connection)?)?
             web_common::database::Table::Roles => unimplemented!("Method word_similarity_search_updatable not implemented for table roles."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method word_similarity_search_updatable not implemented for table sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method word_similarity_search_updatable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => unimplemented!("Method word_similarity_search_updatable not implemented for table sample_containers."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleStates => unimplemented!("Method word_similarity_search_updatable not implemented for table sample_states."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Method word_similarity_search_updatable not implemented for table sampled_individual_bio_ott_taxon_items."),
             web_common::database::Table::SampledIndividuals => {
@@ -3409,7 +3749,15 @@ connection)?)?
             web_common::database::Table::Roles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table roles."),
             web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_containers."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_states."),
             web_common::database::Table::SampledIndividualBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sampled_individual_bio_ott_taxon_items."),
             web_common::database::Table::SampledIndividuals => {

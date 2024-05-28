@@ -162,9 +162,6 @@ def write_backend_flat_variants(
                 if struct.is_immutable() and operation in ["update", "admin"]:
                     continue
 
-                if operation == "update" and not struct.is_updatable():
-                    continue
-
                 if operation == "view":
                     requires_author = struct.may_be_hidden()
                 else:

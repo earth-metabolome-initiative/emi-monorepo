@@ -1441,6 +1441,103 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(derived_samples::dsl::child_sample_id.eq(child_sample_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.parent_sample_id, self.child_sample_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_derived_samples(author_user_id, parent_sample_id, child_sample_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::derived_samples;
+        let mut query = derived_samples::dsl::derived_samples
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(derived_samples::dsl::created_by.eq(created_by));
+        }
+        if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
+            query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
+        }
+        if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
+            query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        query
+            .filter(can_update_derived_samples(author_user_id, derived_samples::dsl::parent_sample_id, derived_samples::dsl::child_sample_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::derived_samples;
+        let mut query = derived_samples::dsl::derived_samples
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(derived_samples::dsl::created_by.eq(created_by));
+        }
+        if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
+            query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
+        }
+        if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
+            query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        query
+            .filter(can_update_derived_samples(author_user_id, derived_samples::dsl::parent_sample_id, derived_samples::dsl::child_sample_id))
+            .order_by(derived_samples::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -5102,6 +5199,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(projects_teams_role_invitations::dsl::team_id.eq(team_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.team_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_projects_teams_role_invitations(author_user_id, table_id, team_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_teams_role_invitations;
+        let mut query = projects_teams_role_invitations::dsl::projects_teams_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_teams_role_invitations(author_user_id, projects_teams_role_invitations::dsl::table_id, projects_teams_role_invitations::dsl::team_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_teams_role_invitations;
+        let mut query = projects_teams_role_invitations::dsl::projects_teams_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_teams_role_invitations(author_user_id, projects_teams_role_invitations::dsl::table_id, projects_teams_role_invitations::dsl::team_id))
+            .order_by(projects_teams_role_invitations::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -5399,6 +5599,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(projects_teams_role_requests::dsl::table_id.eq(table_id))
             .filter(projects_teams_role_requests::dsl::team_id.eq(team_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.team_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_projects_teams_role_requests(author_user_id, table_id, team_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_teams_role_requests;
+        let mut query = projects_teams_role_requests::dsl::projects_teams_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_role_requests::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_teams_role_requests(author_user_id, projects_teams_role_requests::dsl::table_id, projects_teams_role_requests::dsl::team_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_teams_role_requests;
+        let mut query = projects_teams_role_requests::dsl::projects_teams_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_role_requests::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_teams_role_requests(author_user_id, projects_teams_role_requests::dsl::table_id, projects_teams_role_requests::dsl::team_id))
+            .order_by(projects_teams_role_requests::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
@@ -5698,6 +6001,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(projects_teams_roles::dsl::team_id.eq(team_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.team_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_projects_teams_roles(author_user_id, table_id, team_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_teams_roles;
+        let mut query = projects_teams_roles::dsl::projects_teams_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_roles::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_teams_roles(author_user_id, projects_teams_roles::dsl::table_id, projects_teams_roles::dsl::team_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_teams_roles;
+        let mut query = projects_teams_roles::dsl::projects_teams_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_teams_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(projects_teams_roles::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_teams_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_teams_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_teams_roles(author_user_id, projects_teams_roles::dsl::table_id, projects_teams_roles::dsl::team_id))
+            .order_by(projects_teams_roles::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -5994,6 +6400,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(projects_users_role_invitations::dsl::table_id.eq(table_id))
             .filter(projects_users_role_invitations::dsl::user_id.eq(user_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.user_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_projects_users_role_invitations(author_user_id, table_id, user_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_users_role_invitations;
+        let mut query = projects_users_role_invitations::dsl::projects_users_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_role_invitations::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_users_role_invitations(author_user_id, projects_users_role_invitations::dsl::table_id, projects_users_role_invitations::dsl::user_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_users_role_invitations;
+        let mut query = projects_users_role_invitations::dsl::projects_users_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_role_invitations::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_users_role_invitations(author_user_id, projects_users_role_invitations::dsl::table_id, projects_users_role_invitations::dsl::user_id))
+            .order_by(projects_users_role_invitations::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
@@ -6292,6 +6801,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(projects_users_role_requests::dsl::user_id.eq(user_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.user_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_projects_users_role_requests(author_user_id, table_id, user_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_users_role_requests;
+        let mut query = projects_users_role_requests::dsl::projects_users_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_role_requests::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_users_role_requests(author_user_id, projects_users_role_requests::dsl::table_id, projects_users_role_requests::dsl::user_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_users_role_requests;
+        let mut query = projects_users_role_requests::dsl::projects_users_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_role_requests::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_users_role_requests(author_user_id, projects_users_role_requests::dsl::table_id, projects_users_role_requests::dsl::user_id))
+            .order_by(projects_users_role_requests::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -6588,6 +7200,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(projects_users_roles::dsl::table_id.eq(table_id))
             .filter(projects_users_roles::dsl::user_id.eq(user_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.user_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_projects_users_roles(author_user_id, table_id, user_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_users_roles;
+        let mut query = projects_users_roles::dsl::projects_users_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_users_roles(author_user_id, projects_users_roles::dsl::table_id, projects_users_roles::dsl::user_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::projects_users_roles;
+        let mut query = projects_users_roles::dsl::projects_users_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(projects_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(projects_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(projects_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_projects_users_roles(author_user_id, projects_users_roles::dsl::table_id, projects_users_roles::dsl::user_id))
+            .order_by(projects_users_roles::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
@@ -7204,6 +7919,103 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(sample_bio_ott_taxon_items::dsl::sample_id.eq(sample_id))
             .filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.sample_id, self.taxon_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( sample_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_sample_bio_ott_taxon_items(author_user_id, sample_id, taxon_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::sample_bio_ott_taxon_items;
+        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+        }
+        if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::sample_id.eq(sample_id));
+        }
+        if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+        }
+        query
+            .filter(can_update_sample_bio_ott_taxon_items(author_user_id, sample_bio_ott_taxon_items::dsl::sample_id, sample_bio_ott_taxon_items::dsl::taxon_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::sample_bio_ott_taxon_items;
+        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+        }
+        if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::sample_id.eq(sample_id));
+        }
+        if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+        }
+        query
+            .filter(can_update_sample_bio_ott_taxon_items(author_user_id, sample_bio_ott_taxon_items::dsl::sample_id, sample_bio_ott_taxon_items::dsl::taxon_id))
+            .order_by(sample_bio_ott_taxon_items::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
@@ -8018,6 +8830,298 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
 }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_sample_containers(author_user_id, id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::sample_containers;
+        let mut query = sample_containers::dsl::sample_containers
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::sample_containers;
+        let mut query = sample_containers::dsl::sample_containers
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .order_by(sample_containers::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::sample_containers;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::project_id.eq(project_id))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::category_id.eq(category_id))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        sample_containers::dsl::sample_containers
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::sample_containers;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::project_id.eq(project_id))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::category_id.eq(category_id))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        sample_containers::dsl::sample_containers
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&SampleContainerFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::sample_containers;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::project_id.eq(project_id))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::category_id.eq(category_id))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        sample_containers::dsl::sample_containers
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -8791,6 +9895,103 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id.eq(sampled_individual_id))
             .filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.sampled_individual_id, self.taxon_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_sampled_individual_bio_ott_taxon_items(author_user_id, sampled_individual_id, taxon_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::sampled_individual_bio_ott_taxon_items;
+        let mut query = sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+        }
+        if let Some(sampled_individual_id) = filter.and_then(|f| f.sampled_individual_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id.eq(sampled_individual_id));
+        }
+        if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+        }
+        query
+            .filter(can_update_sampled_individual_bio_ott_taxon_items(author_user_id, sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id, sampled_individual_bio_ott_taxon_items::dsl::taxon_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::sampled_individual_bio_ott_taxon_items;
+        let mut query = sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_bio_ott_taxon_items
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+        }
+        if let Some(sampled_individual_id) = filter.and_then(|f| f.sampled_individual_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id.eq(sampled_individual_id));
+        }
+        if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
+            query = query.filter(sampled_individual_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+        }
+        query
+            .filter(can_update_sampled_individual_bio_ott_taxon_items(author_user_id, sampled_individual_bio_ott_taxon_items::dsl::sampled_individual_id, sampled_individual_bio_ott_taxon_items::dsl::taxon_id))
+            .order_by(sampled_individual_bio_ott_taxon_items::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
@@ -13577,6 +14778,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(teams_teams_role_invitations::dsl::team_id.eq(team_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.team_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, team_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_teams_teams_role_invitations(author_user_id, table_id, team_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::teams_teams_role_invitations;
+        let mut query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_teams_teams_role_invitations(author_user_id, teams_teams_role_invitations::dsl::table_id, teams_teams_role_invitations::dsl::team_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::teams_teams_role_invitations;
+        let mut query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(team_id) = filter.and_then(|f| f.team_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::team_id.eq(team_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_teams_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_teams_teams_role_invitations(author_user_id, teams_teams_role_invitations::dsl::table_id, teams_teams_role_invitations::dsl::team_id))
+            .order_by(teams_teams_role_invitations::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -13873,6 +15177,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(teams_users_role_invitations::dsl::table_id.eq(table_id))
             .filter(teams_users_role_invitations::dsl::user_id.eq(user_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.user_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_teams_users_role_invitations(author_user_id, table_id, user_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::teams_users_role_invitations;
+        let mut query = teams_users_role_invitations::dsl::teams_users_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_role_invitations::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_teams_users_role_invitations(author_user_id, teams_users_role_invitations::dsl::table_id, teams_users_role_invitations::dsl::user_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::teams_users_role_invitations;
+        let mut query = teams_users_role_invitations::dsl::teams_users_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_role_invitations::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_teams_users_role_invitations(author_user_id, teams_users_role_invitations::dsl::table_id, teams_users_role_invitations::dsl::user_id))
+            .order_by(teams_users_role_invitations::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
@@ -14171,6 +15578,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(teams_users_role_requests::dsl::user_id.eq(user_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.user_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_teams_users_role_requests(author_user_id, table_id, user_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::teams_users_role_requests;
+        let mut query = teams_users_role_requests::dsl::teams_users_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_role_requests::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_teams_users_role_requests(author_user_id, teams_users_role_requests::dsl::table_id, teams_users_role_requests::dsl::user_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::teams_users_role_requests;
+        let mut query = teams_users_role_requests::dsl::teams_users_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_role_requests::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_teams_users_role_requests(author_user_id, teams_users_role_requests::dsl::table_id, teams_users_role_requests::dsl::user_id))
+            .order_by(teams_users_role_requests::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -14437,6 +15947,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(teams_users_roles::dsl::table_id.eq(table_id))
             .filter(teams_users_roles::dsl::user_id.eq(user_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.user_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_teams_users_roles(author_user_id, table_id, user_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::teams_users_roles;
+        let mut query = teams_users_roles::dsl::teams_users_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_teams_users_roles(author_user_id, teams_users_roles::dsl::table_id, teams_users_roles::dsl::user_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::teams_users_roles;
+        let mut query = teams_users_roles::dsl::teams_users_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(teams_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(teams_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(teams_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_teams_users_roles(author_user_id, teams_users_roles::dsl::table_id, teams_users_roles::dsl::user_id))
+            .order_by(teams_users_roles::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
@@ -14935,6 +16548,97 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Err(web_common::api::ApiError::Unauthorized);
         }
         Ok(flat_variant)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_user_emails(author_user_id, id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&UserEmailFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::user_emails;
+        let mut query = user_emails::dsl::user_emails
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(user_emails::dsl::created_by.eq(created_by));
+        }
+        if let Some(login_provider_id) = filter.and_then(|f| f.login_provider_id) {
+            query = query.filter(user_emails::dsl::login_provider_id.eq(login_provider_id));
+        }
+        query
+            .filter(can_update_user_emails(author_user_id, user_emails::dsl::id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&UserEmailFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::user_emails;
+        let mut query = user_emails::dsl::user_emails
+            .into_boxed();
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(user_emails::dsl::created_by.eq(created_by));
+        }
+        if let Some(login_provider_id) = filter.and_then(|f| f.login_provider_id) {
+            query = query.filter(user_emails::dsl::login_provider_id.eq(login_provider_id));
+        }
+        query
+            .filter(can_update_user_emails(author_user_id, user_emails::dsl::id))
+            .order_by(user_emails::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
@@ -15758,6 +17462,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.user_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_users_users_role_invitations(author_user_id, table_id, user_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::users_users_role_invitations;
+        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_role_invitations::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::users_users_role_invitations;
+        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_role_invitations::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_role_invitations::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_role_invitations::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
+            .order_by(users_users_role_invitations::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -16054,6 +17861,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(users_users_role_requests::dsl::user_id.eq(user_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.user_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_users_users_role_requests(author_user_id, table_id, user_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::users_users_role_requests;
+        let mut query = users_users_role_requests::dsl::users_users_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_role_requests::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_users_users_role_requests(author_user_id, users_users_role_requests::dsl::table_id, users_users_role_requests::dsl::user_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::users_users_role_requests;
+        let mut query = users_users_role_requests::dsl::users_users_role_requests
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_role_requests::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_role_requests::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_role_requests::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_role_requests::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_users_users_role_requests(author_user_id, users_users_role_requests::dsl::table_id, users_users_role_requests::dsl::user_id))
+            .order_by(users_users_role_requests::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -16319,6 +18229,109 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(users_users_roles::dsl::table_id.eq(table_id))
             .filter(users_users_roles::dsl::user_id.eq(user_id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            ( self.table_id, self.user_id ),
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+( table_id, user_id ): ( i32, i32 ),
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_users_users_roles(author_user_id, table_id, user_id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::users_users_roles;
+        let mut query = users_users_roles::dsl::users_users_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_users_users_roles(author_user_id, users_users_roles::dsl::table_id, users_users_roles::dsl::user_id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::users_users_roles;
+        let mut query = users_users_roles::dsl::users_users_roles
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
+            .filter(can_update_users_users_roles(author_user_id, users_users_roles::dsl::table_id, users_users_roles::dsl::user_id))
+            .order_by(users_users_roles::dsl::created_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
