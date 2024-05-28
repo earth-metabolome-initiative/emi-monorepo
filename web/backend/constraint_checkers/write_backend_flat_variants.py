@@ -183,98 +183,96 @@ def write_backend_flat_variants(
                         "Please add the can_view function to the struct."
                     )
 
-                if (
-                    struct.table_metadata.has_postgres_function(can_x_function_name)
-                    or operation == "view"
-                ):
-                    # We now create the more specific methods that check whether the user has a role
-                    # with a role_id less than or equal to the provided role_id. We start with the Viewer role.
-                    method: MethodDefinition = struct.add_backend_method(
-                        MethodDefinition(
-                            name=f"can_{operation}",
-                            summary=f"Check whether the user can {operation} the struct.",
-                        )
+                # We now create the more specific methods that check whether the user has a role
+                # with a role_id less than or equal to the provided role_id. We start with the Viewer role.
+                method: MethodDefinition = struct.add_backend_method(
+                    MethodDefinition(
+                        name=f"can_{operation}",
+                        summary=f"Check whether the user can {operation} the struct.",
                     )
-                    method.include_self_ref()
-                    if struct.table_metadata.has_postgres_function(can_x_function_name):
-                        method.add_argument(
-                            author_user_id, description="The ID of the user to check."
-                        )
-                        method.add_argument(*connection_argument_and_description)
+                )
+                method.include_self_ref()
+                if struct.table_metadata.has_postgres_function(can_x_function_name):
+                    method.add_argument(
+                        author_user_id, description="The ID of the user to check."
+                    )
+                    method.add_argument(*connection_argument_and_description)
 
-                    method.set_return_type(
+                method.set_return_type(
+                    AttributeMetadata(
+                        original_name="_",
+                        name="_",
+                        data_type="Result<bool, web_common::api::ApiError>",
+                        optional=False,
+                    )
+                )
+
+                method.write_header_to(file)
+
+                rust_boolean = "true" if operation == "view" else "false"
+
+                if struct.table_metadata.has_postgres_function(can_x_function_name):
+                    file.write(
+                        " {\n"
+                        f"        Self::can_{operation}_by_id(\n"
+                        f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
+                        f"            {author_user_id.name},\n"
+                        "            connection,\n"
+                        "        )\n"
+                        "    }\n"
+                    )
+                else:
+                    file.write(f"{{\n        Ok({rust_boolean})\n}}\n")
+
+                method: MethodDefinition = struct.add_backend_method(
+                    MethodDefinition(
+                        name=f"can_{operation}_by_id",
+                        summary=f"Check whether the user can {operation} the struct associated to the provided ids.",
+                    )
+                )
+
+                if struct.table_metadata.has_postgres_function(can_x_function_name):
+                    method.add_argument(
                         AttributeMetadata(
-                            original_name="_",
-                            name="_",
-                            data_type="Result<bool, web_common::api::ApiError>",
-                            optional=False,
-                        )
-                    )
-
-                    method.write_header_to(file)
-
-                    if struct.table_metadata.has_postgres_function(can_x_function_name):
-                        file.write(
-                            " {\n"
-                            f"        Self::can_{operation}_by_id(\n"
-                            f"            {struct.get_formatted_primary_keys(include_prefix=True)},\n"
-                            f"            {author_user_id.name},\n"
-                            "            connection,\n"
-                            "        )\n"
-                            "    }\n"
-                        )
-                    else:
-                        file.write("{\n" "        Ok(true)\n" "}\n")
-
-                    method: MethodDefinition = struct.add_backend_method(
-                        MethodDefinition(
-                            name=f"can_{operation}_by_id",
-                            summary=f"Check whether the user can {operation} the struct associated to the provided ids.",
-                        )
-                    )
-
-                    if struct.table_metadata.has_postgres_function(can_x_function_name):
-                        method.add_argument(
-                            AttributeMetadata(
-                                original_name=struct.get_formatted_primary_keys(
-                                    include_prefix=False
-                                ),
-                                name=struct.get_formatted_primary_keys(
-                                    include_prefix=False
-                                ),
-                                data_type=struct.get_formatted_primary_key_data_types(),
-                                optional=False,
-                                reference=False,
-                                mutable=False,
+                            original_name=struct.get_formatted_primary_keys(
+                                include_prefix=False
                             ),
-                            description="The primary key(s) of the struct to check.",
-                        )
-                        method.add_argument(
-                            author_user_id, description="The ID of the user to check."
-                        )
-
-                        method.add_argument(*connection_argument_and_description)
-
-                    method.set_return_type(
-                        AttributeMetadata(
-                            original_name="_",
-                            name="_",
-                            data_type="Result<bool, web_common::api::ApiError>",
+                            name=struct.get_formatted_primary_keys(
+                                include_prefix=False
+                            ),
+                            data_type=struct.get_formatted_primary_key_data_types(),
                             optional=False,
-                        )
+                            reference=False,
+                            mutable=False,
+                        ),
+                        description="The primary key(s) of the struct to check.",
+                    )
+                    method.add_argument(
+                        author_user_id, description="The ID of the user to check."
                     )
 
-                    method.write_header_to(file)
+                    method.add_argument(*connection_argument_and_description)
 
-                    if struct.table_metadata.has_postgres_function(can_x_function_name):
-                        file.write(
-                            "{\n"
-                            f"       diesel::select({can_x_function_name}({author_user_id.name}, {struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))\n"
-                            "            .get_result(connection).map_err(web_common::api::ApiError::from)\n"
-                            "}\n"
-                        )
-                    else:
-                        file.write("{\n" "        Ok(true)\n" "}\n")
+                method.set_return_type(
+                    AttributeMetadata(
+                        original_name="_",
+                        name="_",
+                        data_type="Result<bool, web_common::api::ApiError>",
+                        optional=False,
+                    )
+                )
+
+                method.write_header_to(file)
+
+                if struct.table_metadata.has_postgres_function(can_x_function_name):
+                    file.write(
+                        "{\n"
+                        f"       diesel::select({can_x_function_name}({author_user_id.name}, {struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))\n"
+                        "            .get_result(connection).map_err(web_common::api::ApiError::from)\n"
+                        "}\n"
+                    )
+                else:
+                    file.write(f"{{\n        Ok({rust_boolean})\n}}\n")
 
                 sorted_variants = [False, True]
 
