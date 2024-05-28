@@ -1461,8 +1461,17 @@ def write_frontend_yew_form(
                 attribute.data_type() in INPUT_TYPE_MAP
                 or attribute.data_type() == "NaiveDateTime"
             ):
+                attribute_data_type = attribute.data_type()
+                if "barcode" in attribute.name:
+                    attribute_data_type = "BarCode"
+
+                attribute_conversion = f"builder_store.{attribute.name}.clone()"
+
+                if "barcode" in attribute.name:
+                    attribute_conversion = f"builder_store.{attribute.name}.clone().map(BarCode::from)"
+
                 document.write(
-                    f'            <BasicInput<{attribute.data_type()}> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.clone()}} />\n'
+                    f'            <BasicInput<{attribute_data_type}> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{{attribute_conversion}}} />\n'
                 )
                 continue
 
@@ -1544,6 +1553,8 @@ def write_frontend_yew_form(
                     else "false"
                 )
                 scannable = "true" if "barcode" in attribute.name else "false"
+
+                attribute_data_type = attribute.data_type()
 
                 document.write(
                     f'            <Datalist<{attribute.data_type()}, {updatables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" scanner={{{scannable}}} />\n'

@@ -129,21 +129,6 @@ diesel::expression::functions::sql_function! {
 }
 
 diesel::expression::functions::sql_function! {
-   fn can_update_user_emails(
-        author_user_id: diesel::sql_types::Integer,
-        this_user_emails_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn concat_units_name_description_symbol(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-        symbol: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::expression::functions::sql_function! {
    fn can_update_users(
         author_user_id: diesel::sql_types::Integer,
         this_users_id: diesel::sql_types::Integer,
@@ -170,14 +155,6 @@ diesel::expression::functions::sql_function! {
         author_user_id: diesel::sql_types::Integer,
         this_users_users_role_requests_table_id: diesel::sql_types::Integer,
         this_users_users_role_requests_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn can_update_teams_users_roles(
-        author_user_id: diesel::sql_types::Integer,
-        this_teams_users_roles_table_id: diesel::sql_types::Integer,
-        this_teams_users_roles_user_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
@@ -222,13 +199,6 @@ diesel::expression::functions::sql_function! {
 }
 
 diesel::expression::functions::sql_function! {
-   fn concat_teams_name_description(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::expression::functions::sql_function! {
    fn can_admin_users_users_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_users_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -262,6 +232,21 @@ diesel::expression::functions::sql_function! {
    fn can_admin_teams(
         author_user_id: diesel::sql_types::Integer,
         this_teams_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn concat_teams_name_description(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
+}
+
+diesel::expression::functions::sql_function! {
+   fn can_update_teams_users_roles(
+        author_user_id: diesel::sql_types::Integer,
+        this_teams_users_roles_table_id: diesel::sql_types::Integer,
+        this_teams_users_roles_user_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
@@ -342,6 +327,13 @@ diesel::expression::functions::sql_function! {
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_teams_teams_role_invitations_table_id: diesel::sql_types::Integer,
         this_teams_teams_role_invitations_team_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn can_update_user_emails(
+        author_user_id: diesel::sql_types::Integer,
+        this_user_emails_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
@@ -623,6 +615,14 @@ diesel::expression::functions::sql_function! {
         this_projects_users_role_requests_table_id: diesel::sql_types::Integer,
         this_projects_users_role_requests_user_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn concat_units_name_description_symbol(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+        symbol: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
 }
 
 diesel::expression::functions::sql_function! {

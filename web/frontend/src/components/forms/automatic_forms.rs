@@ -2324,7 +2324,7 @@ pub fn create_sample_container_form(props: &CreateSampleContainerFormProp) -> Ht
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<String> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone()} />
+            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone().map(BarCode::from)} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<NewSampleContainer>>
@@ -2673,7 +2673,7 @@ pub fn create_sampled_individual_form(props: &CreateSampledIndividualFormProp) -
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <BasicInput<String> label="Barcode" optional={true} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone()} />
+            <BasicInput<BarCode> label="Barcode" optional={true} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone().map(BarCode::from)} />
             <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.clone().map(|picture| picture.into())} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
         </BasicForm<NewSampledIndividual>>
@@ -2701,7 +2701,7 @@ pub fn update_sampled_individual_form(props: &UpdateSampledIndividualFormProp) -
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <BasicInput<String> label="Barcode" optional={true} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone()} />
+            <BasicInput<BarCode> label="Barcode" optional={true} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone().map(BarCode::from)} />
             <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.clone().map(|picture| picture.into())} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
         </BasicForm<NewSampledIndividual>>
