@@ -1297,6 +1297,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 pub struct DerivedSample {
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
     pub parent_sample_id: Uuid,
     pub child_sample_id: Uuid,
 }
@@ -1306,6 +1308,8 @@ impl From<DerivedSample> for web_common::database::tables::DerivedSample {
         Self {
             created_by: item.created_by,
             created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             parent_sample_id: item.parent_sample_id,
             child_sample_id: item.child_sample_id,
         }
@@ -1317,6 +1321,8 @@ impl From<web_common::database::tables::DerivedSample> for DerivedSample {
         Self {
             created_by: item.created_by,
             created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
             parent_sample_id: item.parent_sample_id,
             child_sample_id: item.child_sample_id,
         }
@@ -1375,6 +1381,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(derived_samples::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
+        }
         if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
             query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
         }
@@ -1408,6 +1417,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(derived_samples::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
+        }
         if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
             query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
         }
@@ -1416,7 +1428,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         }
         query
             .filter(can_view_derived_samples(author_user_id, derived_samples::dsl::parent_sample_id, derived_samples::dsl::child_sample_id))
-            .order_by(derived_samples::dsl::created_at.desc())
+            .order_by(derived_samples::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -1492,6 +1504,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(derived_samples::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
+        }
         if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
             query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
         }
@@ -1525,6 +1540,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(derived_samples::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
+        }
         if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
             query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
         }
@@ -1533,7 +1551,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         }
         query
             .filter(can_update_derived_samples(author_user_id, derived_samples::dsl::parent_sample_id, derived_samples::dsl::child_sample_id))
-            .order_by(derived_samples::dsl::created_at.desc())
+            .order_by(derived_samples::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -1589,6 +1607,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(derived_samples::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
+        }
         if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
             query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
         }
@@ -1622,6 +1643,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(derived_samples::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
+        }
         if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
             query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
         }
@@ -1630,7 +1654,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         }
         query
             .filter(can_admin_derived_samples(author_user_id, derived_samples::dsl::parent_sample_id, derived_samples::dsl::child_sample_id))
-            .order_by(derived_samples::dsl::created_at.desc())
+            .order_by(derived_samples::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -8470,6 +8494,8 @@ pub struct SampleContainer {
     pub category_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 
 impl From<SampleContainer> for web_common::database::tables::SampleContainer {
@@ -8481,6 +8507,8 @@ impl From<SampleContainer> for web_common::database::tables::SampleContainer {
             category_id: item.category_id,
             created_by: item.created_by,
             created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -8494,6 +8522,8 @@ impl From<web_common::database::tables::SampleContainer> for SampleContainer {
             category_id: item.category_id,
             created_by: item.created_by,
             created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -8556,6 +8586,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_containers::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
         query
             .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
             .offset(offset.unwrap_or(0))
@@ -8589,9 +8622,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_containers::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
         query
             .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
-            .order_by(sample_containers::dsl::created_at.desc())
+            .order_by(sample_containers::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -8659,7 +8695,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
- if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
@@ -8685,6 +8721,16 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::updated_by.eq(updated_by))
             .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(similarity_op(sample_containers::dsl::barcode, query))
             .order_by(similarity_dist(sample_containers::dsl::barcode, query))
@@ -8724,7 +8770,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
- if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
@@ -8750,6 +8796,16 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::updated_by.eq(updated_by))
             .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(word_similarity_op(sample_containers::dsl::barcode, query))
             .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
@@ -8789,7 +8845,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
- if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
@@ -8815,6 +8871,16 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::updated_by.eq(updated_by))
             .filter(can_view_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
             .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
@@ -8887,6 +8953,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_containers::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
         query
             .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
             .offset(offset.unwrap_or(0))
@@ -8920,9 +8989,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_containers::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
         query
             .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
-            .order_by(sample_containers::dsl::created_at.desc())
+            .order_by(sample_containers::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -8951,7 +9023,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
- if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
@@ -8977,6 +9049,16 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::updated_by.eq(updated_by))
             .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(similarity_op(sample_containers::dsl::barcode, query))
             .order_by(similarity_dist(sample_containers::dsl::barcode, query))
@@ -9016,7 +9098,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
- if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
@@ -9042,6 +9124,16 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::updated_by.eq(updated_by))
             .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(word_similarity_op(sample_containers::dsl::barcode, query))
             .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
@@ -9081,7 +9173,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
- if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
@@ -9107,6 +9199,16 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::updated_by.eq(updated_by))
             .filter(can_update_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
             .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
@@ -9179,6 +9281,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_containers::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
         query
             .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
             .offset(offset.unwrap_or(0))
@@ -9212,9 +9317,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_containers::dsl::created_by.eq(created_by));
         }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
         query
             .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
-            .order_by(sample_containers::dsl::created_at.desc())
+            .order_by(sample_containers::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -9243,7 +9351,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
- if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
@@ -9269,6 +9377,16 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(similarity_dist(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::updated_by.eq(updated_by))
             .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(similarity_op(sample_containers::dsl::barcode, query))
             .order_by(similarity_dist(sample_containers::dsl::barcode, query))
@@ -9308,7 +9426,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
- if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
@@ -9334,6 +9452,16 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::updated_by.eq(updated_by))
             .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(word_similarity_op(sample_containers::dsl::barcode, query))
             .order_by(word_similarity_dist_op(sample_containers::dsl::barcode, query))
@@ -9373,7 +9501,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
- if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
@@ -9399,6 +9527,16 @@ if let Some(category_id) = filter.and_then(|f| f.category_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sample_containers::dsl::sample_containers
             .filter(sample_containers::dsl::created_by.eq(created_by))
+            .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
+            .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return sample_containers::dsl::sample_containers
+            .filter(sample_containers::dsl::updated_by.eq(updated_by))
             .filter(can_admin_sample_containers(author_user_id, sample_containers::dsl::id))
             .filter(strict_word_similarity_op(sample_containers::dsl::barcode, query))
             .order_by(strict_word_similarity_dist_op(sample_containers::dsl::barcode, query))
@@ -12552,11 +12690,16 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = spectra)]
 #[diesel(belongs_to(SpectraCollection, foreign_key = spectra_collection_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct Spectra {
     pub id: i32,
     pub notes: Option<String>,
     pub spectra_collection_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
 }
 
 impl From<Spectra> for web_common::database::tables::Spectra {
@@ -12565,6 +12708,10 @@ impl From<Spectra> for web_common::database::tables::Spectra {
             id: item.id,
             notes: item.notes,
             spectra_collection_id: item.spectra_collection_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -12575,6 +12722,10 @@ impl From<web_common::database::tables::Spectra> for Spectra {
             id: item.id,
             notes: item.notes,
             spectra_collection_id: item.spectra_collection_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
         }
     }
 }
@@ -12631,6 +12782,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
             query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
         }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra::dsl::updated_by.eq(updated_by));
+        }
         query
             .filter(can_view_spectra(author_user_id, spectra::dsl::id))
             .offset(offset.unwrap_or(0))
@@ -12658,8 +12815,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
             query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
         }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra::dsl::updated_by.eq(updated_by));
+        }
         query
             .filter(can_view_spectra(author_user_id, spectra::dsl::id))
+            .order_by(spectra::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -12682,6 +12846,230 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         spectra::dsl::spectra
             .filter(spectra::dsl::id.eq(id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_spectra(author_user_id, id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&SpectraFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::spectra;
+        let mut query = spectra::dsl::spectra
+            .into_boxed();
+        if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
+            query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_update_spectra(author_user_id, spectra::dsl::id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&SpectraFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::spectra;
+        let mut query = spectra::dsl::spectra
+            .into_boxed();
+        if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
+            query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_update_spectra(author_user_id, spectra::dsl::id))
+            .order_by(spectra::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_admin_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_admin_spectra(author_user_id, id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&SpectraFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::spectra;
+        let mut query = spectra::dsl::spectra
+            .into_boxed();
+        if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
+            query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_admin_spectra(author_user_id, spectra::dsl::id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&SpectraFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::spectra;
+        let mut query = spectra::dsl::spectra
+            .into_boxed();
+        if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
+            query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(spectra::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(spectra::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_admin_spectra(author_user_id, spectra::dsl::id))
+            .order_by(spectra::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        Self::delete_by_id(self.id, author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        if !Self::can_admin_by_id(id, author_user_id, connection)? {
+            return Err(web_common::api::ApiError::Unauthorized);
+        }
+        diesel::delete(spectra::dsl::spectra
+            .filter(spectra::dsl::id.eq(id))
+        ).execute(connection).map_err(web_common::api::ApiError::from)
     }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]

@@ -128,6 +128,17 @@ impl Searchable<false> for NestedSampleContainer {
         )
     }
 }
+impl Searchable<true> for NestedSampleContainer {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::SampleContainers,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedSampleState {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -362,6 +373,17 @@ impl Searchable<false> for SampleContainerCategory {
 impl Searchable<false> for SampleContainer {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
+             Table::SampleContainers,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for SampleContainer {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
              Table::SampleContainers,
               filter,
               query,

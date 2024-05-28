@@ -35,6 +35,7 @@ pub(super) struct IntermediateNewDerivedSample {
     created_by: i32,
     parent_sample_id: Uuid,
     child_sample_id: Uuid,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewDerivedSample {
@@ -46,6 +47,7 @@ impl InsertRow for web_common::database::NewDerivedSample {
             created_by: user_id,
             parent_sample_id: self.parent_sample_id,
             child_sample_id: self.child_sample_id,
+            updated_by: user_id,
         }
     }
 
@@ -406,6 +408,7 @@ pub(super) struct IntermediateNewSampleContainer {
     barcode: String,
     project_id: i32,
     category_id: i32,
+    updated_by: i32,
 }
 
 impl InsertRow for web_common::database::NewSampleContainer {
@@ -418,6 +421,7 @@ impl InsertRow for web_common::database::NewSampleContainer {
             barcode: self.barcode,
             project_id: self.project_id,
             category_id: self.category_id,
+            updated_by: user_id,
         }
     }
 
@@ -545,6 +549,41 @@ impl InsertRow for web_common::database::NewSample {
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::samples;
         diesel::insert_into(samples::dsl::samples)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
+/// Intermediate representation of the new variant NewSpectra.
+#[derive(Insertable)]
+#[diesel(table_name = spectra)]
+pub(super) struct IntermediateNewSpectra {
+    created_by: i32,
+    notes: Option<String>,
+    spectra_collection_id: i32,
+    updated_by: i32,
+}
+
+impl InsertRow for web_common::database::NewSpectra {
+    type Intermediate = IntermediateNewSpectra;
+    type Flat = Spectra;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSpectra {
+            created_by: user_id,
+            notes: self.notes,
+            spectra_collection_id: self.spectra_collection_id,
+            updated_by: user_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::spectra;
+        diesel::insert_into(spectra::dsl::spectra)
             .values(self.to_intermediate(user_id))
             .get_result(connection)
     }

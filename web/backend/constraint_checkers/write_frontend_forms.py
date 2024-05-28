@@ -677,9 +677,32 @@ def write_frontend_form_builder_implementation(
                     )
         elif variant.is_update_variant():
             for primary_key in primary_keys:
-                document.write(
-                    f"            {primary_key.name}: builder.{primary_key.name}.unwrap(),\n"
-                )
+                if builder.has_attribute(primary_key) and not builder.get_attribute_by_name(primary_key.name).has_struct_data_type():
+                    document.write(
+                        f"            {primary_key.name}: builder.{primary_key.name}.unwrap(),\n"
+                    )
+                else:
+                    richest_variant_attribute = richest_variant.get_attribute_by_name(
+                        primary_key.normalized_name()
+                    )
+                    richest_variant_attribute_struct = richest_variant_attribute.raw_data_type()
+
+                    inner_primary_keys = richest_variant_attribute_struct.get_primary_keys()
+                    assert len(inner_primary_keys) == 1, (
+                        f"Expected a single primary key in the struct {richest_variant_attribute_struct.name}, "
+                        f"but found {len(inner_primary_keys)}."
+                    )
+
+                    inner_primary_key = inner_primary_keys[0]
+
+                    if richest_variant_attribute_struct.is_nested():
+                        document.write(
+                            f"            {primary_key.name}: builder.{richest_variant_attribute.name}.as_ref().map(|{richest_variant_attribute.name}| {richest_variant_attribute.name}.inner.{inner_primary_key.name}).unwrap(),\n"
+                        )
+                    else:
+                        document.write(
+                            f"            {primary_key.name}: builder.{richest_variant_attribute.name}.as_ref().map(|{richest_variant_attribute.name}| {richest_variant_attribute.name}.{inner_primary_key.name}).unwrap(),\n"
+                        )
 
         for attribute in flat_variant.attributes:
 
@@ -780,6 +803,8 @@ def handle_missing_gin_index(
         f"populate_{attribute.raw_data_type().table_name}_table",
         f"create_{attribute.raw_data_type().table_name}_table",
     ]
+
+    print(f"I need for the {attribute.raw_data_type().table_name} table to be searchable to generate the form for the builder {builder.name}.")
 
     # We find the migration after which the index should be created.
     target_migration = None
@@ -1514,7 +1539,7 @@ def write_frontend_yew_form(
                 # we cannot generate the datalist for it and we need to raise an exception.
                 if not struct.is_searchable():
                     if flat_attribute not in properties_attributes:
-                        if struct.table_name == "samples":
+                        if struct.table_name == "spectra_collections":
                             document.write(
                                 f'<p>{{"{flat_attribute.human_readable_name()} has to be selected with a ScannerInput, which is not yet available."}}</p>\n'
                             )

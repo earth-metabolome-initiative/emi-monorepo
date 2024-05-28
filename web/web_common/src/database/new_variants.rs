@@ -418,6 +418,15 @@ impl NewSample {
 
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewSpectra {
+    pub notes: Option<String>,
+    pub spectra_collection_id: i32,
+}
+
+impl Tabular for NewSpectra {
+    const TABLE: Table = Table::Spectra;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSpectraCollection {
     pub notes: Option<String>,
     pub sample_id: Uuid,

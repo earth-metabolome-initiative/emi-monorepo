@@ -57,6 +57,8 @@ pub enum AppRoute {
     SampleContainersNew,
     #[at("/sample_containers/new/project/:project_id")]
     SampleContainersNewWithProject{project_id: i32},
+    #[at("/sample_containers/:id/update")]
+    SampleContainersUpdate{id: i32},
     #[at("/sample_states")]
     SampleStates,
     #[at("/sample_states/:id")]
@@ -77,16 +79,14 @@ pub enum AppRoute {
     SamplesView{id: Uuid},
     #[at("/samples/new")]
     SamplesNew,
+    #[at("/samples/new/container/:container_id")]
+    SamplesNewWithContainer{container_id: i32},
     #[at("/samples/new/project/:project_id")]
     SamplesNewWithProject{project_id: i32},
     #[at("/samples/new/sampled_by/:sampled_by")]
     SamplesNewWithSampledBy{sampled_by: i32},
     #[at("/samples/:id/update")]
     SamplesUpdate{id: Uuid},
-    #[at("/spectra")]
-    Spectra,
-    #[at("/spectra/:id")]
-    SpectraView{id: i32},
     #[at("/spectra_collections")]
     SpectraCollections,
     #[at("/spectra_collections/:id")]
@@ -198,6 +198,9 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::SampleContainersNewWithProject{project_id} => {
             html! { <CreateSampleContainerForm project_id={project_id} /> }
         }
+        AppRoute::SampleContainersUpdate{id} => {
+            html! { <UpdateSampleContainerForm id={id} /> }
+        }
         AppRoute::SampleStates => {
             html! { <BasicList<NestedSampleState> /> }
         }
@@ -228,6 +231,9 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::SamplesNew => {
             html! { <CreateSampleForm /> }
         }
+        AppRoute::SamplesNewWithContainer{container_id} => {
+            html! { <CreateSampleForm container_id={container_id} /> }
+        }
         AppRoute::SamplesNewWithProject{project_id} => {
             html! { <CreateSampleForm project_id={project_id} /> }
         }
@@ -236,12 +242,6 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::SamplesUpdate{id} => {
             html! { <UpdateSampleForm id={id} /> }
-        }
-        AppRoute::Spectra => {
-            html! { <BasicList<NestedSpectra> /> }
-        }
-        AppRoute::SpectraView{id} => {
-            html! { <SpectraPage id = {id} /> }
         }
         AppRoute::SpectraCollections => {
             html! { <BasicList<NestedSpectraCollection> /> }

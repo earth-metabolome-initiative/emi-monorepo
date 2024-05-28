@@ -28,6 +28,39 @@ pub(super) trait UpdateRow {
     ) -> Result<Self::Flat, diesel::result::Error>;
 }
 
+/// Intermediate representation of the update variant UpdateDerivedSample.
+#[derive(Identifiable, AsChangeset)]
+#[diesel(table_name = derived_samples)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(parent_sample_id, child_sample_id))]
+pub(super) struct IntermediateUpdateDerivedSample {
+    updated_by: i32,
+    parent_sample_id: Uuid,
+    child_sample_id: Uuid,
+}
+
+impl UpdateRow for web_common::database::UpdateDerivedSample {
+    type Intermediate = IntermediateUpdateDerivedSample;
+    type Flat = DerivedSample;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateUpdateDerivedSample {
+            updated_by: user_id,
+            parent_sample_id: self.parent_sample_id,
+            child_sample_id: self.child_sample_id,
+        }
+    }
+
+    fn update(
+        self,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        self.to_intermediate(user_id)
+            .save_changes(connection)
+    }
+}
+
 /// Intermediate representation of the update variant UpdateProject.
 #[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = projects)]
@@ -68,6 +101,78 @@ impl UpdateRow for web_common::database::UpdateProject {
             expenses: self.expenses,
             expected_end_date: self.expected_end_date,
             end_date: self.end_date,
+        }
+    }
+
+    fn update(
+        self,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        self.to_intermediate(user_id)
+            .save_changes(connection)
+    }
+}
+
+/// Intermediate representation of the update variant UpdateSampleContainer.
+#[derive(Identifiable, AsChangeset)]
+#[diesel(table_name = sample_containers)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(id))]
+pub(super) struct IntermediateUpdateSampleContainer {
+    updated_by: i32,
+    id: i32,
+    barcode: String,
+    project_id: i32,
+    category_id: i32,
+}
+
+impl UpdateRow for web_common::database::UpdateSampleContainer {
+    type Intermediate = IntermediateUpdateSampleContainer;
+    type Flat = SampleContainer;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateUpdateSampleContainer {
+            updated_by: user_id,
+            id: self.id,
+            barcode: self.barcode,
+            project_id: self.project_id,
+            category_id: self.category_id,
+        }
+    }
+
+    fn update(
+        self,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        self.to_intermediate(user_id)
+            .save_changes(connection)
+    }
+}
+
+/// Intermediate representation of the update variant UpdateSpectra.
+#[derive(Identifiable, AsChangeset)]
+#[diesel(table_name = spectra)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(id))]
+pub(super) struct IntermediateUpdateSpectra {
+    updated_by: i32,
+    id: i32,
+    notes: Option<String>,
+    spectra_collection_id: i32,
+}
+
+impl UpdateRow for web_common::database::UpdateSpectra {
+    type Intermediate = IntermediateUpdateSpectra;
+    type Flat = Spectra;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateUpdateSpectra {
+            updated_by: user_id,
+            id: self.id,
+            notes: self.notes,
+            spectra_collection_id: self.spectra_collection_id,
         }
     }
 

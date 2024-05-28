@@ -220,6 +220,7 @@ impl NestedBioOttTaxonItem {
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
     pub created_by: User,
+    pub updated_by: User,
     pub parent_sample: NestedSample,
     pub child_sample: NestedSample,
 }
@@ -243,6 +244,7 @@ impl NestedDerivedSample {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
             parent_sample: NestedSample::get(flat_variant.parent_sample_id, connection).await?.unwrap(),
             child_sample: NestedSample::get(flat_variant.child_sample_id, connection).await?.unwrap(),
             inner: flat_variant,
@@ -286,6 +288,28 @@ impl NestedDerivedSample {
          }
          Ok(nested_structs)
     }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        filter: Option<&DerivedSampleFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = DerivedSample::all_by_updated_at(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -298,6 +322,7 @@ impl NestedDerivedSample {
     {
         self.inner.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         self.parent_sample.update_or_insert(connection).await?;
         self.child_sample.update_or_insert(connection).await?;
         Ok(())
@@ -1843,6 +1868,7 @@ pub struct NestedSampleContainer {
     pub project: NestedProject,
     pub category: NestedSampleContainerCategory,
     pub created_by: User,
+    pub updated_by: User,
 }
 
 impl Tabular for NestedSampleContainer {
@@ -1866,6 +1892,7 @@ impl NestedSampleContainer {
             project: NestedProject::get(flat_variant.project_id, connection).await?.unwrap(),
             category: NestedSampleContainerCategory::get(flat_variant.category_id, connection).await?.unwrap(),
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
             inner: flat_variant,
         })
     }
@@ -1907,6 +1934,28 @@ impl NestedSampleContainer {
          }
          Ok(nested_structs)
     }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        filter: Option<&SampleContainerFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = SampleContainer::all_by_updated_at(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -1921,6 +1970,7 @@ impl NestedSampleContainer {
         self.project.update_or_insert(connection).await?;
         self.category.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         Ok(())
     }
 }
@@ -2326,6 +2376,8 @@ impl NestedSample {
 pub struct NestedSpectra {
     pub inner: Spectra,
     pub spectra_collection: NestedSpectraCollection,
+    pub created_by: User,
+    pub updated_by: User,
 }
 
 impl Tabular for NestedSpectra {
@@ -2347,6 +2399,8 @@ impl NestedSpectra {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             spectra_collection: NestedSpectraCollection::get(flat_variant.spectra_collection_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
             inner: flat_variant,
         })
     }
@@ -2388,6 +2442,28 @@ impl NestedSpectra {
          }
          Ok(nested_structs)
     }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        filter: Option<&SpectraFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = Spectra::all_by_updated_at(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -2400,6 +2476,8 @@ impl NestedSpectra {
     {
         self.inner.update_or_insert(connection).await?;
         self.spectra_collection.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
         Ok(())
     }
 }

@@ -8,6 +8,54 @@ use chrono::NaiveDateTime;
 use uuid::Uuid;
 use super::*;
 
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct UpdateDerivedSample {
+    pub parent_sample_id: Uuid,
+    pub child_sample_id: Uuid,
+}
+
+impl Tabular for UpdateDerivedSample {
+    const TABLE: Table = Table::DerivedSamples;
+}
+#[cfg(feature = "frontend")]
+impl UpdateDerivedSample {
+    pub fn into_row(self, updated_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(updated_by),
+            gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()),
+            gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()),
+        ]
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("derived_samples")
+            .update()        
+.set("parent_sample_id", gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()))        
+.set("child_sample_id", gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+}
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateProject {
     pub id: i32,
@@ -102,6 +150,117 @@ impl UpdateProject {
         }
         if let Some(end_date) = self.end_date {
             update_row = update_row.set("end_date", gluesql::core::ast_builder::timestamp(end_date.to_string()));
+        }
+            update_row.execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct UpdateSampleContainer {
+    pub id: i32,
+    pub barcode: String,
+    pub project_id: i32,
+    pub category_id: i32,
+}
+
+impl Tabular for UpdateSampleContainer {
+    const TABLE: Table = Table::SampleContainers;
+}
+#[cfg(feature = "frontend")]
+impl UpdateSampleContainer {
+    pub fn into_row(self, updated_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(updated_by),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.barcode),
+            gluesql::core::ast_builder::num(self.project_id),
+            gluesql::core::ast_builder::num(self.category_id),
+        ]
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("sample_containers")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("barcode", gluesql::core::ast_builder::text(self.barcode))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
+.set("category_id", gluesql::core::ast_builder::num(self.category_id))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct UpdateSpectra {
+    pub id: i32,
+    pub notes: Option<String>,
+    pub spectra_collection_id: i32,
+}
+
+impl Tabular for UpdateSpectra {
+    const TABLE: Table = Table::Spectra;
+}
+#[cfg(feature = "frontend")]
+impl UpdateSpectra {
+    pub fn into_row(self, updated_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(updated_by),
+            gluesql::core::ast_builder::num(self.id),
+            match self.notes {
+                Some(notes) => gluesql::core::ast_builder::text(notes),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::num(self.spectra_collection_id),
+        ]
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("spectra")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("spectra_collection_id", gluesql::core::ast_builder::num(self.spectra_collection_id))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
+        if let Some(notes) = self.notes {
+            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
         }
             update_row.execute(connection)
             .await

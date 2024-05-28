@@ -486,6 +486,11 @@ impl UserPageProp {
         filter.created_by = Some(self.id);
         filter
     }
+    fn filter_derived_samples_by_updated_by(&self) -> DerivedSampleFilter {
+        let mut filter = DerivedSampleFilter::default();
+        filter.updated_by = Some(self.id);
+        filter
+    }
     fn filter_observations_by_created_by(&self) -> ObservationFilter {
         let mut filter = ObservationFilter::default();
         filter.created_by = Some(self.id);
@@ -516,6 +521,11 @@ impl UserPageProp {
         filter.created_by = Some(self.id);
         filter
     }
+    fn filter_sample_containers_by_updated_by(&self) -> SampleContainerFilter {
+        let mut filter = SampleContainerFilter::default();
+        filter.updated_by = Some(self.id);
+        filter
+    }
     fn filter_sampled_individual_bio_ott_taxon_items_by_created_by(&self) -> SampledIndividualBioOttTaxonItemFilter {
         let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
         filter.created_by = Some(self.id);
@@ -543,6 +553,16 @@ impl UserPageProp {
     }
     fn filter_samples_by_updated_by(&self) -> SampleFilter {
         let mut filter = SampleFilter::default();
+        filter.updated_by = Some(self.id);
+        filter
+    }
+    fn filter_spectra_by_created_by(&self) -> SpectraFilter {
+        let mut filter = SpectraFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_spectra_by_updated_by(&self) -> SpectraFilter {
+        let mut filter = SpectraFilter::default();
         filter.updated_by = Some(self.id);
         filter
     }
@@ -582,6 +602,8 @@ pub fn user_page(props: &UserPageProp) -> Html {
             <BasicList<NestedProject> filters={props.filter_projects_by_updated_by()}/>
             // Linked with foreign key sample_containers.created_by
             <BasicList<NestedSampleContainer> filters={props.filter_sample_containers_by_created_by()}/>
+            // Linked with foreign key sample_containers.updated_by
+            <BasicList<NestedSampleContainer> filters={props.filter_sample_containers_by_updated_by()}/>
             // Linked with foreign key sampled_individuals.created_by
             <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_created_by()}/>
             // Linked with foreign key sampled_individuals.updated_by
@@ -592,6 +614,10 @@ pub fn user_page(props: &UserPageProp) -> Html {
             <BasicList<NestedSample> filters={props.filter_samples_by_sampled_by()}/>
             // Linked with foreign key samples.updated_by
             <BasicList<NestedSample> filters={props.filter_samples_by_updated_by()}/>
+            // Linked with foreign key spectra.created_by
+            <BasicList<NestedSpectra> filters={props.filter_spectra_by_created_by()}/>
+            // Linked with foreign key spectra.updated_by
+            <BasicList<NestedSpectra> filters={props.filter_spectra_by_updated_by()}/>
             // Linked with foreign key spectra_collections.created_by
             <BasicList<NestedSpectraCollection> filters={props.filter_spectra_collections_by_created_by()}/>
             // Linked with foreign key spectra_collections.updated_by

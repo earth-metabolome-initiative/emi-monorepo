@@ -57,6 +57,8 @@ diesel::table! {
     derived_samples (parent_sample_id, child_sample_id) {
         created_by -> Int4,
         created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         parent_sample_id -> Uuid,
         child_sample_id -> Uuid,
     }
@@ -280,6 +282,8 @@ diesel::table! {
         category_id -> Int4,
         created_by -> Int4,
         created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
     }
 }
 
@@ -336,6 +340,10 @@ diesel::table! {
         id -> Int4,
         notes -> Nullable<Text>,
         spectra_collection_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
     }
 }
 
@@ -486,7 +494,6 @@ diesel::joinable!(bio_ott_ranks -> font_awesome_icons (icon_id));
 diesel::joinable!(bio_ott_taxon_items -> bio_ott_ranks (ott_rank_id));
 diesel::joinable!(bio_ott_taxon_items -> colors (color_id));
 diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (icon_id));
-diesel::joinable!(derived_samples -> users (created_by));
 diesel::joinable!(document_formats -> colors (color_id));
 diesel::joinable!(document_formats -> font_awesome_icons (icon_id));
 diesel::joinable!(login_providers -> colors (color_id));
@@ -530,7 +537,6 @@ diesel::joinable!(sample_container_categories -> font_awesome_icons (icon_id));
 diesel::joinable!(sample_container_categories -> materials (material_id));
 diesel::joinable!(sample_containers -> projects (project_id));
 diesel::joinable!(sample_containers -> sample_container_categories (category_id));
-diesel::joinable!(sample_containers -> users (created_by));
 diesel::joinable!(sample_states -> colors (color_id));
 diesel::joinable!(sample_states -> font_awesome_icons (icon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));

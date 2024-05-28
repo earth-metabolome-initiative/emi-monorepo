@@ -74,6 +74,7 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "roles",
         "invitations",
         "requests",
+        "spectra"
     ] + SUPPORT_TABLE_NAMES
 
     for flat_variant in tqdm(
@@ -184,6 +185,7 @@ def write_frontend_router_page(
         "roles",
         "invitations",
         "requests",
+        "spectra"
     ] + SUPPORT_TABLE_NAMES
 
     for flat_variant in tqdm(

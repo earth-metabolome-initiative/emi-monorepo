@@ -84,7 +84,7 @@
     "delete_migration_00000000000099_create_observations_can_update_trigger": "yes",
     "delete_migration_00000000000070_create_projects_can_update_trigger": "yes",
     "create_derived_samples_can_x_trigger": "yes",
-    "create_observations_can_x_trigger": "yes",
+    "create_observations_can_x_trigger": "no",
     "create_sample_bio_ott_taxon_items_can_x_trigger": "yes",
     "create_sampled_individual_bio_ott_taxon_items_can_x_trigger": "yes",
     "create_sampled_individuals_can_x_trigger": "yes",
@@ -115,5 +115,6 @@
     "create_users_users_roles_can_x_trigger": "yes",
     "create_user_emails_can_x_trigger": "yes",
     "create_spectra_can_x_trigger": "yes",
-    "delete_00000000000120_create_mass_spectrometry_configurations_table": "yes"
+    "delete_00000000000120_create_mass_spectrometry_configurations_table": "yes",
+    "Table derived_samples_users_role_invitations is missing. Do you want to create it? (yes/no)": "no"
 }

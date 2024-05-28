@@ -8,6 +8,7 @@ from constraint_checkers.struct_metadata import (
     MethodDefinition,
 )
 from constraint_checkers.indices import PGIndex, PGIndices
+from constraint_checkers.regroup_tables import SUPPORT_TABLE_NAMES
 
 
 def write_backend_flat_variants(
@@ -151,6 +152,12 @@ def write_backend_flat_variants(
 
             file.write(f"impl {struct.name} {{\n")
 
+            if struct.has_can_update_function() and not struct.is_junktion_table() and struct.table_name not in SUPPORT_TABLE_NAMES:
+                assert struct.is_updatable(), (
+                    f"The {struct.name} struct has the can_update function, but it is not updatable. "
+                    "Please remove the can_update function from the struct or set the updatable attribute to True."
+                )
+
             # For all the tables that have an associated roles table, we implement methods
             # to determine whetheer a provided user id is a Viewer (role_id >= 3), Editor (role_id >= 2), or Admin (role_id == 1),
             # or the user is the creator of the struct (i.e. the created_by field is equal to the user_id).
@@ -161,7 +168,7 @@ def write_backend_flat_variants(
             ):
                 if struct.is_immutable() and operation in ["update", "admin"]:
                     continue
-
+                
                 if operation == "view":
                     requires_author = struct.may_be_hidden()
                 else:

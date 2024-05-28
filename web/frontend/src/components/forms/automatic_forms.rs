@@ -123,6 +123,14 @@ impl From<DerivedSampleBuilder> for NewDerivedSample {
         }
     }
 }
+impl From<DerivedSampleBuilder> for UpdateDerivedSample {
+    fn from(builder: DerivedSampleBuilder) -> Self {
+        Self {
+            parent_sample_id: builder.parent_sample.as_ref().map(|parent_sample| parent_sample.inner.id).unwrap(),
+            child_sample_id: builder.child_sample.as_ref().map(|child_sample| child_sample.inner.id).unwrap(),
+        }
+    }
+}
 impl FormBuildable for NewDerivedSample {
     type Builder = DerivedSampleBuilder;
     fn title() -> &'static str {
@@ -136,6 +144,22 @@ impl FormBuildable for NewDerivedSample {
     }
     fn can_operate_offline() -> bool {
         false
+    }
+}
+
+impl FormBuildable for UpdateDerivedSample {
+    type Builder = DerivedSampleBuilder;
+    fn title() -> &'static str {
+        "Derived sample"
+    }
+    fn task_target() -> &'static str {
+        "Derived sample"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
 
@@ -167,6 +191,31 @@ pub fn create_derived_sample_form(props: &CreateDerivedSampleFormProp) -> Html {
             <Datalist<NestedSample, false> builder={set_parent_sample} optional={false} errors={builder_store.errors_parent_sample.clone()} value={builder_store.parent_sample.clone()} label="Parent sample" scanner={false} />
             <Datalist<NestedSample, false> builder={set_child_sample} optional={false} errors={builder_store.errors_child_sample.clone()} value={builder_store.child_sample.clone()} label="Child sample" scanner={false} />
         </BasicForm<NewDerivedSample>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateDerivedSampleFormProp {
+    pub parent_sample_id: Uuid,
+    pub child_sample_id: Uuid,
+}
+
+#[function_component(UpdateDerivedSampleForm)]
+pub fn update_derived_sample_form(props: &UpdateDerivedSampleFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<DerivedSampleBuilder>();
+    // We push the ID of the row to the named requests.
+    let props = props.clone();
+   named_requests.push(ComponentMessage::get::<UpdateDerivedSample>(( props.parent_sample_id, props.child_sample_id ).into()));
+    let set_parent_sample = builder_dispatch.apply_callback(|parent_sample: Option<NestedSample>| DerivedSampleActions::SetParentSample(parent_sample));
+    let set_child_sample = builder_dispatch.apply_callback(|child_sample: Option<NestedSample>| DerivedSampleActions::SetChildSample(child_sample));
+    html! {
+        <BasicForm<UpdateDerivedSample>
+            method={FormMethod::PUT}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <Datalist<NestedSample, false> builder={set_parent_sample} optional={false} errors={builder_store.errors_parent_sample.clone()} value={builder_store.parent_sample.clone()} label="Parent sample" scanner={false} />
+            <Datalist<NestedSample, false> builder={set_child_sample} optional={false} errors={builder_store.errors_child_sample.clone()} value={builder_store.child_sample.clone()} label="Child sample" scanner={false} />
+        </BasicForm<UpdateDerivedSample>>
     }
 }
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -2282,6 +2331,16 @@ impl From<SampleContainerBuilder> for NewSampleContainer {
         }
     }
 }
+impl From<SampleContainerBuilder> for UpdateSampleContainer {
+    fn from(builder: SampleContainerBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            barcode: builder.barcode.unwrap(),
+            project_id: builder.project.unwrap().inner.id,
+            category_id: builder.category.unwrap().inner.id,
+        }
+    }
+}
 impl FormBuildable for NewSampleContainer {
     type Builder = SampleContainerBuilder;
     fn title() -> &'static str {
@@ -2295,6 +2354,22 @@ impl FormBuildable for NewSampleContainer {
     }
     fn can_operate_offline() -> bool {
         false
+    }
+}
+
+impl FormBuildable for UpdateSampleContainer {
+    type Builder = SampleContainerBuilder;
+    fn title() -> &'static str {
+        "Sample container"
+    }
+    fn task_target() -> &'static str {
+        "Sample container"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
     }
 }
 
@@ -2328,6 +2403,32 @@ pub fn create_sample_container_form(props: &CreateSampleContainerFormProp) -> Ht
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<NewSampleContainer>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateSampleContainerFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateSampleContainerForm)]
+pub fn update_sample_container_form(props: &UpdateSampleContainerFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SampleContainerBuilder>();
+    // We push the ID of the row to the named requests.
+    let props = props.clone();
+   named_requests.push(ComponentMessage::get::<UpdateSampleContainer>(props.id.into()));
+    let set_barcode = builder_dispatch.apply_callback(|barcode: Option<String>| SampleContainerActions::SetBarcode(barcode));
+    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| SampleContainerActions::SetProject(project));
+    let set_category = builder_dispatch.apply_callback(|category: Option<NestedSampleContainerCategory>| SampleContainerActions::SetCategory(category));
+    html! {
+        <BasicForm<UpdateSampleContainer>
+            method={FormMethod::PUT}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone().map(BarCode::from)} />
+            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+            <Datalist<NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
+        </BasicForm<UpdateSampleContainer>>
     }
 }
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -2975,6 +3076,205 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
             <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" scanner={false} />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
         </BasicForm<NewSample>>
+    }
+}
+#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
+pub struct SpectraBuilder {
+    pub id: Option<i32>,
+    pub notes: Option<String>,
+    pub spectra_collection: Option<NestedSpectraCollection>,
+    pub errors_notes: Vec<ApiError>,
+    pub errors_spectra_collection: Vec<ApiError>,
+    pub form_updated_at: NaiveDateTime,
+}
+
+impl Default for SpectraBuilder {
+    fn default() -> Self {
+        Self {
+            id: None,
+            notes: None,
+            spectra_collection: Default::default(),
+            errors_notes: Default::default(),
+            errors_spectra_collection: Default::default(),
+            form_updated_at: Default::default(),
+        }
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub(super) enum SpectraActions {
+    SetNotes(Option<String>),
+    SetSpectraCollection(Option<NestedSpectraCollection>),
+}
+
+impl FromOperation for SpectraActions {
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "spectra_collection" => SpectraActions::SetSpectraCollection(Some(bincode::deserialize(&row).unwrap())),
+            operation_name => unreachable!("The operation name '{}' is not supported.", operation_name),
+        }
+    }
+}
+
+impl Reducer<SpectraBuilder> for SpectraActions {
+    fn apply(self, mut state: std::rc::Rc<SpectraBuilder>) -> std::rc::Rc<SpectraBuilder> {
+        let state_mut = Rc::make_mut(&mut state);
+        match self {
+            SpectraActions::SetNotes(notes) => 'notes: {
+                state_mut.errors_notes.clear();
+                if let Some(value) = notes.as_ref() {
+                    if value.is_empty() {
+                        state_mut.errors_notes.push(ApiError::BadRequest(vec![
+                            "The Notes field cannot be left empty.".to_string()
+                        ]));
+                         state_mut.notes = None;
+                          break 'notes;
+                    }
+                }
+                state_mut.notes = notes;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'notes;
+            }
+            SpectraActions::SetSpectraCollection(spectra_collection) => 'spectra_collection: {
+                state_mut.errors_spectra_collection.clear();
+        if spectra_collection.is_none() {
+            state_mut.errors_spectra_collection.push(ApiError::BadRequest(vec![
+                "The Spectra collection field is required.".to_string()
+             ]));
+            state_mut.spectra_collection = None;
+             break 'spectra_collection;
+        }
+                state_mut.spectra_collection = spectra_collection;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'spectra_collection;
+            }
+        }
+        state
+    }
+}
+impl FormBuilder for SpectraBuilder {
+    type Actions = SpectraActions;
+
+    type RichVariant = NestedSpectra;
+
+    fn has_errors(&self) -> bool {
+!self.errors_notes.is_empty() || !self.errors_spectra_collection.is_empty()
+    }
+
+    fn update(dispatcher: &Dispatch<Self>, richest_variant: Self::RichVariant) -> Vec<ComponentMessage> {
+        dispatcher.reduce_mut(|state| {state.id = Some(richest_variant.inner.id);});
+    dispatcher.apply(SpectraActions::SetNotes(richest_variant.inner.notes.map(|notes| notes.to_string())));
+        dispatcher.apply(SpectraActions::SetSpectraCollection(Some(richest_variant.spectra_collection)));
+        vec![]
+    }
+
+    fn can_submit(&self) -> bool {
+        !self.has_errors()
+        && self.spectra_collection.is_some()
+    }
+
+}
+
+impl From<SpectraBuilder> for NewSpectra {
+    fn from(builder: SpectraBuilder) -> Self {
+        Self {
+            notes: builder.notes,
+            spectra_collection_id: builder.spectra_collection.unwrap().inner.id,
+        }
+    }
+}
+impl From<SpectraBuilder> for UpdateSpectra {
+    fn from(builder: SpectraBuilder) -> Self {
+        Self {
+            id: builder.id.unwrap(),
+            notes: builder.notes,
+            spectra_collection_id: builder.spectra_collection.unwrap().inner.id,
+        }
+    }
+}
+impl FormBuildable for NewSpectra {
+    type Builder = SpectraBuilder;
+    fn title() -> &'static str {
+        "Spectra"
+    }
+    fn task_target() -> &'static str {
+        "Spectra"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        false
+    }
+}
+
+impl FormBuildable for UpdateSpectra {
+    type Builder = SpectraBuilder;
+    fn title() -> &'static str {
+        "Spectra"
+    }
+    fn task_target() -> &'static str {
+        "Spectra"
+    }
+    fn requires_authentication() -> bool {
+        true
+    }
+    fn can_operate_offline() -> bool {
+        true
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct CreateSpectraFormProp {
+    pub spectra_collection_id: i32,
+}
+
+#[function_component(CreateSpectraForm)]
+pub fn create_spectra_form(props: &CreateSpectraFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraBuilder>();
+    named_requests.push(ComponentMessage::get_named::<&str, SpectraCollection>("spectra_collection", props.spectra_collection_id.into()));
+    let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SpectraActions::SetNotes(notes));
+    let set_spectra_collection = builder_dispatch.apply_callback(|spectra_collection: Option<NestedSpectraCollection>| SpectraActions::SetSpectraCollection(spectra_collection));
+    html! {
+        <BasicForm<NewSpectra>
+            method={FormMethod::POST}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
+if let Some(spectra_collection) = builder_store.spectra_collection.as_ref() {
+    <span>{"TODO Selected spectra_collection"}</span>
+} else {
+    <></>
+}
+        </BasicForm<NewSpectra>>
+    }
+}
+#[derive(Clone, PartialEq, Properties)]
+pub struct UpdateSpectraFormProp {
+    pub id: i32,
+}
+
+#[function_component(UpdateSpectraForm)]
+pub fn update_spectra_form(props: &UpdateSpectraFormProp) -> Html {
+     let mut named_requests: Vec<ComponentMessage> = Vec::new();
+    let (builder_store, builder_dispatch) = use_store::<SpectraBuilder>();
+    // We push the ID of the row to the named requests.
+    let props = props.clone();
+   named_requests.push(ComponentMessage::get::<UpdateSpectra>(props.id.into()));
+    let set_notes = builder_dispatch.apply_callback(|notes: Option<String>| SpectraActions::SetNotes(notes));
+    let set_spectra_collection = builder_dispatch.apply_callback(|spectra_collection: Option<NestedSpectraCollection>| SpectraActions::SetSpectraCollection(spectra_collection));
+    html! {
+        <BasicForm<UpdateSpectra>
+            method={FormMethod::PUT}
+            named_requests={named_requests}
+            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
+<p>{"Spectra collection id has to be selected with a ScannerInput, which is not yet available."}</p>
+        </BasicForm<UpdateSpectra>>
     }
 }
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
