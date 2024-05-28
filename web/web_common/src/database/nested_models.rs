@@ -585,6 +585,208 @@ impl NestedMaterial {
     }
 }
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedNameplateCategory {
+    pub inner: NameplateCategory,
+    pub permanence: NestedPermanenceCategory,
+    pub material: NestedMaterial,
+    pub icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+impl Tabular for NestedNameplateCategory {
+    const TABLE: Table = Table::NameplateCategories;
+}
+impl Filtrable for NestedNameplateCategory {
+    type Filter = NameplateCategoryFilter;
+}
+#[cfg(feature = "frontend")]
+impl NestedNameplateCategory {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub async fn from_flat(
+        flat_variant: NameplateCategory,
+        connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
+    ) -> Result<Self, gluesql::prelude::Error> {
+        Ok(Self {
+            permanence: NestedPermanenceCategory::get(flat_variant.permanence_id, connection).await?.unwrap(),
+            material: NestedMaterial::get(flat_variant.material_id, connection).await?.unwrap(),
+            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap(),
+            color: Color::get(flat_variant.color_id, connection).await?.unwrap(),
+            inner: flat_variant,
+        })
+    }
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+       let flat_variant = NameplateCategory::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
+            None => Ok(None),
+        }
+    }
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all<C>(
+        filter: Option<&NameplateCategoryFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = NameplateCategory::all(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.permanence.update_or_insert(connection).await?;
+        self.material.update_or_insert(connection).await?;
+        self.icon.update_or_insert(connection).await?;
+        self.color.update_or_insert(connection).await?;
+        Ok(())
+    }
+}
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedNameplate {
+    pub inner: Nameplate,
+    pub project: NestedProject,
+    pub category: NestedNameplateCategory,
+    pub created_by: User,
+    pub updated_by: User,
+}
+
+impl Tabular for NestedNameplate {
+    const TABLE: Table = Table::Nameplates;
+}
+impl Filtrable for NestedNameplate {
+    type Filter = NameplateFilter;
+}
+#[cfg(feature = "frontend")]
+impl NestedNameplate {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub async fn from_flat(
+        flat_variant: Nameplate,
+        connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
+    ) -> Result<Self, gluesql::prelude::Error> {
+        Ok(Self {
+            project: NestedProject::get(flat_variant.project_id, connection).await?.unwrap(),
+            category: NestedNameplateCategory::get(flat_variant.category_id, connection).await?.unwrap(),
+            created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
+            updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
+            inner: flat_variant,
+        })
+    }
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+       let flat_variant = Nameplate::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
+            None => Ok(None),
+        }
+    }
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all<C>(
+        filter: Option<&NameplateFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = Nameplate::all(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        filter: Option<&NameplateFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = Nameplate::all_by_updated_at(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        self.project.update_or_insert(connection).await?;
+        self.category.update_or_insert(connection).await?;
+        self.created_by.update_or_insert(connection).await?;
+        self.updated_by.update_or_insert(connection).await?;
+        Ok(())
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedNotification {
     pub inner: Notification,
     pub user: User,
@@ -857,6 +1059,94 @@ impl NestedOrganization {
     {
         self.inner.update_or_insert(connection).await?;
         self.country.update_or_insert(connection).await?;
+        Ok(())
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedPermanenceCategory {
+    pub inner: PermanenceCategory,
+    pub icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
+}
+
+impl Tabular for NestedPermanenceCategory {
+    const TABLE: Table = Table::PermanenceCategories;
+}
+impl Filtrable for NestedPermanenceCategory {
+    type Filter = PermanenceCategoryFilter;
+}
+#[cfg(feature = "frontend")]
+impl NestedPermanenceCategory {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub async fn from_flat(
+        flat_variant: PermanenceCategory,
+        connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
+    ) -> Result<Self, gluesql::prelude::Error> {
+        Ok(Self {
+            icon: if let Some(icon_id) = flat_variant.icon_id { FontAwesomeIcon::get(icon_id, connection).await? } else { None },
+            color: if let Some(color_id) = flat_variant.color_id { Color::get(color_id, connection).await? } else { None },
+            inner: flat_variant,
+        })
+    }
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+       let flat_variant = PermanenceCategory::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
+            None => Ok(None),
+        }
+    }
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all<C>(
+        filter: Option<&PermanenceCategoryFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = PermanenceCategory::all(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.update_or_insert(connection).await?;
+        if let Some(icon) = self.icon {
+            icon.update_or_insert(connection).await?;
+        }
+        if let Some(color) = self.color {
+            color.update_or_insert(connection).await?;
+        }
         Ok(())
     }
 }
@@ -2148,6 +2438,7 @@ impl NestedSampledIndividualBioOttTaxonItem {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampledIndividual {
     pub inner: SampledIndividual,
+    pub nameplate: Option<NestedNameplate>,
     pub project: NestedProject,
     pub created_by: User,
     pub updated_by: User,
@@ -2171,6 +2462,7 @@ impl NestedSampledIndividual {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
+            nameplate: if let Some(nameplate_id) = flat_variant.nameplate_id { NestedNameplate::get(nameplate_id, connection).await? } else { None },
             project: NestedProject::get(flat_variant.project_id, connection).await?.unwrap(),
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
             updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
@@ -2248,6 +2540,9 @@ impl NestedSampledIndividual {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         self.inner.update_or_insert(connection).await?;
+        if let Some(nameplate) = self.nameplate {
+            nameplate.update_or_insert(connection).await?;
+        }
         self.project.update_or_insert(connection).await?;
         self.created_by.update_or_insert(connection).await?;
         self.updated_by.update_or_insert(connection).await?;
@@ -2288,7 +2583,7 @@ impl NestedSample {
             created_by: User::get(flat_variant.created_by, connection).await?.unwrap(),
             sampled_by: User::get(flat_variant.sampled_by, connection).await?.unwrap(),
             updated_by: User::get(flat_variant.updated_by, connection).await?.unwrap(),
-            state: NestedSampleState::get(flat_variant.state, connection).await?.unwrap(),
+            state: NestedSampleState::get(flat_variant.state_id, connection).await?.unwrap(),
             inner: flat_variant,
         })
     }

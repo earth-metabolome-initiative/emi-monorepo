@@ -2637,6 +2637,1450 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = nameplate_categories)]
+#[diesel(belongs_to(PermanenceCategory, foreign_key = permanence_id))]
+#[diesel(belongs_to(Material, foreign_key = material_id))]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
+#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(primary_key(id))]
+pub struct NameplateCategory {
+    pub id: i32,
+    pub name: String,
+    pub permanence_id: i32,
+    pub material_id: i32,
+    pub description: String,
+    pub icon_id: i32,
+    pub color_id: i32,
+}
+
+impl From<NameplateCategory> for web_common::database::tables::NameplateCategory {
+    fn from(item: NameplateCategory) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            permanence_id: item.permanence_id,
+            material_id: item.material_id,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::NameplateCategory> for NameplateCategory {
+    fn from(item: web_common::database::tables::NameplateCategory) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            permanence_id: item.permanence_id,
+            material_id: item.material_id,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
+        }
+    }
+}
+
+impl NameplateCategory {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&NameplateCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::nameplate_categories;
+        let mut query = nameplate_categories::dsl::nameplate_categories
+            .into_boxed();
+        if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
+            query = query.filter(nameplate_categories::dsl::permanence_id.eq(permanence_id));
+        }
+        if let Some(material_id) = filter.and_then(|f| f.material_id) {
+            query = query.filter(nameplate_categories::dsl::material_id.eq(material_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(nameplate_categories::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(nameplate_categories::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&NameplateCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::nameplate_categories;
+        let mut query = nameplate_categories::dsl::nameplate_categories
+            .into_boxed();
+        if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
+            query = query.filter(nameplate_categories::dsl::permanence_id.eq(permanence_id));
+        }
+        if let Some(material_id) = filter.and_then(|f| f.material_id) {
+            query = query.filter(nameplate_categories::dsl::material_id.eq(material_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(nameplate_categories::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(nameplate_categories::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        use crate::schema::nameplate_categories;
+        nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::id.eq(id))
+            .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&NameplateCategoryFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, limit, offset, connection);
+        }
+        use crate::schema::nameplate_categories;
+ if filter.map(|f| f.permanence_id.is_some()&&f.material_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::permanence_id.eq(permanence_id))
+            .filter(similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(similarity_dist(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(material_id) = filter.and_then(|f| f.material_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::material_id.eq(material_id))
+            .filter(similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(similarity_dist(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::icon_id.eq(icon_id))
+            .filter(similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(similarity_dist(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(color_id) = filter.and_then(|f| f.color_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::color_id.eq(color_id))
+            .filter(similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(similarity_dist(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplate_categories::dsl::nameplate_categories
+            .filter(similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(similarity_dist(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&NameplateCategoryFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, limit, offset, connection);
+        }
+        use crate::schema::nameplate_categories;
+ if filter.map(|f| f.permanence_id.is_some()&&f.material_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::permanence_id.eq(permanence_id))
+            .filter(word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(material_id) = filter.and_then(|f| f.material_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::material_id.eq(material_id))
+            .filter(word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::icon_id.eq(icon_id))
+            .filter(word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(color_id) = filter.and_then(|f| f.color_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::color_id.eq(color_id))
+            .filter(word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplate_categories::dsl::nameplate_categories
+            .filter(word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&NameplateCategoryFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, limit, offset, connection);
+        }
+        use crate::schema::nameplate_categories;
+ if filter.map(|f| f.permanence_id.is_some()&&f.material_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::permanence_id.eq(permanence_id))
+            .filter(strict_word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(strict_word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(material_id) = filter.and_then(|f| f.material_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::material_id.eq(material_id))
+            .filter(strict_word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(strict_word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::icon_id.eq(icon_id))
+            .filter(strict_word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(strict_word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(color_id) = filter.and_then(|f| f.color_id) {
+        return nameplate_categories::dsl::nameplate_categories
+            .filter(nameplate_categories::dsl::color_id.eq(color_id))
+            .filter(strict_word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(strict_word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplate_categories::dsl::nameplate_categories
+            .filter(strict_word_similarity_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .order_by(strict_word_similarity_dist_op(concat_nameplate_categories_brand(nameplate_categories::dsl::name, nameplate_categories::dsl::description), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = nameplates)]
+#[diesel(belongs_to(Project, foreign_key = project_id))]
+#[diesel(belongs_to(NameplateCategory, foreign_key = category_id))]
+#[diesel(belongs_to(User, foreign_key = created_by))]
+#[diesel(primary_key(id))]
+pub struct Nameplate {
+    pub id: i32,
+    pub barcode: String,
+    pub project_id: i32,
+    pub category_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<Nameplate> for web_common::database::tables::Nameplate {
+    fn from(item: Nameplate) -> Self {
+        Self {
+            id: item.id,
+            barcode: item.barcode,
+            project_id: item.project_id,
+            category_id: item.category_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl From<web_common::database::tables::Nameplate> for Nameplate {
+    fn from(item: web_common::database::tables::Nameplate) -> Self {
+        Self {
+            id: item.id,
+            barcode: item.barcode,
+            project_id: item.project_id,
+            category_id: item.category_id,
+            created_by: item.created_by,
+            created_at: item.created_at,
+            updated_by: item.updated_by,
+            updated_at: item.updated_at,
+        }
+    }
+}
+
+impl Nameplate {
+    /// Check whether the user can view the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_view_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_view_nameplates(author_user_id, id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::nameplates;
+        let mut query = nameplates::dsl::nameplates
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::nameplates;
+        let mut query = nameplates::dsl::nameplates
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .order_by(nameplates::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        if !Self::can_view_by_id(id, author_user_id, connection)? {
+            return Err(web_common::api::ApiError::Unauthorized);
+        }
+        use crate::schema::nameplates;
+        nameplates::dsl::nameplates
+            .filter(nameplates::dsl::id.eq(id))
+            .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get the struct from the database by its barcode.
+    ///
+    /// * `barcode` - The barcode of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_barcode(
+barcode: &str,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        use crate::schema::nameplates;
+        let flat_variant = nameplates::dsl::nameplates
+            .filter(nameplates::dsl::barcode.eq(barcode))
+            .first::<Self>(connection)?;
+        if !flat_variant.can_view(author_user_id, connection)? {
+            return Err(web_common::api::ApiError::Unauthorized);
+        }
+        Ok(flat_variant)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::nameplates;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::project_id.eq(project_id))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::category_id.eq(category_id))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::created_by.eq(created_by))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::updated_by.eq(updated_by))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplates::dsl::nameplates
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::nameplates;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::project_id.eq(project_id))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::category_id.eq(category_id))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::created_by.eq(created_by))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::updated_by.eq(updated_by))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplates::dsl::nameplates
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::nameplates;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::project_id.eq(project_id))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::category_id.eq(category_id))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::created_by.eq(created_by))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::updated_by.eq(updated_by))
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplates::dsl::nameplates
+            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_update_nameplates(author_user_id, id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::nameplates;
+        let mut query = nameplates::dsl::nameplates
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::nameplates;
+        let mut query = nameplates::dsl::nameplates
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .order_by(nameplates::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::nameplates;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::project_id.eq(project_id))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::category_id.eq(category_id))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::created_by.eq(created_by))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::updated_by.eq(updated_by))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplates::dsl::nameplates
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::nameplates;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::project_id.eq(project_id))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::category_id.eq(category_id))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::created_by.eq(created_by))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::updated_by.eq(updated_by))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplates::dsl::nameplates
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::nameplates;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::project_id.eq(project_id))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::category_id.eq(category_id))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::created_by.eq(created_by))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::updated_by.eq(updated_by))
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplates::dsl::nameplates
+            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError> {
+        Self::can_admin_by_id(
+            self.id,
+            author_user_id,
+            connection,
+        )
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+       diesel::select(can_admin_nameplates(author_user_id, id))
+            .get_result(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::nameplates;
+        let mut query = nameplates::dsl::nameplates
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::nameplates;
+        let mut query = nameplates::dsl::nameplates
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .order_by(nameplates::dsl::updated_at.desc())
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::nameplates;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::project_id.eq(project_id))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::category_id.eq(category_id))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::created_by.eq(created_by))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::updated_by.eq(updated_by))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplates::dsl::nameplates
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::nameplates;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::project_id.eq(project_id))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::category_id.eq(category_id))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::created_by.eq(created_by))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::updated_by.eq(updated_by))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplates::dsl::nameplates
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
+        }
+        use crate::schema::nameplates;
+ if filter.map(|f| f.project_id.is_some()&&f.category_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
+       unimplemented!();
+ }
+if let Some(project_id) = filter.and_then(|f| f.project_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::project_id.eq(project_id))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(category_id) = filter.and_then(|f| f.category_id) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::category_id.eq(category_id))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(created_by) = filter.and_then(|f| f.created_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::created_by.eq(created_by))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+        return nameplates::dsl::nameplates
+            .filter(nameplates::dsl::updated_by.eq(updated_by))
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
+}
+        nameplates::dsl::nameplates
+            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        Self::delete_by_id(self.id, author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        if !Self::can_admin_by_id(id, author_user_id, connection)? {
+            return Err(web_common::api::ApiError::Unauthorized);
+        }
+        diesel::delete(nameplates::dsl::nameplates
+            .filter(nameplates::dsl::id.eq(id))
+        ).execute(connection).map_err(web_common::api::ApiError::from)
+    }
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = notifications)]
 #[diesel(belongs_to(User, foreign_key = user_id))]
 #[diesel(primary_key(id))]
@@ -3438,6 +4882,139 @@ if let Some(country_id) = filter.and_then(|f| f.country_id) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
 }
+}
+#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[diesel(table_name = permanence_categories)]
+#[diesel(belongs_to(FontAwesomeIcon, foreign_key = icon_id))]
+#[diesel(belongs_to(Color, foreign_key = color_id))]
+#[diesel(primary_key(id))]
+pub struct PermanenceCategory {
+    pub id: i32,
+    pub name: String,
+    pub description: String,
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+impl From<PermanenceCategory> for web_common::database::tables::PermanenceCategory {
+    fn from(item: PermanenceCategory) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
+        }
+    }
+}
+
+impl From<web_common::database::tables::PermanenceCategory> for PermanenceCategory {
+    fn from(item: web_common::database::tables::PermanenceCategory) -> Self {
+        Self {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
+        }
+    }
+}
+
+impl PermanenceCategory {
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        Ok(true)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&PermanenceCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::permanence_categories;
+        let mut query = permanence_categories::dsl::permanence_categories
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(permanence_categories::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(permanence_categories::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&PermanenceCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        use crate::schema::permanence_categories;
+        let mut query = permanence_categories::dsl::permanence_categories
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(permanence_categories::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(permanence_categories::dsl::color_id.eq(color_id));
+        }
+        query
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        use crate::schema::permanence_categories;
+        permanence_categories::dsl::permanence_categories
+            .filter(permanence_categories::dsl::id.eq(id))
+            .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+    }
+    /// Get the struct from the database by its name.
+    ///
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+name: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        use crate::schema::permanence_categories;
+        let flat_variant = permanence_categories::dsl::permanence_categories
+            .filter(permanence_categories::dsl::name.eq(name))
+            .first::<Self>(connection)?;
+        Ok(flat_variant)
+    }
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = project_states)]
@@ -10262,13 +11839,14 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 }
 #[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
 #[diesel(table_name = sampled_individuals)]
+#[diesel(belongs_to(Nameplate, foreign_key = nameplate_id))]
 #[diesel(belongs_to(Project, foreign_key = project_id))]
 #[diesel(belongs_to(User, foreign_key = created_by))]
 #[diesel(primary_key(id))]
 pub struct SampledIndividual {
     pub id: Uuid,
     pub notes: Option<String>,
-    pub barcode: Option<String>,
+    pub nameplate_id: Option<i32>,
     pub project_id: i32,
     pub created_by: i32,
     pub created_at: NaiveDateTime,
@@ -10282,7 +11860,7 @@ impl From<SampledIndividual> for web_common::database::tables::SampledIndividual
         Self {
             id: item.id,
             notes: item.notes,
-            barcode: item.barcode,
+            nameplate_id: item.nameplate_id,
             project_id: item.project_id,
             created_by: item.created_by,
             created_at: item.created_at,
@@ -10298,7 +11876,7 @@ impl From<web_common::database::tables::SampledIndividual> for SampledIndividual
         Self {
             id: item.id,
             notes: item.notes,
-            barcode: item.barcode,
+            nameplate_id: item.nameplate_id,
             project_id: item.project_id,
             created_by: item.created_by,
             created_at: item.created_at,
@@ -10358,6 +11936,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::sampled_individuals;
         let mut query = sampled_individuals::dsl::sampled_individuals
             .into_boxed();
+        if let Some(nameplate_id) = filter.and_then(|f| f.nameplate_id) {
+            query = query.filter(sampled_individuals::dsl::nameplate_id.eq(nameplate_id));
+        }
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sampled_individuals::dsl::project_id.eq(project_id));
         }
@@ -10391,6 +11972,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::sampled_individuals;
         let mut query = sampled_individuals::dsl::sampled_individuals
             .into_boxed();
+        if let Some(nameplate_id) = filter.and_then(|f| f.nameplate_id) {
+            query = query.filter(sampled_individuals::dsl::nameplate_id.eq(nameplate_id));
+        }
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sampled_individuals::dsl::project_id.eq(project_id));
         }
@@ -10426,6 +12010,26 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(sampled_individuals::dsl::id.eq(id))
             .first::<Self>(connection).map_err(web_common::api::ApiError::from)
     }
+    /// Get the struct from the database by its nameplate_id.
+    ///
+    /// * `nameplate_id` - The nameplate_id of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_nameplate_id(
+nameplate_id: Option<&i32>,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        use crate::schema::sampled_individuals;
+        let flat_variant = sampled_individuals::dsl::sampled_individuals
+            .filter(sampled_individuals::dsl::nameplate_id.eq(nameplate_id))
+            .first::<Self>(connection)?;
+        if !flat_variant.can_view(author_user_id, connection)? {
+            return Err(web_common::api::ApiError::Unauthorized);
+        }
+        Ok(flat_variant)
+    }
     /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -10456,9 +12060,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::project_id.eq(project_id))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10466,9 +12073,12 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10476,17 +12086,23 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
         sampled_individuals::dsl::sampled_individuals
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -10521,9 +12137,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::project_id.eq(project_id))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10531,9 +12150,12 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10541,17 +12163,23 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
         sampled_individuals::dsl::sampled_individuals
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -10586,9 +12214,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::project_id.eq(project_id))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10596,9 +12227,12 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10606,17 +12240,23 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
         sampled_individuals::dsl::sampled_individuals
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_view_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -10669,6 +12309,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::sampled_individuals;
         let mut query = sampled_individuals::dsl::sampled_individuals
             .into_boxed();
+        if let Some(nameplate_id) = filter.and_then(|f| f.nameplate_id) {
+            query = query.filter(sampled_individuals::dsl::nameplate_id.eq(nameplate_id));
+        }
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sampled_individuals::dsl::project_id.eq(project_id));
         }
@@ -10702,6 +12345,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::sampled_individuals;
         let mut query = sampled_individuals::dsl::sampled_individuals
             .into_boxed();
+        if let Some(nameplate_id) = filter.and_then(|f| f.nameplate_id) {
+            query = query.filter(sampled_individuals::dsl::nameplate_id.eq(nameplate_id));
+        }
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sampled_individuals::dsl::project_id.eq(project_id));
         }
@@ -10748,9 +12394,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::project_id.eq(project_id))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10758,9 +12407,12 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10768,17 +12420,23 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
         sampled_individuals::dsl::sampled_individuals
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -10813,9 +12471,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::project_id.eq(project_id))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10823,9 +12484,12 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10833,17 +12497,23 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
         sampled_individuals::dsl::sampled_individuals
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -10878,9 +12548,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::project_id.eq(project_id))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10888,9 +12561,12 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -10898,17 +12574,23 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
         sampled_individuals::dsl::sampled_individuals
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_update_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -10961,6 +12643,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::sampled_individuals;
         let mut query = sampled_individuals::dsl::sampled_individuals
             .into_boxed();
+        if let Some(nameplate_id) = filter.and_then(|f| f.nameplate_id) {
+            query = query.filter(sampled_individuals::dsl::nameplate_id.eq(nameplate_id));
+        }
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sampled_individuals::dsl::project_id.eq(project_id));
         }
@@ -10994,6 +12679,9 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::sampled_individuals;
         let mut query = sampled_individuals::dsl::sampled_individuals
             .into_boxed();
+        if let Some(nameplate_id) = filter.and_then(|f| f.nameplate_id) {
+            query = query.filter(sampled_individuals::dsl::nameplate_id.eq(nameplate_id));
+        }
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sampled_individuals::dsl::project_id.eq(project_id));
         }
@@ -11040,9 +12728,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::project_id.eq(project_id))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -11050,9 +12741,12 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -11060,17 +12754,23 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
         sampled_individuals::dsl::sampled_individuals
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(similarity_dist(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(similarity_op(nameplates::dsl::barcode, query))
+            .order_by(similarity_dist(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -11105,9 +12805,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::project_id.eq(project_id))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -11115,9 +12818,12 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -11125,17 +12831,23 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
         sampled_individuals::dsl::sampled_individuals
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -11170,9 +12882,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 if let Some(project_id) = filter.and_then(|f| f.project_id) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::project_id.eq(project_id))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -11180,9 +12895,12 @@ if let Some(project_id) = filter.and_then(|f| f.project_id) {
 if let Some(created_by) = filter.and_then(|f| f.created_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::created_by.eq(created_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
@@ -11190,17 +12908,23 @@ if let Some(created_by) = filter.and_then(|f| f.created_by) {
 if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
         return sampled_individuals::dsl::sampled_individuals
             .filter(sampled_individuals::dsl::updated_by.eq(updated_by))
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
         sampled_individuals::dsl::sampled_individuals
+            .select(SampledIndividual::as_select())
+            .inner_join(nameplates::dsl::nameplates.on(sampled_individuals::dsl::nameplate_id.eq(nameplates::dsl::id)))
+            .filter(sampled_individuals::dsl::nameplate_id.eq(filter.and_then(|f| f.nameplate_id)))
             .filter(can_admin_sampled_individuals(author_user_id, sampled_individuals::dsl::id))
-            .filter(strict_word_similarity_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
-            .order_by(strict_word_similarity_dist_op(concat_sampled_individuals_notes_barcode(sampled_individuals::dsl::notes, sampled_individuals::dsl::barcode), query))
+            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
+            .order_by(strict_word_similarity_dist_op(nameplates::dsl::barcode, query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from)
@@ -11241,7 +12965,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 #[diesel(belongs_to(SampleContainer, foreign_key = container_id))]
 #[diesel(belongs_to(Project, foreign_key = project_id))]
 #[diesel(belongs_to(User, foreign_key = created_by))]
-#[diesel(belongs_to(SampleState, foreign_key = state))]
+#[diesel(belongs_to(SampleState, foreign_key = state_id))]
 #[diesel(primary_key(id))]
 pub struct Sample {
     pub id: Uuid,
@@ -11253,7 +12977,7 @@ pub struct Sample {
     pub created_at: NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: NaiveDateTime,
-    pub state: i32,
+    pub state_id: i32,
 }
 
 impl From<Sample> for web_common::database::tables::Sample {
@@ -11268,7 +12992,7 @@ impl From<Sample> for web_common::database::tables::Sample {
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
-            state: item.state,
+            state_id: item.state_id,
         }
     }
 }
@@ -11285,7 +13009,7 @@ impl From<web_common::database::tables::Sample> for Sample {
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
-            state: item.state,
+            state_id: item.state_id,
         }
     }
 }
@@ -11354,8 +13078,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             query = query.filter(samples::dsl::updated_by.eq(updated_by));
         }
-        if let Some(state) = filter.and_then(|f| f.state) {
-            query = query.filter(samples::dsl::state.eq(state));
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(samples::dsl::state_id.eq(state_id));
         }
         query
             .filter(can_view_samples(author_user_id, samples::dsl::id))
@@ -11396,8 +13120,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             query = query.filter(samples::dsl::updated_by.eq(updated_by));
         }
-        if let Some(state) = filter.and_then(|f| f.state) {
-            query = query.filter(samples::dsl::state.eq(state));
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(samples::dsl::state_id.eq(state_id));
         }
         query
             .filter(can_view_samples(author_user_id, samples::dsl::id))
@@ -11469,7 +13193,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::samples;
- if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state_id.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(container_id) = filter.and_then(|f| f.container_id) {
@@ -11532,9 +13256,9 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
-if let Some(state) = filter.and_then(|f| f.state) {
+if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return samples::dsl::samples
-            .filter(samples::dsl::state.eq(state))
+            .filter(samples::dsl::state_id.eq(state_id))
             .select(Sample::as_select())
             .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
             .filter(can_view_samples(author_user_id, samples::dsl::id))
@@ -11578,7 +13302,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::samples;
- if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state_id.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(container_id) = filter.and_then(|f| f.container_id) {
@@ -11641,9 +13365,9 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
-if let Some(state) = filter.and_then(|f| f.state) {
+if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return samples::dsl::samples
-            .filter(samples::dsl::state.eq(state))
+            .filter(samples::dsl::state_id.eq(state_id))
             .select(Sample::as_select())
             .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
             .filter(can_view_samples(author_user_id, samples::dsl::id))
@@ -11687,7 +13411,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::samples;
- if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state_id.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(container_id) = filter.and_then(|f| f.container_id) {
@@ -11750,9 +13474,9 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
-if let Some(state) = filter.and_then(|f| f.state) {
+if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return samples::dsl::samples
-            .filter(samples::dsl::state.eq(state))
+            .filter(samples::dsl::state_id.eq(state_id))
             .select(Sample::as_select())
             .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
             .filter(can_view_samples(author_user_id, samples::dsl::id))
@@ -11835,8 +13559,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             query = query.filter(samples::dsl::updated_by.eq(updated_by));
         }
-        if let Some(state) = filter.and_then(|f| f.state) {
-            query = query.filter(samples::dsl::state.eq(state));
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(samples::dsl::state_id.eq(state_id));
         }
         query
             .filter(can_update_samples(author_user_id, samples::dsl::id))
@@ -11877,8 +13601,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             query = query.filter(samples::dsl::updated_by.eq(updated_by));
         }
-        if let Some(state) = filter.and_then(|f| f.state) {
-            query = query.filter(samples::dsl::state.eq(state));
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(samples::dsl::state_id.eq(state_id));
         }
         query
             .filter(can_update_samples(author_user_id, samples::dsl::id))
@@ -11911,7 +13635,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::samples;
- if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state_id.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(container_id) = filter.and_then(|f| f.container_id) {
@@ -11974,9 +13698,9 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
-if let Some(state) = filter.and_then(|f| f.state) {
+if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return samples::dsl::samples
-            .filter(samples::dsl::state.eq(state))
+            .filter(samples::dsl::state_id.eq(state_id))
             .select(Sample::as_select())
             .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
             .filter(can_update_samples(author_user_id, samples::dsl::id))
@@ -12020,7 +13744,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::samples;
- if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state_id.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(container_id) = filter.and_then(|f| f.container_id) {
@@ -12083,9 +13807,9 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
-if let Some(state) = filter.and_then(|f| f.state) {
+if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return samples::dsl::samples
-            .filter(samples::dsl::state.eq(state))
+            .filter(samples::dsl::state_id.eq(state_id))
             .select(Sample::as_select())
             .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
             .filter(can_update_samples(author_user_id, samples::dsl::id))
@@ -12129,7 +13853,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::samples;
- if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state_id.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(container_id) = filter.and_then(|f| f.container_id) {
@@ -12192,9 +13916,9 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
-if let Some(state) = filter.and_then(|f| f.state) {
+if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return samples::dsl::samples
-            .filter(samples::dsl::state.eq(state))
+            .filter(samples::dsl::state_id.eq(state_id))
             .select(Sample::as_select())
             .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
             .filter(can_update_samples(author_user_id, samples::dsl::id))
@@ -12277,8 +14001,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             query = query.filter(samples::dsl::updated_by.eq(updated_by));
         }
-        if let Some(state) = filter.and_then(|f| f.state) {
-            query = query.filter(samples::dsl::state.eq(state));
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(samples::dsl::state_id.eq(state_id));
         }
         query
             .filter(can_admin_samples(author_user_id, samples::dsl::id))
@@ -12319,8 +14043,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             query = query.filter(samples::dsl::updated_by.eq(updated_by));
         }
-        if let Some(state) = filter.and_then(|f| f.state) {
-            query = query.filter(samples::dsl::state.eq(state));
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(samples::dsl::state_id.eq(state_id));
         }
         query
             .filter(can_admin_samples(author_user_id, samples::dsl::id))
@@ -12353,7 +14077,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::samples;
- if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state_id.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(container_id) = filter.and_then(|f| f.container_id) {
@@ -12416,9 +14140,9 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
-if let Some(state) = filter.and_then(|f| f.state) {
+if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return samples::dsl::samples
-            .filter(samples::dsl::state.eq(state))
+            .filter(samples::dsl::state_id.eq(state_id))
             .select(Sample::as_select())
             .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
             .filter(can_admin_samples(author_user_id, samples::dsl::id))
@@ -12462,7 +14186,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::samples;
- if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state_id.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(container_id) = filter.and_then(|f| f.container_id) {
@@ -12525,9 +14249,9 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
-if let Some(state) = filter.and_then(|f| f.state) {
+if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return samples::dsl::samples
-            .filter(samples::dsl::state.eq(state))
+            .filter(samples::dsl::state_id.eq(state_id))
             .select(Sample::as_select())
             .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
             .filter(can_admin_samples(author_user_id, samples::dsl::id))
@@ -12571,7 +14295,7 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::samples;
- if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state.is_some()).unwrap_or(false) {
+ if filter.map(|f| f.container_id.is_some()&&f.project_id.is_some()&&f.created_by.is_some()&&f.sampled_by.is_some()&&f.updated_by.is_some()&&f.state_id.is_some()).unwrap_or(false) {
        unimplemented!();
  }
 if let Some(container_id) = filter.and_then(|f| f.container_id) {
@@ -12634,9 +14358,9 @@ if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection).map_err(web_common::api::ApiError::from);
 }
-if let Some(state) = filter.and_then(|f| f.state) {
+if let Some(state_id) = filter.and_then(|f| f.state_id) {
         return samples::dsl::samples
-            .filter(samples::dsl::state.eq(state))
+            .filter(samples::dsl::state_id.eq(state_id))
             .select(Sample::as_select())
             .inner_join(sample_containers::dsl::sample_containers.on(samples::dsl::container_id.eq(sample_containers::dsl::id)))
             .filter(can_admin_samples(author_user_id, samples::dsl::id))

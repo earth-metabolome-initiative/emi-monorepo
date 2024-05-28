@@ -16,9 +16,12 @@ pub enum Table {
     FontAwesomeIcons,
     LoginProviders,
     Materials,
+    NameplateCategories,
+    Nameplates,
     Notifications,
     Observations,
     Organizations,
+    PermanenceCategories,
     ProjectStates,
     Projects,
     ProjectsTeamsRoleInvitations,
@@ -63,9 +66,12 @@ impl AsRef<str> for Table {
             Table::FontAwesomeIcons => "font_awesome_icons",
             Table::LoginProviders => "login_providers",
             Table::Materials => "materials",
+            Table::NameplateCategories => "nameplate_categories",
+            Table::Nameplates => "nameplates",
             Table::Notifications => "notifications",
             Table::Observations => "observations",
             Table::Organizations => "organizations",
+            Table::PermanenceCategories => "permanence_categories",
             Table::ProjectStates => "project_states",
             Table::Projects => "projects",
             Table::ProjectsTeamsRoleInvitations => "projects_teams_role_invitations",
@@ -122,9 +128,12 @@ impl std::convert::TryFrom<&str> for Table {
             "font_awesome_icons" => Ok(Table::FontAwesomeIcons),
             "login_providers" => Ok(Table::LoginProviders),
             "materials" => Ok(Table::Materials),
+            "nameplate_categories" => Ok(Table::NameplateCategories),
+            "nameplates" => Ok(Table::Nameplates),
             "notifications" => Ok(Table::Notifications),
             "observations" => Ok(Table::Observations),
             "organizations" => Ok(Table::Organizations),
+            "permanence_categories" => Ok(Table::PermanenceCategories),
             "project_states" => Ok(Table::ProjectStates),
             "projects" => Ok(Table::Projects),
             "projects_teams_role_invitations" => Ok(Table::ProjectsTeamsRoleInvitations),
@@ -210,6 +219,12 @@ impl Table {
             Table::Materials => {
                 crate::database::Material::delete_from_id(primary_key.into(), connection).await
             },
+            Table::NameplateCategories => {
+                crate::database::NameplateCategory::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Nameplates => {
+                crate::database::Nameplate::delete_from_id(primary_key.into(), connection).await
+            },
             Table::Notifications => {
                 crate::database::Notification::delete_from_id(primary_key.into(), connection).await
             },
@@ -218,6 +233,9 @@ impl Table {
             },
             Table::Organizations => {
                 crate::database::Organization::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::PermanenceCategories => {
+                crate::database::PermanenceCategory::delete_from_id(primary_key.into(), connection).await
             },
             Table::ProjectStates => {
                 crate::database::ProjectState::delete_from_id(primary_key.into(), connection).await
@@ -336,9 +354,12 @@ impl Table {
             Table::FontAwesomeIcons => crate::database::FontAwesomeIcon::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::LoginProviders => crate::database::NestedLoginProvider::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Materials => crate::database::NestedMaterial::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::NameplateCategories => crate::database::NestedNameplateCategory::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Nameplates => crate::database::NestedNameplate::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Notifications => crate::database::NestedNotification::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Observations => crate::database::NestedObservation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Organizations => crate::database::NestedOrganization::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::PermanenceCategories => crate::database::NestedPermanenceCategory::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ProjectStates => crate::database::NestedProjectState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Projects => crate::database::NestedProject::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ProjectsTeamsRoleInvitations => crate::database::NestedProjectsTeamsRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -427,6 +448,14 @@ impl Table {
                 let filter: Option<MaterialFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedMaterial::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
+            Table::NameplateCategories => {
+                let filter: Option<NameplateCategoryFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedNameplateCategory::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+            },
+            Table::Nameplates => {
+                let filter: Option<NameplateFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedNameplate::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+            },
             Table::Notifications => {
                 let filter: Option<NotificationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedNotification::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
@@ -438,6 +467,10 @@ impl Table {
             Table::Organizations => {
                 let filter: Option<OrganizationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedOrganization::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+            },
+            Table::PermanenceCategories => {
+                let filter: Option<PermanenceCategoryFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedPermanenceCategory::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::ProjectStates => {
                 let filter: Option<ProjectStateFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
@@ -593,12 +626,18 @@ impl Table {
             Table::FontAwesomeIcons => unimplemented!("all_by_updated_at not implemented for font_awesome_icons."),
             Table::LoginProviders => unimplemented!("all_by_updated_at not implemented for login_providers."),
             Table::Materials => unimplemented!("all_by_updated_at not implemented for materials."),
+            Table::NameplateCategories => unimplemented!("all_by_updated_at not implemented for nameplate_categories."),
+            Table::Nameplates => {
+                let filter: Option<NameplateFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedNameplate::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+            },
             Table::Notifications => unimplemented!("all_by_updated_at not implemented for notifications."),
             Table::Observations => {
                 let filter: Option<ObservationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedObservation::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::Organizations => unimplemented!("all_by_updated_at not implemented for organizations."),
+            Table::PermanenceCategories => unimplemented!("all_by_updated_at not implemented for permanence_categories."),
             Table::ProjectStates => unimplemented!("all_by_updated_at not implemented for project_states."),
             Table::Projects => {
                 let filter: Option<ProjectFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
@@ -682,6 +721,8 @@ impl Table {
             Table::FontAwesomeIcons => unimplemented!("Insert not implemented for font_awesome_icons."),
             Table::LoginProviders => unimplemented!("Insert not implemented for login_providers."),
             Table::Materials => unimplemented!("Insert not implemented for materials."),
+            Table::NameplateCategories => unimplemented!("Insert not implemented for nameplate_categories."),
+            Table::Nameplates => unimplemented!("Insert not implemented for nameplates in frontend as it does not have a UUID primary key."),
             Table::Notifications => unimplemented!("Insert not implemented for notifications."),
             Table::Observations => {
                 let new_row: super::NewObservation = bincode::deserialize::<super::NewObservation>(&new_row).map_err(crate::api::ApiError::from)?;
@@ -690,6 +731,7 @@ impl Table {
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::Organizations => unimplemented!("Insert not implemented for organizations."),
+            Table::PermanenceCategories => unimplemented!("Insert not implemented for permanence_categories."),
             Table::ProjectStates => unimplemented!("Insert not implemented for project_states."),
             Table::Projects => unimplemented!("Insert not implemented for projects in frontend as it does not have a UUID primary key."),
             Table::ProjectsTeamsRoleInvitations => unimplemented!("Insert not implemented for projects_teams_role_invitations in frontend as it does not have a UUID primary key."),
@@ -759,6 +801,15 @@ impl Table {
             Table::FontAwesomeIcons => unimplemented!("Update not implemented for font_awesome_icons."),
             Table::LoginProviders => unimplemented!("Update not implemented for login_providers."),
             Table::Materials => unimplemented!("Update not implemented for materials."),
+            Table::NameplateCategories => unimplemented!("Update not implemented for nameplate_categories."),
+            Table::Nameplates => {
+                let update_row: super::UpdateNameplate = bincode::deserialize::<super::UpdateNameplate>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::Nameplate = super::Nameplate::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedNameplate::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::Notifications => unimplemented!("Update not implemented for notifications."),
             Table::Observations => {
                 let update_row: super::NewObservation = bincode::deserialize::<super::NewObservation>(&update_row).map_err(crate::api::ApiError::from)?;
@@ -769,6 +820,7 @@ impl Table {
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::Organizations => unimplemented!("Update not implemented for organizations."),
+            Table::PermanenceCategories => unimplemented!("Update not implemented for permanence_categories."),
             Table::ProjectStates => unimplemented!("Update not implemented for project_states."),
             Table::Projects => {
                 let update_row: super::UpdateProject = bincode::deserialize::<super::UpdateProject>(&update_row).map_err(crate::api::ApiError::from)?;
@@ -925,6 +977,18 @@ impl Table {
                     row.update_or_insert(connection).await?;
                 }
             },
+            Table::NameplateCategories => {
+                for row in rows {
+                    let row: super::NestedNameplateCategory = bincode::deserialize::<super::NestedNameplateCategory>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Nameplates => {
+                for row in rows {
+                    let row: super::NestedNameplate = bincode::deserialize::<super::NestedNameplate>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
             Table::Notifications => {
                 for row in rows {
                     let row: super::NestedNotification = bincode::deserialize::<super::NestedNotification>(&row).map_err(crate::api::ApiError::from)?;
@@ -940,6 +1004,12 @@ impl Table {
             Table::Organizations => {
                 for row in rows {
                     let row: super::NestedOrganization = bincode::deserialize::<super::NestedOrganization>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::PermanenceCategories => {
+                for row in rows {
+                    let row: super::NestedPermanenceCategory = bincode::deserialize::<super::NestedPermanenceCategory>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },

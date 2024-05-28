@@ -150,6 +150,64 @@ pub fn country_page(props: &CountryPageProp) -> Html {
 }
 
 #[derive(Clone, PartialEq, Properties)]
+pub struct NameplateCategoryPageProp {
+    pub id: i32,
+}
+
+impl From<&NameplateCategoryPageProp> for PrimaryKey {
+    fn from(prop: &NameplateCategoryPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl NameplateCategoryPageProp {
+    fn filter_nameplates_by_category_id(&self) -> NameplateFilter {
+        let mut filter = NameplateFilter::default();
+        filter.category_id = Some(self.id);
+        filter
+    }
+}
+
+#[function_component(NameplateCategoryPage)]
+pub fn nameplate_category_page(props: &NameplateCategoryPageProp) -> Html {
+    html! {
+        <BasicPage<NestedNameplateCategory> id={PrimaryKey::from(props)}>
+            // Linked with foreign key nameplates.category_id
+            <BasicList<NestedNameplate> filters={props.filter_nameplates_by_category_id()}/>
+        </BasicPage<NestedNameplateCategory>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct NameplatePageProp {
+    pub id: i32,
+}
+
+impl From<&NameplatePageProp> for PrimaryKey {
+    fn from(prop: &NameplatePageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl NameplatePageProp {
+    fn filter_sampled_individuals_by_nameplate_id(&self) -> SampledIndividualFilter {
+        let mut filter = SampledIndividualFilter::default();
+        filter.nameplate_id = Some(self.id);
+        filter
+    }
+}
+
+#[function_component(NameplatePage)]
+pub fn nameplate_page(props: &NameplatePageProp) -> Html {
+    html! {
+        <BasicPage<NestedNameplate> id={PrimaryKey::from(props)}>
+            // Linked with foreign key sampled_individuals.nameplate_id
+            <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_nameplate_id()}/>
+        </BasicPage<NestedNameplate>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
 pub struct ObservationPageProp {
     pub id: Uuid,
 }
@@ -196,6 +254,35 @@ pub fn organization_page(props: &OrganizationPageProp) -> Html {
 }
 
 #[derive(Clone, PartialEq, Properties)]
+pub struct PermanenceCategoryPageProp {
+    pub id: i32,
+}
+
+impl From<&PermanenceCategoryPageProp> for PrimaryKey {
+    fn from(prop: &PermanenceCategoryPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl PermanenceCategoryPageProp {
+    fn filter_nameplate_categories_by_permanence_id(&self) -> NameplateCategoryFilter {
+        let mut filter = NameplateCategoryFilter::default();
+        filter.permanence_id = Some(self.id);
+        filter
+    }
+}
+
+#[function_component(PermanenceCategoryPage)]
+pub fn permanence_category_page(props: &PermanenceCategoryPageProp) -> Html {
+    html! {
+        <BasicPage<NestedPermanenceCategory> id={PrimaryKey::from(props)}>
+            // Linked with foreign key nameplate_categories.permanence_id
+            <BasicList<NestedNameplateCategory> filters={props.filter_nameplate_categories_by_permanence_id()}/>
+        </BasicPage<NestedPermanenceCategory>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
 pub struct ProjectPageProp {
     pub id: i32,
 }
@@ -217,13 +304,18 @@ impl ProjectPageProp {
         filter.project_id = Some(self.id);
         filter
     }
-    fn filter_sampled_individuals_by_project_id(&self) -> SampledIndividualFilter {
-        let mut filter = SampledIndividualFilter::default();
+    fn filter_samples_by_project_id(&self) -> SampleFilter {
+        let mut filter = SampleFilter::default();
         filter.project_id = Some(self.id);
         filter
     }
-    fn filter_samples_by_project_id(&self) -> SampleFilter {
-        let mut filter = SampleFilter::default();
+    fn filter_nameplates_by_project_id(&self) -> NameplateFilter {
+        let mut filter = NameplateFilter::default();
+        filter.project_id = Some(self.id);
+        filter
+    }
+    fn filter_sampled_individuals_by_project_id(&self) -> SampledIndividualFilter {
+        let mut filter = SampledIndividualFilter::default();
         filter.project_id = Some(self.id);
         filter
     }
@@ -242,10 +334,12 @@ pub fn project_page(props: &ProjectPageProp) -> Html {
             <BasicList<NestedProject> filters={props.filter_projects_by_parent_project_id()}/>
             // Linked with foreign key sample_containers.project_id
             <BasicList<NestedSampleContainer> filters={props.filter_sample_containers_by_project_id()}/>
-            // Linked with foreign key sampled_individuals.project_id
-            <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_project_id()}/>
             // Linked with foreign key samples.project_id
             <BasicList<NestedSample> filters={props.filter_samples_by_project_id()}/>
+            // Linked with foreign key nameplates.project_id
+            <BasicList<NestedNameplate> filters={props.filter_nameplates_by_project_id()}/>
+            // Linked with foreign key sampled_individuals.project_id
+            <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_project_id()}/>
             // Linked with foreign key observations.project_id
             <BasicList<NestedObservation> filters={props.filter_observations_by_project_id()}/>
         </BasicPage<NestedProject>>
@@ -293,9 +387,9 @@ impl From<&SampleStatePageProp> for PrimaryKey {
 }
 
 impl SampleStatePageProp {
-    fn filter_samples_by_state(&self) -> SampleFilter {
+    fn filter_samples_by_state_id(&self) -> SampleFilter {
         let mut filter = SampleFilter::default();
-        filter.state = Some(self.id);
+        filter.state_id = Some(self.id);
         filter
     }
 }
@@ -304,8 +398,8 @@ impl SampleStatePageProp {
 pub fn sample_state_page(props: &SampleStatePageProp) -> Html {
     html! {
         <BasicPage<NestedSampleState> id={PrimaryKey::from(props)}>
-            // Linked with foreign key samples.state
-            <BasicList<NestedSample> filters={props.filter_samples_by_state()}/>
+            // Linked with foreign key samples.state_id
+            <BasicList<NestedSample> filters={props.filter_samples_by_state_id()}/>
         </BasicPage<NestedSampleState>>
     }
 }
@@ -491,6 +585,16 @@ impl UserPageProp {
         filter.updated_by = Some(self.id);
         filter
     }
+    fn filter_nameplates_by_created_by(&self) -> NameplateFilter {
+        let mut filter = NameplateFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_nameplates_by_updated_by(&self) -> NameplateFilter {
+        let mut filter = NameplateFilter::default();
+        filter.updated_by = Some(self.id);
+        filter
+    }
     fn filter_observations_by_created_by(&self) -> ObservationFilter {
         let mut filter = ObservationFilter::default();
         filter.created_by = Some(self.id);
@@ -592,6 +696,10 @@ impl UserPageProp {
 pub fn user_page(props: &UserPageProp) -> Html {
     html! {
         <BasicPage<User> id={PrimaryKey::from(props)}>
+            // Linked with foreign key nameplates.created_by
+            <BasicList<NestedNameplate> filters={props.filter_nameplates_by_created_by()}/>
+            // Linked with foreign key nameplates.updated_by
+            <BasicList<NestedNameplate> filters={props.filter_nameplates_by_updated_by()}/>
             // Linked with foreign key observations.created_by
             <BasicList<NestedObservation> filters={props.filter_observations_by_created_by()}/>
             // Linked with foreign key observations.updated_by

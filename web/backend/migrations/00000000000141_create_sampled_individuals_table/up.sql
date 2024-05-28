@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS sampled_individuals (
   id UUID PRIMARY KEY,
   notes TEXT,
-  barcode TEXT,
+  nameplate_id INTEGER UNIQUE REFERENCES nameplates(id),
   -- TODO: add a foreign key to a table with the phisical tags.
   project_id INTEGER NOT NULL REFERENCES projects(id),
   created_by INTEGER NOT NULL REFERENCES users(id),

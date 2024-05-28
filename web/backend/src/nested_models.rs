@@ -1065,6 +1065,610 @@ impl From<NestedMaterial> for web_common::database::nested_models::NestedMateria
     }
 }
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedNameplateCategory {
+    pub inner: NameplateCategory,
+    pub permanence: NestedPermanenceCategory,
+    pub material: NestedMaterial,
+    pub icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+impl NestedNameplateCategory {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_variant: NameplateCategory,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
+        Ok(Self {
+            permanence: NestedPermanenceCategory::get(flat_variant.permanence_id, connection)?,
+            material: NestedMaterial::get(flat_variant.material_id, connection)?,
+            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
+                inner: flat_variant,
+        })
+    }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        NameplateCategory::can_view_by_id()
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&NameplateCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        NameplateCategory::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&NameplateCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        NameplateCategory::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        NameplateCategory::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&NameplateCategoryFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        NameplateCategory::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&NameplateCategoryFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        NameplateCategory::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&NameplateCategoryFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        NameplateCategory::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+}
+impl From<web_common::database::nested_models::NestedNameplateCategory> for NestedNameplateCategory {
+    fn from(item: web_common::database::nested_models::NestedNameplateCategory) -> Self {
+        Self {
+            inner: item.inner.into(),
+            permanence: item.permanence.into(),
+            material: item.material.into(),
+            icon: item.icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+impl From<NestedNameplateCategory> for web_common::database::nested_models::NestedNameplateCategory {
+    fn from(item: NestedNameplateCategory) -> Self {
+        Self {
+            inner: item.inner.into(),
+            permanence: item.permanence.into(),
+            material: item.material.into(),
+            icon: item.icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedNameplate {
+    pub inner: Nameplate,
+    pub project: NestedProject,
+    pub category: NestedNameplateCategory,
+    pub created_by: User,
+    pub updated_by: User,
+}
+
+impl NestedNameplate {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `author_user_id` - The author user id.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_variant: Nameplate,
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
+        Ok(Self {
+            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
+            category: NestedNameplateCategory::get(flat_variant.category_id, connection)?,
+            created_by: User::get(flat_variant.created_by, connection)?,
+            updated_by: User::get(flat_variant.updated_by, connection)?,
+                inner: flat_variant,
+        })
+    }
+    /// Check whether the user can view the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view(
+        &self,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view(author_user_id, connection)
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_view_by_id(
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Nameplate::can_view_by_id(id, author_user_id, connection)
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::all_viewable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+id: i32,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Nameplate::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Get the struct from the database by its barcode.
+    ///
+    /// * `barcode` - The barcode of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_barcode(
+barcode: &str,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        Nameplate::from_barcode(barcode, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&NameplateFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Check whether the user can update the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_update(author_user_id, connection)
+}
+    /// Check whether the user can update the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_update_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Nameplate::can_update_by_id(id, author_user_id, connection)
+}
+    /// Get all of the updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::all_updatable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted updatable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_updatable_sorted(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Check whether the user can admin the struct.
+    ///
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_admin(author_user_id, connection)
+}
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `id` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn can_admin_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>{
+        Nameplate::can_admin_by_id(id, author_user_id, connection)
+}
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::all_administrable(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_administrable_sorted(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&NameplateFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Nameplate::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Delete the struct from the database.
+    ///
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete(
+        &self,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        self.inner.delete(author_user_id, connection)
+}
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn delete_by_id(
+id: i32,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>{
+        Nameplate::delete_by_id(id, author_user_id, connection)
+}
+}
+impl From<web_common::database::nested_models::NestedNameplate> for NestedNameplate {
+    fn from(item: web_common::database::nested_models::NestedNameplate) -> Self {
+        Self {
+            inner: item.inner.into(),
+            project: item.project.into(),
+            category: item.category.into(),
+            created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
+        }
+    }
+}
+impl From<NestedNameplate> for web_common::database::nested_models::NestedNameplate {
+    fn from(item: NestedNameplate) -> Self {
+        Self {
+            inner: item.inner.into(),
+            project: item.project.into(),
+            category: item.category.into(),
+            created_by: item.created_by.into(),
+            updated_by: item.updated_by.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedNotification {
     pub inner: Notification,
     pub user: User,
@@ -1596,6 +2200,111 @@ impl From<NestedOrganization> for web_common::database::nested_models::NestedOrg
         Self {
             inner: item.inner.into(),
             country: item.country.into(),
+        }
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedPermanenceCategory {
+    pub inner: PermanenceCategory,
+    pub icon: Option<FontAwesomeIcon>,
+    pub color: Option<Color>,
+}
+
+impl NestedPermanenceCategory {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_variant: PermanenceCategory,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
+        Ok(Self {
+            icon: flat_variant.icon_id.map(|icon_id| FontAwesomeIcon::get(icon_id, connection)).transpose()?,
+            color: flat_variant.color_id.map(|color_id| Color::get(color_id, connection)).transpose()?,
+                inner: flat_variant,
+        })
+    }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        PermanenceCategory::can_view_by_id()
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&PermanenceCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        PermanenceCategory::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&PermanenceCategoryFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        PermanenceCategory::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        PermanenceCategory::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+    /// Get the struct from the database by its name.
+    ///
+    /// * `name` - The name of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_name(
+name: &str,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        PermanenceCategory::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+}
+impl From<web_common::database::nested_models::NestedPermanenceCategory> for NestedPermanenceCategory {
+    fn from(item: web_common::database::nested_models::NestedPermanenceCategory) -> Self {
+        Self {
+            inner: item.inner.into(),
+            icon: item.icon.map(|item| item.into()),
+            color: item.color.map(|item| item.into()),
+        }
+    }
+}
+impl From<NestedPermanenceCategory> for web_common::database::nested_models::NestedPermanenceCategory {
+    fn from(item: NestedPermanenceCategory) -> Self {
+        Self {
+            inner: item.inner.into(),
+            icon: item.icon.map(|item| item.into()),
+            color: item.color.map(|item| item.into()),
         }
     }
 }
@@ -5323,6 +6032,7 @@ impl From<NestedSampledIndividualBioOttTaxonItem> for web_common::database::nest
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampledIndividual {
     pub inner: SampledIndividual,
+    pub nameplate: Option<NestedNameplate>,
     pub project: NestedProject,
     pub created_by: User,
     pub updated_by: User,
@@ -5341,6 +6051,7 @@ impl NestedSampledIndividual {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
+            nameplate: flat_variant.nameplate_id.map(|nameplate_id| NestedNameplate::get(nameplate_id, author_user_id, connection)).transpose()?,
             project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
             created_by: User::get(flat_variant.created_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
@@ -5418,6 +6129,19 @@ author_user_id: Option<i32>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         SampledIndividual::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
+}
+    /// Get the struct from the database by its nameplate_id.
+    ///
+    /// * `nameplate_id` - The nameplate_id of the struct to get.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn from_nameplate_id(
+nameplate_id: Option<&i32>,
+author_user_id: Option<i32>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        SampledIndividual::from_nameplate_id(nameplate_id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
     /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
@@ -5738,6 +6462,7 @@ impl From<web_common::database::nested_models::NestedSampledIndividual> for Nest
     fn from(item: web_common::database::nested_models::NestedSampledIndividual) -> Self {
         Self {
             inner: item.inner.into(),
+            nameplate: item.nameplate.map(|item| item.into()),
             project: item.project.into(),
             created_by: item.created_by.into(),
             updated_by: item.updated_by.into(),
@@ -5748,6 +6473,7 @@ impl From<NestedSampledIndividual> for web_common::database::nested_models::Nest
     fn from(item: NestedSampledIndividual) -> Self {
         Self {
             inner: item.inner.into(),
+            nameplate: item.nameplate.map(|item| item.into()),
             project: item.project.into(),
             created_by: item.created_by.into(),
             updated_by: item.updated_by.into(),
@@ -5783,7 +6509,7 @@ impl NestedSample {
             created_by: User::get(flat_variant.created_by, connection)?,
             sampled_by: User::get(flat_variant.sampled_by, connection)?,
             updated_by: User::get(flat_variant.updated_by, connection)?,
-            state: NestedSampleState::get(flat_variant.state, connection)?,
+            state: NestedSampleState::get(flat_variant.state_id, connection)?,
                 inner: flat_variant,
         })
     }

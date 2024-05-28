@@ -114,6 +114,31 @@ diesel::table! {
 }
 
 diesel::table! {
+    nameplate_categories (id) {
+        id -> Int4,
+        name -> Text,
+        permanence_id -> Int4,
+        material_id -> Int4,
+        description -> Text,
+        icon_id -> Int4,
+        color_id -> Int4,
+    }
+}
+
+diesel::table! {
+    nameplates (id) {
+        id -> Int4,
+        barcode -> Text,
+        project_id -> Int4,
+        category_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     notifications (id) {
         id -> Int4,
         user_id -> Int4,
@@ -148,6 +173,16 @@ diesel::table! {
         country_id -> Int4,
         state_province -> Nullable<Text>,
         domain -> Text,
+    }
+}
+
+diesel::table! {
+    permanence_categories (id) {
+        id -> Int4,
+        name -> Text,
+        description -> Text,
+        icon_id -> Nullable<Int4>,
+        color_id -> Nullable<Int4>,
     }
 }
 
@@ -310,7 +345,7 @@ diesel::table! {
     sampled_individuals (id) {
         id -> Uuid,
         notes -> Nullable<Text>,
-        barcode -> Nullable<Text>,
+        nameplate_id -> Nullable<Int4>,
         project_id -> Int4,
         created_by -> Int4,
         created_at -> Timestamp,
@@ -331,7 +366,7 @@ diesel::table! {
         created_at -> Timestamp,
         updated_by -> Int4,
         updated_at -> Timestamp,
-        state -> Int4,
+        state_id -> Int4,
     }
 }
 
@@ -500,10 +535,18 @@ diesel::joinable!(login_providers -> colors (color_id));
 diesel::joinable!(login_providers -> font_awesome_icons (icon_id));
 diesel::joinable!(materials -> colors (color_id));
 diesel::joinable!(materials -> font_awesome_icons (icon_id));
+diesel::joinable!(nameplate_categories -> colors (color_id));
+diesel::joinable!(nameplate_categories -> font_awesome_icons (icon_id));
+diesel::joinable!(nameplate_categories -> materials (material_id));
+diesel::joinable!(nameplate_categories -> permanence_categories (permanence_id));
+diesel::joinable!(nameplates -> nameplate_categories (category_id));
+diesel::joinable!(nameplates -> projects (project_id));
 diesel::joinable!(notifications -> users (user_id));
 diesel::joinable!(observations -> projects (project_id));
 diesel::joinable!(observations -> sampled_individuals (individual_id));
 diesel::joinable!(organizations -> countries (country_id));
+diesel::joinable!(permanence_categories -> colors (color_id));
+diesel::joinable!(permanence_categories -> font_awesome_icons (icon_id));
 diesel::joinable!(project_states -> colors (color_id));
 diesel::joinable!(project_states -> font_awesome_icons (icon_id));
 diesel::joinable!(projects -> colors (color_id));
@@ -542,10 +585,11 @@ diesel::joinable!(sample_states -> font_awesome_icons (icon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals (sampled_individual_id));
 diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
+diesel::joinable!(sampled_individuals -> nameplates (nameplate_id));
 diesel::joinable!(sampled_individuals -> projects (project_id));
 diesel::joinable!(samples -> projects (project_id));
 diesel::joinable!(samples -> sample_containers (container_id));
-diesel::joinable!(samples -> sample_states (state));
+diesel::joinable!(samples -> sample_states (state_id));
 diesel::joinable!(spectra -> spectra_collections (spectra_collection_id));
 diesel::joinable!(spectra_collections -> samples (sample_id));
 diesel::joinable!(team_states -> colors (color_id));
@@ -577,9 +621,12 @@ diesel::allow_tables_to_appear_in_same_query!(
     font_awesome_icons,
     login_providers,
     materials,
+    nameplate_categories,
+    nameplates,
     notifications,
     observations,
     organizations,
+    permanence_categories,
     project_states,
     projects,
     projects_teams_role_invitations,

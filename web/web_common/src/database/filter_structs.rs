@@ -204,6 +204,74 @@ impl MaterialFilter {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NameplateCategoryFilter {
+    pub permanence_id: Option<i32>,
+    pub material_id: Option<i32>,
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl NameplateCategoryFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(permanence_id) = &self.permanence_id {
+            filter = filter.and(gluesql::core::ast_builder::col("nameplate_categories.permanence_id").eq(permanence_id.to_string()));
+        }
+
+        if let Some(material_id) = &self.material_id {
+            filter = filter.and(gluesql::core::ast_builder::col("nameplate_categories.material_id").eq(material_id.to_string()));
+        }
+
+        if let Some(icon_id) = &self.icon_id {
+            filter = filter.and(gluesql::core::ast_builder::col("nameplate_categories.icon_id").eq(icon_id.to_string()));
+        }
+
+        if let Some(color_id) = &self.color_id {
+            filter = filter.and(gluesql::core::ast_builder::col("nameplate_categories.color_id").eq(color_id.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NameplateFilter {
+    pub project_id: Option<i32>,
+    pub category_id: Option<i32>,
+    pub created_by: Option<i32>,
+    pub updated_by: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl NameplateFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(project_id) = &self.project_id {
+            filter = filter.and(gluesql::core::ast_builder::col("nameplates.project_id").eq(project_id.to_string()));
+        }
+
+        if let Some(category_id) = &self.category_id {
+            filter = filter.and(gluesql::core::ast_builder::col("nameplates.category_id").eq(category_id.to_string()));
+        }
+
+        if let Some(created_by) = &self.created_by {
+            filter = filter.and(gluesql::core::ast_builder::col("nameplates.created_by").eq(created_by.to_string()));
+        }
+
+        if let Some(updated_by) = &self.updated_by {
+            filter = filter.and(gluesql::core::ast_builder::col("nameplates.updated_by").eq(updated_by.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NotificationFilter {
     pub user_id: Option<i32>,
 }
@@ -269,6 +337,30 @@ impl OrganizationFilter {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
         if let Some(country_id) = &self.country_id {
             filter = filter.and(gluesql::core::ast_builder::col("organizations.country_id").eq(country_id.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct PermanenceCategoryFilter {
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl PermanenceCategoryFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(icon_id) = &self.icon_id {
+            filter = filter.and(gluesql::core::ast_builder::col("permanence_categories.icon_id").eq(icon_id.to_string()));
+        }
+
+        if let Some(color_id) = &self.color_id {
+            filter = filter.and(gluesql::core::ast_builder::col("permanence_categories.color_id").eq(color_id.to_string()));
         }
 
         filter
@@ -718,6 +810,7 @@ impl SampledIndividualBioOttTaxonItemFilter {
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampledIndividualFilter {
+    pub nameplate_id: Option<i32>,
     pub project_id: Option<i32>,
     pub created_by: Option<i32>,
     pub updated_by: Option<i32>,
@@ -729,6 +822,10 @@ impl SampledIndividualFilter {
 
     pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(nameplate_id) = &self.nameplate_id {
+            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals.nameplate_id").eq(nameplate_id.to_string()));
+        }
+
         if let Some(project_id) = &self.project_id {
             filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals.project_id").eq(project_id.to_string()));
         }
@@ -752,7 +849,7 @@ pub struct SampleFilter {
     pub created_by: Option<i32>,
     pub sampled_by: Option<i32>,
     pub updated_by: Option<i32>,
-    pub state: Option<i32>,
+    pub state_id: Option<i32>,
 }
 
 
@@ -781,8 +878,8 @@ impl SampleFilter {
             filter = filter.and(gluesql::core::ast_builder::col("samples.updated_by").eq(updated_by.to_string()));
         }
 
-        if let Some(state) = &self.state {
-            filter = filter.and(gluesql::core::ast_builder::col("samples.state").eq(state.to_string()));
+        if let Some(state_id) = &self.state_id {
+            filter = filter.and(gluesql::core::ast_builder::col("samples.state_id").eq(state_id.to_string()));
         }
 
         filter

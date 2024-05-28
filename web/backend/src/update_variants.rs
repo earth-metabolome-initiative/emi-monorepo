@@ -61,6 +61,43 @@ impl UpdateRow for web_common::database::UpdateDerivedSample {
     }
 }
 
+/// Intermediate representation of the update variant UpdateNameplate.
+#[derive(Identifiable, AsChangeset)]
+#[diesel(table_name = nameplates)]
+#[diesel(treat_none_as_null = true)]
+#[diesel(primary_key(id))]
+pub(super) struct IntermediateUpdateNameplate {
+    updated_by: i32,
+    id: i32,
+    barcode: String,
+    project_id: i32,
+    category_id: i32,
+}
+
+impl UpdateRow for web_common::database::UpdateNameplate {
+    type Intermediate = IntermediateUpdateNameplate;
+    type Flat = Nameplate;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateUpdateNameplate {
+            updated_by: user_id,
+            id: self.id,
+            barcode: self.barcode,
+            project_id: self.project_id,
+            category_id: self.category_id,
+        }
+    }
+
+    fn update(
+        self,
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        self.to_intermediate(user_id)
+            .save_changes(connection)
+    }
+}
+
 /// Intermediate representation of the update variant UpdateProject.
 #[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = projects)]
@@ -351,7 +388,7 @@ pub(super) struct IntermediateNewSampledIndividual {
     updated_by: i32,
     id: Uuid,
     notes: Option<String>,
-    barcode: Option<String>,
+    nameplate_id: Option<i32>,
     project_id: i32,
     picture: Vec<u8>,
 }
@@ -365,7 +402,7 @@ impl UpdateRow for web_common::database::NewSampledIndividual {
             updated_by: user_id,
             id: self.id,
             notes: self.notes,
-            barcode: self.barcode,
+            nameplate_id: self.nameplate_id,
             project_id: self.project_id,
             picture: self.picture,
         }
@@ -393,7 +430,7 @@ pub(super) struct IntermediateNewSample {
     notes: Option<String>,
     project_id: i32,
     sampled_by: i32,
-    state: i32,
+    state_id: i32,
 }
 
 impl UpdateRow for web_common::database::NewSample {
@@ -408,7 +445,7 @@ impl UpdateRow for web_common::database::NewSample {
             notes: self.notes,
             project_id: self.project_id,
             sampled_by: self.sampled_by,
-            state: self.state,
+            state_id: self.state_id,
         }
     }
 

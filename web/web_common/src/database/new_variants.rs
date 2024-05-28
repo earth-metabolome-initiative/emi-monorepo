@@ -17,6 +17,16 @@ impl Tabular for NewDerivedSample {
     const TABLE: Table = Table::DerivedSamples;
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewNameplate {
+    pub barcode: String,
+    pub project_id: i32,
+    pub category_id: i32,
+}
+
+impl Tabular for NewNameplate {
+    const TABLE: Table = Table::Nameplates;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewObservation {
     pub id: Uuid,
     pub project_id: i32,
@@ -225,7 +235,7 @@ impl Tabular for NewSampledIndividualBioOttTaxonItem {
 pub struct NewSampledIndividual {
     pub id: Uuid,
     pub notes: Option<String>,
-    pub barcode: Option<String>,
+    pub nameplate_id: Option<i32>,
     pub project_id: i32,
     pub picture: Vec<u8>,
 }
@@ -243,8 +253,8 @@ impl NewSampledIndividual {
                 Some(notes) => gluesql::core::ast_builder::text(notes),
                 None => gluesql::core::ast_builder::null(),
             },
-            match self.barcode {
-                Some(barcode) => gluesql::core::ast_builder::text(barcode),
+            match self.nameplate_id {
+                Some(nameplate_id) => gluesql::core::ast_builder::num(nameplate_id),
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::num(self.project_id),
@@ -272,7 +282,7 @@ impl NewSampledIndividual {
         let id = self.id;
         table("sampled_individuals")
             .insert()
-            .columns("created_by,id,notes,barcode,project_id,picture,updated_by")
+            .columns("created_by,id,notes,nameplate_id,project_id,picture,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -308,8 +318,8 @@ impl NewSampledIndividual {
         if let Some(notes) = self.notes {
             update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
         }
-        if let Some(barcode) = self.barcode {
-            update_row = update_row.set("barcode", gluesql::core::ast_builder::text(barcode));
+        if let Some(nameplate_id) = self.nameplate_id {
+            update_row = update_row.set("nameplate_id", gluesql::core::ast_builder::num(nameplate_id));
         }
             update_row.execute(connection)
             .await
@@ -327,7 +337,7 @@ pub struct NewSample {
     pub notes: Option<String>,
     pub project_id: i32,
     pub sampled_by: i32,
-    pub state: i32,
+    pub state_id: i32,
 }
 
 impl Tabular for NewSample {
@@ -346,7 +356,7 @@ impl NewSample {
             },
             gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.sampled_by),
-            gluesql::core::ast_builder::num(self.state),
+            gluesql::core::ast_builder::num(self.state_id),
             gluesql::core::ast_builder::num(created_by),
         ]
     }
@@ -370,7 +380,7 @@ impl NewSample {
         let id = self.id;
         table("samples")
             .insert()
-            .columns("created_by,id,container_id,notes,project_id,sampled_by,state,updated_by")
+            .columns("created_by,id,container_id,notes,project_id,sampled_by,state_id,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -403,7 +413,7 @@ impl NewSample {
 .set("container_id", gluesql::core::ast_builder::num(self.container_id))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
-.set("state", gluesql::core::ast_builder::num(self.state))        
+.set("state_id", gluesql::core::ast_builder::num(self.state_id))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(notes) = self.notes {
             update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));

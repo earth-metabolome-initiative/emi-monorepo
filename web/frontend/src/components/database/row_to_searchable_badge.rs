@@ -43,3 +43,5 @@ pub mod sampled_individuals;
 pub mod sample_container_categories;
 pub mod sample_containers;
 pub mod team_states;
+pub mod nameplate_categories;
+pub mod nameplates;

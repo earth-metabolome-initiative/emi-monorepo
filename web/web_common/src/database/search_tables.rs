@@ -51,6 +51,39 @@ impl Searchable<false> for NestedLoginProvider {
         )
     }
 }
+impl Searchable<false> for NestedNameplateCategory {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::NameplateCategories,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedNameplate {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Nameplates,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for NestedNameplate {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::Nameplates,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedOrganization {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -297,6 +330,39 @@ impl Searchable<false> for LoginProvider {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
              Table::LoginProviders,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NameplateCategory {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::NameplateCategories,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for Nameplate {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Nameplates,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for Nameplate {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::Nameplates,
               filter,
               query,
               limit,

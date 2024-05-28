@@ -396,6 +396,14 @@ NestedLoginProvider::can_view_by_id(
             web_common::database::Table::Materials => {
 NestedMaterial::can_view_by_id(
 )?            },
+            web_common::database::Table::NameplateCategories => {
+NestedNameplateCategory::can_view_by_id(
+)?            },
+            web_common::database::Table::Nameplates => {
+NestedNameplate::can_view_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
             web_common::database::Table::Notifications => {
 NestedNotification::can_view_by_id(
 )?            },
@@ -406,6 +414,9 @@ author_user_id,
 connection)?            },
             web_common::database::Table::Organizations => {
 NestedOrganization::can_view_by_id(
+)?            },
+            web_common::database::Table::PermanenceCategories => {
+NestedPermanenceCategory::can_view_by_id(
 )?            },
             web_common::database::Table::ProjectStates => {
 NestedProjectState::can_view_by_id(
@@ -618,6 +629,21 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::NameplateCategories => {
+bincode::serialize(&NestedNameplateCategory::all_viewable(
+filter.map(|filter| bincode::deserialize::<NameplateCategoryFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::all_viewable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => {
 bincode::serialize(&NestedNotification::all_viewable(
 filter.map(|filter| bincode::deserialize::<NotificationFilter>(&filter)).transpose()?.as_ref(),
@@ -636,6 +662,13 @@ connection)?)?
             web_common::database::Table::Organizations => {
 bincode::serialize(&NestedOrganization::all_viewable(
 filter.map(|filter| bincode::deserialize::<OrganizationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::PermanenceCategories => {
+bincode::serialize(&NestedPermanenceCategory::all_viewable(
+filter.map(|filter| bincode::deserialize::<PermanenceCategoryFilter>(&filter)).transpose()?.as_ref(),
 limit,
 offset,
 connection)?)?
@@ -949,6 +982,21 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::NameplateCategories => {
+bincode::serialize(&NestedNameplateCategory::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<NameplateCategoryFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => {
 bincode::serialize(&NestedNotification::all_viewable_sorted(
 filter.map(|filter| bincode::deserialize::<NotificationFilter>(&filter)).transpose()?.as_ref(),
@@ -967,6 +1015,13 @@ connection)?)?
             web_common::database::Table::Organizations => {
 bincode::serialize(&NestedOrganization::all_viewable_sorted(
 filter.map(|filter| bincode::deserialize::<OrganizationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::PermanenceCategories => {
+bincode::serialize(&NestedPermanenceCategory::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<PermanenceCategoryFilter>(&filter)).transpose()?.as_ref(),
 limit,
 offset,
 connection)?)?
@@ -1261,6 +1316,17 @@ bincode::serialize(&NestedMaterial::get(
 primary_key.into(),
 connection)?)?
             },
+            web_common::database::Table::NameplateCategories => {
+bincode::serialize(&NestedNameplateCategory::get(
+primary_key.into(),
+connection)?)?
+            },
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::get(
+primary_key.into(),
+author_user_id,
+connection)?)?
+            },
             web_common::database::Table::Notifications => {
 bincode::serialize(&NestedNotification::get(
 primary_key.into(),
@@ -1274,6 +1340,11 @@ connection)?)?
             },
             web_common::database::Table::Organizations => {
 bincode::serialize(&NestedOrganization::get(
+primary_key.into(),
+connection)?)?
+            },
+            web_common::database::Table::PermanenceCategories => {
+bincode::serialize(&NestedPermanenceCategory::get(
 primary_key.into(),
 connection)?)?
             },
@@ -1524,6 +1595,23 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Materials => unimplemented!("Method similarity_search_viewable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => {
+bincode::serialize(&NestedNameplateCategory::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<NameplateCategoryFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method similarity_search_viewable not implemented for table observations."),
             web_common::database::Table::Organizations => {
@@ -1534,6 +1622,7 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method similarity_search_viewable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => {
 bincode::serialize(&NestedProjectState::similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<ProjectStateFilter>(&filter)).transpose()?.as_ref(),
@@ -1727,6 +1816,23 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_viewable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => {
+bincode::serialize(&NestedNameplateCategory::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<NameplateCategoryFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method word_similarity_search_viewable not implemented for table observations."),
             web_common::database::Table::Organizations => {
@@ -1737,6 +1843,7 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method word_similarity_search_viewable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => {
 bincode::serialize(&NestedProjectState::word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<ProjectStateFilter>(&filter)).transpose()?.as_ref(),
@@ -1930,6 +2037,23 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => {
+bincode::serialize(&NestedNameplateCategory::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<NameplateCategoryFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table observations."),
             web_common::database::Table::Organizations => {
@@ -1940,6 +2064,7 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => {
 bincode::serialize(&NestedProjectState::strict_word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<ProjectStateFilter>(&filter)).transpose()?.as_ref(),
@@ -2085,6 +2210,12 @@ connection)?            },
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method can_update_by_id not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method can_update_by_id not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method can_update_by_id not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method can_update_by_id not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+NestedNameplate::can_update_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
             web_common::database::Table::Notifications => unimplemented!("Method can_update_by_id not implemented for table notifications."),
             web_common::database::Table::Observations => {
 NestedObservation::can_update_by_id(
@@ -2092,6 +2223,7 @@ primary_key.into(),
 author_user_id,
 connection)?            },
             web_common::database::Table::Organizations => unimplemented!("Method can_update_by_id not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method can_update_by_id not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method can_update_by_id not implemented for table project_states."),
             web_common::database::Table::Projects => {
 NestedProject::can_update_by_id(
@@ -2254,6 +2386,15 @@ connection)?)?
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_updatable not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method all_updatable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method all_updatable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method all_updatable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::all_updatable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method all_updatable not implemented for table notifications."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_updatable(
@@ -2264,6 +2405,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Organizations => unimplemented!("Method all_updatable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method all_updatable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method all_updatable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::all_updatable(
@@ -2497,6 +2639,15 @@ connection)?)?
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_updatable_sorted not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method all_updatable_sorted not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method all_updatable_sorted not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method all_updatable_sorted not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method all_updatable_sorted not implemented for table notifications."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_updatable_sorted(
@@ -2507,6 +2658,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Organizations => unimplemented!("Method all_updatable_sorted not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method all_updatable_sorted not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method all_updatable_sorted not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::all_updatable_sorted(
@@ -2733,6 +2885,12 @@ connection)?            },
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method can_admin_by_id not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method can_admin_by_id not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method can_admin_by_id not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method can_admin_by_id not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+NestedNameplate::can_admin_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
             web_common::database::Table::Notifications => unimplemented!("Method can_admin_by_id not implemented for table notifications."),
             web_common::database::Table::Observations => {
 NestedObservation::can_admin_by_id(
@@ -2740,6 +2898,7 @@ primary_key.into(),
 author_user_id,
 connection)?            },
             web_common::database::Table::Organizations => unimplemented!("Method can_admin_by_id not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method can_admin_by_id not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method can_admin_by_id not implemented for table project_states."),
             web_common::database::Table::Projects => {
 NestedProject::can_admin_by_id(
@@ -2902,6 +3061,15 @@ connection)?)?
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_administrable not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method all_administrable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method all_administrable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method all_administrable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::all_administrable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method all_administrable not implemented for table notifications."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_administrable(
@@ -2912,6 +3080,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Organizations => unimplemented!("Method all_administrable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method all_administrable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method all_administrable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::all_administrable(
@@ -3145,6 +3314,15 @@ connection)?)?
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_administrable_sorted not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method all_administrable_sorted not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method all_administrable_sorted not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method all_administrable_sorted not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::all_administrable_sorted(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method all_administrable_sorted not implemented for table notifications."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_administrable_sorted(
@@ -3155,6 +3333,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Organizations => unimplemented!("Method all_administrable_sorted not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method all_administrable_sorted not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method all_administrable_sorted not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::all_administrable_sorted(
@@ -3381,6 +3560,12 @@ connection)?            },
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method delete_by_id not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method delete_by_id not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method delete_by_id not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method delete_by_id not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+NestedNameplate::delete_by_id(
+primary_key.into(),
+author_user_id,
+connection)?            },
             web_common::database::Table::Notifications => unimplemented!("Method delete_by_id not implemented for table notifications."),
             web_common::database::Table::Observations => {
 NestedObservation::delete_by_id(
@@ -3388,6 +3573,7 @@ primary_key.into(),
 author_user_id,
 connection)?            },
             web_common::database::Table::Organizations => unimplemented!("Method delete_by_id not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method delete_by_id not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method delete_by_id not implemented for table project_states."),
             web_common::database::Table::Projects => {
 NestedProject::delete_by_id(
@@ -3545,9 +3731,20 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method similarity_search_updatable not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method similarity_search_updatable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method similarity_search_updatable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method similarity_search_updatable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method similarity_search_updatable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method similarity_search_updatable not implemented for table observations."),
             web_common::database::Table::Organizations => unimplemented!("Method similarity_search_updatable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method similarity_search_updatable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method similarity_search_updatable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::similarity_search_updatable(
@@ -3656,9 +3853,20 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method word_similarity_search_updatable not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method word_similarity_search_updatable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_updatable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method word_similarity_search_updatable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_updatable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method word_similarity_search_updatable not implemented for table observations."),
             web_common::database::Table::Organizations => unimplemented!("Method word_similarity_search_updatable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method word_similarity_search_updatable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method word_similarity_search_updatable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::word_similarity_search_updatable(
@@ -3767,9 +3975,20 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table observations."),
             web_common::database::Table::Organizations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::strict_word_similarity_search_updatable(
@@ -3878,9 +4097,20 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method similarity_search_administrable not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method similarity_search_administrable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method similarity_search_administrable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method similarity_search_administrable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method similarity_search_administrable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method similarity_search_administrable not implemented for table observations."),
             web_common::database::Table::Organizations => unimplemented!("Method similarity_search_administrable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method similarity_search_administrable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method similarity_search_administrable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::similarity_search_administrable(
@@ -3989,9 +4219,20 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method word_similarity_search_administrable not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method word_similarity_search_administrable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_administrable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method word_similarity_search_administrable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_administrable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method word_similarity_search_administrable not implemented for table observations."),
             web_common::database::Table::Organizations => unimplemented!("Method word_similarity_search_administrable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method word_similarity_search_administrable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method word_similarity_search_administrable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::word_similarity_search_administrable(
@@ -4100,9 +4341,20 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             web_common::database::Table::FontAwesomeIcons => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table font_awesome_icons."),
             web_common::database::Table::LoginProviders => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table notifications."),
             web_common::database::Table::Observations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table observations."),
             web_common::database::Table::Organizations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::strict_word_similarity_search_administrable(
@@ -4222,6 +4474,13 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::LoginProviders => unreachable!("Table `login_providers` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Materials => unreachable!("Table `materials` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::NameplateCategories => unreachable!("Table `nameplate_categories` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::Nameplates => {
+                let row: web_common::database::NewNameplate = bincode::deserialize::<web_common::database::NewNameplate>(&row)?;
+                let inserted_row: crate::models::Nameplate = <web_common::database::NewNameplate as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedNameplate::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Observations => {
                 let row: web_common::database::NewObservation = bincode::deserialize::<web_common::database::NewObservation>(&row)?;
@@ -4230,6 +4489,7 @@ impl InsertableTable for web_common::database::Table {
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Organizations => unreachable!("Table `organizations` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::PermanenceCategories => unreachable!("Table `permanence_categories` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::ProjectStates => unreachable!("Table `project_states` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Projects => {
                 let row: web_common::database::NewProject = bincode::deserialize::<web_common::database::NewProject>(&row)?;
@@ -4344,6 +4604,13 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::LoginProviders => unreachable!("Table `login_providers` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Materials => unreachable!("Table `materials` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::NameplateCategories => unreachable!("Table `nameplate_categories` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::Nameplates => {
+                let row: web_common::database::UpdateNameplate = bincode::deserialize::<web_common::database::UpdateNameplate>(&row)?;
+                let updated_row: crate::models::Nameplate = <web_common::database::UpdateNameplate as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedNameplate::from_flat(updated_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Observations => {
                 let row: web_common::database::NewObservation = bincode::deserialize::<web_common::database::NewObservation>(&row)?;
@@ -4352,6 +4619,7 @@ impl UpdatableTable for web_common::database::Table {
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Organizations => unreachable!("Table `organizations` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::PermanenceCategories => unreachable!("Table `permanence_categories` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::ProjectStates => unreachable!("Table `project_states` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Projects => {
                 let row: web_common::database::UpdateProject = bincode::deserialize::<web_common::database::UpdateProject>(&row)?;
@@ -4485,6 +4753,16 @@ impl FromFlatStrTable for web_common::database::Table {
                  let richest_row = crate::nested_models::NestedMaterial::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row)?
             },
+            web_common::database::Table::NameplateCategories => {
+                let flat_row: crate::models::NameplateCategory = serde_json::from_str::<crate::models::NameplateCategory>(row)?;
+                 let richest_row = crate::nested_models::NestedNameplateCategory::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row)?
+            },
+            web_common::database::Table::Nameplates => {
+                let flat_row: crate::models::Nameplate = serde_json::from_str::<crate::models::Nameplate>(row)?;
+                 let richest_row = crate::nested_models::NestedNameplate::from_flat(flat_row, user_id, connection)?;
+                 bincode::serialize(&richest_row)?
+            },
             web_common::database::Table::Notifications => {
                 let flat_row: crate::models::Notification = serde_json::from_str::<crate::models::Notification>(row)?;
                  let richest_row = crate::nested_models::NestedNotification::from_flat(flat_row, connection)?;
@@ -4498,6 +4776,11 @@ impl FromFlatStrTable for web_common::database::Table {
             web_common::database::Table::Organizations => {
                 let flat_row: crate::models::Organization = serde_json::from_str::<crate::models::Organization>(row)?;
                  let richest_row = crate::nested_models::NestedOrganization::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row)?
+            },
+            web_common::database::Table::PermanenceCategories => {
+                let flat_row: crate::models::PermanenceCategory = serde_json::from_str::<crate::models::PermanenceCategory>(row)?;
+                 let richest_row = crate::nested_models::NestedPermanenceCategory::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row)?
             },
             web_common::database::Table::ProjectStates => {

@@ -63,6 +63,43 @@ impl InsertRow for web_common::database::NewDerivedSample {
     }
 }
 
+/// Intermediate representation of the new variant NewNameplate.
+#[derive(Insertable)]
+#[diesel(table_name = nameplates)]
+pub(super) struct IntermediateNewNameplate {
+    created_by: i32,
+    barcode: String,
+    project_id: i32,
+    category_id: i32,
+    updated_by: i32,
+}
+
+impl InsertRow for web_common::database::NewNameplate {
+    type Intermediate = IntermediateNewNameplate;
+    type Flat = Nameplate;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewNameplate {
+            created_by: user_id,
+            barcode: self.barcode,
+            project_id: self.project_id,
+            category_id: self.category_id,
+            updated_by: user_id,
+        }
+    }
+
+    fn insert(
+        self,
+       user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+    ) -> Result<Self::Flat, diesel::result::Error> {
+        use crate::schema::nameplates;
+        diesel::insert_into(nameplates::dsl::nameplates)
+            .values(self.to_intermediate(user_id))
+            .get_result(connection)
+    }
+}
+
 /// Intermediate representation of the new variant NewObservation.
 #[derive(Insertable)]
 #[diesel(table_name = observations)]
@@ -477,7 +514,7 @@ pub(super) struct IntermediateNewSampledIndividual {
     created_by: i32,
     id: Uuid,
     notes: Option<String>,
-    barcode: Option<String>,
+    nameplate_id: Option<i32>,
     project_id: i32,
     picture: Vec<u8>,
     updated_by: i32,
@@ -492,7 +529,7 @@ impl InsertRow for web_common::database::NewSampledIndividual {
             created_by: user_id,
             id: self.id,
             notes: self.notes,
-            barcode: self.barcode,
+            nameplate_id: self.nameplate_id,
             project_id: self.project_id,
             picture: self.picture,
             updated_by: user_id,
@@ -521,7 +558,7 @@ pub(super) struct IntermediateNewSample {
     notes: Option<String>,
     project_id: i32,
     sampled_by: i32,
-    state: i32,
+    state_id: i32,
     updated_by: i32,
 }
 
@@ -537,7 +574,7 @@ impl InsertRow for web_common::database::NewSample {
             notes: self.notes,
             project_id: self.project_id,
             sampled_by: self.sampled_by,
-            state: self.state,
+            state_id: self.state_id,
             updated_by: user_id,
         }
     }

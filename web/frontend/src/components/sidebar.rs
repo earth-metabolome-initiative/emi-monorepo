@@ -51,6 +51,20 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <span>{Country::section()}</span>
                         </Link<AppRoute>>
                     </li>
+                    <li class={if route == AppRoute::NameplateCategories { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::NameplateCategories}>
+                            <i class={format!("fas fa-{}", NestedNameplateCategory::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedNameplateCategory::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    <li class={if route == AppRoute::Nameplates { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::Nameplates}>
+                            <i class={format!("fas fa-{}", NestedNameplate::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedNameplate::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
                     <li class={if route == AppRoute::Observations { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Observations}>
                             <i class={format!("fas fa-{}", NestedObservation::icon())}></i>
@@ -63,6 +77,13 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <i class={format!("fas fa-{}", NestedOrganization::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedOrganization::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    <li class={if route == AppRoute::PermanenceCategories { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::PermanenceCategories}>
+                            <i class={format!("fas fa-{}", NestedPermanenceCategory::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedPermanenceCategory::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::Projects { "active" } else { "" }}>

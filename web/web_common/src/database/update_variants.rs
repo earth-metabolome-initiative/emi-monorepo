@@ -56,6 +56,60 @@ impl UpdateDerivedSample {
     }
 
 }
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct UpdateNameplate {
+    pub id: i32,
+    pub barcode: String,
+    pub project_id: i32,
+    pub category_id: i32,
+}
+
+impl Tabular for UpdateNameplate {
+    const TABLE: Table = Table::Nameplates;
+}
+#[cfg(feature = "frontend")]
+impl UpdateNameplate {
+    pub fn into_row(self, updated_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(updated_by),
+            gluesql::core::ast_builder::num(self.id),
+            gluesql::core::ast_builder::text(self.barcode),
+            gluesql::core::ast_builder::num(self.project_id),
+            gluesql::core::ast_builder::num(self.category_id),
+        ]
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("nameplates")
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("barcode", gluesql::core::ast_builder::text(self.barcode))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
+.set("category_id", gluesql::core::ast_builder::num(self.category_id))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+}
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateProject {
     pub id: i32,
