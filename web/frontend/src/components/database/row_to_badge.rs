@@ -33,3 +33,5 @@ impl RowToBadge for Country {}
 impl RowToBadge for NestedOrganization {}
 impl RowToBadge for NestedSampleState {}
 impl RowToBadge for NestedSampleContainerCategory {}
+impl RowToBadge for NestedNameplateCategory {}
+impl RowToBadge for NestedNameplate {}

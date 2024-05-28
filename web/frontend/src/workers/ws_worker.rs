@@ -156,96 +156,94 @@ impl WebsocketWorker {
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
-                    Operation::Select(select) => {
-                        match select {
-                            Select::Id {
-                                table_name,
-                                operation_name,
-                                primary_key,
-                            } => {
-                                let table: Table = table_name.try_into().unwrap();
+                    Operation::Select(select) => match select {
+                        Select::Id {
+                            table_name,
+                            operation_name,
+                            primary_key,
+                        } => {
+                            let table: Table = table_name.try_into().unwrap();
 
-                                match table.get(primary_key, &mut database).await {
-                                    Ok(Some(row)) => {
-                                        BackendMessage::GetTable(task_id, operation_name, row)
-                                    }
-                                    Ok(None) => BackendMessage::Error(
-                                        task_id,
-                                        ApiError::BadRequest(vec![
-                                            "No row found with the given primary key".to_string(),
-                                        ]),
-                                    ),
-                                    Err(err) => BackendMessage::Error(task_id, err),
+                            match table.get(primary_key, &mut database).await {
+                                Ok(Some(row)) => {
+                                    BackendMessage::GetTable(task_id, operation_name, row)
                                 }
-                            }
-                            Select::All {
-                                table_name,
-                                filter,
-                                limit,
-                                offset,
-                            } => {
-                                let table: Table = table_name.try_into().unwrap();
-
-                                todo!()
-                            }
-                            Select::AllByUpdatedAt {
-                                table_name,
-                                filter,
-                                limit,
-                                offset,
-                            } => {
-                                let table: Table = table_name.try_into().unwrap();
-
-                                todo!()
-                            }
-                            Select::SearchTable {
-                                filter,
-                                table_name,
-                                query,
-                                limit,
-                                offset
-                            } => {
-                                let table: Table = table_name.try_into().unwrap();
-
-                                todo!()
-                            }
-                            Select::SearchEditableTable {
-                                filter,
-                                table_name,
-                                query,
-                                limit,
-                                offset
-                            } => {
-                                let table: Table = table_name.try_into().unwrap();
-
-                                todo!()
-                            }
-                            Select::CanView {
-                                table_name,
-                                primary_key,
-                            } => {
-                                let table: Table = table_name.try_into().unwrap();
-
-                                todo!()
-                            }
-                            Select::CanUpdate {
-                                table_name,
-                                primary_key,
-                            } => {
-                                let table: Table = table_name.try_into().unwrap();
-
-                                todo!()
-                            }
-                            Select::CanDelete {
-                                table_name,
-                                primary_key,
-                            } => {
-                                let table: Table = table_name.try_into().unwrap();
-
-                                todo!()
+                                Ok(None) => BackendMessage::Error(
+                                    task_id,
+                                    ApiError::BadRequest(vec![
+                                        "No row found with the given primary key".to_string(),
+                                    ]),
+                                ),
+                                Err(err) => BackendMessage::Error(task_id, err),
                             }
                         }
-                    }
+                        Select::All {
+                            table_name,
+                            filter,
+                            limit,
+                            offset,
+                        } => {
+                            let table: Table = table_name.try_into().unwrap();
+
+                            todo!()
+                        }
+                        Select::AllByUpdatedAt {
+                            table_name,
+                            filter,
+                            limit,
+                            offset,
+                        } => {
+                            let table: Table = table_name.try_into().unwrap();
+
+                            todo!()
+                        }
+                        Select::SearchTable {
+                            filter,
+                            table_name,
+                            query,
+                            limit,
+                            offset,
+                        } => {
+                            let table: Table = table_name.try_into().unwrap();
+
+                            todo!()
+                        }
+                        Select::SearchEditableTable {
+                            filter,
+                            table_name,
+                            query,
+                            limit,
+                            offset,
+                        } => {
+                            let table: Table = table_name.try_into().unwrap();
+
+                            todo!()
+                        }
+                        Select::CanView {
+                            table_name,
+                            primary_key,
+                        } => {
+                            let table: Table = table_name.try_into().unwrap();
+
+                            todo!()
+                        }
+                        Select::CanUpdate {
+                            table_name,
+                            primary_key,
+                        } => {
+                            let table: Table = table_name.try_into().unwrap();
+
+                            todo!()
+                        }
+                        Select::CanDelete {
+                            table_name,
+                            primary_key,
+                        } => {
+                            let table: Table = table_name.try_into().unwrap();
+
+                            todo!()
+                        }
+                    },
                     Operation::Update(table_name, serialized_row) => {
                         let table: Table = table_name.try_into().unwrap();
                         match table

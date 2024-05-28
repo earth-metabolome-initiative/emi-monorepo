@@ -326,6 +326,63 @@ impl PageLike for NestedSpectra {
     }
 }
 
+impl PageLike for NestedNameplateCategory {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        Some(self.inner.description.as_ref())
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        None
+    }
+
+    fn icon() -> &'static str {
+        "tag"
+    }
+}
+
+impl PageLike for NestedNameplate {
+    fn title(&self) -> String {
+        self.inner.barcode.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        None
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        Some(AppRoute::NameplatesUpdate { id: self.inner.id })
+    }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        filter
+            .and_then(|f| {
+                f.project_id
+                    .map(|project_id| AppRoute::NameplatesNewWithProject { project_id })
+            })
+            .or(Some(AppRoute::NameplatesNew))
+    }
+
+    fn icon() -> &'static str {
+        "tag"
+    }
+}
+
 impl PageLike for NestedSampledIndividual {
     fn title(&self) -> String {
         format!("Sampled individual {}", self.inner.id)

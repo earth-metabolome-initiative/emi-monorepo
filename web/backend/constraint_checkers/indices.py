@@ -109,6 +109,11 @@ class PGIndex:
                 f"The table {table_name} is not a foreign table of the index {self.name}."
             )
 
+        assert table_name != self.table_name, (
+            "We are not expecting the table name to be the same as the table name of the index. "
+            f"The table name is {table_name} and the table name of the index is {self.table_name}."
+        )
+
         primary_keys = self.get_primary_keys()
         assert len(primary_keys) == 1, (
             "We are expecting the table to have a single primary key, but it has "
@@ -119,7 +124,13 @@ class PGIndex:
         primary_key = primary_keys[0]
         foreign_key_id = self.foreign_table_names[table_name]
 
-        return f".inner_join({self.table_name}::dsl::{self.table_name}.on({table_name}::dsl::{foreign_key_id}.eq({self.table_name}::dsl::{primary_key})))"
+        # Depending on whether the foreign key id column is nullable or not, we need
+        # to add the `.nullable()` method at the end of the index column.
+        nullable = ""
+        if PGIndices.table_metadata.is_nullable(table_name, foreign_key_id):
+            nullable = ".nullable()"
+
+        return f".inner_join({self.table_name}::dsl::{self.table_name}.on({table_name}::dsl::{foreign_key_id}.eq({self.table_name}::dsl::{primary_key}{nullable})))"
 
     def format_operator_diesel(self, query: str, similarity_method: str) -> str:
         """Returns the index in Diesel format.

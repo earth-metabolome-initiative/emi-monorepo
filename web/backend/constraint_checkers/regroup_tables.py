@@ -36,7 +36,9 @@ SUPPORT_TABLE_NAMES = [
     "notifications",
     "team_states",
     "project_states",
-    "sample_container_categories"
+    "sample_container_categories",
+    "nameplate_categories",
+    "permanence_categories"
 ]
 
 def get_best_insertion_point(table_name: str, expected_desinence: str) -> int:

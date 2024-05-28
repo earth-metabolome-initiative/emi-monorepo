@@ -564,6 +564,8 @@ class TableMetadata:
             """
         )
 
+        assert cursor.rowcount == 1, f"Column {column_name} does not exist in table {table_name}."
+
         is_nullable = cursor.fetchone()[0]
 
         cursor.close()

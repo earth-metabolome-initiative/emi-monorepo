@@ -233,6 +233,13 @@ class AttributeMetadata:
         """Returns whether the attribute is the update timestamp."""
         return self.name in ("updated_at",)
 
+    def is_sampled_by(self) -> bool:
+        """Returns whether the attribute is the sampled by."""
+        return self.name in ("sampled_by",) and (
+            (self.has_struct_data_type() and self.raw_data_type().table_name == "users")
+            or self.data_type() == "i32"
+        )
+
     def is_inner(self) -> bool:
         """Returns whether the attribute is the inner attribute."""
         return (
@@ -425,7 +432,9 @@ class MethodDefinition:
     def get_primary_key_argument(self) -> Optional[AttributeMetadata]:
         """Returns the primary key argument."""
         for argument in self.arguments:
-            if argument.name == self.owner.get_formatted_primary_keys(include_prefix=False):
+            if argument.name == self.owner.get_formatted_primary_keys(
+                include_prefix=False
+            ):
                 return argument
         return None
 
@@ -723,6 +732,10 @@ class StructMetadata:
             self.table_name == "users"
         )
 
+    def has_sampled_by(self) -> bool:
+        """Returns whether the struct has a sampled by field."""
+        return any(attribute.is_sampled_by() for attribute in self.attributes)
+
     def is_insertable(self) -> bool:
         """Returns whether the struct is insertable.
 
@@ -851,7 +864,9 @@ class StructMetadata:
                     f"The table associated with the struct is {self.table_name}."
                 )
 
-            raise ValueError(f"The flat variant of the struct {self.name} has not been set.")
+            raise ValueError(
+                f"The flat variant of the struct {self.name} has not been set."
+            )
 
         return self._flat_variant
 

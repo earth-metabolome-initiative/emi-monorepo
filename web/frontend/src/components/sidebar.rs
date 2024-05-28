@@ -1,14 +1,14 @@
 //! This file is auto-generated. Do not edit it manually.
 //!
 //! This file contains the sidebar for the frontend.
+use super::logout::Logout;
+use crate::components::basic_page::PageLike;
+use crate::router::AppRoute;
+use crate::stores::user_state::UserState;
+use web_common::database::*;
 use yew::prelude::*;
 use yew_router::prelude::*;
 use yewdux::use_store;
-use web_common::database::*;
-use crate::router::AppRoute;
-use super::logout::Logout;
-use crate::components::basic_page::PageLike;
-use crate::stores::user_state::UserState;
 
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct SidebarProps {
@@ -51,13 +51,6 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <span>{Country::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::NameplateCategories { "active" } else { "" }}>
-                        <Link<AppRoute> to={AppRoute::NameplateCategories}>
-                            <i class={format!("fas fa-{}", NestedNameplateCategory::icon())}></i>
-                             {'\u{00a0}'}
-                            <span>{NestedNameplateCategory::section()}</span>
-                        </Link<AppRoute>>
-                    </li>
                     <li class={if route == AppRoute::Nameplates { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Nameplates}>
                             <i class={format!("fas fa-{}", NestedNameplate::icon())}></i>
@@ -77,13 +70,6 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <i class={format!("fas fa-{}", NestedOrganization::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedOrganization::section()}</span>
-                        </Link<AppRoute>>
-                    </li>
-                    <li class={if route == AppRoute::PermanenceCategories { "active" } else { "" }}>
-                        <Link<AppRoute> to={AppRoute::PermanenceCategories}>
-                            <i class={format!("fas fa-{}", NestedPermanenceCategory::icon())}></i>
-                             {'\u{00a0}'}
-                            <span>{NestedPermanenceCategory::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::Projects { "active" } else { "" }}>

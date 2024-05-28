@@ -1394,6 +1394,11 @@ def write_frontend_yew_form(
                 f"   named_requests.push(ComponentMessage::get::<{variant.name}>({flat_variant.get_formatted_primary_keys(include_prefix=True, prefix='props')}.into()));\n"
             )
         elif method == "POST":
+            if builder.has_sampled_by():
+                document.write(
+                    "    let user_state = use_store_value::<UserState>();\n"
+                )
+                
             for property_attribute in properties_attributes:
                 property_struct = richest_variant.get_attribute_by_name(
                     property_attribute.normalized_name()
@@ -1408,6 +1413,12 @@ def write_frontend_yew_form(
                         f'         named_requests.push(ComponentMessage::get_named::<&str, {property_struct.name}>("{property_attribute.normalized_name()}", {property_attribute.name}.into()));\n'
                         "    }\n"
                     )
+                    if property_attribute.is_sampled_by():
+                        document.write(
+                            "    else if let Some(user) = user_state.as_ref().user() {\n"
+                            f"        builder_dispatch.apply(SampleActions::SetSampledBy(Some(user.clone())));\n"
+                            "    }\n"
+                        )
                 else:
                     document.write(
                         f'    named_requests.push(ComponentMessage::get_named::<&str, {property_struct.name}>("{property_attribute.normalized_name()}", props.{property_attribute.name}.into()));\n'
@@ -1556,8 +1567,6 @@ def write_frontend_yew_form(
                             f"if let Some({attribute.name}) = builder_store.{attribute.name}.as_ref() {{\n"
                             f'    <span>{{"TODO Selected {attribute.name}"}}</span>\n'
                             # f"    {{{attribute.name}.to_selected_datalist_badge()}}\n"
-                            "} else {\n"
-                            f"    <></>\n"
                             "}\n"
                         )
                         continue
@@ -1674,7 +1683,7 @@ def write_frontend_forms(
         "use serde::{Deserialize, Serialize};",
         "use web_common::database::*;",
         "use yew::prelude::*;",
-        "use yewdux::{use_store, Reducer, Store};",
+        "use yewdux::{use_store, use_store_value, Reducer, Store};",
         "use crate::components::forms::*;",
         "use web_common::api::form_traits::FormMethod;",
         "use std::rc::Rc;",
@@ -1683,6 +1692,7 @@ def write_frontend_forms(
         "use yewdux::Dispatch;",
         "use chrono::NaiveDateTime;",
         "use web_common::api::ApiError;",
+        "use crate::stores::user_state::UserState;",
         "use crate::workers::ws_worker::ComponentMessage;",
         "use web_common::custom_validators::Image;",
         "use web_common::file_formats::GenericFileFormat;",

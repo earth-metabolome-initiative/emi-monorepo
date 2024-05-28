@@ -28,10 +28,10 @@ impl RowToSearchableBadge for NestedSampledIndividual {
     fn similarity_score(&self, query: &str) -> isize {
         self.inner.id.similarity_score(query)
     }
-fn primary_color_class(&self) -> &str {
+    fn primary_color_class(&self) -> &str {
         "grey"
     }
-fn description(&self) -> &str {
+    fn description(&self) -> &str {
         ""
     }
 }

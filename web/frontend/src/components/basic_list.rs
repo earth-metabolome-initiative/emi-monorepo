@@ -1,17 +1,17 @@
 //! Module providing a yew component for a basic page with a websocket connection.
 use crate::components::PageLike;
 use crate::router::AppRoute;
+use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
+use std::rc::Rc;
 use web_common::api::form_traits::FormMethod;
 use web_common::database::*;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::Link;
-use crate::stores::user_state::UserState;
 use yewdux::prelude::*;
-use std::rc::Rc;
 
 use super::database::row_to_badge::RowToBadge;
 
@@ -77,10 +77,9 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
             PagesMessage::Backend(message) => match message {
                 WebsocketMessage::AllTable(rows) => {
                     let mut new_pages: Vec<Page> = bincode::deserialize(&rows).unwrap();
-                    new_pages
-                        .retain(|page| {
-                            self.pages.iter().all(|old_page| old_page.id() != page.id())
-                        });
+                    new_pages.retain(|page| {
+                        self.pages.iter().all(|old_page| old_page.id() != page.id())
+                    });
 
                     self.no_more_pages = new_pages.is_empty();
                     self.request_is_ongoing = false;

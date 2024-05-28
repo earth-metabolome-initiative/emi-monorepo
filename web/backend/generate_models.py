@@ -195,3 +195,19 @@ if __name__ == "__main__":
         flat_variants,
     )
     print("Generated frontend router page.")
+
+    # Finally, as we are currently running in the backend, we can now
+    # format the generated rust code.
+    status = os.system("cargo fmt")
+    if status != 0:
+        print("Error running 'cargo fmt'!")
+        exit(1)
+    print("Formatted backend rust code.")
+    # And the generated frontend rust code, for which we need to be in the
+    # frontend directory.
+    os.chdir("../frontend")
+    status = os.system("cargo fmt")
+    if status != 0:
+        print("Error running 'cargo fmt'!")
+        exit(1)
+    print("Formatted frontend rust code.")

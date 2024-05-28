@@ -1,7 +1,7 @@
-use yew::prelude::*;
+use crate::components::*;
 use uuid::Uuid;
 use web_common::database::*;
-use crate::components::*;
+use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct BioOttRankPageProp {
@@ -89,7 +89,9 @@ impl BioOttTaxonItemPageProp {
         filter.taxon_id = Some(self.id);
         filter
     }
-    fn filter_sampled_individual_bio_ott_taxon_items_by_taxon_id(&self) -> SampledIndividualBioOttTaxonItemFilter {
+    fn filter_sampled_individual_bio_ott_taxon_items_by_taxon_id(
+        &self,
+    ) -> SampledIndividualBioOttTaxonItemFilter {
         let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
         filter.taxon_id = Some(self.id);
         filter
@@ -150,35 +152,6 @@ pub fn country_page(props: &CountryPageProp) -> Html {
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct NameplateCategoryPageProp {
-    pub id: i32,
-}
-
-impl From<&NameplateCategoryPageProp> for PrimaryKey {
-    fn from(prop: &NameplateCategoryPageProp) -> Self {
-        prop.id.into()
-    }
-}
-
-impl NameplateCategoryPageProp {
-    fn filter_nameplates_by_category_id(&self) -> NameplateFilter {
-        let mut filter = NameplateFilter::default();
-        filter.category_id = Some(self.id);
-        filter
-    }
-}
-
-#[function_component(NameplateCategoryPage)]
-pub fn nameplate_category_page(props: &NameplateCategoryPageProp) -> Html {
-    html! {
-        <BasicPage<NestedNameplateCategory> id={PrimaryKey::from(props)}>
-            // Linked with foreign key nameplates.category_id
-            <BasicList<NestedNameplate> filters={props.filter_nameplates_by_category_id()}/>
-        </BasicPage<NestedNameplateCategory>>
-    }
-}
-
-#[derive(Clone, PartialEq, Properties)]
 pub struct NameplatePageProp {
     pub id: i32,
 }
@@ -218,8 +191,7 @@ impl From<&ObservationPageProp> for PrimaryKey {
     }
 }
 
-impl ObservationPageProp {
-}
+impl ObservationPageProp {}
 
 #[function_component(ObservationPage)]
 pub fn observation_page(props: &ObservationPageProp) -> Html {
@@ -241,8 +213,7 @@ impl From<&OrganizationPageProp> for PrimaryKey {
     }
 }
 
-impl OrganizationPageProp {
-}
+impl OrganizationPageProp {}
 
 #[function_component(OrganizationPage)]
 pub fn organization_page(props: &OrganizationPageProp) -> Html {
@@ -250,35 +221,6 @@ pub fn organization_page(props: &OrganizationPageProp) -> Html {
         <BasicPage<NestedOrganization> id={PrimaryKey::from(props)}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedOrganization>>
-    }
-}
-
-#[derive(Clone, PartialEq, Properties)]
-pub struct PermanenceCategoryPageProp {
-    pub id: i32,
-}
-
-impl From<&PermanenceCategoryPageProp> for PrimaryKey {
-    fn from(prop: &PermanenceCategoryPageProp) -> Self {
-        prop.id.into()
-    }
-}
-
-impl PermanenceCategoryPageProp {
-    fn filter_nameplate_categories_by_permanence_id(&self) -> NameplateCategoryFilter {
-        let mut filter = NameplateCategoryFilter::default();
-        filter.permanence_id = Some(self.id);
-        filter
-    }
-}
-
-#[function_component(PermanenceCategoryPage)]
-pub fn permanence_category_page(props: &PermanenceCategoryPageProp) -> Html {
-    html! {
-        <BasicPage<NestedPermanenceCategory> id={PrimaryKey::from(props)}>
-            // Linked with foreign key nameplate_categories.permanence_id
-            <BasicList<NestedNameplateCategory> filters={props.filter_nameplate_categories_by_permanence_id()}/>
-        </BasicPage<NestedPermanenceCategory>>
     }
 }
 
@@ -421,7 +363,9 @@ impl SampledIndividualPageProp {
         filter.individual_id = Some(self.id);
         filter
     }
-    fn filter_sampled_individual_bio_ott_taxon_items_by_sampled_individual_id(&self) -> SampledIndividualBioOttTaxonItemFilter {
+    fn filter_sampled_individual_bio_ott_taxon_items_by_sampled_individual_id(
+        &self,
+    ) -> SampledIndividualBioOttTaxonItemFilter {
         let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
         filter.sampled_individual_id = Some(self.id);
         filter
@@ -493,8 +437,7 @@ impl From<&SpectraPageProp> for PrimaryKey {
     }
 }
 
-impl SpectraPageProp {
-}
+impl SpectraPageProp {}
 
 #[function_component(SpectraPage)]
 pub fn spectra_page(props: &SpectraPageProp) -> Html {
@@ -630,7 +573,9 @@ impl UserPageProp {
         filter.updated_by = Some(self.id);
         filter
     }
-    fn filter_sampled_individual_bio_ott_taxon_items_by_created_by(&self) -> SampledIndividualBioOttTaxonItemFilter {
+    fn filter_sampled_individual_bio_ott_taxon_items_by_created_by(
+        &self,
+    ) -> SampledIndividualBioOttTaxonItemFilter {
         let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
         filter.created_by = Some(self.id);
         filter
@@ -737,4 +682,3 @@ pub fn user_page(props: &UserPageProp) -> Html {
         </BasicPage<User>>
     }
 }
-

@@ -9,20 +9,19 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
-use diesel::Queryable;
-use diesel::QueryableByName;
-use diesel::Identifiable;
-use diesel::Insertable;
 use crate::schema::*;
 use crate::sql_function_bindings::*;
+use crate::views::schema::*;
+use chrono::NaiveDateTime;
+use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::PooledConnection;
+use diesel::Identifiable;
+use diesel::Insertable;
+use diesel::Queryable;
+use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
-use diesel::prelude::*;
-use web_common::database::filter_structs::*;
 use uuid::Uuid;
-use chrono::NaiveDateTime;
-use crate::views::schema::*;
-
+use web_common::database::filter_structs::*;

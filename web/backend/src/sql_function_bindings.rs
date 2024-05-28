@@ -10,41 +10,6 @@
 //! parameter is null or not is done in the postgres function itself.
 
 diesel::expression::functions::sql_function! {
-   fn can_update_user_emails(
-        author_user_id: diesel::sql_types::Integer,
-        this_user_emails_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn can_admin_user_emails(
-        author_user_id: diesel::sql_types::Integer,
-        this_user_emails_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn can_view_user_emails(
-        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        this_user_emails_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn concat_sample_states_name_description(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::expression::functions::sql_function! {
-   fn concat_bio_ott_ranks_name_description(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::expression::functions::sql_function! {
    fn concat_document_formats_extension_mime_type(
         extension: diesel::sql_types::Text,
         mime_type: diesel::sql_types::Text,
@@ -53,6 +18,69 @@ diesel::expression::functions::sql_function! {
 
 diesel::expression::functions::sql_function! {
    fn concat_project_states_name_description(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
+}
+
+diesel::expression::functions::sql_function! {
+   fn strict_word_similarity(
+        arg_0: diesel::sql_types::Text,
+        arg_1: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Float;
+}
+
+diesel::expression::functions::sql_function! {
+   fn strict_word_similarity_op(
+        arg_0: diesel::sql_types::Text,
+        arg_1: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn strict_word_similarity_commutator_op(
+        arg_0: diesel::sql_types::Text,
+        arg_1: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn strict_word_similarity_dist_op(
+        arg_0: diesel::sql_types::Text,
+        arg_1: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Float;
+}
+
+diesel::expression::functions::sql_function! {
+   fn strict_word_similarity_dist_commutator_op(
+        arg_0: diesel::sql_types::Text,
+        arg_1: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Float;
+}
+
+diesel::expression::functions::sql_function! {
+   fn concat_colors_name(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
+}
+
+diesel::expression::functions::sql_function! {
+   fn concat_font_awesome_icons_name(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
+}
+
+diesel::expression::functions::sql_function! {
+   fn concat_sample_container_categories_brand(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
+}
+
+diesel::expression::functions::sql_function! {
+   fn concat_roles_name(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
@@ -521,69 +549,6 @@ diesel::expression::functions::sql_function! {
 }
 
 diesel::expression::functions::sql_function! {
-   fn strict_word_similarity(
-        arg_0: diesel::sql_types::Text,
-        arg_1: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Float;
-}
-
-diesel::expression::functions::sql_function! {
-   fn strict_word_similarity_op(
-        arg_0: diesel::sql_types::Text,
-        arg_1: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn strict_word_similarity_commutator_op(
-        arg_0: diesel::sql_types::Text,
-        arg_1: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn strict_word_similarity_dist_op(
-        arg_0: diesel::sql_types::Text,
-        arg_1: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Float;
-}
-
-diesel::expression::functions::sql_function! {
-   fn strict_word_similarity_dist_commutator_op(
-        arg_0: diesel::sql_types::Text,
-        arg_1: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Float;
-}
-
-diesel::expression::functions::sql_function! {
-   fn concat_colors_name(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::expression::functions::sql_function! {
-   fn concat_font_awesome_icons_name(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::expression::functions::sql_function! {
-   fn concat_sample_container_categories_brand(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::expression::functions::sql_function! {
-   fn concat_roles_name(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::expression::functions::sql_function! {
    fn can_update_users(
         author_user_id: diesel::sql_types::Integer,
         this_users_id: diesel::sql_types::Integer,
@@ -610,53 +575,6 @@ diesel::expression::functions::sql_function! {
         author_user_id: diesel::sql_types::Integer,
         this_users_users_role_requests_table_id: diesel::sql_types::Integer,
         this_users_users_role_requests_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn concat_teams_name_description(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::expression::functions::sql_function! {
-   fn can_update_teams_users_roles(
-        author_user_id: diesel::sql_types::Integer,
-        this_teams_users_roles_table_id: diesel::sql_types::Integer,
-        this_teams_users_roles_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn can_admin_teams_users_roles(
-        author_user_id: diesel::sql_types::Integer,
-        this_teams_users_roles_table_id: diesel::sql_types::Integer,
-        this_teams_users_roles_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn can_update_teams_users_role_requests(
-        author_user_id: diesel::sql_types::Integer,
-        this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
-        this_teams_users_role_requests_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn can_admin_teams_users_role_requests(
-        author_user_id: diesel::sql_types::Integer,
-        this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
-        this_teams_users_role_requests_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::expression::functions::sql_function! {
-   fn can_view_teams_users_role_requests(
-        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
-        this_teams_users_role_requests_user_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
@@ -738,6 +656,53 @@ diesel::expression::functions::sql_function! {
 }
 
 diesel::expression::functions::sql_function! {
+   fn concat_teams_name_description(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
+}
+
+diesel::expression::functions::sql_function! {
+   fn can_update_teams_users_roles(
+        author_user_id: diesel::sql_types::Integer,
+        this_teams_users_roles_table_id: diesel::sql_types::Integer,
+        this_teams_users_roles_user_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn can_admin_teams_users_roles(
+        author_user_id: diesel::sql_types::Integer,
+        this_teams_users_roles_table_id: diesel::sql_types::Integer,
+        this_teams_users_roles_user_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn can_update_teams_users_role_requests(
+        author_user_id: diesel::sql_types::Integer,
+        this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
+        this_teams_users_role_requests_user_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn can_admin_teams_users_role_requests(
+        author_user_id: diesel::sql_types::Integer,
+        this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
+        this_teams_users_role_requests_user_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn can_view_teams_users_role_requests(
+        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
+        this_teams_users_role_requests_user_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
    fn can_update_teams_users_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_teams_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -785,3 +750,37 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
+diesel::expression::functions::sql_function! {
+   fn can_update_user_emails(
+        author_user_id: diesel::sql_types::Integer,
+        this_user_emails_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn can_admin_user_emails(
+        author_user_id: diesel::sql_types::Integer,
+        this_user_emails_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn can_view_user_emails(
+        author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
+        this_user_emails_id: diesel::sql_types::Integer,
+    ) -> diesel::sql_types::Bool;
+}
+
+diesel::expression::functions::sql_function! {
+   fn concat_sample_states_name_description(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
+}
+
+diesel::expression::functions::sql_function! {
+   fn concat_bio_ott_ranks_name_description(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
+}
