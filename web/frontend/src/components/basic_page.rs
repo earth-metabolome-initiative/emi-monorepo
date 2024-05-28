@@ -377,8 +377,15 @@ impl PageLike for NestedSample {
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
-                f.sampled_by
-                    .map(|sampled_by| AppRoute::SamplesNewWithSampledBy { sampled_by })
+                if let Some(project_id) = f.project_id {
+                    Some(AppRoute::SamplesNewWithProject { project_id })
+                } else if let Some(container_id) = f.container_id {
+                    Some(AppRoute::SamplesNewWithContainer { container_id })
+                } else if let Some(sampled_by) = f.sampled_by {
+                    Some(AppRoute::SamplesNewWithSampledBy { sampled_by })
+                } else {
+                    None
+                }
             })
             .or(Some(AppRoute::SamplesNew))
     }
