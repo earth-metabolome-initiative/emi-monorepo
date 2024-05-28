@@ -19,6 +19,10 @@ BEGIN
     IF author_user_id IS NULL THEN
         RETURN FALSE;
     END IF;
+-- If the author_user_id is the same as the user_id of the row, we return TRUE.
+    IF author_user_id = this_users_id THEN
+        RETURN TRUE;
+    END IF;
 -- We check whether the user is in the users_users_roles table with an appropriate role id.
     IF EXISTS (SELECT 1 FROM users_users_roles WHERE users_users_roles.user_id = author_user_id AND users_users_roles.role_id <= 2 AND users_users_roles.table_id = this_users_id) THEN
         RETURN TRUE;
