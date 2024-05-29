@@ -20,6 +20,8 @@ pub enum Table {
     Nameplates,
     Notifications,
     Observations,
+    OrganismBioOttTaxonItems,
+    Organisms,
     Organizations,
     PermanenceCategories,
     ProjectStates,
@@ -35,8 +37,6 @@ pub enum Table {
     SampleContainerCategories,
     SampleContainers,
     SampleStates,
-    SampledIndividualBioOttTaxonItems,
-    SampledIndividuals,
     Samples,
     Spectra,
     SpectraCollections,
@@ -70,6 +70,8 @@ impl AsRef<str> for Table {
             Table::Nameplates => "nameplates",
             Table::Notifications => "notifications",
             Table::Observations => "observations",
+            Table::OrganismBioOttTaxonItems => "organism_bio_ott_taxon_items",
+            Table::Organisms => "organisms",
             Table::Organizations => "organizations",
             Table::PermanenceCategories => "permanence_categories",
             Table::ProjectStates => "project_states",
@@ -85,8 +87,6 @@ impl AsRef<str> for Table {
             Table::SampleContainerCategories => "sample_container_categories",
             Table::SampleContainers => "sample_containers",
             Table::SampleStates => "sample_states",
-            Table::SampledIndividualBioOttTaxonItems => "sampled_individual_bio_ott_taxon_items",
-            Table::SampledIndividuals => "sampled_individuals",
             Table::Samples => "samples",
             Table::Spectra => "spectra",
             Table::SpectraCollections => "spectra_collections",
@@ -132,6 +132,8 @@ impl std::convert::TryFrom<&str> for Table {
             "nameplates" => Ok(Table::Nameplates),
             "notifications" => Ok(Table::Notifications),
             "observations" => Ok(Table::Observations),
+            "organism_bio_ott_taxon_items" => Ok(Table::OrganismBioOttTaxonItems),
+            "organisms" => Ok(Table::Organisms),
             "organizations" => Ok(Table::Organizations),
             "permanence_categories" => Ok(Table::PermanenceCategories),
             "project_states" => Ok(Table::ProjectStates),
@@ -147,8 +149,6 @@ impl std::convert::TryFrom<&str> for Table {
             "sample_container_categories" => Ok(Table::SampleContainerCategories),
             "sample_containers" => Ok(Table::SampleContainers),
             "sample_states" => Ok(Table::SampleStates),
-            "sampled_individual_bio_ott_taxon_items" => Ok(Table::SampledIndividualBioOttTaxonItems),
-            "sampled_individuals" => Ok(Table::SampledIndividuals),
             "samples" => Ok(Table::Samples),
             "spectra" => Ok(Table::Spectra),
             "spectra_collections" => Ok(Table::SpectraCollections),
@@ -231,6 +231,12 @@ impl Table {
             Table::Observations => {
                 crate::database::Observation::delete_from_id(primary_key.into(), connection).await
             },
+            Table::OrganismBioOttTaxonItems => {
+                crate::database::OrganismBioOttTaxonItem::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::Organisms => {
+                crate::database::Organism::delete_from_id(primary_key.into(), connection).await
+            },
             Table::Organizations => {
                 crate::database::Organization::delete_from_id(primary_key.into(), connection).await
             },
@@ -275,12 +281,6 @@ impl Table {
             },
             Table::SampleStates => {
                 crate::database::SampleState::delete_from_id(primary_key.into(), connection).await
-            },
-            Table::SampledIndividualBioOttTaxonItems => {
-                crate::database::SampledIndividualBioOttTaxonItem::delete_from_id(primary_key.into(), connection).await
-            },
-            Table::SampledIndividuals => {
-                crate::database::SampledIndividual::delete_from_id(primary_key.into(), connection).await
             },
             Table::Samples => {
                 crate::database::Sample::delete_from_id(primary_key.into(), connection).await
@@ -358,6 +358,8 @@ impl Table {
             Table::Nameplates => crate::database::NestedNameplate::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Notifications => crate::database::NestedNotification::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Observations => crate::database::NestedObservation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::OrganismBioOttTaxonItems => crate::database::NestedOrganismBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Organisms => crate::database::NestedOrganism::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Organizations => crate::database::NestedOrganization::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::PermanenceCategories => crate::database::NestedPermanenceCategory::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::ProjectStates => crate::database::NestedProjectState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -373,8 +375,6 @@ impl Table {
             Table::SampleContainerCategories => crate::database::NestedSampleContainerCategory::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampleContainers => crate::database::NestedSampleContainer::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SampleStates => crate::database::NestedSampleState::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::SampledIndividualBioOttTaxonItems => crate::database::NestedSampledIndividualBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::SampledIndividuals => crate::database::NestedSampledIndividual::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Samples => crate::database::NestedSample::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Spectra => crate::database::NestedSpectra::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::SpectraCollections => crate::database::NestedSpectraCollection::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -464,6 +464,14 @@ impl Table {
                 let filter: Option<ObservationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedObservation::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
+            Table::OrganismBioOttTaxonItems => {
+                let filter: Option<OrganismBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedOrganismBioOttTaxonItem::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+            },
+            Table::Organisms => {
+                let filter: Option<OrganismFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedOrganism::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+            },
             Table::Organizations => {
                 let filter: Option<OrganizationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedOrganization::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
@@ -523,14 +531,6 @@ impl Table {
             Table::SampleStates => {
                 let filter: Option<SampleStateFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedSampleState::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
-            },
-            Table::SampledIndividualBioOttTaxonItems => {
-                let filter: Option<SampledIndividualBioOttTaxonItemFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
-                crate::database::NestedSampledIndividualBioOttTaxonItem::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
-            },
-            Table::SampledIndividuals => {
-                let filter: Option<SampledIndividualFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
-                crate::database::NestedSampledIndividual::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::Samples => {
                 let filter: Option<SampleFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
@@ -636,6 +636,11 @@ impl Table {
                 let filter: Option<ObservationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedObservation::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
+            Table::OrganismBioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for organism_bio_ott_taxon_items."),
+            Table::Organisms => {
+                let filter: Option<OrganismFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedOrganism::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+            },
             Table::Organizations => unimplemented!("all_by_updated_at not implemented for organizations."),
             Table::PermanenceCategories => unimplemented!("all_by_updated_at not implemented for permanence_categories."),
             Table::ProjectStates => unimplemented!("all_by_updated_at not implemented for project_states."),
@@ -657,11 +662,6 @@ impl Table {
                 crate::database::NestedSampleContainer::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::SampleStates => unimplemented!("all_by_updated_at not implemented for sample_states."),
-            Table::SampledIndividualBioOttTaxonItems => unimplemented!("all_by_updated_at not implemented for sampled_individual_bio_ott_taxon_items."),
-            Table::SampledIndividuals => {
-                let filter: Option<SampledIndividualFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
-                crate::database::NestedSampledIndividual::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
-            },
             Table::Samples => {
                 let filter: Option<SampleFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedSample::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
@@ -730,6 +730,13 @@ impl Table {
                 let nested_row = super::NestedObservation::from_flat(inserted_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
+            Table::OrganismBioOttTaxonItems => unimplemented!("Insert not implemented for organism_bio_ott_taxon_items in frontend as it does not have a UUID primary key."),
+            Table::Organisms => {
+                let new_row: super::NewOrganism = bincode::deserialize::<super::NewOrganism>(&new_row).map_err(crate::api::ApiError::from)?;
+                let inserted_row: super::Organism = new_row.insert(user_id, connection).await?;
+                let nested_row = super::NestedOrganism::from_flat(inserted_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::Organizations => unimplemented!("Insert not implemented for organizations."),
             Table::PermanenceCategories => unimplemented!("Insert not implemented for permanence_categories."),
             Table::ProjectStates => unimplemented!("Insert not implemented for project_states."),
@@ -745,13 +752,6 @@ impl Table {
             Table::SampleContainerCategories => unimplemented!("Insert not implemented for sample_container_categories."),
             Table::SampleContainers => unimplemented!("Insert not implemented for sample_containers in frontend as it does not have a UUID primary key."),
             Table::SampleStates => unimplemented!("Insert not implemented for sample_states."),
-            Table::SampledIndividualBioOttTaxonItems => unimplemented!("Insert not implemented for sampled_individual_bio_ott_taxon_items in frontend as it does not have a UUID primary key."),
-            Table::SampledIndividuals => {
-                let new_row: super::NewSampledIndividual = bincode::deserialize::<super::NewSampledIndividual>(&new_row).map_err(crate::api::ApiError::from)?;
-                let inserted_row: super::SampledIndividual = new_row.insert(user_id, connection).await?;
-                let nested_row = super::NestedSampledIndividual::from_flat(inserted_row, connection).await?;
-                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
-            },
             Table::Samples => {
                 let new_row: super::NewSample = bincode::deserialize::<super::NewSample>(&new_row).map_err(crate::api::ApiError::from)?;
                 let inserted_row: super::Sample = new_row.insert(user_id, connection).await?;
@@ -819,6 +819,15 @@ impl Table {
                 let nested_row = super::NestedObservation::from_flat(updated_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
+            Table::OrganismBioOttTaxonItems => unimplemented!("Update not implemented for organism_bio_ott_taxon_items."),
+            Table::Organisms => {
+                let update_row: super::NewOrganism = bincode::deserialize::<super::NewOrganism>(&update_row).map_err(crate::api::ApiError::from)?;
+                let id = update_row.id;
+                update_row.update(user_id, connection).await?;
+                let updated_row: super::Organism = super::Organism::get(id, connection).await?.unwrap();
+                let nested_row = super::NestedOrganism::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
+            },
             Table::Organizations => unimplemented!("Update not implemented for organizations."),
             Table::PermanenceCategories => unimplemented!("Update not implemented for permanence_categories."),
             Table::ProjectStates => unimplemented!("Update not implemented for project_states."),
@@ -848,15 +857,6 @@ impl Table {
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::SampleStates => unimplemented!("Update not implemented for sample_states."),
-            Table::SampledIndividualBioOttTaxonItems => unimplemented!("Update not implemented for sampled_individual_bio_ott_taxon_items."),
-            Table::SampledIndividuals => {
-                let update_row: super::NewSampledIndividual = bincode::deserialize::<super::NewSampledIndividual>(&update_row).map_err(crate::api::ApiError::from)?;
-                let id = update_row.id;
-                update_row.update(user_id, connection).await?;
-                let updated_row: super::SampledIndividual = super::SampledIndividual::get(id, connection).await?.unwrap();
-                let nested_row = super::NestedSampledIndividual::from_flat(updated_row, connection).await?;
-                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
-            },
             Table::Samples => {
                 let update_row: super::NewSample = bincode::deserialize::<super::NewSample>(&update_row).map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
@@ -1001,6 +1001,18 @@ impl Table {
                     row.update_or_insert(connection).await?;
                 }
             },
+            Table::OrganismBioOttTaxonItems => {
+                for row in rows {
+                    let row: super::NestedOrganismBioOttTaxonItem = bincode::deserialize::<super::NestedOrganismBioOttTaxonItem>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::Organisms => {
+                for row in rows {
+                    let row: super::NestedOrganism = bincode::deserialize::<super::NestedOrganism>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
             Table::Organizations => {
                 for row in rows {
                     let row: super::NestedOrganization = bincode::deserialize::<super::NestedOrganization>(&row).map_err(crate::api::ApiError::from)?;
@@ -1088,18 +1100,6 @@ impl Table {
             Table::SampleStates => {
                 for row in rows {
                     let row: super::NestedSampleState = bincode::deserialize::<super::NestedSampleState>(&row).map_err(crate::api::ApiError::from)?;
-                    row.update_or_insert(connection).await?;
-                }
-            },
-            Table::SampledIndividualBioOttTaxonItems => {
-                for row in rows {
-                    let row: super::NestedSampledIndividualBioOttTaxonItem = bincode::deserialize::<super::NestedSampledIndividualBioOttTaxonItem>(&row).map_err(crate::api::ApiError::from)?;
-                    row.update_or_insert(connection).await?;
-                }
-            },
-            Table::SampledIndividuals => {
-                for row in rows {
-                    let row: super::NestedSampledIndividual = bincode::deserialize::<super::NestedSampledIndividual>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },

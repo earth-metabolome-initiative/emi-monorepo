@@ -84,6 +84,28 @@ impl Searchable<true> for NestedNameplate {
         )
     }
 }
+impl Searchable<false> for NestedOrganism {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Organisms,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for NestedOrganism {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::Organisms,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedOrganization {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -176,28 +198,6 @@ impl Searchable<false> for NestedSampleState {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
              Table::SampleStates,
-              filter,
-              query,
-              limit,
-              offset,
-        )
-    }
-}
-impl Searchable<false> for NestedSampledIndividual {
-    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
-        super::Select::search(
-             Table::SampledIndividuals,
-              filter,
-              query,
-              limit,
-              offset,
-        )
-    }
-}
-impl Searchable<true> for NestedSampledIndividual {
-    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
-        super::Select::search_updatables(
-             Table::SampledIndividuals,
               filter,
               query,
               limit,
@@ -370,6 +370,28 @@ impl Searchable<true> for Nameplate {
         )
     }
 }
+impl Searchable<false> for Organism {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Organisms,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for Organism {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::Organisms,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for Organization {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -462,28 +484,6 @@ impl Searchable<false> for SampleState {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
              Table::SampleStates,
-              filter,
-              query,
-              limit,
-              offset,
-        )
-    }
-}
-impl Searchable<false> for SampledIndividual {
-    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
-        super::Select::search(
-             Table::SampledIndividuals,
-              filter,
-              query,
-              limit,
-              offset,
-        )
-    }
-}
-impl Searchable<true> for SampledIndividual {
-    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
-        super::Select::search_updatables(
-             Table::SampledIndividuals,
               filter,
               query,
               limit,

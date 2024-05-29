@@ -154,13 +154,40 @@ diesel::table! {
 diesel::table! {
     observations (id) {
         id -> Uuid,
+        parent_observation_id -> Nullable<Uuid>,
         created_by -> Int4,
         created_at -> Nullable<Timestamp>,
         updated_by -> Int4,
         updated_at -> Nullable<Timestamp>,
         project_id -> Int4,
-        individual_id -> Nullable<Uuid>,
+        organism_id -> Nullable<Uuid>,
+        sample_id -> Nullable<Uuid>,
         notes -> Nullable<Text>,
+        picture -> Bytea,
+    }
+}
+
+diesel::table! {
+    organism_bio_ott_taxon_items (organism_id, taxon_id) {
+        created_by -> Int4,
+        created_at -> Timestamp,
+        organism_id -> Uuid,
+        taxon_id -> Int4,
+    }
+}
+
+diesel::table! {
+    organisms (id) {
+        id -> Uuid,
+        host_organism_id -> Nullable<Uuid>,
+        sample_id -> Nullable<Uuid>,
+        notes -> Nullable<Text>,
+        nameplate_id -> Int4,
+        project_id -> Int4,
+        created_by -> Int4,
+        created_at -> Timestamp,
+        updated_by -> Int4,
+        updated_at -> Timestamp,
         picture -> Bytea,
     }
 }
@@ -329,29 +356,6 @@ diesel::table! {
         description -> Text,
         icon_id -> Int4,
         color_id -> Int4,
-    }
-}
-
-diesel::table! {
-    sampled_individual_bio_ott_taxon_items (sampled_individual_id, taxon_id) {
-        created_by -> Int4,
-        created_at -> Timestamp,
-        sampled_individual_id -> Uuid,
-        taxon_id -> Int4,
-    }
-}
-
-diesel::table! {
-    sampled_individuals (id) {
-        id -> Uuid,
-        notes -> Nullable<Text>,
-        nameplate_id -> Nullable<Int4>,
-        project_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
-        picture -> Bytea,
     }
 }
 
@@ -542,8 +546,15 @@ diesel::joinable!(nameplate_categories -> permanence_categories (permanence_id))
 diesel::joinable!(nameplates -> nameplate_categories (category_id));
 diesel::joinable!(nameplates -> projects (project_id));
 diesel::joinable!(notifications -> users (user_id));
+diesel::joinable!(observations -> organisms (organism_id));
 diesel::joinable!(observations -> projects (project_id));
-diesel::joinable!(observations -> sampled_individuals (individual_id));
+diesel::joinable!(observations -> samples (sample_id));
+diesel::joinable!(organism_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
+diesel::joinable!(organism_bio_ott_taxon_items -> organisms (organism_id));
+diesel::joinable!(organism_bio_ott_taxon_items -> users (created_by));
+diesel::joinable!(organisms -> nameplates (nameplate_id));
+diesel::joinable!(organisms -> projects (project_id));
+diesel::joinable!(organisms -> samples (sample_id));
 diesel::joinable!(organizations -> countries (country_id));
 diesel::joinable!(permanence_categories -> colors (color_id));
 diesel::joinable!(permanence_categories -> font_awesome_icons (icon_id));
@@ -582,11 +593,6 @@ diesel::joinable!(sample_containers -> projects (project_id));
 diesel::joinable!(sample_containers -> sample_container_categories (category_id));
 diesel::joinable!(sample_states -> colors (color_id));
 diesel::joinable!(sample_states -> font_awesome_icons (icon_id));
-diesel::joinable!(sampled_individual_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
-diesel::joinable!(sampled_individual_bio_ott_taxon_items -> sampled_individuals (sampled_individual_id));
-diesel::joinable!(sampled_individual_bio_ott_taxon_items -> users (created_by));
-diesel::joinable!(sampled_individuals -> nameplates (nameplate_id));
-diesel::joinable!(sampled_individuals -> projects (project_id));
 diesel::joinable!(samples -> projects (project_id));
 diesel::joinable!(samples -> sample_containers (container_id));
 diesel::joinable!(samples -> sample_states (state_id));
@@ -625,6 +631,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     nameplates,
     notifications,
     observations,
+    organism_bio_ott_taxon_items,
+    organisms,
     organizations,
     permanence_categories,
     project_states,
@@ -640,8 +648,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     sample_container_categories,
     sample_containers,
     sample_states,
-    sampled_individual_bio_ott_taxon_items,
-    sampled_individuals,
     samples,
     spectra,
     spectra_collections,

@@ -9,12 +9,13 @@ RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
     this_project_id INTEGER;
-    this_individual_id UUID;
+    this_organism_id UUID;
+    this_sample_id UUID;
     this_created_by INTEGER;
     this_updated_by INTEGER;
 BEGIN
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
-    SELECT project_id, individual_id, created_by, updated_by, 1 INTO this_project_id, this_individual_id, this_created_by, this_updated_by, canary FROM observations WHERE observations.id = this_observations_id;
+    SELECT project_id, organism_id, sample_id, created_by, updated_by, 1 INTO this_project_id, this_organism_id, this_sample_id, this_created_by, this_updated_by, canary FROM observations WHERE observations.id = this_observations_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
         RETURN TRUE;
@@ -35,8 +36,14 @@ BEGIN
             RETURN FALSE;
         END IF;
 -- If the parent column is not NULL, we call the can_update function of the parent column to determine whether the user can edit the row.
-    IF this_individual_id IS NOT NULL THEN
-        IF NOT can_update_sampled_individuals(author_user_id, this_individual_id) THEN
+    IF this_organism_id IS NOT NULL THEN
+        IF NOT can_update_organisms(author_user_id, this_organism_id) THEN
+            RETURN FALSE;
+        END IF;
+    END IF;
+-- If the parent column is not NULL, we call the can_update function of the parent column to determine whether the user can edit the row.
+    IF this_sample_id IS NOT NULL THEN
+        IF NOT can_update_samples(author_user_id, this_sample_id) THEN
             RETURN FALSE;
         END IF;
     END IF;
@@ -61,8 +68,14 @@ BEGIN
         END IF;
     END IF;
 -- We check whether the user can update the row.
-    IF TG_OP = 'INSERT' AND NEW.individual_id IS NOT NULL THEN
-        IF NOT can_update_sampled_individuals(NEW.created_by, NEW.individual_id) THEN
+    IF TG_OP = 'INSERT' AND NEW.organism_id IS NOT NULL THEN
+        IF NOT can_update_organisms(NEW.created_by, NEW.organism_id) THEN
+            RAISE EXCEPTION 'The user does not have the permission to update this row.';
+        END IF;
+    END IF;
+-- We check whether the user can update the row.
+    IF TG_OP = 'INSERT' AND NEW.sample_id IS NOT NULL THEN
+        IF NOT can_update_samples(NEW.created_by, NEW.sample_id) THEN
             RAISE EXCEPTION 'The user does not have the permission to update this row.';
         END IF;
     END IF;
@@ -87,12 +100,13 @@ RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
     this_project_id INTEGER;
-    this_individual_id UUID;
+    this_organism_id UUID;
+    this_sample_id UUID;
     this_created_by INTEGER;
     this_updated_by INTEGER;
 BEGIN
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
-    SELECT project_id, individual_id, created_by, updated_by, 1 INTO this_project_id, this_individual_id, this_created_by, this_updated_by, canary FROM observations WHERE observations.id = this_observations_id;
+    SELECT project_id, organism_id, sample_id, created_by, updated_by, 1 INTO this_project_id, this_organism_id, this_sample_id, this_created_by, this_updated_by, canary FROM observations WHERE observations.id = this_observations_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
         RETURN TRUE;
@@ -113,8 +127,14 @@ BEGIN
             RETURN FALSE;
         END IF;
 -- If the parent column is not NULL, we call the can_delete function of the parent column to determine whether the user can edit the row.
-    IF this_individual_id IS NOT NULL THEN
-        IF NOT can_delete_sampled_individuals(author_user_id, this_individual_id) THEN
+    IF this_organism_id IS NOT NULL THEN
+        IF NOT can_delete_organisms(author_user_id, this_organism_id) THEN
+            RETURN FALSE;
+        END IF;
+    END IF;
+-- If the parent column is not NULL, we call the can_delete function of the parent column to determine whether the user can edit the row.
+    IF this_sample_id IS NOT NULL THEN
+        IF NOT can_delete_samples(author_user_id, this_sample_id) THEN
             RETURN FALSE;
         END IF;
     END IF;
@@ -134,12 +154,13 @@ RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
     this_project_id INTEGER;
-    this_individual_id UUID;
+    this_organism_id UUID;
+    this_sample_id UUID;
     this_created_by INTEGER;
     this_updated_by INTEGER;
 BEGIN
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
-    SELECT project_id, individual_id, created_by, updated_by, 1 INTO this_project_id, this_individual_id, this_created_by, this_updated_by, canary FROM observations WHERE observations.id = this_observations_id;
+    SELECT project_id, organism_id, sample_id, created_by, updated_by, 1 INTO this_project_id, this_organism_id, this_sample_id, this_created_by, this_updated_by, canary FROM observations WHERE observations.id = this_observations_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
         RETURN TRUE;
@@ -156,8 +177,14 @@ BEGIN
             RETURN FALSE;
         END IF;
 -- If the parent column is not NULL, we call the can_view function of the parent column to determine whether the user can edit the row.
-    IF this_individual_id IS NOT NULL THEN
-        IF NOT can_view_sampled_individuals(author_user_id, this_individual_id) THEN
+    IF this_organism_id IS NOT NULL THEN
+        IF NOT can_view_organisms(author_user_id, this_organism_id) THEN
+            RETURN FALSE;
+        END IF;
+    END IF;
+-- If the parent column is not NULL, we call the can_view function of the parent column to determine whether the user can edit the row.
+    IF this_sample_id IS NOT NULL THEN
+        IF NOT can_view_samples(author_user_id, this_sample_id) THEN
             RETURN FALSE;
         END IF;
     END IF;

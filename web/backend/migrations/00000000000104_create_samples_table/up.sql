@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS samples (
     id UUID PRIMARY KEY,
     container_id INTEGER NOT NULL UNIQUE REFERENCES sample_containers(id) ON DELETE CASCADE,
+    
     notes TEXT,
     project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     created_by INTEGER NOT NULL REFERENCES users(id) ON

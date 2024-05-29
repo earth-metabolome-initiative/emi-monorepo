@@ -1,10 +1,10 @@
--- The function `can_update_sampled_individuals` takes a user ID (INTEGER) and the primary keys
+-- The function `can_update_organisms` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
 -- and calls the parent column's can_update function if the parent column is not NULL. Otherwise, the function
--- checks if the row was created by the user or if the user is found in either the sampled_individuals_users_roles table or
--- the sampled_individuals_teams_users table with an appropriate role id.
-CREATE FUNCTION can_update_sampled_individuals(author_user_id INTEGER, this_sampled_individuals_id UUID)
+-- checks if the row was created by the user or if the user is found in either the organisms_users_roles table or
+-- the organisms_teams_users table with an appropriate role id.
+CREATE FUNCTION can_update_organisms(author_user_id INTEGER, this_organisms_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
@@ -13,7 +13,7 @@ DECLARE
     this_updated_by INTEGER;
 BEGIN
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
-    SELECT project_id, created_by, updated_by, 1 INTO this_project_id, this_created_by, this_updated_by, canary FROM sampled_individuals WHERE sampled_individuals.id = this_sampled_individuals_id;
+    SELECT project_id, created_by, updated_by, 1 INTO this_project_id, this_created_by, this_updated_by, canary FROM organisms WHERE organisms.id = this_organisms_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
         RETURN TRUE;
@@ -38,12 +38,12 @@ END;
 $$
 LANGUAGE plpgsql;
 
--- The function `can_update_sampled_individuals_trigger` is a trigger function that checks whether the user can update the row.
-CREATE FUNCTION can_update_sampled_individuals_trigger()
+-- The function `can_update_organisms_trigger` is a trigger function that checks whether the user can update the row.
+CREATE FUNCTION can_update_organisms_trigger()
 RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'UPDATE' THEN
-        IF NOT can_update_sampled_individuals(NEW.updated_by, NEW.id) THEN
+        IF NOT can_update_organisms(NEW.updated_by, NEW.id) THEN
             RAISE EXCEPTION 'The user does not have the permission to update this row.';
         END IF;
     END IF;
@@ -58,18 +58,18 @@ END;
 $$
 LANGUAGE plpgsql;
 
--- We create a trigger that calls the `can_update_sampled_individuals` function before each INSERT or UPDATE.
-CREATE TRIGGER can_update_sampled_individuals
-BEFORE INSERT OR UPDATE ON sampled_individuals
+-- We create a trigger that calls the `can_update_organisms` function before each INSERT or UPDATE.
+CREATE TRIGGER can_update_organisms
+BEFORE INSERT OR UPDATE ON organisms
 FOR EACH ROW
-EXECUTE FUNCTION can_update_sampled_individuals_trigger();
--- The function `can_admin_sampled_individuals` takes a user ID (INTEGER) and the primary keys
+EXECUTE FUNCTION can_update_organisms_trigger();
+-- The function `can_admin_organisms` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
 -- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
--- checks if the row was created by the user or if the user is found in either the sampled_individuals_users_roles table or
--- the sampled_individuals_teams_users table with an appropriate role id.
-CREATE FUNCTION can_admin_sampled_individuals(author_user_id INTEGER, this_sampled_individuals_id UUID)
+-- checks if the row was created by the user or if the user is found in either the organisms_users_roles table or
+-- the organisms_teams_users table with an appropriate role id.
+CREATE FUNCTION can_admin_organisms(author_user_id INTEGER, this_organisms_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
@@ -78,7 +78,7 @@ DECLARE
     this_updated_by INTEGER;
 BEGIN
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
-    SELECT project_id, created_by, updated_by, 1 INTO this_project_id, this_created_by, this_updated_by, canary FROM sampled_individuals WHERE sampled_individuals.id = this_sampled_individuals_id;
+    SELECT project_id, created_by, updated_by, 1 INTO this_project_id, this_created_by, this_updated_by, canary FROM organisms WHERE organisms.id = this_organisms_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
         RETURN TRUE;
@@ -103,13 +103,13 @@ END;
 $$
 LANGUAGE plpgsql;
 
--- The function `can_view_sampled_individuals` takes a user ID (INTEGER) and the primary keys
+-- The function `can_view_organisms` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
 -- and calls the parent column's can_view function if the parent column is not NULL. Otherwise, the function
--- checks if the row was created by the user or if the user is found in either the sampled_individuals_users_roles table or
--- the sampled_individuals_teams_users table with an appropriate role id.
-CREATE FUNCTION can_view_sampled_individuals(author_user_id INTEGER, this_sampled_individuals_id UUID)
+-- checks if the row was created by the user or if the user is found in either the organisms_users_roles table or
+-- the organisms_teams_users table with an appropriate role id.
+CREATE FUNCTION can_view_organisms(author_user_id INTEGER, this_organisms_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
@@ -118,7 +118,7 @@ DECLARE
     this_updated_by INTEGER;
 BEGIN
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
-    SELECT project_id, created_by, updated_by, 1 INTO this_project_id, this_created_by, this_updated_by, canary FROM sampled_individuals WHERE sampled_individuals.id = this_sampled_individuals_id;
+    SELECT project_id, created_by, updated_by, 1 INTO this_project_id, this_created_by, this_updated_by, canary FROM organisms WHERE organisms.id = this_organisms_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
         RETURN TRUE;

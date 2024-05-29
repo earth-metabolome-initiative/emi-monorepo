@@ -2951,12 +2951,14 @@ connection: &mut gluesql::prelude::Glue<C>,
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct Observation {
     pub id: Uuid,
+    pub parent_observation_id: Option<Uuid>,
     pub created_by: i32,
     pub created_at: Option<NaiveDateTime>,
     pub updated_by: i32,
     pub updated_at: Option<NaiveDateTime>,
     pub project_id: i32,
-    pub individual_id: Option<Uuid>,
+    pub organism_id: Option<Uuid>,
+    pub sample_id: Option<Uuid>,
     pub notes: Option<String>,
     pub picture: Vec<u8>,
 }
@@ -2977,6 +2979,10 @@ impl Observation {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::uuid(self.id.to_string()),
+            match self.parent_observation_id {
+                Some(parent_observation_id) => gluesql::core::ast_builder::uuid(parent_observation_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
             gluesql::core::ast_builder::num(self.created_by),
             match self.created_at {
                 Some(created_at) => gluesql::core::ast_builder::timestamp(created_at.to_string()),
@@ -2988,8 +2994,12 @@ impl Observation {
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::num(self.project_id),
-            match self.individual_id {
-                Some(individual_id) => gluesql::core::ast_builder::uuid(individual_id.to_string()),
+            match self.organism_id {
+                Some(organism_id) => gluesql::core::ast_builder::uuid(organism_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.sample_id {
+                Some(sample_id) => gluesql::core::ast_builder::uuid(sample_id.to_string()),
                 None => gluesql::core::ast_builder::null(),
             },
             match self.notes {
@@ -3011,7 +3021,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         table("observations")
             .insert()
-            .columns("id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture")
+            .columns("id, parent_observation_id, created_by, created_at, updated_by, updated_at, project_id, organism_id, sample_id, notes, picture")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -3037,7 +3047,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("observations")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture")
+            .project("id, parent_observation_id, created_by, created_at, updated_by, updated_at, project_id, organism_id, sample_id, notes, picture")
             .limit(1)
             .execute(connection)
             .await?;
@@ -3110,14 +3120,20 @@ connection: &mut gluesql::prelude::Glue<C>,
 .set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("picture", gluesql::core::ast_builder::bytea(self.picture));
+        if let Some(parent_observation_id) = self.parent_observation_id {
+            update_row = update_row.set("parent_observation_id", gluesql::core::ast_builder::uuid(parent_observation_id.to_string()));
+        }
         if let Some(created_at) = self.created_at {
             update_row = update_row.set("created_at", gluesql::core::ast_builder::timestamp(created_at.to_string()));
         }
         if let Some(updated_at) = self.updated_at {
             update_row = update_row.set("updated_at", gluesql::core::ast_builder::timestamp(updated_at.to_string()));
         }
-        if let Some(individual_id) = self.individual_id {
-            update_row = update_row.set("individual_id", gluesql::core::ast_builder::uuid(individual_id.to_string()));
+        if let Some(organism_id) = self.organism_id {
+            update_row = update_row.set("organism_id", gluesql::core::ast_builder::uuid(organism_id.to_string()));
+        }
+        if let Some(sample_id) = self.sample_id {
+            update_row = update_row.set("sample_id", gluesql::core::ast_builder::uuid(sample_id.to_string()));
         }
         if let Some(notes) = self.notes {
             update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
@@ -3170,7 +3186,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("observations")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture")
+           .project("id, parent_observation_id, created_by, created_at, updated_by, updated_at, project_id, organism_id, sample_id, notes, picture")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -3200,7 +3216,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("observations")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, created_by, created_at, updated_by, updated_at, project_id, individual_id, notes, picture")
+           .project("id, parent_observation_id, created_by, created_at, updated_by, updated_at, project_id, organism_id, sample_id, notes, picture")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -3215,6 +3231,11 @@ connection: &mut gluesql::prelude::Glue<C>,
         Self {
             id: match row.get("id").unwrap() {
                 gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            parent_observation_id: match row.get("parent_observation_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(parent_observation_id) => Some(Uuid::from_u128(*parent_observation_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             created_by: match row.get("created_by").unwrap() {
@@ -3239,15 +3260,551 @@ connection: &mut gluesql::prelude::Glue<C>,
                 gluesql::prelude::Value::I32(project_id) => project_id.clone(),
                 _ => unreachable!("Expected I32")
             },
-            individual_id: match row.get("individual_id").unwrap() {
+            organism_id: match row.get("organism_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(individual_id) => Some(Uuid::from_u128(*individual_id)),
+                gluesql::prelude::Value::Uuid(organism_id) => Some(Uuid::from_u128(*organism_id)),
+                _ => unreachable!("Expected Uuid"),
+            },
+            sample_id: match row.get("sample_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(sample_id) => Some(Uuid::from_u128(*sample_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             notes: match row.get("notes").unwrap() {
                 gluesql::prelude::Value::Null => None,
                 gluesql::prelude::Value::Str(notes) => Some(notes.clone()),
                 _ => unreachable!("Expected Str")
+            },
+            picture: match row.get("picture").unwrap() {
+                gluesql::prelude::Value::Bytea(picture) => picture.clone(),
+                _ => unreachable!("Expected Bytea")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct OrganismBioOttTaxonItem {
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub organism_id: Uuid,
+    pub taxon_id: i32,
+}
+
+impl Tabular for OrganismBioOttTaxonItem {
+    const TABLE: Table = Table::OrganismBioOttTaxonItems;
+}
+
+impl Filtrable for OrganismBioOttTaxonItem {
+    type Filter = OrganismBioOttTaxonItemFilter;
+}
+#[cfg(feature = "frontend")]
+impl OrganismBioOttTaxonItem {
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::uuid(self.organism_id.to_string()),
+            gluesql::core::ast_builder::num(self.taxon_id),
+        ]
+    }
+
+    /// Insert the OrganismBioOttTaxonItem into the database.
+    ///
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: OrganismBioOttTaxonItem,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
+        use gluesql::core::ast_builder::*;
+        table("organism_bio_ott_taxon_items")
+            .insert()
+            .columns("created_by, created_at, organism_id, taxon_id")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get OrganismBioOttTaxonItem from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `( organism_id, taxon_id )` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        ( organism_id, taxon_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("organism_bio_ott_taxon_items")
+            .select()
+            .filter(col("organism_id").eq(organism_id.to_string()))
+            .filter(col("taxon_id").eq(taxon_id.to_string()))
+            .project("created_by, created_at, organism_id, taxon_id")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete OrganismBioOttTaxonItem from the database.
+    ///
+    /// # Arguments
+    /// * `( organism_id, taxon_id )` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        ( organism_id, taxon_id ): ( Uuid, i32 ),
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organism_bio_ott_taxon_items")
+            .delete()
+            .filter(col("organism_id").eq(organism_id.to_string()))
+            .filter(col("taxon_id").eq(taxon_id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of OrganismBioOttTaxonItem from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(( self.organism_id, self.taxon_id ), connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organism_bio_ott_taxon_items")
+            .update()        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("organism_id", gluesql::core::ast_builder::uuid(self.organism_id.to_string()))        
+.set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all OrganismBioOttTaxonItem from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("organism_bio_ott_taxon_items")
+            .select()
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("created_by, created_at, organism_id, taxon_id")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            organism_id: match row.get("organism_id").unwrap() {
+                gluesql::prelude::Value::Uuid(organism_id) => Uuid::from_u128(*organism_id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            taxon_id: match row.get("taxon_id").unwrap() {
+                gluesql::prelude::Value::I32(taxon_id) => taxon_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+        }
+    }
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct Organism {
+    pub id: Uuid,
+    pub host_organism_id: Option<Uuid>,
+    pub sample_id: Option<Uuid>,
+    pub notes: Option<String>,
+    pub nameplate_id: i32,
+    pub project_id: i32,
+    pub created_by: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_by: i32,
+    pub updated_at: NaiveDateTime,
+    pub picture: Vec<u8>,
+}
+
+impl Tabular for Organism {
+    const TABLE: Table = Table::Organisms;
+}
+
+impl Filtrable for Organism {
+    type Filter = OrganismFilter;
+}
+#[cfg(feature = "frontend")]
+impl Organism {
+    pub fn get_picture_as_url(&self) -> String {
+        self.picture.guess_image_url().unwrap()
+    }
+
+    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            match self.host_organism_id {
+                Some(host_organism_id) => gluesql::core::ast_builder::uuid(host_organism_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.sample_id {
+                Some(sample_id) => gluesql::core::ast_builder::uuid(sample_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.notes {
+                Some(notes) => gluesql::core::ast_builder::text(notes),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::num(self.nameplate_id),
+            gluesql::core::ast_builder::num(self.project_id),
+            gluesql::core::ast_builder::num(self.created_by),
+            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
+            gluesql::core::ast_builder::num(self.updated_by),
+            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
+            gluesql::core::ast_builder::bytea(self.picture),
+        ]
+    }
+
+    /// Insert the Organism into the database.
+    ///
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
+self: Organism,
+connection: &mut gluesql::prelude::Glue<C>,
+) -> Result<usize, gluesql::prelude::Error>    {
+        use gluesql::core::ast_builder::*;
+        table("organisms")
+            .insert()
+            .columns("id, host_organism_id, sample_id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at, picture")
+            .values(vec![self.into_row()])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })
+    }
+
+    /// Get Organism from the database by its ID.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn get<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("organisms")
+            .select()
+            .filter(col("id").eq(id.to_string()))
+            .project("id, host_organism_id, sample_id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at, picture")
+            .limit(1)
+            .execute(connection)
+            .await?;
+         Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>()
+            .pop())
+    }
+
+    /// Delete Organism from the database.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the struct to delete.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete_from_id<C>(
+        id: Uuid,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        table("organisms")
+            .delete()
+            .filter(col("id").eq(id.to_string()))
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
+                 _ => unreachable!("Payload must be a Delete"),
+             })
+    }
+
+    /// Delete the current instance of Organism from the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows deleted.
+    pub async fn delete<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        Self::delete_from_id(self.id, connection).await
+    }
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("organisms")
+            .update()        
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("nameplate_id", gluesql::core::ast_builder::num(self.nameplate_id))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
+.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
+.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
+.set("picture", gluesql::core::ast_builder::bytea(self.picture));
+        if let Some(host_organism_id) = self.host_organism_id {
+            update_row = update_row.set("host_organism_id", gluesql::core::ast_builder::uuid(host_organism_id.to_string()));
+        }
+        if let Some(sample_id) = self.sample_id {
+            update_row = update_row.set("sample_id", gluesql::core::ast_builder::uuid(sample_id.to_string()));
+        }
+        if let Some(notes) = self.notes {
+            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
+        }
+            update_row.execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+    /// Update the struct in the database if it exists, otherwise insert it.
+    ///
+    /// # Arguments
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated or inserted.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let number_of_rows = self.clone().update(connection).await?;
+        if number_of_rows == 0 {
+            self.insert(connection).await
+        } else {
+            Ok(number_of_rows)
+        }
+    }
+    /// Get all Organism from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all<C>(
+        filter: Option<&OrganismFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("organisms")
+            .select()
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, host_organism_id, sample_id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at, picture")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    /// Get all Organism from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of results, by default `10`.
+    /// * `offset` - The offset of the results, by default `0`.
+    /// * `connection` - The connection to the database.
+    ///
+    pub async fn all_by_updated_at<C>(
+        filter: Option<&OrganismFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let select_row = table("organisms")
+            .select()
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, host_organism_id, sample_id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at, picture")
+            .order_by("updated_at desc")
+            .offset(offset.unwrap_or(0))
+            .limit(limit.unwrap_or(10))
+            .execute(connection)
+            .await?;
+        Ok(select_row.select()
+            .unwrap()
+            .map(Self::from_row)
+            .collect::<Vec<_>>())
+    }
+    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
+        Self {
+            id: match row.get("id").unwrap() {
+                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
+                _ => unreachable!("Expected Uuid"),
+            },
+            host_organism_id: match row.get("host_organism_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(host_organism_id) => Some(Uuid::from_u128(*host_organism_id)),
+                _ => unreachable!("Expected Uuid"),
+            },
+            sample_id: match row.get("sample_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Uuid(sample_id) => Some(Uuid::from_u128(*sample_id)),
+                _ => unreachable!("Expected Uuid"),
+            },
+            notes: match row.get("notes").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::Str(notes) => Some(notes.clone()),
+                _ => unreachable!("Expected Str")
+            },
+            nameplate_id: match row.get("nameplate_id").unwrap() {
+                gluesql::prelude::Value::I32(nameplate_id) => nameplate_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            project_id: match row.get("project_id").unwrap() {
+                gluesql::prelude::Value::I32(project_id) => project_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_by: match row.get("created_by").unwrap() {
+                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            created_at: match row.get("created_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
+                _ => unreachable!("Expected Timestamp")
+            },
+            updated_by: match row.get("updated_by").unwrap() {
+                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            updated_at: match row.get("updated_at").unwrap() {
+                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
+                _ => unreachable!("Expected Timestamp")
             },
             picture: match row.get("picture").unwrap() {
                 gluesql::prelude::Value::Bytea(picture) => picture.clone(),
@@ -6798,517 +7355,6 @@ connection: &mut gluesql::prelude::Glue<C>,
             color_id: match row.get("color_id").unwrap() {
                 gluesql::prelude::Value::I32(color_id) => color_id.clone(),
                 _ => unreachable!("Expected I32")
-            },
-        }
-    }
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividualBioOttTaxonItem {
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-    pub sampled_individual_id: Uuid,
-    pub taxon_id: i32,
-}
-
-impl Tabular for SampledIndividualBioOttTaxonItem {
-    const TABLE: Table = Table::SampledIndividualBioOttTaxonItems;
-}
-
-impl Filtrable for SampledIndividualBioOttTaxonItem {
-    type Filter = SampledIndividualBioOttTaxonItemFilter;
-}
-#[cfg(feature = "frontend")]
-impl SampledIndividualBioOttTaxonItem {
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::num(self.created_by),
-            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::uuid(self.sampled_individual_id.to_string()),
-            gluesql::core::ast_builder::num(self.taxon_id),
-        ]
-    }
-
-    /// Insert the SampledIndividualBioOttTaxonItem into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: SampledIndividualBioOttTaxonItem,
-connection: &mut gluesql::prelude::Glue<C>,
-) -> Result<usize, gluesql::prelude::Error>    {
-        use gluesql::core::ast_builder::*;
-        table("sampled_individual_bio_ott_taxon_items")
-            .insert()
-            .columns("created_by, created_at, sampled_individual_id, taxon_id")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get SampledIndividualBioOttTaxonItem from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        ( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individual_bio_ott_taxon_items")
-            .select()
-            .filter(col("sampled_individual_id").eq(sampled_individual_id.to_string()))
-            .filter(col("taxon_id").eq(taxon_id.to_string()))
-            .project("created_by, created_at, sampled_individual_id, taxon_id")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete SampledIndividualBioOttTaxonItem from the database.
-    ///
-    /// # Arguments
-    /// * `( sampled_individual_id, taxon_id )` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        ( sampled_individual_id, taxon_id ): ( Uuid, i32 ),
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("sampled_individual_bio_ott_taxon_items")
-            .delete()
-            .filter(col("sampled_individual_id").eq(sampled_individual_id.to_string()))
-            .filter(col("taxon_id").eq(taxon_id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of SampledIndividualBioOttTaxonItem from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(( self.sampled_individual_id, self.taxon_id ), connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("sampled_individual_bio_ott_taxon_items")
-            .update()        
-.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("sampled_individual_id", gluesql::core::ast_builder::uuid(self.sampled_individual_id.to_string()))        
-.set("taxon_id", gluesql::core::ast_builder::num(self.taxon_id))            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all SampledIndividualBioOttTaxonItem from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        filter: Option<&SampledIndividualBioOttTaxonItemFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individual_bio_ott_taxon_items")
-            .select()
-            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("created_by, created_at, sampled_individual_id, taxon_id")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            created_by: match row.get("created_by").unwrap() {
-                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            created_at: match row.get("created_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            sampled_individual_id: match row.get("sampled_individual_id").unwrap() {
-                gluesql::prelude::Value::Uuid(sampled_individual_id) => Uuid::from_u128(*sampled_individual_id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            taxon_id: match row.get("taxon_id").unwrap() {
-                gluesql::prelude::Value::I32(taxon_id) => taxon_id.clone(),
-                _ => unreachable!("Expected I32")
-            },
-        }
-    }
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividual {
-    pub id: Uuid,
-    pub notes: Option<String>,
-    pub nameplate_id: Option<i32>,
-    pub project_id: i32,
-    pub created_by: i32,
-    pub created_at: NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
-    pub picture: Vec<u8>,
-}
-
-impl Tabular for SampledIndividual {
-    const TABLE: Table = Table::SampledIndividuals;
-}
-
-impl Filtrable for SampledIndividual {
-    type Filter = SampledIndividualFilter;
-}
-#[cfg(feature = "frontend")]
-impl SampledIndividual {
-    pub fn get_picture_as_url(&self) -> String {
-        self.picture.guess_image_url().unwrap()
-    }
-
-    pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.notes {
-                Some(notes) => gluesql::core::ast_builder::text(notes),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.nameplate_id {
-                Some(nameplate_id) => gluesql::core::ast_builder::num(nameplate_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-            gluesql::core::ast_builder::num(self.project_id),
-            gluesql::core::ast_builder::num(self.created_by),
-            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
-            gluesql::core::ast_builder::bytea(self.picture),
-        ]
-    }
-
-    /// Insert the SampledIndividual into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: SampledIndividual,
-connection: &mut gluesql::prelude::Glue<C>,
-) -> Result<usize, gluesql::prelude::Error>    {
-        use gluesql::core::ast_builder::*;
-        table("sampled_individuals")
-            .insert()
-            .columns("id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at, picture")
-            .values(vec![self.into_row()])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })
-    }
-
-    /// Get SampledIndividual from the database by its ID.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to get.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn get<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Option<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individuals")
-            .select()
-            .filter(col("id").eq(id.to_string()))
-            .project("id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at, picture")
-            .limit(1)
-            .execute(connection)
-            .await?;
-         Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>()
-            .pop())
-    }
-
-    /// Delete SampledIndividual from the database.
-    ///
-    /// # Arguments
-    /// * `id` - The primary key(s) of the struct to delete.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete_from_id<C>(
-        id: Uuid,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        table("sampled_individuals")
-            .delete()
-            .filter(col("id").eq(id.to_string()))
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Delete(number_of_deleted_rows) => number_of_deleted_rows,
-                 _ => unreachable!("Payload must be a Delete"),
-             })
-    }
-
-    /// Delete the current instance of SampledIndividual from the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows deleted.
-    pub async fn delete<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        Self::delete_from_id(self.id, connection).await
-    }
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("sampled_individuals")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
-.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
-.set("picture", gluesql::core::ast_builder::bytea(self.picture));
-        if let Some(notes) = self.notes {
-            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
-        }
-        if let Some(nameplate_id) = self.nameplate_id {
-            update_row = update_row.set("nameplate_id", gluesql::core::ast_builder::num(nameplate_id));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// # Arguments
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated or inserted.
-    pub async fn update_or_insert<C>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let number_of_rows = self.clone().update(connection).await?;
-        if number_of_rows == 0 {
-            self.insert(connection).await
-        } else {
-            Ok(number_of_rows)
-        }
-    }
-    /// Get all SampledIndividual from the database.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all<C>(
-        filter: Option<&SampledIndividualFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individuals")
-            .select()
-            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at, picture")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all SampledIndividual from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        filter: Option<&SampledIndividualFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("sampled_individuals")
-            .select()
-            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at, picture")
-            .order_by("updated_at desc")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
-        Self {
-            id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
-                _ => unreachable!("Expected Uuid"),
-            },
-            notes: match row.get("notes").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Str(notes) => Some(notes.clone()),
-                _ => unreachable!("Expected Str")
-            },
-            nameplate_id: match row.get("nameplate_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(nameplate_id) => Some(nameplate_id.clone()),
-                _ => unreachable!("Expected I32")
-            },
-            project_id: match row.get("project_id").unwrap() {
-                gluesql::prelude::Value::I32(project_id) => project_id.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            created_by: match row.get("created_by").unwrap() {
-                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            created_at: match row.get("created_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            picture: match row.get("picture").unwrap() {
-                gluesql::prelude::Value::Bytea(picture) => picture.clone(),
-                _ => unreachable!("Expected Bytea")
             },
         }
     }
