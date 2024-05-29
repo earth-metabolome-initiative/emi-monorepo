@@ -152,31 +152,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    observations (id) {
-        id -> Uuid,
-        parent_observation_id -> Nullable<Uuid>,
-        created_by -> Int4,
-        created_at -> Nullable<Timestamp>,
-        updated_by -> Int4,
-        updated_at -> Nullable<Timestamp>,
-        project_id -> Int4,
-        organism_id -> Nullable<Uuid>,
-        sample_id -> Nullable<Uuid>,
-        notes -> Nullable<Text>,
-        picture -> Bytea,
-    }
-}
-
-diesel::table! {
-    organism_bio_ott_taxon_items (organism_id, taxon_id) {
-        created_by -> Int4,
-        created_at -> Timestamp,
-        organism_id -> Uuid,
-        taxon_id -> Int4,
-    }
-}
-
-diesel::table! {
     organisms (id) {
         id -> Uuid,
         host_organism_id -> Nullable<Uuid>,
@@ -546,12 +521,6 @@ diesel::joinable!(nameplate_categories -> permanence_categories (permanence_id))
 diesel::joinable!(nameplates -> nameplate_categories (category_id));
 diesel::joinable!(nameplates -> projects (project_id));
 diesel::joinable!(notifications -> users (user_id));
-diesel::joinable!(observations -> organisms (organism_id));
-diesel::joinable!(observations -> projects (project_id));
-diesel::joinable!(observations -> samples (sample_id));
-diesel::joinable!(organism_bio_ott_taxon_items -> bio_ott_taxon_items (taxon_id));
-diesel::joinable!(organism_bio_ott_taxon_items -> organisms (organism_id));
-diesel::joinable!(organism_bio_ott_taxon_items -> users (created_by));
 diesel::joinable!(organisms -> nameplates (nameplate_id));
 diesel::joinable!(organisms -> projects (project_id));
 diesel::joinable!(organisms -> samples (sample_id));
@@ -630,8 +599,6 @@ diesel::allow_tables_to_appear_in_same_query!(
     nameplate_categories,
     nameplates,
     notifications,
-    observations,
-    organism_bio_ott_taxon_items,
     organisms,
     organizations,
     permanence_categories,
