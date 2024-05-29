@@ -1,7 +1,6 @@
 -- This is a no-op SQL statement
 CREATE TEMPORARY TABLE tmp_observation_subjects(
     name TEXT NOT NULL,
-    parent_observation_subject TEXT,
     description TEXT NOT NULL,
     icon TEXT NOT NULL,
     color TEXT NOT NULL
@@ -14,23 +13,19 @@ FROM
 INSERT INTO
     observation_subjects(
         name,
-        parent_observation_subject,
         description,
         icon_id,
         color_id
     )
 SELECT
     tmp_observation_subjects.name,
-    tmp_observation_subjects.parent_observation_subject,
     tmp_observation_subjects.description,
     font_awesome_icons.id,
     colors.id
 FROM
     tmp_observation_subjects
     JOIN font_awesome_icons ON tmp_observation_subjects.icon = font_awesome_icons.name
-    JOIN permanence_categories ON tmp_observation_subjects.permanence = permanence_categories.name
     JOIN colors ON tmp_observation_subjects.color = colors.name
-    JOIN materials ON tmp_observation_subjects.material = materials.name;
 
 -- now we want to assert that the number of lines in the observation_subjects table is the same as the number
 -- of lines in the tmp_observation_subjects table

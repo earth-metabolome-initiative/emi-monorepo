@@ -1,8 +1,8 @@
-name,parent_observation_subject,description,icon,color
-Root,,"Roots function in the absorption of water and inorganic nutrients, anchoring the plant body to the substrate and supporting it, storage of food and nutrients, and vegetative reproduction.",carrot,grey
-Leaf,,"Leaves are the main photosynthetic organs of the plant. They are the primary sites of photosynthesis, the process by which plants synthesize food.",leaf,green
-Stems,,"Stems are the main structural axes of the plant body. They are the primary organs of the shoot system, and they provide structural support, conduct water, minerals, and food, and store food.",plant-wilt,yellow
-Flower,,"The flower is the reproductive unit of the plant. It is the site where the reproductive organs are located.",flower,pink
-Fruit,,"The fruit is the mature ovary of a flowering plant. It usually contains seeds, which are the plant's means of reproduction.",strawberry,red
-Seed,,"A seed is a plant embryo and food reserve enclosed in a protective outer covering called a seed coat.",peapod,brown
-Whole organism,,"The whole organism is the complete individual plant, including all of its parts.",person,grey
+name,description,icon,color
+Root,"Roots function in the absorption of water and inorganic nutrients, anchoring the plant body to the substrate and supporting it, storage of food and nutrients, and vegetative reproduction.",carrot,grey
+Leaf,"Leaves are the main photosynthetic organs of the plant. They are the primary sites of photosynthesis, the process by which plants synthesize food.",leaf,green
+Stems,"Stems are the main structural axes of the plant body. They are the primary organs of the shoot system, and they provide structural support, conduct water, minerals, and food, and store food.",plant-wilt,yellow
+Flower,"The flower is the reproductive unit of the plant. It is the site where the reproductive organs are located.",flower,pink
+Fruit,"The fruit is the mature ovary of a flowering plant. It usually contains seeds, which are the plant's means of reproduction.",strawberry,red
+Seed,"A seed is a plant embryo and food reserve enclosed in a protective outer covering called a seed coat.",peapod,brown
+Whole organism,"The whole organism is the complete individual plant, including all of its parts.",person,grey
