@@ -111,10 +111,12 @@ impl Component for Scanner {
             // Modal for the scanner
             if self.is_scanning {
                 <div class="active-scanner-ui">
-                    <div class="modal-content">
-                    <button onclick={&toggle_flashlight}>{ if self.is_flashlight_on { "Turn off Flashlight" } else { "Turn on Flashlight" } }</button> // Add this line
-                        <span class="close" onclick={&close_scanner}>{ "×" }</span>
-                        <video ref={&self.video_ref} autoPlay="true" style="width:300px;height:300px;" ontimeupdate={time_update}/>
+                    <div class="active-scanner-ui-content">
+                    <button class="toggle-flashlight" onclick={&toggle_flashlight} title="Turn on/off flashlight">
+                        <i class="fas fa-lightbulb"></i>
+                    </button> // Add this line
+                        <button class="close" onclick={&close_scanner}>{ "×" }</button>
+                        <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update}/>
                         <canvas ref={&self.canvas_ref} width={video_width.to_string()} height={video_height.to_string()} style="display: none;"></canvas>
                     </div>
                 </div>
