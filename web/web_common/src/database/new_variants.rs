@@ -29,8 +29,10 @@ impl Tabular for NewNameplate {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewObservation {
     pub id: Uuid,
+    pub parent_observation_id: Option<Uuid>,
     pub project_id: i32,
-    pub individual_id: Option<Uuid>,
+    pub organism_id: Option<Uuid>,
+    pub sample_id: Option<Uuid>,
     pub notes: Option<String>,
     pub picture: Vec<u8>,
 }
@@ -44,9 +46,17 @@ impl NewObservation {
         vec![
             gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
+            match self.parent_observation_id {
+                Some(parent_observation_id) => gluesql::core::ast_builder::uuid(parent_observation_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
             gluesql::core::ast_builder::num(self.project_id),
-            match self.individual_id {
-                Some(individual_id) => gluesql::core::ast_builder::uuid(individual_id.to_string()),
+            match self.organism_id {
+                Some(organism_id) => gluesql::core::ast_builder::uuid(organism_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.sample_id {
+                Some(sample_id) => gluesql::core::ast_builder::uuid(sample_id.to_string()),
                 None => gluesql::core::ast_builder::null(),
             },
             match self.notes {
@@ -77,7 +87,7 @@ impl NewObservation {
         let id = self.id;
         table("observations")
             .insert()
-            .columns("created_by,id,project_id,individual_id,notes,picture,updated_by")
+            .columns("created_by,id,parent_observation_id,project_id,organism_id,sample_id,notes,picture,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -110,8 +120,133 @@ impl NewObservation {
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("picture", gluesql::core::ast_builder::bytea(self.picture))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));
-        if let Some(individual_id) = self.individual_id {
-            update_row = update_row.set("individual_id", gluesql::core::ast_builder::uuid(individual_id.to_string()));
+        if let Some(parent_observation_id) = self.parent_observation_id {
+            update_row = update_row.set("parent_observation_id", gluesql::core::ast_builder::uuid(parent_observation_id.to_string()));
+        }
+        if let Some(organism_id) = self.organism_id {
+            update_row = update_row.set("organism_id", gluesql::core::ast_builder::uuid(organism_id.to_string()));
+        }
+        if let Some(sample_id) = self.sample_id {
+            update_row = update_row.set("sample_id", gluesql::core::ast_builder::uuid(sample_id.to_string()));
+        }
+        if let Some(notes) = self.notes {
+            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
+        }
+            update_row.execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
+    }
+
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewOrganismBioOttTaxonItem {
+    pub organism_id: Uuid,
+    pub taxon_id: i32,
+}
+
+impl Tabular for NewOrganismBioOttTaxonItem {
+    const TABLE: Table = Table::OrganismBioOttTaxonItems;
+}
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct NewOrganism {
+    pub id: Uuid,
+    pub host_organism_id: Option<Uuid>,
+    pub sample_id: Option<Uuid>,
+    pub notes: Option<String>,
+    pub nameplate_id: i32,
+    pub project_id: i32,
+    pub picture: Vec<u8>,
+}
+
+impl Tabular for NewOrganism {
+    const TABLE: Table = Table::Organisms;
+}
+#[cfg(feature = "frontend")]
+impl NewOrganism {
+    pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
+        vec![
+            gluesql::core::ast_builder::num(created_by),
+            gluesql::core::ast_builder::uuid(self.id.to_string()),
+            match self.host_organism_id {
+                Some(host_organism_id) => gluesql::core::ast_builder::uuid(host_organism_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.sample_id {
+                Some(sample_id) => gluesql::core::ast_builder::uuid(sample_id.to_string()),
+                None => gluesql::core::ast_builder::null(),
+            },
+            match self.notes {
+                Some(notes) => gluesql::core::ast_builder::text(notes),
+                None => gluesql::core::ast_builder::null(),
+            },
+            gluesql::core::ast_builder::num(self.nameplate_id),
+            gluesql::core::ast_builder::num(self.project_id),
+            gluesql::core::ast_builder::bytea(self.picture),
+            gluesql::core::ast_builder::num(created_by),
+        ]
+    }
+
+    /// Insert the NewOrganism into the database.
+    ///
+    /// # Arguments
+    /// * `created_by` - The id of the user inserting the row.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows inserted in table NewOrganism
+    pub async fn insert<C>(
+        self,
+        created_by: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<super::Organism, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let id = self.id;
+        table("organisms")
+            .insert()
+            .columns("created_by,id,host_organism_id,sample_id,notes,nameplate_id,project_id,picture,updated_by")
+            .values(vec![self.into_row(created_by)])
+            .execute(connection)
+            .await
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
+                 _ => unreachable!("Payload must be an Insert"),
+             })?;
+        super::Organism::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+    }
+
+    /// Update the struct in the database.
+    ///
+    /// # Arguments
+    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `connection` - The connection to the database.
+    ///
+    /// # Returns
+    /// The number of rows updated.
+    pub async fn update<C>(
+        self,
+        user_id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        use gluesql::core::ast_builder::*;
+        let mut update_row = table("organisms")
+            .update()        
+.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("nameplate_id", gluesql::core::ast_builder::num(self.nameplate_id))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
+.set("picture", gluesql::core::ast_builder::bytea(self.picture))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
+        if let Some(host_organism_id) = self.host_organism_id {
+            update_row = update_row.set("host_organism_id", gluesql::core::ast_builder::uuid(host_organism_id.to_string()));
+        }
+        if let Some(sample_id) = self.sample_id {
+            update_row = update_row.set("sample_id", gluesql::core::ast_builder::uuid(sample_id.to_string()));
         }
         if let Some(notes) = self.notes {
             update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
@@ -221,114 +356,6 @@ pub struct NewSampleContainer {
 
 impl Tabular for NewSampleContainer {
     const TABLE: Table = Table::SampleContainers;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSampledIndividualBioOttTaxonItem {
-    pub sampled_individual_id: Uuid,
-    pub taxon_id: i32,
-}
-
-impl Tabular for NewSampledIndividualBioOttTaxonItem {
-    const TABLE: Table = Table::SampledIndividualBioOttTaxonItems;
-}
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct NewSampledIndividual {
-    pub id: Uuid,
-    pub notes: Option<String>,
-    pub nameplate_id: Option<i32>,
-    pub project_id: i32,
-    pub picture: Vec<u8>,
-}
-
-impl Tabular for NewSampledIndividual {
-    const TABLE: Table = Table::SampledIndividuals;
-}
-#[cfg(feature = "frontend")]
-impl NewSampledIndividual {
-    pub fn into_row(self, created_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::num(created_by),
-            gluesql::core::ast_builder::uuid(self.id.to_string()),
-            match self.notes {
-                Some(notes) => gluesql::core::ast_builder::text(notes),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.nameplate_id {
-                Some(nameplate_id) => gluesql::core::ast_builder::num(nameplate_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-            gluesql::core::ast_builder::num(self.project_id),
-            gluesql::core::ast_builder::bytea(self.picture),
-            gluesql::core::ast_builder::num(created_by),
-        ]
-    }
-
-    /// Insert the NewSampledIndividual into the database.
-    ///
-    /// # Arguments
-    /// * `created_by` - The id of the user inserting the row.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows inserted in table NewSampledIndividual
-    pub async fn insert<C>(
-        self,
-        created_by: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<super::SampledIndividual, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let id = self.id;
-        table("sampled_individuals")
-            .insert()
-            .columns("created_by,id,notes,nameplate_id,project_id,picture,updated_by")
-            .values(vec![self.into_row(created_by)])
-            .execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })?;
-        super::SampledIndividual::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
-    }
-
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `user_id` - The ID of the user who is updating the struct.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        user_id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("sampled_individuals")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
-.set("picture", gluesql::core::ast_builder::bytea(self.picture))        
-.set("updated_by", gluesql::core::ast_builder::num(user_id));
-        if let Some(notes) = self.notes {
-            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
-        }
-        if let Some(nameplate_id) = self.nameplate_id {
-            update_row = update_row.set("nameplate_id", gluesql::core::ast_builder::num(nameplate_id));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {

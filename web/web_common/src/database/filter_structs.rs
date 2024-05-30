@@ -292,10 +292,12 @@ impl NotificationFilter {
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct ObservationFilter {
+    pub parent_observation_id: Option<Uuid>,
     pub created_by: Option<i32>,
     pub updated_by: Option<i32>,
     pub project_id: Option<i32>,
-    pub individual_id: Option<Uuid>,
+    pub organism_id: Option<Uuid>,
+    pub sample_id: Option<Uuid>,
 }
 
 
@@ -304,6 +306,10 @@ impl ObservationFilter {
 
     pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(parent_observation_id) = &self.parent_observation_id {
+            filter = filter.and(gluesql::core::ast_builder::col("observations.parent_observation_id").eq(parent_observation_id.to_string()));
+        }
+
         if let Some(created_by) = &self.created_by {
             filter = filter.and(gluesql::core::ast_builder::col("observations.created_by").eq(created_by.to_string()));
         }
@@ -316,8 +322,85 @@ impl ObservationFilter {
             filter = filter.and(gluesql::core::ast_builder::col("observations.project_id").eq(project_id.to_string()));
         }
 
-        if let Some(individual_id) = &self.individual_id {
-            filter = filter.and(gluesql::core::ast_builder::col("observations.individual_id").eq(individual_id.to_string()));
+        if let Some(organism_id) = &self.organism_id {
+            filter = filter.and(gluesql::core::ast_builder::col("observations.organism_id").eq(organism_id.to_string()));
+        }
+
+        if let Some(sample_id) = &self.sample_id {
+            filter = filter.and(gluesql::core::ast_builder::col("observations.sample_id").eq(sample_id.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct OrganismBioOttTaxonItemFilter {
+    pub created_by: Option<i32>,
+    pub organism_id: Option<Uuid>,
+    pub taxon_id: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl OrganismBioOttTaxonItemFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(created_by) = &self.created_by {
+            filter = filter.and(gluesql::core::ast_builder::col("organism_bio_ott_taxon_items.created_by").eq(created_by.to_string()));
+        }
+
+        if let Some(organism_id) = &self.organism_id {
+            filter = filter.and(gluesql::core::ast_builder::col("organism_bio_ott_taxon_items.organism_id").eq(organism_id.to_string()));
+        }
+
+        if let Some(taxon_id) = &self.taxon_id {
+            filter = filter.and(gluesql::core::ast_builder::col("organism_bio_ott_taxon_items.taxon_id").eq(taxon_id.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct OrganismFilter {
+    pub host_organism_id: Option<Uuid>,
+    pub sample_id: Option<Uuid>,
+    pub nameplate_id: Option<i32>,
+    pub project_id: Option<i32>,
+    pub created_by: Option<i32>,
+    pub updated_by: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl OrganismFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(host_organism_id) = &self.host_organism_id {
+            filter = filter.and(gluesql::core::ast_builder::col("organisms.host_organism_id").eq(host_organism_id.to_string()));
+        }
+
+        if let Some(sample_id) = &self.sample_id {
+            filter = filter.and(gluesql::core::ast_builder::col("organisms.sample_id").eq(sample_id.to_string()));
+        }
+
+        if let Some(nameplate_id) = &self.nameplate_id {
+            filter = filter.and(gluesql::core::ast_builder::col("organisms.nameplate_id").eq(nameplate_id.to_string()));
+        }
+
+        if let Some(project_id) = &self.project_id {
+            filter = filter.and(gluesql::core::ast_builder::col("organisms.project_id").eq(project_id.to_string()));
+        }
+
+        if let Some(created_by) = &self.created_by {
+            filter = filter.and(gluesql::core::ast_builder::col("organisms.created_by").eq(created_by.to_string()));
+        }
+
+        if let Some(updated_by) = &self.updated_by {
+            filter = filter.and(gluesql::core::ast_builder::col("organisms.updated_by").eq(updated_by.to_string()));
         }
 
         filter
@@ -773,69 +856,6 @@ impl SampleStateFilter {
 
         if let Some(color_id) = &self.color_id {
             filter = filter.and(gluesql::core::ast_builder::col("sample_states.color_id").eq(color_id.to_string()));
-        }
-
-        filter
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividualBioOttTaxonItemFilter {
-    pub created_by: Option<i32>,
-    pub sampled_individual_id: Option<Uuid>,
-    pub taxon_id: Option<i32>,
-}
-
-
-#[cfg(feature = "frontend")]
-impl SampledIndividualBioOttTaxonItemFilter {
-
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individual_bio_ott_taxon_items.created_by").eq(created_by.to_string()));
-        }
-
-        if let Some(sampled_individual_id) = &self.sampled_individual_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individual_bio_ott_taxon_items.sampled_individual_id").eq(sampled_individual_id.to_string()));
-        }
-
-        if let Some(taxon_id) = &self.taxon_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individual_bio_ott_taxon_items.taxon_id").eq(taxon_id.to_string()));
-        }
-
-        filter
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
-pub struct SampledIndividualFilter {
-    pub nameplate_id: Option<i32>,
-    pub project_id: Option<i32>,
-    pub created_by: Option<i32>,
-    pub updated_by: Option<i32>,
-}
-
-
-#[cfg(feature = "frontend")]
-impl SampledIndividualFilter {
-
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(nameplate_id) = &self.nameplate_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals.nameplate_id").eq(nameplate_id.to_string()));
-        }
-
-        if let Some(project_id) = &self.project_id {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals.project_id").eq(project_id.to_string()));
-        }
-
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals.created_by").eq(created_by.to_string()));
-        }
-
-        if let Some(updated_by) = &self.updated_by {
-            filter = filter.and(gluesql::core::ast_builder::col("sampled_individuals.updated_by").eq(updated_by.to_string()));
         }
 
         filter
