@@ -25,7 +25,7 @@ SELECT
 FROM
     tmp_observation_subjects
     JOIN font_awesome_icons ON tmp_observation_subjects.icon = font_awesome_icons.name
-    JOIN colors ON tmp_observation_subjects.color = colors.name
+    JOIN colors ON tmp_observation_subjects.color = colors.name;
 
 -- now we want to assert that the number of lines in the observation_subjects table is the same as the number
 -- of lines in the tmp_observation_subjects table
