@@ -15,7 +15,7 @@ impl RowToBadge for User {
         }
     }
 
-    fn to_tiny_badge(&self) -> yew::Html {
+    fn to_small_badge(&self) -> yew::Html {
         yew::html! {
             <div class="tiny-badge primary">
                 <Link<AppRoute> to={AppRoute::UsersView { id: self.id }}>

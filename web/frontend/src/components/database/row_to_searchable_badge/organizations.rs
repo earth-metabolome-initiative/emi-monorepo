@@ -4,23 +4,13 @@ use web_common::database::NestedOrganization;
 use yew::prelude::*;
 
 impl RowToSearchableBadge for NestedOrganization {
-    fn to_datalist_badge(&self, query: &str) -> Html {
+    fn to_searchable_badge(&self, query: Option<&str>) -> Html {
         html! {
             <div>
                 <p>
-                <i class="fas fa-building-columns grey"></i>
-                    <span>{self.inner.name.format_match(query)}</span>
-                </p>
-            </div>
-        }
-    }
-
-    fn to_selected_datalist_badge(&self) -> Html {
-        html! {
-            <div>
-                <p>
-                <i class="fas fa-building-columns grey"></i>
-                    <span>{self.inner.name.clone()}</span>
+                    <i class="fas fa-building-columns grey"></i>
+                    {'\u{00A0}'}
+                    <span>{self.inner.name.maybe_format_match(query)}</span>
                 </p>
             </div>
         }
@@ -30,8 +20,5 @@ impl RowToSearchableBadge for NestedOrganization {
     }
     fn primary_color_class(&self) -> &str {
         "grey"
-    }
-    fn description(&self) -> &str {
-        ""
     }
 }

@@ -7,18 +7,14 @@ use web_common::database::NestedSpectraCollection;
 use yew::prelude::*;
 
 impl RowToSearchableBadge for NestedSpectraCollection {
-    fn to_datalist_badge(&self, query: &str) -> Html {
+    fn to_searchable_badge(&self, query: Option<&str>) -> Html {
         html! {
             <div>
                 <p>
-                    {self.sample.container.inner.barcode.format_match(query)}
+                    {self.sample.container.inner.barcode.maybe_format_match(query)}
                 </p>
             </div>
         }
-    }
-
-    fn to_selected_datalist_badge(&self) -> Html {
-        self.sample.to_selected_datalist_badge()
     }
 
     fn similarity_score(&self, query: &str) -> isize {
@@ -28,9 +24,5 @@ impl RowToSearchableBadge for NestedSpectraCollection {
 
     fn primary_color_class(&self) -> &str {
         "grey"
-    }
-
-    fn description(&self) -> &str {
-        ""
     }
 }

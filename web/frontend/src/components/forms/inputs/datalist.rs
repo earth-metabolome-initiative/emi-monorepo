@@ -355,8 +355,8 @@ where
                             };
                             let classes = format!("selected-datalist-badge {}{}", selection.primary_color_class(), if self.selections_to_delete.contains(&i) {" deleting"} else {""});
                             html! {
-                                <li class={classes} title={format!("{}", selection.description())}>
-                                    {selection.to_selected_datalist_badge()}
+                                <li class={classes}>
+                                    {selection.to_small_badge()}
                                     <button onclick={on_click} class="delete-button">
                                         <i class="fas fa-times"></i>
                                     </button>
@@ -453,7 +453,7 @@ where
                                     })
                                 };
                                 html! {
-                                    <li onclick={on_click} class={format!("datalist-candidate {}", candidate.primary_color_class())}>{candidate.to_datalist_badge(&current_value)}</li>
+                                    <li onclick={on_click} class={format!("datalist-candidate {}", candidate.primary_color_class())}>{candidate.to_searchable_badge(Some(&current_value))}</li>
                                 }
                             })}
                         </ul>

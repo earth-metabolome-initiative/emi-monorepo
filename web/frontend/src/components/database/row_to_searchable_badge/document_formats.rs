@@ -4,30 +4,19 @@ use web_common::database::NestedDocumentFormat;
 use yew::prelude::*;
 
 impl RowToSearchableBadge for NestedDocumentFormat {
-    fn to_datalist_badge(&self, query: &str) -> Html {
+    fn to_searchable_badge(&self, query: Option<&str>) -> Html {
         html! {
             <div>
                 <p>
                 <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
-                    <span>{self.inner.extension.format_match(query)}</span>
-                    <span>{self.inner.mime_type.format_match(query)}</span>
+                    <span>{self.inner.extension.maybe_format_match(query)}</span>
+                    <span>{self.inner.mime_type.maybe_format_match(query)}</span>
                 </p>
-                <p>{self.inner.description.format_match(query)}</p>
+                <p>{self.inner.description.maybe_format_match(query)}</p>
             </div>
         }
     }
 
-    fn to_selected_datalist_badge(&self) -> Html {
-        html! {
-            <div>
-                <p>
-                <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
-                    <span>{self.inner.extension.clone()}</span>
-                </p>
-                <p>{self.inner.description.clone()}</p>
-            </div>
-        }
-    }
     fn similarity_score(&self, query: &str) -> isize {
         self.inner.extension.similarity_score(query)
             + self.inner.mime_type.similarity_score(query)
@@ -35,8 +24,5 @@ impl RowToSearchableBadge for NestedDocumentFormat {
     }
     fn primary_color_class(&self) -> &str {
         &self.color.name
-    }
-    fn description(&self) -> &str {
-        &self.inner.description
     }
 }

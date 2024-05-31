@@ -10,6 +10,12 @@ pub trait FormatMatch {
     /// * `query` - The query to match against.
     fn format_match<S: AsRef<str>>(&self, query: S) -> yew::Html;
 
+    /// Format the string for a given query using sublime_fuzzy if the query is present.
+    /// 
+    /// # Arguments
+    /// * `query` - The optional query to match against.
+    fn maybe_format_match<S: AsRef<str>>(&self, query: Option<S>) -> yew::Html;
+
     /// Returns the similarity score of the implementing type with respect to the query.
     ///
     /// # Arguments
@@ -26,6 +32,12 @@ impl<T: ToString> FormatMatch for T {
                 |match_value| format_simple(&match_value, &current, "<strong>", "</strong>"),
             ),
         ))
+    }
+
+    fn maybe_format_match<S: AsRef<str>>(&self, query: Option<S>) -> yew::Html {
+        query
+            .map(|query| self.format_match(query))
+            .unwrap_or_else(|| yew::Html::from(self.to_string()))
     }
 
     fn similarity_score<S: AsRef<str>>(&self, query: S) -> isize {

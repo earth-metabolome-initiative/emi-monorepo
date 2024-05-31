@@ -18,14 +18,14 @@ impl RowToBadge for NestedObservation {
 
                     // Print out the sample state, procedure, sampled by
                     <div class="sample-info">
-                        <span title="Created by">{self.created_by.to_tiny_badge()}</span>
-                        <span title="Part of project">{self.project.to_tiny_badge()}</span>
+                        <span title="Created by">{self.created_by.to_small_badge()}</span>
+                        <span title="Part of project">{self.project.to_small_badge()}</span>
                     </div>
             </div>
         }
     }
 
-    fn to_tiny_badge(&self) -> yew::Html {
+    fn to_small_badge(&self) -> yew::Html {
         yew::html! {
             <div class={format!("tiny-badge {}", self.project.color.name)} >
                 <Link<AppRoute> to={AppRoute::ObservationsView { id: self.inner.id }}>

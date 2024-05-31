@@ -17,15 +17,15 @@ impl RowToBadge for NestedProject {
 
                     // Print out the sample state, procedure, sampled by
                     <div class="sample-info">
-                        {self.state.to_tiny_badge()}
-                        <span title="Created by">{self.created_by.to_tiny_badge()}</span>
+                        {self.state.to_small_badge()}
+                        <span title="Created by">{self.created_by.to_small_badge()}</span>
                     </div>
                 </Link<AppRoute>>
             </div>
         }
     }
 
-    fn to_tiny_badge(&self) -> yew::Html {
+    fn to_small_badge(&self) -> yew::Html {
         let title_action = format!("View the {} project", self.title());
         yew::html! {
             <div class={format!("badge {}", self.color.name)} title={title_action}>

@@ -7,25 +7,15 @@ use web_common::database::NestedBioOttTaxonItem;
 use yew::prelude::*;
 
 impl RowToSearchableBadge for NestedBioOttTaxonItem {
-    fn to_datalist_badge(&self, query: &str) -> Html {
+    fn to_searchable_badge(&self, query: Option<&str>) -> Html {
         html! {
             <div>
                 <p>
                     <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
-                    // we add the rank of the taxon to the badge
-                    <span>{self.inner.name.format_match(query)}</span>
+                    {'\u{00A0}'}
+                    <span>{self.inner.name.maybe_format_match(query)}</span>
                 </p>
-                {self.ott_rank.to_selected_datalist_badge()}
             </div>
-        }
-    }
-
-    fn to_selected_datalist_badge(&self) -> Html {
-        html! {
-            <p>
-            <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
-                <span>{&self.inner.name}</span>
-            </p>
         }
     }
 
@@ -35,9 +25,5 @@ impl RowToSearchableBadge for NestedBioOttTaxonItem {
 
     fn primary_color_class(&self) -> &str {
         &self.color.name
-    }
-
-    fn description(&self) -> &str {
-        "The taxon name."
     }
 }

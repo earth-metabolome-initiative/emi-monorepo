@@ -4,34 +4,21 @@ use web_common::database::NestedOrganism;
 use yew::prelude::*;
 
 impl RowToSearchableBadge for NestedOrganism {
-    fn to_datalist_badge(&self, query: &str) -> Html {
+    fn to_searchable_badge(&self, query: Option<&str>) -> Html {
         html! {
             <div>
                 <p>
                 <i class="fas fa-question grey"></i>
-                    <span>{self.inner.id.format_match(query)}</span>
+                    <span>{self.inner.id.maybe_format_match(query)}</span>
                 </p>
             </div>
         }
     }
 
-    fn to_selected_datalist_badge(&self) -> Html {
-        html! {
-            <div>
-                <p>
-                <i class="fas fa-question grey"></i>
-                <span>{self.inner.id.to_string()}</span>
-                </p>
-            </div>
-        }
-    }
     fn similarity_score(&self, query: &str) -> isize {
         self.inner.id.similarity_score(query)
     }
     fn primary_color_class(&self) -> &str {
         "grey"
-    }
-    fn description(&self) -> &str {
-        ""
     }
 }

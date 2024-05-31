@@ -7,6 +7,16 @@ pub mod sample_container;
 pub mod samples;
 pub mod teams;
 pub mod users;
+pub mod bio_ott_ranks;
+pub mod team_states;
+pub mod colors;
+pub mod font_awesome_icons;
+pub mod roles;
+pub mod document_formats;
+pub mod units;
+pub mod bio_ott_taxon_items;
+pub mod sample_states;
+pub mod organizations;
 
 use web_common::database::*;
 
@@ -19,7 +29,7 @@ pub trait RowToBadge {
         }
     }
 
-    fn to_tiny_badge(&self) -> yew::Html {
+    fn to_small_badge(&self) -> yew::Html {
         self.to_badge()
     }
 }
@@ -27,11 +37,7 @@ pub trait RowToBadge {
 impl RowToBadge for NestedOrganism {}
 impl RowToBadge for NestedSpectraCollection {}
 impl RowToBadge for NestedSpectra {}
-impl RowToBadge for NestedBioOttRank {}
-impl RowToBadge for NestedBioOttTaxonItem {}
 impl RowToBadge for Country {}
-impl RowToBadge for NestedOrganization {}
-impl RowToBadge for NestedSampleState {}
 impl RowToBadge for NestedSampleContainerCategory {}
 impl RowToBadge for NestedNameplateCategory {}
 impl RowToBadge for NestedNameplate {}
