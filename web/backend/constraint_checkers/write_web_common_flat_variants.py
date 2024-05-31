@@ -473,7 +473,7 @@ def write_web_common_flat_variants(
             if attribute.is_uuid() and not attribute.optional:
                 document.write(
                     f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
-                    f"                gluesql::prelude::Value::Uuid({attribute.name}) => Uuid::from_u128(*{attribute.name}),\n"
+                    f"                gluesql::prelude::Value::Uuid({attribute.name}) => uuid::Uuid::from_u128(*{attribute.name}),\n"
                     '                _ => unreachable!("Expected Uuid"),\n'
                     "            },\n"
                 )
@@ -485,7 +485,7 @@ def write_web_common_flat_variants(
                     "                gluesql::prelude::Value::Null => None,\n"
                 )
                 document.write(
-                    f"                gluesql::prelude::Value::Uuid({attribute.name}) => Some(Uuid::from_u128(*{attribute.name})),\n"
+                    f"                gluesql::prelude::Value::Uuid({attribute.name}) => Some(uuid::Uuid::from_u128(*{attribute.name})),\n"
                 )
                 document.write('                _ => unreachable!("Expected Uuid"),\n')
                 document.write("            },\n")

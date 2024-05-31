@@ -241,7 +241,7 @@ def write_web_common_table_names_enumeration(
         if table.has_filter_variant():
             filter_variant = table.get_filter_variant()
             document.write(
-                f"                let filter: Option<{filter_variant.name}> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;\n"
+                f"                let filter: Option<crate::database::{filter_variant.name}> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;\n"
                 f"                crate::database::{table.richest_struct_name()}::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
             )
         else:
@@ -288,7 +288,7 @@ def write_web_common_table_names_enumeration(
             if table.has_filter_variant():
                 filter_variant = table.get_filter_variant()
                 document.write(
-                    f"                let filter: Option<{filter_variant.name}> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;\n"
+                    f"                let filter: Option<crate::database::{filter_variant.name}> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;\n"
                     f"                crate::database::{table.richest_struct_name()}::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
                 )
             else:

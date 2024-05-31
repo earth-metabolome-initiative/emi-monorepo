@@ -1299,11 +1299,11 @@ connection: &mut gluesql::prelude::Glue<C>,
                 _ => unreachable!("Expected Timestamp")
             },
             parent_sample_id: match row.get("parent_sample_id").unwrap() {
-                gluesql::prelude::Value::Uuid(parent_sample_id) => Uuid::from_u128(*parent_sample_id),
+                gluesql::prelude::Value::Uuid(parent_sample_id) => uuid::Uuid::from_u128(*parent_sample_id),
                 _ => unreachable!("Expected Uuid"),
             },
             child_sample_id: match row.get("child_sample_id").unwrap() {
-                gluesql::prelude::Value::Uuid(child_sample_id) => Uuid::from_u128(*child_sample_id),
+                gluesql::prelude::Value::Uuid(child_sample_id) => uuid::Uuid::from_u128(*child_sample_id),
                 _ => unreachable!("Expected Uuid"),
             },
         }
@@ -3451,12 +3451,12 @@ connection: &mut gluesql::prelude::Glue<C>,
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
+                gluesql::prelude::Value::Uuid(id) => uuid::Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
             parent_observation_id: match row.get("parent_observation_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(parent_observation_id) => Some(Uuid::from_u128(*parent_observation_id)),
+                gluesql::prelude::Value::Uuid(parent_observation_id) => Some(uuid::Uuid::from_u128(*parent_observation_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             created_by: match row.get("created_by").unwrap() {
@@ -3483,12 +3483,12 @@ connection: &mut gluesql::prelude::Glue<C>,
             },
             organism_id: match row.get("organism_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(organism_id) => Some(Uuid::from_u128(*organism_id)),
+                gluesql::prelude::Value::Uuid(organism_id) => Some(uuid::Uuid::from_u128(*organism_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             sample_id: match row.get("sample_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(sample_id) => Some(Uuid::from_u128(*sample_id)),
+                gluesql::prelude::Value::Uuid(sample_id) => Some(uuid::Uuid::from_u128(*sample_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             subject_id: match row.get("subject_id").unwrap() {
@@ -3712,7 +3712,7 @@ connection: &mut gluesql::prelude::Glue<C>,
                 _ => unreachable!("Expected Timestamp")
             },
             organism_id: match row.get("organism_id").unwrap() {
-                gluesql::prelude::Value::Uuid(organism_id) => Uuid::from_u128(*organism_id),
+                gluesql::prelude::Value::Uuid(organism_id) => uuid::Uuid::from_u128(*organism_id),
                 _ => unreachable!("Expected Uuid"),
             },
             taxon_id: match row.get("taxon_id").unwrap() {
@@ -3989,17 +3989,17 @@ connection: &mut gluesql::prelude::Glue<C>,
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
+                gluesql::prelude::Value::Uuid(id) => uuid::Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
             host_organism_id: match row.get("host_organism_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(host_organism_id) => Some(Uuid::from_u128(*host_organism_id)),
+                gluesql::prelude::Value::Uuid(host_organism_id) => Some(uuid::Uuid::from_u128(*host_organism_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             sample_id: match row.get("sample_id").unwrap() {
                 gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Uuid(sample_id) => Some(Uuid::from_u128(*sample_id)),
+                gluesql::prelude::Value::Uuid(sample_id) => Some(uuid::Uuid::from_u128(*sample_id)),
                 _ => unreachable!("Expected Uuid"),
             },
             notes: match row.get("notes").unwrap() {
@@ -6841,7 +6841,7 @@ connection: &mut gluesql::prelude::Glue<C>,
                 _ => unreachable!("Expected Timestamp")
             },
             sample_id: match row.get("sample_id").unwrap() {
-                gluesql::prelude::Value::Uuid(sample_id) => Uuid::from_u128(*sample_id),
+                gluesql::prelude::Value::Uuid(sample_id) => uuid::Uuid::from_u128(*sample_id),
                 _ => unreachable!("Expected Uuid"),
             },
             taxon_id: match row.get("taxon_id").unwrap() {
@@ -7834,7 +7834,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     pub fn from_row(row: std::collections::HashMap<&str, &gluesql::prelude::Value>) -> Self {
         Self {
             id: match row.get("id").unwrap() {
-                gluesql::prelude::Value::Uuid(id) => Uuid::from_u128(*id),
+                gluesql::prelude::Value::Uuid(id) => uuid::Uuid::from_u128(*id),
                 _ => unreachable!("Expected Uuid"),
             },
             container_id: match row.get("container_id").unwrap() {
@@ -8399,7 +8399,7 @@ connection: &mut gluesql::prelude::Glue<C>,
                 _ => unreachable!("Expected Str")
             },
             sample_id: match row.get("sample_id").unwrap() {
-                gluesql::prelude::Value::Uuid(sample_id) => Uuid::from_u128(*sample_id),
+                gluesql::prelude::Value::Uuid(sample_id) => uuid::Uuid::from_u128(*sample_id),
                 _ => unreachable!("Expected Uuid"),
             },
             created_by: match row.get("created_by").unwrap() {
