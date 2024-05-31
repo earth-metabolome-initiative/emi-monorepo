@@ -466,7 +466,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                             }
                                         };
 
-                                    if !self.is_authenticated() && limit > 20 {
+                                    if !self.is_authenticated() && limit > 50 {
                                         ctx.address().do_send(BackendMessage::Error(
                                             task_id,
                                             ApiError::Unauthorized,
@@ -474,7 +474,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         return;
                                     }
 
-                                    if self.is_authenticated() && limit > 100 {
+                                    if self.is_authenticated() && limit > 500 {
                                         ctx.address().do_send(BackendMessage::Error(
                                             task_id,
                                             ApiError::BadRequest(vec![
@@ -515,7 +515,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                             }
                                         };
 
-                                    if !self.is_authenticated() && limit > 20 {
+                                    if !self.is_authenticated() && limit > 50 {
                                         ctx.address().do_send(BackendMessage::Error(
                                             task_id,
                                             ApiError::Unauthorized,
@@ -523,7 +523,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         return;
                                     }
 
-                                    if self.is_authenticated() && limit > 100 {
+                                    if self.is_authenticated() && limit > 500 {
                                         ctx.address().do_send(BackendMessage::Error(
                                             task_id,
                                             ApiError::BadRequest(vec![

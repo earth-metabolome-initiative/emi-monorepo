@@ -1,5 +1,5 @@
 .section_explorer {
-    width: 600px;
+    width: 1200px;
     max-width: 100%;
     margin: 1em auto;
     animation: slide-in-from-bottom 0.3s;
@@ -18,36 +18,6 @@
 
     ul {
         margin-top: 1em;
-
-        /* Increase distance between each listed user */
-        li {
-            margin-bottom: 0.5em;
-
-            /* Increase distance between each listed user */
-            div.badge {
-                display: flex;
-                flex-direction: column;
-
-                .sample-info {
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: 0.5em;
-                    margin-right: 0.9em;
-                    /* Adjust spacing between sample info sections */
-
-                    span {
-                        margin-right: 0.5em;
-                        /* Adjust spacing between label and link */
-                    }
-
-                    a {
-                        text-decoration: none;
-                        /* Remove underline from links */
-                        color: $primary;
-                        /* Set link color to $primary */
-                    }
-                }
-            }
-        }
+        margin-bottom: 1em;
     }
 }

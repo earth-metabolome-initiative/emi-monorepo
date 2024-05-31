@@ -97,7 +97,7 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                 self.websocket
                     .send(ComponentMessage::all_by_updated_at::<Page>(
                         ctx.props().filters.clone(),
-                        10,
+                        24,
                         self.pages.len() as i64,
                     ));
                 true
@@ -121,7 +121,7 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                         <span>{Page::section()}</span>
                     </h2>
                 }
-                <ul>
+                <ul class="badges-container">
                 { for self.pages.iter().map(|page| html!{<li>{page.to_badge()}</li>}) }
                 if self.no_more_pages {
                     <li>{"There are no more entries to load"}</li>
