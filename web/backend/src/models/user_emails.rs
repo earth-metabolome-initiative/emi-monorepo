@@ -6,23 +6,38 @@
 //! If you need to make changes to the backend, please modify the `generate_models`
 //! document in the `migrations` folder.
 
-use diesel::Queryable;
-use diesel::QueryableByName;
-use diesel::Identifiable;
-use diesel::Insertable;
 use crate::schema::*;
 use crate::sql_function_bindings::*;
+use chrono::NaiveDateTime;
+use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::PooledConnection;
+use diesel::Identifiable;
+use diesel::Insertable;
+use diesel::Queryable;
+use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
-use diesel::prelude::*;
-use web_common::database::filter_structs::*;
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use web_common::database::filter_structs::*;
 
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(
+    Queryable,
+    Debug,
+    Identifiable,
+    Eq,
+    PartialEq,
+    Clone,
+    Serialize,
+    Deserialize,
+    Default,
+    QueryableByName,
+    Associations,
+    Insertable,
+    Selectable,
+    AsChangeset,
+)]
 #[diesel(table_name = user_emails)]
 #[diesel(belongs_to(crate::models::users::User, foreign_key = created_by))]
 #[diesel(belongs_to(crate::models::login_providers::LoginProvider, foreign_key = login_provider_id))]
@@ -67,32 +82,27 @@ impl UserEmail {
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_view(
         &self,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_view_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_view_by_id(self.id, author_user_id, connection)
     }
     /// Check whether the user can view the struct associated to the provided ids.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_view_by_id(
-id: i32,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_view_user_emails(author_user_id, id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        id: i32,
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_view_user_emails(author_user_id, id))
+            .get_result(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -100,17 +110,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_viewable(
-filter: Option<&UserEmailFilter>,
-author_user_id: Option<i32>,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UserEmailFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails
-            .into_boxed();
+        let mut query = user_emails::dsl::user_emails.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -121,7 +129,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(can_view_user_emails(author_user_id, user_emails::dsl::id))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted viewable structs from the database.
     ///
@@ -130,17 +139,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_viewable_sorted(
-filter: Option<&UserEmailFilter>,
-author_user_id: Option<i32>,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UserEmailFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails
-            .into_boxed();
+        let mut query = user_emails::dsl::user_emails.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -152,26 +159,27 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .order_by(user_emails::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `connection` - The connection to the database.
-    ///
     pub fn get(
-id: i32,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Self, web_common::api::ApiError>{
+        id: i32,
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
         if !Self::can_view_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
         }
         use crate::schema::user_emails;
         user_emails::dsl::user_emails
             .filter(user_emails::dsl::id.eq(id))
-            .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .first::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get the struct from the database by its email and login_provider_id.
     ///
@@ -179,13 +187,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `login_provider_id` - The login_provider_id of the struct to get.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `connection` - The connection to the database.
-    ///
     pub fn from_email_and_login_provider_id(
-email: &str,
-login_provider_id: &i32,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Self, web_common::api::ApiError>{
+        email: &str,
+        login_provider_id: &i32,
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::user_emails;
         let flat_variant = user_emails::dsl::user_emails
             .filter(user_emails::dsl::email.eq(email))
@@ -200,32 +207,27 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_update(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_update_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(self.id, author_user_id, connection)
     }
     /// Check whether the user can update the struct associated to the provided ids.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_update_by_id(
-id: i32,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_update_user_emails(author_user_id, id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_update_user_emails(author_user_id, id))
+            .get_result(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the updatable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -233,17 +235,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_updatable(
-filter: Option<&UserEmailFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UserEmailFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails
-            .into_boxed();
+        let mut query = user_emails::dsl::user_emails.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -254,7 +254,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(can_update_user_emails(author_user_id, user_emails::dsl::id))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted updatable structs from the database.
     ///
@@ -263,17 +264,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_updatable_sorted(
-filter: Option<&UserEmailFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UserEmailFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails
-            .into_boxed();
+        let mut query = user_emails::dsl::user_emails.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -285,38 +284,34 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .order_by(user_emails::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_admin(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_admin_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_admin_by_id(self.id, author_user_id, connection)
     }
     /// Check whether the user can admin the struct associated to the provided ids.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_admin_by_id(
-id: i32,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_admin_user_emails(author_user_id, id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_admin_user_emails(author_user_id, id))
+            .get_result(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the administrable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -324,17 +319,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_administrable(
-filter: Option<&UserEmailFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UserEmailFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails
-            .into_boxed();
+        let mut query = user_emails::dsl::user_emails.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -345,7 +338,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(can_admin_user_emails(author_user_id, user_emails::dsl::id))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted administrable structs from the database.
     ///
@@ -354,17 +348,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_administrable_sorted(
-filter: Option<&UserEmailFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UserEmailFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails
-            .into_boxed();
+        let mut query = user_emails::dsl::user_emails.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -376,36 +368,35 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .order_by(user_emails::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
-    ///
     pub fn delete(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<usize, web_common::api::ApiError>{
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<usize, web_common::api::ApiError> {
         Self::delete_by_id(self.id, author_user_id, connection)
-}
+    }
     /// Delete the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
-    ///
     pub fn delete_by_id(
-id: i32,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<usize, web_common::api::ApiError>{
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<usize, web_common::api::ApiError> {
         if !Self::can_admin_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
         }
-        diesel::delete(user_emails::dsl::user_emails
-            .filter(user_emails::dsl::id.eq(id))
-        ).execute(connection).map_err(web_common::api::ApiError::from)
+        diesel::delete(user_emails::dsl::user_emails.filter(user_emails::dsl::id.eq(id)))
+            .execute(connection)
+            .map_err(web_common::api::ApiError::from)
     }
 }

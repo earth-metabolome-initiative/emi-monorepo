@@ -5,14 +5,15 @@ pub mod bio_ott_taxon_items;
 pub mod colors;
 pub mod document_formats;
 pub mod font_awesome_icons;
+pub mod observations;
 pub mod organizations;
 pub mod project_states;
 pub mod projects;
 pub mod sample_states;
+pub mod spectra_collections;
 pub mod teams;
 pub mod units;
 pub mod users;
-pub mod observations;
 
 /// Trait for types that can be converted to a badge.
 pub trait RowToSearchableBadge {
@@ -40,9 +41,9 @@ pub trait RowToSearchableBadge {
 }
 pub mod nameplate_categories;
 pub mod nameplates;
+pub mod organisms;
 pub mod roles;
 pub mod sample_container_categories;
 pub mod sample_containers;
-pub mod organisms;
 pub mod samples;
 pub mod team_states;

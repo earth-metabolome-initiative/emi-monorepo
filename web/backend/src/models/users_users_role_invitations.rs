@@ -6,23 +6,38 @@
 //! If you need to make changes to the backend, please modify the `generate_models`
 //! document in the `migrations` folder.
 
-use diesel::Queryable;
-use diesel::QueryableByName;
-use diesel::Identifiable;
-use diesel::Insertable;
 use crate::schema::*;
 use crate::sql_function_bindings::*;
+use chrono::NaiveDateTime;
+use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::PooledConnection;
+use diesel::Identifiable;
+use diesel::Insertable;
+use diesel::Queryable;
+use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
-use diesel::prelude::*;
-use web_common::database::filter_structs::*;
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use web_common::database::filter_structs::*;
 
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(
+    Queryable,
+    Debug,
+    Identifiable,
+    Eq,
+    PartialEq,
+    Clone,
+    Serialize,
+    Deserialize,
+    Default,
+    QueryableByName,
+    Associations,
+    Insertable,
+    Selectable,
+    AsChangeset,
+)]
 #[diesel(table_name = users_users_role_invitations)]
 #[diesel(belongs_to(crate::models::users::User, foreign_key = table_id))]
 #[diesel(belongs_to(crate::models::roles::Role, foreign_key = role_id))]
@@ -64,32 +79,31 @@ impl UsersUsersRoleInvitation {
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_view(
         &self,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_view_by_id(
-            ( self.table_id, self.user_id ),
-            author_user_id,
-            connection,
-        )
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_view_by_id((self.table_id, self.user_id), author_user_id, connection)
     }
     /// Check whether the user can view the struct associated to the provided ids.
     ///
     /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_view_by_id(
-( table_id, user_id ): ( i32, i32 ),
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_view_users_users_role_invitations(author_user_id, table_id, user_id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        (table_id, user_id): (i32, i32),
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_view_users_users_role_invitations(
+            author_user_id,
+            table_id,
+            user_id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -97,17 +111,16 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_viewable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: Option<i32>,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
-        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
-            .into_boxed();
+        let mut query =
+            users_users_role_invitations::dsl::users_users_role_invitations.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -121,10 +134,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
+            .filter(can_view_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted viewable structs from the database.
     ///
@@ -133,17 +151,16 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_viewable_sorted(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: Option<i32>,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
-        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
-            .into_boxed();
+        let mut query =
+            users_users_role_invitations::dsl::users_users_role_invitations.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -157,31 +174,36 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
+            .filter(can_view_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
             .order_by(users_users_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get the struct from the database by its ID.
     ///
     /// * `( table_id, user_id )` - The primary key(s) of the struct to get.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `connection` - The connection to the database.
-    ///
     pub fn get(
-( table_id, user_id ): ( i32, i32 ),
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Self, web_common::api::ApiError>{
-        if !Self::can_view_by_id(( table_id, user_id ), author_user_id, connection)? {
+        (table_id, user_id): (i32, i32),
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
+        if !Self::can_view_by_id((table_id, user_id), author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
         }
         use crate::schema::users_users_role_invitations;
         users_users_role_invitations::dsl::users_users_role_invitations
             .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
             .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .first::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
@@ -191,15 +213,14 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn similarity_search_viewable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: Option<i32>,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -207,117 +228,149 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_role_invitations;
- if filter.map(|f| f.table_id.is_some()&&f.user_id.is_some()&&f.role_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(table_id) = filter.and_then(|f| f.table_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(user_id) = filter.and_then(|f| f.user_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(role_id) = filter.and_then(|f| f.role_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.table_id.is_some()
+                    && f.user_id.is_some()
+                    && f.role_id.is_some()
+                    && f.created_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         users_users_role_invitations::dsl::users_users_role_invitations
             .select(UsersUsersRoleInvitation::as_select())
             // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
+            .inner_join(
+                roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+            )
+            .filter(can_view_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
+            .filter(similarity_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -326,15 +379,14 @@ similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), qu
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn word_similarity_search_viewable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: Option<i32>,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -342,117 +394,149 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_role_invitations;
- if filter.map(|f| f.table_id.is_some()&&f.user_id.is_some()&&f.role_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(table_id) = filter.and_then(|f| f.table_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(user_id) = filter.and_then(|f| f.user_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(role_id) = filter.and_then(|f| f.role_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.table_id.is_some()
+                    && f.user_id.is_some()
+                    && f.role_id.is_some()
+                    && f.created_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         users_users_role_invitations::dsl::users_users_role_invitations
             .select(UsersUsersRoleInvitation::as_select())
             // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
+            .inner_join(
+                roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+            )
+            .filter(can_view_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
+            .filter(word_similarity_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -461,15 +545,14 @@ word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::descript
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn strict_word_similarity_search_viewable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: Option<i32>,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: Option<i32>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -477,147 +560,178 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_role_invitations;
- if filter.map(|f| f.table_id.is_some()&&f.user_id.is_some()&&f.role_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(table_id) = filter.and_then(|f| f.table_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(user_id) = filter.and_then(|f| f.user_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(role_id) = filter.and_then(|f| f.role_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.table_id.is_some()
+                    && f.user_id.is_some()
+                    && f.role_id.is_some()
+                    && f.created_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         users_users_role_invitations::dsl::users_users_role_invitations
             .select(UsersUsersRoleInvitation::as_select())
             // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_view_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
+            .inner_join(
+                roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+            )
+            .filter(can_view_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
+            .filter(strict_word_similarity_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_update(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_update_by_id(
-            ( self.table_id, self.user_id ),
-            author_user_id,
-            connection,
-        )
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id((self.table_id, self.user_id), author_user_id, connection)
     }
     /// Check whether the user can update the struct associated to the provided ids.
     ///
     /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_update_by_id(
-( table_id, user_id ): ( i32, i32 ),
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_update_users_users_role_invitations(author_user_id, table_id, user_id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        (table_id, user_id): (i32, i32),
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_update_users_users_role_invitations(
+            author_user_id,
+            table_id,
+            user_id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the updatable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -625,17 +739,16 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_updatable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
-        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
-            .into_boxed();
+        let mut query =
+            users_users_role_invitations::dsl::users_users_role_invitations.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -649,10 +762,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
+            .filter(can_update_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted updatable structs from the database.
     ///
@@ -661,17 +779,16 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_updatable_sorted(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
-        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
-            .into_boxed();
+        let mut query =
+            users_users_role_invitations::dsl::users_users_role_invitations.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -685,11 +802,16 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
+            .filter(can_update_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
             .order_by(users_users_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Search for the updatable structs by a given string by Postgres's `similarity`.
     ///
@@ -699,15 +821,14 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn similarity_search_updatable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -715,117 +836,149 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_role_invitations;
- if filter.map(|f| f.table_id.is_some()&&f.user_id.is_some()&&f.role_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(table_id) = filter.and_then(|f| f.table_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(user_id) = filter.and_then(|f| f.user_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(role_id) = filter.and_then(|f| f.role_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.table_id.is_some()
+                    && f.user_id.is_some()
+                    && f.role_id.is_some()
+                    && f.created_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         users_users_role_invitations::dsl::users_users_role_invitations
             .select(UsersUsersRoleInvitation::as_select())
             // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
+            .inner_join(
+                roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+            )
+            .filter(can_update_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
+            .filter(similarity_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -834,15 +987,14 @@ similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), qu
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn word_similarity_search_updatable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -850,117 +1002,149 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_role_invitations;
- if filter.map(|f| f.table_id.is_some()&&f.user_id.is_some()&&f.role_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(table_id) = filter.and_then(|f| f.table_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(user_id) = filter.and_then(|f| f.user_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(role_id) = filter.and_then(|f| f.role_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.table_id.is_some()
+                    && f.user_id.is_some()
+                    && f.role_id.is_some()
+                    && f.created_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         users_users_role_invitations::dsl::users_users_role_invitations
             .select(UsersUsersRoleInvitation::as_select())
             // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
+            .inner_join(
+                roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+            )
+            .filter(can_update_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
+            .filter(word_similarity_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -969,15 +1153,14 @@ word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::descript
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn strict_word_similarity_search_updatable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -985,147 +1168,178 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_role_invitations;
- if filter.map(|f| f.table_id.is_some()&&f.user_id.is_some()&&f.role_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(table_id) = filter.and_then(|f| f.table_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(user_id) = filter.and_then(|f| f.user_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(role_id) = filter.and_then(|f| f.role_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.table_id.is_some()
+                    && f.user_id.is_some()
+                    && f.role_id.is_some()
+                    && f.created_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         users_users_role_invitations::dsl::users_users_role_invitations
             .select(UsersUsersRoleInvitation::as_select())
             // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_update_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
+            .inner_join(
+                roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+            )
+            .filter(can_update_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
+            .filter(strict_word_similarity_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_admin(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_admin_by_id(
-            ( self.table_id, self.user_id ),
-            author_user_id,
-            connection,
-        )
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_admin_by_id((self.table_id, self.user_id), author_user_id, connection)
     }
     /// Check whether the user can admin the struct associated to the provided ids.
     ///
     /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_admin_by_id(
-( table_id, user_id ): ( i32, i32 ),
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_admin_users_users_role_invitations(author_user_id, table_id, user_id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        (table_id, user_id): (i32, i32),
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_admin_users_users_role_invitations(
+            author_user_id,
+            table_id,
+            user_id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the administrable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1133,17 +1347,16 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_administrable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
-        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
-            .into_boxed();
+        let mut query =
+            users_users_role_invitations::dsl::users_users_role_invitations.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -1157,10 +1370,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
+            .filter(can_admin_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted administrable structs from the database.
     ///
@@ -1169,17 +1387,16 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_administrable_sorted(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
-        let mut query = users_users_role_invitations::dsl::users_users_role_invitations
-            .into_boxed();
+        let mut query =
+            users_users_role_invitations::dsl::users_users_role_invitations.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -1193,11 +1410,16 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
+            .filter(can_admin_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
             .order_by(users_users_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Search for the administrable structs by a given string by Postgres's `similarity`.
     ///
@@ -1207,15 +1429,14 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn similarity_search_administrable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -1223,117 +1444,149 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_role_invitations;
- if filter.map(|f| f.table_id.is_some()&&f.user_id.is_some()&&f.role_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(table_id) = filter.and_then(|f| f.table_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(user_id) = filter.and_then(|f| f.user_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(role_id) = filter.and_then(|f| f.role_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.table_id.is_some()
+                    && f.user_id.is_some()
+                    && f.role_id.is_some()
+                    && f.created_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         users_users_role_invitations::dsl::users_users_role_invitations
             .select(UsersUsersRoleInvitation::as_select())
             // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
+            .inner_join(
+                roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+            )
+            .filter(can_admin_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
+            .filter(similarity_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1342,15 +1595,14 @@ similarity_dist(concat_roles_name(roles::dsl::name, roles::dsl::description), qu
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn word_similarity_search_administrable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -1358,117 +1610,149 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_role_invitations;
- if filter.map(|f| f.table_id.is_some()&&f.user_id.is_some()&&f.role_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(table_id) = filter.and_then(|f| f.table_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(user_id) = filter.and_then(|f| f.user_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(role_id) = filter.and_then(|f| f.role_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.table_id.is_some()
+                    && f.user_id.is_some()
+                    && f.role_id.is_some()
+                    && f.created_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         users_users_role_invitations::dsl::users_users_role_invitations
             .select(UsersUsersRoleInvitation::as_select())
             // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
+            .inner_join(
+                roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+            )
+            .filter(can_admin_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
+            .filter(word_similarity_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1477,15 +1761,14 @@ word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::descript
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn strict_word_similarity_search_administrable(
-filter: Option<&UsersUsersRoleInvitationFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&UsersUsersRoleInvitationFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -1493,146 +1776,179 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_role_invitations;
- if filter.map(|f| f.table_id.is_some()&&f.user_id.is_some()&&f.role_id.is_some()&&f.created_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(table_id) = filter.and_then(|f| f.table_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(user_id) = filter.and_then(|f| f.user_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(role_id) = filter.and_then(|f| f.role_id) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
-            .select(UsersUsersRoleInvitation::as_select())
-            // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.table_id.is_some()
+                    && f.user_id.is_some()
+                    && f.role_id.is_some()
+                    && f.created_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::role_id.eq(role_id))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::created_by.eq(created_by))
+                .select(UsersUsersRoleInvitation::as_select())
+                // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
+                .inner_join(
+                    roles::dsl::roles
+                        .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+                )
+                .filter(can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ))
+                .filter(strict_word_similarity_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         users_users_role_invitations::dsl::users_users_role_invitations
             .select(UsersUsersRoleInvitation::as_select())
             // This operation is defined by a first order index linking users_users_role_invitations.role_id to roles.
-.inner_join(
-   roles::dsl::roles.on(
-       users_users_role_invitations::dsl::role_id.eq(
-           roles::dsl::id
-        )
-    )
-)
-
-            .filter(can_admin_users_users_role_invitations(author_user_id, users_users_role_invitations::dsl::table_id, users_users_role_invitations::dsl::user_id))
-            .filter(
-strict_word_similarity_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_roles_name(roles::dsl::name, roles::dsl::description), query))
+            .inner_join(
+                roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
+            )
+            .filter(can_admin_users_users_role_invitations(
+                author_user_id,
+                users_users_role_invitations::dsl::table_id,
+                users_users_role_invitations::dsl::user_id,
+            ))
+            .filter(strict_word_similarity_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_roles_name(roles::dsl::name, roles::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
-    ///
     pub fn delete(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<usize, web_common::api::ApiError>{
-        Self::delete_by_id(( self.table_id, self.user_id ), author_user_id, connection)
-}
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<usize, web_common::api::ApiError> {
+        Self::delete_by_id((self.table_id, self.user_id), author_user_id, connection)
+    }
     /// Delete the struct from the database by its ID.
     ///
     /// * `( table_id, user_id )` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
-    ///
     pub fn delete_by_id(
-( table_id, user_id ): ( i32, i32 ),
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<usize, web_common::api::ApiError>{
-        if !Self::can_admin_by_id(( table_id, user_id ), author_user_id, connection)? {
+        (table_id, user_id): (i32, i32),
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<usize, web_common::api::ApiError> {
+        if !Self::can_admin_by_id((table_id, user_id), author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
         }
-        diesel::delete(users_users_role_invitations::dsl::users_users_role_invitations
-            .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
-            .filter(users_users_role_invitations::dsl::user_id.eq(user_id))
-        ).execute(connection).map_err(web_common::api::ApiError::from)
+        diesel::delete(
+            users_users_role_invitations::dsl::users_users_role_invitations
+                .filter(users_users_role_invitations::dsl::table_id.eq(table_id))
+                .filter(users_users_role_invitations::dsl::user_id.eq(user_id)),
+        )
+        .execute(connection)
+        .map_err(web_common::api::ApiError::from)
     }
 }

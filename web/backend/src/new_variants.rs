@@ -2,13 +2,13 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
-use diesel::prelude::*;
 use crate::models::*;
 use crate::schema::*;
-use diesel::r2d2::PooledConnection;
-use diesel::r2d2::ConnectionManager;
-use uuid::Uuid;
 use chrono::NaiveDateTime;
+use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::PooledConnection;
+use uuid::Uuid;
 /// Trait providing the insert method for the new variants.
 pub(super) trait InsertRow {
     /// The intermediate representation of the row.
@@ -24,7 +24,7 @@ pub(super) trait InsertRow {
     fn insert(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error>;
 }
 
@@ -53,8 +53,8 @@ impl InsertRow for web_common::database::NewDerivedSample {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::derived_samples;
         diesel::insert_into(derived_samples::dsl::derived_samples)
@@ -90,8 +90,8 @@ impl InsertRow for web_common::database::NewNameplate {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::nameplates;
         diesel::insert_into(nameplates::dsl::nameplates)
@@ -135,8 +135,8 @@ impl InsertRow for web_common::database::NewObservation {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::observations;
         diesel::insert_into(observations::dsl::observations)
@@ -168,8 +168,8 @@ impl InsertRow for web_common::database::NewOrganismBioOttTaxonItem {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::organism_bio_ott_taxon_items;
         diesel::insert_into(organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items)
@@ -213,8 +213,8 @@ impl InsertRow for web_common::database::NewOrganism {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::organisms;
         diesel::insert_into(organisms::dsl::organisms)
@@ -266,8 +266,8 @@ impl InsertRow for web_common::database::NewProject {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::projects;
         diesel::insert_into(projects::dsl::projects)
@@ -301,8 +301,8 @@ impl InsertRow for web_common::database::NewProjectsTeamsRoleInvitation {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::projects_teams_role_invitations;
         diesel::insert_into(projects_teams_role_invitations::dsl::projects_teams_role_invitations)
@@ -336,8 +336,8 @@ impl InsertRow for web_common::database::NewProjectsTeamsRoleRequest {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::projects_teams_role_requests;
         diesel::insert_into(projects_teams_role_requests::dsl::projects_teams_role_requests)
@@ -371,8 +371,8 @@ impl InsertRow for web_common::database::NewProjectsTeamsRole {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::projects_teams_roles;
         diesel::insert_into(projects_teams_roles::dsl::projects_teams_roles)
@@ -406,8 +406,8 @@ impl InsertRow for web_common::database::NewProjectsUsersRoleInvitation {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::projects_users_role_invitations;
         diesel::insert_into(projects_users_role_invitations::dsl::projects_users_role_invitations)
@@ -441,8 +441,8 @@ impl InsertRow for web_common::database::NewProjectsUsersRoleRequest {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::projects_users_role_requests;
         diesel::insert_into(projects_users_role_requests::dsl::projects_users_role_requests)
@@ -476,8 +476,8 @@ impl InsertRow for web_common::database::NewProjectsUsersRole {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::projects_users_roles;
         diesel::insert_into(projects_users_roles::dsl::projects_users_roles)
@@ -509,8 +509,8 @@ impl InsertRow for web_common::database::NewSampleBioOttTaxonItem {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::sample_bio_ott_taxon_items;
         diesel::insert_into(sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items)
@@ -546,8 +546,8 @@ impl InsertRow for web_common::database::NewSampleContainer {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::sample_containers;
         diesel::insert_into(sample_containers::dsl::sample_containers)
@@ -589,8 +589,8 @@ impl InsertRow for web_common::database::NewSample {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::samples;
         diesel::insert_into(samples::dsl::samples)
@@ -624,8 +624,8 @@ impl InsertRow for web_common::database::NewSpectra {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::spectra;
         diesel::insert_into(spectra::dsl::spectra)
@@ -659,8 +659,8 @@ impl InsertRow for web_common::database::NewSpectraCollection {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::spectra_collections;
         diesel::insert_into(spectra_collections::dsl::spectra_collections)
@@ -702,8 +702,8 @@ impl InsertRow for web_common::database::NewTeam {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::teams;
         diesel::insert_into(teams::dsl::teams)
@@ -737,8 +737,8 @@ impl InsertRow for web_common::database::NewTeamsTeamsRoleInvitation {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::teams_teams_role_invitations;
         diesel::insert_into(teams_teams_role_invitations::dsl::teams_teams_role_invitations)
@@ -772,8 +772,8 @@ impl InsertRow for web_common::database::NewTeamsUsersRoleInvitation {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::teams_users_role_invitations;
         diesel::insert_into(teams_users_role_invitations::dsl::teams_users_role_invitations)
@@ -807,8 +807,8 @@ impl InsertRow for web_common::database::NewTeamsUsersRoleRequest {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::teams_users_role_requests;
         diesel::insert_into(teams_users_role_requests::dsl::teams_users_role_requests)
@@ -842,8 +842,8 @@ impl InsertRow for web_common::database::NewTeamsUsersRole {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::teams_users_roles;
         diesel::insert_into(teams_users_roles::dsl::teams_users_roles)
@@ -877,8 +877,8 @@ impl InsertRow for web_common::database::NewUserEmail {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::user_emails;
         diesel::insert_into(user_emails::dsl::user_emails)
@@ -914,8 +914,8 @@ impl InsertRow for web_common::database::NewUser {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::users;
         assert_eq!(user_id, 0);
@@ -950,8 +950,8 @@ impl InsertRow for web_common::database::NewUsersUsersRoleInvitation {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::users_users_role_invitations;
         diesel::insert_into(users_users_role_invitations::dsl::users_users_role_invitations)
@@ -985,8 +985,8 @@ impl InsertRow for web_common::database::NewUsersUsersRoleRequest {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::users_users_role_requests;
         diesel::insert_into(users_users_role_requests::dsl::users_users_role_requests)
@@ -1020,8 +1020,8 @@ impl InsertRow for web_common::database::NewUsersUsersRole {
 
     fn insert(
         self,
-       user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>
+        user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Self::Flat, diesel::result::Error> {
         use crate::schema::users_users_roles;
         diesel::insert_into(users_users_roles::dsl::users_users_roles)
@@ -1029,4 +1029,3 @@ impl InsertRow for web_common::database::NewUsersUsersRole {
             .get_result(connection)
     }
 }
-

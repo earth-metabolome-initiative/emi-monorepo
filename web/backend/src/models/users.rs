@@ -6,23 +6,37 @@
 //! If you need to make changes to the backend, please modify the `generate_models`
 //! document in the `migrations` folder.
 
-use diesel::Queryable;
-use diesel::QueryableByName;
-use diesel::Identifiable;
-use diesel::Insertable;
 use crate::schema::*;
 use crate::sql_function_bindings::*;
+use chrono::NaiveDateTime;
+use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::PooledConnection;
+use diesel::Identifiable;
+use diesel::Insertable;
+use diesel::Queryable;
+use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
-use diesel::prelude::*;
-use web_common::database::filter_structs::*;
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use web_common::database::filter_structs::*;
 
-#[derive(Queryable, Debug, Identifiable, Eq, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Insertable, Selectable, AsChangeset)]
+#[derive(
+    Queryable,
+    Debug,
+    Identifiable,
+    Eq,
+    PartialEq,
+    Clone,
+    Serialize,
+    Deserialize,
+    Default,
+    QueryableByName,
+    Insertable,
+    Selectable,
+    AsChangeset,
+)]
 #[diesel(table_name = users)]
 #[diesel(primary_key(id))]
 pub struct User {
@@ -68,64 +82,61 @@ impl From<web_common::database::tables::User> for User {
 
 impl User {
     /// Check whether the user can view the struct.
-    pub fn can_view(
-        &self,
-) -> Result<bool, web_common::api::ApiError>{
+    pub fn can_view(&self) -> Result<bool, web_common::api::ApiError> {
         Ok(true)
-}
+    }
     /// Check whether the user can view the struct associated to the provided ids.
-    pub fn can_view_by_id(
-) -> Result<bool, web_common::api::ApiError>{
+    pub fn can_view_by_id() -> Result<bool, web_common::api::ApiError> {
         Ok(true)
-}
+    }
     /// Get all of the viewable structs from the database.
     ///
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_viewable(
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted viewable structs from the database.
     ///
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_viewable_sorted(
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
             .order_by(users::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
     /// * `connection` - The connection to the database.
-    ///
     pub fn get(
-id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Self, web_common::api::ApiError>{
+        id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
             .filter(users::dsl::id.eq(id))
-            .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .first::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
@@ -133,13 +144,12 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn similarity_search_viewable(
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -148,27 +158,39 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(
-similarity_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
-            .order(
-similarity_dist(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
+            .filter(similarity_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn word_similarity_search_viewable(
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -177,27 +199,39 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(
-word_similarity_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
-            .order(
-word_similarity_dist_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
+            .filter(word_similarity_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn strict_word_similarity_search_viewable(
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -206,63 +240,71 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(
-strict_word_similarity_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
-            .order(
-strict_word_similarity_dist_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
+            .filter(strict_word_similarity_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_update(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_update_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(self.id, author_user_id, connection)
     }
     /// Check whether the user can update the struct associated to the provided ids.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_update_by_id(
-id: i32,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_update_users(author_user_id, id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_update_users(author_user_id, id))
+            .get_result(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the updatable structs from the database.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_updatable(
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
             .filter(can_update_users(author_user_id, users::dsl::id))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted updatable structs from the database.
     ///
@@ -270,20 +312,20 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_updatable_sorted(
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
             .filter(can_update_users(author_user_id, users::dsl::id))
             .order_by(users::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Search for the updatable structs by a given string by Postgres's `similarity`.
     ///
@@ -292,14 +334,13 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn similarity_search_updatable(
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -309,14 +350,27 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::users;
         users::dsl::users
             .filter(can_update_users(author_user_id, users::dsl::id))
-            .filter(
-similarity_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
-            .order(
-similarity_dist(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
+            .filter(similarity_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -324,14 +378,13 @@ similarity_dist(concat_users_name(users::dsl::first_name, users::dsl::middle_nam
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn word_similarity_search_updatable(
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -341,14 +394,27 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::users;
         users::dsl::users
             .filter(can_update_users(author_user_id, users::dsl::id))
-            .filter(
-word_similarity_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
-            .order(
-word_similarity_dist_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
+            .filter(word_similarity_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -356,14 +422,13 @@ word_similarity_dist_op(concat_users_name(users::dsl::first_name, users::dsl::mi
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn strict_word_similarity_search_updatable(
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -373,63 +438,71 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::users;
         users::dsl::users
             .filter(can_update_users(author_user_id, users::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
-            .order(
-strict_word_similarity_dist_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
+            .filter(strict_word_similarity_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_admin(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_admin_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_admin_by_id(self.id, author_user_id, connection)
     }
     /// Check whether the user can admin the struct associated to the provided ids.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_admin_by_id(
-id: i32,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_admin_users(author_user_id, id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_admin_users(author_user_id, id))
+            .get_result(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the administrable structs from the database.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_administrable(
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
             .filter(can_admin_users(author_user_id, users::dsl::id))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted administrable structs from the database.
     ///
@@ -437,20 +510,20 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_administrable_sorted(
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
             .filter(can_admin_users(author_user_id, users::dsl::id))
             .order_by(users::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Search for the administrable structs by a given string by Postgres's `similarity`.
     ///
@@ -459,14 +532,13 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn similarity_search_administrable(
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -476,14 +548,27 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::users;
         users::dsl::users
             .filter(can_admin_users(author_user_id, users::dsl::id))
-            .filter(
-similarity_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
-            .order(
-similarity_dist(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
+            .filter(similarity_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -491,14 +576,13 @@ similarity_dist(concat_users_name(users::dsl::first_name, users::dsl::middle_nam
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn word_similarity_search_administrable(
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -508,14 +592,27 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::users;
         users::dsl::users
             .filter(can_admin_users(author_user_id, users::dsl::id))
-            .filter(
-word_similarity_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
-            .order(
-word_similarity_dist_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
+            .filter(word_similarity_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `author_user_id` - The ID of the user who is performing the search.
@@ -523,14 +620,13 @@ word_similarity_dist_op(concat_users_name(users::dsl::first_name, users::dsl::mi
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn strict_word_similarity_search_administrable(
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -540,42 +636,53 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
         use crate::schema::users;
         users::dsl::users
             .filter(can_admin_users(author_user_id, users::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
-            .order(
-strict_word_similarity_dist_op(concat_users_name(users::dsl::first_name, users::dsl::middle_name, users::dsl::last_name), query))
+            .filter(strict_word_similarity_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_users_name(
+                    users::dsl::first_name,
+                    users::dsl::middle_name,
+                    users::dsl::last_name,
+                ),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
-    ///
     pub fn delete(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<usize, web_common::api::ApiError>{
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<usize, web_common::api::ApiError> {
         Self::delete_by_id(self.id, author_user_id, connection)
-}
+    }
     /// Delete the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
-    ///
     pub fn delete_by_id(
-id: i32,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<usize, web_common::api::ApiError>{
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<usize, web_common::api::ApiError> {
         if !Self::can_admin_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
         }
-        diesel::delete(users::dsl::users
-            .filter(users::dsl::id.eq(id))
-        ).execute(connection).map_err(web_common::api::ApiError::from)
+        diesel::delete(users::dsl::users.filter(users::dsl::id.eq(id)))
+            .execute(connection)
+            .map_err(web_common::api::ApiError::from)
     }
 }

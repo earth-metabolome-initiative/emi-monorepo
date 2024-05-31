@@ -33,18 +33,42 @@ pub enum AppRoute {
     NameplatesNewWithProject { project_id: i32 },
     #[at("/nameplates/:id/update")]
     NameplatesUpdate { id: i32 },
+    #[at("/observation_subjects")]
+    ObservationSubjects,
+    #[at("/observation_subjects/:id")]
+    ObservationSubjectsView { id: i32 },
     #[at("/observations")]
     Observations,
     #[at("/observations/:id")]
     ObservationsView { id: Uuid },
     #[at("/observations/new")]
     ObservationsNew,
+    #[at("/observations/new/parent_observation/:parent_observation_id")]
+    ObservationsNewWithParentObservation { parent_observation_id: Uuid },
     #[at("/observations/new/project/:project_id")]
     ObservationsNewWithProject { project_id: i32 },
-    #[at("/observations/new/individual/:individual_id")]
-    ObservationsNewWithIndividual { individual_id: Uuid },
+    #[at("/observations/new/organism/:organism_id")]
+    ObservationsNewWithOrganism { organism_id: Uuid },
+    #[at("/observations/new/sample/:sample_id")]
+    ObservationsNewWithSample { sample_id: Uuid },
     #[at("/observations/:id/update")]
     ObservationsUpdate { id: Uuid },
+    #[at("/organisms")]
+    Organisms,
+    #[at("/organisms/:id")]
+    OrganismsView { id: Uuid },
+    #[at("/organisms/new")]
+    OrganismsNew,
+    #[at("/organisms/new/host_organism/:host_organism_id")]
+    OrganismsNewWithHostOrganism { host_organism_id: Uuid },
+    #[at("/organisms/new/sample/:sample_id")]
+    OrganismsNewWithSample { sample_id: Uuid },
+    #[at("/organisms/new/nameplate/:nameplate_id")]
+    OrganismsNewWithNameplate { nameplate_id: i32 },
+    #[at("/organisms/new/project/:project_id")]
+    OrganismsNewWithProject { project_id: i32 },
+    #[at("/organisms/:id/update")]
+    OrganismsUpdate { id: Uuid },
     #[at("/organizations")]
     Organizations,
     #[at("/organizations/:id")]
@@ -73,18 +97,6 @@ pub enum AppRoute {
     SampleStates,
     #[at("/sample_states/:id")]
     SampleStatesView { id: i32 },
-    #[at("/sampled_individuals")]
-    SampledIndividuals,
-    #[at("/sampled_individuals/:id")]
-    SampledIndividualsView { id: Uuid },
-    #[at("/sampled_individuals/new")]
-    SampledIndividualsNew,
-    #[at("/sampled_individuals/new/nameplate/:nameplate_id")]
-    SampledIndividualsNewWithNameplate { nameplate_id: i32 },
-    #[at("/sampled_individuals/new/project/:project_id")]
-    SampledIndividualsNewWithProject { project_id: i32 },
-    #[at("/sampled_individuals/:id/update")]
-    SampledIndividualsUpdate { id: Uuid },
     #[at("/samples")]
     Samples,
     #[at("/samples/:id")]
@@ -173,6 +185,12 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::NameplatesUpdate { id } => {
             html! { <UpdateNameplateForm id={id} /> }
         }
+        AppRoute::ObservationSubjects => {
+            html! { <BasicList<NestedObservationSubject> /> }
+        }
+        AppRoute::ObservationSubjectsView { id } => {
+            html! { <ObservationSubjectPage id = {id} /> }
+        }
         AppRoute::Observations => {
             html! { <BasicList<NestedObservation> /> }
         }
@@ -182,14 +200,46 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::ObservationsNew => {
             html! { <CreateObservationForm /> }
         }
+        AppRoute::ObservationsNewWithParentObservation {
+            parent_observation_id,
+        } => {
+            html! { <CreateObservationForm parent_observation_id={parent_observation_id} /> }
+        }
         AppRoute::ObservationsNewWithProject { project_id } => {
             html! { <CreateObservationForm project_id={project_id} /> }
         }
-        AppRoute::ObservationsNewWithIndividual { individual_id } => {
-            html! { <CreateObservationForm individual_id={individual_id} /> }
+        AppRoute::ObservationsNewWithOrganism { organism_id } => {
+            html! { <CreateObservationForm organism_id={organism_id} /> }
+        }
+        AppRoute::ObservationsNewWithSample { sample_id } => {
+            html! { <CreateObservationForm sample_id={sample_id} /> }
         }
         AppRoute::ObservationsUpdate { id } => {
             html! { <UpdateObservationForm id={id} /> }
+        }
+        AppRoute::Organisms => {
+            html! { <BasicList<NestedOrganism> /> }
+        }
+        AppRoute::OrganismsView { id } => {
+            html! { <OrganismPage id = {id} /> }
+        }
+        AppRoute::OrganismsNew => {
+            html! { <CreateOrganismForm /> }
+        }
+        AppRoute::OrganismsNewWithHostOrganism { host_organism_id } => {
+            html! { <CreateOrganismForm host_organism_id={host_organism_id} /> }
+        }
+        AppRoute::OrganismsNewWithSample { sample_id } => {
+            html! { <CreateOrganismForm sample_id={sample_id} /> }
+        }
+        AppRoute::OrganismsNewWithNameplate { nameplate_id } => {
+            html! { <CreateOrganismForm nameplate_id={nameplate_id} /> }
+        }
+        AppRoute::OrganismsNewWithProject { project_id } => {
+            html! { <CreateOrganismForm project_id={project_id} /> }
+        }
+        AppRoute::OrganismsUpdate { id } => {
+            html! { <UpdateOrganismForm id={id} /> }
         }
         AppRoute::Organizations => {
             html! { <BasicList<NestedOrganization> /> }
@@ -232,24 +282,6 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::SampleStatesView { id } => {
             html! { <SampleStatePage id = {id} /> }
-        }
-        AppRoute::SampledIndividuals => {
-            html! { <BasicList<NestedSampledIndividual> /> }
-        }
-        AppRoute::SampledIndividualsView { id } => {
-            html! { <SampledIndividualPage id = {id} /> }
-        }
-        AppRoute::SampledIndividualsNew => {
-            html! { <CreateSampledIndividualForm /> }
-        }
-        AppRoute::SampledIndividualsNewWithNameplate { nameplate_id } => {
-            html! { <CreateSampledIndividualForm nameplate_id={nameplate_id} /> }
-        }
-        AppRoute::SampledIndividualsNewWithProject { project_id } => {
-            html! { <CreateSampledIndividualForm project_id={project_id} /> }
-        }
-        AppRoute::SampledIndividualsUpdate { id } => {
-            html! { <UpdateSampledIndividualForm id={id} /> }
         }
         AppRoute::Samples => {
             html! { <BasicList<NestedSample> /> }

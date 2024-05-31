@@ -2639,4 +2639,3 @@ diesel::expression::functions::sql_function! {
         this_observations_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
-

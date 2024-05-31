@@ -6,23 +6,37 @@
 //! If you need to make changes to the backend, please modify the `generate_models`
 //! document in the `migrations` folder.
 
-use diesel::Queryable;
-use diesel::QueryableByName;
-use diesel::Identifiable;
-use diesel::Insertable;
 use crate::schema::*;
 use crate::sql_function_bindings::*;
+use chrono::NaiveDateTime;
+use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::PooledConnection;
+use diesel::Identifiable;
+use diesel::Insertable;
+use diesel::Queryable;
+use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
-use diesel::prelude::*;
-use web_common::database::filter_structs::*;
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use web_common::database::filter_structs::*;
 
-#[derive(Queryable, Debug, Identifiable, PartialEq, Clone, Serialize, Deserialize, Default, QueryableByName, Associations, Insertable, Selectable, AsChangeset)]
+#[derive(
+    Queryable,
+    Debug,
+    Identifiable,
+    PartialEq,
+    Clone,
+    Serialize,
+    Deserialize,
+    Default,
+    QueryableByName,
+    Associations,
+    Insertable,
+    Selectable,
+    AsChangeset,
+)]
 #[diesel(table_name = projects)]
 #[diesel(belongs_to(crate::models::project_states::ProjectState, foreign_key = state_id))]
 #[diesel(belongs_to(crate::models::font_awesome_icons::FontAwesomeIcon, foreign_key = icon_id))]
@@ -100,32 +114,27 @@ impl Project {
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_view(
         &self,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_view_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_view_by_id(self.id, author_user_id, connection)
     }
     /// Check whether the user can view the struct associated to the provided ids.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_view_by_id(
-id: i32,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_view_projects(author_user_id, id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        id: i32,
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_view_projects(author_user_id, id))
+            .get_result(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the viewable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -133,17 +142,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_viewable(
-filter: Option<&ProjectFilter>,
-author_user_id: Option<i32>,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects
-            .into_boxed();
+        let mut query = projects::dsl::projects.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -166,7 +173,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(can_view_projects(author_user_id, projects::dsl::id))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted viewable structs from the database.
     ///
@@ -175,17 +183,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_viewable_sorted(
-filter: Option<&ProjectFilter>,
-author_user_id: Option<i32>,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: Option<i32>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects
-            .into_boxed();
+        let mut query = projects::dsl::projects.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -209,38 +215,38 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .order_by(projects::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to get.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `connection` - The connection to the database.
-    ///
     pub fn get(
-id: i32,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Self, web_common::api::ApiError>{
+        id: i32,
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
         if !Self::can_view_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
         }
         use crate::schema::projects;
         projects::dsl::projects
             .filter(projects::dsl::id.eq(id))
-            .first::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .first::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get the struct from the database by its name.
     ///
     /// * `name` - The name of the struct to get.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `connection` - The connection to the database.
-    ///
     pub fn from_name(
-name: &str,
-author_user_id: Option<i32>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Self, web_common::api::ApiError>{
+        name: &str,
+        author_user_id: Option<i32>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::projects;
         let flat_variant = projects::dsl::projects
             .filter(projects::dsl::name.eq(name))
@@ -258,15 +264,14 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn similarity_search_viewable(
-filter: Option<&ProjectFilter>,
-author_user_id: Option<i32>,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: Option<i32>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -274,85 +279,164 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
- if filter.map(|f| f.state_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(state_id) = filter.and_then(|f| f.state_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::state_id.eq(state_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(color_id) = filter.and_then(|f| f.color_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::created_by.eq(created_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::updated_by.eq(updated_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.state_id.is_some()
+                    && f.icon_id.is_some()
+                    && f.color_id.is_some()
+                    && f.created_by.is_some()
+                    && f.updated_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::state_id.eq(state_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::icon_id.eq(icon_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::color_id.eq(color_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::created_by.eq(created_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::updated_by.eq(updated_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
+            .filter(similarity_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -361,15 +445,14 @@ similarity_dist(concat_projects_name_description(projects::dsl::name, projects::
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn word_similarity_search_viewable(
-filter: Option<&ProjectFilter>,
-author_user_id: Option<i32>,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: Option<i32>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -377,85 +460,164 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
- if filter.map(|f| f.state_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(state_id) = filter.and_then(|f| f.state_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::state_id.eq(state_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(color_id) = filter.and_then(|f| f.color_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::created_by.eq(created_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::updated_by.eq(updated_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.state_id.is_some()
+                    && f.icon_id.is_some()
+                    && f.color_id.is_some()
+                    && f.created_by.is_some()
+                    && f.updated_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::state_id.eq(state_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::icon_id.eq(icon_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::color_id.eq(color_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::created_by.eq(created_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::updated_by.eq(updated_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
+            .filter(word_similarity_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -464,15 +626,14 @@ word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, pr
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn strict_word_similarity_search_viewable(
-filter: Option<&ProjectFilter>,
-author_user_id: Option<i32>,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: Option<i32>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -480,115 +641,189 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
- if filter.map(|f| f.state_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(state_id) = filter.and_then(|f| f.state_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::state_id.eq(state_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(color_id) = filter.and_then(|f| f.color_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::created_by.eq(created_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::updated_by.eq(updated_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.state_id.is_some()
+                    && f.icon_id.is_some()
+                    && f.color_id.is_some()
+                    && f.created_by.is_some()
+                    && f.updated_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::state_id.eq(state_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::icon_id.eq(icon_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::color_id.eq(color_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::created_by.eq(created_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::updated_by.eq(updated_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_view_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
+            .filter(strict_word_similarity_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_update(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_update_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_update_by_id(self.id, author_user_id, connection)
     }
     /// Check whether the user can update the struct associated to the provided ids.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_update_by_id(
-id: i32,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_update_projects(author_user_id, id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_update_projects(author_user_id, id))
+            .get_result(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the updatable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -596,17 +831,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_updatable(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects
-            .into_boxed();
+        let mut query = projects::dsl::projects.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -629,7 +862,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(can_update_projects(author_user_id, projects::dsl::id))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted updatable structs from the database.
     ///
@@ -638,17 +872,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_updatable_sorted(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects
-            .into_boxed();
+        let mut query = projects::dsl::projects.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -672,7 +904,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .order_by(projects::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Search for the updatable structs by a given string by Postgres's `similarity`.
     ///
@@ -682,15 +915,14 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn similarity_search_updatable(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -698,85 +930,164 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
- if filter.map(|f| f.state_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(state_id) = filter.and_then(|f| f.state_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::state_id.eq(state_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(color_id) = filter.and_then(|f| f.color_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::created_by.eq(created_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::updated_by.eq(updated_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.state_id.is_some()
+                    && f.icon_id.is_some()
+                    && f.color_id.is_some()
+                    && f.created_by.is_some()
+                    && f.updated_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::state_id.eq(state_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::icon_id.eq(icon_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::color_id.eq(color_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::created_by.eq(created_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::updated_by.eq(updated_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
+            .filter(similarity_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -785,15 +1096,14 @@ similarity_dist(concat_projects_name_description(projects::dsl::name, projects::
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn word_similarity_search_updatable(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -801,85 +1111,164 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
- if filter.map(|f| f.state_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(state_id) = filter.and_then(|f| f.state_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::state_id.eq(state_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(color_id) = filter.and_then(|f| f.color_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::created_by.eq(created_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::updated_by.eq(updated_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.state_id.is_some()
+                    && f.icon_id.is_some()
+                    && f.color_id.is_some()
+                    && f.created_by.is_some()
+                    && f.updated_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::state_id.eq(state_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::icon_id.eq(icon_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::color_id.eq(color_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::created_by.eq(created_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::updated_by.eq(updated_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
+            .filter(word_similarity_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -888,15 +1277,14 @@ word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, pr
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn strict_word_similarity_search_updatable(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -904,115 +1292,189 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
- if filter.map(|f| f.state_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(state_id) = filter.and_then(|f| f.state_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::state_id.eq(state_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(color_id) = filter.and_then(|f| f.color_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::created_by.eq(created_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::updated_by.eq(updated_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.state_id.is_some()
+                    && f.icon_id.is_some()
+                    && f.color_id.is_some()
+                    && f.created_by.is_some()
+                    && f.updated_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::state_id.eq(state_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::icon_id.eq(icon_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::color_id.eq(color_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::created_by.eq(created_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::updated_by.eq(updated_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_update_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
+            .filter(strict_word_similarity_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_admin(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError> {
-        Self::can_admin_by_id(
-            self.id,
-            author_user_id,
-            connection,
-        )
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Self::can_admin_by_id(self.id, author_user_id, connection)
     }
     /// Check whether the user can admin the struct associated to the provided ids.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    ///
     pub fn can_admin_by_id(
-id: i32,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>{
-       diesel::select(can_admin_projects(author_user_id, id))
-            .get_result(connection).map_err(web_common::api::ApiError::from)
-}
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<bool, web_common::api::ApiError> {
+        diesel::select(can_admin_projects(author_user_id, id))
+            .get_result(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Get all of the administrable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1020,17 +1482,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_administrable(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects
-            .into_boxed();
+        let mut query = projects::dsl::projects.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -1053,7 +1513,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .filter(can_admin_projects(author_user_id, projects::dsl::id))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the sorted administrable structs from the database.
     ///
@@ -1062,17 +1523,15 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn all_administrable_sorted(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects
-            .into_boxed();
+        let mut query = projects::dsl::projects.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -1096,7 +1555,8 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             .order_by(projects::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
     }
     /// Search for the administrable structs by a given string by Postgres's `similarity`.
     ///
@@ -1106,15 +1566,14 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn similarity_search_administrable(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -1122,85 +1581,164 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
- if filter.map(|f| f.state_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(state_id) = filter.and_then(|f| f.state_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::state_id.eq(state_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(color_id) = filter.and_then(|f| f.color_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::created_by.eq(created_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::updated_by.eq(updated_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.state_id.is_some()
+                    && f.icon_id.is_some()
+                    && f.color_id.is_some()
+                    && f.created_by.is_some()
+                    && f.updated_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::state_id.eq(state_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::icon_id.eq(icon_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::color_id.eq(color_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::created_by.eq(created_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::updated_by.eq(updated_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-similarity_dist(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
+            .filter(similarity_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1209,15 +1747,14 @@ similarity_dist(concat_projects_name_description(projects::dsl::name, projects::
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn word_similarity_search_administrable(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -1225,85 +1762,164 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
- if filter.map(|f| f.state_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(state_id) = filter.and_then(|f| f.state_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::state_id.eq(state_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(color_id) = filter.and_then(|f| f.color_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::created_by.eq(created_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::updated_by.eq(updated_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.state_id.is_some()
+                    && f.icon_id.is_some()
+                    && f.color_id.is_some()
+                    && f.created_by.is_some()
+                    && f.updated_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::state_id.eq(state_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::icon_id.eq(icon_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::color_id.eq(color_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::created_by.eq(created_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::updated_by.eq(updated_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
+            .filter(word_similarity_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1312,15 +1928,14 @@ word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, pr
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
-    ///
     pub fn strict_word_similarity_search_administrable(
-filter: Option<&ProjectFilter>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
+        filter: Option<&ProjectFilter>,
+        author_user_id: i32,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
         // search.
@@ -1328,113 +1943,190 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
- if filter.map(|f| f.state_id.is_some()&&f.icon_id.is_some()&&f.color_id.is_some()&&f.created_by.is_some()&&f.updated_by.is_some()).unwrap_or(false) {
-       unimplemented!();
- }
-if let Some(state_id) = filter.and_then(|f| f.state_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::state_id.eq(state_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::icon_id.eq(icon_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(color_id) = filter.and_then(|f| f.color_id) {
-        return projects::dsl::projects
-            .filter(projects::dsl::color_id.eq(color_id))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(created_by) = filter.and_then(|f| f.created_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::created_by.eq(created_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
-if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-        return projects::dsl::projects
-            .filter(projects::dsl::updated_by.eq(updated_by))
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from);
-}
+        if filter
+            .map(|f| {
+                f.state_id.is_some()
+                    && f.icon_id.is_some()
+                    && f.color_id.is_some()
+                    && f.created_by.is_some()
+                    && f.updated_by.is_some()
+            })
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::state_id.eq(state_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::icon_id.eq(icon_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return projects::dsl::projects
+                .filter(projects::dsl::color_id.eq(color_id))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::created_by.eq(created_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            return projects::dsl::projects
+                .filter(projects::dsl::updated_by.eq(updated_by))
+                .filter(
+                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
+                )
+                .filter(can_admin_projects(author_user_id, projects::dsl::id))
+                .filter(strict_word_similarity_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(
-strict_word_similarity_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
-            .order(
-strict_word_similarity_dist_op(concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
+            .filter(strict_word_similarity_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<Self>(connection).map_err(web_common::api::ApiError::from)
-}
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
     /// Delete the struct from the database.
     ///
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
-    ///
     pub fn delete(
         &self,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<usize, web_common::api::ApiError>{
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<usize, web_common::api::ApiError> {
         Self::delete_by_id(self.id, author_user_id, connection)
-}
+    }
     /// Delete the struct from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to delete.
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
-    ///
     pub fn delete_by_id(
-id: i32,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<usize, web_common::api::ApiError>{
+        id: i32,
+        author_user_id: i32,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<usize, web_common::api::ApiError> {
         if !Self::can_admin_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
         }
-        diesel::delete(projects::dsl::projects
-            .filter(projects::dsl::id.eq(id))
-        ).execute(connection).map_err(web_common::api::ApiError::from)
+        diesel::delete(projects::dsl::projects.filter(projects::dsl::id.eq(id)))
+            .execute(connection)
+            .map_err(web_common::api::ApiError::from)
     }
 }

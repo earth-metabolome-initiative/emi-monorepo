@@ -58,11 +58,25 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <span>{NestedNameplate::section()}</span>
                         </Link<AppRoute>>
                     </li>
+                    <li class={if route == AppRoute::ObservationSubjects { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::ObservationSubjects}>
+                            <i class={format!("fas fa-{}", NestedObservationSubject::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedObservationSubject::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
                     <li class={if route == AppRoute::Observations { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Observations}>
                             <i class={format!("fas fa-{}", NestedObservation::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedObservation::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    <li class={if route == AppRoute::Organisms { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::Organisms}>
+                            <i class={format!("fas fa-{}", NestedOrganism::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedOrganism::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::Organizations { "active" } else { "" }}>
@@ -91,13 +105,6 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <i class={format!("fas fa-{}", NestedSampleState::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedSampleState::section()}</span>
-                        </Link<AppRoute>>
-                    </li>
-                    <li class={if route == AppRoute::SampledIndividuals { "active" } else { "" }}>
-                        <Link<AppRoute> to={AppRoute::SampledIndividuals}>
-                            <i class={format!("fas fa-{}", NestedSampledIndividual::icon())}></i>
-                             {'\u{00a0}'}
-                            <span>{NestedSampledIndividual::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     <li class={if route == AppRoute::Samples { "active" } else { "" }}>

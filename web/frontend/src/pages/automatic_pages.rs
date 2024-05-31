@@ -89,10 +89,8 @@ impl BioOttTaxonItemPageProp {
         filter.taxon_id = Some(self.id);
         filter
     }
-    fn filter_sampled_individual_bio_ott_taxon_items_by_taxon_id(
-        &self,
-    ) -> SampledIndividualBioOttTaxonItemFilter {
-        let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
+    fn filter_organism_bio_ott_taxon_items_by_taxon_id(&self) -> OrganismBioOttTaxonItemFilter {
+        let mut filter = OrganismBioOttTaxonItemFilter::default();
         filter.taxon_id = Some(self.id);
         filter
     }
@@ -163,8 +161,8 @@ impl From<&NameplatePageProp> for PrimaryKey {
 }
 
 impl NameplatePageProp {
-    fn filter_sampled_individuals_by_nameplate_id(&self) -> SampledIndividualFilter {
-        let mut filter = SampledIndividualFilter::default();
+    fn filter_organisms_by_nameplate_id(&self) -> OrganismFilter {
+        let mut filter = OrganismFilter::default();
         filter.nameplate_id = Some(self.id);
         filter
     }
@@ -174,9 +172,31 @@ impl NameplatePageProp {
 pub fn nameplate_page(props: &NameplatePageProp) -> Html {
     html! {
         <BasicPage<NestedNameplate> id={PrimaryKey::from(props)}>
-            // Linked with foreign key sampled_individuals.nameplate_id
-            <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_nameplate_id()}/>
+            // Linked with foreign key organisms.nameplate_id
+            <BasicList<NestedOrganism> filters={props.filter_organisms_by_nameplate_id()}/>
         </BasicPage<NestedNameplate>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct ObservationSubjectPageProp {
+    pub id: i32,
+}
+
+impl From<&ObservationSubjectPageProp> for PrimaryKey {
+    fn from(prop: &ObservationSubjectPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl ObservationSubjectPageProp {}
+
+#[function_component(ObservationSubjectPage)]
+pub fn observation_subject_page(props: &ObservationSubjectPageProp) -> Html {
+    html! {
+        <BasicPage<NestedObservationSubject> id={PrimaryKey::from(props)}>
+            <span>{"No content available yet."}</span>
+        </BasicPage<NestedObservationSubject>>
     }
 }
 
@@ -191,14 +211,62 @@ impl From<&ObservationPageProp> for PrimaryKey {
     }
 }
 
-impl ObservationPageProp {}
+impl ObservationPageProp {
+    fn filter_observations_by_parent_observation_id(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
+        filter.parent_observation_id = Some(self.id);
+        filter
+    }
+}
 
 #[function_component(ObservationPage)]
 pub fn observation_page(props: &ObservationPageProp) -> Html {
     html! {
         <BasicPage<NestedObservation> id={PrimaryKey::from(props)}>
-            <span>{"No content available yet."}</span>
+            // Linked with foreign key observations.parent_observation_id
+            <BasicList<NestedObservation> filters={props.filter_observations_by_parent_observation_id()}/>
         </BasicPage<NestedObservation>>
+    }
+}
+
+#[derive(Clone, PartialEq, Properties)]
+pub struct OrganismPageProp {
+    pub id: Uuid,
+}
+
+impl From<&OrganismPageProp> for PrimaryKey {
+    fn from(prop: &OrganismPageProp) -> Self {
+        prop.id.into()
+    }
+}
+
+impl OrganismPageProp {
+    fn filter_organisms_by_host_organism_id(&self) -> OrganismFilter {
+        let mut filter = OrganismFilter::default();
+        filter.host_organism_id = Some(self.id);
+        filter
+    }
+    fn filter_observations_by_organism_id(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
+        filter.organism_id = Some(self.id);
+        filter
+    }
+    fn filter_organism_bio_ott_taxon_items_by_organism_id(&self) -> OrganismBioOttTaxonItemFilter {
+        let mut filter = OrganismBioOttTaxonItemFilter::default();
+        filter.organism_id = Some(self.id);
+        filter
+    }
+}
+
+#[function_component(OrganismPage)]
+pub fn organism_page(props: &OrganismPageProp) -> Html {
+    html! {
+        <BasicPage<NestedOrganism> id={PrimaryKey::from(props)}>
+            // Linked with foreign key organisms.host_organism_id
+            <BasicList<NestedOrganism> filters={props.filter_organisms_by_host_organism_id()}/>
+            // Linked with foreign key observations.organism_id
+            <BasicList<NestedObservation> filters={props.filter_observations_by_organism_id()}/>
+        </BasicPage<NestedOrganism>>
     }
 }
 
@@ -256,8 +324,8 @@ impl ProjectPageProp {
         filter.project_id = Some(self.id);
         filter
     }
-    fn filter_sampled_individuals_by_project_id(&self) -> SampledIndividualFilter {
-        let mut filter = SampledIndividualFilter::default();
+    fn filter_organisms_by_project_id(&self) -> OrganismFilter {
+        let mut filter = OrganismFilter::default();
         filter.project_id = Some(self.id);
         filter
     }
@@ -280,8 +348,8 @@ pub fn project_page(props: &ProjectPageProp) -> Html {
             <BasicList<NestedSample> filters={props.filter_samples_by_project_id()}/>
             // Linked with foreign key nameplates.project_id
             <BasicList<NestedNameplate> filters={props.filter_nameplates_by_project_id()}/>
-            // Linked with foreign key sampled_individuals.project_id
-            <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_project_id()}/>
+            // Linked with foreign key organisms.project_id
+            <BasicList<NestedOrganism> filters={props.filter_organisms_by_project_id()}/>
             // Linked with foreign key observations.project_id
             <BasicList<NestedObservation> filters={props.filter_observations_by_project_id()}/>
         </BasicPage<NestedProject>>
@@ -347,42 +415,6 @@ pub fn sample_state_page(props: &SampleStatePageProp) -> Html {
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct SampledIndividualPageProp {
-    pub id: Uuid,
-}
-
-impl From<&SampledIndividualPageProp> for PrimaryKey {
-    fn from(prop: &SampledIndividualPageProp) -> Self {
-        prop.id.into()
-    }
-}
-
-impl SampledIndividualPageProp {
-    fn filter_observations_by_individual_id(&self) -> ObservationFilter {
-        let mut filter = ObservationFilter::default();
-        filter.individual_id = Some(self.id);
-        filter
-    }
-    fn filter_sampled_individual_bio_ott_taxon_items_by_sampled_individual_id(
-        &self,
-    ) -> SampledIndividualBioOttTaxonItemFilter {
-        let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
-        filter.sampled_individual_id = Some(self.id);
-        filter
-    }
-}
-
-#[function_component(SampledIndividualPage)]
-pub fn sampled_individual_page(props: &SampledIndividualPageProp) -> Html {
-    html! {
-        <BasicPage<NestedSampledIndividual> id={PrimaryKey::from(props)}>
-            // Linked with foreign key observations.individual_id
-            <BasicList<NestedObservation> filters={props.filter_observations_by_individual_id()}/>
-        </BasicPage<NestedSampledIndividual>>
-    }
-}
-
-#[derive(Clone, PartialEq, Properties)]
 pub struct SamplePageProp {
     pub id: Uuid,
 }
@@ -409,8 +441,18 @@ impl SamplePageProp {
         filter.child_sample_id = Some(self.id);
         filter
     }
+    fn filter_organisms_by_sample_id(&self) -> OrganismFilter {
+        let mut filter = OrganismFilter::default();
+        filter.sample_id = Some(self.id);
+        filter
+    }
     fn filter_sample_bio_ott_taxon_items_by_sample_id(&self) -> SampleBioOttTaxonItemFilter {
         let mut filter = SampleBioOttTaxonItemFilter::default();
+        filter.sample_id = Some(self.id);
+        filter
+    }
+    fn filter_observations_by_sample_id(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
         filter.sample_id = Some(self.id);
         filter
     }
@@ -422,6 +464,10 @@ pub fn sample_page(props: &SamplePageProp) -> Html {
         <BasicPage<NestedSample> id={PrimaryKey::from(props)}>
             // Linked with foreign key spectra_collections.sample_id
             <BasicList<NestedSpectraCollection> filters={props.filter_spectra_collections_by_sample_id()}/>
+            // Linked with foreign key organisms.sample_id
+            <BasicList<NestedOrganism> filters={props.filter_organisms_by_sample_id()}/>
+            // Linked with foreign key observations.sample_id
+            <BasicList<NestedObservation> filters={props.filter_observations_by_sample_id()}/>
         </BasicPage<NestedSample>>
     }
 }
@@ -548,6 +594,21 @@ impl UserPageProp {
         filter.updated_by = Some(self.id);
         filter
     }
+    fn filter_organism_bio_ott_taxon_items_by_created_by(&self) -> OrganismBioOttTaxonItemFilter {
+        let mut filter = OrganismBioOttTaxonItemFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_organisms_by_created_by(&self) -> OrganismFilter {
+        let mut filter = OrganismFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_organisms_by_updated_by(&self) -> OrganismFilter {
+        let mut filter = OrganismFilter::default();
+        filter.updated_by = Some(self.id);
+        filter
+    }
     fn filter_projects_by_created_by(&self) -> ProjectFilter {
         let mut filter = ProjectFilter::default();
         filter.created_by = Some(self.id);
@@ -570,23 +631,6 @@ impl UserPageProp {
     }
     fn filter_sample_containers_by_updated_by(&self) -> SampleContainerFilter {
         let mut filter = SampleContainerFilter::default();
-        filter.updated_by = Some(self.id);
-        filter
-    }
-    fn filter_sampled_individual_bio_ott_taxon_items_by_created_by(
-        &self,
-    ) -> SampledIndividualBioOttTaxonItemFilter {
-        let mut filter = SampledIndividualBioOttTaxonItemFilter::default();
-        filter.created_by = Some(self.id);
-        filter
-    }
-    fn filter_sampled_individuals_by_created_by(&self) -> SampledIndividualFilter {
-        let mut filter = SampledIndividualFilter::default();
-        filter.created_by = Some(self.id);
-        filter
-    }
-    fn filter_sampled_individuals_by_updated_by(&self) -> SampledIndividualFilter {
-        let mut filter = SampledIndividualFilter::default();
         filter.updated_by = Some(self.id);
         filter
     }
@@ -649,6 +693,10 @@ pub fn user_page(props: &UserPageProp) -> Html {
             <BasicList<NestedObservation> filters={props.filter_observations_by_created_by()}/>
             // Linked with foreign key observations.updated_by
             <BasicList<NestedObservation> filters={props.filter_observations_by_updated_by()}/>
+            // Linked with foreign key organisms.created_by
+            <BasicList<NestedOrganism> filters={props.filter_organisms_by_created_by()}/>
+            // Linked with foreign key organisms.updated_by
+            <BasicList<NestedOrganism> filters={props.filter_organisms_by_updated_by()}/>
             // Linked with foreign key projects.created_by
             <BasicList<NestedProject> filters={props.filter_projects_by_created_by()}/>
             // Linked with foreign key projects.updated_by
@@ -657,10 +705,6 @@ pub fn user_page(props: &UserPageProp) -> Html {
             <BasicList<NestedSampleContainer> filters={props.filter_sample_containers_by_created_by()}/>
             // Linked with foreign key sample_containers.updated_by
             <BasicList<NestedSampleContainer> filters={props.filter_sample_containers_by_updated_by()}/>
-            // Linked with foreign key sampled_individuals.created_by
-            <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_created_by()}/>
-            // Linked with foreign key sampled_individuals.updated_by
-            <BasicList<NestedSampledIndividual> filters={props.filter_sampled_individuals_by_updated_by()}/>
             // Linked with foreign key samples.created_by
             <BasicList<NestedSample> filters={props.filter_samples_by_created_by()}/>
             // Linked with foreign key samples.sampled_by
