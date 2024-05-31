@@ -1,9 +1,9 @@
 use super::RowToSearchableBadge;
 use crate::traits::format_match::FormatMatch;
-use web_common::database::NestedSampledIndividual;
+use web_common::database::NestedOrganism;
 use yew::prelude::*;
 
-impl RowToSearchableBadge for NestedSampledIndividual {
+impl RowToSearchableBadge for NestedOrganism {
     fn to_datalist_badge(&self, query: &str) -> Html {
         html! {
             <div>

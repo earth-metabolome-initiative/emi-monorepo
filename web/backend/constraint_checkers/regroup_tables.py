@@ -19,10 +19,15 @@ ALLOW_LISTED_MIGRATIONS = [
     "00000000000000_diesel_initial_setup",
     "00000000000001_enable_uuid_extension",
     "00000000000002_enable_pg_trgm_extension",
+    "00000000000003_enable_postgis_extension",
 ]
 
 ALLOW_LISTED_SINGLETONS = [
     "units"
+]
+
+POSTGIS_TABLES = [
+    "spatial_ref_sys"
 ]
 
 SUPPORT_TABLE_NAMES = [
@@ -39,7 +44,7 @@ SUPPORT_TABLE_NAMES = [
     "sample_container_categories",
     "nameplate_categories",
     "permanence_categories"
-]
+] + POSTGIS_TABLES
 
 def get_best_insertion_point(table_name: str, expected_desinence: str) -> int:
     """Get the best insertion point for a new migration related to a table.

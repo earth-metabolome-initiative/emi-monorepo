@@ -118,5 +118,6 @@
     "delete_00000000000120_create_mass_spectrometry_configurations_table": "yes",
     "Table derived_samples_users_role_invitations is missing. Do you want to create it? (yes/no)": "no",
     "delete_migration_00000000000100_create_nameplates_sequential_index": "no",
-    "create_nameplates_can_x_trigger": "yes"
+    "create_nameplates_can_x_trigger": "yes",
+    "delete_migration_00000000000003_enable_postgis_extension": "no"
 }

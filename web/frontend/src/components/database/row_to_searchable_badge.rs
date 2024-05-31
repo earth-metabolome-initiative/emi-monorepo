@@ -12,6 +12,7 @@ pub mod sample_states;
 pub mod teams;
 pub mod units;
 pub mod users;
+pub mod observations;
 
 /// Trait for types that can be converted to a badge.
 pub trait RowToSearchableBadge {
@@ -42,6 +43,6 @@ pub mod nameplates;
 pub mod roles;
 pub mod sample_container_categories;
 pub mod sample_containers;
-pub mod sampled_individuals;
+pub mod organisms;
 pub mod samples;
 pub mod team_states;

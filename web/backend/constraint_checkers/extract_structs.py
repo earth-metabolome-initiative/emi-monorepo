@@ -2,7 +2,13 @@
 from typing import List
 from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
 
-def extract_structs(path: str) -> List[StructMetadata]:
+IGNORED_TABLES = [
+    "spatial_ref_sys",
+]
+
+def extract_structs(
+    path: str,
+) -> List[StructMetadata]:
     """Extract the structs from the Rust file at the given path.
 
     Parameters
@@ -16,6 +22,7 @@ def extract_structs(path: str) -> List[StructMetadata]:
     derives = []
     last_table_name = None
     inside_struct = False
+    unique_constraints = None
 
     with open(path, "r", encoding="utf8") as file:
         document = file.read()
@@ -45,6 +52,13 @@ def extract_structs(path: str) -> List[StructMetadata]:
                 struct_name=struct_name,
             )
 
+            if last_table_name in IGNORED_TABLES:
+                continue
+
+            unique_constraints: List[List[str]] = StructMetadata.table_metadata.get_unique_constraint_columns(
+                struct_metadata.table_name,
+            )
+
             for derive in derives:
                 struct_metadata.add_derive(derive)
 
@@ -60,12 +74,18 @@ def extract_structs(path: str) -> List[StructMetadata]:
                 if field_type.startswith("Option<"):
                     option = True
                     field_type = field_type[7:-1]
+
                 struct_metadata.add_attribute(
                     AttributeMetadata(
                         original_name=field_name,
                         name=field_name,
                         data_type=field_type,
                         optional=option,
+                        unique=[
+                            unique_constraint[0] == field_name
+                            for unique_constraint in unique_constraints
+                            if len(unique_constraints) == 1
+                        ]
                     )
                 )
 

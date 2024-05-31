@@ -55,7 +55,8 @@ from constraint_checkers import (
 )
 from constraint_checkers import (
     ensure_can_x_function_existance,
-    ensures_no_duplicated_migrations
+    ensures_no_duplicated_migrations,
+    register_derived_search_indices
 )
 
 
@@ -111,6 +112,9 @@ if __name__ == "__main__":
         f"Extracted {len(table_structs)} tables and {len(view_structs)} views from the backend."
     )
 
+    StructMetadata.init_indices()
+    register_derived_search_indices(flat_variants)
+
     filter_structs: List[StructMetadata] = create_filter_structs(
         table_structs + view_structs
     )
@@ -120,6 +124,10 @@ if __name__ == "__main__":
         table_structs + view_structs
     )
     print(f"Derived {len(nested_structs)} nested structs.")
+    assert len(nested_structs) > 0, (
+        "No nested structs were derived. This is likely due some error in the "
+        "generation process. Please rerun the generation script."
+    )
 
     new_model_structs = derive_webcommon_new_variants(table_structs)
     print(f"Derived {len(new_model_structs)} structs for the New versions")

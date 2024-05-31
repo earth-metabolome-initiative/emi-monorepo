@@ -459,6 +459,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         DerivedSample::get(( parent_sample_id, child_sample_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -518,6 +575,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         DerivedSample::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -576,6 +690,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         DerivedSample::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&DerivedSampleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        DerivedSample::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -888,57 +1059,6 @@ name: &str,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Self, web_common::api::ApiError>{
         LoginProvider::from_name(name, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
-}
-    /// Search for the viewable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn similarity_search_viewable(
-filter: Option<&LoginProviderFilter>,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
-        LoginProvider::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-}
-    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn word_similarity_search_viewable(
-filter: Option<&LoginProviderFilter>,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
-        LoginProvider::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
-}
-    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-    pub fn strict_word_similarity_search_viewable(
-filter: Option<&LoginProviderFilter>,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<Self>, web_common::api::ApiError>{
-        LoginProvider::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
 }
 impl From<web_common::database::nested_models::NestedLoginProvider> for NestedLoginProvider {
@@ -1758,6 +1878,100 @@ impl From<NestedNotification> for web_common::database::nested_models::NestedNot
         }
     }
 }
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedObservationSubject {
+    pub inner: ObservationSubject,
+    pub icon: FontAwesomeIcon,
+    pub color: Color,
+}
+
+impl NestedObservationSubject {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub fn from_flat(
+        flat_variant: ObservationSubject,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Self, web_common::api::ApiError> {
+        Ok(Self {
+            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
+            color: Color::get(flat_variant.color_id, connection)?,
+                inner: flat_variant,
+        })
+    }
+    /// Check whether the user can view the struct.
+    pub fn can_view(
+        &self,
+) -> Result<bool, web_common::api::ApiError>{
+        self.inner.can_view()
+}
+    /// Check whether the user can view the struct associated to the provided ids.
+    pub fn can_view_by_id(
+) -> Result<bool, web_common::api::ApiError>{
+        ObservationSubject::can_view_by_id()
+}
+    /// Get all of the viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable(
+filter: Option<&ObservationSubjectFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ObservationSubject::all_viewable(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get all of the sorted viewable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn all_viewable_sorted(
+filter: Option<&ObservationSubjectFilter>,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ObservationSubject::all_viewable_sorted(filter, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Get the struct from the database by its ID.
+    ///
+    /// * `id` - The primary key(s) of the struct to get.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn get(
+id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Self, web_common::api::ApiError>{
+        ObservationSubject::get(id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+}
+}
+impl From<web_common::database::nested_models::NestedObservationSubject> for NestedObservationSubject {
+    fn from(item: web_common::database::nested_models::NestedObservationSubject) -> Self {
+        Self {
+            inner: item.inner.into(),
+            icon: item.icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
+impl From<NestedObservationSubject> for web_common::database::nested_models::NestedObservationSubject {
+    fn from(item: NestedObservationSubject) -> Self {
+        Self {
+            inner: item.inner.into(),
+            icon: item.icon.into(),
+            color: item.color.into(),
+        }
+    }
+}
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedObservation {
     pub inner: Observation,
@@ -1863,6 +2077,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         Observation::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&ObservationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&ObservationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&ObservationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -1922,6 +2193,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         Observation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -1980,6 +2308,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         Observation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&ObservationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        Observation::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -2132,6 +2517,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         OrganismBioOttTaxonItem::get(( organism_id, taxon_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&OrganismBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        OrganismBioOttTaxonItem::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&OrganismBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        OrganismBioOttTaxonItem::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&OrganismBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        OrganismBioOttTaxonItem::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -2191,6 +2633,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         OrganismBioOttTaxonItem::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&OrganismBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        OrganismBioOttTaxonItem::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&OrganismBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        OrganismBioOttTaxonItem::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&OrganismBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        OrganismBioOttTaxonItem::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -2249,6 +2748,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         OrganismBioOttTaxonItem::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&OrganismBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        OrganismBioOttTaxonItem::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&OrganismBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        OrganismBioOttTaxonItem::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&OrganismBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        OrganismBioOttTaxonItem::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -3776,6 +4332,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsTeamsRoleInvitation::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -3835,6 +4448,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsTeamsRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -3893,6 +4563,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsTeamsRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleInvitation::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -4043,6 +4770,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsTeamsRoleRequest::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4102,6 +4886,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsTeamsRoleRequest::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4160,6 +5001,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsTeamsRoleRequest::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&ProjectsTeamsRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRoleRequest::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -4310,6 +5208,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsTeamsRole::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4369,6 +5324,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsTeamsRole::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4427,6 +5439,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsTeamsRole::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&ProjectsTeamsRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsTeamsRole::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -4577,6 +5646,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsUsersRoleInvitation::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4636,6 +5762,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsUsersRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4694,6 +5877,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsUsersRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&ProjectsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleInvitation::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -4844,6 +6084,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsUsersRoleRequest::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4903,6 +6200,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsUsersRoleRequest::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -4961,6 +6315,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsUsersRoleRequest::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&ProjectsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRoleRequest::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -5111,6 +6522,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         ProjectsUsersRole::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -5170,6 +6638,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsUsersRole::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -5228,6 +6753,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         ProjectsUsersRole::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&ProjectsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        ProjectsUsersRole::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -5565,6 +7147,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         SampleBioOttTaxonItem::get(( sample_id, taxon_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -5624,6 +7263,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         SampleBioOttTaxonItem::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -5682,6 +7378,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         SampleBioOttTaxonItem::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&SampleBioOttTaxonItemFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SampleBioOttTaxonItem::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -7317,6 +9070,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         SpectraCollection::get(id, author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -7376,6 +9186,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         SpectraCollection::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -7434,6 +9301,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         SpectraCollection::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&SpectraCollectionFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        SpectraCollection::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, Some(author_user_id), connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -8187,6 +10111,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         TeamsTeamsRoleInvitation::get(( table_id, team_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -8246,6 +10227,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         TeamsTeamsRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -8304,6 +10342,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         TeamsTeamsRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&TeamsTeamsRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsTeamsRoleInvitation::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -8452,6 +10547,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         TeamsUsersRoleInvitation::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -8511,6 +10663,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         TeamsUsersRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -8569,6 +10778,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         TeamsUsersRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&TeamsUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleInvitation::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -8717,6 +10983,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         TeamsUsersRoleRequest::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -8776,6 +11099,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         TeamsUsersRoleRequest::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -8834,6 +11214,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         TeamsUsersRoleRequest::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&TeamsUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRoleRequest::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -8962,6 +11399,57 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         TeamsUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&TeamsUsersRoleFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&TeamsUsersRoleFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&TeamsUsersRoleFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -9021,6 +11509,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         TeamsUsersRole::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -9079,6 +11624,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         TeamsUsersRole::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&TeamsUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        TeamsUsersRole::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -9499,6 +12101,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         UsersUsersRoleInvitation::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -9558,6 +12217,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         UsersUsersRoleInvitation::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -9616,6 +12332,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         UsersUsersRoleInvitation::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&UsersUsersRoleInvitationFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleInvitation::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -9764,6 +12537,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         UsersUsersRoleRequest::get(( table_id, user_id ), author_user_id, connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: Option<i32>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::strict_word_similarity_search_viewable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -9823,6 +12653,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         UsersUsersRoleRequest::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -9881,6 +12768,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         UsersUsersRoleRequest::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&UsersUsersRoleRequestFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRoleRequest::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Delete the struct from the database.
     ///
@@ -10009,6 +12953,57 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Self, web_common::api::ApiError>{
         UsersUsersRole::get(( table_id, user_id ), connection).and_then(|flat_variant| Self::from_flat(flat_variant, connection))
 }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_viewable(
+filter: Option<&UsersUsersRoleFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_viewable(
+filter: Option<&UsersUsersRoleFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_viewable(
+filter: Option<&UsersUsersRoleFilter>,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::strict_word_similarity_search_viewable(filter, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can update the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -10068,6 +13063,63 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         UsersUsersRole::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_updatable(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_updatable(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_updatable(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::strict_word_similarity_search_updatable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -10126,6 +13178,63 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<Self>, web_common::api::ApiError>{
         UsersUsersRole::all_administrable_sorted(filter, author_user_id, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn similarity_search_administrable(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn word_similarity_search_administrable(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
+}
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+    pub fn strict_word_similarity_search_administrable(
+filter: Option<&UsersUsersRoleFilter>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<Self>, web_common::api::ApiError>{
+        UsersUsersRole::strict_word_similarity_search_administrable(filter, author_user_id, query, limit, offset, connection)?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, connection)).collect()
 }
     /// Delete the struct from the database.
     ///

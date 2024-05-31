@@ -291,6 +291,30 @@ impl NotificationFilter {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+pub struct ObservationSubjectFilter {
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl ObservationSubjectFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(icon_id) = &self.icon_id {
+            filter = filter.and(gluesql::core::ast_builder::col("observation_subjects.icon_id").eq(icon_id.to_string()));
+        }
+
+        if let Some(color_id) = &self.color_id {
+            filter = filter.and(gluesql::core::ast_builder::col("observation_subjects.color_id").eq(color_id.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct ObservationFilter {
     pub parent_observation_id: Option<Uuid>,
     pub created_by: Option<i32>,

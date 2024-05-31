@@ -177,66 +177,6 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
-    /// Check whether the user can admin the struct associated to the provided ids.
-    ///
-    /// * `primary_key` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    ///
-     fn can_admin_by_id(
-        &self,
-primary_key: PrimaryKey,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<bool, web_common::api::ApiError>;
-
-    /// Get all of the administrable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn all_administrable(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError>;
-
-    /// Get all of the sorted administrable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn all_administrable_sorted(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError>;
-
-    /// Delete the struct from the database by its ID.
-    ///
-    /// * `primary_key` - The primary key(s) of the struct to delete.
-    /// * `author_user_id` - The ID of the user who is deleting the struct.
-    /// * `connection` - The connection to the database.
-    ///
-     fn delete_by_id(
-        &self,
-primary_key: PrimaryKey,
-author_user_id: i32,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<usize, web_common::api::ApiError>;
-
     /// Search for the updatable structs by a given string by Postgres's `similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -289,6 +229,53 @@ connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnectio
 filter: Option<Vec<u8>>,
 author_user_id: i32,
 query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError>;
+
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `primary_key` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    ///
+     fn can_admin_by_id(
+        &self,
+primary_key: PrimaryKey,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<bool, web_common::api::ApiError>;
+
+    /// Get all of the administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn all_administrable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError>;
+
+    /// Get all of the sorted administrable structs from the database.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn all_administrable_sorted(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
 limit: Option<i64>,
 offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
@@ -351,6 +338,19 @@ offset: Option<i64>,
 connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
 ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
+    /// Delete the struct from the database by its ID.
+    ///
+    /// * `primary_key` - The primary key(s) of the struct to delete.
+    /// * `author_user_id` - The ID of the user who is deleting the struct.
+    /// * `connection` - The connection to the database.
+    ///
+     fn delete_by_id(
+        &self,
+primary_key: PrimaryKey,
+author_user_id: i32,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<usize, web_common::api::ApiError>;
+
 }
 
 impl BackendTable for web_common::database::Table {
@@ -406,6 +406,9 @@ author_user_id,
 connection)?            },
             web_common::database::Table::Notifications => {
 NestedNotification::can_view_by_id(
+)?            },
+            web_common::database::Table::ObservationSubjects => {
+NestedObservationSubject::can_view_by_id(
 )?            },
             web_common::database::Table::Observations => {
 NestedObservation::can_view_by_id(
@@ -647,6 +650,13 @@ connection)?)?
             web_common::database::Table::Notifications => {
 bincode::serialize(&NestedNotification::all_viewable(
 filter.map(|filter| bincode::deserialize::<NotificationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ObservationSubjects => {
+bincode::serialize(&NestedObservationSubject::all_viewable(
+filter.map(|filter| bincode::deserialize::<ObservationSubjectFilter>(&filter)).transpose()?.as_ref(),
 limit,
 offset,
 connection)?)?
@@ -1004,6 +1014,13 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::ObservationSubjects => {
+bincode::serialize(&NestedObservationSubject::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<ObservationSubjectFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_viewable_sorted(
 filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
@@ -1332,6 +1349,11 @@ bincode::serialize(&NestedNotification::get(
 primary_key.into(),
 connection)?)?
             },
+            web_common::database::Table::ObservationSubjects => {
+bincode::serialize(&NestedObservationSubject::get(
+primary_key.into(),
+connection)?)?
+            },
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::get(
 primary_key.into(),
@@ -1570,7 +1592,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::DerivedSamples => unimplemented!("Method similarity_search_viewable not implemented for table derived_samples."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::DocumentFormats => {
 bincode::serialize(&NestedDocumentFormat::similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<DocumentFormatFilter>(&filter)).transpose()?.as_ref(),
@@ -1586,14 +1616,7 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::LoginProviders => {
-bincode::serialize(&NestedLoginProvider::similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
-query,
-limit,
-offset,
-connection)?)?
-            },
+            web_common::database::Table::LoginProviders => unimplemented!("Method similarity_search_viewable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::NameplateCategories => {
 bincode::serialize(&NestedNameplateCategory::similarity_search_viewable(
@@ -1613,8 +1636,25 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method similarity_search_viewable not implemented for table notifications."),
-            web_common::database::Table::Observations => unimplemented!("Method similarity_search_viewable not implemented for table observations."),
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method similarity_search_viewable not implemented for table organism_bio_ott_taxon_items."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method similarity_search_viewable not implemented for table observation_subjects."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+bincode::serialize(&NestedOrganismBioOttTaxonItem::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
@@ -1650,12 +1690,60 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method similarity_search_viewable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method similarity_search_viewable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method similarity_search_viewable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method similarity_search_viewable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method similarity_search_viewable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method similarity_search_viewable not implemented for table projects_users_roles."),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Roles => {
 bincode::serialize(&NestedRole::similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<RoleFilter>(&filter)).transpose()?.as_ref(),
@@ -1664,7 +1752,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method similarity_search_viewable not implemented for table sample_bio_ott_taxon_items."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleContainerCategories => {
 bincode::serialize(&NestedSampleContainerCategory::similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<SampleContainerCategoryFilter>(&filter)).transpose()?.as_ref(),
@@ -1700,7 +1796,15 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Spectra => unimplemented!("Method similarity_search_viewable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => unimplemented!("Method similarity_search_viewable not implemented for table spectra_collections."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamStates => {
 bincode::serialize(&NestedTeamState::similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<TeamStateFilter>(&filter)).transpose()?.as_ref(),
@@ -1717,10 +1821,41 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method similarity_search_viewable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method similarity_search_viewable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method similarity_search_viewable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method similarity_search_viewable not implemented for table teams_users_roles."),
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Units => {
 bincode::serialize(&Unit::similarity_search_viewable(
 query,
@@ -1736,9 +1871,32 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method similarity_search_viewable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method similarity_search_viewable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method similarity_search_viewable not implemented for table users_users_roles."),
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
         })
     }
 
@@ -1791,7 +1949,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::DerivedSamples => unimplemented!("Method word_similarity_search_viewable not implemented for table derived_samples."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::DocumentFormats => {
 bincode::serialize(&NestedDocumentFormat::word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<DocumentFormatFilter>(&filter)).transpose()?.as_ref(),
@@ -1807,14 +1973,7 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::LoginProviders => {
-bincode::serialize(&NestedLoginProvider::word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
-query,
-limit,
-offset,
-connection)?)?
-            },
+            web_common::database::Table::LoginProviders => unimplemented!("Method word_similarity_search_viewable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::NameplateCategories => {
 bincode::serialize(&NestedNameplateCategory::word_similarity_search_viewable(
@@ -1834,8 +1993,25 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_viewable not implemented for table notifications."),
-            web_common::database::Table::Observations => unimplemented!("Method word_similarity_search_viewable not implemented for table observations."),
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method word_similarity_search_viewable not implemented for table organism_bio_ott_taxon_items."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method word_similarity_search_viewable not implemented for table observation_subjects."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+bincode::serialize(&NestedOrganismBioOttTaxonItem::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
@@ -1871,12 +2047,60 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method word_similarity_search_viewable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method word_similarity_search_viewable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method word_similarity_search_viewable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method word_similarity_search_viewable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method word_similarity_search_viewable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method word_similarity_search_viewable not implemented for table projects_users_roles."),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Roles => {
 bincode::serialize(&NestedRole::word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<RoleFilter>(&filter)).transpose()?.as_ref(),
@@ -1885,7 +2109,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method word_similarity_search_viewable not implemented for table sample_bio_ott_taxon_items."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleContainerCategories => {
 bincode::serialize(&NestedSampleContainerCategory::word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<SampleContainerCategoryFilter>(&filter)).transpose()?.as_ref(),
@@ -1921,7 +2153,15 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_viewable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => unimplemented!("Method word_similarity_search_viewable not implemented for table spectra_collections."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamStates => {
 bincode::serialize(&NestedTeamState::word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<TeamStateFilter>(&filter)).transpose()?.as_ref(),
@@ -1938,10 +2178,41 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method word_similarity_search_viewable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method word_similarity_search_viewable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method word_similarity_search_viewable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method word_similarity_search_viewable not implemented for table teams_users_roles."),
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Units => {
 bincode::serialize(&Unit::word_similarity_search_viewable(
 query,
@@ -1957,9 +2228,32 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method word_similarity_search_viewable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method word_similarity_search_viewable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method word_similarity_search_viewable not implemented for table users_users_roles."),
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
         })
     }
 
@@ -2012,7 +2306,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::DerivedSamples => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table derived_samples."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::DocumentFormats => {
 bincode::serialize(&NestedDocumentFormat::strict_word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<DocumentFormatFilter>(&filter)).transpose()?.as_ref(),
@@ -2028,14 +2330,7 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::LoginProviders => {
-bincode::serialize(&NestedLoginProvider::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter)).transpose()?.as_ref(),
-query,
-limit,
-offset,
-connection)?)?
-            },
+            web_common::database::Table::LoginProviders => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table login_providers."),
             web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::NameplateCategories => {
 bincode::serialize(&NestedNameplateCategory::strict_word_similarity_search_viewable(
@@ -2055,8 +2350,25 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table notifications."),
-            web_common::database::Table::Observations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table observations."),
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table organism_bio_ott_taxon_items."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table observation_subjects."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+bincode::serialize(&NestedOrganismBioOttTaxonItem::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::strict_word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
@@ -2092,12 +2404,60 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table projects_users_roles."),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Roles => {
 bincode::serialize(&NestedRole::strict_word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<RoleFilter>(&filter)).transpose()?.as_ref(),
@@ -2106,7 +2466,15 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table sample_bio_ott_taxon_items."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleContainerCategories => {
 bincode::serialize(&NestedSampleContainerCategory::strict_word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<SampleContainerCategoryFilter>(&filter)).transpose()?.as_ref(),
@@ -2142,7 +2510,15 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table spectra_collections."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamStates => {
 bincode::serialize(&NestedTeamState::strict_word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<TeamStateFilter>(&filter)).transpose()?.as_ref(),
@@ -2159,10 +2535,41 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table teams_users_roles."),
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Units => {
 bincode::serialize(&Unit::strict_word_similarity_search_viewable(
 query,
@@ -2178,9 +2585,32 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table users_users_roles."),
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
         })
     }
 
@@ -2217,6 +2647,7 @@ primary_key.into(),
 author_user_id,
 connection)?            },
             web_common::database::Table::Notifications => unimplemented!("Method can_update_by_id not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method can_update_by_id not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 NestedObservation::can_update_by_id(
 primary_key.into(),
@@ -2396,6 +2827,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method all_updatable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method all_updatable not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_updatable(
 filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
@@ -2649,6 +3081,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method all_updatable_sorted not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method all_updatable_sorted not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_updatable_sorted(
 filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
@@ -2859,6 +3292,807 @@ connection)?)?
         })
     }
 
+    /// Search for the updatable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn similarity_search_updatable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Method similarity_search_updatable not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method similarity_search_updatable not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method similarity_search_updatable not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method similarity_search_updatable not implemented for table countries."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method similarity_search_updatable not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method similarity_search_updatable not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method similarity_search_updatable not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method similarity_search_updatable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method similarity_search_updatable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Notifications => unimplemented!("Method similarity_search_updatable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method similarity_search_updatable not implemented for table observation_subjects."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+bincode::serialize(&NestedOrganismBioOttTaxonItem::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organisms => {
+bincode::serialize(&NestedOrganism::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method similarity_search_updatable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method similarity_search_updatable not implemented for table permanence_categories."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method similarity_search_updatable not implemented for table project_states."),
+            web_common::database::Table::Projects => {
+bincode::serialize(&NestedProject::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method similarity_search_updatable not implemented for table roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method similarity_search_updatable not implemented for table sample_container_categories."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method similarity_search_updatable not implemented for table sample_states."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method similarity_search_updatable not implemented for table spectra."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method similarity_search_updatable not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method similarity_search_updatable not implemented for table units."),
+            web_common::database::Table::UserEmails => unimplemented!("Method similarity_search_updatable not implemented for table user_emails."),
+            web_common::database::Table::Users => {
+bincode::serialize(&User::similarity_search_updatable(
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+        })
+    }
+
+    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn word_similarity_search_updatable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Method word_similarity_search_updatable not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method word_similarity_search_updatable not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method word_similarity_search_updatable not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method word_similarity_search_updatable not implemented for table countries."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method word_similarity_search_updatable not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method word_similarity_search_updatable not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method word_similarity_search_updatable not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_updatable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method word_similarity_search_updatable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_updatable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method word_similarity_search_updatable not implemented for table observation_subjects."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+bincode::serialize(&NestedOrganismBioOttTaxonItem::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organisms => {
+bincode::serialize(&NestedOrganism::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method word_similarity_search_updatable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method word_similarity_search_updatable not implemented for table permanence_categories."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method word_similarity_search_updatable not implemented for table project_states."),
+            web_common::database::Table::Projects => {
+bincode::serialize(&NestedProject::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method word_similarity_search_updatable not implemented for table roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method word_similarity_search_updatable not implemented for table sample_container_categories."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method word_similarity_search_updatable not implemented for table sample_states."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_updatable not implemented for table spectra."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method word_similarity_search_updatable not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method word_similarity_search_updatable not implemented for table units."),
+            web_common::database::Table::UserEmails => unimplemented!("Method word_similarity_search_updatable not implemented for table user_emails."),
+            web_common::database::Table::Users => {
+bincode::serialize(&User::word_similarity_search_updatable(
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+        })
+    }
+
+    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn strict_word_similarity_search_updatable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table countries."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table observation_subjects."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+bincode::serialize(&NestedOrganismBioOttTaxonItem::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organisms => {
+bincode::serialize(&NestedOrganism::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table permanence_categories."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table project_states."),
+            web_common::database::Table::Projects => {
+bincode::serialize(&NestedProject::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_container_categories."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_states."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table spectra."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table units."),
+            web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table user_emails."),
+            web_common::database::Table::Users => {
+bincode::serialize(&User::strict_word_similarity_search_updatable(
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+        })
+    }
+
     /// Check whether the user can admin the struct associated to the provided ids.
     ///
     /// * `primary_key` - The primary key(s) of the struct to check.
@@ -2892,6 +4126,7 @@ primary_key.into(),
 author_user_id,
 connection)?            },
             web_common::database::Table::Notifications => unimplemented!("Method can_admin_by_id not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method can_admin_by_id not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 NestedObservation::can_admin_by_id(
 primary_key.into(),
@@ -3071,6 +4306,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method all_administrable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method all_administrable not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_administrable(
 filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
@@ -3324,6 +4560,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method all_administrable_sorted not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method all_administrable_sorted not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_administrable_sorted(
 filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
@@ -3534,6 +4771,807 @@ connection)?)?
         })
     }
 
+    /// Search for the administrable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn similarity_search_administrable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Method similarity_search_administrable not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method similarity_search_administrable not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method similarity_search_administrable not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method similarity_search_administrable not implemented for table countries."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method similarity_search_administrable not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method similarity_search_administrable not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method similarity_search_administrable not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method similarity_search_administrable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method similarity_search_administrable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Notifications => unimplemented!("Method similarity_search_administrable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method similarity_search_administrable not implemented for table observation_subjects."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+bincode::serialize(&NestedOrganismBioOttTaxonItem::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organisms => {
+bincode::serialize(&NestedOrganism::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method similarity_search_administrable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method similarity_search_administrable not implemented for table permanence_categories."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method similarity_search_administrable not implemented for table project_states."),
+            web_common::database::Table::Projects => {
+bincode::serialize(&NestedProject::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method similarity_search_administrable not implemented for table roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method similarity_search_administrable not implemented for table sample_container_categories."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method similarity_search_administrable not implemented for table sample_states."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method similarity_search_administrable not implemented for table spectra."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method similarity_search_administrable not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method similarity_search_administrable not implemented for table units."),
+            web_common::database::Table::UserEmails => unimplemented!("Method similarity_search_administrable not implemented for table user_emails."),
+            web_common::database::Table::Users => {
+bincode::serialize(&User::similarity_search_administrable(
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+        })
+    }
+
+    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn word_similarity_search_administrable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Method word_similarity_search_administrable not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method word_similarity_search_administrable not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method word_similarity_search_administrable not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method word_similarity_search_administrable not implemented for table countries."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method word_similarity_search_administrable not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method word_similarity_search_administrable not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method word_similarity_search_administrable not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_administrable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method word_similarity_search_administrable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_administrable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method word_similarity_search_administrable not implemented for table observation_subjects."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+bincode::serialize(&NestedOrganismBioOttTaxonItem::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organisms => {
+bincode::serialize(&NestedOrganism::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method word_similarity_search_administrable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method word_similarity_search_administrable not implemented for table permanence_categories."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method word_similarity_search_administrable not implemented for table project_states."),
+            web_common::database::Table::Projects => {
+bincode::serialize(&NestedProject::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method word_similarity_search_administrable not implemented for table roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method word_similarity_search_administrable not implemented for table sample_container_categories."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method word_similarity_search_administrable not implemented for table sample_states."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_administrable not implemented for table spectra."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method word_similarity_search_administrable not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method word_similarity_search_administrable not implemented for table units."),
+            web_common::database::Table::UserEmails => unimplemented!("Method word_similarity_search_administrable not implemented for table user_emails."),
+            web_common::database::Table::Users => {
+bincode::serialize(&User::word_similarity_search_administrable(
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+        })
+    }
+
+    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    ///
+     fn strict_word_similarity_search_administrable(
+        &self,
+filter: Option<Vec<u8>>,
+author_user_id: i32,
+query: &str,
+limit: Option<i64>,
+offset: Option<i64>,
+connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+) -> Result<Vec<u8>, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table countries."),
+            web_common::database::Table::DerivedSamples => {
+bincode::serialize(&NestedDerivedSample::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table nameplate_categories."),
+            web_common::database::Table::Nameplates => {
+bincode::serialize(&NestedNameplate::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table observation_subjects."),
+            web_common::database::Table::Observations => {
+bincode::serialize(&NestedObservation::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+bincode::serialize(&NestedOrganismBioOttTaxonItem::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organisms => {
+bincode::serialize(&NestedOrganism::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table permanence_categories."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table project_states."),
+            web_common::database::Table::Projects => {
+bincode::serialize(&NestedProject::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+bincode::serialize(&NestedProjectsTeamsRoleRequest::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+bincode::serialize(&NestedProjectsTeamsRole::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+bincode::serialize(&NestedProjectsUsersRoleInvitation::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+bincode::serialize(&NestedProjectsUsersRoleRequest::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+bincode::serialize(&NestedProjectsUsersRole::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table roles."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+bincode::serialize(&NestedSampleBioOttTaxonItem::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table sample_container_categories."),
+            web_common::database::Table::SampleContainers => {
+bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table sample_states."),
+            web_common::database::Table::Samples => {
+bincode::serialize(&NestedSample::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table spectra."),
+            web_common::database::Table::SpectraCollections => {
+bincode::serialize(&NestedSpectraCollection::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+bincode::serialize(&NestedTeamsUsersRoleInvitation::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+bincode::serialize(&NestedTeamsUsersRoleRequest::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+bincode::serialize(&NestedTeamsUsersRole::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table units."),
+            web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table user_emails."),
+            web_common::database::Table::Users => {
+bincode::serialize(&User::strict_word_similarity_search_administrable(
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleInvitations => {
+bincode::serialize(&NestedUsersUsersRoleInvitation::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+bincode::serialize(&NestedUsersUsersRoleRequest::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+bincode::serialize(&NestedUsersUsersRole::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+        })
+    }
+
     /// Delete the struct from the database by its ID.
     ///
     /// * `primary_key` - The primary key(s) of the struct to delete.
@@ -3567,6 +5605,7 @@ primary_key.into(),
 author_user_id,
 connection)?            },
             web_common::database::Table::Notifications => unimplemented!("Method delete_by_id not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method delete_by_id not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 NestedObservation::delete_by_id(
 primary_key.into(),
@@ -3703,738 +5742,6 @@ connection)?            },
         })
     }
 
-    /// Search for the updatable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn similarity_search_updatable(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method similarity_search_updatable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method similarity_search_updatable not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method similarity_search_updatable not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method similarity_search_updatable not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => unimplemented!("Method similarity_search_updatable not implemented for table derived_samples."),
-            web_common::database::Table::DocumentFormats => unimplemented!("Method similarity_search_updatable not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method similarity_search_updatable not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method similarity_search_updatable not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method similarity_search_updatable not implemented for table materials."),
-            web_common::database::Table::NameplateCategories => unimplemented!("Method similarity_search_updatable not implemented for table nameplate_categories."),
-            web_common::database::Table::Nameplates => {
-bincode::serialize(&NestedNameplate::similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Notifications => unimplemented!("Method similarity_search_updatable not implemented for table notifications."),
-            web_common::database::Table::Observations => unimplemented!("Method similarity_search_updatable not implemented for table observations."),
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method similarity_search_updatable not implemented for table organism_bio_ott_taxon_items."),
-            web_common::database::Table::Organisms => {
-bincode::serialize(&NestedOrganism::similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Organizations => unimplemented!("Method similarity_search_updatable not implemented for table organizations."),
-            web_common::database::Table::PermanenceCategories => unimplemented!("Method similarity_search_updatable not implemented for table permanence_categories."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method similarity_search_updatable not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-bincode::serialize(&NestedProject::similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method similarity_search_updatable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method similarity_search_updatable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method similarity_search_updatable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method similarity_search_updatable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method similarity_search_updatable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method similarity_search_updatable not implemented for table projects_users_roles."),
-            web_common::database::Table::Roles => unimplemented!("Method similarity_search_updatable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method similarity_search_updatable not implemented for table sample_bio_ott_taxon_items."),
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method similarity_search_updatable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => {
-bincode::serialize(&NestedSampleContainer::similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::SampleStates => unimplemented!("Method similarity_search_updatable not implemented for table sample_states."),
-            web_common::database::Table::Samples => {
-bincode::serialize(&NestedSample::similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Spectra => unimplemented!("Method similarity_search_updatable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => unimplemented!("Method similarity_search_updatable not implemented for table spectra_collections."),
-            web_common::database::Table::TeamStates => unimplemented!("Method similarity_search_updatable not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-bincode::serialize(&NestedTeam::similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method similarity_search_updatable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method similarity_search_updatable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method similarity_search_updatable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method similarity_search_updatable not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method similarity_search_updatable not implemented for table units."),
-            web_common::database::Table::UserEmails => unimplemented!("Method similarity_search_updatable not implemented for table user_emails."),
-            web_common::database::Table::Users => {
-bincode::serialize(&User::similarity_search_updatable(
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method similarity_search_updatable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method similarity_search_updatable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method similarity_search_updatable not implemented for table users_users_roles."),
-        })
-    }
-
-    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn word_similarity_search_updatable(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method word_similarity_search_updatable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method word_similarity_search_updatable not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method word_similarity_search_updatable not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method word_similarity_search_updatable not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => unimplemented!("Method word_similarity_search_updatable not implemented for table derived_samples."),
-            web_common::database::Table::DocumentFormats => unimplemented!("Method word_similarity_search_updatable not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method word_similarity_search_updatable not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method word_similarity_search_updatable not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_updatable not implemented for table materials."),
-            web_common::database::Table::NameplateCategories => unimplemented!("Method word_similarity_search_updatable not implemented for table nameplate_categories."),
-            web_common::database::Table::Nameplates => {
-bincode::serialize(&NestedNameplate::word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_updatable not implemented for table notifications."),
-            web_common::database::Table::Observations => unimplemented!("Method word_similarity_search_updatable not implemented for table observations."),
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method word_similarity_search_updatable not implemented for table organism_bio_ott_taxon_items."),
-            web_common::database::Table::Organisms => {
-bincode::serialize(&NestedOrganism::word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Organizations => unimplemented!("Method word_similarity_search_updatable not implemented for table organizations."),
-            web_common::database::Table::PermanenceCategories => unimplemented!("Method word_similarity_search_updatable not implemented for table permanence_categories."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method word_similarity_search_updatable not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-bincode::serialize(&NestedProject::word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method word_similarity_search_updatable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method word_similarity_search_updatable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method word_similarity_search_updatable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method word_similarity_search_updatable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method word_similarity_search_updatable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method word_similarity_search_updatable not implemented for table projects_users_roles."),
-            web_common::database::Table::Roles => unimplemented!("Method word_similarity_search_updatable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method word_similarity_search_updatable not implemented for table sample_bio_ott_taxon_items."),
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method word_similarity_search_updatable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => {
-bincode::serialize(&NestedSampleContainer::word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::SampleStates => unimplemented!("Method word_similarity_search_updatable not implemented for table sample_states."),
-            web_common::database::Table::Samples => {
-bincode::serialize(&NestedSample::word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_updatable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => unimplemented!("Method word_similarity_search_updatable not implemented for table spectra_collections."),
-            web_common::database::Table::TeamStates => unimplemented!("Method word_similarity_search_updatable not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-bincode::serialize(&NestedTeam::word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method word_similarity_search_updatable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method word_similarity_search_updatable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method word_similarity_search_updatable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method word_similarity_search_updatable not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method word_similarity_search_updatable not implemented for table units."),
-            web_common::database::Table::UserEmails => unimplemented!("Method word_similarity_search_updatable not implemented for table user_emails."),
-            web_common::database::Table::Users => {
-bincode::serialize(&User::word_similarity_search_updatable(
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method word_similarity_search_updatable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method word_similarity_search_updatable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method word_similarity_search_updatable not implemented for table users_users_roles."),
-        })
-    }
-
-    /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn strict_word_similarity_search_updatable(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table derived_samples."),
-            web_common::database::Table::DocumentFormats => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table materials."),
-            web_common::database::Table::NameplateCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table nameplate_categories."),
-            web_common::database::Table::Nameplates => {
-bincode::serialize(&NestedNameplate::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table notifications."),
-            web_common::database::Table::Observations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table observations."),
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table organism_bio_ott_taxon_items."),
-            web_common::database::Table::Organisms => {
-bincode::serialize(&NestedOrganism::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Organizations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table organizations."),
-            web_common::database::Table::PermanenceCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table permanence_categories."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-bincode::serialize(&NestedProject::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table projects_users_roles."),
-            web_common::database::Table::Roles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_bio_ott_taxon_items."),
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => {
-bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::SampleStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_states."),
-            web_common::database::Table::Samples => {
-bincode::serialize(&NestedSample::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table spectra_collections."),
-            web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-bincode::serialize(&NestedTeam::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table units."),
-            web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table user_emails."),
-            web_common::database::Table::Users => {
-bincode::serialize(&User::strict_word_similarity_search_updatable(
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table users_users_roles."),
-        })
-    }
-
-    /// Search for the administrable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn similarity_search_administrable(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method similarity_search_administrable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method similarity_search_administrable not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method similarity_search_administrable not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method similarity_search_administrable not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => unimplemented!("Method similarity_search_administrable not implemented for table derived_samples."),
-            web_common::database::Table::DocumentFormats => unimplemented!("Method similarity_search_administrable not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method similarity_search_administrable not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method similarity_search_administrable not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method similarity_search_administrable not implemented for table materials."),
-            web_common::database::Table::NameplateCategories => unimplemented!("Method similarity_search_administrable not implemented for table nameplate_categories."),
-            web_common::database::Table::Nameplates => {
-bincode::serialize(&NestedNameplate::similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Notifications => unimplemented!("Method similarity_search_administrable not implemented for table notifications."),
-            web_common::database::Table::Observations => unimplemented!("Method similarity_search_administrable not implemented for table observations."),
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method similarity_search_administrable not implemented for table organism_bio_ott_taxon_items."),
-            web_common::database::Table::Organisms => {
-bincode::serialize(&NestedOrganism::similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Organizations => unimplemented!("Method similarity_search_administrable not implemented for table organizations."),
-            web_common::database::Table::PermanenceCategories => unimplemented!("Method similarity_search_administrable not implemented for table permanence_categories."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method similarity_search_administrable not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-bincode::serialize(&NestedProject::similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method similarity_search_administrable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method similarity_search_administrable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method similarity_search_administrable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method similarity_search_administrable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method similarity_search_administrable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method similarity_search_administrable not implemented for table projects_users_roles."),
-            web_common::database::Table::Roles => unimplemented!("Method similarity_search_administrable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method similarity_search_administrable not implemented for table sample_bio_ott_taxon_items."),
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method similarity_search_administrable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => {
-bincode::serialize(&NestedSampleContainer::similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::SampleStates => unimplemented!("Method similarity_search_administrable not implemented for table sample_states."),
-            web_common::database::Table::Samples => {
-bincode::serialize(&NestedSample::similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Spectra => unimplemented!("Method similarity_search_administrable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => unimplemented!("Method similarity_search_administrable not implemented for table spectra_collections."),
-            web_common::database::Table::TeamStates => unimplemented!("Method similarity_search_administrable not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-bincode::serialize(&NestedTeam::similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method similarity_search_administrable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method similarity_search_administrable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method similarity_search_administrable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method similarity_search_administrable not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method similarity_search_administrable not implemented for table units."),
-            web_common::database::Table::UserEmails => unimplemented!("Method similarity_search_administrable not implemented for table user_emails."),
-            web_common::database::Table::Users => {
-bincode::serialize(&User::similarity_search_administrable(
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method similarity_search_administrable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method similarity_search_administrable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method similarity_search_administrable not implemented for table users_users_roles."),
-        })
-    }
-
-    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn word_similarity_search_administrable(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method word_similarity_search_administrable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method word_similarity_search_administrable not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method word_similarity_search_administrable not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method word_similarity_search_administrable not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => unimplemented!("Method word_similarity_search_administrable not implemented for table derived_samples."),
-            web_common::database::Table::DocumentFormats => unimplemented!("Method word_similarity_search_administrable not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method word_similarity_search_administrable not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method word_similarity_search_administrable not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method word_similarity_search_administrable not implemented for table materials."),
-            web_common::database::Table::NameplateCategories => unimplemented!("Method word_similarity_search_administrable not implemented for table nameplate_categories."),
-            web_common::database::Table::Nameplates => {
-bincode::serialize(&NestedNameplate::word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_administrable not implemented for table notifications."),
-            web_common::database::Table::Observations => unimplemented!("Method word_similarity_search_administrable not implemented for table observations."),
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method word_similarity_search_administrable not implemented for table organism_bio_ott_taxon_items."),
-            web_common::database::Table::Organisms => {
-bincode::serialize(&NestedOrganism::word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Organizations => unimplemented!("Method word_similarity_search_administrable not implemented for table organizations."),
-            web_common::database::Table::PermanenceCategories => unimplemented!("Method word_similarity_search_administrable not implemented for table permanence_categories."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method word_similarity_search_administrable not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-bincode::serialize(&NestedProject::word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method word_similarity_search_administrable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method word_similarity_search_administrable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method word_similarity_search_administrable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method word_similarity_search_administrable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method word_similarity_search_administrable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method word_similarity_search_administrable not implemented for table projects_users_roles."),
-            web_common::database::Table::Roles => unimplemented!("Method word_similarity_search_administrable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method word_similarity_search_administrable not implemented for table sample_bio_ott_taxon_items."),
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method word_similarity_search_administrable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => {
-bincode::serialize(&NestedSampleContainer::word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::SampleStates => unimplemented!("Method word_similarity_search_administrable not implemented for table sample_states."),
-            web_common::database::Table::Samples => {
-bincode::serialize(&NestedSample::word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Spectra => unimplemented!("Method word_similarity_search_administrable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => unimplemented!("Method word_similarity_search_administrable not implemented for table spectra_collections."),
-            web_common::database::Table::TeamStates => unimplemented!("Method word_similarity_search_administrable not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-bincode::serialize(&NestedTeam::word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method word_similarity_search_administrable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method word_similarity_search_administrable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method word_similarity_search_administrable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method word_similarity_search_administrable not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method word_similarity_search_administrable not implemented for table units."),
-            web_common::database::Table::UserEmails => unimplemented!("Method word_similarity_search_administrable not implemented for table user_emails."),
-            web_common::database::Table::Users => {
-bincode::serialize(&User::word_similarity_search_administrable(
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method word_similarity_search_administrable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method word_similarity_search_administrable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method word_similarity_search_administrable not implemented for table users_users_roles."),
-        })
-    }
-
-    /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    ///
-     fn strict_word_similarity_search_administrable(
-        &self,
-filter: Option<Vec<u8>>,
-author_user_id: i32,
-query: &str,
-limit: Option<i64>,
-offset: Option<i64>,
-connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
-) -> Result<Vec<u8>, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table bio_ott_taxon_items."),
-            web_common::database::Table::Colors => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table colors."),
-            web_common::database::Table::Countries => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table countries."),
-            web_common::database::Table::DerivedSamples => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table derived_samples."),
-            web_common::database::Table::DocumentFormats => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table document_formats."),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table font_awesome_icons."),
-            web_common::database::Table::LoginProviders => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table login_providers."),
-            web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table materials."),
-            web_common::database::Table::NameplateCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table nameplate_categories."),
-            web_common::database::Table::Nameplates => {
-bincode::serialize(&NestedNameplate::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table notifications."),
-            web_common::database::Table::Observations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table observations."),
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table organism_bio_ott_taxon_items."),
-            web_common::database::Table::Organisms => {
-bincode::serialize(&NestedOrganism::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Organizations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table organizations."),
-            web_common::database::Table::PermanenceCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table permanence_categories."),
-            web_common::database::Table::ProjectStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table project_states."),
-            web_common::database::Table::Projects => {
-bincode::serialize(&NestedProject::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table projects_teams_role_invitations."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table projects_teams_role_requests."),
-            web_common::database::Table::ProjectsTeamsRoles => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table projects_teams_roles."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table projects_users_role_invitations."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table projects_users_role_requests."),
-            web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table projects_users_roles."),
-            web_common::database::Table::Roles => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table sample_bio_ott_taxon_items."),
-            web_common::database::Table::SampleContainerCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table sample_container_categories."),
-            web_common::database::Table::SampleContainers => {
-bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::SampleStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table sample_states."),
-            web_common::database::Table::Samples => {
-bincode::serialize(&NestedSample::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table spectra."),
-            web_common::database::Table::SpectraCollections => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table spectra_collections."),
-            web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table team_states."),
-            web_common::database::Table::Teams => {
-bincode::serialize(&NestedTeam::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table teams_teams_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table teams_users_role_invitations."),
-            web_common::database::Table::TeamsUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table teams_users_role_requests."),
-            web_common::database::Table::TeamsUsersRoles => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table teams_users_roles."),
-            web_common::database::Table::Units => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table units."),
-            web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table user_emails."),
-            web_common::database::Table::Users => {
-bincode::serialize(&User::strict_word_similarity_search_administrable(
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::UsersUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table users_users_role_invitations."),
-            web_common::database::Table::UsersUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table users_users_role_requests."),
-            web_common::database::Table::UsersUsersRoles => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table users_users_roles."),
-        })
-    }
-
     }
 
 /// Trait providing the insert method for the Table enum.
@@ -4482,6 +5789,7 @@ impl InsertableTable for web_common::database::Table {
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ObservationSubjects => unreachable!("Table `observation_subjects` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Observations => {
                 let row: web_common::database::NewObservation = bincode::deserialize::<web_common::database::NewObservation>(&row)?;
                 let inserted_row: crate::models::Observation = <web_common::database::NewObservation as InsertRow>::insert(row, user_id, connection)?;
@@ -4612,6 +5920,7 @@ impl UpdatableTable for web_common::database::Table {
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::ObservationSubjects => unreachable!("Table `observation_subjects` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Observations => {
                 let row: web_common::database::NewObservation = bincode::deserialize::<web_common::database::NewObservation>(&row)?;
                 let updated_row: crate::models::Observation = <web_common::database::NewObservation as UpdateRow>::update(row, user_id, connection)?;
@@ -4766,6 +6075,11 @@ impl FromFlatStrTable for web_common::database::Table {
             web_common::database::Table::Notifications => {
                 let flat_row: crate::models::Notification = serde_json::from_str::<crate::models::Notification>(row)?;
                  let richest_row = crate::nested_models::NestedNotification::from_flat(flat_row, connection)?;
+                 bincode::serialize(&richest_row)?
+            },
+            web_common::database::Table::ObservationSubjects => {
+                let flat_row: crate::models::ObservationSubject = serde_json::from_str::<crate::models::ObservationSubject>(row)?;
+                 let richest_row = crate::nested_models::NestedObservationSubject::from_flat(flat_row, connection)?;
                  bincode::serialize(&richest_row)?
             },
             web_common::database::Table::Observations => {

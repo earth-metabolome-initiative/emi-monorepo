@@ -19,6 +19,7 @@ pub enum Table {
     NameplateCategories,
     Nameplates,
     Notifications,
+    ObservationSubjects,
     Observations,
     OrganismBioOttTaxonItems,
     Organisms,
@@ -69,6 +70,7 @@ impl AsRef<str> for Table {
             Table::NameplateCategories => "nameplate_categories",
             Table::Nameplates => "nameplates",
             Table::Notifications => "notifications",
+            Table::ObservationSubjects => "observation_subjects",
             Table::Observations => "observations",
             Table::OrganismBioOttTaxonItems => "organism_bio_ott_taxon_items",
             Table::Organisms => "organisms",
@@ -131,6 +133,7 @@ impl std::convert::TryFrom<&str> for Table {
             "nameplate_categories" => Ok(Table::NameplateCategories),
             "nameplates" => Ok(Table::Nameplates),
             "notifications" => Ok(Table::Notifications),
+            "observation_subjects" => Ok(Table::ObservationSubjects),
             "observations" => Ok(Table::Observations),
             "organism_bio_ott_taxon_items" => Ok(Table::OrganismBioOttTaxonItems),
             "organisms" => Ok(Table::Organisms),
@@ -227,6 +230,9 @@ impl Table {
             },
             Table::Notifications => {
                 crate::database::Notification::delete_from_id(primary_key.into(), connection).await
+            },
+            Table::ObservationSubjects => {
+                crate::database::ObservationSubject::delete_from_id(primary_key.into(), connection).await
             },
             Table::Observations => {
                 crate::database::Observation::delete_from_id(primary_key.into(), connection).await
@@ -357,6 +363,7 @@ impl Table {
             Table::NameplateCategories => crate::database::NestedNameplateCategory::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Nameplates => crate::database::NestedNameplate::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Notifications => crate::database::NestedNotification::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::ObservationSubjects => crate::database::NestedObservationSubject::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Observations => crate::database::NestedObservation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::OrganismBioOttTaxonItems => crate::database::NestedOrganismBioOttTaxonItem::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Organisms => crate::database::NestedOrganism::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -459,6 +466,10 @@ impl Table {
             Table::Notifications => {
                 let filter: Option<NotificationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedNotification::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+            },
+            Table::ObservationSubjects => {
+                let filter: Option<ObservationSubjectFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedObservationSubject::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::Observations => {
                 let filter: Option<ObservationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
@@ -632,6 +643,7 @@ impl Table {
                 crate::database::NestedNameplate::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::Notifications => unimplemented!("all_by_updated_at not implemented for notifications."),
+            Table::ObservationSubjects => unimplemented!("all_by_updated_at not implemented for observation_subjects."),
             Table::Observations => {
                 let filter: Option<ObservationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedObservation::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
@@ -724,6 +736,7 @@ impl Table {
             Table::NameplateCategories => unimplemented!("Insert not implemented for nameplate_categories."),
             Table::Nameplates => unimplemented!("Insert not implemented for nameplates in frontend as it does not have a UUID primary key."),
             Table::Notifications => unimplemented!("Insert not implemented for notifications."),
+            Table::ObservationSubjects => unimplemented!("Insert not implemented for observation_subjects."),
             Table::Observations => {
                 let new_row: super::NewObservation = bincode::deserialize::<super::NewObservation>(&new_row).map_err(crate::api::ApiError::from)?;
                 let inserted_row: super::Observation = new_row.insert(user_id, connection).await?;
@@ -811,6 +824,7 @@ impl Table {
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::Notifications => unimplemented!("Update not implemented for notifications."),
+            Table::ObservationSubjects => unimplemented!("Update not implemented for observation_subjects."),
             Table::Observations => {
                 let update_row: super::NewObservation = bincode::deserialize::<super::NewObservation>(&update_row).map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
@@ -992,6 +1006,12 @@ impl Table {
             Table::Notifications => {
                 for row in rows {
                     let row: super::NestedNotification = bincode::deserialize::<super::NestedNotification>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            },
+            Table::ObservationSubjects => {
+                for row in rows {
+                    let row: super::NestedObservationSubject = bincode::deserialize::<super::NestedObservationSubject>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },

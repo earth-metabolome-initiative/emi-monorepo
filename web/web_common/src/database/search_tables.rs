@@ -29,10 +29,10 @@ impl Searchable<false> for NestedBioOttTaxonItem {
         )
     }
 }
-impl Searchable<false> for NestedDocumentFormat {
+impl Searchable<false> for NestedDerivedSample {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
-             Table::DocumentFormats,
+             Table::DerivedSamples,
               filter,
               query,
               limit,
@@ -40,10 +40,21 @@ impl Searchable<false> for NestedDocumentFormat {
         )
     }
 }
-impl Searchable<false> for NestedLoginProvider {
+impl Searchable<true> for NestedDerivedSample {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::DerivedSamples,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedDocumentFormat {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
-             Table::LoginProviders,
+             Table::DocumentFormats,
               filter,
               query,
               limit,
@@ -77,6 +88,39 @@ impl Searchable<true> for NestedNameplate {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search_updatables(
              Table::Nameplates,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedObservation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Observations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for NestedObservation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::Observations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedOrganismBioOttTaxonItem {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::OrganismBioOttTaxonItems,
               filter,
               query,
               limit,
@@ -150,10 +194,87 @@ impl Searchable<true> for NestedProject {
         )
     }
 }
+impl Searchable<false> for NestedProjectsTeamsRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsTeamsRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedProjectsTeamsRoleRequest {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsTeamsRoleRequests,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedProjectsTeamsRole {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsTeamsRoles,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedProjectsUsersRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsUsersRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedProjectsUsersRoleRequest {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsUsersRoleRequests,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedProjectsUsersRole {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsUsersRoles,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedRole {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
              Table::Roles,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedSampleBioOttTaxonItem {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::SampleBioOttTaxonItems,
               filter,
               query,
               limit,
@@ -227,6 +348,28 @@ impl Searchable<true> for NestedSample {
         )
     }
 }
+impl Searchable<false> for NestedSpectraCollection {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::SpectraCollections,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for NestedSpectraCollection {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::SpectraCollections,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedTeamState {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -253,6 +396,83 @@ impl Searchable<true> for NestedTeam {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search_updatables(
              Table::Teams,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedTeamsTeamsRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::TeamsTeamsRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedTeamsUsersRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::TeamsUsersRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedTeamsUsersRoleRequest {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::TeamsUsersRoleRequests,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedTeamsUsersRole {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::TeamsUsersRoles,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedUsersUsersRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::UsersUsersRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedUsersUsersRoleRequest {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::UsersUsersRoleRequests,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for NestedUsersUsersRole {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::UsersUsersRoles,
               filter,
               query,
               limit,
@@ -304,6 +524,28 @@ impl Searchable<false> for Country {
         )
     }
 }
+impl Searchable<false> for DerivedSample {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::DerivedSamples,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for DerivedSample {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::DerivedSamples,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for DocumentFormat {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -319,17 +561,6 @@ impl Searchable<false> for FontAwesomeIcon {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
              Table::FontAwesomeIcons,
-              filter,
-              query,
-              limit,
-              offset,
-        )
-    }
-}
-impl Searchable<false> for LoginProvider {
-    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
-        super::Select::search(
-             Table::LoginProviders,
               filter,
               query,
               limit,
@@ -363,6 +594,39 @@ impl Searchable<true> for Nameplate {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search_updatables(
              Table::Nameplates,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for Observation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Observations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for Observation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::Observations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for OrganismBioOttTaxonItem {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::OrganismBioOttTaxonItems,
               filter,
               query,
               limit,
@@ -436,10 +700,87 @@ impl Searchable<true> for Project {
         )
     }
 }
+impl Searchable<false> for ProjectsTeamsRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsTeamsRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for ProjectsTeamsRoleRequest {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsTeamsRoleRequests,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for ProjectsTeamsRole {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsTeamsRoles,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for ProjectsUsersRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsUsersRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for ProjectsUsersRoleRequest {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsUsersRoleRequests,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for ProjectsUsersRole {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ProjectsUsersRoles,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for Role {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
              Table::Roles,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for SampleBioOttTaxonItem {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::SampleBioOttTaxonItems,
               filter,
               query,
               limit,
@@ -513,6 +854,28 @@ impl Searchable<true> for Sample {
         )
     }
 }
+impl Searchable<false> for SpectraCollection {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::SpectraCollections,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for SpectraCollection {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::SpectraCollections,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for TeamState {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -546,6 +909,50 @@ impl Searchable<true> for Team {
         )
     }
 }
+impl Searchable<false> for TeamsTeamsRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::TeamsTeamsRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for TeamsUsersRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::TeamsUsersRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for TeamsUsersRoleRequest {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::TeamsUsersRoleRequests,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for TeamsUsersRole {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::TeamsUsersRoles,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for Unit {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -572,6 +979,39 @@ impl Searchable<true> for User {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search_updatables(
              Table::Users,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for UsersUsersRoleInvitation {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::UsersUsersRoleInvitations,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for UsersUsersRoleRequest {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::UsersUsersRoleRequests,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for UsersUsersRole {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::UsersUsersRoles,
               filter,
               query,
               limit,

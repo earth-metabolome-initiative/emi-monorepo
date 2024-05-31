@@ -13,7 +13,7 @@ from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadat
 from constraint_checkers.table_metadata import TableStructMetadata
 from constraint_checkers.replace_serial_indices import replace_serial_indices
 from constraint_checkers.write_frontend_router_page import write_frontend_router_page
-from constraint_checkers.indices import PGIndex, PGIndices, find_search_indices
+from constraint_checkers.indices import PGIndex, PGIndices, find_primary_search_indices
 from constraint_checkers.enforce_migration_naming_convention import (
     enforce_migration_naming_convention,
 )
@@ -86,6 +86,8 @@ from constraint_checkers.ensure_can_x_function_existance import ensure_can_x_fun
 from constraint_checkers.ensure_no_dead_python_code import ensure_no_dead_python_code
 from constraint_checkers.write_diesel_sql_function_bindings import write_diesel_sql_function_bindings
 from constraint_checkers.ensures_no_duplicated_migrations import ensures_no_duplicated_migrations
+from constraint_checkers.derived_indices import register_derived_search_indices
+
 
 __all__ = [
     "ensures_all_update_at_trigger_exists",
@@ -106,7 +108,7 @@ __all__ = [
     "write_frontend_router_page",
     "PGIndex",
     "PGIndices",
-    "find_search_indices",
+    "find_primary_search_indices",
     "enforce_migration_naming_convention",
     "generate_view_schema",
     "ensure_tables_have_creation_notification_trigger",
@@ -133,5 +135,6 @@ __all__ = [
     "ensure_can_x_function_existance",
     "ensure_no_dead_python_code",
     "write_diesel_sql_function_bindings",
-    "ensures_no_duplicated_migrations"
+    "ensures_no_duplicated_migrations",
+    "register_derived_search_indices"
 ]

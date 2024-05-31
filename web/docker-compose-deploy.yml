@@ -2,7 +2,9 @@ name: ${DOCKER_PROJECT_NAME}
 services:
   postgres:
     container_name: ${POSTGRES_DOCKER_NAME}
-    image: postgres:latest
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}

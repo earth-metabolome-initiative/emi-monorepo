@@ -9,7 +9,12 @@ from constraint_checkers.find_foreign_keys import (
     is_role_invitation_table,
     is_role_request_table,
 )
-from constraint_checkers.indices import PGIndices, find_search_indices
+from constraint_checkers.indices import (
+    PGIndices,
+    find_primary_search_indices,
+    PGIndex,
+    DerivedPGIndex,
+)
 
 
 def rust_type_to_diesel_type(rust_type: str) -> str:
@@ -61,6 +66,7 @@ class AttributeMetadata:
         name: str,
         data_type: Union[str, "StructMetadata"],
         optional: bool = False,
+        unique: bool = False,
         reference: bool = False,
         mutable: bool = False,
         lifetime: Optional[str] = None,
@@ -69,6 +75,7 @@ class AttributeMetadata:
         self.name = name
         self._data_type = data_type
         self.optional = optional
+        self.unique = unique
         self.reference = reference
         self.mutable = mutable
         self.lifetime = lifetime
@@ -100,6 +107,7 @@ class AttributeMetadata:
             self.name,
             self._data_type,
             self.optional,
+            unique=self.unique,
             reference=True,
         )
 
@@ -111,6 +119,8 @@ class AttributeMetadata:
             self._data_type,
             True,
             reference=self.reference,
+            unique=self.unique,
+            mutable=self.mutable,
         )
 
     def is_image_blob(self) -> bool:
@@ -658,18 +668,20 @@ class StructMetadata:
     pg_indices: PGIndices = None
 
     @staticmethod
-    def _init_indices():
+    def init_indices():
         """Initializes the search indices."""
-        if StructMetadata.pg_indices is None:
-            StructMetadata.pg_indices = find_search_indices(
-                table_metadata=StructMetadata.table_metadata
-            )
+        assert StructMetadata.table_metadata is not None
+        assert StructMetadata.pg_indices is None
+        StructMetadata.pg_indices = find_primary_search_indices(
+            table_metadata=StructMetadata.table_metadata
+        )
 
     @staticmethod
     def init_table_metadata():
         """Initializes the table metadata."""
-        if StructMetadata.table_metadata is None:
-            StructMetadata.table_metadata = find_foreign_keys()
+        assert StructMetadata.table_metadata is None
+        StructMetadata.table_metadata = find_foreign_keys()
+
 
     def __init__(self, struct_name: str, table_name: str):
         self.name = struct_name
@@ -685,6 +697,309 @@ class StructMetadata:
         self._backend_methods: List[MethodDefinition] = []
         self._webcommon_methods: List[MethodDefinition] = []
         self._child_variants: Dict[(str, AttributeMetadata), StructMetadata] = {}
+        self._primary_search_index: Optional[PGIndex] = None
+        self._first_order_derived_search_indices: List[DerivedPGIndex] = []
+        self._second_order_derived_search_indices: List[DerivedPGIndex] = []
+
+    def set_primary_search_index(self, index: PGIndex):
+        """Sets the primary search index of the struct."""
+        assert isinstance(index, PGIndex)
+        if self._primary_search_index is not None:
+            raise ValueError(
+                "The primary search index has already been set for the struct."
+            )
+        assert index.table_name == self.table_name, (
+            "The table name of the index must be the same as the table name of the struct. "
+            f"The provided table name is {index.table_name}, and the table name of the struct is {self.table_name}."
+        )
+        self._primary_search_index = index
+
+    def has_primary_search_index(self) -> bool:
+        """Returns whether the struct has a primary search index."""
+        return self._primary_search_index is not None
+
+    def _retro_fix_zero_alias_number(self, table_name: str, alias_number: int):
+        assert isinstance(alias_number, int)
+        assert isinstance(table_name, str)
+        # Only in the case where the alias number is 1 we need to go back
+        # and fix the case where it needs to be set to zero.
+        if alias_number != 1:
+            return
+        matches_found = 0
+        for other_index in self.get_all_search_indices():
+            if other_index.index_table_name() == table_name:
+                assert not other_index.has_alias_number()
+                other_index.set_alias_number(0)
+                matches_found += 1
+            if isinstance(other_index, DerivedPGIndex) and other_index.is_second_order():
+                if other_index.index.index_table_name() == table_name:
+                    assert not other_index.has_inner_alias_number()
+                    other_index.set_inner_alias_number(0)
+                    matches_found += 1
+        assert matches_found == 1, (
+            "The alias number must be set to zero for exactly one index. "
+            f"The provided table name is {table_name}."
+        )
+
+    def register_first_order_derived_search_index(self, index: DerivedPGIndex):
+        """Registers a first-order derived search index."""
+        assert isinstance(index, DerivedPGIndex)
+        assert index.table_name == self.table_name, (
+            "The table name of the index must be the same as the table name of the struct. "
+            f"The provided table name is {index.table_name}, and the table name of the struct is {self.table_name}."
+        )
+        assert self.has_attribute_by_name(index.foreign_key_id), (
+            "The foreign key ID of the index must be an attribute of the struct. "
+            f"The provided foreign key ID is {index.foreign_key_id}."
+        )
+        assert index.is_first_order(), (
+            "The index must be a first-order derived search index. "
+            f"The provided index is {index}."
+        )
+
+        for other_index in self._first_order_derived_search_indices:
+            assert other_index.foreign_key_id != index.foreign_key_id, (
+                "The index searches over a table that is already covered by another "
+                "first-order derived search index. The current struct is "
+                f"{self.name}, and the provided index searches over the table {index.table_name}'s "
+                f"foreign key {index.foreign_key_id}, which searches over the table {index.index.table_name}. "
+                f"The other first-order derived search index searches over the table {other_index.index.table_name} "
+                "using the SAME foreign key."
+            )
+
+        # We get the number of existing indices that search over the same table,
+        # and if the value is greater than 0, we set the index the alias counter
+        # of the index.
+        alias_number = sum(
+            other_index.index_table_name() == index.index_table_name()
+            for other_index in self.get_all_search_indices()
+        )
+
+        if alias_number> 0:
+            index.set_alias_number(alias_number)
+        self._retro_fix_zero_alias_number(index.index_table_name(), alias_number)
+
+        self._first_order_derived_search_indices.append(index)
+
+    def get_first_order_derived_search_indices(self) -> List[DerivedPGIndex]:
+        """Returns the first-order derived search indices."""
+        return self._first_order_derived_search_indices
+
+    def has_first_order_derived_search_indices(self) -> bool:
+        """Returns whether the struct has first-order derived search indices."""
+        return len(self._first_order_derived_search_indices) > 0
+
+    def has_first_order_derived_search_index_for_foreign_key(
+        self, foreign_key_id: AttributeMetadata
+    ) -> bool:
+        """Returns whether the struct has a first-order derived search index for the foreign key."""
+        return any(
+            index.foreign_key_id == foreign_key_id.name
+            for index in self._first_order_derived_search_indices
+        )
+
+    def register_second_order_derived_search_index(self, index: DerivedPGIndex):
+        """Registers a second-order derived search index."""
+        assert isinstance(index, DerivedPGIndex)
+        assert index.table_name == self.table_name, (
+            "The table name of the index must be the same as the table name of the struct. "
+            f"The provided table name is {index.table_name}, and the table name of the struct is {self.table_name}."
+        )
+        assert self.has_attribute_by_name(index.foreign_key_id), (
+            "The foreign key ID of the index must be an attribute of the struct. "
+            f"The provided foreign key ID is {index.foreign_key_id}."
+        )
+        assert index.is_second_order(), (
+            "The index must be a second-order derived search index. "
+            f"The provided index is {index}."
+        )
+        # We check that this index does not search over a table that can be
+        # covered by a more efficient first-order derived search index.
+        for first_order_index in self._first_order_derived_search_indices:
+            assert first_order_index.foreign_key_id != index.foreign_key_id, (
+                "The index searches over a table that can be covered by a more efficient "
+                "first-order derived search index. The current struct is "
+                f"{self.name}, and the provided index searches over the table {index.table_name}'s "
+                f"foreign key {index.foreign_key_id}, which searches over the table {index.index.table_name}. "
+                f"The first-order derived search index searches over the table {first_order_index.index.table_name} "
+                "using the SAME foreign key."
+            )
+
+        # We check that no other second-order derived search index searches over the same foreign key.
+        for other_index in self._second_order_derived_search_indices:
+            assert other_index.index != index.index or other_index.foreign_key_id != index.foreign_key_id, (
+                "The index searches over a table that is already covered by another "
+                "second-order derived search index. The current struct is "
+                f"{self.name}, and the provided index searches over the table {index.table_name}'s "
+                f"foreign key {index.foreign_key_id}, which searches over the table {index.index.table_name}. "
+                f"The other second-order derived search index searches over the table {other_index.index.table_name} "
+                "using the SAME foreign key."
+            )
+
+        # We get the number of existing indices that search over the same table,
+        # and if the value is greater than 0, we set the index the alias counter
+        # of the index.
+        alias_number = sum(
+            other_index.index_table_name() == index.index_table_name()
+            for other_index in self.get_all_search_indices()
+        ) + sum(
+            second_other_index.index.index_table_name() == index.index_table_name()
+            for second_other_index in self._second_order_derived_search_indices
+        )
+
+        inner_alias_number = sum(
+            other_index.index_table_name() == index.index.index_table_name()
+            for other_index in self.get_all_search_indices()
+        ) + sum(
+            second_other_index.index.index_table_name() == index.index.index_table_name()
+            for second_other_index in self._second_order_derived_search_indices
+        )
+
+        if alias_number > 0:
+            index.set_alias_number(alias_number)
+        self._retro_fix_zero_alias_number(index.index_table_name(), alias_number)
+        if inner_alias_number > 0:
+            index.set_inner_alias_number(inner_alias_number)
+        self._retro_fix_zero_alias_number(index.index.index_table_name(), inner_alias_number)
+
+        self._second_order_derived_search_indices.append(index)
+
+    def get_second_order_derived_search_indices(self) -> List[DerivedPGIndex]:
+        """Returns the second-order derived search indices."""
+        return self._second_order_derived_search_indices
+
+    def has_second_order_derived_search_indices(self) -> bool:
+        """Returns whether the struct has second-order derived search indices."""
+        return len(self._second_order_derived_search_indices) > 0
+
+    def has_derived_search_indices(self) -> bool:
+        """Returns whether the struct has derived search indices."""
+        return (
+            self.has_first_order_derived_search_indices()
+            or self.has_second_order_derived_search_indices()
+        )
+
+    def format_diesel_search_join(self) -> str:
+        """Returns the diesel search join for the struct."""
+        assert (
+            self.has_derived_search_indices()
+        ), "The struct must have derived search indices to format the diesel search join."
+        return "\n".join(
+            index.format_diesel_search_join()
+            for index in self.get_first_order_derived_search_indices()
+            + self.get_second_order_derived_search_indices()
+        )
+
+    def get_all_search_indices(self) -> List[Union[PGIndex, DerivedPGIndex]]:
+        """Returns all search indices of the struct."""
+        return (
+            ([self._primary_search_index] if self.has_primary_search_index() else [])
+            + self.get_first_order_derived_search_indices()
+            + self.get_second_order_derived_search_indices()
+        )
+
+    def format_diesel_search_aliases(self) -> str:
+        """Returns the diesel search aliases for the struct.
+        
+        Implementative details
+        ----------------------
+        In settings such as the multi-index search queries, we execute several
+        join operations. In some tables, there exist several foreign keys to the
+        same table. In such cases, we need to alias the tables to avoid conflicts.
+        """
+        # First, we identify the foreign keys that are used in the search indices
+        # that refer to the same table.
+        table_alias_numbers: Dict[str, List[int]] = {}
+        for index in self.get_all_search_indices():
+            if isinstance(index, DerivedPGIndex):
+                if index.has_alias_number():
+                    table_name = index.index_table_name()
+                    if table_name not in table_alias_numbers:
+                        table_alias_numbers[table_name] = []
+                    table_alias_numbers[table_name].append(index.get_alias_number())
+                if index.has_inner_alias_number():
+                    table_name = index.index.index_table_name()
+                    if table_name not in table_alias_numbers:
+                        table_alias_numbers[table_name] = []
+                    table_alias_numbers[table_name].append(index.get_inner_alias_number())
+        
+        if len(table_alias_numbers) == 0:
+            return ""
+        
+        assert all(len(alias_numbers) > 1 for alias_numbers in table_alias_numbers.values())
+
+        # We then create the aliases for the tables associated to the foreign keys
+        # that are used in the search indices that refer to the same table.
+        aliases = ""
+        for table_name, alias_numbers in table_alias_numbers.items():
+            if len(alias_numbers) > 1:
+                assert len(alias_numbers) == len(set(alias_numbers)), (
+                    "The foreign keys must be unique. "
+                    f"The provided foreign keys are {alias_numbers}."
+                )
+
+                # let (users1, users2) = diesel::alias!(schema::users as user1, schema::users as user2);
+                new_table_names = [
+                    f"{table_name}{alias_number}" for alias_number in alias_numbers
+                ]
+                schema_aliases = ", ".join(
+                    [f"crate::schema::{table_name} as {new_column_name}" for new_column_name in new_table_names]
+                )
+                aliases += f"let ({', '.join(new_table_names)}) = diesel::alias!({schema_aliases});\n"
+        
+        return aliases
+
+
+    def format_diesel_search_filter(self, query: str, similarity_method: str) -> str:
+        """Returns the index in Diesel format.
+
+        Parameters
+        ----------
+        query : str
+            The query to search for.
+        similarity_method : str
+            The similarity method to use.
+        """
+        assert (
+            self.has_derived_search_indices() or self.has_primary_search_index()
+        ), "The struct must have derived search indices or a primary search index to format the diesel search filter."
+
+        search_filter = ".filter(\n"
+        for i, index in enumerate(self.get_all_search_indices()):
+            if i > 0:
+                search_filter += "    .or(\n"
+            search_filter += index.format_diesel_search_filter(query, similarity_method)
+            if i > 0:
+                search_filter += "    )\n"
+        search_filter += ")"
+
+        return search_filter
+
+    def format_diesel_search_order(self, query: str, similarity_method: str) -> str:
+        """Returns the index in Diesel format.
+
+        Parameters
+        ----------
+        query : str
+            The query to search for.
+        similarity_method : str
+            The similarity method to use.
+        """
+        assert (
+            self.has_derived_search_indices() or self.has_primary_search_index()
+        ), "The struct must have derived search indices or a primary search index to format the diesel search order."
+
+        search_order = ".order(\n"
+        for i, index in enumerate(self.get_all_search_indices()):
+            if i > 0:
+                search_order += "    +\n"
+            search_order += index.format_distance_operator_diesel(query, similarity_method)
+            # if i > 0:
+            #     search_order += "    )\n"
+        search_order += ")"
+
+        return search_order
+        
 
     def backend_methods(self) -> List[MethodDefinition]:
         """Returns the methods of the struct."""
@@ -761,6 +1076,39 @@ class StructMetadata:
         """
         return not self.is_insertable() and not self.is_updatable()
 
+    def get_belonging_structs(self) -> List[Tuple["StructMetadata", AttributeMetadata]]:
+        """Returns the structs that the struct belongs to."""
+
+        # Diesel for the time being only supports one single foreign key
+        # per table in the belongs_to attribute. For this reason, we skip
+        # the keys associated to duplicated foreign keys.
+
+        encountered_tables = set()
+        belonging_structs = []
+
+        for attribute in self.get_foreign_keys():
+            foreign_key_table = (
+                StructMetadata.table_metadata.get_foreign_key_table_name(
+                    self.table_name, attribute.name
+                )
+            )
+            if foreign_key_table in encountered_tables:
+                continue
+
+            encountered_tables.add(foreign_key_table)
+            foreign_key_flat_variant = (
+                StructMetadata.table_metadata.get_flat_variant(foreign_key_table)
+            )
+
+            assert foreign_key_flat_variant is not None, (
+                f"The foreign key flat variant for the table {foreign_key_table} "
+                "is not defined."
+            )
+
+            belonging_structs.append((foreign_key_flat_variant, attribute))
+
+        return belonging_structs
+
     def write_to(
         self,
         file: "File",
@@ -794,28 +1142,9 @@ class StructMetadata:
             # per table in the belongs_to attribute. For this reason, we skip
             # the keys associated to duplicated foreign keys.
 
-            encountered_tables = set()
-
-            for attribute in self.get_foreign_keys():
-                foreign_key_table = (
-                    StructMetadata.table_metadata.get_foreign_key_table_name(
-                        self.table_name, attribute.name
-                    )
-                )
-                if foreign_key_table in encountered_tables:
-                    continue
-
-                encountered_tables.add(foreign_key_table)
-                foreign_key_flat_variant = (
-                    StructMetadata.table_metadata.get_flat_variant(foreign_key_table)
-                )
-
-                assert foreign_key_flat_variant is not None, (
-                    f"The foreign key flat variant for the table {foreign_key_table} "
-                    "is not defined."
-                )
+            for belonging_struct, attribute in self.get_belonging_structs(): 
                 file.write(
-                    f"#[diesel(belongs_to({foreign_key_flat_variant.name}, foreign_key = {attribute.name}))]\n"
+                    f"#[diesel(belongs_to(crate::models::{belonging_struct.table_name}::{belonging_struct.name}, foreign_key = {attribute.name}))]\n"
                 )
 
         if diesel is not None:
@@ -1358,6 +1687,16 @@ class StructMetadata:
             attribute == existing_attribute for existing_attribute in self.attributes
         )
 
+    def has_attribute_by_name(self, attribute_name: str) -> bool:
+        """Returns whether the struct has the attribute by name.
+
+        Parameters
+        ----------
+        attribute_name : str
+            The name of the attribute to check.
+        """
+        return any(attribute.name == attribute_name for attribute in self.attributes)
+
     def get_capitalized_table_name(self) -> str:
         return "".join(word.capitalize() for word in self.table_name.split("_"))
 
@@ -1631,8 +1970,9 @@ class StructMetadata:
         -----------------------
         A struct is searchable if it has a trigram index on the table.
         """
-        StructMetadata._init_indices()
-        return StructMetadata.pg_indices.has_table(self.table_name)
+        if self._flat_variant is not None:
+            return self._flat_variant.is_searchable()
+        return self.has_primary_search_index() or self.has_derived_search_indices()
 
     def get_can_update_function_name(self) -> str:
         """Returns the name of the can_update function."""

@@ -1,10 +1,31 @@
+"""Module for finding foreign keys in the database."""
+
 from typing import List, Optional, Tuple, Union, Dict
-import pandas as pd
 from functools import cache
 import os
-from constraint_checkers.cursor import get_cursor
 import re
+import pandas as pd
 from constraint_checkers.regroup_tables import get_desinences
+from constraint_checkers.cursor import get_cursor
+
+SPACED_ARGUMENT_TYPES = ("double precision", "character varying", "center geometry", "timestamp without time zone")
+
+UNSUPPORTED_DATA_TYPES = [
+    "internal",
+    "anyelement",
+    "valid_detail",
+    "box",
+    "box2d",
+    "box3d",
+    "box2df",
+    "box3df",
+    "spheroid",
+    "path",
+    "xid",
+    "gidx"
+]
+
+DENY_FUNCTION_NAMES = []
 
 
 def is_role_table(table_name: str) -> bool:
@@ -86,7 +107,7 @@ def postgres_type_to_diesel_type(postgres_type: str) -> str:
         return "diesel::sql_types::Integer"
     if postgres_type == "text":
         return "diesel::sql_types::Text"
-    if postgres_type == "timestamp with time zone":
+    if postgres_type == "timestamp without time zone":
         return "diesel::sql_types::Timestamp"
     if postgres_type == "uuid":
         return "diesel::sql_types::Uuid"
@@ -94,8 +115,44 @@ def postgres_type_to_diesel_type(postgres_type: str) -> str:
         return "diesel::sql_types::Bool"
     if postgres_type == "real":
         return "diesel::sql_types::Float"
+    if postgres_type == "double precision":
+        return "diesel::sql_types::Double"
+    if postgres_type == "character varying":
+        return "diesel::sql_types::Text"
+    if postgres_type == "bytea":
+        return "diesel::sql_types::Binary"
+    if postgres_type == "json":
+        return "diesel::sql_types::Json"
+    if postgres_type == "jsonb":
+        return "diesel::sql_types::Jsonb"
+    if postgres_type == "record":
+        return "diesel::sql_types::Record"
+    if postgres_type == "oid":
+        return "diesel::sql_types::Oid"
+    if postgres_type == "smallint":
+        return "diesel::sql_types::SmallInt"
+    if postgres_type == "bigint":
+        return "diesel::sql_types::BigInt"
+    if postgres_type == "cstring":
+        return "diesel::sql_types::Text"
+    if postgres_type == "interval":
+        return "diesel::sql_types::Interval"
+    if postgres_type == "geometry":
+        return "postgis_diesel::sql_types::Geometry"
+    if postgres_type == "geography":
+        return "postgis_diesel::sql_types::Geography"
+    if postgres_type == "point":
+        return "postgis_diesel::sql_types::Geometry"
+        # return "postgis_diesel::types::Point"
+    if postgres_type == "polygon":
+        return "postgis_diesel::sql_types::Geometry"
+        # return "postgis_diesel::types::Polygon<postgis_diesel::types::Point>"
 
-    raise ValueError(f"Unknown Postgres type: {postgres_type}")
+    # Here we handle the recursive case of arrays.
+    if postgres_type.endswith("[]"):
+        return f"diesel::pg::sql_types::Array<{postgres_type_to_diesel_type(postgres_type[:-2])}>"
+
+    raise NotImplementedError(f"Unknown Postgres type: {postgres_type}")
 
 
 class SQLFunction:
@@ -110,11 +167,14 @@ class SQLFunction:
 
     def add_argument(self, argument: str, argument_type: str):
         """Adds an argument to the SQL function."""
+        assert len(argument) > 0, "The argument name must not be empty."
+        assert len(argument_type) > 0, "The argument type must not be empty."
         self.arguments.append(argument)
         self.argument_types.append(argument_type)
 
     def set_return_type(self, return_type: str):
         """Sets the return type of the SQL function."""
+        assert len(return_type) > 0, "The return type must not be empty."
         self.return_type = return_type
 
     def set_flat_variant(self, flat_variant: "StructMetadata"):
@@ -128,24 +188,43 @@ class SQLFunction:
         """Writes the Diesel binding for the SQL function to a file."""
         f.write("diesel::expression::functions::sql_function! {\n")
         f.write(f"   fn {self.name}(\n")
-        for argument, argument_type in zip(self.arguments, self.argument_types):
-            if self.flat_variant is not None:
-                optional = self.flat_variant.get_attribute_by_name(argument).optional
-            elif "can_view" in self.name and argument == "author_user_id":
-                optional = True
-            else:
-                optional = False
+        try:
+            for argument, argument_type in zip(self.arguments, self.argument_types):
+                if self.flat_variant is not None:
+                    optional = self.flat_variant.get_attribute_by_name(
+                        argument
+                    ).optional
+                elif "can_view" in self.name and argument == "author_user_id":
+                    optional = True
+                else:
+                    optional = False
 
-            if optional:
-                f.write(
-                    f"        {argument}: diesel::sql_types::Nullable<{postgres_type_to_diesel_type(argument_type)}>,\n"
-                )
+                if argument == "move":
+                    argument = "r#move"
+
+                if optional:
+                    f.write(
+                        f"        {argument}: diesel::sql_types::Nullable<{postgres_type_to_diesel_type(argument_type)}>,\n"
+                    )
+                else:
+                    f.write(
+                        f"        {argument}: {postgres_type_to_diesel_type(argument_type)},\n"
+                    )
+            if self.return_type != "void":
+                f.write(f"    ) -> {postgres_type_to_diesel_type(self.return_type)};\n")
             else:
-                f.write(
-                    f"        {argument}: {postgres_type_to_diesel_type(argument_type)},\n"
-                )
-        f.write(f"    ) -> {postgres_type_to_diesel_type(self.return_type)};\n")
-        f.write("}\n\n")
+                f.write("    );\n")
+            f.write("}\n\n")
+        except NotImplementedError as e:
+            argument_names = ", ".join(
+                f"{argument}: {argument_type}"
+                for argument, argument_type in zip(self.arguments, self.argument_types)
+            )
+
+            raise NotImplementedError(
+                f"Error writing Diesel binding for function {self.name}. "
+                f"Arguments: {argument_names}. Return type: {self.return_type}."
+            ) from e
 
 
 class TableMetadata:
@@ -271,7 +350,8 @@ class TableMetadata:
             FROM
                 information_schema.views
             WHERE
-                table_name = '{view_name}';
+                table_name = '{view_name}'
+            AND table_schema = 'public';
             """
         )
         view_definition = cursor.fetchall()
@@ -315,7 +395,8 @@ class TableMetadata:
                     remapped = True
                     if remapped_table_name is None:
                         raise ValueError(
-                            f"The table {original_table_name} does not exist."
+                            f"The table {original_table_name} does not exist. "
+                            f"We encountered this table in the view {view_name}."
                         )
                     original_table_name = remapped_table_name
 
@@ -564,7 +645,9 @@ class TableMetadata:
             """
         )
 
-        assert cursor.rowcount == 1, f"Column {column_name} does not exist in table {table_name}."
+        assert (
+            cursor.rowcount == 1
+        ), f"Column {column_name} does not exist in table {table_name}."
 
         is_nullable = cursor.fetchone()[0]
 
@@ -1003,19 +1086,80 @@ class TableMetadata:
             "as the can_view and can_update functions."
         )
 
-        sql_functions = []
+        sql_functions: List[SQLFunction] = []
+        overloading_functions: List[SQLFunction] = []
 
         for function in postgres_functions:
             function_name = function[0]
             sql_function = SQLFunction(function_name)
-            arguments = function[2].split(", ")
+            arguments = function[2].split(", ") if len(function[2]) > 0 else []
+
+            if function_name in DENY_FUNCTION_NAMES:
+                continue
+
+            if any(
+                overloading_function.name == function_name
+                for overloading_function in overloading_functions
+            ):
+                continue
+
+            if any(
+                funct.name == function_name
+                for funct in sql_functions
+            ):
+                # We remove the function from the list of functions, as it is overloaded
+                # and at this time we do not support overloading.
+                sql_functions.remove(
+                    next(
+                        funct
+                        for funct in sql_functions
+                        if funct.name == function_name
+                    )
+                )
+
+                overloading_functions.append(sql_function)
+                continue
+
+            if "OUT" in function[2] or "SETOF" in function[2] or "SETOF" in function[1] or "TABLE" in function[1]:
+                # For the moment, we do not support functions with OUT, SETOF or TABLE.
+                continue
+
+            if function_name.startswith("_"):
+                # We do not support functions that start with an underscore,
+                # as they are typically used for internal purposes.
+                continue
+
+            found_unsupported_data_type = False
+
             for i, argument in enumerate(arguments):
-                if " " in argument:
-                    argument_name, argument_type = argument.split(" ")
+                original_argument = argument
+                if "DEFAULT" in argument:
+                    argument = argument.split(" DEFAULT ")[0]
+                if " " in argument and argument not in SPACED_ARGUMENT_TYPES:
+                    argument_name, argument_type = argument.split(" ", maxsplit=1)
+                    if " " in argument_type:
+                        assert argument_type in SPACED_ARGUMENT_TYPES, (
+                            f"Expected the argument type to be among {', '.join(SPACED_ARGUMENT_TYPES)}, "
+                            f"but got '{argument_type}'. "
+                            f"The argument name is '{argument_name}', the argument is '{original_argument}'. "
+                            f"The function name is '{function_name}'."
+                        )
                 else:
                     argument_name = f"arg_{i}"
                     argument_type = argument
+
+                if argument_type in UNSUPPORTED_DATA_TYPES:
+                    found_unsupported_data_type = True
+                    # We do not want to include the internal argument in the function signature.
+                    break
+
                 sql_function.add_argument(argument_name, argument_type)
+            if found_unsupported_data_type:
+                continue
+
+            if function[1] in UNSUPPORTED_DATA_TYPES:
+                continue
+
             sql_function.set_return_type(function[1])
             sql_functions.append(sql_function)
 
