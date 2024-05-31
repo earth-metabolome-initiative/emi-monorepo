@@ -2,17 +2,37 @@ use super::RowToSearchableBadge;
 use crate::traits::format_match::FormatMatch;
 use web_common::database::NestedSampleState;
 use yew::prelude::*;
+use yew_router::prelude::Link;
+use crate::router::AppRoute;
+use crate::components::basic_page::PageLike;
+use web_common::traits::CapitalizeString;
 
 impl RowToSearchableBadge for NestedSampleState {
     fn to_searchable_badge(&self, query: Option<&str>) -> Html {
         html! {
-            <div>
+            <div class={format!("badge {}", self.color.name)}>
+                <Link<AppRoute> to={self.view_path()}>
                 <p>
-                    <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
-                    {'\u{00A0}'}
-                    <span>{self.inner.name.maybe_format_match(query)}</span>
+                        <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
+                        {'\u{00A0}'}
+                        <strong>{self.inner.name.capitalize().maybe_format_match(query)}</strong>
                 </p>
-                <p>{self.inner.description.maybe_format_match(query)}</p>
+                <p class="description">{self.inner.description.maybe_format_match(query)}</p>
+                </Link<AppRoute>>
+            </div>
+        }
+    }
+
+    fn to_searchable_small_badge(&self, query: Option<&str>) -> Html {
+        html! {
+            <div class={format!("badge small {}", self.color.name)}>
+                <Link<AppRoute> to={self.view_path()}>
+                    <p>
+                        <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
+                        {'\u{00A0}'}
+                        <span>{self.inner.name.maybe_format_match(query)}</span>
+                    </p>
+                </Link<AppRoute>>
             </div>
         }
     }
