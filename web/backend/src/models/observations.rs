@@ -44,6 +44,7 @@ use web_common::database::filter_structs::*;
 #[diesel(belongs_to(crate::models::projects::Project, foreign_key = project_id))]
 #[diesel(belongs_to(crate::models::organisms::Organism, foreign_key = organism_id))]
 #[diesel(belongs_to(crate::models::samples::Sample, foreign_key = sample_id))]
+#[diesel(belongs_to(crate::models::observation_subjects::ObservationSubject, foreign_key = subject_id))]
 #[diesel(primary_key(id))]
 pub struct Observation {
     pub id: Uuid,
@@ -55,6 +56,7 @@ pub struct Observation {
     pub project_id: i32,
     pub organism_id: Option<Uuid>,
     pub sample_id: Option<Uuid>,
+    pub subject_id: i32,
     pub notes: Option<String>,
     pub picture: Vec<u8>,
 }
@@ -71,6 +73,7 @@ impl From<Observation> for web_common::database::tables::Observation {
             project_id: item.project_id,
             organism_id: item.organism_id,
             sample_id: item.sample_id,
+            subject_id: item.subject_id,
             notes: item.notes,
             picture: item.picture,
         }
@@ -89,6 +92,7 @@ impl From<web_common::database::tables::Observation> for Observation {
             project_id: item.project_id,
             organism_id: item.organism_id,
             sample_id: item.sample_id,
+            subject_id: item.subject_id,
             notes: item.notes,
             picture: item.picture,
         }
@@ -156,6 +160,9 @@ impl Observation {
         if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
             query = query.filter(observations::dsl::sample_id.eq(sample_id));
         }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            query = query.filter(observations::dsl::subject_id.eq(subject_id));
+        }
         query
             .filter(can_view_observations(author_user_id, observations::dsl::id))
             .offset(offset.unwrap_or(0))
@@ -197,6 +204,9 @@ impl Observation {
         }
         if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
             query = query.filter(observations::dsl::sample_id.eq(sample_id));
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            query = query.filter(observations::dsl::subject_id.eq(subject_id));
         }
         query
             .filter(can_view_observations(author_user_id, observations::dsl::id))
@@ -263,7 +273,12 @@ impl Observation {
             crate::schema::samples as samples2
         );
         if filter
-            .map(|f| f.created_by.is_some() && f.updated_by.is_some() && f.project_id.is_some())
+            .map(|f| {
+                f.created_by.is_some()
+                    && f.updated_by.is_some()
+                    && f.project_id.is_some()
+                    && f.subject_id.is_some()
+            })
             .unwrap_or(false)
         {
             unimplemented!();
@@ -276,6 +291,11 @@ impl Observation {
                 .inner_join(
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
                 )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
@@ -344,6 +364,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
@@ -373,6 +400,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -413,6 +446,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -480,6 +518,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
@@ -509,6 +554,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -549,6 +600,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -616,6 +672,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
@@ -645,6 +708,166 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + similarity_dist(nameplates::dsl::barcode, query)
+                        + similarity_dist(
+                            concat_projects_name_description(
+                                projects1.field(projects::dsl::name),
+                                projects1.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + similarity_dist(sample_containers::dsl::barcode, query)
+                        + similarity_dist(
+                            concat_projects_name_description(
+                                projects2.field(projects::dsl::name),
+                                projects2.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + similarity_dist(
+                            concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            ),
+                            query,
+                        ),
+                )
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            return observations::dsl::observations
+                .filter(observations::dsl::subject_id.eq(subject_id))
+                .select(Observation::as_select())
+                // This operation is defined by a first order index linking observations.project_id to projects.
+                .inner_join(
+                    projects0
+                        .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(observations::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(observations::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects1.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects1.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(samples0.on(
+                    observations::dsl::sample_id.eq(samples0.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(
+                    sample_containers::dsl::sample_containers.on(samples0
+                        .field(samples::dsl::container_id)
+                        .eq(sample_containers::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(samples1.on(
+                    observations::dsl::sample_id.eq(samples1.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(
+                    projects2.on(samples1
+                        .field(samples::dsl::project_id)
+                        .eq(projects2.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(samples2.on(
+                    observations::dsl::sample_id.eq(samples2.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(
+                    sample_states::dsl::sample_states.on(samples2
+                        .field(samples::dsl::state_id)
+                        .eq(sample_states::dsl::id)),
+                )
+                .filter(
+                    observations::dsl::parent_observation_id
+                        .eq(filter.and_then(|f| f.parent_observation_id)),
+                )
+                .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
+                .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
+                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(
+                    similarity_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
+                    .or(similarity_op(nameplates::dsl::barcode, query))
+                    .or(similarity_op(
+                        concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(similarity_op(sample_containers::dsl::barcode, query))
+                    .or(similarity_op(
+                        concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(similarity_op(
+                        concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )),
+                )
+                .order(
+                    similarity_dist(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -681,6 +904,11 @@ impl Observation {
             // This operation is defined by a first order index linking observations.project_id to projects.
             .inner_join(
                 projects0.on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+            )
+            // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+            .inner_join(
+                observation_subjects::dsl::observation_subjects
+                    .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
             )
             // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
             .inner_join(organisms0.on(
@@ -753,6 +981,13 @@ impl Observation {
                     ),
                     query,
                 )
+                .or(similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
                 .or(similarity_op(nameplates::dsl::barcode, query))
                 .or(similarity_op(
                     concat_projects_name_description(
@@ -782,6 +1017,12 @@ impl Observation {
                     concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + similarity_dist(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
                     ),
                     query,
                 ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -851,7 +1092,12 @@ impl Observation {
             crate::schema::samples as samples2
         );
         if filter
-            .map(|f| f.created_by.is_some() && f.updated_by.is_some() && f.project_id.is_some())
+            .map(|f| {
+                f.created_by.is_some()
+                    && f.updated_by.is_some()
+                    && f.project_id.is_some()
+                    && f.subject_id.is_some()
+            })
             .unwrap_or(false)
         {
             unimplemented!();
@@ -864,6 +1110,11 @@ impl Observation {
                 .inner_join(
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
                 )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
@@ -932,6 +1183,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
@@ -961,6 +1219,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -1001,6 +1265,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -1068,6 +1337,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
@@ -1097,6 +1373,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -1137,6 +1419,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -1204,6 +1491,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
@@ -1233,6 +1527,166 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
+                        + word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects1.field(projects::dsl::name),
+                                projects1.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
+                        + word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects2.field(projects::dsl::name),
+                                projects2.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + word_similarity_dist_op(
+                            concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            ),
+                            query,
+                        ),
+                )
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            return observations::dsl::observations
+                .filter(observations::dsl::subject_id.eq(subject_id))
+                .select(Observation::as_select())
+                // This operation is defined by a first order index linking observations.project_id to projects.
+                .inner_join(
+                    projects0
+                        .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(observations::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(observations::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects1.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects1.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(samples0.on(
+                    observations::dsl::sample_id.eq(samples0.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(
+                    sample_containers::dsl::sample_containers.on(samples0
+                        .field(samples::dsl::container_id)
+                        .eq(sample_containers::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(samples1.on(
+                    observations::dsl::sample_id.eq(samples1.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(
+                    projects2.on(samples1
+                        .field(samples::dsl::project_id)
+                        .eq(projects2.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(samples2.on(
+                    observations::dsl::sample_id.eq(samples2.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(
+                    sample_states::dsl::sample_states.on(samples2
+                        .field(samples::dsl::state_id)
+                        .eq(sample_states::dsl::id)),
+                )
+                .filter(
+                    observations::dsl::parent_observation_id
+                        .eq(filter.and_then(|f| f.parent_observation_id)),
+                )
+                .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
+                .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
+                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(
+                    word_similarity_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
+                    .or(word_similarity_op(nameplates::dsl::barcode, query))
+                    .or(word_similarity_op(
+                        concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
+                    .or(word_similarity_op(
+                        concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(word_similarity_op(
+                        concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )),
+                )
+                .order(
+                    word_similarity_dist_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -1269,6 +1723,11 @@ impl Observation {
             // This operation is defined by a first order index linking observations.project_id to projects.
             .inner_join(
                 projects0.on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+            )
+            // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+            .inner_join(
+                observation_subjects::dsl::observation_subjects
+                    .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
             )
             // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
             .inner_join(organisms0.on(
@@ -1341,6 +1800,13 @@ impl Observation {
                     ),
                     query,
                 )
+                .or(word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
                 .or(word_similarity_op(nameplates::dsl::barcode, query))
                 .or(word_similarity_op(
                     concat_projects_name_description(
@@ -1370,6 +1836,12 @@ impl Observation {
                     concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
                     ),
                     query,
                 ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -1439,7 +1911,12 @@ impl Observation {
             crate::schema::samples as samples2
         );
         if filter
-            .map(|f| f.created_by.is_some() && f.updated_by.is_some() && f.project_id.is_some())
+            .map(|f| {
+                f.created_by.is_some()
+                    && f.updated_by.is_some()
+                    && f.project_id.is_some()
+                    && f.subject_id.is_some()
+            })
             .unwrap_or(false)
         {
             unimplemented!();
@@ -1452,6 +1929,11 @@ impl Observation {
                 .inner_join(
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
                 )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
@@ -1520,6 +2002,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
@@ -1552,6 +2041,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -1592,6 +2087,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -1659,6 +2159,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
@@ -1691,6 +2198,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -1731,6 +2244,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -1798,6 +2316,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
@@ -1830,6 +2355,169 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
+                        + strict_word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects1.field(projects::dsl::name),
+                                projects1.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
+                        + strict_word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects2.field(projects::dsl::name),
+                                projects2.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + strict_word_similarity_dist_op(
+                            concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            ),
+                            query,
+                        ),
+                )
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            return observations::dsl::observations
+                .filter(observations::dsl::subject_id.eq(subject_id))
+                .select(Observation::as_select())
+                // This operation is defined by a first order index linking observations.project_id to projects.
+                .inner_join(
+                    projects0
+                        .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(observations::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(observations::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects1.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects1.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(samples0.on(
+                    observations::dsl::sample_id.eq(samples0.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(
+                    sample_containers::dsl::sample_containers.on(samples0
+                        .field(samples::dsl::container_id)
+                        .eq(sample_containers::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(samples1.on(
+                    observations::dsl::sample_id.eq(samples1.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(
+                    projects2.on(samples1
+                        .field(samples::dsl::project_id)
+                        .eq(projects2.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(samples2.on(
+                    observations::dsl::sample_id.eq(samples2.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(
+                    sample_states::dsl::sample_states.on(samples2
+                        .field(samples::dsl::state_id)
+                        .eq(sample_states::dsl::id)),
+                )
+                .filter(
+                    observations::dsl::parent_observation_id
+                        .eq(filter.and_then(|f| f.parent_observation_id)),
+                )
+                .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
+                .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
+                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(
+                    strict_word_similarity_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
+                    .or(strict_word_similarity_op(
+                        concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(
+                        concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(
+                        concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )),
+                )
+                .order(
+                    strict_word_similarity_dist_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -1866,6 +2554,11 @@ impl Observation {
             // This operation is defined by a first order index linking observations.project_id to projects.
             .inner_join(
                 projects0.on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+            )
+            // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+            .inner_join(
+                observation_subjects::dsl::observation_subjects
+                    .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
             )
             // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
             .inner_join(organisms0.on(
@@ -1938,6 +2631,13 @@ impl Observation {
                     ),
                     query,
                 )
+                .or(strict_word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
                 .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                 .or(strict_word_similarity_op(
                     concat_projects_name_description(
@@ -1970,6 +2670,12 @@ impl Observation {
                     concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + strict_word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
                     ),
                     query,
                 ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -2061,6 +2767,9 @@ impl Observation {
         if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
             query = query.filter(observations::dsl::sample_id.eq(sample_id));
         }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            query = query.filter(observations::dsl::subject_id.eq(subject_id));
+        }
         query
             .filter(can_update_observations(
                 author_user_id,
@@ -2105,6 +2814,9 @@ impl Observation {
         }
         if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
             query = query.filter(observations::dsl::sample_id.eq(sample_id));
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            query = query.filter(observations::dsl::subject_id.eq(subject_id));
         }
         query
             .filter(can_update_observations(
@@ -2155,7 +2867,12 @@ impl Observation {
             crate::schema::samples as samples2
         );
         if filter
-            .map(|f| f.created_by.is_some() && f.updated_by.is_some() && f.project_id.is_some())
+            .map(|f| {
+                f.created_by.is_some()
+                    && f.updated_by.is_some()
+                    && f.project_id.is_some()
+                    && f.subject_id.is_some()
+            })
             .unwrap_or(false)
         {
             unimplemented!();
@@ -2168,6 +2885,11 @@ impl Observation {
                 .inner_join(
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
                 )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
@@ -2239,6 +2961,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
@@ -2268,6 +2997,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -2308,6 +3043,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -2378,6 +3118,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
@@ -2407,6 +3154,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -2447,6 +3200,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -2517,6 +3275,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
@@ -2546,6 +3311,169 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + similarity_dist(nameplates::dsl::barcode, query)
+                        + similarity_dist(
+                            concat_projects_name_description(
+                                projects1.field(projects::dsl::name),
+                                projects1.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + similarity_dist(sample_containers::dsl::barcode, query)
+                        + similarity_dist(
+                            concat_projects_name_description(
+                                projects2.field(projects::dsl::name),
+                                projects2.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + similarity_dist(
+                            concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            ),
+                            query,
+                        ),
+                )
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            return observations::dsl::observations
+                .filter(observations::dsl::subject_id.eq(subject_id))
+                .select(Observation::as_select())
+                // This operation is defined by a first order index linking observations.project_id to projects.
+                .inner_join(
+                    projects0
+                        .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(observations::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(observations::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects1.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects1.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(samples0.on(
+                    observations::dsl::sample_id.eq(samples0.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(
+                    sample_containers::dsl::sample_containers.on(samples0
+                        .field(samples::dsl::container_id)
+                        .eq(sample_containers::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(samples1.on(
+                    observations::dsl::sample_id.eq(samples1.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(
+                    projects2.on(samples1
+                        .field(samples::dsl::project_id)
+                        .eq(projects2.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(samples2.on(
+                    observations::dsl::sample_id.eq(samples2.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(
+                    sample_states::dsl::sample_states.on(samples2
+                        .field(samples::dsl::state_id)
+                        .eq(sample_states::dsl::id)),
+                )
+                .filter(
+                    observations::dsl::parent_observation_id
+                        .eq(filter.and_then(|f| f.parent_observation_id)),
+                )
+                .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
+                .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
+                .filter(can_update_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
+                .filter(
+                    similarity_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
+                    .or(similarity_op(nameplates::dsl::barcode, query))
+                    .or(similarity_op(
+                        concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(similarity_op(sample_containers::dsl::barcode, query))
+                    .or(similarity_op(
+                        concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(similarity_op(
+                        concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )),
+                )
+                .order(
+                    similarity_dist(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -2582,6 +3510,11 @@ impl Observation {
             // This operation is defined by a first order index linking observations.project_id to projects.
             .inner_join(
                 projects0.on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+            )
+            // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+            .inner_join(
+                observation_subjects::dsl::observation_subjects
+                    .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
             )
             // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
             .inner_join(organisms0.on(
@@ -2657,6 +3590,13 @@ impl Observation {
                     ),
                     query,
                 )
+                .or(similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
                 .or(similarity_op(nameplates::dsl::barcode, query))
                 .or(similarity_op(
                     concat_projects_name_description(
@@ -2686,6 +3626,12 @@ impl Observation {
                     concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + similarity_dist(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
                     ),
                     query,
                 ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -2755,7 +3701,12 @@ impl Observation {
             crate::schema::samples as samples2
         );
         if filter
-            .map(|f| f.created_by.is_some() && f.updated_by.is_some() && f.project_id.is_some())
+            .map(|f| {
+                f.created_by.is_some()
+                    && f.updated_by.is_some()
+                    && f.project_id.is_some()
+                    && f.subject_id.is_some()
+            })
             .unwrap_or(false)
         {
             unimplemented!();
@@ -2768,6 +3719,11 @@ impl Observation {
                 .inner_join(
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
                 )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
@@ -2839,6 +3795,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
@@ -2868,6 +3831,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -2908,6 +3877,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -2978,6 +3952,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
@@ -3007,6 +3988,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -3047,6 +4034,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -3117,6 +4109,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
@@ -3146,6 +4145,169 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
+                        + word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects1.field(projects::dsl::name),
+                                projects1.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
+                        + word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects2.field(projects::dsl::name),
+                                projects2.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + word_similarity_dist_op(
+                            concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            ),
+                            query,
+                        ),
+                )
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            return observations::dsl::observations
+                .filter(observations::dsl::subject_id.eq(subject_id))
+                .select(Observation::as_select())
+                // This operation is defined by a first order index linking observations.project_id to projects.
+                .inner_join(
+                    projects0
+                        .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(observations::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(observations::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects1.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects1.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(samples0.on(
+                    observations::dsl::sample_id.eq(samples0.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(
+                    sample_containers::dsl::sample_containers.on(samples0
+                        .field(samples::dsl::container_id)
+                        .eq(sample_containers::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(samples1.on(
+                    observations::dsl::sample_id.eq(samples1.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(
+                    projects2.on(samples1
+                        .field(samples::dsl::project_id)
+                        .eq(projects2.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(samples2.on(
+                    observations::dsl::sample_id.eq(samples2.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(
+                    sample_states::dsl::sample_states.on(samples2
+                        .field(samples::dsl::state_id)
+                        .eq(sample_states::dsl::id)),
+                )
+                .filter(
+                    observations::dsl::parent_observation_id
+                        .eq(filter.and_then(|f| f.parent_observation_id)),
+                )
+                .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
+                .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
+                .filter(can_update_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
+                .filter(
+                    word_similarity_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
+                    .or(word_similarity_op(nameplates::dsl::barcode, query))
+                    .or(word_similarity_op(
+                        concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
+                    .or(word_similarity_op(
+                        concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(word_similarity_op(
+                        concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )),
+                )
+                .order(
+                    word_similarity_dist_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -3182,6 +4344,11 @@ impl Observation {
             // This operation is defined by a first order index linking observations.project_id to projects.
             .inner_join(
                 projects0.on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+            )
+            // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+            .inner_join(
+                observation_subjects::dsl::observation_subjects
+                    .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
             )
             // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
             .inner_join(organisms0.on(
@@ -3257,6 +4424,13 @@ impl Observation {
                     ),
                     query,
                 )
+                .or(word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
                 .or(word_similarity_op(nameplates::dsl::barcode, query))
                 .or(word_similarity_op(
                     concat_projects_name_description(
@@ -3286,6 +4460,12 @@ impl Observation {
                     concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
                     ),
                     query,
                 ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -3355,7 +4535,12 @@ impl Observation {
             crate::schema::samples as samples2
         );
         if filter
-            .map(|f| f.created_by.is_some() && f.updated_by.is_some() && f.project_id.is_some())
+            .map(|f| {
+                f.created_by.is_some()
+                    && f.updated_by.is_some()
+                    && f.project_id.is_some()
+                    && f.subject_id.is_some()
+            })
             .unwrap_or(false)
         {
             unimplemented!();
@@ -3368,6 +4553,11 @@ impl Observation {
                 .inner_join(
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
                 )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
@@ -3439,6 +4629,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
@@ -3471,6 +4668,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -3511,6 +4714,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -3581,6 +4789,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
@@ -3613,6 +4828,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -3653,6 +4874,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -3723,6 +4949,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
@@ -3755,6 +4988,172 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
+                        + strict_word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects1.field(projects::dsl::name),
+                                projects1.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
+                        + strict_word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects2.field(projects::dsl::name),
+                                projects2.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + strict_word_similarity_dist_op(
+                            concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            ),
+                            query,
+                        ),
+                )
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            return observations::dsl::observations
+                .filter(observations::dsl::subject_id.eq(subject_id))
+                .select(Observation::as_select())
+                // This operation is defined by a first order index linking observations.project_id to projects.
+                .inner_join(
+                    projects0
+                        .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(observations::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(observations::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects1.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects1.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(samples0.on(
+                    observations::dsl::sample_id.eq(samples0.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(
+                    sample_containers::dsl::sample_containers.on(samples0
+                        .field(samples::dsl::container_id)
+                        .eq(sample_containers::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(samples1.on(
+                    observations::dsl::sample_id.eq(samples1.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(
+                    projects2.on(samples1
+                        .field(samples::dsl::project_id)
+                        .eq(projects2.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(samples2.on(
+                    observations::dsl::sample_id.eq(samples2.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(
+                    sample_states::dsl::sample_states.on(samples2
+                        .field(samples::dsl::state_id)
+                        .eq(sample_states::dsl::id)),
+                )
+                .filter(
+                    observations::dsl::parent_observation_id
+                        .eq(filter.and_then(|f| f.parent_observation_id)),
+                )
+                .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
+                .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
+                .filter(can_update_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
+                .filter(
+                    strict_word_similarity_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
+                    .or(strict_word_similarity_op(
+                        concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(
+                        concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(
+                        concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )),
+                )
+                .order(
+                    strict_word_similarity_dist_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -3791,6 +5190,11 @@ impl Observation {
             // This operation is defined by a first order index linking observations.project_id to projects.
             .inner_join(
                 projects0.on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+            )
+            // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+            .inner_join(
+                observation_subjects::dsl::observation_subjects
+                    .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
             )
             // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
             .inner_join(organisms0.on(
@@ -3866,6 +5270,13 @@ impl Observation {
                     ),
                     query,
                 )
+                .or(strict_word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
                 .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                 .or(strict_word_similarity_op(
                     concat_projects_name_description(
@@ -3898,6 +5309,12 @@ impl Observation {
                     concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + strict_word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
                     ),
                     query,
                 ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -3989,6 +5406,9 @@ impl Observation {
         if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
             query = query.filter(observations::dsl::sample_id.eq(sample_id));
         }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            query = query.filter(observations::dsl::subject_id.eq(subject_id));
+        }
         query
             .filter(can_admin_observations(
                 author_user_id,
@@ -4033,6 +5453,9 @@ impl Observation {
         }
         if let Some(sample_id) = filter.and_then(|f| f.sample_id) {
             query = query.filter(observations::dsl::sample_id.eq(sample_id));
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            query = query.filter(observations::dsl::subject_id.eq(subject_id));
         }
         query
             .filter(can_admin_observations(
@@ -4083,7 +5506,12 @@ impl Observation {
             crate::schema::samples as samples2
         );
         if filter
-            .map(|f| f.created_by.is_some() && f.updated_by.is_some() && f.project_id.is_some())
+            .map(|f| {
+                f.created_by.is_some()
+                    && f.updated_by.is_some()
+                    && f.project_id.is_some()
+                    && f.subject_id.is_some()
+            })
             .unwrap_or(false)
         {
             unimplemented!();
@@ -4096,6 +5524,11 @@ impl Observation {
                 .inner_join(
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
                 )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
@@ -4167,6 +5600,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
@@ -4196,6 +5636,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -4236,6 +5682,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -4306,6 +5757,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
@@ -4335,6 +5793,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -4375,6 +5839,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -4445,6 +5914,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
@@ -4474,6 +5950,169 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + similarity_dist(nameplates::dsl::barcode, query)
+                        + similarity_dist(
+                            concat_projects_name_description(
+                                projects1.field(projects::dsl::name),
+                                projects1.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + similarity_dist(sample_containers::dsl::barcode, query)
+                        + similarity_dist(
+                            concat_projects_name_description(
+                                projects2.field(projects::dsl::name),
+                                projects2.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + similarity_dist(
+                            concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            ),
+                            query,
+                        ),
+                )
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            return observations::dsl::observations
+                .filter(observations::dsl::subject_id.eq(subject_id))
+                .select(Observation::as_select())
+                // This operation is defined by a first order index linking observations.project_id to projects.
+                .inner_join(
+                    projects0
+                        .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(observations::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(observations::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects1.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects1.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(samples0.on(
+                    observations::dsl::sample_id.eq(samples0.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(
+                    sample_containers::dsl::sample_containers.on(samples0
+                        .field(samples::dsl::container_id)
+                        .eq(sample_containers::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(samples1.on(
+                    observations::dsl::sample_id.eq(samples1.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(
+                    projects2.on(samples1
+                        .field(samples::dsl::project_id)
+                        .eq(projects2.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(samples2.on(
+                    observations::dsl::sample_id.eq(samples2.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(
+                    sample_states::dsl::sample_states.on(samples2
+                        .field(samples::dsl::state_id)
+                        .eq(sample_states::dsl::id)),
+                )
+                .filter(
+                    observations::dsl::parent_observation_id
+                        .eq(filter.and_then(|f| f.parent_observation_id)),
+                )
+                .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
+                .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
+                .filter(can_admin_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
+                .filter(
+                    similarity_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    )
+                    .or(similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
+                    .or(similarity_op(nameplates::dsl::barcode, query))
+                    .or(similarity_op(
+                        concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(similarity_op(sample_containers::dsl::barcode, query))
+                    .or(similarity_op(
+                        concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(similarity_op(
+                        concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )),
+                )
+                .order(
+                    similarity_dist(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + similarity_dist(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -4510,6 +6149,11 @@ impl Observation {
             // This operation is defined by a first order index linking observations.project_id to projects.
             .inner_join(
                 projects0.on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+            )
+            // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+            .inner_join(
+                observation_subjects::dsl::observation_subjects
+                    .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
             )
             // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
             .inner_join(organisms0.on(
@@ -4585,6 +6229,13 @@ impl Observation {
                     ),
                     query,
                 )
+                .or(similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
                 .or(similarity_op(nameplates::dsl::barcode, query))
                 .or(similarity_op(
                     concat_projects_name_description(
@@ -4614,6 +6265,12 @@ impl Observation {
                     concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + similarity_dist(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
                     ),
                     query,
                 ) + similarity_dist(nameplates::dsl::barcode, query)
@@ -4683,7 +6340,12 @@ impl Observation {
             crate::schema::samples as samples2
         );
         if filter
-            .map(|f| f.created_by.is_some() && f.updated_by.is_some() && f.project_id.is_some())
+            .map(|f| {
+                f.created_by.is_some()
+                    && f.updated_by.is_some()
+                    && f.project_id.is_some()
+                    && f.subject_id.is_some()
+            })
             .unwrap_or(false)
         {
             unimplemented!();
@@ -4696,6 +6358,11 @@ impl Observation {
                 .inner_join(
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
                 )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
@@ -4767,6 +6434,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
@@ -4796,6 +6470,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -4836,6 +6516,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -4906,6 +6591,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
@@ -4935,6 +6627,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -4975,6 +6673,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -5045,6 +6748,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
@@ -5074,6 +6784,169 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
+                        + word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects1.field(projects::dsl::name),
+                                projects1.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
+                        + word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects2.field(projects::dsl::name),
+                                projects2.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + word_similarity_dist_op(
+                            concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            ),
+                            query,
+                        ),
+                )
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            return observations::dsl::observations
+                .filter(observations::dsl::subject_id.eq(subject_id))
+                .select(Observation::as_select())
+                // This operation is defined by a first order index linking observations.project_id to projects.
+                .inner_join(
+                    projects0
+                        .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(observations::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(observations::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects1.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects1.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(samples0.on(
+                    observations::dsl::sample_id.eq(samples0.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(
+                    sample_containers::dsl::sample_containers.on(samples0
+                        .field(samples::dsl::container_id)
+                        .eq(sample_containers::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(samples1.on(
+                    observations::dsl::sample_id.eq(samples1.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(
+                    projects2.on(samples1
+                        .field(samples::dsl::project_id)
+                        .eq(projects2.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(samples2.on(
+                    observations::dsl::sample_id.eq(samples2.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(
+                    sample_states::dsl::sample_states.on(samples2
+                        .field(samples::dsl::state_id)
+                        .eq(sample_states::dsl::id)),
+                )
+                .filter(
+                    observations::dsl::parent_observation_id
+                        .eq(filter.and_then(|f| f.parent_observation_id)),
+                )
+                .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
+                .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
+                .filter(can_admin_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
+                .filter(
+                    word_similarity_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    )
+                    .or(word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
+                    .or(word_similarity_op(nameplates::dsl::barcode, query))
+                    .or(word_similarity_op(
+                        concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
+                    .or(word_similarity_op(
+                        concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(word_similarity_op(
+                        concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )),
+                )
+                .order(
+                    word_similarity_dist_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -5110,6 +6983,11 @@ impl Observation {
             // This operation is defined by a first order index linking observations.project_id to projects.
             .inner_join(
                 projects0.on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+            )
+            // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+            .inner_join(
+                observation_subjects::dsl::observation_subjects
+                    .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
             )
             // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
             .inner_join(organisms0.on(
@@ -5185,6 +7063,13 @@ impl Observation {
                     ),
                     query,
                 )
+                .or(word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
                 .or(word_similarity_op(nameplates::dsl::barcode, query))
                 .or(word_similarity_op(
                     concat_projects_name_description(
@@ -5214,6 +7099,12 @@ impl Observation {
                     concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
                     ),
                     query,
                 ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -5283,7 +7174,12 @@ impl Observation {
             crate::schema::samples as samples2
         );
         if filter
-            .map(|f| f.created_by.is_some() && f.updated_by.is_some() && f.project_id.is_some())
+            .map(|f| {
+                f.created_by.is_some()
+                    && f.updated_by.is_some()
+                    && f.project_id.is_some()
+                    && f.subject_id.is_some()
+            })
             .unwrap_or(false)
         {
             unimplemented!();
@@ -5296,6 +7192,11 @@ impl Observation {
                 .inner_join(
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
                 )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
@@ -5367,6 +7268,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
@@ -5399,6 +7307,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -5439,6 +7353,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -5509,6 +7428,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
@@ -5541,6 +7467,12 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -5581,6 +7513,11 @@ impl Observation {
                     projects0
                         .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
                 )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
                 // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
                 .inner_join(
                     organisms0.on(observations::dsl::organism_id
@@ -5651,6 +7588,13 @@ impl Observation {
                         ),
                         query,
                     )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
@@ -5683,6 +7627,172 @@ impl Observation {
                         concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
+                        + strict_word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects1.field(projects::dsl::name),
+                                projects1.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
+                        + strict_word_similarity_dist_op(
+                            concat_projects_name_description(
+                                projects2.field(projects::dsl::name),
+                                projects2.field(projects::dsl::description),
+                            ),
+                            query,
+                        )
+                        + strict_word_similarity_dist_op(
+                            concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            ),
+                            query,
+                        ),
+                )
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(subject_id) = filter.and_then(|f| f.subject_id) {
+            return observations::dsl::observations
+                .filter(observations::dsl::subject_id.eq(subject_id))
+                .select(Observation::as_select())
+                // This operation is defined by a first order index linking observations.project_id to projects.
+                .inner_join(
+                    projects0
+                        .on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+                )
+                // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+                .inner_join(
+                    observation_subjects::dsl::observation_subjects
+                        .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(observations::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(observations::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id).nullable())),
+                )
+                // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects1.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects1.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(samples0.on(
+                    observations::dsl::sample_id.eq(samples0.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.container_id to sample_containers.
+                .inner_join(
+                    sample_containers::dsl::sample_containers.on(samples0
+                        .field(samples::dsl::container_id)
+                        .eq(sample_containers::dsl::id)),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(samples1.on(
+                    observations::dsl::sample_id.eq(samples1.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.project_id to projects.
+                .inner_join(
+                    projects2.on(samples1
+                        .field(samples::dsl::project_id)
+                        .eq(projects2.field(projects::dsl::id))),
+                )
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(samples2.on(
+                    observations::dsl::sample_id.eq(samples2.field(samples::dsl::id).nullable()),
+                ))
+                // This operation is defined by a second order index linking observations.sample_id to samples and samples.state_id to sample_states.
+                .inner_join(
+                    sample_states::dsl::sample_states.on(samples2
+                        .field(samples::dsl::state_id)
+                        .eq(sample_states::dsl::id)),
+                )
+                .filter(
+                    observations::dsl::parent_observation_id
+                        .eq(filter.and_then(|f| f.parent_observation_id)),
+                )
+                .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
+                .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
+                .filter(can_admin_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
+                .filter(
+                    strict_word_similarity_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    )
+                    .or(strict_word_similarity_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
+                    .or(strict_word_similarity_op(
+                        concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(
+                        concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ))
+                    .or(strict_word_similarity_op(
+                        concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )),
+                )
+                .order(
+                    strict_word_similarity_dist_op(
+                        concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + strict_word_similarity_dist_op(
+                        concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
                         ),
                         query,
                     ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
@@ -5719,6 +7829,11 @@ impl Observation {
             // This operation is defined by a first order index linking observations.project_id to projects.
             .inner_join(
                 projects0.on(observations::dsl::project_id.eq(projects0.field(projects::dsl::id))),
+            )
+            // This operation is defined by a first order index linking observations.subject_id to observation_subjects.
+            .inner_join(
+                observation_subjects::dsl::observation_subjects
+                    .on(observations::dsl::subject_id.eq(observation_subjects::dsl::id)),
             )
             // This operation is defined by a second order index linking observations.organism_id to organisms and organisms.nameplate_id to nameplates.
             .inner_join(organisms0.on(
@@ -5794,6 +7909,13 @@ impl Observation {
                     ),
                     query,
                 )
+                .or(strict_word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
                 .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                 .or(strict_word_similarity_op(
                     concat_projects_name_description(
@@ -5826,6 +7948,12 @@ impl Observation {
                     concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + strict_word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
                     ),
                     query,
                 ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)

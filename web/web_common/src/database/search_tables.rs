@@ -95,6 +95,17 @@ impl Searchable<true> for NestedNameplate {
         )
     }
 }
+impl Searchable<false> for NestedObservationSubject {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ObservationSubjects,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedObservation {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -594,6 +605,17 @@ impl Searchable<true> for Nameplate {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search_updatables(
              Table::Nameplates,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<false> for ObservationSubject {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::ObservationSubjects,
               filter,
               query,
               limit,

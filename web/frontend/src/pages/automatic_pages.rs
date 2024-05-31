@@ -189,13 +189,20 @@ impl From<&ObservationSubjectPageProp> for PrimaryKey {
     }
 }
 
-impl ObservationSubjectPageProp {}
+impl ObservationSubjectPageProp {
+    fn filter_observations_by_subject_id(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
+        filter.subject_id = Some(self.id);
+        filter
+    }
+}
 
 #[function_component(ObservationSubjectPage)]
 pub fn observation_subject_page(props: &ObservationSubjectPageProp) -> Html {
     html! {
         <BasicPage<NestedObservationSubject> id={PrimaryKey::from(props)}>
-            <span>{"No content available yet."}</span>
+            // Linked with foreign key observations.subject_id
+            <BasicList<NestedObservation> filters={props.filter_observations_by_subject_id()}/>
         </BasicPage<NestedObservationSubject>>
     }
 }

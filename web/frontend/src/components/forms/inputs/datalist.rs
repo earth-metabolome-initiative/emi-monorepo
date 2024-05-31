@@ -144,9 +144,10 @@ where
             },
             DatalistMessage::UpdateCandidates(candidates) => {
                 if candidates.is_empty() {
-                    self.errors.push(ApiError::BadRequest(
-                        vec!["No candidates found".to_string()],
-                    ));
+                    let not_found = ApiError::BadRequest(vec!["No candidates found".to_string()]);
+                    if !self.errors.contains(&not_found) {
+                        self.errors.push(not_found);
+                    }
                 } else {
                     self.errors.clear();
                 }

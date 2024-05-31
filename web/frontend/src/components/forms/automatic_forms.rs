@@ -545,12 +545,14 @@ pub struct ObservationBuilder {
     pub project: Option<NestedProject>,
     pub organism: Option<NestedOrganism>,
     pub sample: Option<NestedSample>,
+    pub subject: Option<NestedObservationSubject>,
     pub errors_notes: Vec<ApiError>,
     pub errors_picture: Vec<ApiError>,
     pub errors_parent_observation: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
     pub errors_organism: Vec<ApiError>,
     pub errors_sample: Vec<ApiError>,
+    pub errors_subject: Vec<ApiError>,
     pub form_updated_at: NaiveDateTime,
 }
 
@@ -564,12 +566,14 @@ impl Default for ObservationBuilder {
             project: Default::default(),
             organism: Default::default(),
             sample: Default::default(),
+            subject: Default::default(),
             errors_notes: Default::default(),
             errors_picture: Default::default(),
             errors_parent_observation: Default::default(),
             errors_project: Default::default(),
             errors_organism: Default::default(),
             errors_sample: Default::default(),
+            errors_subject: Default::default(),
             form_updated_at: Default::default(),
         }
     }
@@ -583,6 +587,7 @@ pub(super) enum ObservationActions {
     SetProject(Option<NestedProject>),
     SetOrganism(Option<NestedOrganism>),
     SetSample(Option<NestedSample>),
+    SetSubject(Option<NestedObservationSubject>),
 }
 
 impl FromOperation for ObservationActions {
@@ -596,6 +601,7 @@ impl FromOperation for ObservationActions {
                 ObservationActions::SetOrganism(Some(bincode::deserialize(&row).unwrap()))
             }
             "sample" => ObservationActions::SetSample(Some(bincode::deserialize(&row).unwrap())),
+            "subject" => ObservationActions::SetSubject(Some(bincode::deserialize(&row).unwrap())),
             operation_name => {
                 unreachable!("The operation name '{}' is not supported.", operation_name)
             }
@@ -686,6 +692,20 @@ impl Reducer<ObservationBuilder> for ObservationActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'sample;
             }
+            ObservationActions::SetSubject(subject) => 'subject: {
+                state_mut.errors_subject.clear();
+                if subject.is_none() {
+                    state_mut.errors_subject.push(ApiError::BadRequest(vec![
+                        "The Subject field is required.".to_string(),
+                    ]));
+                    state_mut.subject = None;
+                    break 'subject;
+                }
+                state_mut.subject = subject;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'subject;
+            }
         }
         state
     }
@@ -702,6 +722,7 @@ impl FormBuilder for ObservationBuilder {
             || !self.errors_project.is_empty()
             || !self.errors_organism.is_empty()
             || !self.errors_sample.is_empty()
+            || !self.errors_subject.is_empty()
     }
 
     fn update(
@@ -722,6 +743,9 @@ impl FormBuilder for ObservationBuilder {
         )));
         dispatcher.apply(ObservationActions::SetOrganism(richest_variant.organism));
         dispatcher.apply(ObservationActions::SetSample(richest_variant.sample));
+        dispatcher.apply(ObservationActions::SetSubject(Some(
+            richest_variant.subject,
+        )));
         let mut named_requests = Vec::new();
         if let Some(parent_observation_id) = richest_variant.inner.parent_observation_id {
             named_requests.push(ComponentMessage::get_named::<&str, Observation>(
@@ -735,7 +759,10 @@ impl FormBuilder for ObservationBuilder {
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors() && self.picture.is_some() && self.project.is_some()
+        !self.has_errors()
+            && self.picture.is_some()
+            && self.project.is_some()
+            && self.subject.is_some()
     }
 }
 
@@ -749,6 +776,7 @@ impl From<ObservationBuilder> for NewObservation {
             project_id: builder.project.unwrap().inner.id,
             organism_id: builder.organism.map(|organism| organism.inner.id),
             sample_id: builder.sample.map(|sample| sample.inner.id),
+            subject_id: builder.subject.unwrap().inner.id,
             notes: builder.notes,
             picture: builder.picture.unwrap(),
         }
@@ -780,6 +808,8 @@ pub struct CreateObservationFormProp {
     pub organism_id: Option<Uuid>,
     #[prop_or_default]
     pub sample_id: Option<Uuid>,
+    #[prop_or_default]
+    pub subject_id: Option<i32>,
 }
 
 #[function_component(CreateObservationForm)]
@@ -810,6 +840,12 @@ pub fn create_observation_form(props: &CreateObservationFormProp) -> Html {
             sample_id.into(),
         ));
     }
+    if let Some(subject_id) = props.subject_id {
+        named_requests.push(ComponentMessage::get_named::<&str, ObservationSubject>(
+            "subject",
+            subject_id.into(),
+        ));
+    }
     let set_notes = builder_dispatch
         .apply_callback(|notes: Option<String>| ObservationActions::SetNotes(notes));
     let set_picture = builder_dispatch.apply_callback(|picture: Option<Image>| {
@@ -826,6 +862,10 @@ pub fn create_observation_form(props: &CreateObservationFormProp) -> Html {
     });
     let set_sample = builder_dispatch
         .apply_callback(|sample: Option<NestedSample>| ObservationActions::SetSample(sample));
+    let set_subject =
+        builder_dispatch.apply_callback(|subject: Option<NestedObservationSubject>| {
+            ObservationActions::SetSubject(subject)
+        });
     html! {
         <BasicForm<NewObservation>
             method={FormMethod::POST}
@@ -837,6 +877,7 @@ pub fn create_observation_form(props: &CreateObservationFormProp) -> Html {
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedOrganism, false> builder={set_organism} optional={true} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
             <Datalist<NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
+            <Datalist<NestedObservationSubject, false> builder={set_subject} optional={false} errors={builder_store.errors_subject.clone()} value={builder_store.subject.clone()} label="Subject" scanner={false} />
         </BasicForm<NewObservation>>
     }
 }
@@ -868,6 +909,10 @@ pub fn update_observation_form(props: &UpdateObservationFormProp) -> Html {
     });
     let set_sample = builder_dispatch
         .apply_callback(|sample: Option<NestedSample>| ObservationActions::SetSample(sample));
+    let set_subject =
+        builder_dispatch.apply_callback(|subject: Option<NestedObservationSubject>| {
+            ObservationActions::SetSubject(subject)
+        });
     html! {
         <BasicForm<NewObservation>
             method={FormMethod::PUT}
@@ -879,6 +924,7 @@ pub fn update_observation_form(props: &UpdateObservationFormProp) -> Html {
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedOrganism, false> builder={set_organism} optional={true} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
             <Datalist<NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
+            <Datalist<NestedObservationSubject, false> builder={set_subject} optional={false} errors={builder_store.errors_subject.clone()} value={builder_store.subject.clone()} label="Subject" scanner={false} />
         </BasicForm<NewObservation>>
     }
 }

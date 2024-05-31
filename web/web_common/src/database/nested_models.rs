@@ -960,6 +960,7 @@ pub struct NestedObservation {
     pub project: NestedProject,
     pub organism: Option<NestedOrganism>,
     pub sample: Option<NestedSample>,
+    pub subject: NestedObservationSubject,
 }
 
 impl Tabular for NestedObservation {
@@ -986,6 +987,7 @@ impl NestedObservation {
             project: NestedProject::get(flat_variant.project_id, connection).await?.unwrap(),
             organism: if let Some(organism_id) = flat_variant.organism_id { NestedOrganism::get(organism_id, connection).await? } else { None },
             sample: if let Some(sample_id) = flat_variant.sample_id { NestedSample::get(sample_id, connection).await? } else { None },
+            subject: NestedObservationSubject::get(flat_variant.subject_id, connection).await?.unwrap(),
             inner: flat_variant,
         })
     }
@@ -1072,6 +1074,7 @@ impl NestedObservation {
         if let Some(sample) = self.sample {
             sample.update_or_insert(connection).await?;
         }
+        self.subject.update_or_insert(connection).await?;
         Ok(())
     }
 }

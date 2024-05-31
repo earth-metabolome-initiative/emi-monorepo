@@ -1,9 +1,9 @@
 use super::RowToSearchableBadge;
 use crate::traits::format_match::FormatMatch;
-use web_common::database::NestedBioOttRank;
+use web_common::database::NestedObservationSubject;
 use yew::prelude::*;
 
-impl RowToSearchableBadge for NestedBioOttRank {
+impl RowToSearchableBadge for NestedObservationSubject {
     fn to_searchable_badge(&self, query: Option<&str>) -> Html {
         html! {
             <div>

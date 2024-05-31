@@ -322,6 +322,7 @@ pub struct ObservationFilter {
     pub project_id: Option<i32>,
     pub organism_id: Option<Uuid>,
     pub sample_id: Option<Uuid>,
+    pub subject_id: Option<i32>,
 }
 
 
@@ -352,6 +353,10 @@ impl ObservationFilter {
 
         if let Some(sample_id) = &self.sample_id {
             filter = filter.and(gluesql::core::ast_builder::col("observations.sample_id").eq(sample_id.to_string()));
+        }
+
+        if let Some(subject_id) = &self.subject_id {
+            filter = filter.and(gluesql::core::ast_builder::col("observations.subject_id").eq(subject_id.to_string()));
         }
 
         filter

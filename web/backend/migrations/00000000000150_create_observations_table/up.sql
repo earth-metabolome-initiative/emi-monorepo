@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS observations (
     project_id INTEGER NOT NULL REFERENCES projects(id),
     organism_id UUID REFERENCES organisms(id),
     sample_id UUID REFERENCES samples(id),
+    subject_id INTEGER NOT NULL REFERENCES observation_subjects(id),
     notes TEXT,
     picture BYTEA NOT NULL
 );

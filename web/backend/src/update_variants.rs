@@ -344,6 +344,7 @@ pub(super) struct IntermediateNewObservation {
     project_id: i32,
     organism_id: Option<Uuid>,
     sample_id: Option<Uuid>,
+    subject_id: i32,
     notes: Option<String>,
     picture: Vec<u8>,
 }
@@ -360,6 +361,7 @@ impl UpdateRow for web_common::database::NewObservation {
             project_id: self.project_id,
             organism_id: self.organism_id,
             sample_id: self.sample_id,
+            subject_id: self.subject_id,
             notes: self.notes,
             picture: self.picture,
         }

@@ -1845,7 +1845,14 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method similarity_search_viewable not implemented for table notifications."),
-            web_common::database::Table::ObservationSubjects => unimplemented!("Method similarity_search_viewable not implemented for table observation_subjects."),
+            web_common::database::Table::ObservationSubjects => {
+bincode::serialize(&NestedObservationSubject::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ObservationSubjectFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
@@ -2201,7 +2208,14 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method word_similarity_search_viewable not implemented for table notifications."),
-            web_common::database::Table::ObservationSubjects => unimplemented!("Method word_similarity_search_viewable not implemented for table observation_subjects."),
+            web_common::database::Table::ObservationSubjects => {
+bincode::serialize(&NestedObservationSubject::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ObservationSubjectFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
@@ -2557,7 +2571,14 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table notifications."),
-            web_common::database::Table::ObservationSubjects => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table observation_subjects."),
+            web_common::database::Table::ObservationSubjects => {
+bincode::serialize(&NestedObservationSubject::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<ObservationSubjectFilter>(&filter)).transpose()?.as_ref(),
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::strict_word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),

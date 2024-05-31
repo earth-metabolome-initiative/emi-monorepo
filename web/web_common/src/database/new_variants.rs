@@ -33,6 +33,7 @@ pub struct NewObservation {
     pub project_id: i32,
     pub organism_id: Option<Uuid>,
     pub sample_id: Option<Uuid>,
+    pub subject_id: i32,
     pub notes: Option<String>,
     pub picture: Vec<u8>,
 }
@@ -59,6 +60,7 @@ impl NewObservation {
                 Some(sample_id) => gluesql::core::ast_builder::uuid(sample_id.to_string()),
                 None => gluesql::core::ast_builder::null(),
             },
+            gluesql::core::ast_builder::num(self.subject_id),
             match self.notes {
                 Some(notes) => gluesql::core::ast_builder::text(notes),
                 None => gluesql::core::ast_builder::null(),
@@ -87,7 +89,7 @@ impl NewObservation {
         let id = self.id;
         table("observations")
             .insert()
-            .columns("created_by,id,parent_observation_id,project_id,organism_id,sample_id,notes,picture,updated_by")
+            .columns("created_by,id,parent_observation_id,project_id,organism_id,sample_id,subject_id,notes,picture,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -118,6 +120,7 @@ impl NewObservation {
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
+.set("subject_id", gluesql::core::ast_builder::num(self.subject_id))        
 .set("picture", gluesql::core::ast_builder::bytea(self.picture))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(parent_observation_id) = self.parent_observation_id {

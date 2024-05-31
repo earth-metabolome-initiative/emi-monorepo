@@ -149,4 +149,277 @@ impl ObservationSubject {
             .first::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn similarity_search_viewable(
+        filter: Option<&ObservationSubjectFilter>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, limit, offset, connection);
+        }
+        use crate::schema::observation_subjects;
+        if filter
+            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return observation_subjects::dsl::observation_subjects
+                .filter(observation_subjects::dsl::icon_id.eq(icon_id))
+                .filter(similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return observation_subjects::dsl::observation_subjects
+                .filter(observation_subjects::dsl::color_id.eq(color_id))
+                .filter(similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(similarity_dist(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        observation_subjects::dsl::observation_subjects
+            .filter(similarity_op(
+                concat_observation_subjects_name_description(
+                    observation_subjects::dsl::name,
+                    observation_subjects::dsl::description,
+                ),
+                query,
+            ))
+            .order(similarity_dist(
+                concat_observation_subjects_name_description(
+                    observation_subjects::dsl::name,
+                    observation_subjects::dsl::description,
+                ),
+                query,
+            ))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn word_similarity_search_viewable(
+        filter: Option<&ObservationSubjectFilter>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, limit, offset, connection);
+        }
+        use crate::schema::observation_subjects;
+        if filter
+            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return observation_subjects::dsl::observation_subjects
+                .filter(observation_subjects::dsl::icon_id.eq(icon_id))
+                .filter(word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return observation_subjects::dsl::observation_subjects
+                .filter(observation_subjects::dsl::color_id.eq(color_id))
+                .filter(word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        observation_subjects::dsl::observation_subjects
+            .filter(word_similarity_op(
+                concat_observation_subjects_name_description(
+                    observation_subjects::dsl::name,
+                    observation_subjects::dsl::description,
+                ),
+                query,
+            ))
+            .order(word_similarity_dist_op(
+                concat_observation_subjects_name_description(
+                    observation_subjects::dsl::name,
+                    observation_subjects::dsl::description,
+                ),
+                query,
+            ))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn strict_word_similarity_search_viewable(
+        filter: Option<&ObservationSubjectFilter>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
+        // If the query string is empty, we run an all query with the
+        // limit parameter provided instead of a more complex similarity
+        // search.
+        if query.is_empty() {
+            return Self::all_viewable(filter, limit, offset, connection);
+        }
+        use crate::schema::observation_subjects;
+        if filter
+            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
+            .unwrap_or(false)
+        {
+            unimplemented!();
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            return observation_subjects::dsl::observation_subjects
+                .filter(observation_subjects::dsl::icon_id.eq(icon_id))
+                .filter(strict_word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            return observation_subjects::dsl::observation_subjects
+                .filter(observation_subjects::dsl::color_id.eq(color_id))
+                .filter(strict_word_similarity_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .order(strict_word_similarity_dist_op(
+                    concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    ),
+                    query,
+                ))
+                .limit(limit.unwrap_or(10))
+                .offset(offset.unwrap_or(0))
+                .load::<Self>(connection)
+                .map_err(web_common::api::ApiError::from);
+        }
+        observation_subjects::dsl::observation_subjects
+            .filter(strict_word_similarity_op(
+                concat_observation_subjects_name_description(
+                    observation_subjects::dsl::name,
+                    observation_subjects::dsl::description,
+                ),
+                query,
+            ))
+            .order(strict_word_similarity_dist_op(
+                concat_observation_subjects_name_description(
+                    observation_subjects::dsl::name,
+                    observation_subjects::dsl::description,
+                ),
+                query,
+            ))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
 }

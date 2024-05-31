@@ -1,22 +1,23 @@
 //! Submodule defining a trait to be implemented by types that can be converted to a badge.
 
+pub mod bio_ott_ranks;
+pub mod bio_ott_taxon_items;
+pub mod colors;
+pub mod document_formats;
+pub mod font_awesome_icons;
+pub mod observation_subjects;
 pub mod observations;
+pub mod organizations;
 pub mod project_state;
 pub mod projects;
-pub mod sample_container;
-pub mod samples;
-pub mod teams;
-pub mod users;
-pub mod bio_ott_ranks;
-pub mod team_states;
-pub mod colors;
-pub mod font_awesome_icons;
 pub mod roles;
-pub mod document_formats;
-pub mod units;
-pub mod bio_ott_taxon_items;
+pub mod sample_container;
 pub mod sample_states;
-pub mod organizations;
+pub mod samples;
+pub mod team_states;
+pub mod teams;
+pub mod units;
+pub mod users;
 
 use web_common::database::*;
 
@@ -41,4 +42,3 @@ impl RowToBadge for Country {}
 impl RowToBadge for NestedSampleContainerCategory {}
 impl RowToBadge for NestedNameplateCategory {}
 impl RowToBadge for NestedNameplate {}
-impl RowToBadge for NestedObservationSubject {}

@@ -2224,6 +2224,67 @@ impl NestedObservationSubject {
         ObservationSubject::get(id, connection)
             .and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
+    /// Search for the viewable structs by a given string by Postgres's `similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn similarity_search_viewable(
+        filter: Option<&ObservationSubjectFilter>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
+        ObservationSubject::similarity_search_viewable(filter, query, limit, offset, connection)?
+            .into_iter()
+            .map(|flat_variant| Self::from_flat(flat_variant, connection))
+            .collect()
+    }
+    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn word_similarity_search_viewable(
+        filter: Option<&ObservationSubjectFilter>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
+        ObservationSubject::word_similarity_search_viewable(
+            filter, query, limit, offset, connection,
+        )?
+        .into_iter()
+        .map(|flat_variant| Self::from_flat(flat_variant, connection))
+        .collect()
+    }
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `filter` - The optional filter to apply to the query.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn strict_word_similarity_search_viewable(
+        filter: Option<&ObservationSubjectFilter>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+    ) -> Result<Vec<Self>, web_common::api::ApiError> {
+        ObservationSubject::strict_word_similarity_search_viewable(
+            filter, query, limit, offset, connection,
+        )?
+        .into_iter()
+        .map(|flat_variant| Self::from_flat(flat_variant, connection))
+        .collect()
+    }
 }
 impl From<web_common::database::nested_models::NestedObservationSubject>
     for NestedObservationSubject
@@ -2256,6 +2317,7 @@ pub struct NestedObservation {
     pub project: NestedProject,
     pub organism: Option<NestedOrganism>,
     pub sample: Option<NestedSample>,
+    pub subject: NestedObservationSubject,
 }
 
 impl NestedObservation {
@@ -2288,6 +2350,7 @@ impl NestedObservation {
                 .sample_id
                 .map(|sample_id| NestedSample::get(sample_id, author_user_id, connection))
                 .transpose()?,
+            subject: NestedObservationSubject::get(flat_variant.subject_id, connection)?,
             inner: flat_variant,
         })
     }
@@ -2773,6 +2836,7 @@ impl From<web_common::database::nested_models::NestedObservation> for NestedObse
             project: item.project.into(),
             organism: item.organism.map(|item| item.into()),
             sample: item.sample.map(|item| item.into()),
+            subject: item.subject.into(),
         }
     }
 }
@@ -2786,6 +2850,7 @@ impl From<NestedObservation> for web_common::database::nested_models::NestedObse
             project: item.project.into(),
             organism: item.organism.map(|item| item.into()),
             sample: item.sample.map(|item| item.into()),
+            subject: item.subject.into(),
         }
     }
 }

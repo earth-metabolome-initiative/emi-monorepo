@@ -7,22 +7,23 @@ pub mod bio_ott_taxon_items;
 pub mod colors;
 pub mod document_formats;
 pub mod font_awesome_icons;
+pub mod nameplate_categories;
+pub mod nameplates;
+pub mod observation_subjects;
 pub mod observations;
+pub mod organisms;
 pub mod organizations;
 pub mod project_states;
 pub mod projects;
-pub mod sample_states;
-pub mod spectra_collections;
-pub mod teams;
-pub mod units;
-pub mod nameplate_categories;
-pub mod nameplates;
-pub mod organisms;
 pub mod roles;
 pub mod sample_container_categories;
 pub mod sample_containers;
+pub mod sample_states;
 pub mod samples;
+pub mod spectra_collections;
 pub mod team_states;
+pub mod teams;
+pub mod units;
 pub mod users;
 
 /// Trait for types that can be converted to a badge.
@@ -35,7 +36,7 @@ pub trait RowToSearchableBadge: RowToBadge {
     fn to_searchable_badge(&self, query: Option<&str>) -> yew::Html;
 
     /// Convert the implementing type to a small badge.
-    /// 
+    ///
     /// # Arguments
     /// * `query` - The optional query whose values are to be highlighted
     ///             using the sublime_fuzzy best_match and format_simple methods.

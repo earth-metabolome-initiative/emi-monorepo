@@ -214,6 +214,7 @@ diesel::table! {
         project_id -> Int4,
         organism_id -> Nullable<Uuid>,
         sample_id -> Nullable<Uuid>,
+        subject_id -> Int4,
         notes -> Nullable<Text>,
         picture -> Bytea,
     }
@@ -712,6 +713,7 @@ diesel::joinable!(nameplates -> projects (project_id));
 diesel::joinable!(notifications -> users (user_id));
 diesel::joinable!(observation_subjects -> colors (color_id));
 diesel::joinable!(observation_subjects -> font_awesome_icons (icon_id));
+diesel::joinable!(observations -> observation_subjects (subject_id));
 diesel::joinable!(observations -> organisms (organism_id));
 diesel::joinable!(observations -> projects (project_id));
 diesel::joinable!(observations -> samples (sample_id));
