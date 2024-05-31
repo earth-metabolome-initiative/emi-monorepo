@@ -9,14 +9,13 @@ use serde::de::DeserializeOwned;
 use web_common::api::form_traits::FormMethod;
 use web_common::database::PrimaryKey;
 use web_common::database::*;
+use web_common::traits::CapitalizeString;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::hooks::use_navigator;
 use yew_router::prelude::Link;
 use yewdux::Dispatch;
-
-use super::App;
 
 pub trait PageLike: DeserializeOwned + Filtrable + PartialEq + Clone + Tabular + 'static {
     fn title(&self) -> String;
@@ -49,7 +48,7 @@ pub trait PageLike: DeserializeOwned + Filtrable + PartialEq + Clone + Tabular +
 
 impl PageLike for NestedBioOttRank {
     fn title(&self) -> String {
-        self.inner.name.clone()
+        self.inner.name.capitalize()
     }
 
     fn description(&self) -> Option<&str> {

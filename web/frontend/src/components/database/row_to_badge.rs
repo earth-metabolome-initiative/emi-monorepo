@@ -3,6 +3,7 @@
 pub mod bio_ott_ranks;
 pub mod bio_ott_taxon_items;
 pub mod colors;
+pub mod countries;
 pub mod document_formats;
 pub mod font_awesome_icons;
 pub mod observation_subjects;
@@ -38,7 +39,6 @@ pub trait RowToBadge {
 impl RowToBadge for NestedOrganism {}
 impl RowToBadge for NestedSpectraCollection {}
 impl RowToBadge for NestedSpectra {}
-impl RowToBadge for Country {}
 impl RowToBadge for NestedSampleContainerCategory {}
 impl RowToBadge for NestedNameplateCategory {}
 impl RowToBadge for NestedNameplate {}

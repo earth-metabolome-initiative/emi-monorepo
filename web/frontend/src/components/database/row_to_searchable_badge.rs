@@ -5,6 +5,7 @@ use super::row_to_badge::RowToBadge;
 pub mod bio_ott_ranks;
 pub mod bio_ott_taxon_items;
 pub mod colors;
+pub mod countries;
 pub mod document_formats;
 pub mod font_awesome_icons;
 pub mod nameplate_categories;

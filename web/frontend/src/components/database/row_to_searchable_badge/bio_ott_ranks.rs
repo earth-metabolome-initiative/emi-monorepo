@@ -25,11 +25,13 @@ impl RowToSearchableBadge for NestedBioOttRank {
     fn to_searchable_small_badge(&self, query: Option<&str>) -> Html {
         html! {
             <div class={format!("badge small {}", self.color.name)}>
-                <p>
-                    <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
-                    {'\u{00A0}'}
-                    <span>{self.inner.name.maybe_format_match(query)}</span>
-                </p>
+                <Link<AppRoute> to={self.view_path()}>
+                    <p>
+                        <i class={format!("fas fa-{} {}", self.icon.name, self.color.name)}></i>
+                        {'\u{00A0}'}
+                        <span>{self.inner.name.maybe_format_match(query)}</span>
+                    </p>
+                </Link<AppRoute>>
             </div>
         }
     }

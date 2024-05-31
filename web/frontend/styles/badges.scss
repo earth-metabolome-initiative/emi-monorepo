@@ -20,6 +20,8 @@ $breakpoints: (
 .badges-container {
     display: grid;
     grid-gap: 10px;
+    margin-top: 1em;
+    margin-bottom: 1em;
     align-items: stretch;
     grid-template-columns: repeat(1, 1fr); // Default for small devices
 
@@ -37,7 +39,9 @@ $breakpoints: (
 }
 
 .badge {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
     border-radius: 0.25rem;
     border: 1px solid;
     border-color: $light_grey;
@@ -54,6 +58,16 @@ $breakpoints: (
         width: auto;
         box-sizing: border-box;
         padding: 0.25rem;
+        border-color: $light_grey;
+    }
+
+    ul.badges-list {
+        list-style: none;
+        padding: 0;
+        padding-top: 0.5em;
+        margin-top: auto;
+        display: flex;
+        flex-wrap: wrap;
     }
 
     img {

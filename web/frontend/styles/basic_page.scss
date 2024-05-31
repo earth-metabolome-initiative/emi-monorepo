@@ -1,5 +1,5 @@
 .page {
-    width: 600px;
+    width: 1200px;
     max-width: 100%;
     margin: 1em auto;
     animation: slide-in-from-bottom 0.3s;
@@ -25,14 +25,6 @@
         color: white;
         font-weight: 600;
         font-size: 1em;
-        border-bottom: 1px solid $near_black;
-        border-top-left-radius: 0.5em;
-        border-top-right-radius: 0.5em;
-    }
-
-    p.description {
-        margin: 0;
-        padding: 0.5em;
         border-bottom: 1px solid $near_black;
         border-top-left-radius: 0.5em;
         border-top-right-radius: 0.5em;

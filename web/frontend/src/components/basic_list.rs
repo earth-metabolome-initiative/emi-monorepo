@@ -107,7 +107,7 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
-            <div class="section_explorer">
+            <div class="page">
                 if ctx.props().filters.is_some() {
                     <h3>
                         <i class={format!("fas fa-{}", Page::icon())}></i>
