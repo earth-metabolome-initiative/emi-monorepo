@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -137,7 +132,9 @@ impl BioOttTaxonItem {
         filter: Option<&BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::bio_ott_taxon_items;
         let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items.into_boxed();
@@ -190,7 +187,9 @@ impl BioOttTaxonItem {
         filter: Option<&BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::bio_ott_taxon_items;
         let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items.into_boxed();
@@ -239,7 +238,9 @@ impl BioOttTaxonItem {
     /// * `connection` - The connection to the database.
     pub fn get(
         id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::bio_ott_taxon_items;
         bio_ott_taxon_items::dsl::bio_ott_taxon_items
@@ -253,7 +254,9 @@ impl BioOttTaxonItem {
     /// * `connection` - The connection to the database.
     pub fn from_ott_id(
         ott_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::bio_ott_taxon_items;
         let flat_variant = bio_ott_taxon_items::dsl::bio_ott_taxon_items
@@ -273,7 +276,9 @@ impl BioOttTaxonItem {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -303,8 +308,17 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(similarity_op(bio_ott_taxon_items::dsl::name, query))
-                .order(similarity_dist(bio_ott_taxon_items::dsl::name, query))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    bio_ott_taxon_items::dsl::name,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -320,8 +334,17 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(similarity_op(bio_ott_taxon_items::dsl::name, query))
-                .order(similarity_dist(bio_ott_taxon_items::dsl::name, query))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    bio_ott_taxon_items::dsl::name,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -337,8 +360,17 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(similarity_op(bio_ott_taxon_items::dsl::name, query))
-                .order(similarity_dist(bio_ott_taxon_items::dsl::name, query))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    bio_ott_taxon_items::dsl::name,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -354,8 +386,17 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(similarity_op(bio_ott_taxon_items::dsl::name, query))
-                .order(similarity_dist(bio_ott_taxon_items::dsl::name, query))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    bio_ott_taxon_items::dsl::name,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -369,8 +410,14 @@ impl BioOttTaxonItem {
             .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
             .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
             .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-            .filter(similarity_op(bio_ott_taxon_items::dsl::name, query))
-            .order(similarity_dist(bio_ott_taxon_items::dsl::name, query))
+            .filter(
+                crate::sql_function_bindings::similarity_op(bio_ott_taxon_items::dsl::name, query)
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                bio_ott_taxon_items::dsl::name,
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -388,7 +435,9 @@ impl BioOttTaxonItem {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -418,8 +467,14 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(word_similarity_op(bio_ott_taxon_items::dsl::name, query))
-                .order(word_similarity_dist_op(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
                     bio_ott_taxon_items::dsl::name,
                     query,
                 ))
@@ -438,8 +493,14 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(word_similarity_op(bio_ott_taxon_items::dsl::name, query))
-                .order(word_similarity_dist_op(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
                     bio_ott_taxon_items::dsl::name,
                     query,
                 ))
@@ -458,8 +519,14 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(word_similarity_op(bio_ott_taxon_items::dsl::name, query))
-                .order(word_similarity_dist_op(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
                     bio_ott_taxon_items::dsl::name,
                     query,
                 ))
@@ -478,8 +545,14 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(word_similarity_op(bio_ott_taxon_items::dsl::name, query))
-                .order(word_similarity_dist_op(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
                     bio_ott_taxon_items::dsl::name,
                     query,
                 ))
@@ -496,8 +569,14 @@ impl BioOttTaxonItem {
             .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
             .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
             .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-            .filter(word_similarity_op(bio_ott_taxon_items::dsl::name, query))
-            .order(word_similarity_dist_op(
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    bio_ott_taxon_items::dsl::name,
+                    query,
+                )
+                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
                 bio_ott_taxon_items::dsl::name,
                 query,
             ))
@@ -518,7 +597,9 @@ impl BioOttTaxonItem {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -548,14 +629,19 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -571,14 +657,19 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -594,14 +685,19 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -617,14 +713,19 @@ impl BioOttTaxonItem {
                 .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
                 .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
                 .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-                .filter(strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    )
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -638,14 +739,19 @@ impl BioOttTaxonItem {
             .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
             .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
             .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-            .filter(strict_word_similarity_op(
-                bio_ott_taxon_items::dsl::name,
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                bio_ott_taxon_items::dsl::name,
-                query,
-            ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    bio_ott_taxon_items::dsl::name,
+                    query,
+                )
+                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    bio_ott_taxon_items::dsl::name,
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

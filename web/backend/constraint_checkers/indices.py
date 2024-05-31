@@ -67,17 +67,11 @@ class PGIndex:
     def __repr__(self) -> str:
         return f"PGIndex(name={self.name}, table_name={self.table_name}, arguments={self.arguments}, index_type={self.index_type})"
 
-    def _format_diesel(
+    def _format_function(
         self,
-        query: str,
-        similarity_method: str,
-        desinence: str,
         alias_number: Optional[int] = None,
     ) -> str:
-        """Returns the index in Diesel format."""
-        assert similarity_method in PGIndices.SIMILARITY_METHODS
-        assert desinence in ("op", "dist", "dist_op")
-
+        """Returns the argument portion of the distance or similarity function."""
         if alias_number == -1:
             alias_number = None
 
@@ -93,16 +87,30 @@ class PGIndex:
                     for argument in self.associated_function.arguments
                 )
 
-            return f"{similarity_method}_{desinence}({self.associated_function.name}({arguments}), {query})"
+            return f"crate::sql_function_bindings::{self.associated_function.name}({arguments})"
 
         assert " " not in self.arguments, (
-            "We are not expecting any spaces in the arguments of the index, as this "
-            f"should be a single argument. The current index is {self}."
+            "The arguments of the index contain spaces, which is not expected. "
+            f"The current index is {self}."
         )
-
         if alias_number is not None:
-            return f"{similarity_method}_{desinence}({self.index_table_name()}{alias_number}.field({self.table_name}::dsl::{self.arguments}), {query})"
-        return f"{similarity_method}_{desinence}({self.index_table_name()}::dsl::{self.arguments}, {query})"
+            return f"{self.index_table_name()}{alias_number}.field({self.table_name}::dsl::{self.arguments})"
+        return f"{self.index_table_name()}::dsl::{self.arguments}"
+        
+
+    def _format_diesel(
+        self,
+        query: str,
+        similarity_method: str,
+        desinence: str,
+        alias_number: Optional[int] = None,
+    ) -> str:
+        """Returns the index in Diesel format."""
+        assert similarity_method in PGIndices.SIMILARITY_METHODS
+        assert desinence in ("op", "dist", "dist_op")
+
+        formatted_function = self._format_function(alias_number)
+        return f"crate::sql_function_bindings::{similarity_method}_{desinence}({formatted_function}, {query})"
 
     def format_diesel_search_filter(
         self, query: str, similarity_method: str, alias_number: Optional[int] = None
@@ -118,7 +126,14 @@ class PGIndex:
         alias_number : Optional[int]
             The alias number of the index.
         """
-        return self._format_diesel(query, similarity_method, "op", alias_number)
+
+        formatted_function = self._format_function(alias_number)
+        
+        return (
+            f"{self._format_diesel(query, similarity_method, 'op', alias_number)}.or(\n"
+            f"    {formatted_function}.ilike(format!(\"%{{}}%\", {query}))\n"
+            ")\n"
+        )
 
     def format_distance_operator_diesel(
         self, query: str, similarity_method: str, alias_number: Optional[int] = None

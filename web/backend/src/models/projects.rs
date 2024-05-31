@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -56,11 +51,11 @@ pub struct Project {
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
-    pub expected_end_date: Option<NaiveDateTime>,
-    pub end_date: Option<NaiveDateTime>,
+    pub updated_at: chrono::NaiveDateTime,
+    pub expected_end_date: Option<chrono::NaiveDateTime>,
+    pub end_date: Option<chrono::NaiveDateTime>,
 }
 
 impl From<Project> for web_common::database::tables::Project {
@@ -117,7 +112,9 @@ impl Project {
     pub fn can_view(
         &self,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_view_by_id(self.id, author_user_id, connection)
     }
@@ -129,11 +126,16 @@ impl Project {
     pub fn can_view_by_id(
         id: i32,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_view_projects(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_view_projects(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the viewable structs from the database.
     ///
@@ -147,7 +149,9 @@ impl Project {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
         let mut query = projects::dsl::projects.into_boxed();
@@ -170,7 +174,10 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -188,7 +195,9 @@ impl Project {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
         let mut query = projects::dsl::projects.into_boxed();
@@ -211,7 +220,10 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
             .order_by(projects::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -226,7 +238,9 @@ impl Project {
     pub fn get(
         id: i32,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         if !Self::can_view_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
@@ -245,7 +259,9 @@ impl Project {
     pub fn from_name(
         name: &str,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::projects;
         let flat_variant = projects::dsl::projects
@@ -270,7 +286,9 @@ impl Project {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -297,16 +315,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -323,16 +353,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -349,16 +391,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -375,16 +429,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -401,16 +467,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -423,13 +501,31 @@ impl Project {
         }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(similarity_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
+            .filter(crate::sql_function_bindings::can_view_projects(
+                author_user_id,
+                projects::dsl::id,
             ))
-            .order(similarity_dist(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -451,7 +547,9 @@ impl Project {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -478,16 +576,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -504,16 +614,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -530,16 +652,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -556,16 +690,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -582,16 +728,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -604,13 +762,31 @@ impl Project {
         }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(word_similarity_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
+            .filter(crate::sql_function_bindings::can_view_projects(
+                author_user_id,
+                projects::dsl::id,
             ))
-            .order(word_similarity_dist_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -632,7 +808,9 @@ impl Project {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -659,21 +837,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -685,21 +877,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -711,21 +917,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -737,21 +957,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -763,21 +997,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_view_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_view_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -785,15 +1033,35 @@ impl Project {
         }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_view_projects(author_user_id, projects::dsl::id))
-            .filter(strict_word_similarity_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
+            .filter(crate::sql_function_bindings::can_view_projects(
+                author_user_id,
+                projects::dsl::id,
             ))
-            .order(strict_word_similarity_dist_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
-            ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -806,7 +1074,9 @@ impl Project {
     pub fn can_update(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_update_by_id(self.id, author_user_id, connection)
     }
@@ -818,11 +1088,16 @@ impl Project {
     pub fn can_update_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_update_projects(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_update_projects(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the updatable structs from the database.
     ///
@@ -836,7 +1111,9 @@ impl Project {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
         let mut query = projects::dsl::projects.into_boxed();
@@ -859,7 +1136,10 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
+            .filter(crate::sql_function_bindings::can_update_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -877,7 +1157,9 @@ impl Project {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
         let mut query = projects::dsl::projects.into_boxed();
@@ -900,7 +1182,10 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
+            .filter(crate::sql_function_bindings::can_update_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
             .order_by(projects::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -921,7 +1206,9 @@ impl Project {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -948,16 +1235,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -974,16 +1273,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1000,16 +1311,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1026,16 +1349,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1052,16 +1387,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1074,13 +1421,31 @@ impl Project {
         }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(similarity_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
+            .filter(crate::sql_function_bindings::can_update_projects(
+                author_user_id,
+                projects::dsl::id,
             ))
-            .order(similarity_dist(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -1102,7 +1467,9 @@ impl Project {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1129,16 +1496,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1155,16 +1534,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1181,16 +1572,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1207,16 +1610,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1233,16 +1648,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1255,13 +1682,31 @@ impl Project {
         }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(word_similarity_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
+            .filter(crate::sql_function_bindings::can_update_projects(
+                author_user_id,
+                projects::dsl::id,
             ))
-            .order(word_similarity_dist_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -1283,7 +1728,9 @@ impl Project {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1310,21 +1757,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1336,21 +1797,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1362,21 +1837,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1388,21 +1877,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1414,21 +1917,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_update_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_update_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1436,15 +1953,35 @@ impl Project {
         }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_update_projects(author_user_id, projects::dsl::id))
-            .filter(strict_word_similarity_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
+            .filter(crate::sql_function_bindings::can_update_projects(
+                author_user_id,
+                projects::dsl::id,
             ))
-            .order(strict_word_similarity_dist_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
-            ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1457,7 +1994,9 @@ impl Project {
     pub fn can_admin(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_admin_by_id(self.id, author_user_id, connection)
     }
@@ -1469,11 +2008,16 @@ impl Project {
     pub fn can_admin_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_admin_projects(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_admin_projects(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the administrable structs from the database.
     ///
@@ -1487,7 +2031,9 @@ impl Project {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
         let mut query = projects::dsl::projects.into_boxed();
@@ -1510,7 +2056,10 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
+            .filter(crate::sql_function_bindings::can_admin_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -1528,7 +2077,9 @@ impl Project {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
         let mut query = projects::dsl::projects.into_boxed();
@@ -1551,7 +2102,10 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
+            .filter(crate::sql_function_bindings::can_admin_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
             .order_by(projects::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -1572,7 +2126,9 @@ impl Project {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1599,16 +2155,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1625,16 +2193,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1651,16 +2231,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1677,16 +2269,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1703,16 +2307,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(similarity_dist(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1725,13 +2341,31 @@ impl Project {
         }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(similarity_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
+            .filter(crate::sql_function_bindings::can_admin_projects(
+                author_user_id,
+                projects::dsl::id,
             ))
-            .order(similarity_dist(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -1753,7 +2387,9 @@ impl Project {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1780,16 +2416,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1806,16 +2454,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1832,16 +2492,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1858,16 +2530,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1884,16 +2568,28 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(word_similarity_dist_op(
-                    concat_projects_name_description(
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects::dsl::name,
                         projects::dsl::description,
                     ),
@@ -1906,13 +2602,31 @@ impl Project {
         }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(word_similarity_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
+            .filter(crate::sql_function_bindings::can_admin_projects(
+                author_user_id,
+                projects::dsl::id,
             ))
-            .order(word_similarity_dist_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -1934,7 +2648,9 @@ impl Project {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1961,21 +2677,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1987,21 +2717,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -2013,21 +2757,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -2039,21 +2797,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -2065,21 +2837,35 @@ impl Project {
                 .filter(
                     projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
                 )
-                .filter(can_admin_projects(author_user_id, projects::dsl::id))
-                .filter(strict_word_similarity_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_projects(
+                    author_user_id,
+                    projects::dsl::id,
                 ))
-                .order(strict_word_similarity_dist_op(
-                    concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -2087,15 +2873,35 @@ impl Project {
         }
         projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
-            .filter(can_admin_projects(author_user_id, projects::dsl::id))
-            .filter(strict_word_similarity_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
+            .filter(crate::sql_function_bindings::can_admin_projects(
+                author_user_id,
+                projects::dsl::id,
             ))
-            .order(strict_word_similarity_dist_op(
-                concat_projects_name_description(projects::dsl::name, projects::dsl::description),
-                query,
-            ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    ),
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -2108,7 +2914,9 @@ impl Project {
     pub fn delete(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         Self::delete_by_id(self.id, author_user_id, connection)
     }
@@ -2120,7 +2928,9 @@ impl Project {
     pub fn delete_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         if !Self::can_admin_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);

@@ -36,8 +36,6 @@ def write_web_common_update_variants(
 
     imports = [
         "use serde::{Deserialize, Serialize};",
-        "use chrono::NaiveDateTime;",
-        "use uuid::Uuid;",
         "use super::*;",
     ]
 

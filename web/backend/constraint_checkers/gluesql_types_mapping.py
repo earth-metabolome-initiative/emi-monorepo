@@ -14,9 +14,9 @@ GLUESQL_TYPES_MAPPING = {
     "f32": "gluesql::core::ast_builder::num({})",
     "f64": "gluesql::core::ast_builder::num({})",
     "String": "gluesql::core::ast_builder::text({})",
-    "Uuid": "gluesql::core::ast_builder::uuid({}.to_string())",
+    "uuid::Uuid": "gluesql::core::ast_builder::uuid({}.to_string())",
     "bool": "({}.into())",
-    "NaiveDateTime": "gluesql::core::ast_builder::timestamp({}.to_string())",
+    "chrono::NaiveDateTime": "gluesql::core::ast_builder::timestamp({}.to_string())",
     "DateTime<Utc>": "gluesql::core::ast_builder::timestamp({}.to_string())",
     "Vec<u8>": "gluesql::core::ast_builder::bytea({})",
 }

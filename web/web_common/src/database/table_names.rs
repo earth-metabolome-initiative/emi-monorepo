@@ -4,7 +4,6 @@
 
 use serde::Deserialize;
 use serde::Serialize;
-use super::*;
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, Copy)]
 pub enum Table {
     BioOttRanks,

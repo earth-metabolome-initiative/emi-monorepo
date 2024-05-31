@@ -4,14 +4,12 @@
 //! This module is automatically generated. Do not write anything here.
 
 use serde::{Deserialize, Serialize};
-use chrono::NaiveDateTime;
-use uuid::Uuid;
 use super::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateDerivedSample {
-    pub parent_sample_id: Uuid,
-    pub child_sample_id: Uuid,
+    pub parent_sample_id: uuid::Uuid,
+    pub child_sample_id: uuid::Uuid,
 }
 
 impl Tabular for UpdateDerivedSample {
@@ -122,8 +120,8 @@ pub struct UpdateProject {
     pub parent_project_id: Option<i32>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
-    pub expected_end_date: Option<NaiveDateTime>,
-    pub end_date: Option<NaiveDateTime>,
+    pub expected_end_date: Option<chrono::NaiveDateTime>,
+    pub end_date: Option<chrono::NaiveDateTime>,
 }
 
 impl Tabular for UpdateProject {
@@ -329,7 +327,7 @@ impl UpdateSpectra {
 pub struct UpdateSpectraCollection {
     pub id: i32,
     pub notes: Option<String>,
-    pub sample_id: Uuid,
+    pub sample_id: uuid::Uuid,
 }
 
 impl Tabular for UpdateSpectraCollection {

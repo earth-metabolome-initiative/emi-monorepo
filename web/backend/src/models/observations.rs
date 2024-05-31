@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -47,15 +42,15 @@ use web_common::database::filter_structs::*;
 #[diesel(belongs_to(crate::models::observation_subjects::ObservationSubject, foreign_key = subject_id))]
 #[diesel(primary_key(id))]
 pub struct Observation {
-    pub id: Uuid,
-    pub parent_observation_id: Option<Uuid>,
+    pub id: uuid::Uuid,
+    pub parent_observation_id: Option<uuid::Uuid>,
     pub created_by: i32,
-    pub created_at: Option<NaiveDateTime>,
+    pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_by: i32,
-    pub updated_at: Option<NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
     pub project_id: i32,
-    pub organism_id: Option<Uuid>,
-    pub sample_id: Option<Uuid>,
+    pub organism_id: Option<uuid::Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     pub subject_id: i32,
     pub notes: Option<String>,
     pub picture: Vec<u8>,
@@ -107,7 +102,9 @@ impl Observation {
     pub fn can_view(
         &self,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_view_by_id(self.id, author_user_id, connection)
     }
@@ -117,13 +114,18 @@ impl Observation {
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
     pub fn can_view_by_id(
-        id: Uuid,
+        id: uuid::Uuid,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_view_observations(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_view_observations(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the viewable structs from the database.
     ///
@@ -137,7 +139,9 @@ impl Observation {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::observations;
         let mut query = observations::dsl::observations.into_boxed();
@@ -164,7 +168,10 @@ impl Observation {
             query = query.filter(observations::dsl::subject_id.eq(subject_id));
         }
         query
-            .filter(can_view_observations(author_user_id, observations::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_observations(
+                author_user_id,
+                observations::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -182,7 +189,9 @@ impl Observation {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::observations;
         let mut query = observations::dsl::observations.into_boxed();
@@ -209,7 +218,10 @@ impl Observation {
             query = query.filter(observations::dsl::subject_id.eq(subject_id));
         }
         query
-            .filter(can_view_observations(author_user_id, observations::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_observations(
+                author_user_id,
+                observations::dsl::id,
+            ))
             .order_by(observations::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -222,9 +234,11 @@ impl Observation {
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `connection` - The connection to the database.
     pub fn get(
-        id: Uuid,
+        id: uuid::Uuid,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         if !Self::can_view_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
@@ -249,7 +263,9 @@ impl Observation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -355,82 +371,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -509,82 +573,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -663,82 +775,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -817,82 +977,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -972,77 +1180,125 @@ impl Observation {
             )
             .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
             .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-            .filter(can_view_observations(author_user_id, observations::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_observations(
+                author_user_id,
+                observations::dsl::id,
+            ))
             .filter(
-                similarity_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
                 )
-                .or(similarity_op(
-                    concat_observation_subjects_name_description(
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects0.field(projects::dsl::name),
+                        projects0.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(similarity_op(nameplates::dsl::barcode, query))
-                .or(similarity_op(
-                    concat_projects_name_description(
+                .or(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects1.field(projects::dsl::name),
                         projects1.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(similarity_op(sample_containers::dsl::barcode, query))
-                .or(similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::similarity_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                )
+                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects2.field(projects::dsl::name),
                         projects2.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(similarity_op(
-                    concat_sample_states_name_description(
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 )),
             )
             .order(
-                similarity_dist(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
-                ) + similarity_dist(
-                    concat_observation_subjects_name_description(
+                ) + crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
-                ) + similarity_dist(nameplates::dsl::barcode, query)
-                    + similarity_dist(
-                        concat_projects_name_description(
+                ) + crate::sql_function_bindings::similarity_dist(nameplates::dsl::barcode, query)
+                    + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    + similarity_dist(sample_containers::dsl::barcode, query)
-                    + similarity_dist(
-                        concat_projects_name_description(
+                    + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    + similarity_dist(
-                        concat_sample_states_name_description(
+                    + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
@@ -1068,7 +1324,9 @@ impl Observation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1174,82 +1432,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -1328,82 +1634,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -1482,82 +1836,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -1636,82 +2038,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -1791,82 +2241,130 @@ impl Observation {
             )
             .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
             .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-            .filter(can_view_observations(author_user_id, observations::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_observations(
+                author_user_id,
+                observations::dsl::id,
+            ))
             .filter(
-                word_similarity_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
                 )
-                .or(word_similarity_op(
-                    concat_observation_subjects_name_description(
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects0.field(projects::dsl::name),
+                        projects0.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(word_similarity_op(nameplates::dsl::barcode, query))
-                .or(word_similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    nameplates::dsl::barcode,
+                    query,
+                )
+                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects1.field(projects::dsl::name),
                         projects1.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                .or(word_similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                )
+                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects2.field(projects::dsl::name),
                         projects2.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(word_similarity_op(
-                    concat_sample_states_name_description(
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 )),
             )
             .order(
-                word_similarity_dist_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
-                ) + word_similarity_dist_op(
-                    concat_observation_subjects_name_description(
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
-                ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                    + word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                    + word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects2.field(projects::dsl::name),
-                            projects2.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + word_similarity_dist_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
                     ),
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
+                ),
             )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -1887,7 +2385,9 @@ impl Observation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1993,85 +2493,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -2150,85 +2697,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -2307,85 +2901,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -2464,85 +3105,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_view_observations(author_user_id, observations::dsl::id))
+                .filter(crate::sql_function_bindings::can_view_observations(
+                    author_user_id,
+                    observations::dsl::id,
+                ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -2622,85 +3310,130 @@ impl Observation {
             )
             .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
             .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-            .filter(can_view_observations(author_user_id, observations::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_observations(
+                author_user_id,
+                observations::dsl::id,
+            ))
             .filter(
-                strict_word_similarity_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
                 )
-                .or(strict_word_similarity_op(
-                    concat_observation_subjects_name_description(
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects0.field(projects::dsl::name),
+                        projects0.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .or(strict_word_similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    nameplates::dsl::barcode,
+                    query,
+                )
+                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects1.field(projects::dsl::name),
                         projects1.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(strict_word_similarity_op(
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
                     sample_containers::dsl::barcode,
                     query,
-                ))
-                .or(strict_word_similarity_op(
-                    concat_projects_name_description(
+                )
+                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects2.field(projects::dsl::name),
                         projects2.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(strict_word_similarity_op(
-                    concat_sample_states_name_description(
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 )),
             )
             .order(
-                strict_word_similarity_dist_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
-                ) + strict_word_similarity_dist_op(
-                    concat_observation_subjects_name_description(
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
-                ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                    + strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                    + strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects2.field(projects::dsl::name),
-                            projects2.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + strict_word_similarity_dist_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
                     ),
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
+                ),
             )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -2714,7 +3447,9 @@ impl Observation {
     pub fn can_update(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_update_by_id(self.id, author_user_id, connection)
     }
@@ -2724,13 +3459,18 @@ impl Observation {
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
     pub fn can_update_by_id(
-        id: Uuid,
+        id: uuid::Uuid,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_update_observations(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_update_observations(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the updatable structs from the database.
     ///
@@ -2744,7 +3484,9 @@ impl Observation {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::observations;
         let mut query = observations::dsl::observations.into_boxed();
@@ -2771,7 +3513,7 @@ impl Observation {
             query = query.filter(observations::dsl::subject_id.eq(subject_id));
         }
         query
-            .filter(can_update_observations(
+            .filter(crate::sql_function_bindings::can_update_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
@@ -2792,7 +3534,9 @@ impl Observation {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::observations;
         let mut query = observations::dsl::observations.into_boxed();
@@ -2819,7 +3563,7 @@ impl Observation {
             query = query.filter(observations::dsl::subject_id.eq(subject_id));
         }
         query
-            .filter(can_update_observations(
+            .filter(crate::sql_function_bindings::can_update_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
@@ -2843,7 +3587,9 @@ impl Observation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -2949,85 +3695,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -3106,85 +3897,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -3263,85 +4099,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -3420,85 +4301,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -3578,80 +4504,125 @@ impl Observation {
             )
             .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
             .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-            .filter(can_update_observations(
+            .filter(crate::sql_function_bindings::can_update_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
             .filter(
-                similarity_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
                 )
-                .or(similarity_op(
-                    concat_observation_subjects_name_description(
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects0.field(projects::dsl::name),
+                        projects0.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(similarity_op(nameplates::dsl::barcode, query))
-                .or(similarity_op(
-                    concat_projects_name_description(
+                .or(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects1.field(projects::dsl::name),
                         projects1.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(similarity_op(sample_containers::dsl::barcode, query))
-                .or(similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::similarity_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                )
+                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects2.field(projects::dsl::name),
                         projects2.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(similarity_op(
-                    concat_sample_states_name_description(
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 )),
             )
             .order(
-                similarity_dist(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
-                ) + similarity_dist(
-                    concat_observation_subjects_name_description(
+                ) + crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
-                ) + similarity_dist(nameplates::dsl::barcode, query)
-                    + similarity_dist(
-                        concat_projects_name_description(
+                ) + crate::sql_function_bindings::similarity_dist(nameplates::dsl::barcode, query)
+                    + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    + similarity_dist(sample_containers::dsl::barcode, query)
-                    + similarity_dist(
-                        concat_projects_name_description(
+                    + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    + similarity_dist(
-                        concat_sample_states_name_description(
+                    + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
@@ -3677,7 +4648,9 @@ impl Observation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -3783,85 +4756,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -3940,85 +4958,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -4097,85 +5160,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -4254,85 +5362,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -4412,85 +5565,130 @@ impl Observation {
             )
             .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
             .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-            .filter(can_update_observations(
+            .filter(crate::sql_function_bindings::can_update_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
             .filter(
-                word_similarity_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
                 )
-                .or(word_similarity_op(
-                    concat_observation_subjects_name_description(
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects0.field(projects::dsl::name),
+                        projects0.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(word_similarity_op(nameplates::dsl::barcode, query))
-                .or(word_similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    nameplates::dsl::barcode,
+                    query,
+                )
+                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects1.field(projects::dsl::name),
                         projects1.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                .or(word_similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                )
+                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects2.field(projects::dsl::name),
                         projects2.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(word_similarity_op(
-                    concat_sample_states_name_description(
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 )),
             )
             .order(
-                word_similarity_dist_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
-                ) + word_similarity_dist_op(
-                    concat_observation_subjects_name_description(
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
-                ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                    + word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                    + word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects2.field(projects::dsl::name),
-                            projects2.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + word_similarity_dist_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
                     ),
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
+                ),
             )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -4511,7 +5709,9 @@ impl Observation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -4617,88 +5817,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -4777,88 +6021,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -4937,88 +6225,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -5097,88 +6429,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_update_observations(
+                .filter(crate::sql_function_bindings::can_update_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -5258,88 +6634,130 @@ impl Observation {
             )
             .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
             .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-            .filter(can_update_observations(
+            .filter(crate::sql_function_bindings::can_update_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
             .filter(
-                strict_word_similarity_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
                 )
-                .or(strict_word_similarity_op(
-                    concat_observation_subjects_name_description(
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects0.field(projects::dsl::name),
+                        projects0.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .or(strict_word_similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    nameplates::dsl::barcode,
+                    query,
+                )
+                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects1.field(projects::dsl::name),
                         projects1.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(strict_word_similarity_op(
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
                     sample_containers::dsl::barcode,
                     query,
-                ))
-                .or(strict_word_similarity_op(
-                    concat_projects_name_description(
+                )
+                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects2.field(projects::dsl::name),
                         projects2.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(strict_word_similarity_op(
-                    concat_sample_states_name_description(
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 )),
             )
             .order(
-                strict_word_similarity_dist_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
-                ) + strict_word_similarity_dist_op(
-                    concat_observation_subjects_name_description(
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
-                ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                    + strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                    + strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects2.field(projects::dsl::name),
-                            projects2.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + strict_word_similarity_dist_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
                     ),
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
+                ),
             )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -5353,7 +6771,9 @@ impl Observation {
     pub fn can_admin(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_admin_by_id(self.id, author_user_id, connection)
     }
@@ -5363,13 +6783,18 @@ impl Observation {
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
     pub fn can_admin_by_id(
-        id: Uuid,
+        id: uuid::Uuid,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_admin_observations(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_admin_observations(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the administrable structs from the database.
     ///
@@ -5383,7 +6808,9 @@ impl Observation {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::observations;
         let mut query = observations::dsl::observations.into_boxed();
@@ -5410,7 +6837,7 @@ impl Observation {
             query = query.filter(observations::dsl::subject_id.eq(subject_id));
         }
         query
-            .filter(can_admin_observations(
+            .filter(crate::sql_function_bindings::can_admin_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
@@ -5431,7 +6858,9 @@ impl Observation {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::observations;
         let mut query = observations::dsl::observations.into_boxed();
@@ -5458,7 +6887,7 @@ impl Observation {
             query = query.filter(observations::dsl::subject_id.eq(subject_id));
         }
         query
-            .filter(can_admin_observations(
+            .filter(crate::sql_function_bindings::can_admin_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
@@ -5482,7 +6911,9 @@ impl Observation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -5588,85 +7019,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -5745,85 +7221,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -5902,85 +7423,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -6059,85 +7625,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(nameplates::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(sample_containers::dsl::barcode, query))
-                    .or(similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    similarity_dist(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + similarity_dist(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + similarity_dist(nameplates::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(sample_containers::dsl::barcode, query)
-                        + similarity_dist(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + similarity_dist(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -6217,80 +7828,125 @@ impl Observation {
             )
             .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
             .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-            .filter(can_admin_observations(
+            .filter(crate::sql_function_bindings::can_admin_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
             .filter(
-                similarity_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
                 )
-                .or(similarity_op(
-                    concat_observation_subjects_name_description(
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects0.field(projects::dsl::name),
+                        projects0.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(similarity_op(nameplates::dsl::barcode, query))
-                .or(similarity_op(
-                    concat_projects_name_description(
+                .or(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects1.field(projects::dsl::name),
                         projects1.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(similarity_op(sample_containers::dsl::barcode, query))
-                .or(similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::similarity_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                )
+                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects2.field(projects::dsl::name),
                         projects2.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(similarity_op(
-                    concat_sample_states_name_description(
+                .or(crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 )),
             )
             .order(
-                similarity_dist(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
-                ) + similarity_dist(
-                    concat_observation_subjects_name_description(
+                ) + crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
-                ) + similarity_dist(nameplates::dsl::barcode, query)
-                    + similarity_dist(
-                        concat_projects_name_description(
+                ) + crate::sql_function_bindings::similarity_dist(nameplates::dsl::barcode, query)
+                    + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    + similarity_dist(sample_containers::dsl::barcode, query)
-                    + similarity_dist(
-                        concat_projects_name_description(
+                    + crate::sql_function_bindings::similarity_dist(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    + similarity_dist(
-                        concat_sample_states_name_description(
+                    + crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
@@ -6316,7 +7972,9 @@ impl Observation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -6422,85 +8080,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -6579,85 +8282,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -6736,85 +8484,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -6893,85 +8686,130 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                    .or(word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(word_similarity_op(
-                        concat_sample_states_name_description(
+                    .or(crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )),
                 )
                 .order(
-                    word_similarity_dist_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
-                    ) + word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
-                    ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + word_similarity_dist_op(
-                            concat_sample_states_name_description(
-                                sample_states::dsl::name,
-                                sample_states::dsl::description,
-                            ),
-                            query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
                         ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -7051,85 +8889,130 @@ impl Observation {
             )
             .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
             .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-            .filter(can_admin_observations(
+            .filter(crate::sql_function_bindings::can_admin_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
             .filter(
-                word_similarity_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
                 )
-                .or(word_similarity_op(
-                    concat_observation_subjects_name_description(
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects0.field(projects::dsl::name),
+                        projects0.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(word_similarity_op(nameplates::dsl::barcode, query))
-                .or(word_similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    nameplates::dsl::barcode,
+                    query,
+                )
+                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects1.field(projects::dsl::name),
                         projects1.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(word_similarity_op(sample_containers::dsl::barcode, query))
-                .or(word_similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                )
+                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects2.field(projects::dsl::name),
                         projects2.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(word_similarity_op(
-                    concat_sample_states_name_description(
+                .or(crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 )),
             )
             .order(
-                word_similarity_dist_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
-                ) + word_similarity_dist_op(
-                    concat_observation_subjects_name_description(
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
-                ) + word_similarity_dist_op(nameplates::dsl::barcode, query)
-                    + word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                    + word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects2.field(projects::dsl::name),
-                            projects2.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + word_similarity_dist_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
                     ),
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
+                ),
             )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -7150,7 +9033,9 @@ impl Observation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -7256,88 +9141,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -7416,88 +9345,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -7576,88 +9549,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -7736,88 +9753,132 @@ impl Observation {
                 )
                 .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
                 .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-                .filter(can_admin_observations(
+                .filter(crate::sql_function_bindings::can_admin_observations(
                     author_user_id,
                     observations::dsl::id,
                 ))
                 .filter(
-                    strict_word_similarity_op(
-                        concat_projects_name_description(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
                             projects0.field(projects::dsl::description),
                         ),
                         query,
                     )
-                    .or(strict_word_similarity_op(
-                        concat_observation_subjects_name_description(
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    )
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
                             observation_subjects::dsl::name,
                             observation_subjects::dsl::description,
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects1.field(projects::dsl::name),
                             projects1.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers::dsl::barcode,
                         query,
-                    ))
-                    .or(strict_word_similarity_op(
-                        concat_projects_name_description(
+                    )
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
                             projects2.field(projects::dsl::name),
                             projects2.field(projects::dsl::description),
                         ),
                         query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
                     ))
-                    .or(strict_word_similarity_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )),
-                )
-                .order(
-                    strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(
-                        concat_observation_subjects_name_description(
-                            observation_subjects::dsl::name,
-                            observation_subjects::dsl::description,
-                        ),
-                        query,
-                    ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects1.field(projects::dsl::name),
-                                projects1.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                        + strict_word_similarity_dist_op(
-                            concat_projects_name_description(
-                                projects2.field(projects::dsl::name),
-                                projects2.field(projects::dsl::description),
-                            ),
-                            query,
-                        )
-                        + strict_word_similarity_dist_op(
-                            concat_sample_states_name_description(
+                    .or(
+                        crate::sql_function_bindings::strict_word_similarity_op(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
                                 sample_states::dsl::name,
                                 sample_states::dsl::description,
                             ),
                             query,
+                        )
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
+                    ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects0.field(projects::dsl::name),
+                            projects0.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_observation_subjects_name_description(
+                            observation_subjects::dsl::name,
+                            observation_subjects::dsl::description,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects1.field(projects::dsl::name),
+                            projects1.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        sample_containers::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects2.field(projects::dsl::name),
+                            projects2.field(projects::dsl::description),
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    ),
                 )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
@@ -7897,88 +9958,130 @@ impl Observation {
             )
             .filter(observations::dsl::organism_id.eq(filter.and_then(|f| f.organism_id)))
             .filter(observations::dsl::sample_id.eq(filter.and_then(|f| f.sample_id)))
-            .filter(can_admin_observations(
+            .filter(crate::sql_function_bindings::can_admin_observations(
                 author_user_id,
                 observations::dsl::id,
             ))
             .filter(
-                strict_word_similarity_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
                 )
-                .or(strict_word_similarity_op(
-                    concat_observation_subjects_name_description(
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects0.field(projects::dsl::name),
+                        projects0.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
+                        observation_subjects::dsl::name,
+                        observation_subjects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .or(strict_word_similarity_op(
-                    concat_projects_name_description(
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    nameplates::dsl::barcode,
+                    query,
+                )
+                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects1.field(projects::dsl::name),
                         projects1.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(strict_word_similarity_op(
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
                     sample_containers::dsl::barcode,
                     query,
-                ))
-                .or(strict_word_similarity_op(
-                    concat_projects_name_description(
+                )
+                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects2.field(projects::dsl::name),
                         projects2.field(projects::dsl::description),
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)),
                 ))
-                .or(strict_word_similarity_op(
-                    concat_sample_states_name_description(
+                .or(crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
                     query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 )),
             )
             .order(
-                strict_word_similarity_dist_op(
-                    concat_projects_name_description(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
                         projects0.field(projects::dsl::name),
                         projects0.field(projects::dsl::description),
                     ),
                     query,
-                ) + strict_word_similarity_dist_op(
-                    concat_observation_subjects_name_description(
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_observation_subjects_name_description(
                         observation_subjects::dsl::name,
                         observation_subjects::dsl::description,
                     ),
                     query,
-                ) + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
-                    + strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + strict_word_similarity_dist_op(sample_containers::dsl::barcode, query)
-                    + strict_word_similarity_dist_op(
-                        concat_projects_name_description(
-                            projects2.field(projects::dsl::name),
-                            projects2.field(projects::dsl::description),
-                        ),
-                        query,
-                    )
-                    + strict_word_similarity_dist_op(
-                        concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects1.field(projects::dsl::name),
+                        projects1.field(projects::dsl::description),
                     ),
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects2.field(projects::dsl::name),
+                        projects2.field(projects::dsl::description),
+                    ),
+                    query,
+                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
+                ),
             )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -7992,7 +10095,9 @@ impl Observation {
     pub fn delete(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         Self::delete_by_id(self.id, author_user_id, connection)
     }
@@ -8002,9 +10107,11 @@ impl Observation {
     /// * `author_user_id` - The ID of the user who is deleting the struct.
     /// * `connection` - The connection to the database.
     pub fn delete_by_id(
-        id: Uuid,
+        id: uuid::Uuid,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         if !Self::can_admin_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);

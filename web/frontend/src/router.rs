@@ -40,35 +40,35 @@ pub enum AppRoute {
     #[at("/observations")]
     Observations,
     #[at("/observations/:id")]
-    ObservationsView { id: Uuid },
+    ObservationsView { id: uuid::Uuid },
     #[at("/observations/new")]
     ObservationsNew,
     #[at("/observations/new/parent_observation/:parent_observation_id")]
-    ObservationsNewWithParentObservation { parent_observation_id: Uuid },
+    ObservationsNewWithParentObservation { parent_observation_id: uuid::Uuid },
     #[at("/observations/new/project/:project_id")]
     ObservationsNewWithProject { project_id: i32 },
     #[at("/observations/new/organism/:organism_id")]
-    ObservationsNewWithOrganism { organism_id: Uuid },
+    ObservationsNewWithOrganism { organism_id: uuid::Uuid },
     #[at("/observations/new/sample/:sample_id")]
-    ObservationsNewWithSample { sample_id: Uuid },
+    ObservationsNewWithSample { sample_id: uuid::Uuid },
     #[at("/observations/:id/update")]
-    ObservationsUpdate { id: Uuid },
+    ObservationsUpdate { id: uuid::Uuid },
     #[at("/organisms")]
     Organisms,
     #[at("/organisms/:id")]
-    OrganismsView { id: Uuid },
+    OrganismsView { id: uuid::Uuid },
     #[at("/organisms/new")]
     OrganismsNew,
     #[at("/organisms/new/host_organism/:host_organism_id")]
-    OrganismsNewWithHostOrganism { host_organism_id: Uuid },
+    OrganismsNewWithHostOrganism { host_organism_id: uuid::Uuid },
     #[at("/organisms/new/sample/:sample_id")]
-    OrganismsNewWithSample { sample_id: Uuid },
+    OrganismsNewWithSample { sample_id: uuid::Uuid },
     #[at("/organisms/new/nameplate/:nameplate_id")]
     OrganismsNewWithNameplate { nameplate_id: i32 },
     #[at("/organisms/new/project/:project_id")]
     OrganismsNewWithProject { project_id: i32 },
     #[at("/organisms/:id/update")]
-    OrganismsUpdate { id: Uuid },
+    OrganismsUpdate { id: uuid::Uuid },
     #[at("/organizations")]
     Organizations,
     #[at("/organizations/:id")]
@@ -100,7 +100,7 @@ pub enum AppRoute {
     #[at("/samples")]
     Samples,
     #[at("/samples/:id")]
-    SamplesView { id: Uuid },
+    SamplesView { id: uuid::Uuid },
     #[at("/samples/new")]
     SamplesNew,
     #[at("/samples/new/container/:container_id")]
@@ -110,7 +110,7 @@ pub enum AppRoute {
     #[at("/samples/new/sampled_by/:sampled_by")]
     SamplesNewWithSampledBy { sampled_by: i32 },
     #[at("/samples/:id/update")]
-    SamplesUpdate { id: Uuid },
+    SamplesUpdate { id: uuid::Uuid },
     #[at("/spectra_collections")]
     SpectraCollections,
     #[at("/spectra_collections/:id")]
@@ -118,7 +118,7 @@ pub enum AppRoute {
     #[at("/spectra_collections/new")]
     SpectraCollectionsNew,
     #[at("/spectra_collections/new/sample/:sample_id")]
-    SpectraCollectionsNewWithSample { sample_id: Uuid },
+    SpectraCollectionsNewWithSample { sample_id: uuid::Uuid },
     #[at("/spectra_collections/:id/update")]
     SpectraCollectionsUpdate { id: i32 },
     #[at("/teams")]

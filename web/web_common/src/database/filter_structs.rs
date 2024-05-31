@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 pub struct EmptyFilter;
@@ -101,8 +100,8 @@ impl BioOttTaxonItemFilter {
 pub struct DerivedSampleFilter {
     pub created_by: Option<i32>,
     pub updated_by: Option<i32>,
-    pub parent_sample_id: Option<Uuid>,
-    pub child_sample_id: Option<Uuid>,
+    pub parent_sample_id: Option<uuid::Uuid>,
+    pub child_sample_id: Option<uuid::Uuid>,
 }
 
 
@@ -316,12 +315,12 @@ impl ObservationSubjectFilter {
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct ObservationFilter {
-    pub parent_observation_id: Option<Uuid>,
+    pub parent_observation_id: Option<uuid::Uuid>,
     pub created_by: Option<i32>,
     pub updated_by: Option<i32>,
     pub project_id: Option<i32>,
-    pub organism_id: Option<Uuid>,
-    pub sample_id: Option<Uuid>,
+    pub organism_id: Option<uuid::Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     pub subject_id: Option<i32>,
 }
 
@@ -366,7 +365,7 @@ impl ObservationFilter {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct OrganismBioOttTaxonItemFilter {
     pub created_by: Option<i32>,
-    pub organism_id: Option<Uuid>,
+    pub organism_id: Option<uuid::Uuid>,
     pub taxon_id: Option<i32>,
 }
 
@@ -394,8 +393,8 @@ impl OrganismBioOttTaxonItemFilter {
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct OrganismFilter {
-    pub host_organism_id: Option<Uuid>,
-    pub sample_id: Option<Uuid>,
+    pub host_organism_id: Option<uuid::Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     pub nameplate_id: Option<i32>,
     pub project_id: Option<i32>,
     pub created_by: Option<i32>,
@@ -778,7 +777,7 @@ impl RoleFilter {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampleBioOttTaxonItemFilter {
     pub created_by: Option<i32>,
-    pub sample_id: Option<Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     pub taxon_id: Option<i32>,
 }
 
@@ -966,7 +965,7 @@ impl SpectraFilter {
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SpectraCollectionFilter {
-    pub sample_id: Option<Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     pub created_by: Option<i32>,
     pub updated_by: Option<i32>,
 }

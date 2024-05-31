@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -93,7 +88,9 @@ impl Material {
         filter: Option<&MaterialFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::materials;
         let mut query = materials::dsl::materials.into_boxed();
@@ -119,7 +116,9 @@ impl Material {
         filter: Option<&MaterialFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::materials;
         let mut query = materials::dsl::materials.into_boxed();
@@ -141,7 +140,9 @@ impl Material {
     /// * `connection` - The connection to the database.
     pub fn get(
         id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::materials;
         materials::dsl::materials
@@ -155,7 +156,9 @@ impl Material {
     /// * `connection` - The connection to the database.
     pub fn from_name(
         name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::materials;
         let flat_variant = materials::dsl::materials

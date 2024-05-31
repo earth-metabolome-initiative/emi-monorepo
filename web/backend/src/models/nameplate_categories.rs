@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -101,7 +96,9 @@ impl NameplateCategory {
         filter: Option<&NameplateCategoryFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::nameplate_categories;
         let mut query = nameplate_categories::dsl::nameplate_categories.into_boxed();
@@ -133,7 +130,9 @@ impl NameplateCategory {
         filter: Option<&NameplateCategoryFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::nameplate_categories;
         let mut query = nameplate_categories::dsl::nameplate_categories.into_boxed();
@@ -161,7 +160,9 @@ impl NameplateCategory {
     /// * `connection` - The connection to the database.
     pub fn get(
         id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::nameplate_categories;
         nameplate_categories::dsl::nameplate_categories
@@ -181,7 +182,9 @@ impl NameplateCategory {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -204,15 +207,24 @@ impl NameplateCategory {
         if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::permanence_id.eq(permanence_id))
-                .filter(similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_nameplate_categories_brand(
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
                         nameplate_categories::dsl::name,
                         nameplate_categories::dsl::description,
                     ),
@@ -226,15 +238,24 @@ impl NameplateCategory {
         if let Some(material_id) = filter.and_then(|f| f.material_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::material_id.eq(material_id))
-                .filter(similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_nameplate_categories_brand(
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
                         nameplate_categories::dsl::name,
                         nameplate_categories::dsl::description,
                     ),
@@ -248,15 +269,24 @@ impl NameplateCategory {
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::icon_id.eq(icon_id))
-                .filter(similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_nameplate_categories_brand(
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
                         nameplate_categories::dsl::name,
                         nameplate_categories::dsl::description,
                     ),
@@ -270,15 +300,24 @@ impl NameplateCategory {
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::color_id.eq(color_id))
-                .filter(similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_nameplate_categories_brand(
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
                         nameplate_categories::dsl::name,
                         nameplate_categories::dsl::description,
                     ),
@@ -290,15 +329,24 @@ impl NameplateCategory {
                 .map_err(web_common::api::ApiError::from);
         }
         nameplate_categories::dsl::nameplate_categories
-            .filter(similarity_op(
-                concat_nameplate_categories_brand(
-                    nameplate_categories::dsl::name,
-                    nameplate_categories::dsl::description,
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
+                        nameplate_categories::dsl::name,
+                        nameplate_categories::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
+                        nameplate_categories::dsl::name,
+                        nameplate_categories::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ),
-                query,
-            ))
-            .order(similarity_dist(
-                concat_nameplate_categories_brand(
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_nameplate_categories_brand(
                     nameplate_categories::dsl::name,
                     nameplate_categories::dsl::description,
                 ),
@@ -321,7 +369,9 @@ impl NameplateCategory {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -344,15 +394,24 @@ impl NameplateCategory {
         if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::permanence_id.eq(permanence_id))
-                .filter(word_similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_nameplate_categories_brand(
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
                         nameplate_categories::dsl::name,
                         nameplate_categories::dsl::description,
                     ),
@@ -366,15 +425,24 @@ impl NameplateCategory {
         if let Some(material_id) = filter.and_then(|f| f.material_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::material_id.eq(material_id))
-                .filter(word_similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_nameplate_categories_brand(
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
                         nameplate_categories::dsl::name,
                         nameplate_categories::dsl::description,
                     ),
@@ -388,15 +456,24 @@ impl NameplateCategory {
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::icon_id.eq(icon_id))
-                .filter(word_similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_nameplate_categories_brand(
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
                         nameplate_categories::dsl::name,
                         nameplate_categories::dsl::description,
                     ),
@@ -410,15 +487,24 @@ impl NameplateCategory {
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::color_id.eq(color_id))
-                .filter(word_similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_nameplate_categories_brand(
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
                         nameplate_categories::dsl::name,
                         nameplate_categories::dsl::description,
                     ),
@@ -430,15 +516,24 @@ impl NameplateCategory {
                 .map_err(web_common::api::ApiError::from);
         }
         nameplate_categories::dsl::nameplate_categories
-            .filter(word_similarity_op(
-                concat_nameplate_categories_brand(
-                    nameplate_categories::dsl::name,
-                    nameplate_categories::dsl::description,
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
+                        nameplate_categories::dsl::name,
+                        nameplate_categories::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
+                        nameplate_categories::dsl::name,
+                        nameplate_categories::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ),
-                query,
-            ))
-            .order(word_similarity_dist_op(
-                concat_nameplate_categories_brand(
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_nameplate_categories_brand(
                     nameplate_categories::dsl::name,
                     nameplate_categories::dsl::description,
                 ),
@@ -461,7 +556,9 @@ impl NameplateCategory {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -484,20 +581,31 @@ impl NameplateCategory {
         if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::permanence_id.eq(permanence_id))
-                .filter(strict_word_similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
                     ),
-                    query,
-                ))
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -506,20 +614,31 @@ impl NameplateCategory {
         if let Some(material_id) = filter.and_then(|f| f.material_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::material_id.eq(material_id))
-                .filter(strict_word_similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
                     ),
-                    query,
-                ))
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -528,20 +647,31 @@ impl NameplateCategory {
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::icon_id.eq(icon_id))
-                .filter(strict_word_similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
                     ),
-                    query,
-                ))
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -550,40 +680,62 @@ impl NameplateCategory {
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             return nameplate_categories::dsl::nameplate_categories
                 .filter(nameplate_categories::dsl::color_id.eq(color_id))
-                .filter(strict_word_similarity_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_nameplate_categories_brand(
+                            nameplate_categories::dsl::name,
+                            nameplate_categories::dsl::description,
+                        ),
+                        query,
                     ),
-                    query,
-                ))
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplate_categories::dsl::nameplate_categories
-            .filter(strict_word_similarity_op(
-                concat_nameplate_categories_brand(
-                    nameplate_categories::dsl::name,
-                    nameplate_categories::dsl::description,
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
+                        nameplate_categories::dsl::name,
+                        nameplate_categories::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
+                        nameplate_categories::dsl::name,
+                        nameplate_categories::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ),
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                concat_nameplate_categories_brand(
-                    nameplate_categories::dsl::name,
-                    nameplate_categories::dsl::description,
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_nameplate_categories_brand(
+                        nameplate_categories::dsl::name,
+                        nameplate_categories::dsl::description,
+                    ),
+                    query,
                 ),
-                query,
-            ))
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

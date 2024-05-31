@@ -2,15 +2,13 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
-use uuid::Uuid;
 use serde::{Deserialize, Serialize};
-use chrono::NaiveDateTime;
 use super::*;
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewDerivedSample {
-    pub parent_sample_id: Uuid,
-    pub child_sample_id: Uuid,
+    pub parent_sample_id: uuid::Uuid,
+    pub child_sample_id: uuid::Uuid,
 }
 
 impl Tabular for NewDerivedSample {
@@ -28,11 +26,11 @@ impl Tabular for NewNameplate {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewObservation {
-    pub id: Uuid,
-    pub parent_observation_id: Option<Uuid>,
+    pub id: uuid::Uuid,
+    pub parent_observation_id: Option<uuid::Uuid>,
     pub project_id: i32,
-    pub organism_id: Option<Uuid>,
-    pub sample_id: Option<Uuid>,
+    pub organism_id: Option<uuid::Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     pub subject_id: i32,
     pub notes: Option<String>,
     pub picture: Vec<u8>,
@@ -146,7 +144,7 @@ impl NewObservation {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewOrganismBioOttTaxonItem {
-    pub organism_id: Uuid,
+    pub organism_id: uuid::Uuid,
     pub taxon_id: i32,
 }
 
@@ -155,9 +153,9 @@ impl Tabular for NewOrganismBioOttTaxonItem {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewOrganism {
-    pub id: Uuid,
-    pub host_organism_id: Option<Uuid>,
-    pub sample_id: Option<Uuid>,
+    pub id: uuid::Uuid,
+    pub host_organism_id: Option<uuid::Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     pub notes: Option<String>,
     pub nameplate_id: i32,
     pub project_id: i32,
@@ -274,8 +272,8 @@ pub struct NewProject {
     pub parent_project_id: Option<i32>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
-    pub expected_end_date: Option<NaiveDateTime>,
-    pub end_date: Option<NaiveDateTime>,
+    pub expected_end_date: Option<chrono::NaiveDateTime>,
+    pub end_date: Option<chrono::NaiveDateTime>,
 }
 
 impl Tabular for NewProject {
@@ -343,7 +341,7 @@ impl Tabular for NewProjectsUsersRole {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSampleBioOttTaxonItem {
-    pub sample_id: Uuid,
+    pub sample_id: uuid::Uuid,
     pub taxon_id: i32,
 }
 
@@ -362,7 +360,7 @@ impl Tabular for NewSampleContainer {
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {
-    pub id: Uuid,
+    pub id: uuid::Uuid,
     pub container_id: i32,
     pub notes: Option<String>,
     pub project_id: i32,
@@ -469,7 +467,7 @@ impl Tabular for NewSpectra {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewSpectraCollection {
     pub notes: Option<String>,
-    pub sample_id: Uuid,
+    pub sample_id: uuid::Uuid,
 }
 
 impl Tabular for NewSpectraCollection {

@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -95,7 +90,9 @@ impl Organization {
         filter: Option<&OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::organizations;
         let mut query = organizations::dsl::organizations.into_boxed();
@@ -118,7 +115,9 @@ impl Organization {
         filter: Option<&OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::organizations;
         let mut query = organizations::dsl::organizations.into_boxed();
@@ -137,7 +136,9 @@ impl Organization {
     /// * `connection` - The connection to the database.
     pub fn get(
         id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::organizations;
         organizations::dsl::organizations
@@ -151,7 +152,9 @@ impl Organization {
     /// * `connection` - The connection to the database.
     pub fn from_domain(
         domain: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::organizations;
         let flat_variant = organizations::dsl::organizations
@@ -169,7 +172,9 @@ impl Organization {
         name: &str,
         country_id: &i32,
         state_province: Option<&str>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::organizations;
         let flat_variant = organizations::dsl::organizations
@@ -185,7 +190,9 @@ impl Organization {
     /// * `connection` - The connection to the database.
     pub fn from_url(
         url: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::organizations;
         let flat_variant = organizations::dsl::organizations
@@ -205,7 +212,9 @@ impl Organization {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -217,16 +226,28 @@ impl Organization {
         if let Some(country_id) = filter.and_then(|f| f.country_id) {
             return organizations::dsl::organizations
                 .filter(organizations::dsl::country_id.eq(country_id))
-                .filter(similarity_op(organizations::dsl::name, query))
-                .order(similarity_dist(organizations::dsl::name, query))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(organizations::dsl::name, query)
+                        .or(organizations::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    organizations::dsl::name,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         organizations::dsl::organizations
-            .filter(similarity_op(organizations::dsl::name, query))
-            .order(similarity_dist(organizations::dsl::name, query))
+            .filter(
+                crate::sql_function_bindings::similarity_op(organizations::dsl::name, query)
+                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                organizations::dsl::name,
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -244,7 +265,9 @@ impl Organization {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -256,16 +279,31 @@ impl Organization {
         if let Some(country_id) = filter.and_then(|f| f.country_id) {
             return organizations::dsl::organizations
                 .filter(organizations::dsl::country_id.eq(country_id))
-                .filter(word_similarity_op(organizations::dsl::name, query))
-                .order(word_similarity_dist_op(organizations::dsl::name, query))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        organizations::dsl::name,
+                        query,
+                    )
+                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    organizations::dsl::name,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         organizations::dsl::organizations
-            .filter(word_similarity_op(organizations::dsl::name, query))
-            .order(word_similarity_dist_op(organizations::dsl::name, query))
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(organizations::dsl::name, query)
+                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                organizations::dsl::name,
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -283,7 +321,9 @@ impl Organization {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -295,22 +335,38 @@ impl Organization {
         if let Some(country_id) = filter.and_then(|f| f.country_id) {
             return organizations::dsl::organizations
                 .filter(organizations::dsl::country_id.eq(country_id))
-                .filter(strict_word_similarity_op(organizations::dsl::name, query))
-                .order(strict_word_similarity_dist_op(
-                    organizations::dsl::name,
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        organizations::dsl::name,
+                        query,
+                    )
+                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        organizations::dsl::name,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         organizations::dsl::organizations
-            .filter(strict_word_similarity_op(organizations::dsl::name, query))
-            .order(strict_word_similarity_dist_op(
-                organizations::dsl::name,
-                query,
-            ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    organizations::dsl::name,
+                    query,
+                )
+                .or(organizations::dsl::name.ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    organizations::dsl::name,
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

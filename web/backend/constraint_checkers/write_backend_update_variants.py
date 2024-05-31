@@ -34,10 +34,6 @@ def write_backend_update_variants(
         "use diesel::prelude::*;",
         "use crate::models::*;",
         "use crate::schema::*;",
-        "use diesel::r2d2::PooledConnection;",
-        "use diesel::r2d2::ConnectionManager;",
-        "use uuid::Uuid;",
-        "use chrono::NaiveDateTime;",
     ]
 
     document.write("\n".join(imports) + "\n")
@@ -75,7 +71,7 @@ def write_backend_update_variants(
         "    fn update(\n"
         "        self,\n"
         "        user_id: i32,\n"
-        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::prelude::PgConnection>>\n"
         "    ) -> Result<Self::Flat, diesel::result::Error>;\n"
         "}\n\n"
     )
@@ -158,7 +154,7 @@ def write_backend_update_variants(
             "    fn update(\n"
             "        self,\n"
             "        user_id: i32,\n"
-            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+            "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>\n"
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
             "        self.to_intermediate(user_id)\n"
             "            .save_changes(connection)\n"

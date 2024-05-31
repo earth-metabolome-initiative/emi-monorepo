@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,8 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
-use web_common::database::filter_structs::*;
 
 #[derive(
     Queryable,
@@ -46,8 +40,8 @@ pub struct User {
     pub last_name: String,
     pub description: Option<String>,
     pub profile_picture: Vec<u8>,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl From<User> for web_common::database::tables::User {
@@ -97,7 +91,9 @@ impl User {
     pub fn all_viewable(
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
@@ -114,7 +110,9 @@ impl User {
     pub fn all_viewable_sorted(
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
@@ -130,7 +128,9 @@ impl User {
     /// * `connection` - The connection to the database.
     pub fn get(
         id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
@@ -148,7 +148,9 @@ impl User {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -158,16 +160,24 @@ impl User {
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(similarity_op(
-                concat_users_name(
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
-                ),
-                query,
-            ))
-            .order(similarity_dist(
-                concat_users_name(
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
@@ -189,7 +199,9 @@ impl User {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -199,16 +211,24 @@ impl User {
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(word_similarity_op(
-                concat_users_name(
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
-                ),
-                query,
-            ))
-            .order(word_similarity_dist_op(
-                concat_users_name(
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
@@ -230,7 +250,9 @@ impl User {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -240,22 +262,32 @@ impl User {
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(strict_word_similarity_op(
-                concat_users_name(
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
                 ),
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                concat_users_name(
-                    users::dsl::first_name,
-                    users::dsl::middle_name,
-                    users::dsl::last_name,
-                ),
-                query,
-            ))
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -268,7 +300,9 @@ impl User {
     pub fn can_update(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_update_by_id(self.id, author_user_id, connection)
     }
@@ -280,11 +314,16 @@ impl User {
     pub fn can_update_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_update_users(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_update_users(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the updatable structs from the database.
     ///
@@ -296,11 +335,16 @@ impl User {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
-            .filter(can_update_users(author_user_id, users::dsl::id))
+            .filter(crate::sql_function_bindings::can_update_users(
+                author_user_id,
+                users::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -316,11 +360,16 @@ impl User {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
-            .filter(can_update_users(author_user_id, users::dsl::id))
+            .filter(crate::sql_function_bindings::can_update_users(
+                author_user_id,
+                users::dsl::id,
+            ))
             .order_by(users::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -339,7 +388,9 @@ impl User {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -349,17 +400,28 @@ impl User {
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(can_update_users(author_user_id, users::dsl::id))
-            .filter(similarity_op(
-                concat_users_name(
+            .filter(crate::sql_function_bindings::can_update_users(
+                author_user_id,
+                users::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
-                ),
-                query,
-            ))
-            .order(similarity_dist(
-                concat_users_name(
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
@@ -383,7 +445,9 @@ impl User {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -393,17 +457,28 @@ impl User {
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(can_update_users(author_user_id, users::dsl::id))
-            .filter(word_similarity_op(
-                concat_users_name(
+            .filter(crate::sql_function_bindings::can_update_users(
+                author_user_id,
+                users::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
-                ),
-                query,
-            ))
-            .order(word_similarity_dist_op(
-                concat_users_name(
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
@@ -427,7 +502,9 @@ impl User {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -437,23 +514,36 @@ impl User {
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(can_update_users(author_user_id, users::dsl::id))
-            .filter(strict_word_similarity_op(
-                concat_users_name(
+            .filter(crate::sql_function_bindings::can_update_users(
+                author_user_id,
+                users::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
                 ),
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                concat_users_name(
-                    users::dsl::first_name,
-                    users::dsl::middle_name,
-                    users::dsl::last_name,
-                ),
-                query,
-            ))
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -466,7 +556,9 @@ impl User {
     pub fn can_admin(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_admin_by_id(self.id, author_user_id, connection)
     }
@@ -478,11 +570,16 @@ impl User {
     pub fn can_admin_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_admin_users(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_admin_users(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the administrable structs from the database.
     ///
@@ -494,11 +591,16 @@ impl User {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
-            .filter(can_admin_users(author_user_id, users::dsl::id))
+            .filter(crate::sql_function_bindings::can_admin_users(
+                author_user_id,
+                users::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -514,11 +616,16 @@ impl User {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
         users::dsl::users
-            .filter(can_admin_users(author_user_id, users::dsl::id))
+            .filter(crate::sql_function_bindings::can_admin_users(
+                author_user_id,
+                users::dsl::id,
+            ))
             .order_by(users::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -537,7 +644,9 @@ impl User {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -547,17 +656,28 @@ impl User {
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(can_admin_users(author_user_id, users::dsl::id))
-            .filter(similarity_op(
-                concat_users_name(
+            .filter(crate::sql_function_bindings::can_admin_users(
+                author_user_id,
+                users::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
-                ),
-                query,
-            ))
-            .order(similarity_dist(
-                concat_users_name(
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
@@ -581,7 +701,9 @@ impl User {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -591,17 +713,28 @@ impl User {
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(can_admin_users(author_user_id, users::dsl::id))
-            .filter(word_similarity_op(
-                concat_users_name(
+            .filter(crate::sql_function_bindings::can_admin_users(
+                author_user_id,
+                users::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
-                ),
-                query,
-            ))
-            .order(word_similarity_dist_op(
-                concat_users_name(
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
@@ -625,7 +758,9 @@ impl User {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -635,23 +770,36 @@ impl User {
         }
         use crate::schema::users;
         users::dsl::users
-            .filter(can_admin_users(author_user_id, users::dsl::id))
-            .filter(strict_word_similarity_op(
-                concat_users_name(
+            .filter(crate::sql_function_bindings::can_admin_users(
+                author_user_id,
+                users::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_users_name(
+                        users::dsl::first_name,
+                        users::dsl::middle_name,
+                        users::dsl::last_name,
+                    ),
+                    query,
                 ),
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                concat_users_name(
-                    users::dsl::first_name,
-                    users::dsl::middle_name,
-                    users::dsl::last_name,
-                ),
-                query,
-            ))
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -664,7 +812,9 @@ impl User {
     pub fn delete(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         Self::delete_by_id(self.id, author_user_id, connection)
     }
@@ -676,7 +826,9 @@ impl User {
     pub fn delete_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         if !Self::can_admin_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);

@@ -4,7 +4,6 @@
 
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use super::*;
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
@@ -256,7 +255,7 @@ impl NestedDerivedSample {
     /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub async fn get<C>(
-        ( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
+        ( parent_sample_id, child_sample_id ): ( uuid::Uuid, uuid::Uuid ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -997,7 +996,7 @@ impl NestedObservation {
     /// * `id` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1116,7 +1115,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `( organism_id, taxon_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub async fn get<C>(
-        ( organism_id, taxon_id ): ( Uuid, i32 ),
+        ( organism_id, taxon_id ): ( uuid::Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1209,7 +1208,7 @@ impl NestedOrganism {
     /// * `id` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2322,7 +2321,7 @@ impl NestedSampleBioOttTaxonItem {
     /// * `( sample_id, taxon_id )` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub async fn get<C>(
-        ( sample_id, taxon_id ): ( Uuid, i32 ),
+        ( sample_id, taxon_id ): ( uuid::Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2698,7 +2697,7 @@ impl NestedSample {
     /// * `id` - The primary key(s) of the row.
     /// * `connection` - The database connection.
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,

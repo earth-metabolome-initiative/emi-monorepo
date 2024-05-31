@@ -34,10 +34,6 @@ def write_backend_new_variants(
         "use diesel::prelude::*;",
         "use crate::models::*;",
         "use crate::schema::*;",
-        "use diesel::r2d2::PooledConnection;",
-        "use diesel::r2d2::ConnectionManager;",
-        "use uuid::Uuid;",
-        "use chrono::NaiveDateTime;",
     ]
 
     document.write("\n".join(imports) + "\n")
@@ -76,7 +72,7 @@ def write_backend_new_variants(
         "    fn insert(\n"
         "        self,\n"
         "        user_id: i32,\n"
-        "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+        "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>\n"
         "    ) -> Result<Self::Flat, diesel::result::Error>;\n"
         "}\n\n"
     )
@@ -174,7 +170,7 @@ def write_backend_new_variants(
             "    fn insert(\n"
             "        self,\n"
             f"       user_id: i32,\n"
-            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>\n"
+            "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>\n"
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
             f"        use crate::schema::{struct.table_name};\n{assert_user_id_check}"
             f"        diesel::insert_into({struct.table_name}::dsl::{struct.table_name})\n"

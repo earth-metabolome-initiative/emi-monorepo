@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,8 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
-use web_common::database::filter_structs::*;
 
 #[derive(
     Queryable,
@@ -82,7 +76,9 @@ impl FontAwesomeIcon {
     pub fn all_viewable(
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::font_awesome_icons;
         font_awesome_icons::dsl::font_awesome_icons
@@ -99,7 +95,9 @@ impl FontAwesomeIcon {
     pub fn all_viewable_sorted(
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::font_awesome_icons;
         font_awesome_icons::dsl::font_awesome_icons
@@ -114,7 +112,9 @@ impl FontAwesomeIcon {
     /// * `connection` - The connection to the database.
     pub fn get(
         id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::font_awesome_icons;
         font_awesome_icons::dsl::font_awesome_icons
@@ -128,7 +128,9 @@ impl FontAwesomeIcon {
     /// * `connection` - The connection to the database.
     pub fn from_name(
         name: &str,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::font_awesome_icons;
         let flat_variant = font_awesome_icons::dsl::font_awesome_icons
@@ -146,7 +148,9 @@ impl FontAwesomeIcon {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -156,15 +160,24 @@ impl FontAwesomeIcon {
         }
         use crate::schema::font_awesome_icons;
         font_awesome_icons::dsl::font_awesome_icons
-            .filter(similarity_op(
-                concat_font_awesome_icons_name(
-                    font_awesome_icons::dsl::name,
-                    font_awesome_icons::dsl::description,
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_font_awesome_icons_name(
+                        font_awesome_icons::dsl::name,
+                        font_awesome_icons::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_font_awesome_icons_name(
+                        font_awesome_icons::dsl::name,
+                        font_awesome_icons::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ),
-                query,
-            ))
-            .order(similarity_dist(
-                concat_font_awesome_icons_name(
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_font_awesome_icons_name(
                     font_awesome_icons::dsl::name,
                     font_awesome_icons::dsl::description,
                 ),
@@ -185,7 +198,9 @@ impl FontAwesomeIcon {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -195,15 +210,24 @@ impl FontAwesomeIcon {
         }
         use crate::schema::font_awesome_icons;
         font_awesome_icons::dsl::font_awesome_icons
-            .filter(word_similarity_op(
-                concat_font_awesome_icons_name(
-                    font_awesome_icons::dsl::name,
-                    font_awesome_icons::dsl::description,
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_font_awesome_icons_name(
+                        font_awesome_icons::dsl::name,
+                        font_awesome_icons::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_font_awesome_icons_name(
+                        font_awesome_icons::dsl::name,
+                        font_awesome_icons::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ),
-                query,
-            ))
-            .order(word_similarity_dist_op(
-                concat_font_awesome_icons_name(
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_font_awesome_icons_name(
                     font_awesome_icons::dsl::name,
                     font_awesome_icons::dsl::description,
                 ),
@@ -224,7 +248,9 @@ impl FontAwesomeIcon {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -234,20 +260,31 @@ impl FontAwesomeIcon {
         }
         use crate::schema::font_awesome_icons;
         font_awesome_icons::dsl::font_awesome_icons
-            .filter(strict_word_similarity_op(
-                concat_font_awesome_icons_name(
-                    font_awesome_icons::dsl::name,
-                    font_awesome_icons::dsl::description,
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_font_awesome_icons_name(
+                        font_awesome_icons::dsl::name,
+                        font_awesome_icons::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_font_awesome_icons_name(
+                        font_awesome_icons::dsl::name,
+                        font_awesome_icons::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ),
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                concat_font_awesome_icons_name(
-                    font_awesome_icons::dsl::name,
-                    font_awesome_icons::dsl::description,
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_font_awesome_icons_name(
+                        font_awesome_icons::dsl::name,
+                        font_awesome_icons::dsl::description,
+                    ),
+                    query,
                 ),
-                query,
-            ))
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

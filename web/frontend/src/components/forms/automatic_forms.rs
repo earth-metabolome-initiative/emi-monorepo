@@ -26,7 +26,7 @@ pub struct DerivedSampleBuilder {
     pub child_sample: Option<NestedSample>,
     pub errors_parent_sample: Vec<ApiError>,
     pub errors_child_sample: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for DerivedSampleBuilder {
@@ -200,9 +200,9 @@ impl FormBuildable for UpdateDerivedSample {
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateDerivedSampleFormProp {
     #[prop_or_default]
-    pub parent_sample_id: Option<Uuid>,
+    pub parent_sample_id: Option<uuid::Uuid>,
     #[prop_or_default]
-    pub child_sample_id: Option<Uuid>,
+    pub child_sample_id: Option<uuid::Uuid>,
 }
 
 #[function_component(CreateDerivedSampleForm)]
@@ -240,8 +240,8 @@ pub fn create_derived_sample_form(props: &CreateDerivedSampleFormProp) -> Html {
 }
 #[derive(Clone, PartialEq, Properties)]
 pub struct UpdateDerivedSampleFormProp {
-    pub parent_sample_id: Uuid,
-    pub child_sample_id: Uuid,
+    pub parent_sample_id: uuid::Uuid,
+    pub child_sample_id: uuid::Uuid,
 }
 
 #[function_component(UpdateDerivedSampleForm)]
@@ -280,7 +280,7 @@ pub struct NameplateBuilder {
     pub errors_barcode: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
     pub errors_category: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for NameplateBuilder {
@@ -538,7 +538,7 @@ pub fn update_nameplate_form(props: &UpdateNameplateFormProp) -> Html {
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ObservationBuilder {
-    pub id: Option<Uuid>,
+    pub id: Option<uuid::Uuid>,
     pub notes: Option<String>,
     pub picture: Option<Vec<u8>>,
     pub parent_observation: Option<NestedObservation>,
@@ -553,7 +553,7 @@ pub struct ObservationBuilder {
     pub errors_organism: Vec<ApiError>,
     pub errors_sample: Vec<ApiError>,
     pub errors_subject: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for ObservationBuilder {
@@ -801,13 +801,13 @@ impl FormBuildable for NewObservation {
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateObservationFormProp {
     #[prop_or_default]
-    pub parent_observation_id: Option<Uuid>,
+    pub parent_observation_id: Option<uuid::Uuid>,
     #[prop_or_default]
     pub project_id: Option<i32>,
     #[prop_or_default]
-    pub organism_id: Option<Uuid>,
+    pub organism_id: Option<uuid::Uuid>,
     #[prop_or_default]
-    pub sample_id: Option<Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     #[prop_or_default]
     pub subject_id: Option<i32>,
 }
@@ -883,7 +883,7 @@ pub fn create_observation_form(props: &CreateObservationFormProp) -> Html {
 }
 #[derive(Clone, PartialEq, Properties)]
 pub struct UpdateObservationFormProp {
-    pub id: Uuid,
+    pub id: uuid::Uuid,
 }
 
 #[function_component(UpdateObservationForm)]
@@ -935,7 +935,7 @@ pub struct OrganismBioOttTaxonItemBuilder {
     pub taxon: Option<NestedBioOttTaxonItem>,
     pub errors_organism: Vec<ApiError>,
     pub errors_taxon: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for OrganismBioOttTaxonItemBuilder {
@@ -1069,7 +1069,7 @@ impl FormBuildable for NewOrganismBioOttTaxonItem {
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateOrganismBioOttTaxonItemFormProp {
     #[prop_or_default]
-    pub organism_id: Option<Uuid>,
+    pub organism_id: Option<uuid::Uuid>,
     #[prop_or_default]
     pub taxon_id: Option<i32>,
 }
@@ -1111,7 +1111,7 @@ pub fn create_organism_bio_ott_taxon_item_form(
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct OrganismBuilder {
-    pub id: Option<Uuid>,
+    pub id: Option<uuid::Uuid>,
     pub notes: Option<String>,
     pub picture: Option<Vec<u8>>,
     pub host_organism: Option<NestedOrganism>,
@@ -1124,7 +1124,7 @@ pub struct OrganismBuilder {
     pub errors_sample: Vec<ApiError>,
     pub errors_nameplate: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for OrganismBuilder {
@@ -1357,9 +1357,9 @@ impl FormBuildable for NewOrganism {
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateOrganismFormProp {
     #[prop_or_default]
-    pub host_organism_id: Option<Uuid>,
+    pub host_organism_id: Option<uuid::Uuid>,
     #[prop_or_default]
-    pub sample_id: Option<Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     #[prop_or_default]
     pub nameplate_id: Option<i32>,
     #[prop_or_default]
@@ -1426,7 +1426,7 @@ pub fn create_organism_form(props: &CreateOrganismFormProp) -> Html {
 }
 #[derive(Clone, PartialEq, Properties)]
 pub struct UpdateOrganismFormProp {
-    pub id: Uuid,
+    pub id: uuid::Uuid,
 }
 
 #[function_component(UpdateOrganismForm)]
@@ -1475,8 +1475,8 @@ pub struct ProjectBuilder {
     pub public: Option<bool>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
-    pub expected_end_date: Option<NaiveDateTime>,
-    pub end_date: Option<NaiveDateTime>,
+    pub expected_end_date: Option<chrono::NaiveDateTime>,
+    pub end_date: Option<chrono::NaiveDateTime>,
     pub state: Option<NestedProjectState>,
     pub icon: Option<FontAwesomeIcon>,
     pub color: Option<Color>,
@@ -1492,7 +1492,7 @@ pub struct ProjectBuilder {
     pub errors_icon: Vec<ApiError>,
     pub errors_color: Vec<ApiError>,
     pub errors_parent_project: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for ProjectBuilder {
@@ -1533,8 +1533,8 @@ pub(super) enum ProjectActions {
     SetPublic(Option<bool>),
     SetBudget(Option<String>),
     SetExpenses(Option<String>),
-    SetExpectedEndDate(Option<String>),
-    SetEndDate(Option<String>),
+    SetExpectedEndDate(Option<chrono::NaiveDateTime>),
+    SetEndDate(Option<chrono::NaiveDateTime>),
     SetState(Option<NestedProjectState>),
     SetIcon(Option<FontAwesomeIcon>),
     SetColor(Option<Color>),
@@ -1691,35 +1691,14 @@ impl Reducer<ProjectBuilder> for ProjectActions {
             }
             ProjectActions::SetExpectedEndDate(expected_end_date) => 'expected_end_date: {
                 state_mut.errors_expected_end_date.clear();
-                match expected_end_date {
-                    Some(value) => match NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {
-                        Ok(expected_end_date) => {
-                            state_mut.expected_end_date = Some(expected_end_date)
-                        }
-                        Err(_) => state_mut
-                            .errors_expected_end_date
-                            .push(ApiError::BadRequest(vec![
-                                "The expected_end_date field must be a valid date and time."
-                                    .to_string(),
-                            ])),
-                    },
-                    None => state_mut.expected_end_date = None,
-                }
+                state_mut.expected_end_date = expected_end_date;
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'expected_end_date;
             }
             ProjectActions::SetEndDate(end_date) => 'end_date: {
                 state_mut.errors_end_date.clear();
-                match end_date {
-                    Some(value) => match NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {
-                        Ok(end_date) => state_mut.end_date = Some(end_date),
-                        Err(_) => state_mut.errors_end_date.push(ApiError::BadRequest(vec![
-                            "The end_date field must be a valid date and time.".to_string(),
-                        ])),
-                    },
-                    None => state_mut.end_date = None,
-                }
+                state_mut.end_date = end_date;
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'end_date;
@@ -1842,17 +1821,9 @@ impl FormBuilder for ProjectBuilder {
                 .map(|expenses| expenses.to_string()),
         ));
         dispatcher.apply(ProjectActions::SetExpectedEndDate(
-            richest_variant
-                .inner
-                .expected_end_date
-                .map(|expected_end_date| expected_end_date.to_string()),
+            richest_variant.inner.expected_end_date,
         ));
-        dispatcher.apply(ProjectActions::SetEndDate(
-            richest_variant
-                .inner
-                .end_date
-                .map(|end_date| end_date.to_string()),
-        ));
+        dispatcher.apply(ProjectActions::SetEndDate(richest_variant.inner.end_date));
         dispatcher.apply(ProjectActions::SetState(Some(richest_variant.state)));
         dispatcher.apply(ProjectActions::SetIcon(Some(richest_variant.icon)));
         dispatcher.apply(ProjectActions::SetColor(Some(richest_variant.color)));
@@ -1995,11 +1966,13 @@ pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
     let set_expenses = builder_dispatch
         .apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
     let set_expected_end_date =
-        builder_dispatch.apply_callback(|expected_end_date: Option<String>| {
+        builder_dispatch.apply_callback(|expected_end_date: Option<chrono::NaiveDateTime>| {
             ProjectActions::SetExpectedEndDate(expected_end_date)
         });
-    let set_end_date = builder_dispatch
-        .apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
+    let set_end_date =
+        builder_dispatch.apply_callback(|end_date: Option<chrono::NaiveDateTime>| {
+            ProjectActions::SetEndDate(end_date)
+        });
     let set_state = builder_dispatch
         .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
     let set_icon = builder_dispatch
@@ -2020,8 +1993,6 @@ pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
             <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
-            <BasicInput<NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone()} />
-            <BasicInput<NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone()} />
             <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
@@ -2052,11 +2023,13 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
     let set_expenses = builder_dispatch
         .apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
     let set_expected_end_date =
-        builder_dispatch.apply_callback(|expected_end_date: Option<String>| {
+        builder_dispatch.apply_callback(|expected_end_date: Option<chrono::NaiveDateTime>| {
             ProjectActions::SetExpectedEndDate(expected_end_date)
         });
-    let set_end_date = builder_dispatch
-        .apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
+    let set_end_date =
+        builder_dispatch.apply_callback(|end_date: Option<chrono::NaiveDateTime>| {
+            ProjectActions::SetEndDate(end_date)
+        });
     let set_state = builder_dispatch
         .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
     let set_icon = builder_dispatch
@@ -2077,8 +2050,6 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
             <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
-            <BasicInput<NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone()} />
-            <BasicInput<NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone()} />
             <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
@@ -2095,7 +2066,7 @@ pub struct ProjectsTeamsRoleInvitationBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_team: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for ProjectsTeamsRoleInvitationBuilder {
@@ -2311,7 +2282,7 @@ pub struct ProjectsTeamsRoleRequestBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_team: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for ProjectsTeamsRoleRequestBuilder {
@@ -2525,7 +2496,7 @@ pub struct ProjectsTeamsRoleBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_team: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for ProjectsTeamsRoleBuilder {
@@ -2732,7 +2703,7 @@ pub struct ProjectsUsersRoleInvitationBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for ProjectsUsersRoleInvitationBuilder {
@@ -2947,7 +2918,7 @@ pub struct ProjectsUsersRoleRequestBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for ProjectsUsersRoleRequestBuilder {
@@ -3161,7 +3132,7 @@ pub struct ProjectsUsersRoleBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for ProjectsUsersRoleBuilder {
@@ -3366,7 +3337,7 @@ pub struct SampleBioOttTaxonItemBuilder {
     pub taxon: Option<NestedBioOttTaxonItem>,
     pub errors_sample: Vec<ApiError>,
     pub errors_taxon: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for SampleBioOttTaxonItemBuilder {
@@ -3500,7 +3471,7 @@ impl FormBuildable for NewSampleBioOttTaxonItem {
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSampleBioOttTaxonItemFormProp {
     #[prop_or_default]
-    pub sample_id: Option<Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     #[prop_or_default]
     pub taxon_id: Option<i32>,
 }
@@ -3547,7 +3518,7 @@ pub struct SampleContainerBuilder {
     pub errors_barcode: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
     pub errors_category: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for SampleContainerBuilder {
@@ -3820,7 +3791,7 @@ pub fn update_sample_container_form(props: &UpdateSampleContainerFormProp) -> Ht
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBuilder {
-    pub id: Option<Uuid>,
+    pub id: Option<uuid::Uuid>,
     pub notes: Option<String>,
     pub container: Option<NestedSampleContainer>,
     pub project: Option<NestedProject>,
@@ -3831,7 +3802,7 @@ pub struct SampleBuilder {
     pub errors_project: Vec<ApiError>,
     pub errors_sampled_by: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for SampleBuilder {
@@ -4093,7 +4064,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
 }
 #[derive(Clone, PartialEq, Properties)]
 pub struct UpdateSampleFormProp {
-    pub id: Uuid,
+    pub id: uuid::Uuid,
 }
 
 #[function_component(UpdateSampleForm)]
@@ -4136,7 +4107,7 @@ pub struct SpectraBuilder {
     pub spectra_collection: Option<NestedSpectraCollection>,
     pub errors_notes: Vec<ApiError>,
     pub errors_spectra_collection: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for SpectraBuilder {
@@ -4358,7 +4329,7 @@ pub struct SpectraCollectionBuilder {
     pub sample: Option<NestedSample>,
     pub errors_notes: Vec<ApiError>,
     pub errors_sample: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for SpectraCollectionBuilder {
@@ -4516,7 +4487,7 @@ impl FormBuildable for UpdateSpectraCollection {
 #[derive(Clone, PartialEq, Properties)]
 pub struct CreateSpectraCollectionFormProp {
     #[prop_or_default]
-    pub sample_id: Option<Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
 }
 
 #[function_component(CreateSpectraCollectionForm)]
@@ -4587,7 +4558,7 @@ pub struct TeamBuilder {
     pub errors_color: Vec<ApiError>,
     pub errors_state: Vec<ApiError>,
     pub errors_parent_team: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for TeamBuilder {
@@ -4966,7 +4937,7 @@ pub struct TeamsTeamsRoleInvitationBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_team: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for TeamsTeamsRoleInvitationBuilder {
@@ -5180,7 +5151,7 @@ pub struct TeamsUsersRoleInvitationBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for TeamsUsersRoleInvitationBuilder {
@@ -5394,7 +5365,7 @@ pub struct TeamsUsersRoleRequestBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for TeamsUsersRoleRequestBuilder {
@@ -5605,7 +5576,7 @@ pub struct TeamsUsersRoleBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for TeamsUsersRoleBuilder {
@@ -5809,7 +5780,7 @@ pub struct UserBuilder {
     pub errors_last_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_profile_picture: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for UserBuilder {
@@ -6061,7 +6032,7 @@ pub struct UsersUsersRoleInvitationBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for UsersUsersRoleInvitationBuilder {
@@ -6274,7 +6245,7 @@ pub struct UsersUsersRoleRequestBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for UsersUsersRoleRequestBuilder {
@@ -6485,7 +6456,7 @@ pub struct UsersUsersRoleBuilder {
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
-    pub form_updated_at: NaiveDateTime,
+    pub form_updated_at: chrono::NaiveDateTime,
 }
 
 impl Default for UsersUsersRoleBuilder {

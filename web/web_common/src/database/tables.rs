@@ -1,7 +1,5 @@
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
-use chrono::NaiveDateTime;
 use crate::database::*;
 use crate::traits::GuessImageFormat;
 
@@ -1054,11 +1052,11 @@ connection: &mut gluesql::prelude::Glue<C>,
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct DerivedSample {
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
-    pub parent_sample_id: Uuid,
-    pub child_sample_id: Uuid,
+    pub updated_at: chrono::NaiveDateTime,
+    pub parent_sample_id: uuid::Uuid,
+    pub child_sample_id: uuid::Uuid,
 }
 
 impl Tabular for DerivedSample {
@@ -1109,7 +1107,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
+        ( parent_sample_id, child_sample_id ): ( uuid::Uuid, uuid::Uuid ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -1139,7 +1137,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( parent_sample_id, child_sample_id ): ( Uuid, Uuid ),
+        ( parent_sample_id, child_sample_id ): ( uuid::Uuid, uuid::Uuid ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -2456,9 +2454,9 @@ pub struct Nameplate {
     pub project_id: i32,
     pub category_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for Nameplate {
@@ -3170,15 +3168,15 @@ connection: &mut gluesql::prelude::Glue<C>,
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct Observation {
-    pub id: Uuid,
-    pub parent_observation_id: Option<Uuid>,
+    pub id: uuid::Uuid,
+    pub parent_observation_id: Option<uuid::Uuid>,
     pub created_by: i32,
-    pub created_at: Option<NaiveDateTime>,
+    pub created_at: Option<chrono::NaiveDateTime>,
     pub updated_by: i32,
-    pub updated_at: Option<NaiveDateTime>,
+    pub updated_at: Option<chrono::NaiveDateTime>,
     pub project_id: i32,
-    pub organism_id: Option<Uuid>,
-    pub sample_id: Option<Uuid>,
+    pub organism_id: Option<uuid::Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     pub subject_id: i32,
     pub notes: Option<String>,
     pub picture: Vec<u8>,
@@ -3260,7 +3258,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3289,7 +3287,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3512,8 +3510,8 @@ connection: &mut gluesql::prelude::Glue<C>,
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct OrganismBioOttTaxonItem {
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
-    pub organism_id: Uuid,
+    pub created_at: chrono::NaiveDateTime,
+    pub organism_id: uuid::Uuid,
     pub taxon_id: i32,
 }
 
@@ -3563,7 +3561,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( organism_id, taxon_id ): ( Uuid, i32 ),
+        ( organism_id, taxon_id ): ( uuid::Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3593,7 +3591,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( organism_id, taxon_id ): ( Uuid, i32 ),
+        ( organism_id, taxon_id ): ( uuid::Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3726,16 +3724,16 @@ connection: &mut gluesql::prelude::Glue<C>,
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct Organism {
-    pub id: Uuid,
-    pub host_organism_id: Option<Uuid>,
-    pub sample_id: Option<Uuid>,
+    pub id: uuid::Uuid,
+    pub host_organism_id: Option<uuid::Uuid>,
+    pub sample_id: Option<uuid::Uuid>,
     pub notes: Option<String>,
     pub nameplate_id: i32,
     pub project_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
     pub picture: Vec<u8>,
 }
 
@@ -3805,7 +3803,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -3834,7 +3832,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -4740,11 +4738,11 @@ pub struct Project {
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
-    pub expected_end_date: Option<NaiveDateTime>,
-    pub end_date: Option<NaiveDateTime>,
+    pub updated_at: chrono::NaiveDateTime,
+    pub expected_end_date: Option<chrono::NaiveDateTime>,
+    pub end_date: Option<chrono::NaiveDateTime>,
 }
 
 impl Tabular for Project {
@@ -5092,7 +5090,7 @@ pub struct ProjectsTeamsRoleInvitation {
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for ProjectsTeamsRoleInvitation {
@@ -5314,7 +5312,7 @@ pub struct ProjectsTeamsRoleRequest {
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for ProjectsTeamsRoleRequest {
@@ -5536,7 +5534,7 @@ pub struct ProjectsTeamsRole {
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for ProjectsTeamsRole {
@@ -5758,7 +5756,7 @@ pub struct ProjectsUsersRoleInvitation {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for ProjectsUsersRoleInvitation {
@@ -5980,7 +5978,7 @@ pub struct ProjectsUsersRoleRequest {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for ProjectsUsersRoleRequest {
@@ -6202,7 +6200,7 @@ pub struct ProjectsUsersRole {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for ProjectsUsersRole {
@@ -6641,8 +6639,8 @@ connection: &mut gluesql::prelude::Glue<C>,
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct SampleBioOttTaxonItem {
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
-    pub sample_id: Uuid,
+    pub created_at: chrono::NaiveDateTime,
+    pub sample_id: uuid::Uuid,
     pub taxon_id: i32,
 }
 
@@ -6692,7 +6690,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        ( sample_id, taxon_id ): ( Uuid, i32 ),
+        ( sample_id, taxon_id ): ( uuid::Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -6722,7 +6720,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        ( sample_id, taxon_id ): ( Uuid, i32 ),
+        ( sample_id, taxon_id ): ( uuid::Uuid, i32 ),
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7101,9 +7099,9 @@ pub struct SampleContainer {
     pub project_id: i32,
     pub category_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for SampleContainer {
@@ -7588,15 +7586,15 @@ connection: &mut gluesql::prelude::Glue<C>,
 }
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct Sample {
-    pub id: Uuid,
+    pub id: uuid::Uuid,
     pub container_id: i32,
     pub notes: Option<String>,
     pub project_id: i32,
     pub created_by: i32,
     pub sampled_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
     pub state_id: i32,
 }
 
@@ -7655,7 +7653,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// * `connection` - The connection to the database.
     ///
     pub async fn get<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7684,7 +7682,7 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// # Returns
     /// The number of rows deleted.
     pub async fn delete_from_id<C>(
-        id: Uuid,
+        id: uuid::Uuid,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
@@ -7885,9 +7883,9 @@ pub struct Spectra {
     pub notes: Option<String>,
     pub spectra_collection_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for Spectra {
@@ -8155,11 +8153,11 @@ connection: &mut gluesql::prelude::Glue<C>,
 pub struct SpectraCollection {
     pub id: i32,
     pub notes: Option<String>,
-    pub sample_id: Uuid,
+    pub sample_id: uuid::Uuid,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for SpectraCollection {
@@ -8653,9 +8651,9 @@ pub struct Team {
     pub state_id: i32,
     pub parent_team_id: Option<i32>,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for Team {
@@ -8949,7 +8947,7 @@ pub struct TeamsTeamsRoleInvitation {
     pub team_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for TeamsTeamsRoleInvitation {
@@ -9171,7 +9169,7 @@ pub struct TeamsUsersRoleInvitation {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for TeamsUsersRoleInvitation {
@@ -9393,7 +9391,7 @@ pub struct TeamsUsersRoleRequest {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for TeamsUsersRoleRequest {
@@ -9615,7 +9613,7 @@ pub struct TeamsUsersRole {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for TeamsUsersRole {
@@ -10046,7 +10044,7 @@ pub struct UserEmail {
     pub id: i32,
     pub email: String,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub login_provider_id: i32,
     pub primary_email: bool,
 }
@@ -10276,8 +10274,8 @@ pub struct User {
     pub last_name: String,
     pub description: Option<String>,
     pub profile_picture: Vec<u8>,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for User {
@@ -10557,7 +10555,7 @@ pub struct UsersUsersRoleInvitation {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for UsersUsersRoleInvitation {
@@ -10779,7 +10777,7 @@ pub struct UsersUsersRoleRequest {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for UsersUsersRoleRequest {
@@ -11001,7 +10999,7 @@ pub struct UsersUsersRole {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for UsersUsersRole {

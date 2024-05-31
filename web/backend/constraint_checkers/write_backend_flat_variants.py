@@ -27,26 +27,20 @@ def write_backend_flat_variants(
     impl_from_line = "impl From<{struct_name}> for web_common::database::{table_type}::{struct_name} {{\n"
     reverse_from = "impl From<web_common::database::{table_type}::{struct_name}> for {struct_name} {{\n"
 
-    imports = [
+    default_imports = [
         "use diesel::Queryable;",
         "use diesel::QueryableByName;",
         "use diesel::Identifiable;",
         "use diesel::Insertable;",
         "use crate::schema::*;",
-        "use crate::sql_function_bindings::*;",
         "use diesel::Selectable;",
         "use serde::Deserialize;",
         "use serde::Serialize;",
-        "use diesel::r2d2::ConnectionManager;",
-        "use diesel::r2d2::PooledConnection;",
         "use diesel::prelude::*;",
-        "use web_common::database::filter_structs::*;",
-        "use uuid::Uuid;",
-        "use chrono::NaiveDateTime;",
     ]
 
     if table_type == "views":
-        imports.append("use crate::views::schema::*;")
+        default_imports.append("use crate::views::schema::*;")
 
     path_directory = path.split(".")[0]
     os.makedirs(path_directory, exist_ok=True)
@@ -110,10 +104,15 @@ def write_backend_flat_variants(
         leave=False,
     ):
 
+        this_imports = list(default_imports)
+        
+        if struct.has_filter_variant():
+            this_imports.append("use web_common::database::filter_structs::*;")
+
         struct_document = open(f"{path_directory}/{struct.table_name}.rs", "w", encoding="utf8")
         struct_document.write(warning_header)
         # Then, we write the import statements.
-        struct_document.write("\n".join(imports) + "\n\n")
+        struct_document.write("\n".join(this_imports) + "\n\n")
 
         main_document.write(
             f"mod {struct.table_name};\n"
@@ -280,7 +279,7 @@ def write_backend_flat_variants(
             if struct.table_metadata.has_postgres_function(can_x_function_name):
                 struct_document.write(
                     "{\n"
-                    f"       diesel::select({can_x_function_name}({author_user_id.name}, {struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))\n"
+                    f"       diesel::select(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))\n"
                     "            .get_result(connection).map_err(web_common::api::ApiError::from)\n"
                     "}\n"
                 )
@@ -377,7 +376,7 @@ def write_backend_flat_variants(
                         for primary_key in struct.get_primary_keys()
                     )
                     struct_document.write(
-                        f"            .filter({can_x_function_name}({author_user_id.name}, {diesel_primary_keys}))\n"
+                        f"            .filter(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {diesel_primary_keys}))\n"
                     )
 
                 if sorted_variant:
@@ -676,7 +675,7 @@ def write_backend_flat_variants(
                             f"{struct.table_name}::dsl::{primary_key.name}"
                             for primary_key in struct.get_primary_keys()
                         )
-                        filter_method_content += f"            .filter({can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
+                        filter_method_content += f"            .filter(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
 
                     filter_method_content += f"            {struct.format_diesel_search_filter('query', similarity_method_name)}\n"
 

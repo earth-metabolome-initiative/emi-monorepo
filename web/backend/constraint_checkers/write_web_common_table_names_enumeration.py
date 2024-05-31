@@ -12,7 +12,7 @@ def write_web_common_table_names_enumeration(
     update_model_structs: List[StructMetadata],
 ) -> List[TableStructMetadata]:
     """Writes the table names enumeration to the web_common crate."""
-    imports = ["use serde::Deserialize;", "use serde::Serialize;", "use super::*;"]
+    imports = ["use serde::Deserialize;", "use serde::Serialize;"]
 
     # The derives to apply to the structs in the `src/database/tables.rs` document
     derives = ["Deserialize", "Serialize", "Clone", "Debug", "PartialEq", "Eq", "Copy"]

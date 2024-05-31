@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -93,7 +88,9 @@ impl SampleState {
         filter: Option<&SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_states;
         let mut query = sample_states::dsl::sample_states.into_boxed();
@@ -119,7 +116,9 @@ impl SampleState {
         filter: Option<&SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_states;
         let mut query = sample_states::dsl::sample_states.into_boxed();
@@ -141,7 +140,9 @@ impl SampleState {
     /// * `connection` - The connection to the database.
     pub fn get(
         id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::sample_states;
         sample_states::dsl::sample_states
@@ -155,7 +156,9 @@ impl SampleState {
     /// * `connection` - The connection to the database.
     pub fn from_color_id(
         color_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::sample_states;
         let flat_variant = sample_states::dsl::sample_states
@@ -169,7 +172,9 @@ impl SampleState {
     /// * `connection` - The connection to the database.
     pub fn from_icon_id(
         icon_id: &i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::sample_states;
         let flat_variant = sample_states::dsl::sample_states
@@ -189,7 +194,9 @@ impl SampleState {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -207,15 +214,24 @@ impl SampleState {
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             return sample_states::dsl::sample_states
                 .filter(sample_states::dsl::icon_id.eq(icon_id))
-                .filter(similarity_op(
-                    concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_sample_states_name_description(
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
@@ -229,15 +245,24 @@ impl SampleState {
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             return sample_states::dsl::sample_states
                 .filter(sample_states::dsl::color_id.eq(color_id))
-                .filter(similarity_op(
-                    concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_sample_states_name_description(
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
@@ -249,15 +274,24 @@ impl SampleState {
                 .map_err(web_common::api::ApiError::from);
         }
         sample_states::dsl::sample_states
-            .filter(similarity_op(
-                concat_sample_states_name_description(
-                    sample_states::dsl::name,
-                    sample_states::dsl::description,
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ),
-                query,
-            ))
-            .order(similarity_dist(
-                concat_sample_states_name_description(
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_sample_states_name_description(
                     sample_states::dsl::name,
                     sample_states::dsl::description,
                 ),
@@ -280,7 +314,9 @@ impl SampleState {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -298,15 +334,24 @@ impl SampleState {
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             return sample_states::dsl::sample_states
                 .filter(sample_states::dsl::icon_id.eq(icon_id))
-                .filter(word_similarity_op(
-                    concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_sample_states_name_description(
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
@@ -320,15 +365,24 @@ impl SampleState {
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             return sample_states::dsl::sample_states
                 .filter(sample_states::dsl::color_id.eq(color_id))
-                .filter(word_similarity_op(
-                    concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_sample_states_name_description(
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
                         sample_states::dsl::name,
                         sample_states::dsl::description,
                     ),
@@ -340,15 +394,24 @@ impl SampleState {
                 .map_err(web_common::api::ApiError::from);
         }
         sample_states::dsl::sample_states
-            .filter(word_similarity_op(
-                concat_sample_states_name_description(
-                    sample_states::dsl::name,
-                    sample_states::dsl::description,
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ),
-                query,
-            ))
-            .order(word_similarity_dist_op(
-                concat_sample_states_name_description(
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_sample_states_name_description(
                     sample_states::dsl::name,
                     sample_states::dsl::description,
                 ),
@@ -371,7 +434,9 @@ impl SampleState {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -389,20 +454,31 @@ impl SampleState {
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             return sample_states::dsl::sample_states
                 .filter(sample_states::dsl::icon_id.eq(icon_id))
-                .filter(strict_word_similarity_op(
-                    concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
                     ),
-                    query,
-                ))
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -411,40 +487,62 @@ impl SampleState {
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             return sample_states::dsl::sample_states
                 .filter(sample_states::dsl::color_id.eq(color_id))
-                .filter(strict_word_similarity_op(
-                    concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        ),
+                        query,
                     ),
-                    query,
-                ))
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         sample_states::dsl::sample_states
-            .filter(strict_word_similarity_op(
-                concat_sample_states_name_description(
-                    sample_states::dsl::name,
-                    sample_states::dsl::description,
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
+                )
+                .or(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
                 ),
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                concat_sample_states_name_description(
-                    sample_states::dsl::name,
-                    sample_states::dsl::description,
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_states_name_description(
+                        sample_states::dsl::name,
+                        sample_states::dsl::description,
+                    ),
+                    query,
                 ),
-                query,
-            ))
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

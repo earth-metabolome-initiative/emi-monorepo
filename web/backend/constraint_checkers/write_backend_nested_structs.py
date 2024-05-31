@@ -33,9 +33,6 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
     imports = [
         "use serde::Deserialize;",
         "use serde::Serialize;",
-        "use diesel::r2d2::ConnectionManager;",
-        "use diesel::r2d2::PooledConnection;",
-        "use uuid::Uuid;",
         "use crate::models::*;",
         "use web_common::database::filter_structs::*;",
         # "use crate::views::views::*;",
@@ -82,7 +79,7 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
                 "        author_user_id: Option<i32>,\n"
             )
         document.write(
-            "        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,\n"
+            "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Self, web_common::api::ApiError> {\n"
             "        Ok(Self {\n"
         )

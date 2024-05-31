@@ -22,7 +22,6 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
     imports = [
         "use serde::Deserialize;",
         "use serde::Serialize;",
-        "use uuid::Uuid;",
         "use super::*;",
     ]
 

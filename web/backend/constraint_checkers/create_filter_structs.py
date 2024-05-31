@@ -48,7 +48,6 @@ def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMet
 
     imports = [
         "use serde::{Deserialize, Serialize};",
-        "use uuid::Uuid;",
     ]
 
     document.write("\n".join(imports) + "\n\n")

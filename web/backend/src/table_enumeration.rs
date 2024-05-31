@@ -22,7 +22,9 @@ pub trait BackendTable {
         &self,
         primary_key: PrimaryKey,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError>;
 
     /// Get all of the viewable structs from the database.
@@ -38,7 +40,9 @@ pub trait BackendTable {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Get all of the sorted viewable structs from the database.
@@ -54,7 +58,9 @@ pub trait BackendTable {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Get the struct from the database by its ID.
@@ -66,7 +72,9 @@ pub trait BackendTable {
         &self,
         primary_key: PrimaryKey,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the viewable structs by a given string by Postgres's `similarity`.
@@ -84,7 +92,9 @@ pub trait BackendTable {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
@@ -102,7 +112,9 @@ pub trait BackendTable {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
@@ -120,7 +132,9 @@ pub trait BackendTable {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Check whether the user can update the struct associated to the provided ids.
@@ -132,7 +146,9 @@ pub trait BackendTable {
         &self,
         primary_key: PrimaryKey,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError>;
 
     /// Get all of the updatable structs from the database.
@@ -148,7 +164,9 @@ pub trait BackendTable {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Get all of the sorted updatable structs from the database.
@@ -164,7 +182,9 @@ pub trait BackendTable {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the updatable structs by a given string by Postgres's `similarity`.
@@ -182,7 +202,9 @@ pub trait BackendTable {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
@@ -200,7 +222,9 @@ pub trait BackendTable {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
@@ -218,7 +242,9 @@ pub trait BackendTable {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Check whether the user can admin the struct associated to the provided ids.
@@ -230,7 +256,9 @@ pub trait BackendTable {
         &self,
         primary_key: PrimaryKey,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError>;
 
     /// Get all of the administrable structs from the database.
@@ -246,7 +274,9 @@ pub trait BackendTable {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Get all of the sorted administrable structs from the database.
@@ -262,7 +292,9 @@ pub trait BackendTable {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the administrable structs by a given string by Postgres's `similarity`.
@@ -280,7 +312,9 @@ pub trait BackendTable {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
@@ -298,7 +332,9 @@ pub trait BackendTable {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
@@ -316,7 +352,9 @@ pub trait BackendTable {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
 
     /// Delete the struct from the database by its ID.
@@ -328,7 +366,9 @@ pub trait BackendTable {
         &self,
         primary_key: PrimaryKey,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError>;
 }
 
@@ -342,7 +382,9 @@ impl BackendTable for web_common::database::Table {
         &self,
         primary_key: PrimaryKey,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => NestedBioOttRank::can_view_by_id()?,
@@ -521,7 +563,9 @@ impl BackendTable for web_common::database::Table {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -1043,7 +1087,9 @@ impl BackendTable for web_common::database::Table {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -1565,7 +1611,9 @@ impl BackendTable for web_common::database::Table {
         &self,
         primary_key: PrimaryKey,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -1768,7 +1816,9 @@ impl BackendTable for web_common::database::Table {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -2131,7 +2181,9 @@ connection)?)?
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -2494,7 +2546,9 @@ connection)?)?
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -2851,7 +2905,9 @@ connection)?)?
         &self,
         primary_key: PrimaryKey,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -3074,7 +3130,9 @@ connection)?)?
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -3482,7 +3540,9 @@ connection)?)?
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => unimplemented!("Method all_updatable_sorted not implemented for table bio_ott_ranks."),
@@ -3737,7 +3797,9 @@ connection)?)?
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => unimplemented!("Method similarity_search_updatable not implemented for table bio_ott_ranks."),
@@ -4003,7 +4065,9 @@ connection)?)?
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => unimplemented!("Method word_similarity_search_updatable not implemented for table bio_ott_ranks."),
@@ -4269,7 +4333,9 @@ connection)?)?
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table bio_ott_ranks."),
@@ -4529,7 +4595,9 @@ connection)?)?
         &self,
         primary_key: PrimaryKey,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -4752,7 +4820,9 @@ connection)?)?
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
@@ -5162,7 +5232,9 @@ connection)?)?
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => unimplemented!("Method all_administrable_sorted not implemented for table bio_ott_ranks."),
@@ -5417,7 +5489,9 @@ connection)?)?
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => unimplemented!("Method similarity_search_administrable not implemented for table bio_ott_ranks."),
@@ -5683,7 +5757,9 @@ connection)?)?
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => unimplemented!("Method word_similarity_search_administrable not implemented for table bio_ott_ranks."),
@@ -5949,7 +6025,9 @@ connection)?)?
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table bio_ott_ranks."),
@@ -6209,7 +6287,9 @@ connection)?)?
         &self,
         primary_key: PrimaryKey,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {

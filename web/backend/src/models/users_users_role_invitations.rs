@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -47,7 +42,7 @@ pub struct UsersUsersRoleInvitation {
     pub user_id: i32,
     pub role_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
 }
 
 impl From<UsersUsersRoleInvitation> for web_common::database::tables::UsersUsersRoleInvitation {
@@ -82,7 +77,9 @@ impl UsersUsersRoleInvitation {
     pub fn can_view(
         &self,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_view_by_id((self.table_id, self.user_id), author_user_id, connection)
     }
@@ -94,13 +91,17 @@ impl UsersUsersRoleInvitation {
     pub fn can_view_by_id(
         (table_id, user_id): (i32, i32),
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_view_users_users_role_invitations(
-            author_user_id,
-            table_id,
-            user_id,
-        ))
+        diesel::select(
+            crate::sql_function_bindings::can_view_users_users_role_invitations(
+                author_user_id,
+                table_id,
+                user_id,
+            ),
+        )
         .get_result(connection)
         .map_err(web_common::api::ApiError::from)
     }
@@ -116,7 +117,9 @@ impl UsersUsersRoleInvitation {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
         let mut query =
@@ -134,11 +137,13 @@ impl UsersUsersRoleInvitation {
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_view_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
+            .filter(
+                crate::sql_function_bindings::can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -156,7 +161,9 @@ impl UsersUsersRoleInvitation {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
         let mut query =
@@ -174,11 +181,13 @@ impl UsersUsersRoleInvitation {
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_view_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
+            .filter(
+                crate::sql_function_bindings::can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
             .order_by(users_users_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -193,7 +202,9 @@ impl UsersUsersRoleInvitation {
     pub fn get(
         (table_id, user_id): (i32, i32),
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         if !Self::can_view_by_id((table_id, user_id), author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
@@ -219,7 +230,9 @@ impl UsersUsersRoleInvitation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -248,17 +261,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -275,17 +303,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -302,17 +345,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -329,17 +387,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -353,17 +426,32 @@ impl UsersUsersRoleInvitation {
             .inner_join(
                 roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
             )
-            .filter(can_view_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
-            .filter(similarity_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
-            .order(similarity_dist(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
+            .filter(
+                crate::sql_function_bindings::can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -385,7 +473,9 @@ impl UsersUsersRoleInvitation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -414,17 +504,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -441,17 +546,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -468,17 +588,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -495,17 +630,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -519,17 +669,32 @@ impl UsersUsersRoleInvitation {
             .inner_join(
                 roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
             )
-            .filter(can_view_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
-            .filter(word_similarity_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
-            .order(word_similarity_dist_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
+            .filter(
+                crate::sql_function_bindings::can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -551,7 +716,9 @@ impl UsersUsersRoleInvitation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -580,19 +747,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -607,19 +791,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -634,19 +835,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -661,19 +879,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_view_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_view_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -685,19 +920,36 @@ impl UsersUsersRoleInvitation {
             .inner_join(
                 roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
             )
-            .filter(can_view_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
-            .filter(strict_word_similarity_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
+            .filter(
+                crate::sql_function_bindings::can_view_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -710,7 +962,9 @@ impl UsersUsersRoleInvitation {
     pub fn can_update(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_update_by_id((self.table_id, self.user_id), author_user_id, connection)
     }
@@ -722,13 +976,17 @@ impl UsersUsersRoleInvitation {
     pub fn can_update_by_id(
         (table_id, user_id): (i32, i32),
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_update_users_users_role_invitations(
-            author_user_id,
-            table_id,
-            user_id,
-        ))
+        diesel::select(
+            crate::sql_function_bindings::can_update_users_users_role_invitations(
+                author_user_id,
+                table_id,
+                user_id,
+            ),
+        )
         .get_result(connection)
         .map_err(web_common::api::ApiError::from)
     }
@@ -744,7 +1002,9 @@ impl UsersUsersRoleInvitation {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
         let mut query =
@@ -762,11 +1022,13 @@ impl UsersUsersRoleInvitation {
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_update_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
+            .filter(
+                crate::sql_function_bindings::can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -784,7 +1046,9 @@ impl UsersUsersRoleInvitation {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
         let mut query =
@@ -802,11 +1066,13 @@ impl UsersUsersRoleInvitation {
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_update_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
+            .filter(
+                crate::sql_function_bindings::can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
             .order_by(users_users_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -827,7 +1093,9 @@ impl UsersUsersRoleInvitation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -856,17 +1124,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -883,17 +1166,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -910,17 +1208,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -937,17 +1250,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -961,17 +1289,32 @@ impl UsersUsersRoleInvitation {
             .inner_join(
                 roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
             )
-            .filter(can_update_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
-            .filter(similarity_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
-            .order(similarity_dist(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
+            .filter(
+                crate::sql_function_bindings::can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -993,7 +1336,9 @@ impl UsersUsersRoleInvitation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1022,17 +1367,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1049,17 +1409,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1076,17 +1451,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1103,17 +1493,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1127,17 +1532,32 @@ impl UsersUsersRoleInvitation {
             .inner_join(
                 roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
             )
-            .filter(can_update_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
-            .filter(word_similarity_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
-            .order(word_similarity_dist_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
+            .filter(
+                crate::sql_function_bindings::can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -1159,7 +1579,9 @@ impl UsersUsersRoleInvitation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1188,19 +1610,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1215,19 +1654,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1242,19 +1698,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1269,19 +1742,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_update_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_update_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1293,19 +1783,36 @@ impl UsersUsersRoleInvitation {
             .inner_join(
                 roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
             )
-            .filter(can_update_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
-            .filter(strict_word_similarity_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
+            .filter(
+                crate::sql_function_bindings::can_update_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1318,7 +1825,9 @@ impl UsersUsersRoleInvitation {
     pub fn can_admin(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_admin_by_id((self.table_id, self.user_id), author_user_id, connection)
     }
@@ -1330,13 +1839,17 @@ impl UsersUsersRoleInvitation {
     pub fn can_admin_by_id(
         (table_id, user_id): (i32, i32),
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_admin_users_users_role_invitations(
-            author_user_id,
-            table_id,
-            user_id,
-        ))
+        diesel::select(
+            crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                author_user_id,
+                table_id,
+                user_id,
+            ),
+        )
         .get_result(connection)
         .map_err(web_common::api::ApiError::from)
     }
@@ -1352,7 +1865,9 @@ impl UsersUsersRoleInvitation {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
         let mut query =
@@ -1370,11 +1885,13 @@ impl UsersUsersRoleInvitation {
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_admin_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
+            .filter(
+                crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -1392,7 +1909,9 @@ impl UsersUsersRoleInvitation {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_invitations;
         let mut query =
@@ -1410,11 +1929,13 @@ impl UsersUsersRoleInvitation {
             query = query.filter(users_users_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(can_admin_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
+            .filter(
+                crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
             .order_by(users_users_role_invitations::dsl::created_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -1435,7 +1956,9 @@ impl UsersUsersRoleInvitation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1464,17 +1987,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1491,17 +2029,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1518,17 +2071,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1545,17 +2113,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(similarity_dist(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1569,17 +2152,32 @@ impl UsersUsersRoleInvitation {
             .inner_join(
                 roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
             )
-            .filter(can_admin_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
-            .filter(similarity_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
-            .order(similarity_dist(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
+            .filter(
+                crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
+            .filter(
+                crate::sql_function_bindings::similarity_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -1601,7 +2199,9 @@ impl UsersUsersRoleInvitation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1630,17 +2230,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1657,17 +2272,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1684,17 +2314,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1711,17 +2356,32 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
                     query,
                 ))
                 .limit(limit.unwrap_or(10))
@@ -1735,17 +2395,32 @@ impl UsersUsersRoleInvitation {
             .inner_join(
                 roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
             )
-            .filter(can_admin_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
-            .filter(word_similarity_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
-            .order(word_similarity_dist_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
+            .filter(
+                crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                ),
                 query,
             ))
             .limit(limit.unwrap_or(10))
@@ -1767,7 +2442,9 @@ impl UsersUsersRoleInvitation {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1796,19 +2473,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1823,19 +2517,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1850,19 +2561,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1877,19 +2605,36 @@ impl UsersUsersRoleInvitation {
                     roles::dsl::roles
                         .on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
-                .filter(can_admin_users_users_role_invitations(
-                    author_user_id,
-                    users_users_role_invitations::dsl::table_id,
-                    users_users_role_invitations::dsl::user_id,
-                ))
-                .filter(strict_word_similarity_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
-                .order(strict_word_similarity_dist_op(
-                    concat_roles_name(roles::dsl::name, roles::dsl::description),
-                    query,
-                ))
+                .filter(
+                    crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                        author_user_id,
+                        users_users_role_invitations::dsl::table_id,
+                        users_users_role_invitations::dsl::user_id,
+                    ),
+                )
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_roles_name(
+                            roles::dsl::name,
+                            roles::dsl::description,
+                        ),
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1901,19 +2646,36 @@ impl UsersUsersRoleInvitation {
             .inner_join(
                 roles::dsl::roles.on(users_users_role_invitations::dsl::role_id.eq(roles::dsl::id)),
             )
-            .filter(can_admin_users_users_role_invitations(
-                author_user_id,
-                users_users_role_invitations::dsl::table_id,
-                users_users_role_invitations::dsl::user_id,
-            ))
-            .filter(strict_word_similarity_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
-            .order(strict_word_similarity_dist_op(
-                concat_roles_name(roles::dsl::name, roles::dsl::description),
-                query,
-            ))
+            .filter(
+                crate::sql_function_bindings::can_admin_users_users_role_invitations(
+                    author_user_id,
+                    users_users_role_invitations::dsl::table_id,
+                    users_users_role_invitations::dsl::user_id,
+                ),
+            )
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                )
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    ),
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1926,7 +2688,9 @@ impl UsersUsersRoleInvitation {
     pub fn delete(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         Self::delete_by_id((self.table_id, self.user_id), author_user_id, connection)
     }
@@ -1938,7 +2702,9 @@ impl UsersUsersRoleInvitation {
     pub fn delete_by_id(
         (table_id, user_id): (i32, i32),
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         if !Self::can_admin_by_id((table_id, user_id), author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);

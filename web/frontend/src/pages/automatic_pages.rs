@@ -209,7 +209,7 @@ pub fn observation_subject_page(props: &ObservationSubjectPageProp) -> Html {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct ObservationPageProp {
-    pub id: Uuid,
+    pub id: uuid::Uuid,
 }
 
 impl From<&ObservationPageProp> for PrimaryKey {
@@ -238,7 +238,7 @@ pub fn observation_page(props: &ObservationPageProp) -> Html {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct OrganismPageProp {
-    pub id: Uuid,
+    pub id: uuid::Uuid,
 }
 
 impl From<&OrganismPageProp> for PrimaryKey {
@@ -423,7 +423,7 @@ pub fn sample_state_page(props: &SampleStatePageProp) -> Html {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct SamplePageProp {
-    pub id: Uuid,
+    pub id: uuid::Uuid,
 }
 
 impl From<&SamplePageProp> for PrimaryKey {

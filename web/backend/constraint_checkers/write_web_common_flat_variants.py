@@ -59,8 +59,6 @@ def write_web_common_flat_variants(
     imports = [
         "use serde::Deserialize;",
         "use serde::Serialize;",
-        "use uuid::Uuid;",
-        "use chrono::NaiveDateTime;",
         "use crate::database::*;",
         "use crate::traits::GuessImageFormat;",
     ]
@@ -173,7 +171,7 @@ def write_web_common_flat_variants(
                     f"The type {attribute.data_type()} is not supported."
                 )
 
-        document.write("        ]\n" "    }\n\n")
+        document.write("        ]\n    }\n\n")
 
         # We implement the `insert` method for the struct. This method
         # receives a connection to the GlueSQL database and inserts the
@@ -467,19 +465,19 @@ def write_web_common_flat_variants(
             "f32": "F32",
             "f64": "F64",
             "String": "Str",
-            "NaiveDateTime": "Timestamp",
+            "chrono::NaiveDateTime": "Timestamp",
             "Vec<u8>": "Bytea",
         }
 
         for attribute in struct.attributes:
-            if attribute.format_data_type() == "Uuid":
+            if attribute.is_uuid() and not attribute.optional:
                 document.write(
                     f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                     f"                gluesql::prelude::Value::Uuid({attribute.name}) => Uuid::from_u128(*{attribute.name}),\n"
                     '                _ => unreachable!("Expected Uuid"),\n'
                     "            },\n"
                 )
-            elif attribute.format_data_type() == "Option<Uuid>":
+            elif attribute.is_uuid() and attribute.optional:
                 document.write(
                     f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                 )

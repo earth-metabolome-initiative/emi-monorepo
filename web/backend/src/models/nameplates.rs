@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -49,9 +44,9 @@ pub struct Nameplate {
     pub project_id: i32,
     pub category_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl From<Nameplate> for web_common::database::tables::Nameplate {
@@ -92,7 +87,9 @@ impl Nameplate {
     pub fn can_view(
         &self,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_view_by_id(self.id, author_user_id, connection)
     }
@@ -104,11 +101,16 @@ impl Nameplate {
     pub fn can_view_by_id(
         id: i32,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_view_nameplates(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_view_nameplates(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the viewable structs from the database.
     ///
@@ -122,7 +124,9 @@ impl Nameplate {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::nameplates;
         let mut query = nameplates::dsl::nameplates.into_boxed();
@@ -139,7 +143,10 @@ impl Nameplate {
             query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -157,7 +164,9 @@ impl Nameplate {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::nameplates;
         let mut query = nameplates::dsl::nameplates.into_boxed();
@@ -174,7 +183,10 @@ impl Nameplate {
             query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
             .order_by(nameplates::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -189,7 +201,9 @@ impl Nameplate {
     pub fn get(
         id: i32,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         if !Self::can_view_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
@@ -208,7 +222,9 @@ impl Nameplate {
     pub fn from_barcode(
         barcode: &str,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         use crate::schema::nameplates;
         let flat_variant = nameplates::dsl::nameplates
@@ -233,7 +249,9 @@ impl Nameplate {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -256,9 +274,18 @@ impl Nameplate {
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -267,9 +294,18 @@ impl Nameplate {
         if let Some(category_id) = filter.and_then(|f| f.category_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -278,9 +314,18 @@ impl Nameplate {
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -289,18 +334,36 @@ impl Nameplate {
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplates::dsl::nameplates
-            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-            .filter(similarity_op(nameplates::dsl::barcode, query))
-            .order(similarity_dist(nameplates::dsl::barcode, query))
+            .filter(crate::sql_function_bindings::can_view_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                nameplates::dsl::barcode,
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -320,7 +383,9 @@ impl Nameplate {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -343,9 +408,21 @@ impl Nameplate {
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -354,9 +431,21 @@ impl Nameplate {
         if let Some(category_id) = filter.and_then(|f| f.category_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -365,9 +454,21 @@ impl Nameplate {
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -376,18 +477,39 @@ impl Nameplate {
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplates::dsl::nameplates
-            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-            .filter(word_similarity_op(nameplates::dsl::barcode, query))
-            .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .filter(crate::sql_function_bindings::can_view_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(nameplates::dsl::barcode, query)
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                nameplates::dsl::barcode,
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -407,7 +529,9 @@ impl Nameplate {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -430,12 +554,23 @@ impl Nameplate {
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -444,12 +579,23 @@ impl Nameplate {
         if let Some(category_id) = filter.and_then(|f| f.category_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -458,12 +604,23 @@ impl Nameplate {
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -472,24 +629,46 @@ impl Nameplate {
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_view_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplates::dsl::nameplates
-            .filter(can_view_nameplates(author_user_id, nameplates::dsl::id))
-            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-            .order(strict_word_similarity_dist_op(
-                nameplates::dsl::barcode,
-                query,
+            .filter(crate::sql_function_bindings::can_view_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
             ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    nameplates::dsl::barcode,
+                    query,
+                )
+                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -502,7 +681,9 @@ impl Nameplate {
     pub fn can_update(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_update_by_id(self.id, author_user_id, connection)
     }
@@ -514,11 +695,16 @@ impl Nameplate {
     pub fn can_update_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_update_nameplates(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_update_nameplates(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the updatable structs from the database.
     ///
@@ -532,7 +718,9 @@ impl Nameplate {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::nameplates;
         let mut query = nameplates::dsl::nameplates.into_boxed();
@@ -549,7 +737,10 @@ impl Nameplate {
             query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(crate::sql_function_bindings::can_update_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -567,7 +758,9 @@ impl Nameplate {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::nameplates;
         let mut query = nameplates::dsl::nameplates.into_boxed();
@@ -584,7 +777,10 @@ impl Nameplate {
             query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(crate::sql_function_bindings::can_update_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
             .order_by(nameplates::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -605,7 +801,9 @@ impl Nameplate {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -628,9 +826,18 @@ impl Nameplate {
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -639,9 +846,18 @@ impl Nameplate {
         if let Some(category_id) = filter.and_then(|f| f.category_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -650,9 +866,18 @@ impl Nameplate {
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -661,18 +886,36 @@ impl Nameplate {
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplates::dsl::nameplates
-            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-            .filter(similarity_op(nameplates::dsl::barcode, query))
-            .order(similarity_dist(nameplates::dsl::barcode, query))
+            .filter(crate::sql_function_bindings::can_update_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                nameplates::dsl::barcode,
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -692,7 +935,9 @@ impl Nameplate {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -715,9 +960,21 @@ impl Nameplate {
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -726,9 +983,21 @@ impl Nameplate {
         if let Some(category_id) = filter.and_then(|f| f.category_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -737,9 +1006,21 @@ impl Nameplate {
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -748,18 +1029,39 @@ impl Nameplate {
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplates::dsl::nameplates
-            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-            .filter(word_similarity_op(nameplates::dsl::barcode, query))
-            .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .filter(crate::sql_function_bindings::can_update_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(nameplates::dsl::barcode, query)
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                nameplates::dsl::barcode,
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -779,7 +1081,9 @@ impl Nameplate {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -802,12 +1106,23 @@ impl Nameplate {
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -816,12 +1131,23 @@ impl Nameplate {
         if let Some(category_id) = filter.and_then(|f| f.category_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -830,12 +1156,23 @@ impl Nameplate {
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -844,24 +1181,46 @@ impl Nameplate {
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_update_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplates::dsl::nameplates
-            .filter(can_update_nameplates(author_user_id, nameplates::dsl::id))
-            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-            .order(strict_word_similarity_dist_op(
-                nameplates::dsl::barcode,
-                query,
+            .filter(crate::sql_function_bindings::can_update_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
             ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    nameplates::dsl::barcode,
+                    query,
+                )
+                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -874,7 +1233,9 @@ impl Nameplate {
     pub fn can_admin(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_admin_by_id(self.id, author_user_id, connection)
     }
@@ -886,11 +1247,16 @@ impl Nameplate {
     pub fn can_admin_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_admin_nameplates(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_admin_nameplates(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the administrable structs from the database.
     ///
@@ -904,7 +1270,9 @@ impl Nameplate {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::nameplates;
         let mut query = nameplates::dsl::nameplates.into_boxed();
@@ -921,7 +1289,10 @@ impl Nameplate {
             query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(crate::sql_function_bindings::can_admin_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -939,7 +1310,9 @@ impl Nameplate {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::nameplates;
         let mut query = nameplates::dsl::nameplates.into_boxed();
@@ -956,7 +1329,10 @@ impl Nameplate {
             query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
+            .filter(crate::sql_function_bindings::can_admin_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
             .order_by(nameplates::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -977,7 +1353,9 @@ impl Nameplate {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1000,9 +1378,18 @@ impl Nameplate {
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1011,9 +1398,18 @@ impl Nameplate {
         if let Some(category_id) = filter.and_then(|f| f.category_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1022,9 +1418,18 @@ impl Nameplate {
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1033,18 +1438,36 @@ impl Nameplate {
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(similarity_op(nameplates::dsl::barcode, query))
-                .order(similarity_dist(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::similarity_dist(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplates::dsl::nameplates
-            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-            .filter(similarity_op(nameplates::dsl::barcode, query))
-            .order(similarity_dist(nameplates::dsl::barcode, query))
+            .filter(crate::sql_function_bindings::can_admin_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::similarity_dist(
+                nameplates::dsl::barcode,
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1064,7 +1487,9 @@ impl Nameplate {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1087,9 +1512,21 @@ impl Nameplate {
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1098,9 +1535,21 @@ impl Nameplate {
         if let Some(category_id) = filter.and_then(|f| f.category_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1109,9 +1558,21 @@ impl Nameplate {
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1120,18 +1581,39 @@ impl Nameplate {
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(word_similarity_op(nameplates::dsl::barcode, query))
-                .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
+                ))
+                .filter(
+                    crate::sql_function_bindings::word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(crate::sql_function_bindings::word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ))
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplates::dsl::nameplates
-            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-            .filter(word_similarity_op(nameplates::dsl::barcode, query))
-            .order(word_similarity_dist_op(nameplates::dsl::barcode, query))
+            .filter(crate::sql_function_bindings::can_admin_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
+            ))
+            .filter(
+                crate::sql_function_bindings::word_similarity_op(nameplates::dsl::barcode, query)
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+            )
+            .order(crate::sql_function_bindings::word_similarity_dist_op(
+                nameplates::dsl::barcode,
+                query,
+            ))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1151,7 +1633,9 @@ impl Nameplate {
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         // If the query string is empty, we run an all query with the
         // limit parameter provided instead of a more complex similarity
@@ -1174,12 +1658,23 @@ impl Nameplate {
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1188,12 +1683,23 @@ impl Nameplate {
         if let Some(category_id) = filter.and_then(|f| f.category_id) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1202,12 +1708,23 @@ impl Nameplate {
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
@@ -1216,24 +1733,46 @@ impl Nameplate {
         if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
             return nameplates::dsl::nameplates
                 .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-                .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-                .order(strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
+                .filter(crate::sql_function_bindings::can_admin_nameplates(
+                    author_user_id,
+                    nameplates::dsl::id,
                 ))
+                .filter(
+                    crate::sql_function_bindings::strict_word_similarity_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    )
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ),
+                )
                 .limit(limit.unwrap_or(10))
                 .offset(offset.unwrap_or(0))
                 .load::<Self>(connection)
                 .map_err(web_common::api::ApiError::from);
         }
         nameplates::dsl::nameplates
-            .filter(can_admin_nameplates(author_user_id, nameplates::dsl::id))
-            .filter(strict_word_similarity_op(nameplates::dsl::barcode, query))
-            .order(strict_word_similarity_dist_op(
-                nameplates::dsl::barcode,
-                query,
+            .filter(crate::sql_function_bindings::can_admin_nameplates(
+                author_user_id,
+                nameplates::dsl::id,
             ))
+            .filter(
+                crate::sql_function_bindings::strict_word_similarity_op(
+                    nameplates::dsl::barcode,
+                    query,
+                )
+                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    nameplates::dsl::barcode,
+                    query,
+                ),
+            )
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1246,7 +1785,9 @@ impl Nameplate {
     pub fn delete(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         Self::delete_by_id(self.id, author_user_id, connection)
     }
@@ -1258,7 +1799,9 @@ impl Nameplate {
     pub fn delete_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         if !Self::can_admin_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);

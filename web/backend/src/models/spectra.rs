@@ -7,11 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
-use crate::sql_function_bindings::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
 use diesel::Identifiable;
 use diesel::Insertable;
 use diesel::Queryable;
@@ -19,7 +15,6 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 use web_common::database::filter_structs::*;
 
 #[derive(
@@ -47,9 +42,9 @@ pub struct Spectra {
     pub notes: Option<String>,
     pub spectra_collection_id: i32,
     pub created_by: i32,
-    pub created_at: NaiveDateTime,
+    pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
-    pub updated_at: NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl From<Spectra> for web_common::database::tables::Spectra {
@@ -88,7 +83,9 @@ impl Spectra {
     pub fn can_view(
         &self,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_view_by_id(self.id, author_user_id, connection)
     }
@@ -100,11 +97,16 @@ impl Spectra {
     pub fn can_view_by_id(
         id: i32,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_view_spectra(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_view_spectra(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the viewable structs from the database.
     ///
@@ -118,7 +120,9 @@ impl Spectra {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
         let mut query = spectra::dsl::spectra.into_boxed();
@@ -132,7 +136,10 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_view_spectra(author_user_id, spectra::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -150,7 +157,9 @@ impl Spectra {
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
         let mut query = spectra::dsl::spectra.into_boxed();
@@ -164,7 +173,10 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_view_spectra(author_user_id, spectra::dsl::id))
+            .filter(crate::sql_function_bindings::can_view_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
             .order_by(spectra::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -179,7 +191,9 @@ impl Spectra {
     pub fn get(
         id: i32,
         author_user_id: Option<i32>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self, web_common::api::ApiError> {
         if !Self::can_view_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
@@ -197,7 +211,9 @@ impl Spectra {
     pub fn can_update(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_update_by_id(self.id, author_user_id, connection)
     }
@@ -209,11 +225,16 @@ impl Spectra {
     pub fn can_update_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_update_spectra(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_update_spectra(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the updatable structs from the database.
     ///
@@ -227,7 +248,9 @@ impl Spectra {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
         let mut query = spectra::dsl::spectra.into_boxed();
@@ -241,7 +264,10 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_update_spectra(author_user_id, spectra::dsl::id))
+            .filter(crate::sql_function_bindings::can_update_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -259,7 +285,9 @@ impl Spectra {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
         let mut query = spectra::dsl::spectra.into_boxed();
@@ -273,7 +301,10 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_update_spectra(author_user_id, spectra::dsl::id))
+            .filter(crate::sql_function_bindings::can_update_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
             .order_by(spectra::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -287,7 +318,9 @@ impl Spectra {
     pub fn can_admin(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
         Self::can_admin_by_id(self.id, author_user_id, connection)
     }
@@ -299,11 +332,16 @@ impl Spectra {
     pub fn can_admin_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(can_admin_spectra(author_user_id, id))
-            .get_result(connection)
-            .map_err(web_common::api::ApiError::from)
+        diesel::select(crate::sql_function_bindings::can_admin_spectra(
+            author_user_id,
+            id,
+        ))
+        .get_result(connection)
+        .map_err(web_common::api::ApiError::from)
     }
     /// Get all of the administrable structs from the database.
     ///
@@ -317,7 +355,9 @@ impl Spectra {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
         let mut query = spectra::dsl::spectra.into_boxed();
@@ -331,7 +371,10 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_admin_spectra(author_user_id, spectra::dsl::id))
+            .filter(crate::sql_function_bindings::can_admin_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -349,7 +392,9 @@ impl Spectra {
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
         let mut query = spectra::dsl::spectra.into_boxed();
@@ -363,7 +408,10 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(can_admin_spectra(author_user_id, spectra::dsl::id))
+            .filter(crate::sql_function_bindings::can_admin_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
             .order_by(spectra::dsl::updated_at.desc())
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -377,7 +425,9 @@ impl Spectra {
     pub fn delete(
         &self,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         Self::delete_by_id(self.id, author_user_id, connection)
     }
@@ -389,7 +439,9 @@ impl Spectra {
     pub fn delete_by_id(
         id: i32,
         author_user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<usize, web_common::api::ApiError> {
         if !Self::can_admin_by_id(id, author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);

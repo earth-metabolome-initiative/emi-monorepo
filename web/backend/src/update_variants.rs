@@ -4,11 +4,7 @@
 
 use crate::models::*;
 use crate::schema::*;
-use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use diesel::r2d2::ConnectionManager;
-use diesel::r2d2::PooledConnection;
-use uuid::Uuid;
 /// Trait providing the update method for the update variants.
 pub(super) trait UpdateRow {
     /// The intermediate representation of the row.
@@ -24,7 +20,9 @@ pub(super) trait UpdateRow {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::prelude::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error>;
 }
 
@@ -35,8 +33,8 @@ pub(super) trait UpdateRow {
 #[diesel(primary_key(parent_sample_id, child_sample_id))]
 pub(super) struct IntermediateUpdateDerivedSample {
     updated_by: i32,
-    parent_sample_id: Uuid,
-    child_sample_id: Uuid,
+    parent_sample_id: uuid::Uuid,
+    child_sample_id: uuid::Uuid,
 }
 
 impl UpdateRow for web_common::database::UpdateDerivedSample {
@@ -54,7 +52,9 @@ impl UpdateRow for web_common::database::UpdateDerivedSample {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -90,7 +90,9 @@ impl UpdateRow for web_common::database::UpdateNameplate {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -113,8 +115,8 @@ pub(super) struct IntermediateUpdateProject {
     parent_project_id: Option<i32>,
     budget: Option<f64>,
     expenses: Option<f64>,
-    expected_end_date: Option<NaiveDateTime>,
-    end_date: Option<NaiveDateTime>,
+    expected_end_date: Option<chrono::NaiveDateTime>,
+    end_date: Option<chrono::NaiveDateTime>,
 }
 
 impl UpdateRow for web_common::database::UpdateProject {
@@ -142,7 +144,9 @@ impl UpdateRow for web_common::database::UpdateProject {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -178,7 +182,9 @@ impl UpdateRow for web_common::database::UpdateSampleContainer {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -212,7 +218,9 @@ impl UpdateRow for web_common::database::UpdateSpectra {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -227,7 +235,7 @@ pub(super) struct IntermediateUpdateSpectraCollection {
     updated_by: i32,
     id: i32,
     notes: Option<String>,
-    sample_id: Uuid,
+    sample_id: uuid::Uuid,
 }
 
 impl UpdateRow for web_common::database::UpdateSpectraCollection {
@@ -246,7 +254,9 @@ impl UpdateRow for web_common::database::UpdateSpectraCollection {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -288,7 +298,9 @@ impl UpdateRow for web_common::database::UpdateTeam {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -326,7 +338,9 @@ impl UpdateRow for web_common::database::UpdateUser {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -339,11 +353,11 @@ impl UpdateRow for web_common::database::UpdateUser {
 #[diesel(primary_key(id))]
 pub(super) struct IntermediateNewObservation {
     updated_by: i32,
-    id: Uuid,
-    parent_observation_id: Option<Uuid>,
+    id: uuid::Uuid,
+    parent_observation_id: Option<uuid::Uuid>,
     project_id: i32,
-    organism_id: Option<Uuid>,
-    sample_id: Option<Uuid>,
+    organism_id: Option<uuid::Uuid>,
+    sample_id: Option<uuid::Uuid>,
     subject_id: i32,
     notes: Option<String>,
     picture: Vec<u8>,
@@ -370,7 +384,9 @@ impl UpdateRow for web_common::database::NewObservation {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -383,9 +399,9 @@ impl UpdateRow for web_common::database::NewObservation {
 #[diesel(primary_key(id))]
 pub(super) struct IntermediateNewOrganism {
     updated_by: i32,
-    id: Uuid,
-    host_organism_id: Option<Uuid>,
-    sample_id: Option<Uuid>,
+    id: uuid::Uuid,
+    host_organism_id: Option<uuid::Uuid>,
+    sample_id: Option<uuid::Uuid>,
     notes: Option<String>,
     nameplate_id: i32,
     project_id: i32,
@@ -412,7 +428,9 @@ impl UpdateRow for web_common::database::NewOrganism {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }
@@ -425,7 +443,7 @@ impl UpdateRow for web_common::database::NewOrganism {
 #[diesel(primary_key(id))]
 pub(super) struct IntermediateNewSample {
     updated_by: i32,
-    id: Uuid,
+    id: uuid::Uuid,
     container_id: i32,
     notes: Option<String>,
     project_id: i32,
@@ -452,7 +470,9 @@ impl UpdateRow for web_common::database::NewSample {
     fn update(
         self,
         user_id: i32,
-        connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
     ) -> Result<Self::Flat, diesel::result::Error> {
         self.to_intermediate(user_id).save_changes(connection)
     }

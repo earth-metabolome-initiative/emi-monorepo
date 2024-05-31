@@ -16,6 +16,24 @@ from constraint_checkers.indices import (
     DerivedPGIndex,
 )
 
+TYPES_FROM_CORE_AND_STANDARD_LIBRARIES = [
+    "bool",
+    "i8",
+    "i16",
+    "i32",
+    "i64",
+    "i128",
+    "u8",
+    "u16",
+    "u32",
+    "u64",
+    "u128",
+    "f32",
+    "f64",
+    "Vec<u8>",
+    "String",
+    "str"
+]
 
 def rust_type_to_diesel_type(rust_type: str) -> str:
     """Converts a Rust type to a diesel type, including full crate path.
@@ -57,6 +75,68 @@ def rust_type_to_diesel_type(rust_type: str) -> str:
     raise ValueError(f"Unsupported Rust type: {rust_type}")
 
 
+def data_type_to_absolute_import_path(data_type: str) -> str:
+    """Converts a data type to an absolute import path.
+
+    Parameters
+    ----------
+    data_type : str
+        The data type to convert.
+
+    Returns
+    -------
+    str
+        The converted absolute import path.
+
+    Examples
+    --------
+    >>> data_type_to_absolute_import_path("Uuid")
+    "crate::models::Uuid"
+    >>> data_type_to_absolute_import_path("Vec<ApiError>")
+    "crate::models::ApiError"
+    """
+    if data_type in TYPES_FROM_CORE_AND_STANDARD_LIBRARIES:
+        return data_type
+
+    if data_type.startswith("Nested"):
+        return data_type
+    if "ApiError" in data_type:
+        return data_type
+
+    if data_type == "Uuid" or data_type == "uuid::Uuid":
+        return "uuid::Uuid"
+
+    if "uuid::Uuid" in data_type:
+        return data_type
+
+    if data_type in [
+        "( i32, i32 )",
+        "PrimaryKey"
+    ]:
+        return data_type
+
+    if data_type == "NaiveDateTime" or data_type == "chrono::NaiveDateTime":
+        return "chrono::NaiveDateTime"
+    
+    if data_type in [
+        "PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>",
+        "diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>",
+    ]:
+        return "diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>"
+
+    if data_type in [
+        "Result<usize, gluesql::prelude::Error>",
+    ]:
+        return "Result<usize, gluesql::prelude::Error>"
+
+    if data_type in [
+        "gluesql::prelude::Glue<C>"
+    ]:
+        return "gluesql::prelude::Glue<C>"
+    
+    raise ValueError(f"Unsupported data type: {data_type}")
+
+
 class AttributeMetadata:
     """Class representing the metadata of an attribute."""
 
@@ -73,7 +153,7 @@ class AttributeMetadata:
     ):
         self.original_name = original_name
         self.name = name
-        self._data_type = data_type
+        self._data_type = data_type_to_absolute_import_path(data_type) if isinstance(data_type, str) else data_type
         self.optional = optional
         self.unique = unique
         self.reference = reference
@@ -317,6 +397,7 @@ class AttributeMetadata:
         return self.name == other.name and self._data_type == other._data_type
 
     def implements_clone(self) -> bool:
+        """Returns whether the attribute implements the Clone trait."""
         return (
             self._data_type
             in [
@@ -333,12 +414,12 @@ class AttributeMetadata:
                 "u128",
                 "f32",
                 "f64",
-                "Uuid",
+                "uuid::Uuid",
                 "String",
                 "Vec<ApiError>",
                 "Vec<u8>",
                 "ApiError",
-                "NaiveDateTime",
+                "chrono::NaiveDateTime",
             ]
             or isinstance(self._data_type, StructMetadata)
             and self._data_type.can_implement_clone()
@@ -346,7 +427,7 @@ class AttributeMetadata:
 
     def is_uuid(self) -> bool:
         """Returns whether the attribute is a UUID."""
-        return self.data_type() == "Uuid"
+        return self.data_type() == "uuid::Uuid"
 
     def normalized_name(self) -> str:
         """Returns the name of the attribute eventually without the _id suffix."""
@@ -1612,7 +1693,7 @@ class StructMetadata:
         """
         primary_keys = self.get_primary_keys()
         return (
-            all(attribute.data_type() == "Uuid" for attribute in primary_keys)
+            all(attribute.is_uuid() for attribute in primary_keys)
             and len(primary_keys) == 1
         )
 
