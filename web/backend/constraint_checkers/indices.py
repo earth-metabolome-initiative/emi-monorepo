@@ -78,6 +78,9 @@ class PGIndex:
         assert similarity_method in PGIndices.SIMILARITY_METHODS
         assert desinence in ("op", "dist", "dist_op")
 
+        if alias_number == -1:
+            alias_number = None
+
         if self.associated_function is not None:
             if alias_number is not None:
                 arguments = ", ".join(
@@ -317,8 +320,11 @@ class DerivedPGIndex:
         if alias_number is None:
             if self.is_second_order():
                 alias_number = self._inner_alias_number
-            if self.is_first_order():
+            elif self.is_first_order():
                 alias_number = self._alias_number
+            
+            if alias_number is None:
+                alias_number = -1
         return self.index.format_diesel_search_filter(
             query, similarity_method, alias_number
         )
@@ -340,8 +346,11 @@ class DerivedPGIndex:
         if alias_number is None:
             if self.is_second_order():
                 alias_number = self._inner_alias_number
-            if self.is_first_order():
+            elif self.is_first_order():
                 alias_number = self._alias_number
+
+            if alias_number is None:
+                alias_number = -1
         return self.index.format_distance_operator_diesel(
             query, similarity_method, alias_number
         )

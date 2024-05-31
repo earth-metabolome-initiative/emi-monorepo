@@ -383,7 +383,7 @@ impl PageLike for NestedNameplate {
     }
 }
 
-impl PageLike for NestedSampledIndividual {
+impl PageLike for NestedOrganism {
     fn title(&self) -> String {
         format!("Sampled individual {}", self.inner.id)
     }
@@ -397,16 +397,42 @@ impl PageLike for NestedSampledIndividual {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::SampledIndividualsUpdate { id: self.inner.id })
+        Some(AppRoute::OrganismsUpdate { id: self.inner.id })
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
                 f.project_id
-                    .map(|project_id| AppRoute::SampledIndividualsNewWithProject { project_id })
+                    .map(|project_id| AppRoute::OrganismsNewWithProject { project_id })
             })
-            .or(Some(AppRoute::SampledIndividualsNew))
+            .or(Some(AppRoute::OrganismsNew))
+    }
+
+    fn icon() -> &'static str {
+        "dna"
+    }
+}
+
+impl PageLike for NestedObservationSubject {
+    fn title(&self) -> String {
+        self.inner.name.clone()
+    }
+
+    fn description(&self) -> Option<&str> {
+        Some(&self.inner.description)
+    }
+
+    fn id(&self) -> PrimaryKey {
+        self.inner.id.into()
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        None
     }
 
     fn icon() -> &'static str {

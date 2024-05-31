@@ -274,8 +274,8 @@ impl OrganismBioOttTaxonItem {
                         .or(similarity_op(nameplates::dsl::barcode, query))
                         .or(similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -285,8 +285,8 @@ impl OrganismBioOttTaxonItem {
                         + similarity_dist(nameplates::dsl::barcode, query)
                         + similarity_dist(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -336,8 +336,8 @@ impl OrganismBioOttTaxonItem {
                         .or(similarity_op(nameplates::dsl::barcode, query))
                         .or(similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -347,8 +347,8 @@ impl OrganismBioOttTaxonItem {
                         + similarity_dist(nameplates::dsl::barcode, query)
                         + similarity_dist(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -398,8 +398,8 @@ impl OrganismBioOttTaxonItem {
                         .or(similarity_op(nameplates::dsl::barcode, query))
                         .or(similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -409,8 +409,8 @@ impl OrganismBioOttTaxonItem {
                         + similarity_dist(nameplates::dsl::barcode, query)
                         + similarity_dist(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -460,8 +460,8 @@ impl OrganismBioOttTaxonItem {
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     )),
@@ -471,8 +471,8 @@ impl OrganismBioOttTaxonItem {
                     + similarity_dist(nameplates::dsl::barcode, query)
                     + similarity_dist(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     ),
@@ -555,8 +555,8 @@ impl OrganismBioOttTaxonItem {
                         .or(word_similarity_op(nameplates::dsl::barcode, query))
                         .or(word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -566,8 +566,8 @@ impl OrganismBioOttTaxonItem {
                         + word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -617,8 +617,8 @@ impl OrganismBioOttTaxonItem {
                         .or(word_similarity_op(nameplates::dsl::barcode, query))
                         .or(word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -628,8 +628,8 @@ impl OrganismBioOttTaxonItem {
                         + word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -679,8 +679,8 @@ impl OrganismBioOttTaxonItem {
                         .or(word_similarity_op(nameplates::dsl::barcode, query))
                         .or(word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -690,8 +690,8 @@ impl OrganismBioOttTaxonItem {
                         + word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -741,8 +741,8 @@ impl OrganismBioOttTaxonItem {
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     )),
@@ -752,8 +752,8 @@ impl OrganismBioOttTaxonItem {
                     + word_similarity_dist_op(nameplates::dsl::barcode, query)
                     + word_similarity_dist_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     ),
@@ -836,8 +836,8 @@ impl OrganismBioOttTaxonItem {
                         .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                         .or(strict_word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -847,8 +847,8 @@ impl OrganismBioOttTaxonItem {
                         + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + strict_word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -898,8 +898,8 @@ impl OrganismBioOttTaxonItem {
                         .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                         .or(strict_word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -909,8 +909,8 @@ impl OrganismBioOttTaxonItem {
                         + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + strict_word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -960,8 +960,8 @@ impl OrganismBioOttTaxonItem {
                         .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                         .or(strict_word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -971,8 +971,8 @@ impl OrganismBioOttTaxonItem {
                         + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + strict_word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1022,8 +1022,8 @@ impl OrganismBioOttTaxonItem {
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     )),
@@ -1033,8 +1033,8 @@ impl OrganismBioOttTaxonItem {
                     + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                     + strict_word_similarity_dist_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     ),
@@ -1225,8 +1225,8 @@ impl OrganismBioOttTaxonItem {
                         .or(similarity_op(nameplates::dsl::barcode, query))
                         .or(similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -1236,8 +1236,8 @@ impl OrganismBioOttTaxonItem {
                         + similarity_dist(nameplates::dsl::barcode, query)
                         + similarity_dist(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1287,8 +1287,8 @@ impl OrganismBioOttTaxonItem {
                         .or(similarity_op(nameplates::dsl::barcode, query))
                         .or(similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -1298,8 +1298,8 @@ impl OrganismBioOttTaxonItem {
                         + similarity_dist(nameplates::dsl::barcode, query)
                         + similarity_dist(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1349,8 +1349,8 @@ impl OrganismBioOttTaxonItem {
                         .or(similarity_op(nameplates::dsl::barcode, query))
                         .or(similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -1360,8 +1360,8 @@ impl OrganismBioOttTaxonItem {
                         + similarity_dist(nameplates::dsl::barcode, query)
                         + similarity_dist(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1411,8 +1411,8 @@ impl OrganismBioOttTaxonItem {
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     )),
@@ -1422,8 +1422,8 @@ impl OrganismBioOttTaxonItem {
                     + similarity_dist(nameplates::dsl::barcode, query)
                     + similarity_dist(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     ),
@@ -1506,8 +1506,8 @@ impl OrganismBioOttTaxonItem {
                         .or(word_similarity_op(nameplates::dsl::barcode, query))
                         .or(word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -1517,8 +1517,8 @@ impl OrganismBioOttTaxonItem {
                         + word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1568,8 +1568,8 @@ impl OrganismBioOttTaxonItem {
                         .or(word_similarity_op(nameplates::dsl::barcode, query))
                         .or(word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -1579,8 +1579,8 @@ impl OrganismBioOttTaxonItem {
                         + word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1630,8 +1630,8 @@ impl OrganismBioOttTaxonItem {
                         .or(word_similarity_op(nameplates::dsl::barcode, query))
                         .or(word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -1641,8 +1641,8 @@ impl OrganismBioOttTaxonItem {
                         + word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1692,8 +1692,8 @@ impl OrganismBioOttTaxonItem {
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     )),
@@ -1703,8 +1703,8 @@ impl OrganismBioOttTaxonItem {
                     + word_similarity_dist_op(nameplates::dsl::barcode, query)
                     + word_similarity_dist_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     ),
@@ -1787,8 +1787,8 @@ impl OrganismBioOttTaxonItem {
                         .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                         .or(strict_word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -1798,8 +1798,8 @@ impl OrganismBioOttTaxonItem {
                         + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + strict_word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1849,8 +1849,8 @@ impl OrganismBioOttTaxonItem {
                         .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                         .or(strict_word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -1860,8 +1860,8 @@ impl OrganismBioOttTaxonItem {
                         + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + strict_word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1911,8 +1911,8 @@ impl OrganismBioOttTaxonItem {
                         .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                         .or(strict_word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -1922,8 +1922,8 @@ impl OrganismBioOttTaxonItem {
                         + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + strict_word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -1973,8 +1973,8 @@ impl OrganismBioOttTaxonItem {
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     )),
@@ -1984,8 +1984,8 @@ impl OrganismBioOttTaxonItem {
                     + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                     + strict_word_similarity_dist_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     ),
@@ -2176,8 +2176,8 @@ impl OrganismBioOttTaxonItem {
                         .or(similarity_op(nameplates::dsl::barcode, query))
                         .or(similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -2187,8 +2187,8 @@ impl OrganismBioOttTaxonItem {
                         + similarity_dist(nameplates::dsl::barcode, query)
                         + similarity_dist(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -2238,8 +2238,8 @@ impl OrganismBioOttTaxonItem {
                         .or(similarity_op(nameplates::dsl::barcode, query))
                         .or(similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -2249,8 +2249,8 @@ impl OrganismBioOttTaxonItem {
                         + similarity_dist(nameplates::dsl::barcode, query)
                         + similarity_dist(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -2300,8 +2300,8 @@ impl OrganismBioOttTaxonItem {
                         .or(similarity_op(nameplates::dsl::barcode, query))
                         .or(similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -2311,8 +2311,8 @@ impl OrganismBioOttTaxonItem {
                         + similarity_dist(nameplates::dsl::barcode, query)
                         + similarity_dist(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -2362,8 +2362,8 @@ impl OrganismBioOttTaxonItem {
                     .or(similarity_op(nameplates::dsl::barcode, query))
                     .or(similarity_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     )),
@@ -2373,8 +2373,8 @@ impl OrganismBioOttTaxonItem {
                     + similarity_dist(nameplates::dsl::barcode, query)
                     + similarity_dist(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     ),
@@ -2457,8 +2457,8 @@ impl OrganismBioOttTaxonItem {
                         .or(word_similarity_op(nameplates::dsl::barcode, query))
                         .or(word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -2468,8 +2468,8 @@ impl OrganismBioOttTaxonItem {
                         + word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -2519,8 +2519,8 @@ impl OrganismBioOttTaxonItem {
                         .or(word_similarity_op(nameplates::dsl::barcode, query))
                         .or(word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -2530,8 +2530,8 @@ impl OrganismBioOttTaxonItem {
                         + word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -2581,8 +2581,8 @@ impl OrganismBioOttTaxonItem {
                         .or(word_similarity_op(nameplates::dsl::barcode, query))
                         .or(word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -2592,8 +2592,8 @@ impl OrganismBioOttTaxonItem {
                         + word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -2643,8 +2643,8 @@ impl OrganismBioOttTaxonItem {
                     .or(word_similarity_op(nameplates::dsl::barcode, query))
                     .or(word_similarity_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     )),
@@ -2654,8 +2654,8 @@ impl OrganismBioOttTaxonItem {
                     + word_similarity_dist_op(nameplates::dsl::barcode, query)
                     + word_similarity_dist_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     ),
@@ -2738,8 +2738,8 @@ impl OrganismBioOttTaxonItem {
                         .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                         .or(strict_word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -2749,8 +2749,8 @@ impl OrganismBioOttTaxonItem {
                         + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + strict_word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -2800,8 +2800,8 @@ impl OrganismBioOttTaxonItem {
                         .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                         .or(strict_word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -2811,8 +2811,8 @@ impl OrganismBioOttTaxonItem {
                         + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + strict_word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -2862,8 +2862,8 @@ impl OrganismBioOttTaxonItem {
                         .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                         .or(strict_word_similarity_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         )),
@@ -2873,8 +2873,8 @@ impl OrganismBioOttTaxonItem {
                         + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                         + strict_word_similarity_dist_op(
                             concat_projects_name_description(
-                                projects0.field(projects::dsl::name),
-                                projects0.field(projects::dsl::description),
+                                projects::dsl::name,
+                                projects::dsl::description,
                             ),
                             query,
                         ),
@@ -2924,8 +2924,8 @@ impl OrganismBioOttTaxonItem {
                     .or(strict_word_similarity_op(nameplates::dsl::barcode, query))
                     .or(strict_word_similarity_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     )),
@@ -2935,8 +2935,8 @@ impl OrganismBioOttTaxonItem {
                     + strict_word_similarity_dist_op(nameplates::dsl::barcode, query)
                     + strict_word_similarity_dist_op(
                         concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
+                            projects::dsl::name,
+                            projects::dsl::description,
                         ),
                         query,
                     ),

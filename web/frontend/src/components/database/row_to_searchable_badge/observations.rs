@@ -11,7 +11,7 @@ impl RowToSearchableBadge for NestedObservation {
         html! {
             <div>
                 <p>
-                    "OBSERVATION"
+                    {"OBSERVATION"}
                 </p>
             </div>
         }
@@ -20,7 +20,7 @@ impl RowToSearchableBadge for NestedObservation {
     fn to_selected_datalist_badge(&self) -> Html {
         html! {
             <p>
-            "TODO OBSERVATION"
+            {"TODO OBSERVATION"}
             </p>
         }
     }

@@ -24,7 +24,7 @@ pub trait RowToBadge {
     }
 }
 
-impl RowToBadge for NestedSampledIndividual {}
+impl RowToBadge for NestedOrganism {}
 impl RowToBadge for NestedSpectraCollection {}
 impl RowToBadge for NestedSpectra {}
 impl RowToBadge for NestedBioOttRank {}
@@ -35,3 +35,4 @@ impl RowToBadge for NestedSampleState {}
 impl RowToBadge for NestedSampleContainerCategory {}
 impl RowToBadge for NestedNameplateCategory {}
 impl RowToBadge for NestedNameplate {}
+impl RowToBadge for NestedObservationSubject {}
