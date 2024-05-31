@@ -169,6 +169,22 @@ impl NestedBioOttRank {
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
         .collect()
     }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        BioOttRank::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        BioOttRank::can_admin_by_id()
+    }
 }
 impl From<web_common::database::nested_models::NestedBioOttRank> for NestedBioOttRank {
     fn from(item: web_common::database::nested_models::NestedBioOttRank) -> Self {
@@ -388,6 +404,22 @@ impl NestedBioOttTaxonItem {
         .into_iter()
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
         .collect()
+    }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        BioOttTaxonItem::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        BioOttTaxonItem::can_admin_by_id()
     }
 }
 impl From<web_common::database::nested_models::NestedBioOttTaxonItem> for NestedBioOttTaxonItem {
@@ -1189,6 +1221,22 @@ impl NestedDocumentFormat {
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
         .collect()
     }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        DocumentFormat::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        DocumentFormat::can_admin_by_id()
+    }
 }
 impl From<web_common::database::nested_models::NestedDocumentFormat> for NestedDocumentFormat {
     fn from(item: web_common::database::nested_models::NestedDocumentFormat) -> Self {
@@ -1331,6 +1379,22 @@ impl NestedLoginProvider {
         LoginProvider::from_name(name, connection)
             .and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        LoginProvider::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        LoginProvider::can_admin_by_id()
+    }
 }
 impl From<web_common::database::nested_models::NestedLoginProvider> for NestedLoginProvider {
     fn from(item: web_common::database::nested_models::NestedLoginProvider) -> Self {
@@ -1452,6 +1516,22 @@ impl NestedMaterial {
     ) -> Result<Self, web_common::api::ApiError> {
         Material::from_name(name, connection)
             .and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        Material::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        Material::can_admin_by_id()
     }
 }
 impl From<web_common::database::nested_models::NestedMaterial> for NestedMaterial {
@@ -1626,6 +1706,22 @@ impl NestedNameplateCategory {
         .into_iter()
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
         .collect()
+    }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        NameplateCategory::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        NameplateCategory::can_admin_by_id()
     }
 }
 impl From<web_common::database::nested_models::NestedNameplateCategory>
@@ -2324,6 +2420,22 @@ impl NestedNotification {
         Notification::get(id, connection)
             .and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        Notification::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        Notification::can_admin_by_id()
+    }
 }
 impl From<web_common::database::nested_models::NestedNotification> for NestedNotification {
     fn from(item: web_common::database::nested_models::NestedNotification) -> Self {
@@ -2491,6 +2603,22 @@ impl NestedObservationSubject {
         .into_iter()
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
         .collect()
+    }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        ObservationSubject::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        ObservationSubject::can_admin_by_id()
     }
 }
 impl From<web_common::database::nested_models::NestedObservationSubject>
@@ -4513,6 +4641,22 @@ impl NestedOrganization {
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
         .collect()
     }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        Organization::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        Organization::can_admin_by_id()
+    }
 }
 impl From<web_common::database::nested_models::NestedOrganization> for NestedOrganization {
     fn from(item: web_common::database::nested_models::NestedOrganization) -> Self {
@@ -4632,6 +4776,22 @@ impl NestedPermanenceCategory {
     ) -> Result<Self, web_common::api::ApiError> {
         PermanenceCategory::from_name(name, connection)
             .and_then(|flat_variant| Self::from_flat(flat_variant, connection))
+    }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        PermanenceCategory::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        PermanenceCategory::can_admin_by_id()
     }
 }
 impl From<web_common::database::nested_models::NestedPermanenceCategory>
@@ -4843,6 +5003,22 @@ impl NestedProjectState {
         .into_iter()
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
         .collect()
+    }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        ProjectState::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        ProjectState::can_admin_by_id()
     }
 }
 impl From<web_common::database::nested_models::NestedProjectState> for NestedProjectState {
@@ -9272,6 +9448,22 @@ impl NestedRole {
             .map(|flat_variant| Self::from_flat(flat_variant, connection))
             .collect()
     }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        Role::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        Role::can_admin_by_id()
+    }
 }
 impl From<web_common::database::nested_models::NestedRole> for NestedRole {
     fn from(item: web_common::database::nested_models::NestedRole) -> Self {
@@ -10036,6 +10228,22 @@ impl NestedSampleContainerCategory {
         .into_iter()
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
         .collect()
+    }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        SampleContainerCategory::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        SampleContainerCategory::can_admin_by_id()
     }
 }
 impl From<web_common::database::nested_models::NestedSampleContainerCategory>
@@ -10830,6 +11038,22 @@ impl NestedSampleState {
         .into_iter()
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
         .collect()
+    }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        SampleState::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        SampleState::can_admin_by_id()
     }
 }
 impl From<web_common::database::nested_models::NestedSampleState> for NestedSampleState {
@@ -12517,6 +12741,22 @@ impl NestedTeamState {
             .into_iter()
             .map(|flat_variant| Self::from_flat(flat_variant, connection))
             .collect()
+    }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        TeamState::can_update_by_id()
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_admin()
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        TeamState::can_admin_by_id()
     }
 }
 impl From<web_common::database::nested_models::NestedTeamState> for NestedTeamState {

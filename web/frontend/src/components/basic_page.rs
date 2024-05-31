@@ -233,7 +233,6 @@ impl PageLike for NestedOrganization {
     }
 }
 
-
 impl PageLike for NestedObservationSubject {
     fn title(&self) -> String {
         self.inner.name.clone()
@@ -263,7 +262,6 @@ impl PageLike for NestedObservationSubject {
         "dna"
     }
 }
-
 
 impl PageLike for NestedObservation {
     fn title(&self) -> String {

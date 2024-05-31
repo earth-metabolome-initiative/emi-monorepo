@@ -166,4 +166,20 @@ impl PermanenceCategory {
             .first::<Self>(connection)?;
         Ok(flat_variant)
     }
+    /// Check whether the user can update the struct.
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
+    }
+    /// Check whether the user can update the struct associated to the provided ids.
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
+    }
+    /// Check whether the user can admin the struct.
+    pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
+    }
+    /// Check whether the user can admin the struct associated to the provided ids.
+    pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
+    }
 }

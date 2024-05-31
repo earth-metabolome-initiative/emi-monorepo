@@ -176,9 +176,6 @@ def write_backend_flat_variants(
             ("update", "updatable", struct.get_can_update_function_name()),
             ("admin", "administrable", struct.get_can_admin_function_name()),
         ):
-            if struct.is_immutable() and operation in ["update", "admin"]:
-                continue
-
             if operation == "view":
                 requires_author = struct.may_be_hidden()
             else:
@@ -285,6 +282,9 @@ def write_backend_flat_variants(
                 )
             else:
                 struct_document.write(f"{{\n        Ok({rust_boolean})\n}}\n")
+
+            if struct.is_immutable() and operation in ["update", "admin"]:
+                continue
 
             sorted_variants = [False, True]
 

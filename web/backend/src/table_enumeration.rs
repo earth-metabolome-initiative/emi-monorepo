@@ -151,6 +151,20 @@ pub trait BackendTable {
         >,
     ) -> Result<bool, web_common::api::ApiError>;
 
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `primary_key` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    fn can_admin_by_id(
+        &self,
+        primary_key: PrimaryKey,
+        author_user_id: i32,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<bool, web_common::api::ApiError>;
+
     /// Get all of the updatable structs from the database.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -246,20 +260,6 @@ pub trait BackendTable {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError>;
-
-    /// Check whether the user can admin the struct associated to the provided ids.
-    ///
-    /// * `primary_key` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    fn can_admin_by_id(
-        &self,
-        primary_key: PrimaryKey,
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError>;
 
     /// Get all of the administrable structs from the database.
     ///
@@ -2910,47 +2910,33 @@ connection)?)?
         >,
     ) -> Result<bool, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-                unimplemented!("Method can_update_by_id not implemented for table bio_ott_ranks.")
+            web_common::database::Table::BioOttRanks => NestedBioOttRank::can_update_by_id()?,
+            web_common::database::Table::BioOttTaxonItems => {
+                NestedBioOttTaxonItem::can_update_by_id()?
             }
-            web_common::database::Table::BioOttTaxonItems => unimplemented!(
-                "Method can_update_by_id not implemented for table bio_ott_taxon_items."
-            ),
-            web_common::database::Table::Colors => {
-                unimplemented!("Method can_update_by_id not implemented for table colors.")
-            }
-            web_common::database::Table::Countries => {
-                unimplemented!("Method can_update_by_id not implemented for table countries.")
-            }
+            web_common::database::Table::Colors => Color::can_update_by_id()?,
+            web_common::database::Table::Countries => Country::can_update_by_id()?,
             web_common::database::Table::DerivedSamples => NestedDerivedSample::can_update_by_id(
                 primary_key.into(),
                 author_user_id,
                 connection,
             )?,
-            web_common::database::Table::DocumentFormats => unimplemented!(
-                "Method can_update_by_id not implemented for table document_formats."
-            ),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!(
-                "Method can_update_by_id not implemented for table font_awesome_icons."
-            ),
-            web_common::database::Table::LoginProviders => {
-                unimplemented!("Method can_update_by_id not implemented for table login_providers.")
+            web_common::database::Table::DocumentFormats => {
+                NestedDocumentFormat::can_update_by_id()?
             }
-            web_common::database::Table::Materials => {
-                unimplemented!("Method can_update_by_id not implemented for table materials.")
+            web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::can_update_by_id()?,
+            web_common::database::Table::LoginProviders => NestedLoginProvider::can_update_by_id()?,
+            web_common::database::Table::Materials => NestedMaterial::can_update_by_id()?,
+            web_common::database::Table::NameplateCategories => {
+                NestedNameplateCategory::can_update_by_id()?
             }
-            web_common::database::Table::NameplateCategories => unimplemented!(
-                "Method can_update_by_id not implemented for table nameplate_categories."
-            ),
             web_common::database::Table::Nameplates => {
                 NestedNameplate::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::Notifications => {
-                unimplemented!("Method can_update_by_id not implemented for table notifications.")
+            web_common::database::Table::Notifications => NestedNotification::can_update_by_id()?,
+            web_common::database::Table::ObservationSubjects => {
+                NestedObservationSubject::can_update_by_id()?
             }
-            web_common::database::Table::ObservationSubjects => unimplemented!(
-                "Method can_update_by_id not implemented for table observation_subjects."
-            ),
             web_common::database::Table::Observations => {
                 NestedObservation::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -2964,15 +2950,11 @@ connection)?)?
             web_common::database::Table::Organisms => {
                 NestedOrganism::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::Organizations => {
-                unimplemented!("Method can_update_by_id not implemented for table organizations.")
+            web_common::database::Table::Organizations => NestedOrganization::can_update_by_id()?,
+            web_common::database::Table::PermanenceCategories => {
+                NestedPermanenceCategory::can_update_by_id()?
             }
-            web_common::database::Table::PermanenceCategories => unimplemented!(
-                "Method can_update_by_id not implemented for table permanence_categories."
-            ),
-            web_common::database::Table::ProjectStates => {
-                unimplemented!("Method can_update_by_id not implemented for table project_states.")
-            }
+            web_common::database::Table::ProjectStates => NestedProjectState::can_update_by_id()?,
             web_common::database::Table::Projects => {
                 NestedProject::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -3018,9 +3000,7 @@ connection)?)?
                     connection,
                 )?
             }
-            web_common::database::Table::Roles => {
-                unimplemented!("Method can_update_by_id not implemented for table roles.")
-            }
+            web_common::database::Table::Roles => NestedRole::can_update_by_id()?,
             web_common::database::Table::SampleBioOttTaxonItems => {
                 NestedSampleBioOttTaxonItem::can_update_by_id(
                     primary_key.into(),
@@ -3028,9 +3008,9 @@ connection)?)?
                     connection,
                 )?
             }
-            web_common::database::Table::SampleContainerCategories => unimplemented!(
-                "Method can_update_by_id not implemented for table sample_container_categories."
-            ),
+            web_common::database::Table::SampleContainerCategories => {
+                NestedSampleContainerCategory::can_update_by_id()?
+            }
             web_common::database::Table::SampleContainers => {
                 NestedSampleContainer::can_update_by_id(
                     primary_key.into(),
@@ -3038,9 +3018,7 @@ connection)?)?
                     connection,
                 )?
             }
-            web_common::database::Table::SampleStates => {
-                unimplemented!("Method can_update_by_id not implemented for table sample_states.")
-            }
+            web_common::database::Table::SampleStates => NestedSampleState::can_update_by_id()?,
             web_common::database::Table::Samples => {
                 NestedSample::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -3054,9 +3032,7 @@ connection)?)?
                     connection,
                 )?
             }
-            web_common::database::Table::TeamStates => {
-                unimplemented!("Method can_update_by_id not implemented for table team_states.")
-            }
+            web_common::database::Table::TeamStates => NestedTeamState::can_update_by_id()?,
             web_common::database::Table::Teams => {
                 NestedTeam::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -3086,9 +3062,7 @@ connection)?)?
                 author_user_id,
                 connection,
             )?,
-            web_common::database::Table::Units => {
-                unimplemented!("Method can_update_by_id not implemented for table units.")
-            }
+            web_common::database::Table::Units => Unit::can_update_by_id()?,
             web_common::database::Table::UserEmails => {
                 NestedUserEmail::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -3110,6 +3084,201 @@ connection)?)?
                 )?
             }
             web_common::database::Table::UsersUsersRoles => NestedUsersUsersRole::can_update_by_id(
+                primary_key.into(),
+                author_user_id,
+                connection,
+            )?,
+        })
+    }
+
+    /// Check whether the user can admin the struct associated to the provided ids.
+    ///
+    /// * `primary_key` - The primary key(s) of the struct to check.
+    /// * `author_user_id` - The ID of the user to check.
+    /// * `connection` - The connection to the database.
+    fn can_admin_by_id(
+        &self,
+        primary_key: PrimaryKey,
+        author_user_id: i32,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<bool, web_common::api::ApiError> {
+        Ok(match self {
+            web_common::database::Table::BioOttRanks => NestedBioOttRank::can_admin_by_id()?,
+            web_common::database::Table::BioOttTaxonItems => {
+                NestedBioOttTaxonItem::can_admin_by_id()?
+            }
+            web_common::database::Table::Colors => Color::can_admin_by_id()?,
+            web_common::database::Table::Countries => Country::can_admin_by_id()?,
+            web_common::database::Table::DerivedSamples => NestedDerivedSample::can_admin_by_id(
+                primary_key.into(),
+                author_user_id,
+                connection,
+            )?,
+            web_common::database::Table::DocumentFormats => {
+                NestedDocumentFormat::can_admin_by_id()?
+            }
+            web_common::database::Table::FontAwesomeIcons => FontAwesomeIcon::can_admin_by_id()?,
+            web_common::database::Table::LoginProviders => NestedLoginProvider::can_admin_by_id()?,
+            web_common::database::Table::Materials => NestedMaterial::can_admin_by_id()?,
+            web_common::database::Table::NameplateCategories => {
+                NestedNameplateCategory::can_admin_by_id()?
+            }
+            web_common::database::Table::Nameplates => {
+                NestedNameplate::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
+            web_common::database::Table::Notifications => NestedNotification::can_admin_by_id()?,
+            web_common::database::Table::ObservationSubjects => {
+                NestedObservationSubject::can_admin_by_id()?
+            }
+            web_common::database::Table::Observations => {
+                NestedObservation::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+                NestedOrganismBioOttTaxonItem::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::Organisms => {
+                NestedOrganism::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
+            web_common::database::Table::Organizations => NestedOrganization::can_admin_by_id()?,
+            web_common::database::Table::PermanenceCategories => {
+                NestedPermanenceCategory::can_admin_by_id()?
+            }
+            web_common::database::Table::ProjectStates => NestedProjectState::can_admin_by_id()?,
+            web_common::database::Table::Projects => {
+                NestedProject::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+                NestedProjectsTeamsRoleInvitation::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+                NestedProjectsTeamsRoleRequest::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::ProjectsTeamsRoles => {
+                NestedProjectsTeamsRole::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+                NestedProjectsUsersRoleInvitation::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+                NestedProjectsUsersRoleRequest::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::ProjectsUsersRoles => {
+                NestedProjectsUsersRole::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::Roles => NestedRole::can_admin_by_id()?,
+            web_common::database::Table::SampleBioOttTaxonItems => {
+                NestedSampleBioOttTaxonItem::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::SampleContainerCategories => {
+                NestedSampleContainerCategory::can_admin_by_id()?
+            }
+            web_common::database::Table::SampleContainers => {
+                NestedSampleContainer::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::SampleStates => NestedSampleState::can_admin_by_id()?,
+            web_common::database::Table::Samples => {
+                NestedSample::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
+            web_common::database::Table::Spectra => {
+                NestedSpectra::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
+            web_common::database::Table::SpectraCollections => {
+                NestedSpectraCollection::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::TeamStates => NestedTeamState::can_admin_by_id()?,
+            web_common::database::Table::Teams => {
+                NestedTeam::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+                NestedTeamsTeamsRoleInvitation::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+                NestedTeamsUsersRoleInvitation::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::TeamsUsersRoleRequests => {
+                NestedTeamsUsersRoleRequest::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::TeamsUsersRoles => NestedTeamsUsersRole::can_admin_by_id(
+                primary_key.into(),
+                author_user_id,
+                connection,
+            )?,
+            web_common::database::Table::Units => Unit::can_admin_by_id()?,
+            web_common::database::Table::UserEmails => {
+                NestedUserEmail::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
+            web_common::database::Table::Users => {
+                User::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
+            web_common::database::Table::UsersUsersRoleInvitations => {
+                NestedUsersUsersRoleInvitation::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::UsersUsersRoleRequests => {
+                NestedUsersUsersRoleRequest::can_admin_by_id(
+                    primary_key.into(),
+                    author_user_id,
+                    connection,
+                )?
+            }
+            web_common::database::Table::UsersUsersRoles => NestedUsersUsersRole::can_admin_by_id(
                 primary_key.into(),
                 author_user_id,
                 connection,
@@ -4583,227 +4752,6 @@ limit,
 offset,
 connection)?)?
             },
-        })
-    }
-
-    /// Check whether the user can admin the struct associated to the provided ids.
-    ///
-    /// * `primary_key` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    fn can_admin_by_id(
-        &self,
-        primary_key: PrimaryKey,
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-                unimplemented!("Method can_admin_by_id not implemented for table bio_ott_ranks.")
-            }
-            web_common::database::Table::BioOttTaxonItems => unimplemented!(
-                "Method can_admin_by_id not implemented for table bio_ott_taxon_items."
-            ),
-            web_common::database::Table::Colors => {
-                unimplemented!("Method can_admin_by_id not implemented for table colors.")
-            }
-            web_common::database::Table::Countries => {
-                unimplemented!("Method can_admin_by_id not implemented for table countries.")
-            }
-            web_common::database::Table::DerivedSamples => NestedDerivedSample::can_admin_by_id(
-                primary_key.into(),
-                author_user_id,
-                connection,
-            )?,
-            web_common::database::Table::DocumentFormats => {
-                unimplemented!("Method can_admin_by_id not implemented for table document_formats.")
-            }
-            web_common::database::Table::FontAwesomeIcons => unimplemented!(
-                "Method can_admin_by_id not implemented for table font_awesome_icons."
-            ),
-            web_common::database::Table::LoginProviders => {
-                unimplemented!("Method can_admin_by_id not implemented for table login_providers.")
-            }
-            web_common::database::Table::Materials => {
-                unimplemented!("Method can_admin_by_id not implemented for table materials.")
-            }
-            web_common::database::Table::NameplateCategories => unimplemented!(
-                "Method can_admin_by_id not implemented for table nameplate_categories."
-            ),
-            web_common::database::Table::Nameplates => {
-                NestedNameplate::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
-            web_common::database::Table::Notifications => {
-                unimplemented!("Method can_admin_by_id not implemented for table notifications.")
-            }
-            web_common::database::Table::ObservationSubjects => unimplemented!(
-                "Method can_admin_by_id not implemented for table observation_subjects."
-            ),
-            web_common::database::Table::Observations => {
-                NestedObservation::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-                NestedOrganismBioOttTaxonItem::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::Organisms => {
-                NestedOrganism::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
-            web_common::database::Table::Organizations => {
-                unimplemented!("Method can_admin_by_id not implemented for table organizations.")
-            }
-            web_common::database::Table::PermanenceCategories => unimplemented!(
-                "Method can_admin_by_id not implemented for table permanence_categories."
-            ),
-            web_common::database::Table::ProjectStates => {
-                unimplemented!("Method can_admin_by_id not implemented for table project_states.")
-            }
-            web_common::database::Table::Projects => {
-                NestedProject::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
-            web_common::database::Table::ProjectsTeamsRoleInvitations => {
-                NestedProjectsTeamsRoleInvitation::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::ProjectsTeamsRoleRequests => {
-                NestedProjectsTeamsRoleRequest::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::ProjectsTeamsRoles => {
-                NestedProjectsTeamsRole::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::ProjectsUsersRoleInvitations => {
-                NestedProjectsUsersRoleInvitation::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::ProjectsUsersRoleRequests => {
-                NestedProjectsUsersRoleRequest::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::ProjectsUsersRoles => {
-                NestedProjectsUsersRole::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::Roles => {
-                unimplemented!("Method can_admin_by_id not implemented for table roles.")
-            }
-            web_common::database::Table::SampleBioOttTaxonItems => {
-                NestedSampleBioOttTaxonItem::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::SampleContainerCategories => unimplemented!(
-                "Method can_admin_by_id not implemented for table sample_container_categories."
-            ),
-            web_common::database::Table::SampleContainers => {
-                NestedSampleContainer::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::SampleStates => {
-                unimplemented!("Method can_admin_by_id not implemented for table sample_states.")
-            }
-            web_common::database::Table::Samples => {
-                NestedSample::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
-            web_common::database::Table::Spectra => {
-                NestedSpectra::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
-            web_common::database::Table::SpectraCollections => {
-                NestedSpectraCollection::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::TeamStates => {
-                unimplemented!("Method can_admin_by_id not implemented for table team_states.")
-            }
-            web_common::database::Table::Teams => {
-                NestedTeam::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
-            web_common::database::Table::TeamsTeamsRoleInvitations => {
-                NestedTeamsTeamsRoleInvitation::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::TeamsUsersRoleInvitations => {
-                NestedTeamsUsersRoleInvitation::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::TeamsUsersRoleRequests => {
-                NestedTeamsUsersRoleRequest::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::TeamsUsersRoles => NestedTeamsUsersRole::can_admin_by_id(
-                primary_key.into(),
-                author_user_id,
-                connection,
-            )?,
-            web_common::database::Table::Units => {
-                unimplemented!("Method can_admin_by_id not implemented for table units.")
-            }
-            web_common::database::Table::UserEmails => {
-                NestedUserEmail::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
-            web_common::database::Table::Users => {
-                User::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
-            web_common::database::Table::UsersUsersRoleInvitations => {
-                NestedUsersUsersRoleInvitation::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::UsersUsersRoleRequests => {
-                NestedUsersUsersRoleRequest::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
-            web_common::database::Table::UsersUsersRoles => NestedUsersUsersRole::can_admin_by_id(
-                primary_key.into(),
-                author_user_id,
-                connection,
-            )?,
         })
     }
 
