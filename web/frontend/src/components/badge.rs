@@ -107,10 +107,16 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
     let navigator = use_navigator().unwrap();
 
     let onclick = {
+        let closable = props.closable;
+        let on_close = props.on_close.clone();
         let path = props.badge.path();
         Callback::from(move |e: MouseEvent| {
             e.prevent_default();
             e.stop_immediate_propagation();
+            if closable {
+                on_close.emit(());
+                return;
+            }
             if let Some(path) = path {
                 navigator.push(&path);
             }
@@ -118,7 +124,7 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
     };
 
     let badge_classes = format!(
-        "badge{}{}{}{}",
+        "badge{}{}{}{}{}",
         match props.size {
             BadgeSize::Small => " small",
             BadgeSize::Large => "",
@@ -134,6 +140,10 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
         match props.badge.color() {
             Some(color) => format!(" {}", color),
             None => "".to_owned(),
+        },
+        match props.closable {
+            true => " closable",
+            false => "",
         }
     );
 

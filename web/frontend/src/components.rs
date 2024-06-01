@@ -12,7 +12,7 @@ mod search_bar;
 pub mod sidebar;
 
 pub mod basic_page;
-pub use basic_page::{BasicPage, PageLike};
+pub(crate) use basic_page::{BasicPage, PageLike};
 
 pub mod basic_list;
 pub use basic_list::BasicList;

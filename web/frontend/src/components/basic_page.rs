@@ -1,7 +1,7 @@
 //! Module providing a yew component for a basic page with a websocket connection.
 use std::rc::Rc;
 
-use crate::router::AppRoute;
+use crate::router::{AppRoute, Viewable};
 use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
@@ -17,7 +17,7 @@ use yew_router::hooks::use_navigator;
 use yew_router::prelude::Link;
 use yewdux::Dispatch;
 
-pub trait PageLike: DeserializeOwned + Filtrable + PartialEq + Clone + Tabular + 'static {
+pub(crate) trait PageLike: DeserializeOwned + Filtrable + Viewable + PartialEq + Clone + Tabular + 'static {
     fn title(&self) -> String;
 
     fn section() -> String {
@@ -33,8 +33,6 @@ pub trait PageLike: DeserializeOwned + Filtrable + PartialEq + Clone + Tabular +
     fn id(&self) -> PrimaryKey;
 
     fn update_path(&self) -> Option<AppRoute>;
-
-    fn view_path(&self) -> AppRoute;
 
     /// Create a path to create a new item.
     ///
@@ -63,10 +61,6 @@ impl PageLike for NestedBioOttRank {
         None
     }
 
-    fn view_path(&self) -> AppRoute {
-        AppRoute::BioOttRanksView { id: self.inner.id }
-    }
-
     fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
         None
     }
@@ -93,10 +87,6 @@ impl PageLike for NestedBioOttTaxonItem {
         None
     }
 
-    fn view_path(&self) -> AppRoute {
-        AppRoute::BioOttTaxonItemsView { id: self.inner.id }
-    }
-
     fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
         None
     }
@@ -121,10 +111,6 @@ impl PageLike for Country {
 
     fn update_path(&self) -> Option<AppRoute> {
         None
-    }
-
-    fn view_path(&self) -> AppRoute {
-        AppRoute::CountriesView { id: self.id }
     }
 
     fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
@@ -157,10 +143,6 @@ impl PageLike for NestedSampleState {
         None
     }
 
-    fn view_path(&self) -> AppRoute {
-        AppRoute::SampleStatesView { id: self.inner.id }
-    }
-
     fn icon() -> &'static str {
         "vial"
     }
@@ -181,10 +163,6 @@ impl PageLike for NestedProject {
 
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::ProjectsUpdate { id: self.inner.id })
-    }
-
-    fn view_path(&self) -> AppRoute {
-        AppRoute::ProjectsView { id: self.inner.id }
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
@@ -219,10 +197,6 @@ impl PageLike for NestedOrganization {
         None
     }
 
-    fn view_path(&self) -> AppRoute {
-        AppRoute::OrganizationsView { id: self.inner.id }
-    }
-
     fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
         None
     }
@@ -249,10 +223,6 @@ impl PageLike for NestedObservationSubject {
         None
     }
 
-    fn view_path(&self) -> AppRoute {
-        AppRoute::ObservationSubjectsView { id: self.inner.id }
-    }
-
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         None
     }
@@ -277,10 +247,6 @@ impl PageLike for NestedObservation {
 
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::ObservationsUpdate { id: self.inner.id })
-    }
-
-    fn view_path(&self) -> AppRoute {
-        AppRoute::ObservationsView { id: self.inner.id }
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
@@ -313,11 +279,6 @@ impl PageLike for NestedSpectraCollection {
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::SpectraCollectionsUpdate { id: self.inner.id })
     }
-
-    fn view_path(&self) -> AppRoute {
-        AppRoute::SpectraCollectionsView { id: self.inner.id }
-    }
-
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
@@ -347,11 +308,6 @@ impl PageLike for NestedSpectra {
 
     fn update_path(&self) -> Option<AppRoute> {
         None
-    }
-
-    fn view_path(&self) -> AppRoute {
-        // AppRoute::SpectraView { id: self.inner.id }
-        todo!()
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
@@ -387,10 +343,6 @@ impl PageLike for NestedNameplate {
         Some(AppRoute::NameplatesUpdate { id: self.inner.id })
     }
 
-    fn view_path(&self) -> AppRoute {
-        AppRoute::NameplatesView { id: self.inner.id }
-    }
-
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
@@ -422,10 +374,6 @@ impl PageLike for NestedOrganism {
         Some(AppRoute::OrganismsUpdate { id: self.inner.id })
     }
 
-    fn view_path(&self) -> AppRoute {
-        AppRoute::OrganismsView { id: self.inner.id }
-    }
-
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         filter
             .and_then(|f| {
@@ -455,10 +403,6 @@ impl PageLike for NestedSample {
 
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::SamplesUpdate { id: self.inner.id })
-    }
-
-    fn view_path(&self) -> AppRoute {
-        AppRoute::SamplesView { id: self.inner.id }
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
@@ -499,10 +443,6 @@ impl PageLike for User {
         Some(AppRoute::UsersUpdate { id: self.id })
     }
 
-    fn view_path(&self) -> AppRoute {
-        AppRoute::UsersView { id: self.id }
-    }
-
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
         None
     }
@@ -527,10 +467,6 @@ impl PageLike for NestedTeam {
 
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::TeamsUpdate { id: self.inner.id })
-    }
-
-    fn view_path(&self) -> AppRoute {
-        AppRoute::TeamsView { id: self.inner.id }
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
@@ -562,10 +498,6 @@ impl PageLike for NestedSampleContainer {
 
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::SampleContainersUpdate { id: self.inner.id })
-    }
-
-    fn view_path(&self) -> AppRoute {
-        AppRoute::SampleContainersView { id: self.inner.id }
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {

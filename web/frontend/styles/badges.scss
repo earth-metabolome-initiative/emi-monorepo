@@ -88,6 +88,20 @@ $breakpoints: (
         }
     }
 
+    &.closable {
+        cursor: pointer;
+        position: relative;
+        padding-right: 2em;
+        &:after {
+            content: "×";
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.25em;
+            cursor: pointer;
+        }
+    }
+
     a {
         color: inherit;
         text-decoration: none;
