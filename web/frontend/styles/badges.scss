@@ -72,13 +72,20 @@ $breakpoints: (
         flex-wrap: wrap;
     }
 
-    img {
-        width: 1.7rem;
-        height: 1.7rem;
-        margin-right: 0.5rem;
-        border-radius: 0.5rem;
-        display: inline;
-        vertical-align: middle;
+    &.has-image {
+        position: relative;
+        padding-left: 2em;
+        img.badge-image {
+            position: absolute;
+            width: auto;
+            height: 100%;
+            max-width: 1.75em;
+            max-height: fit-content;
+            border-radius: 0.25rem;
+            display: inline-block;
+            top: 0;
+            left: 0;
+        }
     }
 
     a {

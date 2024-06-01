@@ -145,6 +145,9 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
 
     html! {
         <@{tag} class={badge_classes} onclick={onclick}>
+            if let Some(image_url) = props.badge.primary_image_url() {
+                <img class="badge-image" src={image_url} />
+            }
             <p class="badge-title">
                 if let Some(icon) = props.badge.font_awesome_icon() {
                     <>

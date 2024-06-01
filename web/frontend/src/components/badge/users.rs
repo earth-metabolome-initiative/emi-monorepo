@@ -9,4 +9,8 @@ impl RowToBadge for User {
     fn path(&self) -> Option<crate::router::AppRoute> {
         Some(<Self as crate::router::Viewable>::view_route(self))
     }
+
+    fn primary_image_url(&self) -> Option<String> {
+        Some(self.get_profile_picture_as_url())
+    }
 }
