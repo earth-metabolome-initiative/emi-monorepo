@@ -575,13 +575,15 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
         }
     }
 
-    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
-        if first_render {
+    fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
+        if self.page.as_ref().map_or(true, |p| p.id() != ctx.props().id){
             self.websocket
                 .send(ComponentMessage::can_view::<Page>(ctx.props().id));
             if self.user_state.has_user() {
-                self.websocket
-                    .send(ComponentMessage::can_admin::<Page>(ctx.props().id));
+                if Page::create_path(None).is_some() {
+                    self.websocket
+                        .send(ComponentMessage::can_admin::<Page>(ctx.props().id));
+                }
                 self.websocket
                     .send(ComponentMessage::can_update::<Page>(ctx.props().id));
             }
