@@ -42,7 +42,6 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
 
     imports = [
         "use yew::prelude::*;",
-        "use uuid::Uuid;",
         "use web_common::database::*;",
         "use crate::components::*;",
     ]

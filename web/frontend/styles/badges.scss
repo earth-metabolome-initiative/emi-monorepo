@@ -39,18 +39,20 @@ $breakpoints: (
 }
 
 .badge {
-    display: flex;
-    flex-direction: column;
+    // flex-direction: column;
     justify-content: space-between; 
     border-radius: 0.25rem;
     border: 1px solid;
     border-color: $light_grey;
     box-sizing: border-box;
     padding: 0.25rem;
-    height: 100%;
-    width: 100%;
-    transition: border-color 0.3s;
+    min-width: 0;
+    transition: border-color 0.2s;
     animation: pop-in 0.3s;
+
+    &.clickable {
+        cursor: pointer;
+    }
 
     &.small {
         border-radius: 0.5rem;
@@ -84,8 +86,13 @@ $breakpoints: (
         text-decoration: none;
     }
 
-    strong {
-        font-weight: 400;
+    p.badge-title {
+        strong {
+            font-weight: 400;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
     }
 
     p {
@@ -94,7 +101,7 @@ $breakpoints: (
         font-size: 1rem;
     }
 
-    p.description {
+    p.badge-description {
         font-size: 0.9rem;
         margin-top: 0.5rem;
         text-align: justify;

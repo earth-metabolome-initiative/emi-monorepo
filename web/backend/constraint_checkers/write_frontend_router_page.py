@@ -74,7 +74,6 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "roles",
         "invitations",
         "requests",
-        "spectra"
     ] + SUPPORT_TABLE_NAMES
 
     for flat_variant in tqdm(
@@ -167,26 +166,83 @@ def write_frontend_router_page(
         "use yew::prelude::*;",
         "use yew_router::prelude::*;",
         "use crate::pages::*;",
-        "use uuid::Uuid;",
         "use crate::components::BasicList;",
         "use web_common::database::*;",
         "use crate::components::forms::automatic_forms::*;",
     ]
 
+    deny_list = [
+        "roles",
+        "invitations",
+        "requests",
+    ] + SUPPORT_TABLE_NAMES
+
     document.write("\n".join(imports) + "\n\n")
+
+    # We define the traits to tightly integrate the structs with the router and avoid
+    # having to manually define the URLs for each struct.
+
+    document.write(
+        "/// Trait defining a struct whose page is be visitable by the router.\n"
+        "pub trait Viewable {\n"
+        "    /// Returns the route associated with the struct.\n"
+        "    fn view_route(&self) -> AppRoute;\n"
+        "}\n\n"
+    )
+
+    for flat_variant in tqdm(
+        flat_variants,
+        desc="Writing Viewable traits for frontend structs",
+        unit="page",
+        leave=False,
+    ):
+        found_skip = False
+        for deny in deny_list:
+            if flat_variant.table_name.endswith(deny):
+                found_skip = True
+                break
+        
+        if found_skip:
+            continue
+
+        if flat_variant.is_junktion_table():
+            continue
+
+        richest_variant = flat_variant.get_richest_variant()
+        primary_keys = flat_variant.get_primary_keys()
+
+        document.write(
+            f"impl Viewable for {flat_variant.name} {{\n"
+            f"    fn view_route(&self) -> AppRoute {{\n"
+            f"        AppRoute::{flat_variant.get_capitalized_table_name()}View{{"
+        )
+
+        for primary_key in primary_keys:
+            document.write(f"{primary_key.name}: self.{primary_key.name}, ")
+
+        document.write("}\n    }\n}\n\n")
+
+        if not richest_variant.is_nested():
+            continue
+
+        document.write(
+            f"impl Viewable for {richest_variant.name} {{\n"
+            f"    fn view_route(&self) -> AppRoute {{\n"
+            f"        AppRoute::{flat_variant.get_capitalized_table_name()}View{{"
+        )
+
+        # For some structs, the primary keys may not be trivially accessible.
+        # For this reason, we employ the path search to find the primary keys.
+        for primary_key in primary_keys:
+            document.write(f"{primary_key.name}: self.{richest_variant.get_attribute_path(primary_key)}, ")
+
+        document.write("}\n    }\n}\n\n")
 
     document.write(
         "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\npub enum AppRoute {\n"
     )
 
     enum_variants = []
-
-    deny_list = [
-        "roles",
-        "invitations",
-        "requests",
-        "spectra"
-    ] + SUPPORT_TABLE_NAMES
 
     for flat_variant in tqdm(
         flat_variants,

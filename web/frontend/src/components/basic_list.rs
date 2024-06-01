@@ -1,4 +1,6 @@
 //! Module providing a yew component for a basic page with a websocket connection.
+use super::RowToBadge;
+use crate::components::Badge;
 use crate::components::PageLike;
 use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
@@ -12,8 +14,6 @@ use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::Link;
 use yewdux::prelude::*;
-
-use super::database::row_to_badge::RowToBadge;
 
 #[derive(Clone, Debug, PartialEq, Properties)]
 /// Properties for a BasicList component.
@@ -122,7 +122,7 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                     </h2>
                 }
                 <ul class="badges-container">
-                { for self.pages.iter().map(|page| html!{<li>{page.to_badge()}</li>}) }
+                { for self.pages.iter().map(|page| html!{<Badge<Page> badge={page.clone()} li={true}/>}) }
                 if self.no_more_pages {
                     <li>{"There are no more entries to load"}</li>
                 }

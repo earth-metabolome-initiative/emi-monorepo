@@ -11,6 +11,7 @@ from constraint_checkers.gluesql_types_mapping import GLUESQL_TYPES_MAPPING
 from constraint_checkers.write_update_method_for_gluesql import (
     write_update_method_for_gluesql,
 )
+from constraint_checkers.rust_implementation_check import trait_implementation_exist
 
 
 def write_image_as_url_getter_method(attribute: AttributeMetadata, document: "TextIO"):
@@ -72,11 +73,21 @@ def write_web_common_flat_variants(
     # structs.
     if target == "tables":
         document.write(
+            "/// A struct that is associated to a table in the database.\n"
             "\npub trait Tabular {\n"
             "    const TABLE: Table;\n"
             "}\n\n"
+            "/// A struct that is associated to a filter struct.\n"
             "pub trait Filtrable: PartialEq {\n"
             "    type Filter: Serialize + PartialEq + Clone;\n"
+            "}\n\n"
+            "/// A struct that may be associated to a textual description.\n"
+            "pub trait Describable {\n"
+            "    fn description(&self) -> Option<&str>;\n"
+            "}\n\n"
+            "/// A struct that may be associated to a color.\n"
+            "pub trait Colorable {\n"
+            "    fn color(&self) -> Option<&str>;\n"
             "}\n\n"
         )
 
@@ -108,6 +119,52 @@ def write_web_common_flat_variants(
             f"    const TABLE: Table = Table::{struct.capitalized_table_name()};\n"
             "}\n"
         )
+
+        if not trait_implementation_exist(
+            "Describable",
+            struct.name,
+            deny_file_list=("database/tables.rs",),
+            root="webcommon",
+        ):
+            description_attribute = struct.get_description_attribute()
+
+            document.write(
+                f"impl Describable for {struct.name} {{\n"
+                "    fn description(&self) -> Option<&str> {\n"
+            )
+            if description_attribute:
+                if description_attribute.optional:
+                    document.write(
+                        f"        self.{description_attribute.name}.as_deref()\n"
+                    )
+                else:
+                    document.write(
+                        f"        Some(self.{description_attribute.name}.as_str())\n"
+                    )
+            else:
+                document.write("        None\n")
+            document.write("    }\n}\n")
+
+        if not trait_implementation_exist(
+            "Colorable",
+            struct.name,
+            deny_file_list=("database/tables.rs",),
+            root="webcommon",
+        ):
+            color_attribute = struct.get_color_attribute()
+
+            document.write(
+                f"impl Colorable for {struct.name} {{\n"
+                "    fn color(&self) -> Option<&str> {\n"
+            )
+            if color_attribute:
+                if color_attribute.optional:
+                    document.write(f"        self.{color_attribute.name}.as_deref()\n")
+                else:
+                    document.write(f"        Some(self.{color_attribute.name}.as_str())\n")
+            else:
+                document.write("        None\n")
+            document.write("    }\n}\n")
 
         # We implement the Filtrable trait for the struct. This trait
         # is used to provide the informations on the filter struct that

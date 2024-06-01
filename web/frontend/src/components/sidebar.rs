@@ -114,6 +114,13 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <span>{NestedSample::section()}</span>
                         </Link<AppRoute>>
                     </li>
+                    <li class={if route == AppRoute::Spectra { "active" } else { "" }}>
+                        <Link<AppRoute> to={AppRoute::Spectra}>
+                            <i class={format!("fas fa-{}", NestedSpectra::icon())}></i>
+                             {'\u{00a0}'}
+                            <span>{NestedSpectra::section()}</span>
+                        </Link<AppRoute>>
+                    </li>
                     <li class={if route == AppRoute::SpectraCollections { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::SpectraCollections}>
                             <i class={format!("fas fa-{}", NestedSpectraCollection::icon())}></i>

@@ -1,5 +1,4 @@
 use crate::components::*;
-use uuid::Uuid;
 use web_common::database::*;
 use yew::prelude::*;
 

@@ -429,6 +429,17 @@ class AttributeMetadata:
         """Returns whether the attribute is a UUID."""
         return self.data_type() == "uuid::Uuid"
 
+    def is_description(self) -> bool:
+        """Returns whether the attribute is a description."""
+        # An attribute may be considered a description when its
+        # name is either 'notes' or 'description' and has a string
+        # data type.
+        return self.name in ("notes", "description") and self.data_type() == "String"
+
+    def is_color(self) -> bool:
+        """Returns whether the attribute is a color."""
+        return self.name in ("color",) and self.data_type() == "Color" and self.has_struct_data_type()
+
     def normalized_name(self) -> str:
         """Returns the name of the attribute eventually without the _id suffix."""
         if self.name.endswith("_id"):
@@ -1410,6 +1421,26 @@ class StructMetadata:
         """Returns the capitalized table name."""
         return "".join(word.capitalize() for word in self.table_name.split("_"))
 
+    def get_description_attribute(self) -> Optional[AttributeMetadata]:
+        """Returns the description attribute if it exists."""
+        if self._flat_variant is not None:
+            return self._flat_variant.get_description_attribute()
+        
+        for attribute in self.attributes:
+            if attribute.is_description():
+                return attribute
+        return None
+
+    def get_color_attribute(self) -> Optional[AttributeMetadata]:
+        """Returns the color attribute if it exists."""
+        if self.name == "Color" and self.table_name == "colors":
+            return self.get_attribute_by_name("name")
+
+        for attribute in self.attributes:
+            if attribute.is_color():
+                return attribute
+        return None
+
     def is_nested(self) -> bool:
         """Returns whether the struct is nested."""
         return any(attribute.has_struct_data_type() for attribute in self.attributes)
@@ -1980,6 +2011,38 @@ class StructMetadata:
             for attribute in self.attributes
             if not attribute.is_inner()
         )
+
+    def get_inner_attribute(self) -> Optional[AttributeMetadata]:
+        """Returns the inner attribute of the struct."""
+        assert self.is_nested(), (
+            "Non-nested structs do not have inner attributes. "
+            f"The struct {self.name} associated with the table {self.table_name} is not nested."
+        )
+
+        for attribute in self.attributes:
+            if attribute.is_inner():
+                return attribute
+
+        return None
+
+    def get_attribute_path(self, needle: AttributeMetadata) -> str:
+        """Returns the attribute path.
+
+        Parameters
+        ----------
+        needle : AttributeMetadata
+            The attribute to get the path from.
+        """
+        for attribute in self.attributes:
+            try:
+                return attribute.get_attribute_path(needle)
+            except ValueError:
+                continue
+        
+        raise ValueError(
+            f"The attribute {needle.name} is not in the struct {self.name}."
+        )
+
 
     def get_foreign_key_flat_variant(
         self, foreign_key: AttributeMetadata

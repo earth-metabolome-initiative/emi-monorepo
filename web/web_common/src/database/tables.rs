@@ -2,13 +2,25 @@ use serde::Deserialize;
 use serde::Serialize;
 use crate::database::*;
 use crate::traits::GuessImageFormat;
+/// A struct that is associated to a table in the database.
 
 pub trait Tabular {
     const TABLE: Table;
 }
 
+/// A struct that is associated to a filter struct.
 pub trait Filtrable: PartialEq {
     type Filter: Serialize + PartialEq + Clone;
+}
+
+/// A struct that may be associated to a textual description.
+pub trait Describable {
+    fn description(&self) -> Option<&str>;
+}
+
+/// A struct that may be associated to a color.
+pub trait Colorable {
+    fn color(&self) -> Option<&str>;
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
@@ -22,6 +34,16 @@ pub struct BioOttRank {
 
 impl Tabular for BioOttRank {
     const TABLE: Table = Table::BioOttRanks;
+}
+impl Describable for BioOttRank {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for BioOttRank {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for BioOttRank {
@@ -256,6 +278,16 @@ pub struct BioOttTaxonItem {
 
 impl Tabular for BioOttTaxonItem {
     const TABLE: Table = Table::BioOttTaxonItems;
+}
+impl Describable for BioOttTaxonItem {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for BioOttTaxonItem {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for BioOttTaxonItem {
@@ -633,6 +665,16 @@ pub struct Color {
 impl Tabular for Color {
     const TABLE: Table = Table::Colors;
 }
+impl Describable for Color {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for Color {
+    fn color(&self) -> Option<&str> {
+        Some(self.name.as_str())
+    }
+}
 
 impl Filtrable for Color {
     type Filter = EmptyFilter;
@@ -843,6 +885,16 @@ pub struct Country {
 
 impl Tabular for Country {
     const TABLE: Table = Table::Countries;
+}
+impl Describable for Country {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for Country {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for Country {
@@ -1061,6 +1113,16 @@ pub struct DerivedSample {
 
 impl Tabular for DerivedSample {
     const TABLE: Table = Table::DerivedSamples;
+}
+impl Describable for DerivedSample {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for DerivedSample {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for DerivedSample {
@@ -1322,6 +1384,16 @@ pub struct DocumentFormat {
 impl Tabular for DocumentFormat {
     const TABLE: Table = Table::DocumentFormats;
 }
+impl Describable for DocumentFormat {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for DocumentFormat {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for DocumentFormat {
     type Filter = DocumentFormatFilter;
@@ -1546,6 +1618,16 @@ pub struct FontAwesomeIcon {
 impl Tabular for FontAwesomeIcon {
     const TABLE: Table = Table::FontAwesomeIcons;
 }
+impl Describable for FontAwesomeIcon {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for FontAwesomeIcon {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for FontAwesomeIcon {
     type Filter = EmptyFilter;
@@ -1753,6 +1835,16 @@ pub struct LoginProvider {
 
 impl Tabular for LoginProvider {
     const TABLE: Table = Table::LoginProviders;
+}
+impl Describable for LoginProvider {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for LoginProvider {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for LoginProvider {
@@ -1992,6 +2084,16 @@ pub struct Material {
 impl Tabular for Material {
     const TABLE: Table = Table::Materials;
 }
+impl Describable for Material {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for Material {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for Material {
     type Filter = MaterialFilter;
@@ -2227,6 +2329,16 @@ pub struct NameplateCategory {
 impl Tabular for NameplateCategory {
     const TABLE: Table = Table::NameplateCategories;
 }
+impl Describable for NameplateCategory {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for NameplateCategory {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for NameplateCategory {
     type Filter = NameplateCategoryFilter;
@@ -2461,6 +2573,16 @@ pub struct Nameplate {
 
 impl Tabular for Nameplate {
     const TABLE: Table = Table::Nameplates;
+}
+impl Describable for Nameplate {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for Nameplate {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for Nameplate {
@@ -2732,6 +2854,16 @@ pub struct Notification {
 impl Tabular for Notification {
     const TABLE: Table = Table::Notifications;
 }
+impl Describable for Notification {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for Notification {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for Notification {
     type Filter = NotificationFilter;
@@ -2957,6 +3089,16 @@ pub struct ObservationSubject {
 
 impl Tabular for ObservationSubject {
     const TABLE: Table = Table::ObservationSubjects;
+}
+impl Describable for ObservationSubject {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for ObservationSubject {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for ObservationSubject {
@@ -3184,6 +3326,16 @@ pub struct Observation {
 
 impl Tabular for Observation {
     const TABLE: Table = Table::Observations;
+}
+impl Describable for Observation {
+    fn description(&self) -> Option<&str> {
+        self.notes.as_deref()
+    }
+}
+impl Colorable for Observation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for Observation {
@@ -3518,6 +3670,16 @@ pub struct OrganismBioOttTaxonItem {
 impl Tabular for OrganismBioOttTaxonItem {
     const TABLE: Table = Table::OrganismBioOttTaxonItems;
 }
+impl Describable for OrganismBioOttTaxonItem {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for OrganismBioOttTaxonItem {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for OrganismBioOttTaxonItem {
     type Filter = OrganismBioOttTaxonItemFilter;
@@ -3739,6 +3901,16 @@ pub struct Organism {
 
 impl Tabular for Organism {
     const TABLE: Table = Table::Organisms;
+}
+impl Describable for Organism {
+    fn description(&self) -> Option<&str> {
+        self.notes.as_deref()
+    }
+}
+impl Colorable for Organism {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for Organism {
@@ -4051,6 +4223,16 @@ pub struct Organization {
 impl Tabular for Organization {
     const TABLE: Table = Table::Organizations;
 }
+impl Describable for Organization {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for Organization {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for Organization {
     type Filter = OrganizationFilter;
@@ -4283,6 +4465,16 @@ pub struct PermanenceCategory {
 
 impl Tabular for PermanenceCategory {
     const TABLE: Table = Table::PermanenceCategories;
+}
+impl Describable for PermanenceCategory {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for PermanenceCategory {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for PermanenceCategory {
@@ -4517,6 +4709,16 @@ pub struct ProjectState {
 impl Tabular for ProjectState {
     const TABLE: Table = Table::ProjectStates;
 }
+impl Describable for ProjectState {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for ProjectState {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for ProjectState {
     type Filter = ProjectStateFilter;
@@ -4747,6 +4949,16 @@ pub struct Project {
 
 impl Tabular for Project {
     const TABLE: Table = Table::Projects;
+}
+impl Describable for Project {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for Project {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for Project {
@@ -5096,6 +5308,16 @@ pub struct ProjectsTeamsRoleInvitation {
 impl Tabular for ProjectsTeamsRoleInvitation {
     const TABLE: Table = Table::ProjectsTeamsRoleInvitations;
 }
+impl Describable for ProjectsTeamsRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for ProjectsTeamsRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for ProjectsTeamsRoleInvitation {
     type Filter = ProjectsTeamsRoleInvitationFilter;
@@ -5317,6 +5539,16 @@ pub struct ProjectsTeamsRoleRequest {
 
 impl Tabular for ProjectsTeamsRoleRequest {
     const TABLE: Table = Table::ProjectsTeamsRoleRequests;
+}
+impl Describable for ProjectsTeamsRoleRequest {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for ProjectsTeamsRoleRequest {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for ProjectsTeamsRoleRequest {
@@ -5540,6 +5772,16 @@ pub struct ProjectsTeamsRole {
 impl Tabular for ProjectsTeamsRole {
     const TABLE: Table = Table::ProjectsTeamsRoles;
 }
+impl Describable for ProjectsTeamsRole {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for ProjectsTeamsRole {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for ProjectsTeamsRole {
     type Filter = ProjectsTeamsRoleFilter;
@@ -5761,6 +6003,16 @@ pub struct ProjectsUsersRoleInvitation {
 
 impl Tabular for ProjectsUsersRoleInvitation {
     const TABLE: Table = Table::ProjectsUsersRoleInvitations;
+}
+impl Describable for ProjectsUsersRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for ProjectsUsersRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for ProjectsUsersRoleInvitation {
@@ -5984,6 +6236,16 @@ pub struct ProjectsUsersRoleRequest {
 impl Tabular for ProjectsUsersRoleRequest {
     const TABLE: Table = Table::ProjectsUsersRoleRequests;
 }
+impl Describable for ProjectsUsersRoleRequest {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for ProjectsUsersRoleRequest {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for ProjectsUsersRoleRequest {
     type Filter = ProjectsUsersRoleRequestFilter;
@@ -6205,6 +6467,16 @@ pub struct ProjectsUsersRole {
 
 impl Tabular for ProjectsUsersRole {
     const TABLE: Table = Table::ProjectsUsersRoles;
+}
+impl Describable for ProjectsUsersRole {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for ProjectsUsersRole {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for ProjectsUsersRole {
@@ -6428,6 +6700,16 @@ pub struct Role {
 impl Tabular for Role {
     const TABLE: Table = Table::Roles;
 }
+impl Describable for Role {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for Role {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for Role {
     type Filter = RoleFilter;
@@ -6647,6 +6929,16 @@ pub struct SampleBioOttTaxonItem {
 impl Tabular for SampleBioOttTaxonItem {
     const TABLE: Table = Table::SampleBioOttTaxonItems;
 }
+impl Describable for SampleBioOttTaxonItem {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for SampleBioOttTaxonItem {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for SampleBioOttTaxonItem {
     type Filter = SampleBioOttTaxonItemFilter;
@@ -6865,6 +7157,16 @@ pub struct SampleContainerCategory {
 
 impl Tabular for SampleContainerCategory {
     const TABLE: Table = Table::SampleContainerCategories;
+}
+impl Describable for SampleContainerCategory {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for SampleContainerCategory {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for SampleContainerCategory {
@@ -7106,6 +7408,16 @@ pub struct SampleContainer {
 
 impl Tabular for SampleContainer {
     const TABLE: Table = Table::SampleContainers;
+}
+impl Describable for SampleContainer {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for SampleContainer {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for SampleContainer {
@@ -7376,6 +7688,16 @@ pub struct SampleState {
 impl Tabular for SampleState {
     const TABLE: Table = Table::SampleStates;
 }
+impl Describable for SampleState {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for SampleState {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for SampleState {
     type Filter = SampleStateFilter;
@@ -7600,6 +7922,16 @@ pub struct Sample {
 
 impl Tabular for Sample {
     const TABLE: Table = Table::Samples;
+}
+impl Describable for Sample {
+    fn description(&self) -> Option<&str> {
+        self.notes.as_deref()
+    }
+}
+impl Colorable for Sample {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for Sample {
@@ -7891,6 +8223,16 @@ pub struct Spectra {
 impl Tabular for Spectra {
     const TABLE: Table = Table::Spectra;
 }
+impl Describable for Spectra {
+    fn description(&self) -> Option<&str> {
+        self.notes.as_deref()
+    }
+}
+impl Colorable for Spectra {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for Spectra {
     type Filter = SpectraFilter;
@@ -8163,6 +8505,16 @@ pub struct SpectraCollection {
 impl Tabular for SpectraCollection {
     const TABLE: Table = Table::SpectraCollections;
 }
+impl Describable for SpectraCollection {
+    fn description(&self) -> Option<&str> {
+        self.notes.as_deref()
+    }
+}
+impl Colorable for SpectraCollection {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for SpectraCollection {
     type Filter = SpectraCollectionFilter;
@@ -8433,6 +8785,16 @@ pub struct TeamState {
 impl Tabular for TeamState {
     const TABLE: Table = Table::TeamStates;
 }
+impl Describable for TeamState {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for TeamState {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for TeamState {
     type Filter = TeamStateFilter;
@@ -8658,6 +9020,16 @@ pub struct Team {
 
 impl Tabular for Team {
     const TABLE: Table = Table::Teams;
+}
+impl Describable for Team {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for Team {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for Team {
@@ -8953,6 +9325,16 @@ pub struct TeamsTeamsRoleInvitation {
 impl Tabular for TeamsTeamsRoleInvitation {
     const TABLE: Table = Table::TeamsTeamsRoleInvitations;
 }
+impl Describable for TeamsTeamsRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for TeamsTeamsRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for TeamsTeamsRoleInvitation {
     type Filter = TeamsTeamsRoleInvitationFilter;
@@ -9174,6 +9556,16 @@ pub struct TeamsUsersRoleInvitation {
 
 impl Tabular for TeamsUsersRoleInvitation {
     const TABLE: Table = Table::TeamsUsersRoleInvitations;
+}
+impl Describable for TeamsUsersRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for TeamsUsersRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for TeamsUsersRoleInvitation {
@@ -9397,6 +9789,16 @@ pub struct TeamsUsersRoleRequest {
 impl Tabular for TeamsUsersRoleRequest {
     const TABLE: Table = Table::TeamsUsersRoleRequests;
 }
+impl Describable for TeamsUsersRoleRequest {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for TeamsUsersRoleRequest {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for TeamsUsersRoleRequest {
     type Filter = TeamsUsersRoleRequestFilter;
@@ -9619,6 +10021,16 @@ pub struct TeamsUsersRole {
 impl Tabular for TeamsUsersRole {
     const TABLE: Table = Table::TeamsUsersRoles;
 }
+impl Describable for TeamsUsersRole {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for TeamsUsersRole {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for TeamsUsersRole {
     type Filter = TeamsUsersRoleFilter;
@@ -9840,6 +10252,16 @@ pub struct Unit {
 impl Tabular for Unit {
     const TABLE: Table = Table::Units;
 }
+impl Describable for Unit {
+    fn description(&self) -> Option<&str> {
+        Some(self.description.as_str())
+    }
+}
+impl Colorable for Unit {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for Unit {
     type Filter = EmptyFilter;
@@ -10051,6 +10473,16 @@ pub struct UserEmail {
 
 impl Tabular for UserEmail {
     const TABLE: Table = Table::UserEmails;
+}
+impl Describable for UserEmail {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for UserEmail {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for UserEmail {
@@ -10280,6 +10712,16 @@ pub struct User {
 
 impl Tabular for User {
     const TABLE: Table = Table::Users;
+}
+impl Describable for User {
+    fn description(&self) -> Option<&str> {
+        self.description.as_deref()
+    }
+}
+impl Colorable for User {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for User {
@@ -10561,6 +11003,16 @@ pub struct UsersUsersRoleInvitation {
 impl Tabular for UsersUsersRoleInvitation {
     const TABLE: Table = Table::UsersUsersRoleInvitations;
 }
+impl Describable for UsersUsersRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for UsersUsersRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for UsersUsersRoleInvitation {
     type Filter = UsersUsersRoleInvitationFilter;
@@ -10783,6 +11235,16 @@ pub struct UsersUsersRoleRequest {
 impl Tabular for UsersUsersRoleRequest {
     const TABLE: Table = Table::UsersUsersRoleRequests;
 }
+impl Describable for UsersUsersRoleRequest {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for UsersUsersRoleRequest {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 
 impl Filtrable for UsersUsersRoleRequest {
     type Filter = UsersUsersRoleRequestFilter;
@@ -11004,6 +11466,16 @@ pub struct UsersUsersRole {
 
 impl Tabular for UsersUsersRole {
     const TABLE: Table = Table::UsersUsersRoles;
+}
+impl Describable for UsersUsersRole {
+    fn description(&self) -> Option<&str> {
+        None
+    }
+}
+impl Colorable for UsersUsersRole {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 
 impl Filtrable for UsersUsersRole {

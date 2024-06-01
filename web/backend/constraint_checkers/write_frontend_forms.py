@@ -963,61 +963,6 @@ def handle_missing_gin_index(
         f"the form for the {builder.name} builder."
     )
 
-
-def implements_row_to_searchable_badge(
-    struct: StructMetadata,
-):
-    """Returns whether the struct implements the RowToSearchableBadge trait.
-
-    Parameters
-    ----------
-    struct : StructMetadata
-        The struct for which to check the implementation.
-
-    Returns
-    -------
-    bool
-        Whether the struct implements the RowToSearchableBadge trait.
-
-    Implementation details
-    ----------------------
-    This method checks whether the provided struct implements the RowToSearchableBadge trait.
-    """
-    # The standard position of the RowToSearchableBadge trait implementation is in the
-    # frontend crate, in the /src/components/row_to_searchable_badge/{table_name}.rs file.
-    # We check whether the file exists, and if it does, we check whether the
-    # struct implements the trait, meaning whether there appears therein the
-    # implementation of the RowToSearchableBadge trait for the struct:
-    #
-    # impl RowToSearchableBadge for {struct_name} {
-
-    # We check that this method is called at the correct position, in the
-    # backend crate.
-
-    assert os.getcwd().endswith("/backend")
-
-    path = f"../frontend/src/components/database/row_to_searchable_badge/{struct.table_name}.rs"
-
-    if not os.path.exists(path):
-        return False
-
-    module_path = "../frontend/src/components/database/row_to_searchable_badge.rs"
-
-    # We check that the module is imported in the row_to_searchable_badge.rs file.
-    with open(module_path, "r", encoding="utf8") as module:
-        for line in module:
-            if line.startswith(f"pub mod {struct.table_name};"):
-                break
-        else:
-            return False
-
-    with open(path, "r", encoding="utf8") as document:
-        for line in document:
-            if line.startswith(f"impl RowToSearchableBadge for {struct.name} {{"):
-                return True
-
-    return False
-
 def write_frontend_yew_form(
     builder: StructMetadata,
     document: "io.TextIO",
@@ -1323,14 +1268,6 @@ def write_frontend_yew_form(
                             "}\n"
                         )
                         continue
-
-                # We check that the nested struct implements the RowToSearchableBadge trait, as we need to
-                # be able to convert the nested struct to a badge within the Datalist.
-                if not implements_row_to_searchable_badge(attribute.raw_data_type()):
-                    print(f"The form for the {builder.name} requires the {struct.name} struct to implement the RowToSearchableBadge trait.")
-                    raise RuntimeError(
-                        f"The struct {attribute.raw_data_type().name} does not implement the RowToSearchableBadge trait."
-                    )
 
                 updatables = (
                     "true"

@@ -3,7 +3,8 @@
 use std::fmt::Debug;
 
 use super::InputErrors;
-use crate::components::database::row_to_searchable_badge::RowToSearchableBadge;
+use crate::components::Badge;
+use crate::components::RowToBadge;
 use crate::workers::ws_worker::ComponentMessage;
 use crate::workers::ws_worker::WebsocketMessage;
 use crate::workers::WebsocketWorker;
@@ -97,13 +98,7 @@ pub enum DatalistMessage<Data> {
 
 impl<Data, const EDIT: bool> Component for MultiDatalist<Data, EDIT>
 where
-    Data: 'static
-        + Clone
-        + PartialEq
-        + DeserializeOwned
-        + Searchable<EDIT>
-        + RowToSearchableBadge
-        + Debug,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToBadge + Debug,
 {
     type Message = DatalistMessage<Data>;
     type Properties = MultiDatalistProp<Data, EDIT>;
@@ -348,19 +343,13 @@ where
                         {for self.selections.iter().enumerate().map(|(i, selection)| {
                             let on_click = {
                                 let link = ctx.link().clone();
-                                Callback::from(move |e: MouseEvent| {
-                                    e.prevent_default();
-                                    e.stop_propagation();
+                                Callback::from(move |_: ()| {
                                     link.send_message(DatalistMessage::StartDeleteSelectionTimeout(i));
                                 })
                             };
-                            let classes = format!("selected-datalist-badge {}{}", selection.primary_color_class(), if self.selections_to_delete.contains(&i) {" deleting"} else {""});
                             html! {
-                                <li class={classes}>
-                                    {selection.to_small_badge()}
-                                    <button onclick={on_click} class="delete-button">
-                                        <i class="fas fa-times"></i>
-                                    </button>
+                                <li>
+                                    <Badge<Data> badge={selection.clone()} closable={true} on_close={on_click}/>
                                 </li>
                             }
                         })}
@@ -454,7 +443,7 @@ where
                                     })
                                 };
                                 html! {
-                                    <li onclick={on_click} class={format!("datalist-candidate {}", candidate.primary_color_class())}>{candidate.to_searchable_badge(Some(&current_value))}</li>
+                                    <li onclick={on_click}><Badge<Data> badge={candidate.clone()} query={Some(current_value.clone())}/></li>
                                 }
                             })}
                         </ul>
@@ -493,13 +482,7 @@ where
 #[function_component(Datalist)]
 pub fn datalist<Data, const EDIT: bool>(props: &DatalistProp<Data, EDIT>) -> Html
 where
-    Data: 'static
-        + Clone
-        + PartialEq
-        + DeserializeOwned
-        + Searchable<EDIT>
-        + RowToSearchableBadge
-        + Debug,
+    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToBadge + Debug,
 {
     let builder_callback = {
         let old_builder = props.builder.clone();

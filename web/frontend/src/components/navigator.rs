@@ -19,12 +19,13 @@
 //! user if they are offline by putting a badge with the text "Offline" on their avatar. Upon returning online,
 //! the badge will disappear.
 
-use crate::components::database::row_to_badge::RowToBadge;
+use crate::components::RowToBadge;
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 
+use crate::components::Badge;
 use web_common::database::User;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -158,7 +159,7 @@ impl Component for Navigator {
                     <SearchBar />
                     if let Some(user) = self.user() {
                         if user.has_complete_profile() {
-                            {user.to_badge()}
+                            <Badge<User> badge={user.clone()}/>
                         } else {
                             <Link<AppRoute> classes="right_nav_button" to={AppRoute::UsersUpdate { id: user.id }}>
                                 <i class="fas fa-clipboard-check"></i>

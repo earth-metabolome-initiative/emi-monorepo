@@ -1,5 +1,5 @@
 {
-    "Create RowToSearchableBadge implementation?": "yes",
+    "Create RowToBadge implementation?": "yes",
     "Proceed with the creation of the trigger?": "yes",
     "Table container_horizontal_rules_users_roles is missing. Do you want to create it? (yes/no)": "yes",
     "Table derived_samples_users_roles is missing. Do you want to create it? (yes/no)": "yes",

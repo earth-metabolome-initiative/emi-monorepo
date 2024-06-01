@@ -4,10 +4,195 @@
 use crate::components::forms::automatic_forms::*;
 use crate::components::BasicList;
 use crate::pages::*;
-use uuid::Uuid;
 use web_common::database::*;
 use yew::prelude::*;
 use yew_router::prelude::*;
+
+/// Trait defining a struct whose page is be visitable by the router.
+pub trait Viewable {
+    /// Returns the route associated with the struct.
+    fn view_route(&self) -> AppRoute;
+}
+
+impl Viewable for BioOttRank {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::BioOttRanksView { id: self.id }
+    }
+}
+
+impl Viewable for NestedBioOttRank {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::BioOttRanksView { id: self.inner.id }
+    }
+}
+
+impl Viewable for BioOttTaxonItem {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::BioOttTaxonItemsView { id: self.id }
+    }
+}
+
+impl Viewable for NestedBioOttTaxonItem {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::BioOttTaxonItemsView { id: self.inner.id }
+    }
+}
+
+impl Viewable for Country {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::CountriesView { id: self.id }
+    }
+}
+
+impl Viewable for Nameplate {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::NameplatesView { id: self.id }
+    }
+}
+
+impl Viewable for NestedNameplate {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::NameplatesView { id: self.inner.id }
+    }
+}
+
+impl Viewable for ObservationSubject {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ObservationSubjectsView { id: self.id }
+    }
+}
+
+impl Viewable for NestedObservationSubject {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ObservationSubjectsView { id: self.inner.id }
+    }
+}
+
+impl Viewable for Observation {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ObservationsView { id: self.id }
+    }
+}
+
+impl Viewable for NestedObservation {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ObservationsView { id: self.inner.id }
+    }
+}
+
+impl Viewable for Organism {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::OrganismsView { id: self.id }
+    }
+}
+
+impl Viewable for NestedOrganism {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::OrganismsView { id: self.inner.id }
+    }
+}
+
+impl Viewable for Organization {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::OrganizationsView { id: self.id }
+    }
+}
+
+impl Viewable for NestedOrganization {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::OrganizationsView { id: self.inner.id }
+    }
+}
+
+impl Viewable for Project {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsView { id: self.id }
+    }
+}
+
+impl Viewable for NestedProject {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsView { id: self.inner.id }
+    }
+}
+
+impl Viewable for SampleContainer {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SampleContainersView { id: self.id }
+    }
+}
+
+impl Viewable for NestedSampleContainer {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SampleContainersView { id: self.inner.id }
+    }
+}
+
+impl Viewable for SampleState {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SampleStatesView { id: self.id }
+    }
+}
+
+impl Viewable for NestedSampleState {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SampleStatesView { id: self.inner.id }
+    }
+}
+
+impl Viewable for Sample {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SamplesView { id: self.id }
+    }
+}
+
+impl Viewable for NestedSample {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SamplesView { id: self.inner.id }
+    }
+}
+
+impl Viewable for Spectra {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SpectraView { id: self.id }
+    }
+}
+
+impl Viewable for NestedSpectra {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SpectraView { id: self.inner.id }
+    }
+}
+
+impl Viewable for SpectraCollection {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SpectraCollectionsView { id: self.id }
+    }
+}
+
+impl Viewable for NestedSpectraCollection {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SpectraCollectionsView { id: self.inner.id }
+    }
+}
+
+impl Viewable for Team {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsView { id: self.id }
+    }
+}
+
+impl Viewable for NestedTeam {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsView { id: self.inner.id }
+    }
+}
+
+impl Viewable for User {
+    fn view_route(&self) -> AppRoute {
+        AppRoute::UsersView { id: self.id }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Routable)]
 pub enum AppRoute {
@@ -111,6 +296,16 @@ pub enum AppRoute {
     SamplesNewWithSampledBy { sampled_by: i32 },
     #[at("/samples/:id/update")]
     SamplesUpdate { id: uuid::Uuid },
+    #[at("/spectra")]
+    Spectra,
+    #[at("/spectra/:id")]
+    SpectraView { id: i32 },
+    #[at("/spectra/new")]
+    SpectraNew,
+    #[at("/spectra/new/spectra_collection/:spectra_collection_id")]
+    SpectraNewWithSpectraCollection { spectra_collection_id: i32 },
+    #[at("/spectra/:id/update")]
+    SpectraUpdate { id: i32 },
     #[at("/spectra_collections")]
     SpectraCollections,
     #[at("/spectra_collections/:id")]
@@ -303,6 +498,23 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::SamplesUpdate { id } => {
             html! { <UpdateSampleForm id={id} /> }
+        }
+        AppRoute::Spectra => {
+            html! { <BasicList<NestedSpectra> /> }
+        }
+        AppRoute::SpectraView { id } => {
+            html! { <SpectraPage id = {id} /> }
+        }
+        AppRoute::SpectraNew => {
+            html! { <CreateSpectraForm /> }
+        }
+        AppRoute::SpectraNewWithSpectraCollection {
+            spectra_collection_id,
+        } => {
+            html! { <CreateSpectraForm spectra_collection_id={spectra_collection_id} /> }
+        }
+        AppRoute::SpectraUpdate { id } => {
+            html! { <UpdateSpectraForm id={id} /> }
         }
         AppRoute::SpectraCollections => {
             html! { <BasicList<NestedSpectraCollection> /> }

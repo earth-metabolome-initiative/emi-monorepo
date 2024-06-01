@@ -1,5 +1,5 @@
 pub mod app;
-pub mod database;
+pub mod badge;
 pub mod error_page;
 pub mod footer;
 pub mod forms;
@@ -18,6 +18,7 @@ pub mod basic_list;
 pub use basic_list::BasicList;
 
 pub use app::App;
+pub use badge::{Badge, RowToBadge};
 pub use error_page::ErrorPage;
 pub use footer::Footer;
 pub use input_with_icon::InputWithIcon;

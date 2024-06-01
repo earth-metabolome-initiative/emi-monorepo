@@ -1,6 +1,7 @@
 """This module contains the function to write the nested structs to the web_common crate."""
 from typing import List
 from constraint_checkers.struct_metadata import StructMetadata
+from constraint_checkers.rust_implementation_check import trait_implementation_exist
 
 def write_web_common_nested_structs(path: str, nested_structs: List[StructMetadata]):
     """Writes the nested structs to the web_common crate."""
@@ -44,6 +45,47 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
                 f"    type Filter = {filter_variant.name};\n"
                 "}\n"
             )
+
+        if not trait_implementation_exist(
+            "Describable",
+            nested_struct.name,
+            deny_file_list=(f"database/{path}.rs",),
+            root="webcommon",
+        ):
+            inner = nested_struct.get_inner_attribute()
+
+            document.write(
+                f"impl Describable for {nested_struct.name} {{\n"
+                "    fn description(&self) -> Option<&str> {\n"
+            )
+            if inner is not None:
+                document.write(
+                    "        self.inner.description()\n"
+                )
+            else:
+                document.write("        None\n")
+            document.write("    }\n}\n")
+
+        if not trait_implementation_exist(
+            "Colorable",
+            nested_struct.name,
+            deny_file_list=(f"database/{path}.rs",),
+            root="webcommon",
+        ):
+            color_attribute = nested_struct.get_color_attribute()
+
+            document.write(
+                f"impl Colorable for {nested_struct.name} {{\n"
+                "    fn color(&self) -> Option<&str> {\n"
+            )
+            if color_attribute:
+                if color_attribute.optional:
+                    document.write(f"        self.{color_attribute.name}.as_ref().map(|color| color.name.as_str())\n")
+                else:
+                    document.write(f"        Some(self.{color_attribute.name}.name.as_str())\n")
+            else:
+                document.write("        None\n")
+            document.write("    }\n}\n")
 
         # We implement the `get` method for the struct when the frontend feature
         # is enabled using GlueSQL. This method will be extremely similar to the

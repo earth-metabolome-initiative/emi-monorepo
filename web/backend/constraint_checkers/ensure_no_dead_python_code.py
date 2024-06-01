@@ -12,7 +12,8 @@ import ast
 from tqdm.auto import tqdm
 
 ALLOW_LIST = [
-    "url_ok"
+    "url_ok",
+    "_exists_in_file"
 ]
 
 class DeadCodeException(Exception):

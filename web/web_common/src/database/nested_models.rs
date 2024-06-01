@@ -19,6 +19,16 @@ impl Tabular for NestedBioOttRank {
 impl Filtrable for NestedBioOttRank {
     type Filter = BioOttRankFilter;
 }
+impl Describable for NestedBioOttRank {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedBioOttRank {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedBioOttRank {
     /// Convert the flat struct to the nested struct.
@@ -111,6 +121,16 @@ impl Tabular for NestedBioOttTaxonItem {
 }
 impl Filtrable for NestedBioOttTaxonItem {
     type Filter = BioOttTaxonItemFilter;
+}
+impl Describable for NestedBioOttTaxonItem {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedBioOttTaxonItem {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedBioOttTaxonItem {
@@ -230,6 +250,16 @@ impl Tabular for NestedDerivedSample {
 impl Filtrable for NestedDerivedSample {
     type Filter = DerivedSampleFilter;
 }
+impl Describable for NestedDerivedSample {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedDerivedSample {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedDerivedSample {
     /// Convert the flat struct to the nested struct.
@@ -340,6 +370,16 @@ impl Tabular for NestedDocumentFormat {
 impl Filtrable for NestedDocumentFormat {
     type Filter = DocumentFormatFilter;
 }
+impl Describable for NestedDocumentFormat {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedDocumentFormat {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedDocumentFormat {
     /// Convert the flat struct to the nested struct.
@@ -424,6 +464,16 @@ impl Tabular for NestedLoginProvider {
 impl Filtrable for NestedLoginProvider {
     type Filter = LoginProviderFilter;
 }
+impl Describable for NestedLoginProvider {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedLoginProvider {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedLoginProvider {
     /// Convert the flat struct to the nested struct.
@@ -507,6 +557,16 @@ impl Tabular for NestedMaterial {
 }
 impl Filtrable for NestedMaterial {
     type Filter = MaterialFilter;
+}
+impl Describable for NestedMaterial {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedMaterial {
+    fn color(&self) -> Option<&str> {
+        self.color.as_ref().map(|color| color.name.as_str())
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedMaterial {
@@ -598,6 +658,16 @@ impl Tabular for NestedNameplateCategory {
 impl Filtrable for NestedNameplateCategory {
     type Filter = NameplateCategoryFilter;
 }
+impl Describable for NestedNameplateCategory {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedNameplateCategory {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedNameplateCategory {
     /// Convert the flat struct to the nested struct.
@@ -687,6 +757,16 @@ impl Tabular for NestedNameplate {
 }
 impl Filtrable for NestedNameplate {
     type Filter = NameplateFilter;
+}
+impl Describable for NestedNameplate {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedNameplate {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedNameplate {
@@ -797,6 +877,16 @@ impl Tabular for NestedNotification {
 impl Filtrable for NestedNotification {
     type Filter = NotificationFilter;
 }
+impl Describable for NestedNotification {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedNotification {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedNotification {
     /// Convert the flat struct to the nested struct.
@@ -878,6 +968,16 @@ impl Tabular for NestedObservationSubject {
 }
 impl Filtrable for NestedObservationSubject {
     type Filter = ObservationSubjectFilter;
+}
+impl Describable for NestedObservationSubject {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedObservationSubject {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedObservationSubject {
@@ -967,6 +1067,16 @@ impl Tabular for NestedObservation {
 }
 impl Filtrable for NestedObservation {
     type Filter = ObservationFilter;
+}
+impl Describable for NestedObservation {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedObservation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedObservation {
@@ -1091,6 +1201,16 @@ impl Tabular for NestedOrganismBioOttTaxonItem {
 impl Filtrable for NestedOrganismBioOttTaxonItem {
     type Filter = OrganismBioOttTaxonItemFilter;
 }
+impl Describable for NestedOrganismBioOttTaxonItem {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedOrganismBioOttTaxonItem {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedOrganismBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
@@ -1180,6 +1300,16 @@ impl Tabular for NestedOrganism {
 }
 impl Filtrable for NestedOrganism {
     type Filter = OrganismFilter;
+}
+impl Describable for NestedOrganism {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedOrganism {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedOrganism {
@@ -1298,6 +1428,16 @@ impl Tabular for NestedOrganization {
 impl Filtrable for NestedOrganization {
     type Filter = OrganizationFilter;
 }
+impl Describable for NestedOrganization {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedOrganization {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedOrganization {
     /// Convert the flat struct to the nested struct.
@@ -1379,6 +1519,16 @@ impl Tabular for NestedPermanenceCategory {
 }
 impl Filtrable for NestedPermanenceCategory {
     type Filter = PermanenceCategoryFilter;
+}
+impl Describable for NestedPermanenceCategory {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedPermanenceCategory {
+    fn color(&self) -> Option<&str> {
+        self.color.as_ref().map(|color| color.name.as_str())
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedPermanenceCategory {
@@ -1468,6 +1618,16 @@ impl Tabular for NestedProjectState {
 impl Filtrable for NestedProjectState {
     type Filter = ProjectStateFilter;
 }
+impl Describable for NestedProjectState {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedProjectState {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectState {
     /// Convert the flat struct to the nested struct.
@@ -1555,6 +1715,16 @@ impl Tabular for NestedProject {
 }
 impl Filtrable for NestedProject {
     type Filter = ProjectFilter;
+}
+impl Describable for NestedProject {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedProject {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedProject {
@@ -1674,6 +1844,16 @@ impl Tabular for NestedProjectsTeamsRoleInvitation {
 impl Filtrable for NestedProjectsTeamsRoleInvitation {
     type Filter = ProjectsTeamsRoleInvitationFilter;
 }
+impl Describable for NestedProjectsTeamsRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedProjectsTeamsRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -1763,6 +1943,16 @@ impl Tabular for NestedProjectsTeamsRoleRequest {
 }
 impl Filtrable for NestedProjectsTeamsRoleRequest {
     type Filter = ProjectsTeamsRoleRequestFilter;
+}
+impl Describable for NestedProjectsTeamsRoleRequest {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedProjectsTeamsRoleRequest {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedProjectsTeamsRoleRequest {
@@ -1854,6 +2044,16 @@ impl Tabular for NestedProjectsTeamsRole {
 impl Filtrable for NestedProjectsTeamsRole {
     type Filter = ProjectsTeamsRoleFilter;
 }
+impl Describable for NestedProjectsTeamsRole {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedProjectsTeamsRole {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsTeamsRole {
     /// Convert the flat struct to the nested struct.
@@ -1943,6 +2143,16 @@ impl Tabular for NestedProjectsUsersRoleInvitation {
 }
 impl Filtrable for NestedProjectsUsersRoleInvitation {
     type Filter = ProjectsUsersRoleInvitationFilter;
+}
+impl Describable for NestedProjectsUsersRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedProjectsUsersRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedProjectsUsersRoleInvitation {
@@ -2034,6 +2244,16 @@ impl Tabular for NestedProjectsUsersRoleRequest {
 impl Filtrable for NestedProjectsUsersRoleRequest {
     type Filter = ProjectsUsersRoleRequestFilter;
 }
+impl Describable for NestedProjectsUsersRoleRequest {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedProjectsUsersRoleRequest {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -2124,6 +2344,16 @@ impl Tabular for NestedProjectsUsersRole {
 impl Filtrable for NestedProjectsUsersRole {
     type Filter = ProjectsUsersRoleFilter;
 }
+impl Describable for NestedProjectsUsersRole {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedProjectsUsersRole {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedProjectsUsersRole {
     /// Convert the flat struct to the nested struct.
@@ -2212,6 +2442,16 @@ impl Tabular for NestedRole {
 impl Filtrable for NestedRole {
     type Filter = RoleFilter;
 }
+impl Describable for NestedRole {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedRole {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedRole {
     /// Convert the flat struct to the nested struct.
@@ -2296,6 +2536,16 @@ impl Tabular for NestedSampleBioOttTaxonItem {
 }
 impl Filtrable for NestedSampleBioOttTaxonItem {
     type Filter = SampleBioOttTaxonItemFilter;
+}
+impl Describable for NestedSampleBioOttTaxonItem {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedSampleBioOttTaxonItem {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedSampleBioOttTaxonItem {
@@ -2384,6 +2634,16 @@ impl Tabular for NestedSampleContainerCategory {
 impl Filtrable for NestedSampleContainerCategory {
     type Filter = SampleContainerCategoryFilter;
 }
+impl Describable for NestedSampleContainerCategory {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedSampleContainerCategory {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedSampleContainerCategory {
     /// Convert the flat struct to the nested struct.
@@ -2471,6 +2731,16 @@ impl Tabular for NestedSampleContainer {
 }
 impl Filtrable for NestedSampleContainer {
     type Filter = SampleContainerFilter;
+}
+impl Describable for NestedSampleContainer {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedSampleContainer {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedSampleContainer {
@@ -2582,6 +2852,16 @@ impl Tabular for NestedSampleState {
 impl Filtrable for NestedSampleState {
     type Filter = SampleStateFilter;
 }
+impl Describable for NestedSampleState {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedSampleState {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedSampleState {
     /// Convert the flat struct to the nested struct.
@@ -2669,6 +2949,16 @@ impl Tabular for NestedSample {
 }
 impl Filtrable for NestedSample {
     type Filter = SampleFilter;
+}
+impl Describable for NestedSample {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedSample {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedSample {
@@ -2785,6 +3075,16 @@ impl Tabular for NestedSpectra {
 impl Filtrable for NestedSpectra {
     type Filter = SpectraFilter;
 }
+impl Describable for NestedSpectra {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedSpectra {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectra {
     /// Convert the flat struct to the nested struct.
@@ -2894,6 +3194,16 @@ impl Tabular for NestedSpectraCollection {
 impl Filtrable for NestedSpectraCollection {
     type Filter = SpectraCollectionFilter;
 }
+impl Describable for NestedSpectraCollection {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedSpectraCollection {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedSpectraCollection {
     /// Convert the flat struct to the nested struct.
@@ -3002,6 +3312,16 @@ impl Tabular for NestedTeamState {
 impl Filtrable for NestedTeamState {
     type Filter = TeamStateFilter;
 }
+impl Describable for NestedTeamState {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedTeamState {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedTeamState {
     /// Convert the flat struct to the nested struct.
@@ -3089,6 +3409,16 @@ impl Tabular for NestedTeam {
 }
 impl Filtrable for NestedTeam {
     type Filter = TeamFilter;
+}
+impl Describable for NestedTeam {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedTeam {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedTeam {
@@ -3208,6 +3538,16 @@ impl Tabular for NestedTeamsTeamsRoleInvitation {
 impl Filtrable for NestedTeamsTeamsRoleInvitation {
     type Filter = TeamsTeamsRoleInvitationFilter;
 }
+impl Describable for NestedTeamsTeamsRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedTeamsTeamsRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedTeamsTeamsRoleInvitation {
     /// Convert the flat struct to the nested struct.
@@ -3297,6 +3637,16 @@ impl Tabular for NestedTeamsUsersRoleInvitation {
 }
 impl Filtrable for NestedTeamsUsersRoleInvitation {
     type Filter = TeamsUsersRoleInvitationFilter;
+}
+impl Describable for NestedTeamsUsersRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedTeamsUsersRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedTeamsUsersRoleInvitation {
@@ -3388,6 +3738,16 @@ impl Tabular for NestedTeamsUsersRoleRequest {
 impl Filtrable for NestedTeamsUsersRoleRequest {
     type Filter = TeamsUsersRoleRequestFilter;
 }
+impl Describable for NestedTeamsUsersRoleRequest {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedTeamsUsersRoleRequest {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedTeamsUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -3478,6 +3838,16 @@ impl Tabular for NestedTeamsUsersRole {
 impl Filtrable for NestedTeamsUsersRole {
     type Filter = TeamsUsersRoleFilter;
 }
+impl Describable for NestedTeamsUsersRole {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedTeamsUsersRole {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedTeamsUsersRole {
     /// Convert the flat struct to the nested struct.
@@ -3566,6 +3936,16 @@ impl Tabular for NestedUserEmail {
 impl Filtrable for NestedUserEmail {
     type Filter = UserEmailFilter;
 }
+impl Describable for NestedUserEmail {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedUserEmail {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedUserEmail {
     /// Convert the flat struct to the nested struct.
@@ -3651,6 +4031,16 @@ impl Tabular for NestedUsersUsersRoleInvitation {
 }
 impl Filtrable for NestedUsersUsersRoleInvitation {
     type Filter = UsersUsersRoleInvitationFilter;
+}
+impl Describable for NestedUsersUsersRoleInvitation {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedUsersUsersRoleInvitation {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedUsersUsersRoleInvitation {
@@ -3742,6 +4132,16 @@ impl Tabular for NestedUsersUsersRoleRequest {
 impl Filtrable for NestedUsersUsersRoleRequest {
     type Filter = UsersUsersRoleRequestFilter;
 }
+impl Describable for NestedUsersUsersRoleRequest {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedUsersUsersRoleRequest {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
 #[cfg(feature = "frontend")]
 impl NestedUsersUsersRoleRequest {
     /// Convert the flat struct to the nested struct.
@@ -3831,6 +4231,16 @@ impl Tabular for NestedUsersUsersRole {
 }
 impl Filtrable for NestedUsersUsersRole {
     type Filter = UsersUsersRoleFilter;
+}
+impl Describable for NestedUsersUsersRole {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedUsersUsersRole {
+    fn color(&self) -> Option<&str> {
+        None
+    }
 }
 #[cfg(feature = "frontend")]
 impl NestedUsersUsersRole {

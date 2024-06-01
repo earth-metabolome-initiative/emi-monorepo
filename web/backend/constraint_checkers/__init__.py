@@ -87,7 +87,7 @@ from constraint_checkers.ensure_no_dead_python_code import ensure_no_dead_python
 from constraint_checkers.write_diesel_sql_function_bindings import write_diesel_sql_function_bindings
 from constraint_checkers.ensures_no_duplicated_migrations import ensures_no_duplicated_migrations
 from constraint_checkers.derived_indices import register_derived_search_indices
-
+from constraint_checkers.rust_implementation_check import trait_implementation_exist
 
 __all__ = [
     "ensures_all_update_at_trigger_exists",
