@@ -1,4 +1,4 @@
-use super::{Badge, BadgeSize, RowToBadge};
+use super::RowToBadge;
 use web_common::database::NestedObservationSubject;
 use web_common::traits::CapitalizeString;
 

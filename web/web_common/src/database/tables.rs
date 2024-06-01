@@ -2077,8 +2077,8 @@ pub struct Material {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub icon_id: Option<i32>,
-    pub color_id: Option<i32>,
+    pub icon_id: i32,
+    pub color_id: i32,
 }
 
 impl Tabular for Material {
@@ -2105,14 +2105,8 @@ impl Material {
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
-            match self.icon_id {
-                Some(icon_id) => gluesql::core::ast_builder::num(icon_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.color_id {
-                Some(color_id) => gluesql::core::ast_builder::num(color_id),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::num(self.icon_id),
+            gluesql::core::ast_builder::num(self.color_id),
         ]
     }
 
@@ -2219,18 +2213,13 @@ connection: &mut gluesql::prelude::Glue<C>,
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let mut update_row = table("materials")
+        table("materials")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("description", gluesql::core::ast_builder::text(self.description));
-        if let Some(icon_id) = self.icon_id {
-            update_row = update_row.set("icon_id", gluesql::core::ast_builder::num(icon_id));
-        }
-        if let Some(color_id) = self.color_id {
-            update_row = update_row.set("color_id", gluesql::core::ast_builder::num(color_id));
-        }
-            update_row.execute(connection)
+.set("description", gluesql::core::ast_builder::text(self.description))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -2303,13 +2292,11 @@ connection: &mut gluesql::prelude::Glue<C>,
                 _ => unreachable!("Expected Str")
             },
             icon_id: match row.get("icon_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(icon_id) => Some(icon_id.clone()),
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(color_id) => Some(color_id.clone()),
+                gluesql::prelude::Value::I32(color_id) => color_id.clone(),
                 _ => unreachable!("Expected I32")
             },
         }
@@ -4459,8 +4446,8 @@ pub struct PermanenceCategory {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub icon_id: Option<i32>,
-    pub color_id: Option<i32>,
+    pub icon_id: i32,
+    pub color_id: i32,
 }
 
 impl Tabular for PermanenceCategory {
@@ -4487,14 +4474,8 @@ impl PermanenceCategory {
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
             gluesql::core::ast_builder::text(self.description),
-            match self.icon_id {
-                Some(icon_id) => gluesql::core::ast_builder::num(icon_id),
-                None => gluesql::core::ast_builder::null(),
-            },
-            match self.color_id {
-                Some(color_id) => gluesql::core::ast_builder::num(color_id),
-                None => gluesql::core::ast_builder::null(),
-            },
+            gluesql::core::ast_builder::num(self.icon_id),
+            gluesql::core::ast_builder::num(self.color_id),
         ]
     }
 
@@ -4601,18 +4582,13 @@ connection: &mut gluesql::prelude::Glue<C>,
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let mut update_row = table("permanence_categories")
+        table("permanence_categories")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("description", gluesql::core::ast_builder::text(self.description));
-        if let Some(icon_id) = self.icon_id {
-            update_row = update_row.set("icon_id", gluesql::core::ast_builder::num(icon_id));
-        }
-        if let Some(color_id) = self.color_id {
-            update_row = update_row.set("color_id", gluesql::core::ast_builder::num(color_id));
-        }
-            update_row.execute(connection)
+.set("description", gluesql::core::ast_builder::text(self.description))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -4685,13 +4661,11 @@ connection: &mut gluesql::prelude::Glue<C>,
                 _ => unreachable!("Expected Str")
             },
             icon_id: match row.get("icon_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(icon_id) => Some(icon_id.clone()),
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
                 _ => unreachable!("Expected I32")
             },
             color_id: match row.get("color_id").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::I32(color_id) => Some(color_id.clone()),
+                gluesql::prelude::Value::I32(color_id) => color_id.clone(),
                 _ => unreachable!("Expected I32")
             },
         }

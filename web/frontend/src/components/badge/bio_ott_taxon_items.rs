@@ -1,5 +1,4 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use std::rc::Rc;
 use web_common::database::NestedBioOttRank;
 use web_common::{database::NestedBioOttTaxonItem, traits::CapitalizeString};
 use yew::prelude::*;
@@ -19,7 +18,7 @@ impl RowToBadge for NestedBioOttTaxonItem {
 
     fn children(&self, props: &super::BadgeProps<Self>) -> Option<yew::prelude::Html> {
         Some(html! {
-            <Badge<NestedBioOttRank> badge={Rc::from(self.ott_rank.clone())} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+            <Badge<NestedBioOttRank> badge={self.ott_rank.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
         })
     }
 }

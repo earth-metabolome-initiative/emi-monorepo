@@ -41,8 +41,8 @@ pub struct PermanenceCategory {
     pub id: i32,
     pub name: String,
     pub description: String,
-    pub icon_id: Option<i32>,
-    pub color_id: Option<i32>,
+    pub icon_id: i32,
+    pub color_id: i32,
 }
 
 impl From<PermanenceCategory> for web_common::database::tables::PermanenceCategory {

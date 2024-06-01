@@ -20,7 +20,6 @@
 //! the badge will disappear.
 
 use crate::components::badge::BadgeSize;
-use crate::components::RowToBadge;
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;

@@ -109,6 +109,9 @@ def derive_frontend_builders(
             if attribute.is_automatically_determined_column():
                 continue
 
+            if not attribute.implements_copy():
+                attribute = attribute.as_rc()
+
             builder.add_attribute(attribute.as_option())
 
         if len(foreign_keys) > 0:
@@ -130,6 +133,7 @@ def derive_frontend_builders(
                             name=attribute.name,
                             data_type=richest_variant,
                             optional=True,
+                            rc=True
                         )
                     )
                     continue

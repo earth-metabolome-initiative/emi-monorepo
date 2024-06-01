@@ -196,6 +196,7 @@ class AttributeMetadata:
             self._data_type,
             self.optional,
             unique=self.unique,
+            rc=self.rc,
             reference=True,
         )
 
@@ -208,9 +209,10 @@ class AttributeMetadata:
             True,
             reference=self.reference,
             unique=self.unique,
+            rc=self.rc,
             mutable=self.mutable,
         )
-
+    
     def as_rc(self) -> "AttributeMetadata":
         """Returns the attribute as an Rc."""
         return AttributeMetadata(
@@ -224,7 +226,6 @@ class AttributeMetadata:
             rc=True,
             lifetime=self.lifetime,
         )
-        
 
     def is_image_blob(self) -> bool:
         """Returns whether the attribute is an image blob."""
@@ -441,6 +442,7 @@ class AttributeMetadata:
                 "f32",
                 "f64",
                 "uuid::Uuid",
+                "chrono::NaiveDateTime"
             ]
             or isinstance(self._data_type, StructMetadata)
             and self._data_type.can_implement_copy()
@@ -456,7 +458,6 @@ class AttributeMetadata:
                 "Vec<ApiError>",
                 "Vec<u8>",
                 "ApiError",
-                "chrono::NaiveDateTime",
             ]
             or isinstance(self._data_type, StructMetadata)
             and self._data_type.can_implement_clone()
@@ -847,7 +848,7 @@ class StructMetadata:
         """Returns the struct as an Rc."""
         for attribute in self.attributes:
             if not attribute.implements_copy():
-                attribute = attribute.as_rc()
+                attribute.rc = True
 
         return self
 
@@ -1489,6 +1490,10 @@ class StructMetadata:
     def is_nested(self) -> bool:
         """Returns whether the struct is nested."""
         return any(attribute.has_struct_data_type() for attribute in self.attributes)
+
+    def contains_nested_structs(self) -> bool:
+        """Returns whether the struct contains nested structs."""
+        return any(attribute.has_struct_data_type() and attribute.raw_data_type().is_nested() for attribute in self.attributes)
 
     def add_attribute(self, attribute_metadata: AttributeMetadata):
         """Adds an attribute to the struct.

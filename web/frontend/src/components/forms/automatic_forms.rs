@@ -22,8 +22,8 @@ use yewdux::{use_store, use_store_value, Reducer, Store};
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct DerivedSampleBuilder {
-    pub parent_sample: Option<NestedSample>,
-    pub child_sample: Option<NestedSample>,
+    pub parent_sample: Option<Rc<NestedSample>>,
+    pub child_sample: Option<Rc<NestedSample>>,
     pub errors_parent_sample: Vec<ApiError>,
     pub errors_child_sample: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
@@ -43,8 +43,8 @@ impl Default for DerivedSampleBuilder {
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum DerivedSampleActions {
-    SetParentSample(Option<NestedSample>),
-    SetChildSample(Option<NestedSample>),
+    SetParentSample(Option<Rc<NestedSample>>),
+    SetChildSample(Option<Rc<NestedSample>>),
 }
 
 impl FromOperation for DerivedSampleActions {
@@ -81,7 +81,7 @@ impl Reducer<DerivedSampleBuilder> for DerivedSampleActions {
                     state_mut.parent_sample = None;
                     break 'parent_sample;
                 }
-                state_mut.parent_sample = parent_sample;
+                state_mut.parent_sample = parent_sample.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'parent_sample;
@@ -97,7 +97,7 @@ impl Reducer<DerivedSampleBuilder> for DerivedSampleActions {
                     state_mut.child_sample = None;
                     break 'child_sample;
                 }
-                state_mut.child_sample = child_sample;
+                state_mut.child_sample = child_sample.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'child_sample;
@@ -119,12 +119,12 @@ impl FormBuilder for DerivedSampleBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(DerivedSampleActions::SetParentSample(Some(
-            richest_variant.parent_sample,
-        )));
-        dispatcher.apply(DerivedSampleActions::SetChildSample(Some(
-            richest_variant.child_sample,
-        )));
+        dispatcher.apply(DerivedSampleActions::SetParentSample(
+            Some(richest_variant.parent_sample).map(Rc::from),
+        ));
+        dispatcher.apply(DerivedSampleActions::SetChildSample(
+            Some(richest_variant.child_sample).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -222,12 +222,13 @@ pub fn create_derived_sample_form(props: &CreateDerivedSampleFormProp) -> Html {
         ));
     }
     let set_parent_sample =
-        builder_dispatch.apply_callback(|parent_sample: Option<NestedSample>| {
+        builder_dispatch.apply_callback(|parent_sample: Option<Rc<NestedSample>>| {
             DerivedSampleActions::SetParentSample(parent_sample)
         });
-    let set_child_sample = builder_dispatch.apply_callback(|child_sample: Option<NestedSample>| {
-        DerivedSampleActions::SetChildSample(child_sample)
-    });
+    let set_child_sample =
+        builder_dispatch.apply_callback(|child_sample: Option<Rc<NestedSample>>| {
+            DerivedSampleActions::SetChildSample(child_sample)
+        });
     html! {
         <BasicForm<NewDerivedSample>
             method={FormMethod::POST}
@@ -254,12 +255,13 @@ pub fn update_derived_sample_form(props: &UpdateDerivedSampleFormProp) -> Html {
         (props.parent_sample_id, props.child_sample_id).into(),
     ));
     let set_parent_sample =
-        builder_dispatch.apply_callback(|parent_sample: Option<NestedSample>| {
+        builder_dispatch.apply_callback(|parent_sample: Option<Rc<NestedSample>>| {
             DerivedSampleActions::SetParentSample(parent_sample)
         });
-    let set_child_sample = builder_dispatch.apply_callback(|child_sample: Option<NestedSample>| {
-        DerivedSampleActions::SetChildSample(child_sample)
-    });
+    let set_child_sample =
+        builder_dispatch.apply_callback(|child_sample: Option<Rc<NestedSample>>| {
+            DerivedSampleActions::SetChildSample(child_sample)
+        });
     html! {
         <BasicForm<UpdateDerivedSample>
             method={FormMethod::PUT}
@@ -274,9 +276,9 @@ pub fn update_derived_sample_form(props: &UpdateDerivedSampleFormProp) -> Html {
 #[store(storage = "local", storage_tab_sync)]
 pub struct NameplateBuilder {
     pub id: Option<i32>,
-    pub barcode: Option<String>,
-    pub project: Option<NestedProject>,
-    pub category: Option<NestedNameplateCategory>,
+    pub barcode: Option<Rc<String>>,
+    pub project: Option<Rc<NestedProject>>,
+    pub category: Option<Rc<NestedNameplateCategory>>,
     pub errors_barcode: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
     pub errors_category: Vec<ApiError>,
@@ -301,8 +303,8 @@ impl Default for NameplateBuilder {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum NameplateActions {
     SetBarcode(Option<String>),
-    SetProject(Option<NestedProject>),
-    SetCategory(Option<NestedNameplateCategory>),
+    SetProject(Option<Rc<NestedProject>>),
+    SetCategory(Option<Rc<NestedNameplateCategory>>),
 }
 
 impl FromOperation for NameplateActions {
@@ -339,7 +341,7 @@ impl Reducer<NameplateBuilder> for NameplateActions {
                         break 'barcode;
                     }
                 }
-                state_mut.barcode = barcode;
+                state_mut.barcode = barcode.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'barcode;
@@ -353,7 +355,7 @@ impl Reducer<NameplateBuilder> for NameplateActions {
                     state_mut.project = None;
                     break 'project;
                 }
-                state_mut.project = project;
+                state_mut.project = project.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'project;
@@ -367,7 +369,7 @@ impl Reducer<NameplateBuilder> for NameplateActions {
                     state_mut.category = None;
                     break 'category;
                 }
-                state_mut.category = category;
+                state_mut.category = category.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'category;
@@ -397,10 +399,12 @@ impl FormBuilder for NameplateBuilder {
         dispatcher.apply(NameplateActions::SetBarcode(Some(
             richest_variant.inner.barcode.to_string(),
         )));
-        dispatcher.apply(NameplateActions::SetProject(Some(richest_variant.project)));
-        dispatcher.apply(NameplateActions::SetCategory(Some(
-            richest_variant.category,
-        )));
+        dispatcher.apply(NameplateActions::SetProject(
+            Some(richest_variant.project).map(Rc::from),
+        ));
+        dispatcher.apply(NameplateActions::SetCategory(
+            Some(richest_variant.category).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -415,9 +419,9 @@ impl FormBuilder for NameplateBuilder {
 impl From<NameplateBuilder> for NewNameplate {
     fn from(builder: NameplateBuilder) -> Self {
         Self {
-            barcode: builder.barcode.unwrap(),
-            project_id: builder.project.unwrap().inner.id,
-            category_id: builder.category.unwrap().inner.id,
+            barcode: builder.barcode.as_deref().cloned().unwrap(),
+            project_id: builder.project.as_deref().cloned().unwrap().inner.id,
+            category_id: builder.category.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -425,9 +429,9 @@ impl From<NameplateBuilder> for UpdateNameplate {
     fn from(builder: NameplateBuilder) -> Self {
         Self {
             id: builder.id.unwrap(),
-            barcode: builder.barcode.unwrap(),
-            project_id: builder.project.unwrap().inner.id,
-            category_id: builder.category.unwrap().inner.id,
+            barcode: builder.barcode.as_deref().cloned().unwrap(),
+            project_id: builder.project.as_deref().cloned().unwrap().inner.id,
+            category_id: builder.category.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -488,9 +492,9 @@ pub fn create_nameplate_form(props: &CreateNameplateFormProp) -> Html {
     let set_barcode = builder_dispatch
         .apply_callback(|barcode: Option<String>| NameplateActions::SetBarcode(barcode));
     let set_project = builder_dispatch
-        .apply_callback(|project: Option<NestedProject>| NameplateActions::SetProject(project));
+        .apply_callback(|project: Option<Rc<NestedProject>>| NameplateActions::SetProject(project));
     let set_category =
-        builder_dispatch.apply_callback(|category: Option<NestedNameplateCategory>| {
+        builder_dispatch.apply_callback(|category: Option<Rc<NestedNameplateCategory>>| {
             NameplateActions::SetCategory(category)
         });
     html! {
@@ -498,7 +502,7 @@ pub fn create_nameplate_form(props: &CreateNameplateFormProp) -> Html {
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone().map(BarCode::from)} />
+            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.as_deref().cloned().map(BarCode::from).map(Rc::from)} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedNameplateCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<NewNameplate>>
@@ -519,9 +523,9 @@ pub fn update_nameplate_form(props: &UpdateNameplateFormProp) -> Html {
     let set_barcode = builder_dispatch
         .apply_callback(|barcode: Option<String>| NameplateActions::SetBarcode(barcode));
     let set_project = builder_dispatch
-        .apply_callback(|project: Option<NestedProject>| NameplateActions::SetProject(project));
+        .apply_callback(|project: Option<Rc<NestedProject>>| NameplateActions::SetProject(project));
     let set_category =
-        builder_dispatch.apply_callback(|category: Option<NestedNameplateCategory>| {
+        builder_dispatch.apply_callback(|category: Option<Rc<NestedNameplateCategory>>| {
             NameplateActions::SetCategory(category)
         });
     html! {
@@ -529,7 +533,7 @@ pub fn update_nameplate_form(props: &UpdateNameplateFormProp) -> Html {
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone().map(BarCode::from)} />
+            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.as_deref().cloned().map(BarCode::from).map(Rc::from)} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedNameplateCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<UpdateNameplate>>
@@ -539,13 +543,13 @@ pub fn update_nameplate_form(props: &UpdateNameplateFormProp) -> Html {
 #[store(storage = "local", storage_tab_sync)]
 pub struct ObservationBuilder {
     pub id: Option<uuid::Uuid>,
-    pub notes: Option<String>,
-    pub picture: Option<Vec<u8>>,
-    pub parent_observation: Option<NestedObservation>,
-    pub project: Option<NestedProject>,
-    pub organism: Option<NestedOrganism>,
-    pub sample: Option<NestedSample>,
-    pub subject: Option<NestedObservationSubject>,
+    pub notes: Option<Rc<String>>,
+    pub picture: Option<Rc<Vec<u8>>>,
+    pub parent_observation: Option<Rc<NestedObservation>>,
+    pub project: Option<Rc<NestedProject>>,
+    pub organism: Option<Rc<NestedOrganism>>,
+    pub sample: Option<Rc<NestedSample>>,
+    pub subject: Option<Rc<NestedObservationSubject>>,
     pub errors_notes: Vec<ApiError>,
     pub errors_picture: Vec<ApiError>,
     pub errors_parent_observation: Vec<ApiError>,
@@ -582,12 +586,12 @@ impl Default for ObservationBuilder {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ObservationActions {
     SetNotes(Option<String>),
-    SetPicture(Option<Vec<u8>>),
-    SetParentObservation(Option<NestedObservation>),
-    SetProject(Option<NestedProject>),
-    SetOrganism(Option<NestedOrganism>),
-    SetSample(Option<NestedSample>),
-    SetSubject(Option<NestedObservationSubject>),
+    SetPicture(Option<Rc<Vec<u8>>>),
+    SetParentObservation(Option<Rc<NestedObservation>>),
+    SetProject(Option<Rc<NestedProject>>),
+    SetOrganism(Option<Rc<NestedOrganism>>),
+    SetSample(Option<Rc<NestedSample>>),
+    SetSubject(Option<Rc<NestedObservationSubject>>),
 }
 
 impl FromOperation for ObservationActions {
@@ -624,7 +628,7 @@ impl Reducer<ObservationBuilder> for ObservationActions {
                         break 'notes;
                     }
                 }
-                state_mut.notes = notes;
+                state_mut.notes = notes.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'notes;
@@ -638,7 +642,7 @@ impl Reducer<ObservationBuilder> for ObservationActions {
                     state_mut.picture = None;
                     break 'picture;
                 }
-                state_mut.picture = picture;
+                state_mut.picture = picture.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'picture;
@@ -659,7 +663,7 @@ impl Reducer<ObservationBuilder> for ObservationActions {
                     }
                     None => (),
                 }
-                state_mut.parent_observation = parent_observation;
+                state_mut.parent_observation = parent_observation.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'parent_observation;
@@ -673,21 +677,21 @@ impl Reducer<ObservationBuilder> for ObservationActions {
                     state_mut.project = None;
                     break 'project;
                 }
-                state_mut.project = project;
+                state_mut.project = project.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'project;
             }
             ObservationActions::SetOrganism(organism) => 'organism: {
                 state_mut.errors_organism.clear();
-                state_mut.organism = organism;
+                state_mut.organism = organism.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'organism;
             }
             ObservationActions::SetSample(sample) => 'sample: {
                 state_mut.errors_sample.clear();
-                state_mut.sample = sample;
+                state_mut.sample = sample.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'sample;
@@ -701,7 +705,7 @@ impl Reducer<ObservationBuilder> for ObservationActions {
                     state_mut.subject = None;
                     break 'subject;
                 }
-                state_mut.subject = subject;
+                state_mut.subject = subject.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'subject;
@@ -733,19 +737,27 @@ impl FormBuilder for ObservationBuilder {
             state.id = Some(richest_variant.inner.id);
         });
         dispatcher.apply(ObservationActions::SetNotes(
-            richest_variant.inner.notes.map(|notes| notes.to_string()),
+            richest_variant
+                .inner
+                .notes
+                .as_ref()
+                .map(|notes| notes.to_string()),
         ));
-        dispatcher.apply(ObservationActions::SetPicture(Some(
-            richest_variant.inner.picture,
-        )));
-        dispatcher.apply(ObservationActions::SetProject(Some(
-            richest_variant.project,
-        )));
-        dispatcher.apply(ObservationActions::SetOrganism(richest_variant.organism));
-        dispatcher.apply(ObservationActions::SetSample(richest_variant.sample));
-        dispatcher.apply(ObservationActions::SetSubject(Some(
-            richest_variant.subject,
-        )));
+        dispatcher.apply(ObservationActions::SetPicture(
+            Some(richest_variant.inner.as_ref().clone().picture).map(Rc::from),
+        ));
+        dispatcher.apply(ObservationActions::SetProject(
+            Some(richest_variant.project).map(Rc::from),
+        ));
+        dispatcher.apply(ObservationActions::SetOrganism(
+            richest_variant.organism.map(Rc::from),
+        ));
+        dispatcher.apply(ObservationActions::SetSample(
+            richest_variant.sample.map(Rc::from),
+        ));
+        dispatcher.apply(ObservationActions::SetSubject(
+            Some(richest_variant.subject).map(Rc::from),
+        ));
         let mut named_requests = Vec::new();
         if let Some(parent_observation_id) = richest_variant.inner.parent_observation_id {
             named_requests.push(ComponentMessage::get_named::<&str, Observation>(
@@ -772,13 +784,23 @@ impl From<ObservationBuilder> for NewObservation {
             id: builder.id.unwrap_or_else(Uuid::new_v4),
             parent_observation_id: builder
                 .parent_observation
+                .as_deref()
+                .cloned()
                 .map(|parent_observation| parent_observation.inner.id),
-            project_id: builder.project.unwrap().inner.id,
-            organism_id: builder.organism.map(|organism| organism.inner.id),
-            sample_id: builder.sample.map(|sample| sample.inner.id),
-            subject_id: builder.subject.unwrap().inner.id,
-            notes: builder.notes,
-            picture: builder.picture.unwrap(),
+            project_id: builder.project.as_deref().cloned().unwrap().inner.id,
+            organism_id: builder
+                .organism
+                .as_deref()
+                .cloned()
+                .map(|organism| organism.inner.id),
+            sample_id: builder
+                .sample
+                .as_deref()
+                .cloned()
+                .map(|sample| sample.inner.id),
+            subject_id: builder.subject.as_deref().cloned().unwrap().inner.id,
+            notes: builder.notes.as_deref().cloned(),
+            picture: builder.picture.as_deref().cloned().unwrap(),
         }
     }
 }
@@ -849,21 +871,22 @@ pub fn create_observation_form(props: &CreateObservationFormProp) -> Html {
     let set_notes = builder_dispatch
         .apply_callback(|notes: Option<String>| ObservationActions::SetNotes(notes));
     let set_picture = builder_dispatch.apply_callback(|picture: Option<Image>| {
-        ObservationActions::SetPicture(picture.map(|picture| picture.into()))
+        ObservationActions::SetPicture(picture.map(<Vec<u8>>::from).map(Rc::from))
     });
     let set_parent_observation =
-        builder_dispatch.apply_callback(|parent_observation: Option<NestedObservation>| {
+        builder_dispatch.apply_callback(|parent_observation: Option<Rc<NestedObservation>>| {
             ObservationActions::SetParentObservation(parent_observation)
         });
-    let set_project = builder_dispatch
-        .apply_callback(|project: Option<NestedProject>| ObservationActions::SetProject(project));
-    let set_organism = builder_dispatch.apply_callback(|organism: Option<NestedOrganism>| {
+    let set_project = builder_dispatch.apply_callback(|project: Option<Rc<NestedProject>>| {
+        ObservationActions::SetProject(project)
+    });
+    let set_organism = builder_dispatch.apply_callback(|organism: Option<Rc<NestedOrganism>>| {
         ObservationActions::SetOrganism(organism)
     });
     let set_sample = builder_dispatch
-        .apply_callback(|sample: Option<NestedSample>| ObservationActions::SetSample(sample));
+        .apply_callback(|sample: Option<Rc<NestedSample>>| ObservationActions::SetSample(sample));
     let set_subject =
-        builder_dispatch.apply_callback(|subject: Option<NestedObservationSubject>| {
+        builder_dispatch.apply_callback(|subject: Option<Rc<NestedObservationSubject>>| {
             ObservationActions::SetSubject(subject)
         });
     html! {
@@ -872,7 +895,7 @@ pub fn create_observation_form(props: &CreateObservationFormProp) -> Html {
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.clone().map(|picture| picture.into())} />
+            <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.as_deref().map(|picture| picture.into())} />
             <Datalist<NestedObservation, false> builder={set_parent_observation} optional={true} errors={builder_store.errors_parent_observation.clone()} value={builder_store.parent_observation.clone()} label="Parent observation" scanner={false} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedOrganism, false> builder={set_organism} optional={true} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
@@ -896,21 +919,22 @@ pub fn update_observation_form(props: &UpdateObservationFormProp) -> Html {
     let set_notes = builder_dispatch
         .apply_callback(|notes: Option<String>| ObservationActions::SetNotes(notes));
     let set_picture = builder_dispatch.apply_callback(|picture: Option<Image>| {
-        ObservationActions::SetPicture(picture.map(|picture| picture.into()))
+        ObservationActions::SetPicture(picture.map(<Vec<u8>>::from).map(Rc::from))
     });
     let set_parent_observation =
-        builder_dispatch.apply_callback(|parent_observation: Option<NestedObservation>| {
+        builder_dispatch.apply_callback(|parent_observation: Option<Rc<NestedObservation>>| {
             ObservationActions::SetParentObservation(parent_observation)
         });
-    let set_project = builder_dispatch
-        .apply_callback(|project: Option<NestedProject>| ObservationActions::SetProject(project));
-    let set_organism = builder_dispatch.apply_callback(|organism: Option<NestedOrganism>| {
+    let set_project = builder_dispatch.apply_callback(|project: Option<Rc<NestedProject>>| {
+        ObservationActions::SetProject(project)
+    });
+    let set_organism = builder_dispatch.apply_callback(|organism: Option<Rc<NestedOrganism>>| {
         ObservationActions::SetOrganism(organism)
     });
     let set_sample = builder_dispatch
-        .apply_callback(|sample: Option<NestedSample>| ObservationActions::SetSample(sample));
+        .apply_callback(|sample: Option<Rc<NestedSample>>| ObservationActions::SetSample(sample));
     let set_subject =
-        builder_dispatch.apply_callback(|subject: Option<NestedObservationSubject>| {
+        builder_dispatch.apply_callback(|subject: Option<Rc<NestedObservationSubject>>| {
             ObservationActions::SetSubject(subject)
         });
     html! {
@@ -919,7 +943,7 @@ pub fn update_observation_form(props: &UpdateObservationFormProp) -> Html {
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.clone().map(|picture| picture.into())} />
+            <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.as_deref().map(|picture| picture.into())} />
             <Datalist<NestedObservation, false> builder={set_parent_observation} optional={true} errors={builder_store.errors_parent_observation.clone()} value={builder_store.parent_observation.clone()} label="Parent observation" scanner={false} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedOrganism, false> builder={set_organism} optional={true} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
@@ -931,8 +955,8 @@ pub fn update_observation_form(props: &UpdateObservationFormProp) -> Html {
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct OrganismBioOttTaxonItemBuilder {
-    pub organism: Option<NestedOrganism>,
-    pub taxon: Option<NestedBioOttTaxonItem>,
+    pub organism: Option<Rc<NestedOrganism>>,
+    pub taxon: Option<Rc<NestedBioOttTaxonItem>>,
     pub errors_organism: Vec<ApiError>,
     pub errors_taxon: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
@@ -952,8 +976,8 @@ impl Default for OrganismBioOttTaxonItemBuilder {
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum OrganismBioOttTaxonItemActions {
-    SetOrganism(Option<NestedOrganism>),
-    SetTaxon(Option<NestedBioOttTaxonItem>),
+    SetOrganism(Option<Rc<NestedOrganism>>),
+    SetTaxon(Option<Rc<NestedBioOttTaxonItem>>),
 }
 
 impl FromOperation for OrganismBioOttTaxonItemActions {
@@ -988,7 +1012,7 @@ impl Reducer<OrganismBioOttTaxonItemBuilder> for OrganismBioOttTaxonItemActions 
                     state_mut.organism = None;
                     break 'organism;
                 }
-                state_mut.organism = organism;
+                state_mut.organism = organism.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'organism;
@@ -1002,7 +1026,7 @@ impl Reducer<OrganismBioOttTaxonItemBuilder> for OrganismBioOttTaxonItemActions 
                     state_mut.taxon = None;
                     break 'taxon;
                 }
-                state_mut.taxon = taxon;
+                state_mut.taxon = taxon.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'taxon;
@@ -1024,12 +1048,12 @@ impl FormBuilder for OrganismBioOttTaxonItemBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(OrganismBioOttTaxonItemActions::SetOrganism(Some(
-            richest_variant.organism,
-        )));
-        dispatcher.apply(OrganismBioOttTaxonItemActions::SetTaxon(Some(
-            richest_variant.taxon,
-        )));
+        dispatcher.apply(OrganismBioOttTaxonItemActions::SetOrganism(
+            Some(richest_variant.organism).map(Rc::from),
+        ));
+        dispatcher.apply(OrganismBioOttTaxonItemActions::SetTaxon(
+            Some(richest_variant.taxon).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -1092,10 +1116,10 @@ pub fn create_organism_bio_ott_taxon_item_form(
             taxon_id.into(),
         ));
     }
-    let set_organism = builder_dispatch.apply_callback(|organism: Option<NestedOrganism>| {
+    let set_organism = builder_dispatch.apply_callback(|organism: Option<Rc<NestedOrganism>>| {
         OrganismBioOttTaxonItemActions::SetOrganism(organism)
     });
-    let set_taxon = builder_dispatch.apply_callback(|taxon: Option<NestedBioOttTaxonItem>| {
+    let set_taxon = builder_dispatch.apply_callback(|taxon: Option<Rc<NestedBioOttTaxonItem>>| {
         OrganismBioOttTaxonItemActions::SetTaxon(taxon)
     });
     html! {
@@ -1112,12 +1136,12 @@ pub fn create_organism_bio_ott_taxon_item_form(
 #[store(storage = "local", storage_tab_sync)]
 pub struct OrganismBuilder {
     pub id: Option<uuid::Uuid>,
-    pub notes: Option<String>,
-    pub picture: Option<Vec<u8>>,
-    pub host_organism: Option<NestedOrganism>,
-    pub sample: Option<NestedSample>,
-    pub nameplate: Option<NestedNameplate>,
-    pub project: Option<NestedProject>,
+    pub notes: Option<Rc<String>>,
+    pub picture: Option<Rc<Vec<u8>>>,
+    pub host_organism: Option<Rc<NestedOrganism>>,
+    pub sample: Option<Rc<NestedSample>>,
+    pub nameplate: Option<Rc<NestedNameplate>>,
+    pub project: Option<Rc<NestedProject>>,
     pub errors_notes: Vec<ApiError>,
     pub errors_picture: Vec<ApiError>,
     pub errors_host_organism: Vec<ApiError>,
@@ -1151,11 +1175,11 @@ impl Default for OrganismBuilder {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum OrganismActions {
     SetNotes(Option<String>),
-    SetPicture(Option<Vec<u8>>),
-    SetHostOrganism(Option<NestedOrganism>),
-    SetSample(Option<NestedSample>),
-    SetNameplate(Option<NestedNameplate>),
-    SetProject(Option<NestedProject>),
+    SetPicture(Option<Rc<Vec<u8>>>),
+    SetHostOrganism(Option<Rc<NestedOrganism>>),
+    SetSample(Option<Rc<NestedSample>>),
+    SetNameplate(Option<Rc<NestedNameplate>>),
+    SetProject(Option<Rc<NestedProject>>),
 }
 
 impl FromOperation for OrganismActions {
@@ -1189,7 +1213,7 @@ impl Reducer<OrganismBuilder> for OrganismActions {
                         break 'notes;
                     }
                 }
-                state_mut.notes = notes;
+                state_mut.notes = notes.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'notes;
@@ -1203,7 +1227,7 @@ impl Reducer<OrganismBuilder> for OrganismActions {
                     state_mut.picture = None;
                     break 'picture;
                 }
-                state_mut.picture = picture;
+                state_mut.picture = picture.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'picture;
@@ -1227,14 +1251,14 @@ impl Reducer<OrganismBuilder> for OrganismActions {
                     }
                     None => (),
                 }
-                state_mut.host_organism = host_organism;
+                state_mut.host_organism = host_organism.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'host_organism;
             }
             OrganismActions::SetSample(sample) => 'sample: {
                 state_mut.errors_sample.clear();
-                state_mut.sample = sample;
+                state_mut.sample = sample.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'sample;
@@ -1248,7 +1272,7 @@ impl Reducer<OrganismBuilder> for OrganismActions {
                     state_mut.nameplate = None;
                     break 'nameplate;
                 }
-                state_mut.nameplate = nameplate;
+                state_mut.nameplate = nameplate.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'nameplate;
@@ -1262,7 +1286,7 @@ impl Reducer<OrganismBuilder> for OrganismActions {
                     state_mut.project = None;
                     break 'project;
                 }
-                state_mut.project = project;
+                state_mut.project = project.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'project;
@@ -1293,16 +1317,24 @@ impl FormBuilder for OrganismBuilder {
             state.id = Some(richest_variant.inner.id);
         });
         dispatcher.apply(OrganismActions::SetNotes(
-            richest_variant.inner.notes.map(|notes| notes.to_string()),
+            richest_variant
+                .inner
+                .notes
+                .as_ref()
+                .map(|notes| notes.to_string()),
         ));
-        dispatcher.apply(OrganismActions::SetPicture(Some(
-            richest_variant.inner.picture,
-        )));
-        dispatcher.apply(OrganismActions::SetSample(richest_variant.sample));
-        dispatcher.apply(OrganismActions::SetNameplate(Some(
-            richest_variant.nameplate,
-        )));
-        dispatcher.apply(OrganismActions::SetProject(Some(richest_variant.project)));
+        dispatcher.apply(OrganismActions::SetPicture(
+            Some(richest_variant.inner.as_ref().clone().picture).map(Rc::from),
+        ));
+        dispatcher.apply(OrganismActions::SetSample(
+            richest_variant.sample.map(Rc::from),
+        ));
+        dispatcher.apply(OrganismActions::SetNameplate(
+            Some(richest_variant.nameplate).map(Rc::from),
+        ));
+        dispatcher.apply(OrganismActions::SetProject(
+            Some(richest_variant.project).map(Rc::from),
+        ));
         let mut named_requests = Vec::new();
         if let Some(host_organism_id) = richest_variant.inner.host_organism_id {
             named_requests.push(ComponentMessage::get_named::<&str, Organism>(
@@ -1329,12 +1361,18 @@ impl From<OrganismBuilder> for NewOrganism {
             id: builder.id.unwrap_or_else(Uuid::new_v4),
             host_organism_id: builder
                 .host_organism
+                .as_deref()
+                .cloned()
                 .map(|host_organism| host_organism.inner.id),
-            sample_id: builder.sample.map(|sample| sample.inner.id),
-            notes: builder.notes,
-            nameplate_id: builder.nameplate.unwrap().inner.id,
-            project_id: builder.project.unwrap().inner.id,
-            picture: builder.picture.unwrap(),
+            sample_id: builder
+                .sample
+                .as_deref()
+                .cloned()
+                .map(|sample| sample.inner.id),
+            notes: builder.notes.as_deref().cloned(),
+            nameplate_id: builder.nameplate.as_deref().cloned().unwrap().inner.id,
+            project_id: builder.project.as_deref().cloned().unwrap().inner.id,
+            picture: builder.picture.as_deref().cloned().unwrap(),
         }
     }
 }
@@ -1397,26 +1435,27 @@ pub fn create_organism_form(props: &CreateOrganismFormProp) -> Html {
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| OrganismActions::SetNotes(notes));
     let set_picture = builder_dispatch.apply_callback(|picture: Option<Image>| {
-        OrganismActions::SetPicture(picture.map(|picture| picture.into()))
+        OrganismActions::SetPicture(picture.map(<Vec<u8>>::from).map(Rc::from))
     });
     let set_host_organism =
-        builder_dispatch.apply_callback(|host_organism: Option<NestedOrganism>| {
+        builder_dispatch.apply_callback(|host_organism: Option<Rc<NestedOrganism>>| {
             OrganismActions::SetHostOrganism(host_organism)
         });
     let set_sample = builder_dispatch
-        .apply_callback(|sample: Option<NestedSample>| OrganismActions::SetSample(sample));
-    let set_nameplate = builder_dispatch.apply_callback(|nameplate: Option<NestedNameplate>| {
-        OrganismActions::SetNameplate(nameplate)
-    });
+        .apply_callback(|sample: Option<Rc<NestedSample>>| OrganismActions::SetSample(sample));
+    let set_nameplate =
+        builder_dispatch.apply_callback(|nameplate: Option<Rc<NestedNameplate>>| {
+            OrganismActions::SetNameplate(nameplate)
+        });
     let set_project = builder_dispatch
-        .apply_callback(|project: Option<NestedProject>| OrganismActions::SetProject(project));
+        .apply_callback(|project: Option<Rc<NestedProject>>| OrganismActions::SetProject(project));
     html! {
         <BasicForm<NewOrganism>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.clone().map(|picture| picture.into())} />
+            <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.as_deref().map(|picture| picture.into())} />
             <Datalist<NestedOrganism, false> builder={set_host_organism} optional={true} errors={builder_store.errors_host_organism.clone()} value={builder_store.host_organism.clone()} label="Host organism" scanner={false} />
             <Datalist<NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
             <Datalist<NestedNameplate, false> builder={set_nameplate} optional={false} errors={builder_store.errors_nameplate.clone()} value={builder_store.nameplate.clone()} label="Nameplate" scanner={false} />
@@ -1439,26 +1478,27 @@ pub fn update_organism_form(props: &UpdateOrganismFormProp) -> Html {
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| OrganismActions::SetNotes(notes));
     let set_picture = builder_dispatch.apply_callback(|picture: Option<Image>| {
-        OrganismActions::SetPicture(picture.map(|picture| picture.into()))
+        OrganismActions::SetPicture(picture.map(<Vec<u8>>::from).map(Rc::from))
     });
     let set_host_organism =
-        builder_dispatch.apply_callback(|host_organism: Option<NestedOrganism>| {
+        builder_dispatch.apply_callback(|host_organism: Option<Rc<NestedOrganism>>| {
             OrganismActions::SetHostOrganism(host_organism)
         });
     let set_sample = builder_dispatch
-        .apply_callback(|sample: Option<NestedSample>| OrganismActions::SetSample(sample));
-    let set_nameplate = builder_dispatch.apply_callback(|nameplate: Option<NestedNameplate>| {
-        OrganismActions::SetNameplate(nameplate)
-    });
+        .apply_callback(|sample: Option<Rc<NestedSample>>| OrganismActions::SetSample(sample));
+    let set_nameplate =
+        builder_dispatch.apply_callback(|nameplate: Option<Rc<NestedNameplate>>| {
+            OrganismActions::SetNameplate(nameplate)
+        });
     let set_project = builder_dispatch
-        .apply_callback(|project: Option<NestedProject>| OrganismActions::SetProject(project));
+        .apply_callback(|project: Option<Rc<NestedProject>>| OrganismActions::SetProject(project));
     html! {
         <BasicForm<NewOrganism>
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.clone().map(|picture| picture.into())} />
+            <FileInput<Image> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.picture.as_deref().map(|picture| picture.into())} />
             <Datalist<NestedOrganism, false> builder={set_host_organism} optional={true} errors={builder_store.errors_host_organism.clone()} value={builder_store.host_organism.clone()} label="Host organism" scanner={false} />
             <Datalist<NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
             <Datalist<NestedNameplate, false> builder={set_nameplate} optional={false} errors={builder_store.errors_nameplate.clone()} value={builder_store.nameplate.clone()} label="Nameplate" scanner={false} />
@@ -1470,17 +1510,17 @@ pub fn update_organism_form(props: &UpdateOrganismFormProp) -> Html {
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectBuilder {
     pub id: Option<i32>,
-    pub name: Option<String>,
-    pub description: Option<String>,
+    pub name: Option<Rc<String>>,
+    pub description: Option<Rc<String>>,
     pub public: Option<bool>,
     pub budget: Option<f64>,
     pub expenses: Option<f64>,
     pub expected_end_date: Option<chrono::NaiveDateTime>,
     pub end_date: Option<chrono::NaiveDateTime>,
-    pub state: Option<NestedProjectState>,
-    pub icon: Option<FontAwesomeIcon>,
-    pub color: Option<Color>,
-    pub parent_project: Option<NestedProject>,
+    pub state: Option<Rc<NestedProjectState>>,
+    pub icon: Option<Rc<FontAwesomeIcon>>,
+    pub color: Option<Rc<Color>>,
+    pub parent_project: Option<Rc<NestedProject>>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_public: Vec<ApiError>,
@@ -1535,10 +1575,10 @@ pub(super) enum ProjectActions {
     SetExpenses(Option<String>),
     SetExpectedEndDate(Option<chrono::NaiveDateTime>),
     SetEndDate(Option<chrono::NaiveDateTime>),
-    SetState(Option<NestedProjectState>),
-    SetIcon(Option<FontAwesomeIcon>),
-    SetColor(Option<Color>),
-    SetParentProject(Option<NestedProject>),
+    SetState(Option<Rc<NestedProjectState>>),
+    SetIcon(Option<Rc<FontAwesomeIcon>>),
+    SetColor(Option<Rc<Color>>),
+    SetParentProject(Option<Rc<NestedProject>>),
 }
 
 impl FromOperation for ProjectActions {
@@ -1579,7 +1619,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                         break 'name;
                     }
                 }
-                state_mut.name = name;
+                state_mut.name = name.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'name;
@@ -1602,7 +1642,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                         break 'description;
                     }
                 }
-                state_mut.description = description;
+                state_mut.description = description.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'description;
@@ -1712,7 +1752,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     state_mut.state = None;
                     break 'state;
                 }
-                state_mut.state = state;
+                state_mut.state = state.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'state;
@@ -1726,7 +1766,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     state_mut.icon = None;
                     break 'icon;
                 }
-                state_mut.icon = icon;
+                state_mut.icon = icon.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'icon;
@@ -1740,7 +1780,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     state_mut.color = None;
                     break 'color;
                 }
-                state_mut.color = color;
+                state_mut.color = color.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'color;
@@ -1764,7 +1804,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     }
                     None => (),
                 }
-                state_mut.parent_project = parent_project;
+                state_mut.parent_project = parent_project.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'parent_project;
@@ -1812,21 +1852,29 @@ impl FormBuilder for ProjectBuilder {
             richest_variant
                 .inner
                 .budget
+                .as_ref()
                 .map(|budget| budget.to_string()),
         ));
         dispatcher.apply(ProjectActions::SetExpenses(
             richest_variant
                 .inner
                 .expenses
+                .as_ref()
                 .map(|expenses| expenses.to_string()),
         ));
         dispatcher.apply(ProjectActions::SetExpectedEndDate(
             richest_variant.inner.expected_end_date,
         ));
         dispatcher.apply(ProjectActions::SetEndDate(richest_variant.inner.end_date));
-        dispatcher.apply(ProjectActions::SetState(Some(richest_variant.state)));
-        dispatcher.apply(ProjectActions::SetIcon(Some(richest_variant.icon)));
-        dispatcher.apply(ProjectActions::SetColor(Some(richest_variant.color)));
+        dispatcher.apply(ProjectActions::SetState(
+            Some(richest_variant.state).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectActions::SetIcon(
+            Some(richest_variant.icon).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectActions::SetColor(
+            Some(richest_variant.color).map(Rc::from),
+        ));
         let mut named_requests = Vec::new();
         if let Some(parent_project_id) = richest_variant.inner.parent_project_id {
             named_requests.push(ComponentMessage::get_named::<&str, Project>(
@@ -1853,14 +1901,16 @@ impl FormBuilder for ProjectBuilder {
 impl From<ProjectBuilder> for NewProject {
     fn from(builder: ProjectBuilder) -> Self {
         Self {
-            name: builder.name.unwrap(),
-            description: builder.description.unwrap(),
+            name: builder.name.as_deref().cloned().unwrap(),
+            description: builder.description.as_deref().cloned().unwrap(),
             public: builder.public.unwrap(),
-            state_id: builder.state.unwrap().inner.id,
-            icon_id: builder.icon.unwrap().id,
-            color_id: builder.color.unwrap().id,
+            state_id: builder.state.as_deref().cloned().unwrap().inner.id,
+            icon_id: builder.icon.as_deref().cloned().unwrap().id,
+            color_id: builder.color.as_deref().cloned().unwrap().id,
             parent_project_id: builder
                 .parent_project
+                .as_deref()
+                .cloned()
                 .map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
@@ -1873,14 +1923,16 @@ impl From<ProjectBuilder> for UpdateProject {
     fn from(builder: ProjectBuilder) -> Self {
         Self {
             id: builder.id.unwrap(),
-            name: builder.name.unwrap(),
-            description: builder.description.unwrap(),
+            name: builder.name.as_deref().cloned().unwrap(),
+            description: builder.description.as_deref().cloned().unwrap(),
             public: builder.public.unwrap(),
-            state_id: builder.state.unwrap().inner.id,
-            icon_id: builder.icon.unwrap().id,
-            color_id: builder.color.unwrap().id,
+            state_id: builder.state.as_deref().cloned().unwrap().inner.id,
+            icon_id: builder.icon.as_deref().cloned().unwrap().id,
+            color_id: builder.color.as_deref().cloned().unwrap().id,
             parent_project_id: builder
                 .parent_project
+                .as_deref()
+                .cloned()
                 .map(|parent_project| parent_project.inner.id),
             budget: builder.budget,
             expenses: builder.expenses,
@@ -1974,13 +2026,13 @@ pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
             ProjectActions::SetEndDate(end_date)
         });
     let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+        .apply_callback(|state: Option<Rc<NestedProjectState>>| ProjectActions::SetState(state));
     let set_icon = builder_dispatch
-        .apply_callback(|icon: Option<FontAwesomeIcon>| ProjectActions::SetIcon(icon));
+        .apply_callback(|icon: Option<Rc<FontAwesomeIcon>>| ProjectActions::SetIcon(icon));
     let set_color =
-        builder_dispatch.apply_callback(|color: Option<Color>| ProjectActions::SetColor(color));
+        builder_dispatch.apply_callback(|color: Option<Rc<Color>>| ProjectActions::SetColor(color));
     let set_parent_project =
-        builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| {
+        builder_dispatch.apply_callback(|parent_project: Option<Rc<NestedProject>>| {
             ProjectActions::SetParentProject(parent_project)
         });
     html! {
@@ -1991,8 +2043,8 @@ pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
-            <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
-            <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
+            <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone().map(Rc::from)} />
+            <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone().map(Rc::from)} />
             <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
@@ -2031,13 +2083,13 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
             ProjectActions::SetEndDate(end_date)
         });
     let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedProjectState>| ProjectActions::SetState(state));
+        .apply_callback(|state: Option<Rc<NestedProjectState>>| ProjectActions::SetState(state));
     let set_icon = builder_dispatch
-        .apply_callback(|icon: Option<FontAwesomeIcon>| ProjectActions::SetIcon(icon));
+        .apply_callback(|icon: Option<Rc<FontAwesomeIcon>>| ProjectActions::SetIcon(icon));
     let set_color =
-        builder_dispatch.apply_callback(|color: Option<Color>| ProjectActions::SetColor(color));
+        builder_dispatch.apply_callback(|color: Option<Rc<Color>>| ProjectActions::SetColor(color));
     let set_parent_project =
-        builder_dispatch.apply_callback(|parent_project: Option<NestedProject>| {
+        builder_dispatch.apply_callback(|parent_project: Option<Rc<NestedProject>>| {
             ProjectActions::SetParentProject(parent_project)
         });
     html! {
@@ -2048,8 +2100,8 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
-            <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone()} />
-            <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone()} />
+            <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone().map(Rc::from)} />
+            <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone().map(Rc::from)} />
             <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
@@ -2060,9 +2112,9 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsTeamsRoleInvitationBuilder {
-    pub table: Option<NestedProject>,
-    pub team: Option<NestedTeam>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedProject>>,
+    pub team: Option<Rc<NestedTeam>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_team: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -2085,9 +2137,9 @@ impl Default for ProjectsTeamsRoleInvitationBuilder {
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsTeamsRoleInvitationActions {
-    SetTable(Option<NestedProject>),
-    SetTeam(Option<NestedTeam>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedProject>>),
+    SetTeam(Option<Rc<NestedTeam>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for ProjectsTeamsRoleInvitationActions {
@@ -2125,7 +2177,7 @@ impl Reducer<ProjectsTeamsRoleInvitationBuilder> for ProjectsTeamsRoleInvitation
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -2139,7 +2191,7 @@ impl Reducer<ProjectsTeamsRoleInvitationBuilder> for ProjectsTeamsRoleInvitation
                     state_mut.team = None;
                     break 'team;
                 }
-                state_mut.team = team;
+                state_mut.team = team.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'team;
@@ -2153,7 +2205,7 @@ impl Reducer<ProjectsTeamsRoleInvitationBuilder> for ProjectsTeamsRoleInvitation
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -2177,15 +2229,15 @@ impl FormBuilder for ProjectsTeamsRoleInvitationBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(ProjectsTeamsRoleInvitationActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(ProjectsTeamsRoleInvitationActions::SetTeam(Some(
-            richest_variant.team,
-        )));
-        dispatcher.apply(ProjectsTeamsRoleInvitationActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(ProjectsTeamsRoleInvitationActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsTeamsRoleInvitationActions::SetTeam(
+            Some(richest_variant.team).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsTeamsRoleInvitationActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -2199,7 +2251,7 @@ impl From<ProjectsTeamsRoleInvitationBuilder> for NewProjectsTeamsRoleInvitation
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -2253,13 +2305,13 @@ pub fn create_projects_teams_role_invitation_form(
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| {
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedProject>>| {
         ProjectsTeamsRoleInvitationActions::SetTable(table)
     });
-    let set_team = builder_dispatch.apply_callback(|team: Option<NestedTeam>| {
+    let set_team = builder_dispatch.apply_callback(|team: Option<Rc<NestedTeam>>| {
         ProjectsTeamsRoleInvitationActions::SetTeam(team)
     });
-    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| {
+    let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
         ProjectsTeamsRoleInvitationActions::SetRole(role)
     });
     html! {
@@ -2276,9 +2328,9 @@ pub fn create_projects_teams_role_invitation_form(
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsTeamsRoleRequestBuilder {
-    pub table: Option<NestedProject>,
-    pub team: Option<NestedTeam>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedProject>>,
+    pub team: Option<Rc<NestedTeam>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_team: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -2301,9 +2353,9 @@ impl Default for ProjectsTeamsRoleRequestBuilder {
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsTeamsRoleRequestActions {
-    SetTable(Option<NestedProject>),
-    SetTeam(Option<NestedTeam>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedProject>>),
+    SetTeam(Option<Rc<NestedTeam>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for ProjectsTeamsRoleRequestActions {
@@ -2341,7 +2393,7 @@ impl Reducer<ProjectsTeamsRoleRequestBuilder> for ProjectsTeamsRoleRequestAction
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -2355,7 +2407,7 @@ impl Reducer<ProjectsTeamsRoleRequestBuilder> for ProjectsTeamsRoleRequestAction
                     state_mut.team = None;
                     break 'team;
                 }
-                state_mut.team = team;
+                state_mut.team = team.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'team;
@@ -2369,7 +2421,7 @@ impl Reducer<ProjectsTeamsRoleRequestBuilder> for ProjectsTeamsRoleRequestAction
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -2393,15 +2445,15 @@ impl FormBuilder for ProjectsTeamsRoleRequestBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(ProjectsTeamsRoleRequestActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(ProjectsTeamsRoleRequestActions::SetTeam(Some(
-            richest_variant.team,
-        )));
-        dispatcher.apply(ProjectsTeamsRoleRequestActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(ProjectsTeamsRoleRequestActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsTeamsRoleRequestActions::SetTeam(
+            Some(richest_variant.team).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsTeamsRoleRequestActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -2415,7 +2467,7 @@ impl From<ProjectsTeamsRoleRequestBuilder> for NewProjectsTeamsRoleRequest {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -2469,13 +2521,15 @@ pub fn create_projects_teams_role_request_form(
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| {
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedProject>>| {
         ProjectsTeamsRoleRequestActions::SetTable(table)
     });
-    let set_team = builder_dispatch
-        .apply_callback(|team: Option<NestedTeam>| ProjectsTeamsRoleRequestActions::SetTeam(team));
-    let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| ProjectsTeamsRoleRequestActions::SetRole(role));
+    let set_team = builder_dispatch.apply_callback(|team: Option<Rc<NestedTeam>>| {
+        ProjectsTeamsRoleRequestActions::SetTeam(team)
+    });
+    let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
+        ProjectsTeamsRoleRequestActions::SetRole(role)
+    });
     html! {
         <BasicForm<NewProjectsTeamsRoleRequest>
             method={FormMethod::POST}
@@ -2490,9 +2544,9 @@ pub fn create_projects_teams_role_request_form(
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsTeamsRoleBuilder {
-    pub table: Option<NestedProject>,
-    pub team: Option<NestedTeam>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedProject>>,
+    pub team: Option<Rc<NestedTeam>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_team: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -2515,9 +2569,9 @@ impl Default for ProjectsTeamsRoleBuilder {
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsTeamsRoleActions {
-    SetTable(Option<NestedProject>),
-    SetTeam(Option<NestedTeam>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedProject>>),
+    SetTeam(Option<Rc<NestedTeam>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for ProjectsTeamsRoleActions {
@@ -2551,7 +2605,7 @@ impl Reducer<ProjectsTeamsRoleBuilder> for ProjectsTeamsRoleActions {
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -2565,7 +2619,7 @@ impl Reducer<ProjectsTeamsRoleBuilder> for ProjectsTeamsRoleActions {
                     state_mut.team = None;
                     break 'team;
                 }
-                state_mut.team = team;
+                state_mut.team = team.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'team;
@@ -2579,7 +2633,7 @@ impl Reducer<ProjectsTeamsRoleBuilder> for ProjectsTeamsRoleActions {
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -2603,15 +2657,15 @@ impl FormBuilder for ProjectsTeamsRoleBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(ProjectsTeamsRoleActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(ProjectsTeamsRoleActions::SetTeam(Some(
-            richest_variant.team,
-        )));
-        dispatcher.apply(ProjectsTeamsRoleActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(ProjectsTeamsRoleActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsTeamsRoleActions::SetTeam(
+            Some(richest_variant.team).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsTeamsRoleActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -2625,7 +2679,7 @@ impl From<ProjectsTeamsRoleBuilder> for NewProjectsTeamsRole {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -2677,12 +2731,13 @@ pub fn create_projects_teams_role_form(props: &CreateProjectsTeamsRoleFormProp) 
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch
-        .apply_callback(|table: Option<NestedProject>| ProjectsTeamsRoleActions::SetTable(table));
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedProject>>| {
+        ProjectsTeamsRoleActions::SetTable(table)
+    });
     let set_team = builder_dispatch
-        .apply_callback(|team: Option<NestedTeam>| ProjectsTeamsRoleActions::SetTeam(team));
+        .apply_callback(|team: Option<Rc<NestedTeam>>| ProjectsTeamsRoleActions::SetTeam(team));
     let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| ProjectsTeamsRoleActions::SetRole(role));
+        .apply_callback(|role: Option<Rc<NestedRole>>| ProjectsTeamsRoleActions::SetRole(role));
     html! {
         <BasicForm<NewProjectsTeamsRole>
             method={FormMethod::POST}
@@ -2697,9 +2752,9 @@ pub fn create_projects_teams_role_form(props: &CreateProjectsTeamsRoleFormProp) 
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleInvitationBuilder {
-    pub table: Option<NestedProject>,
-    pub user: Option<User>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedProject>>,
+    pub user: Option<Rc<User>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -2722,9 +2777,9 @@ impl Default for ProjectsUsersRoleInvitationBuilder {
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsUsersRoleInvitationActions {
-    SetTable(Option<NestedProject>),
-    SetUser(Option<User>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedProject>>),
+    SetUser(Option<Rc<User>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for ProjectsUsersRoleInvitationActions {
@@ -2762,7 +2817,7 @@ impl Reducer<ProjectsUsersRoleInvitationBuilder> for ProjectsUsersRoleInvitation
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -2776,7 +2831,7 @@ impl Reducer<ProjectsUsersRoleInvitationBuilder> for ProjectsUsersRoleInvitation
                     state_mut.user = None;
                     break 'user;
                 }
-                state_mut.user = user;
+                state_mut.user = user.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'user;
@@ -2790,7 +2845,7 @@ impl Reducer<ProjectsUsersRoleInvitationBuilder> for ProjectsUsersRoleInvitation
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -2814,15 +2869,15 @@ impl FormBuilder for ProjectsUsersRoleInvitationBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(ProjectsUsersRoleInvitationActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(ProjectsUsersRoleInvitationActions::SetUser(Some(
-            richest_variant.user,
-        )));
-        dispatcher.apply(ProjectsUsersRoleInvitationActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(ProjectsUsersRoleInvitationActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsUsersRoleInvitationActions::SetUser(
+            Some(richest_variant.user).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsUsersRoleInvitationActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -2836,7 +2891,7 @@ impl From<ProjectsUsersRoleInvitationBuilder> for NewProjectsUsersRoleInvitation
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -2890,12 +2945,12 @@ pub fn create_projects_users_role_invitation_form(
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| {
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedProject>>| {
         ProjectsUsersRoleInvitationActions::SetTable(table)
     });
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<User>| ProjectsUsersRoleInvitationActions::SetUser(user));
-    let set_role = builder_dispatch.apply_callback(|role: Option<NestedRole>| {
+        .apply_callback(|user: Option<Rc<User>>| ProjectsUsersRoleInvitationActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
         ProjectsUsersRoleInvitationActions::SetRole(role)
     });
     html! {
@@ -2912,9 +2967,9 @@ pub fn create_projects_users_role_invitation_form(
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleRequestBuilder {
-    pub table: Option<NestedProject>,
-    pub user: Option<User>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedProject>>,
+    pub user: Option<Rc<User>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -2937,9 +2992,9 @@ impl Default for ProjectsUsersRoleRequestBuilder {
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsUsersRoleRequestActions {
-    SetTable(Option<NestedProject>),
-    SetUser(Option<User>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedProject>>),
+    SetUser(Option<Rc<User>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for ProjectsUsersRoleRequestActions {
@@ -2977,7 +3032,7 @@ impl Reducer<ProjectsUsersRoleRequestBuilder> for ProjectsUsersRoleRequestAction
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -2991,7 +3046,7 @@ impl Reducer<ProjectsUsersRoleRequestBuilder> for ProjectsUsersRoleRequestAction
                     state_mut.user = None;
                     break 'user;
                 }
-                state_mut.user = user;
+                state_mut.user = user.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'user;
@@ -3005,7 +3060,7 @@ impl Reducer<ProjectsUsersRoleRequestBuilder> for ProjectsUsersRoleRequestAction
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -3029,15 +3084,15 @@ impl FormBuilder for ProjectsUsersRoleRequestBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(ProjectsUsersRoleRequestActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(ProjectsUsersRoleRequestActions::SetUser(Some(
-            richest_variant.user,
-        )));
-        dispatcher.apply(ProjectsUsersRoleRequestActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(ProjectsUsersRoleRequestActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsUsersRoleRequestActions::SetUser(
+            Some(richest_variant.user).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsUsersRoleRequestActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -3051,7 +3106,7 @@ impl From<ProjectsUsersRoleRequestBuilder> for NewProjectsUsersRoleRequest {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -3105,13 +3160,14 @@ pub fn create_projects_users_role_request_form(
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch.apply_callback(|table: Option<NestedProject>| {
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedProject>>| {
         ProjectsUsersRoleRequestActions::SetTable(table)
     });
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<User>| ProjectsUsersRoleRequestActions::SetUser(user));
-    let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| ProjectsUsersRoleRequestActions::SetRole(role));
+        .apply_callback(|user: Option<Rc<User>>| ProjectsUsersRoleRequestActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
+        ProjectsUsersRoleRequestActions::SetRole(role)
+    });
     html! {
         <BasicForm<NewProjectsUsersRoleRequest>
             method={FormMethod::POST}
@@ -3126,9 +3182,9 @@ pub fn create_projects_users_role_request_form(
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleBuilder {
-    pub table: Option<NestedProject>,
-    pub user: Option<User>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedProject>>,
+    pub user: Option<Rc<User>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -3151,9 +3207,9 @@ impl Default for ProjectsUsersRoleBuilder {
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsUsersRoleActions {
-    SetTable(Option<NestedProject>),
-    SetUser(Option<User>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedProject>>),
+    SetUser(Option<Rc<User>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for ProjectsUsersRoleActions {
@@ -3187,7 +3243,7 @@ impl Reducer<ProjectsUsersRoleBuilder> for ProjectsUsersRoleActions {
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -3201,7 +3257,7 @@ impl Reducer<ProjectsUsersRoleBuilder> for ProjectsUsersRoleActions {
                     state_mut.user = None;
                     break 'user;
                 }
-                state_mut.user = user;
+                state_mut.user = user.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'user;
@@ -3215,7 +3271,7 @@ impl Reducer<ProjectsUsersRoleBuilder> for ProjectsUsersRoleActions {
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -3239,15 +3295,15 @@ impl FormBuilder for ProjectsUsersRoleBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(ProjectsUsersRoleActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(ProjectsUsersRoleActions::SetUser(Some(
-            richest_variant.user,
-        )));
-        dispatcher.apply(ProjectsUsersRoleActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(ProjectsUsersRoleActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsUsersRoleActions::SetUser(
+            Some(richest_variant.user).map(Rc::from),
+        ));
+        dispatcher.apply(ProjectsUsersRoleActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -3261,7 +3317,7 @@ impl From<ProjectsUsersRoleBuilder> for NewProjectsUsersRole {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -3313,12 +3369,13 @@ pub fn create_projects_users_role_form(props: &CreateProjectsUsersRoleFormProp) 
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch
-        .apply_callback(|table: Option<NestedProject>| ProjectsUsersRoleActions::SetTable(table));
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedProject>>| {
+        ProjectsUsersRoleActions::SetTable(table)
+    });
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<User>| ProjectsUsersRoleActions::SetUser(user));
+        .apply_callback(|user: Option<Rc<User>>| ProjectsUsersRoleActions::SetUser(user));
     let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| ProjectsUsersRoleActions::SetRole(role));
+        .apply_callback(|role: Option<Rc<NestedRole>>| ProjectsUsersRoleActions::SetRole(role));
     html! {
         <BasicForm<NewProjectsUsersRole>
             method={FormMethod::POST}
@@ -3333,8 +3390,8 @@ pub fn create_projects_users_role_form(props: &CreateProjectsUsersRoleFormProp) 
 #[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBioOttTaxonItemBuilder {
-    pub sample: Option<NestedSample>,
-    pub taxon: Option<NestedBioOttTaxonItem>,
+    pub sample: Option<Rc<NestedSample>>,
+    pub taxon: Option<Rc<NestedBioOttTaxonItem>>,
     pub errors_sample: Vec<ApiError>,
     pub errors_taxon: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
@@ -3354,8 +3411,8 @@ impl Default for SampleBioOttTaxonItemBuilder {
 
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleBioOttTaxonItemActions {
-    SetSample(Option<NestedSample>),
-    SetTaxon(Option<NestedBioOttTaxonItem>),
+    SetSample(Option<Rc<NestedSample>>),
+    SetTaxon(Option<Rc<NestedBioOttTaxonItem>>),
 }
 
 impl FromOperation for SampleBioOttTaxonItemActions {
@@ -3390,7 +3447,7 @@ impl Reducer<SampleBioOttTaxonItemBuilder> for SampleBioOttTaxonItemActions {
                     state_mut.sample = None;
                     break 'sample;
                 }
-                state_mut.sample = sample;
+                state_mut.sample = sample.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'sample;
@@ -3404,7 +3461,7 @@ impl Reducer<SampleBioOttTaxonItemBuilder> for SampleBioOttTaxonItemActions {
                     state_mut.taxon = None;
                     break 'taxon;
                 }
-                state_mut.taxon = taxon;
+                state_mut.taxon = taxon.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'taxon;
@@ -3426,12 +3483,12 @@ impl FormBuilder for SampleBioOttTaxonItemBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(SampleBioOttTaxonItemActions::SetSample(Some(
-            richest_variant.sample,
-        )));
-        dispatcher.apply(SampleBioOttTaxonItemActions::SetTaxon(Some(
-            richest_variant.taxon,
-        )));
+        dispatcher.apply(SampleBioOttTaxonItemActions::SetSample(
+            Some(richest_variant.sample).map(Rc::from),
+        ));
+        dispatcher.apply(SampleBioOttTaxonItemActions::SetTaxon(
+            Some(richest_variant.taxon).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -3492,10 +3549,10 @@ pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItem
             taxon_id.into(),
         ));
     }
-    let set_sample = builder_dispatch.apply_callback(|sample: Option<NestedSample>| {
+    let set_sample = builder_dispatch.apply_callback(|sample: Option<Rc<NestedSample>>| {
         SampleBioOttTaxonItemActions::SetSample(sample)
     });
-    let set_taxon = builder_dispatch.apply_callback(|taxon: Option<NestedBioOttTaxonItem>| {
+    let set_taxon = builder_dispatch.apply_callback(|taxon: Option<Rc<NestedBioOttTaxonItem>>| {
         SampleBioOttTaxonItemActions::SetTaxon(taxon)
     });
     html! {
@@ -3512,9 +3569,9 @@ pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItem
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleContainerBuilder {
     pub id: Option<i32>,
-    pub barcode: Option<String>,
-    pub project: Option<NestedProject>,
-    pub category: Option<NestedSampleContainerCategory>,
+    pub barcode: Option<Rc<String>>,
+    pub project: Option<Rc<NestedProject>>,
+    pub category: Option<Rc<NestedSampleContainerCategory>>,
     pub errors_barcode: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
     pub errors_category: Vec<ApiError>,
@@ -3539,8 +3596,8 @@ impl Default for SampleContainerBuilder {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleContainerActions {
     SetBarcode(Option<String>),
-    SetProject(Option<NestedProject>),
-    SetCategory(Option<NestedSampleContainerCategory>),
+    SetProject(Option<Rc<NestedProject>>),
+    SetCategory(Option<Rc<NestedSampleContainerCategory>>),
 }
 
 impl FromOperation for SampleContainerActions {
@@ -3584,7 +3641,7 @@ impl Reducer<SampleContainerBuilder> for SampleContainerActions {
                         break 'barcode;
                     }
                 }
-                state_mut.barcode = barcode;
+                state_mut.barcode = barcode.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'barcode;
@@ -3598,7 +3655,7 @@ impl Reducer<SampleContainerBuilder> for SampleContainerActions {
                     state_mut.project = None;
                     break 'project;
                 }
-                state_mut.project = project;
+                state_mut.project = project.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'project;
@@ -3612,7 +3669,7 @@ impl Reducer<SampleContainerBuilder> for SampleContainerActions {
                     state_mut.category = None;
                     break 'category;
                 }
-                state_mut.category = category;
+                state_mut.category = category.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'category;
@@ -3642,12 +3699,12 @@ impl FormBuilder for SampleContainerBuilder {
         dispatcher.apply(SampleContainerActions::SetBarcode(Some(
             richest_variant.inner.barcode.to_string(),
         )));
-        dispatcher.apply(SampleContainerActions::SetProject(Some(
-            richest_variant.project,
-        )));
-        dispatcher.apply(SampleContainerActions::SetCategory(Some(
-            richest_variant.category,
-        )));
+        dispatcher.apply(SampleContainerActions::SetProject(
+            Some(richest_variant.project).map(Rc::from),
+        ));
+        dispatcher.apply(SampleContainerActions::SetCategory(
+            Some(richest_variant.category).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -3662,9 +3719,9 @@ impl FormBuilder for SampleContainerBuilder {
 impl From<SampleContainerBuilder> for NewSampleContainer {
     fn from(builder: SampleContainerBuilder) -> Self {
         Self {
-            barcode: builder.barcode.unwrap(),
-            project_id: builder.project.unwrap().inner.id,
-            category_id: builder.category.unwrap().inner.id,
+            barcode: builder.barcode.as_deref().cloned().unwrap(),
+            project_id: builder.project.as_deref().cloned().unwrap().inner.id,
+            category_id: builder.category.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -3672,9 +3729,9 @@ impl From<SampleContainerBuilder> for UpdateSampleContainer {
     fn from(builder: SampleContainerBuilder) -> Self {
         Self {
             id: builder.id.unwrap(),
-            barcode: builder.barcode.unwrap(),
-            project_id: builder.project.unwrap().inner.id,
-            category_id: builder.category.unwrap().inner.id,
+            barcode: builder.barcode.as_deref().cloned().unwrap(),
+            project_id: builder.project.as_deref().cloned().unwrap().inner.id,
+            category_id: builder.category.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -3736,11 +3793,11 @@ pub fn create_sample_container_form(props: &CreateSampleContainerFormProp) -> Ht
     );
     let set_barcode = builder_dispatch
         .apply_callback(|barcode: Option<String>| SampleContainerActions::SetBarcode(barcode));
-    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| {
+    let set_project = builder_dispatch.apply_callback(|project: Option<Rc<NestedProject>>| {
         SampleContainerActions::SetProject(project)
     });
     let set_category =
-        builder_dispatch.apply_callback(|category: Option<NestedSampleContainerCategory>| {
+        builder_dispatch.apply_callback(|category: Option<Rc<NestedSampleContainerCategory>>| {
             SampleContainerActions::SetCategory(category)
         });
     html! {
@@ -3748,7 +3805,7 @@ pub fn create_sample_container_form(props: &CreateSampleContainerFormProp) -> Ht
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone().map(BarCode::from)} />
+            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.as_deref().cloned().map(BarCode::from).map(Rc::from)} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<NewSampleContainer>>
@@ -3770,11 +3827,11 @@ pub fn update_sample_container_form(props: &UpdateSampleContainerFormProp) -> Ht
     ));
     let set_barcode = builder_dispatch
         .apply_callback(|barcode: Option<String>| SampleContainerActions::SetBarcode(barcode));
-    let set_project = builder_dispatch.apply_callback(|project: Option<NestedProject>| {
+    let set_project = builder_dispatch.apply_callback(|project: Option<Rc<NestedProject>>| {
         SampleContainerActions::SetProject(project)
     });
     let set_category =
-        builder_dispatch.apply_callback(|category: Option<NestedSampleContainerCategory>| {
+        builder_dispatch.apply_callback(|category: Option<Rc<NestedSampleContainerCategory>>| {
             SampleContainerActions::SetCategory(category)
         });
     html! {
@@ -3782,7 +3839,7 @@ pub fn update_sample_container_form(props: &UpdateSampleContainerFormProp) -> Ht
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.clone().map(BarCode::from)} />
+            <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.as_deref().cloned().map(BarCode::from).map(Rc::from)} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
             <Datalist<NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<UpdateSampleContainer>>
@@ -3792,11 +3849,11 @@ pub fn update_sample_container_form(props: &UpdateSampleContainerFormProp) -> Ht
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBuilder {
     pub id: Option<uuid::Uuid>,
-    pub notes: Option<String>,
-    pub container: Option<NestedSampleContainer>,
-    pub project: Option<NestedProject>,
-    pub sampled_by: Option<User>,
-    pub state: Option<NestedSampleState>,
+    pub notes: Option<Rc<String>>,
+    pub container: Option<Rc<NestedSampleContainer>>,
+    pub project: Option<Rc<NestedProject>>,
+    pub sampled_by: Option<Rc<User>>,
+    pub state: Option<Rc<NestedSampleState>>,
     pub errors_notes: Vec<ApiError>,
     pub errors_container: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
@@ -3827,10 +3884,10 @@ impl Default for SampleBuilder {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleActions {
     SetNotes(Option<String>),
-    SetContainer(Option<NestedSampleContainer>),
-    SetProject(Option<NestedProject>),
-    SetSampledBy(Option<User>),
-    SetState(Option<NestedSampleState>),
+    SetContainer(Option<Rc<NestedSampleContainer>>),
+    SetProject(Option<Rc<NestedProject>>),
+    SetSampledBy(Option<Rc<User>>),
+    SetState(Option<Rc<NestedSampleState>>),
 }
 
 impl FromOperation for SampleActions {
@@ -3862,7 +3919,7 @@ impl Reducer<SampleBuilder> for SampleActions {
                         break 'notes;
                     }
                 }
-                state_mut.notes = notes;
+                state_mut.notes = notes.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'notes;
@@ -3876,7 +3933,7 @@ impl Reducer<SampleBuilder> for SampleActions {
                     state_mut.container = None;
                     break 'container;
                 }
-                state_mut.container = container;
+                state_mut.container = container.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'container;
@@ -3890,7 +3947,7 @@ impl Reducer<SampleBuilder> for SampleActions {
                     state_mut.project = None;
                     break 'project;
                 }
-                state_mut.project = project;
+                state_mut.project = project.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'project;
@@ -3904,7 +3961,7 @@ impl Reducer<SampleBuilder> for SampleActions {
                     state_mut.sampled_by = None;
                     break 'sampled_by;
                 }
-                state_mut.sampled_by = sampled_by;
+                state_mut.sampled_by = sampled_by.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'sampled_by;
@@ -3918,7 +3975,7 @@ impl Reducer<SampleBuilder> for SampleActions {
                     state_mut.state = None;
                     break 'state;
                 }
-                state_mut.state = state;
+                state_mut.state = state.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'state;
@@ -3948,14 +4005,24 @@ impl FormBuilder for SampleBuilder {
             state.id = Some(richest_variant.inner.id);
         });
         dispatcher.apply(SampleActions::SetNotes(
-            richest_variant.inner.notes.map(|notes| notes.to_string()),
+            richest_variant
+                .inner
+                .notes
+                .as_ref()
+                .map(|notes| notes.to_string()),
         ));
-        dispatcher.apply(SampleActions::SetContainer(Some(richest_variant.container)));
-        dispatcher.apply(SampleActions::SetProject(Some(richest_variant.project)));
-        dispatcher.apply(SampleActions::SetSampledBy(Some(
-            richest_variant.sampled_by,
-        )));
-        dispatcher.apply(SampleActions::SetState(Some(richest_variant.state)));
+        dispatcher.apply(SampleActions::SetContainer(
+            Some(richest_variant.container).map(Rc::from),
+        ));
+        dispatcher.apply(SampleActions::SetProject(
+            Some(richest_variant.project).map(Rc::from),
+        ));
+        dispatcher.apply(SampleActions::SetSampledBy(
+            Some(richest_variant.sampled_by).map(Rc::from),
+        ));
+        dispatcher.apply(SampleActions::SetState(
+            Some(richest_variant.state).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -3972,11 +4039,11 @@ impl From<SampleBuilder> for NewSample {
     fn from(builder: SampleBuilder) -> Self {
         Self {
             id: builder.id.unwrap_or_else(Uuid::new_v4),
-            container_id: builder.container.unwrap().inner.id,
-            notes: builder.notes,
-            project_id: builder.project.unwrap().inner.id,
-            sampled_by: builder.sampled_by.unwrap().id,
-            state_id: builder.state.unwrap().inner.id,
+            container_id: builder.container.as_deref().cloned().unwrap().inner.id,
+            notes: builder.notes.as_deref().cloned(),
+            project_id: builder.project.as_deref().cloned().unwrap().inner.id,
+            sampled_by: builder.sampled_by.as_deref().cloned().unwrap().id,
+            state_id: builder.state.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -4031,7 +4098,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
             sampled_by.into(),
         ));
     } else if let Some(user) = user_state.as_ref().user() {
-        builder_dispatch.apply(SampleActions::SetSampledBy(Some(user.as_ref().clone())));
+        builder_dispatch.apply(SampleActions::SetSampledBy(Some(user)));
     }
     named_requests.push(ComponentMessage::get_named::<&str, SampleState>(
         "state",
@@ -4040,15 +4107,15 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
     let set_container =
-        builder_dispatch.apply_callback(|container: Option<NestedSampleContainer>| {
+        builder_dispatch.apply_callback(|container: Option<Rc<NestedSampleContainer>>| {
             SampleActions::SetContainer(container)
         });
     let set_project = builder_dispatch
-        .apply_callback(|project: Option<NestedProject>| SampleActions::SetProject(project));
+        .apply_callback(|project: Option<Rc<NestedProject>>| SampleActions::SetProject(project));
     let set_sampled_by = builder_dispatch
-        .apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
+        .apply_callback(|sampled_by: Option<Rc<User>>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
+        .apply_callback(|state: Option<Rc<NestedSampleState>>| SampleActions::SetState(state));
     html! {
         <BasicForm<NewSample>
             method={FormMethod::POST}
@@ -4077,15 +4144,15 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
     let set_container =
-        builder_dispatch.apply_callback(|container: Option<NestedSampleContainer>| {
+        builder_dispatch.apply_callback(|container: Option<Rc<NestedSampleContainer>>| {
             SampleActions::SetContainer(container)
         });
     let set_project = builder_dispatch
-        .apply_callback(|project: Option<NestedProject>| SampleActions::SetProject(project));
+        .apply_callback(|project: Option<Rc<NestedProject>>| SampleActions::SetProject(project));
     let set_sampled_by = builder_dispatch
-        .apply_callback(|sampled_by: Option<User>| SampleActions::SetSampledBy(sampled_by));
+        .apply_callback(|sampled_by: Option<Rc<User>>| SampleActions::SetSampledBy(sampled_by));
     let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedSampleState>| SampleActions::SetState(state));
+        .apply_callback(|state: Option<Rc<NestedSampleState>>| SampleActions::SetState(state));
     html! {
         <BasicForm<NewSample>
             method={FormMethod::PUT}
@@ -4103,8 +4170,8 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
 #[store(storage = "local", storage_tab_sync)]
 pub struct SpectraBuilder {
     pub id: Option<i32>,
-    pub notes: Option<String>,
-    pub spectra_collection: Option<NestedSpectraCollection>,
+    pub notes: Option<Rc<String>>,
+    pub spectra_collection: Option<Rc<NestedSpectraCollection>>,
     pub errors_notes: Vec<ApiError>,
     pub errors_spectra_collection: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
@@ -4126,7 +4193,7 @@ impl Default for SpectraBuilder {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SpectraActions {
     SetNotes(Option<String>),
-    SetSpectraCollection(Option<NestedSpectraCollection>),
+    SetSpectraCollection(Option<Rc<NestedSpectraCollection>>),
 }
 
 impl FromOperation for SpectraActions {
@@ -4157,7 +4224,7 @@ impl Reducer<SpectraBuilder> for SpectraActions {
                         break 'notes;
                     }
                 }
-                state_mut.notes = notes;
+                state_mut.notes = notes.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'notes;
@@ -4173,7 +4240,7 @@ impl Reducer<SpectraBuilder> for SpectraActions {
                     state_mut.spectra_collection = None;
                     break 'spectra_collection;
                 }
-                state_mut.spectra_collection = spectra_collection;
+                state_mut.spectra_collection = spectra_collection.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'spectra_collection;
@@ -4199,11 +4266,15 @@ impl FormBuilder for SpectraBuilder {
             state.id = Some(richest_variant.inner.id);
         });
         dispatcher.apply(SpectraActions::SetNotes(
-            richest_variant.inner.notes.map(|notes| notes.to_string()),
+            richest_variant
+                .inner
+                .notes
+                .as_ref()
+                .map(|notes| notes.to_string()),
         ));
-        dispatcher.apply(SpectraActions::SetSpectraCollection(Some(
-            richest_variant.spectra_collection,
-        )));
+        dispatcher.apply(SpectraActions::SetSpectraCollection(
+            Some(richest_variant.spectra_collection).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -4215,8 +4286,14 @@ impl FormBuilder for SpectraBuilder {
 impl From<SpectraBuilder> for NewSpectra {
     fn from(builder: SpectraBuilder) -> Self {
         Self {
-            notes: builder.notes,
-            spectra_collection_id: builder.spectra_collection.unwrap().inner.id,
+            notes: builder.notes.as_deref().cloned(),
+            spectra_collection_id: builder
+                .spectra_collection
+                .as_deref()
+                .cloned()
+                .unwrap()
+                .inner
+                .id,
         }
     }
 }
@@ -4224,8 +4301,14 @@ impl From<SpectraBuilder> for UpdateSpectra {
     fn from(builder: SpectraBuilder) -> Self {
         Self {
             id: builder.id.unwrap(),
-            notes: builder.notes,
-            spectra_collection_id: builder.spectra_collection.unwrap().inner.id,
+            notes: builder.notes.as_deref().cloned(),
+            spectra_collection_id: builder
+                .spectra_collection
+                .as_deref()
+                .cloned()
+                .unwrap()
+                .inner
+                .id,
         }
     }
 }
@@ -4279,10 +4362,11 @@ pub fn create_spectra_form(props: &CreateSpectraFormProp) -> Html {
     }
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| SpectraActions::SetNotes(notes));
-    let set_spectra_collection =
-        builder_dispatch.apply_callback(|spectra_collection: Option<NestedSpectraCollection>| {
+    let set_spectra_collection = builder_dispatch.apply_callback(
+        |spectra_collection: Option<Rc<NestedSpectraCollection>>| {
             SpectraActions::SetSpectraCollection(spectra_collection)
-        });
+        },
+    );
     html! {
         <BasicForm<NewSpectra>
             method={FormMethod::POST}
@@ -4307,10 +4391,11 @@ pub fn update_spectra_form(props: &UpdateSpectraFormProp) -> Html {
     named_requests.push(ComponentMessage::get::<UpdateSpectra>(props.id.into()));
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| SpectraActions::SetNotes(notes));
-    let set_spectra_collection =
-        builder_dispatch.apply_callback(|spectra_collection: Option<NestedSpectraCollection>| {
+    let set_spectra_collection = builder_dispatch.apply_callback(
+        |spectra_collection: Option<Rc<NestedSpectraCollection>>| {
             SpectraActions::SetSpectraCollection(spectra_collection)
-        });
+        },
+    );
     html! {
         <BasicForm<UpdateSpectra>
             method={FormMethod::PUT}
@@ -4325,8 +4410,8 @@ pub fn update_spectra_form(props: &UpdateSpectraFormProp) -> Html {
 #[store(storage = "local", storage_tab_sync)]
 pub struct SpectraCollectionBuilder {
     pub id: Option<i32>,
-    pub notes: Option<String>,
-    pub sample: Option<NestedSample>,
+    pub notes: Option<Rc<String>>,
+    pub sample: Option<Rc<NestedSample>>,
     pub errors_notes: Vec<ApiError>,
     pub errors_sample: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
@@ -4348,7 +4433,7 @@ impl Default for SpectraCollectionBuilder {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SpectraCollectionActions {
     SetNotes(Option<String>),
-    SetSample(Option<NestedSample>),
+    SetSample(Option<Rc<NestedSample>>),
 }
 
 impl FromOperation for SpectraCollectionActions {
@@ -4382,7 +4467,7 @@ impl Reducer<SpectraCollectionBuilder> for SpectraCollectionActions {
                         break 'notes;
                     }
                 }
-                state_mut.notes = notes;
+                state_mut.notes = notes.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'notes;
@@ -4396,7 +4481,7 @@ impl Reducer<SpectraCollectionBuilder> for SpectraCollectionActions {
                     state_mut.sample = None;
                     break 'sample;
                 }
-                state_mut.sample = sample;
+                state_mut.sample = sample.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'sample;
@@ -4422,11 +4507,15 @@ impl FormBuilder for SpectraCollectionBuilder {
             state.id = Some(richest_variant.inner.id);
         });
         dispatcher.apply(SpectraCollectionActions::SetNotes(
-            richest_variant.inner.notes.map(|notes| notes.to_string()),
+            richest_variant
+                .inner
+                .notes
+                .as_ref()
+                .map(|notes| notes.to_string()),
         ));
-        dispatcher.apply(SpectraCollectionActions::SetSample(Some(
-            richest_variant.sample,
-        )));
+        dispatcher.apply(SpectraCollectionActions::SetSample(
+            Some(richest_variant.sample).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -4438,8 +4527,8 @@ impl FormBuilder for SpectraCollectionBuilder {
 impl From<SpectraCollectionBuilder> for NewSpectraCollection {
     fn from(builder: SpectraCollectionBuilder) -> Self {
         Self {
-            notes: builder.notes,
-            sample_id: builder.sample.unwrap().inner.id,
+            notes: builder.notes.as_deref().cloned(),
+            sample_id: builder.sample.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -4447,8 +4536,8 @@ impl From<SpectraCollectionBuilder> for UpdateSpectraCollection {
     fn from(builder: SpectraCollectionBuilder) -> Self {
         Self {
             id: builder.id.unwrap(),
-            notes: builder.notes,
-            sample_id: builder.sample.unwrap().inner.id,
+            notes: builder.notes.as_deref().cloned(),
+            sample_id: builder.sample.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -4502,8 +4591,9 @@ pub fn create_spectra_collection_form(props: &CreateSpectraCollectionFormProp) -
     }
     let set_notes = builder_dispatch
         .apply_callback(|notes: Option<String>| SpectraCollectionActions::SetNotes(notes));
-    let set_sample = builder_dispatch
-        .apply_callback(|sample: Option<NestedSample>| SpectraCollectionActions::SetSample(sample));
+    let set_sample = builder_dispatch.apply_callback(|sample: Option<Rc<NestedSample>>| {
+        SpectraCollectionActions::SetSample(sample)
+    });
     html! {
         <BasicForm<NewSpectraCollection>
             method={FormMethod::POST}
@@ -4530,8 +4620,9 @@ pub fn update_spectra_collection_form(props: &UpdateSpectraCollectionFormProp) -
     ));
     let set_notes = builder_dispatch
         .apply_callback(|notes: Option<String>| SpectraCollectionActions::SetNotes(notes));
-    let set_sample = builder_dispatch
-        .apply_callback(|sample: Option<NestedSample>| SpectraCollectionActions::SetSample(sample));
+    let set_sample = builder_dispatch.apply_callback(|sample: Option<Rc<NestedSample>>| {
+        SpectraCollectionActions::SetSample(sample)
+    });
     html! {
         <BasicForm<UpdateSpectraCollection>
             method={FormMethod::PUT}
@@ -4546,12 +4637,12 @@ pub fn update_spectra_collection_form(props: &UpdateSpectraCollectionFormProp) -
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamBuilder {
     pub id: Option<i32>,
-    pub name: Option<String>,
-    pub description: Option<String>,
-    pub icon: Option<FontAwesomeIcon>,
-    pub color: Option<Color>,
-    pub state: Option<NestedTeamState>,
-    pub parent_team: Option<NestedTeam>,
+    pub name: Option<Rc<String>>,
+    pub description: Option<Rc<String>>,
+    pub icon: Option<Rc<FontAwesomeIcon>>,
+    pub color: Option<Rc<Color>>,
+    pub state: Option<Rc<NestedTeamState>>,
+    pub parent_team: Option<Rc<NestedTeam>>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_icon: Vec<ApiError>,
@@ -4586,10 +4677,10 @@ impl Default for TeamBuilder {
 pub(super) enum TeamActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
-    SetIcon(Option<FontAwesomeIcon>),
-    SetColor(Option<Color>),
-    SetState(Option<NestedTeamState>),
-    SetParentTeam(Option<NestedTeam>),
+    SetIcon(Option<Rc<FontAwesomeIcon>>),
+    SetColor(Option<Rc<Color>>),
+    SetState(Option<Rc<NestedTeamState>>),
+    SetParentTeam(Option<Rc<NestedTeam>>),
 }
 
 impl FromOperation for TeamActions {
@@ -4628,7 +4719,7 @@ impl Reducer<TeamBuilder> for TeamActions {
                         break 'name;
                     }
                 }
-                state_mut.name = name;
+                state_mut.name = name.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'name;
@@ -4651,7 +4742,7 @@ impl Reducer<TeamBuilder> for TeamActions {
                         break 'description;
                     }
                 }
-                state_mut.description = description;
+                state_mut.description = description.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'description;
@@ -4665,7 +4756,7 @@ impl Reducer<TeamBuilder> for TeamActions {
                     state_mut.icon = None;
                     break 'icon;
                 }
-                state_mut.icon = icon;
+                state_mut.icon = icon.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'icon;
@@ -4679,7 +4770,7 @@ impl Reducer<TeamBuilder> for TeamActions {
                     state_mut.color = None;
                     break 'color;
                 }
-                state_mut.color = color;
+                state_mut.color = color.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'color;
@@ -4693,7 +4784,7 @@ impl Reducer<TeamBuilder> for TeamActions {
                     state_mut.state = None;
                     break 'state;
                 }
-                state_mut.state = state;
+                state_mut.state = state.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'state;
@@ -4712,7 +4803,7 @@ impl Reducer<TeamBuilder> for TeamActions {
                     }
                     None => (),
                 }
-                state_mut.parent_team = parent_team;
+                state_mut.parent_team = parent_team.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'parent_team;
@@ -4748,9 +4839,15 @@ impl FormBuilder for TeamBuilder {
         dispatcher.apply(TeamActions::SetDescription(Some(
             richest_variant.inner.description.to_string(),
         )));
-        dispatcher.apply(TeamActions::SetIcon(Some(richest_variant.icon)));
-        dispatcher.apply(TeamActions::SetColor(Some(richest_variant.color)));
-        dispatcher.apply(TeamActions::SetState(Some(richest_variant.state)));
+        dispatcher.apply(TeamActions::SetIcon(
+            Some(richest_variant.icon).map(Rc::from),
+        ));
+        dispatcher.apply(TeamActions::SetColor(
+            Some(richest_variant.color).map(Rc::from),
+        ));
+        dispatcher.apply(TeamActions::SetState(
+            Some(richest_variant.state).map(Rc::from),
+        ));
         let mut named_requests = Vec::new();
         if let Some(parent_team_id) = richest_variant.inner.parent_team_id {
             named_requests.push(ComponentMessage::get_named::<&str, Team>(
@@ -4776,12 +4873,16 @@ impl FormBuilder for TeamBuilder {
 impl From<TeamBuilder> for NewTeam {
     fn from(builder: TeamBuilder) -> Self {
         Self {
-            name: builder.name.unwrap(),
-            description: builder.description.unwrap(),
-            icon_id: builder.icon.unwrap().id,
-            color_id: builder.color.unwrap().id,
-            state_id: builder.state.unwrap().inner.id,
-            parent_team_id: builder.parent_team.map(|parent_team| parent_team.inner.id),
+            name: builder.name.as_deref().cloned().unwrap(),
+            description: builder.description.as_deref().cloned().unwrap(),
+            icon_id: builder.icon.as_deref().cloned().unwrap().id,
+            color_id: builder.color.as_deref().cloned().unwrap().id,
+            state_id: builder.state.as_deref().cloned().unwrap().inner.id,
+            parent_team_id: builder
+                .parent_team
+                .as_deref()
+                .cloned()
+                .map(|parent_team| parent_team.inner.id),
         }
     }
 }
@@ -4789,12 +4890,16 @@ impl From<TeamBuilder> for UpdateTeam {
     fn from(builder: TeamBuilder) -> Self {
         Self {
             id: builder.id.unwrap(),
-            name: builder.name.unwrap(),
-            description: builder.description.unwrap(),
-            icon_id: builder.icon.unwrap().id,
-            color_id: builder.color.unwrap().id,
-            state_id: builder.state.unwrap().inner.id,
-            parent_team_id: builder.parent_team.map(|parent_team| parent_team.inner.id),
+            name: builder.name.as_deref().cloned().unwrap(),
+            description: builder.description.as_deref().cloned().unwrap(),
+            icon_id: builder.icon.as_deref().cloned().unwrap().id,
+            color_id: builder.color.as_deref().cloned().unwrap().id,
+            state_id: builder.state.as_deref().cloned().unwrap().inner.id,
+            parent_team_id: builder
+                .parent_team
+                .as_deref()
+                .cloned()
+                .map(|parent_team| parent_team.inner.id),
         }
     }
 }
@@ -4868,14 +4973,15 @@ pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
         builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch
         .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_icon =
-        builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
+    let set_icon = builder_dispatch
+        .apply_callback(|icon: Option<Rc<FontAwesomeIcon>>| TeamActions::SetIcon(icon));
     let set_color =
-        builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
+        builder_dispatch.apply_callback(|color: Option<Rc<Color>>| TeamActions::SetColor(color));
     let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedTeamState>| TeamActions::SetState(state));
-    let set_parent_team = builder_dispatch
-        .apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+        .apply_callback(|state: Option<Rc<NestedTeamState>>| TeamActions::SetState(state));
+    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<Rc<NestedTeam>>| {
+        TeamActions::SetParentTeam(parent_team)
+    });
     html! {
         <BasicForm<NewTeam>
             method={FormMethod::POST}
@@ -4906,14 +5012,15 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
         builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch
         .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_icon =
-        builder_dispatch.apply_callback(|icon: Option<FontAwesomeIcon>| TeamActions::SetIcon(icon));
+    let set_icon = builder_dispatch
+        .apply_callback(|icon: Option<Rc<FontAwesomeIcon>>| TeamActions::SetIcon(icon));
     let set_color =
-        builder_dispatch.apply_callback(|color: Option<Color>| TeamActions::SetColor(color));
+        builder_dispatch.apply_callback(|color: Option<Rc<Color>>| TeamActions::SetColor(color));
     let set_state = builder_dispatch
-        .apply_callback(|state: Option<NestedTeamState>| TeamActions::SetState(state));
-    let set_parent_team = builder_dispatch
-        .apply_callback(|parent_team: Option<NestedTeam>| TeamActions::SetParentTeam(parent_team));
+        .apply_callback(|state: Option<Rc<NestedTeamState>>| TeamActions::SetState(state));
+    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<Rc<NestedTeam>>| {
+        TeamActions::SetParentTeam(parent_team)
+    });
     html! {
         <BasicForm<UpdateTeam>
             method={FormMethod::PUT}
@@ -4931,9 +5038,9 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamsTeamsRoleInvitationBuilder {
-    pub table: Option<NestedTeam>,
-    pub team: Option<NestedTeam>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedTeam>>,
+    pub team: Option<Rc<NestedTeam>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_team: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -4956,9 +5063,9 @@ impl Default for TeamsTeamsRoleInvitationBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsTeamsRoleInvitationActions {
-    SetTable(Option<NestedTeam>),
-    SetTeam(Option<NestedTeam>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedTeam>>),
+    SetTeam(Option<Rc<NestedTeam>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for TeamsTeamsRoleInvitationActions {
@@ -4996,7 +5103,7 @@ impl Reducer<TeamsTeamsRoleInvitationBuilder> for TeamsTeamsRoleInvitationAction
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -5010,7 +5117,7 @@ impl Reducer<TeamsTeamsRoleInvitationBuilder> for TeamsTeamsRoleInvitationAction
                     state_mut.team = None;
                     break 'team;
                 }
-                state_mut.team = team;
+                state_mut.team = team.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'team;
@@ -5024,7 +5131,7 @@ impl Reducer<TeamsTeamsRoleInvitationBuilder> for TeamsTeamsRoleInvitationAction
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -5048,15 +5155,15 @@ impl FormBuilder for TeamsTeamsRoleInvitationBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(TeamsTeamsRoleInvitationActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(TeamsTeamsRoleInvitationActions::SetTeam(Some(
-            richest_variant.team,
-        )));
-        dispatcher.apply(TeamsTeamsRoleInvitationActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(TeamsTeamsRoleInvitationActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(TeamsTeamsRoleInvitationActions::SetTeam(
+            Some(richest_variant.team).map(Rc::from),
+        ));
+        dispatcher.apply(TeamsTeamsRoleInvitationActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -5070,7 +5177,7 @@ impl From<TeamsTeamsRoleInvitationBuilder> for NewTeamsTeamsRoleInvitation {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             team_id: builder.team.as_ref().map(|team| team.inner.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -5124,13 +5231,15 @@ pub fn create_teams_teams_role_invitation_form(
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch.apply_callback(|table: Option<NestedTeam>| {
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedTeam>>| {
         TeamsTeamsRoleInvitationActions::SetTable(table)
     });
-    let set_team = builder_dispatch
-        .apply_callback(|team: Option<NestedTeam>| TeamsTeamsRoleInvitationActions::SetTeam(team));
-    let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| TeamsTeamsRoleInvitationActions::SetRole(role));
+    let set_team = builder_dispatch.apply_callback(|team: Option<Rc<NestedTeam>>| {
+        TeamsTeamsRoleInvitationActions::SetTeam(team)
+    });
+    let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
+        TeamsTeamsRoleInvitationActions::SetRole(role)
+    });
     html! {
         <BasicForm<NewTeamsTeamsRoleInvitation>
             method={FormMethod::POST}
@@ -5145,9 +5254,9 @@ pub fn create_teams_teams_role_invitation_form(
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamsUsersRoleInvitationBuilder {
-    pub table: Option<NestedTeam>,
-    pub user: Option<User>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedTeam>>,
+    pub user: Option<Rc<User>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -5170,9 +5279,9 @@ impl Default for TeamsUsersRoleInvitationBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsUsersRoleInvitationActions {
-    SetTable(Option<NestedTeam>),
-    SetUser(Option<User>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedTeam>>),
+    SetUser(Option<Rc<User>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for TeamsUsersRoleInvitationActions {
@@ -5210,7 +5319,7 @@ impl Reducer<TeamsUsersRoleInvitationBuilder> for TeamsUsersRoleInvitationAction
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -5224,7 +5333,7 @@ impl Reducer<TeamsUsersRoleInvitationBuilder> for TeamsUsersRoleInvitationAction
                     state_mut.user = None;
                     break 'user;
                 }
-                state_mut.user = user;
+                state_mut.user = user.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'user;
@@ -5238,7 +5347,7 @@ impl Reducer<TeamsUsersRoleInvitationBuilder> for TeamsUsersRoleInvitationAction
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -5262,15 +5371,15 @@ impl FormBuilder for TeamsUsersRoleInvitationBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(TeamsUsersRoleInvitationActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(TeamsUsersRoleInvitationActions::SetUser(Some(
-            richest_variant.user,
-        )));
-        dispatcher.apply(TeamsUsersRoleInvitationActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(TeamsUsersRoleInvitationActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(TeamsUsersRoleInvitationActions::SetUser(
+            Some(richest_variant.user).map(Rc::from),
+        ));
+        dispatcher.apply(TeamsUsersRoleInvitationActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -5284,7 +5393,7 @@ impl From<TeamsUsersRoleInvitationBuilder> for NewTeamsUsersRoleInvitation {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -5338,13 +5447,14 @@ pub fn create_teams_users_role_invitation_form(
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch.apply_callback(|table: Option<NestedTeam>| {
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedTeam>>| {
         TeamsUsersRoleInvitationActions::SetTable(table)
     });
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<User>| TeamsUsersRoleInvitationActions::SetUser(user));
-    let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| TeamsUsersRoleInvitationActions::SetRole(role));
+        .apply_callback(|user: Option<Rc<User>>| TeamsUsersRoleInvitationActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
+        TeamsUsersRoleInvitationActions::SetRole(role)
+    });
     html! {
         <BasicForm<NewTeamsUsersRoleInvitation>
             method={FormMethod::POST}
@@ -5359,9 +5469,9 @@ pub fn create_teams_users_role_invitation_form(
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamsUsersRoleRequestBuilder {
-    pub table: Option<NestedTeam>,
-    pub user: Option<User>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedTeam>>,
+    pub user: Option<Rc<User>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -5384,9 +5494,9 @@ impl Default for TeamsUsersRoleRequestBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsUsersRoleRequestActions {
-    SetTable(Option<NestedTeam>),
-    SetUser(Option<User>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedTeam>>),
+    SetUser(Option<Rc<User>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for TeamsUsersRoleRequestActions {
@@ -5424,7 +5534,7 @@ impl Reducer<TeamsUsersRoleRequestBuilder> for TeamsUsersRoleRequestActions {
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -5438,7 +5548,7 @@ impl Reducer<TeamsUsersRoleRequestBuilder> for TeamsUsersRoleRequestActions {
                     state_mut.user = None;
                     break 'user;
                 }
-                state_mut.user = user;
+                state_mut.user = user.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'user;
@@ -5452,7 +5562,7 @@ impl Reducer<TeamsUsersRoleRequestBuilder> for TeamsUsersRoleRequestActions {
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -5476,15 +5586,15 @@ impl FormBuilder for TeamsUsersRoleRequestBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(TeamsUsersRoleRequestActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(TeamsUsersRoleRequestActions::SetUser(Some(
-            richest_variant.user,
-        )));
-        dispatcher.apply(TeamsUsersRoleRequestActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(TeamsUsersRoleRequestActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(TeamsUsersRoleRequestActions::SetUser(
+            Some(richest_variant.user).map(Rc::from),
+        ));
+        dispatcher.apply(TeamsUsersRoleRequestActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -5498,7 +5608,7 @@ impl From<TeamsUsersRoleRequestBuilder> for NewTeamsUsersRoleRequest {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -5550,12 +5660,13 @@ pub fn create_teams_users_role_request_form(props: &CreateTeamsUsersRoleRequestF
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch
-        .apply_callback(|table: Option<NestedTeam>| TeamsUsersRoleRequestActions::SetTable(table));
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedTeam>>| {
+        TeamsUsersRoleRequestActions::SetTable(table)
+    });
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<User>| TeamsUsersRoleRequestActions::SetUser(user));
+        .apply_callback(|user: Option<Rc<User>>| TeamsUsersRoleRequestActions::SetUser(user));
     let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| TeamsUsersRoleRequestActions::SetRole(role));
+        .apply_callback(|role: Option<Rc<NestedRole>>| TeamsUsersRoleRequestActions::SetRole(role));
     html! {
         <BasicForm<NewTeamsUsersRoleRequest>
             method={FormMethod::POST}
@@ -5570,9 +5681,9 @@ pub fn create_teams_users_role_request_form(props: &CreateTeamsUsersRoleRequestF
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamsUsersRoleBuilder {
-    pub table: Option<NestedTeam>,
-    pub user: Option<User>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<NestedTeam>>,
+    pub user: Option<Rc<User>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -5595,9 +5706,9 @@ impl Default for TeamsUsersRoleBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsUsersRoleActions {
-    SetTable(Option<NestedTeam>),
-    SetUser(Option<User>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<NestedTeam>>),
+    SetUser(Option<Rc<User>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for TeamsUsersRoleActions {
@@ -5629,7 +5740,7 @@ impl Reducer<TeamsUsersRoleBuilder> for TeamsUsersRoleActions {
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -5643,7 +5754,7 @@ impl Reducer<TeamsUsersRoleBuilder> for TeamsUsersRoleActions {
                     state_mut.user = None;
                     break 'user;
                 }
-                state_mut.user = user;
+                state_mut.user = user.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'user;
@@ -5657,7 +5768,7 @@ impl Reducer<TeamsUsersRoleBuilder> for TeamsUsersRoleActions {
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -5681,9 +5792,15 @@ impl FormBuilder for TeamsUsersRoleBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(TeamsUsersRoleActions::SetTable(Some(richest_variant.table)));
-        dispatcher.apply(TeamsUsersRoleActions::SetUser(Some(richest_variant.user)));
-        dispatcher.apply(TeamsUsersRoleActions::SetRole(Some(richest_variant.role)));
+        dispatcher.apply(TeamsUsersRoleActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(TeamsUsersRoleActions::SetUser(
+            Some(richest_variant.user).map(Rc::from),
+        ));
+        dispatcher.apply(TeamsUsersRoleActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -5697,7 +5814,7 @@ impl From<TeamsUsersRoleBuilder> for NewTeamsUsersRole {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -5750,11 +5867,11 @@ pub fn create_teams_users_role_form(props: &CreateTeamsUsersRoleFormProp) -> Htm
         ));
     }
     let set_table = builder_dispatch
-        .apply_callback(|table: Option<NestedTeam>| TeamsUsersRoleActions::SetTable(table));
-    let set_user =
-        builder_dispatch.apply_callback(|user: Option<User>| TeamsUsersRoleActions::SetUser(user));
+        .apply_callback(|table: Option<Rc<NestedTeam>>| TeamsUsersRoleActions::SetTable(table));
+    let set_user = builder_dispatch
+        .apply_callback(|user: Option<Rc<User>>| TeamsUsersRoleActions::SetUser(user));
     let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| TeamsUsersRoleActions::SetRole(role));
+        .apply_callback(|role: Option<Rc<NestedRole>>| TeamsUsersRoleActions::SetRole(role));
     html! {
         <BasicForm<NewTeamsUsersRole>
             method={FormMethod::POST}
@@ -5770,11 +5887,11 @@ pub fn create_teams_users_role_form(props: &CreateTeamsUsersRoleFormProp) -> Htm
 #[store(storage = "local", storage_tab_sync)]
 pub struct UserBuilder {
     pub id: Option<i32>,
-    pub first_name: Option<String>,
-    pub middle_name: Option<String>,
-    pub last_name: Option<String>,
-    pub description: Option<String>,
-    pub profile_picture: Option<Vec<u8>>,
+    pub first_name: Option<Rc<String>>,
+    pub middle_name: Option<Rc<String>>,
+    pub last_name: Option<Rc<String>>,
+    pub description: Option<Rc<String>>,
+    pub profile_picture: Option<Rc<Vec<u8>>>,
     pub errors_first_name: Vec<ApiError>,
     pub errors_middle_name: Vec<ApiError>,
     pub errors_last_name: Vec<ApiError>,
@@ -5808,7 +5925,7 @@ pub(super) enum UserActions {
     SetMiddleName(Option<String>),
     SetLastName(Option<String>),
     SetDescription(Option<String>),
-    SetProfilePicture(Option<Vec<u8>>),
+    SetProfilePicture(Option<Rc<Vec<u8>>>),
 }
 
 impl FromOperation for UserActions {
@@ -5839,7 +5956,7 @@ impl Reducer<UserBuilder> for UserActions {
                         break 'first_name;
                     }
                 }
-                state_mut.first_name = first_name;
+                state_mut.first_name = first_name.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'first_name;
@@ -5855,7 +5972,7 @@ impl Reducer<UserBuilder> for UserActions {
                         break 'middle_name;
                     }
                 }
-                state_mut.middle_name = middle_name;
+                state_mut.middle_name = middle_name.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'middle_name;
@@ -5878,7 +5995,7 @@ impl Reducer<UserBuilder> for UserActions {
                         break 'last_name;
                     }
                 }
-                state_mut.last_name = last_name;
+                state_mut.last_name = last_name.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'last_name;
@@ -5894,7 +6011,7 @@ impl Reducer<UserBuilder> for UserActions {
                         break 'description;
                     }
                 }
-                state_mut.description = description;
+                state_mut.description = description.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'description;
@@ -5910,7 +6027,7 @@ impl Reducer<UserBuilder> for UserActions {
                     state_mut.profile_picture = None;
                     break 'profile_picture;
                 }
-                state_mut.profile_picture = profile_picture;
+                state_mut.profile_picture = profile_picture.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'profile_picture;
@@ -5943,9 +6060,9 @@ impl FormBuilder for UserBuilder {
         dispatcher.apply(UserActions::SetMiddleName(richest_variant.middle_name));
         dispatcher.apply(UserActions::SetLastName(Some(richest_variant.last_name)));
         dispatcher.apply(UserActions::SetDescription(richest_variant.description));
-        dispatcher.apply(UserActions::SetProfilePicture(Some(
-            richest_variant.profile_picture,
-        )));
+        dispatcher.apply(UserActions::SetProfilePicture(
+            Some(richest_variant.profile_picture).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -5961,11 +6078,11 @@ impl From<UserBuilder> for UpdateUser {
     fn from(builder: UserBuilder) -> Self {
         Self {
             id: builder.id.unwrap(),
-            first_name: builder.first_name.unwrap(),
-            middle_name: builder.middle_name,
-            last_name: builder.last_name.unwrap(),
-            description: builder.description,
-            profile_picture: builder.profile_picture.unwrap(),
+            first_name: builder.first_name.as_deref().cloned().unwrap(),
+            middle_name: builder.middle_name.as_deref().cloned(),
+            last_name: builder.last_name.as_deref().cloned().unwrap(),
+            description: builder.description.as_deref().cloned(),
+            profile_picture: builder.profile_picture.as_deref().cloned().unwrap(),
         }
     }
 }
@@ -6006,9 +6123,7 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
     let set_description = builder_dispatch
         .apply_callback(|description: Option<String>| UserActions::SetDescription(description));
     let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| {
-        UserActions::SetProfilePicture(
-            profile_picture.map(|profile_picture| profile_picture.into()),
-        )
+        UserActions::SetProfilePicture(profile_picture.map(<Vec<u8>>::from).map(Rc::from))
     });
     html! {
         <BasicForm<UpdateUser>
@@ -6019,16 +6134,16 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
             <BasicInput<String> label="Middle name" optional={true} errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
             <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
             <BasicInput<String> label="Description" optional={true} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
-            <FileInput<Image> label="Profile picture" optional={false} errors={builder_store.errors_profile_picture.clone()} builder={set_profile_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.profile_picture.clone().map(|profile_picture| profile_picture.into())} />
+            <FileInput<Image> label="Profile picture" optional={false} errors={builder_store.errors_profile_picture.clone()} builder={set_profile_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.profile_picture.as_deref().map(|profile_picture| profile_picture.into())} />
         </BasicForm<UpdateUser>>
     }
 }
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct UsersUsersRoleInvitationBuilder {
-    pub table: Option<User>,
-    pub user: Option<User>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<User>>,
+    pub user: Option<Rc<User>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -6051,9 +6166,9 @@ impl Default for UsersUsersRoleInvitationBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UsersUsersRoleInvitationActions {
-    SetTable(Option<User>),
-    SetUser(Option<User>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<User>>),
+    SetUser(Option<Rc<User>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for UsersUsersRoleInvitationActions {
@@ -6091,7 +6206,7 @@ impl Reducer<UsersUsersRoleInvitationBuilder> for UsersUsersRoleInvitationAction
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -6105,7 +6220,7 @@ impl Reducer<UsersUsersRoleInvitationBuilder> for UsersUsersRoleInvitationAction
                     state_mut.user = None;
                     break 'user;
                 }
-                state_mut.user = user;
+                state_mut.user = user.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'user;
@@ -6119,7 +6234,7 @@ impl Reducer<UsersUsersRoleInvitationBuilder> for UsersUsersRoleInvitationAction
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -6143,15 +6258,15 @@ impl FormBuilder for UsersUsersRoleInvitationBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(UsersUsersRoleInvitationActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(UsersUsersRoleInvitationActions::SetUser(Some(
-            richest_variant.user,
-        )));
-        dispatcher.apply(UsersUsersRoleInvitationActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(UsersUsersRoleInvitationActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(UsersUsersRoleInvitationActions::SetUser(
+            Some(richest_variant.user).map(Rc::from),
+        ));
+        dispatcher.apply(UsersUsersRoleInvitationActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -6165,7 +6280,7 @@ impl From<UsersUsersRoleInvitationBuilder> for NewUsersUsersRoleInvitation {
         Self {
             table_id: builder.table.as_ref().map(|table| table.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -6220,11 +6335,12 @@ pub fn create_users_users_role_invitation_form(
         ));
     }
     let set_table = builder_dispatch
-        .apply_callback(|table: Option<User>| UsersUsersRoleInvitationActions::SetTable(table));
+        .apply_callback(|table: Option<Rc<User>>| UsersUsersRoleInvitationActions::SetTable(table));
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<User>| UsersUsersRoleInvitationActions::SetUser(user));
-    let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| UsersUsersRoleInvitationActions::SetRole(role));
+        .apply_callback(|user: Option<Rc<User>>| UsersUsersRoleInvitationActions::SetUser(user));
+    let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
+        UsersUsersRoleInvitationActions::SetRole(role)
+    });
     html! {
         <BasicForm<NewUsersUsersRoleInvitation>
             method={FormMethod::POST}
@@ -6239,9 +6355,9 @@ pub fn create_users_users_role_invitation_form(
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct UsersUsersRoleRequestBuilder {
-    pub table: Option<User>,
-    pub user: Option<User>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<User>>,
+    pub user: Option<Rc<User>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -6264,9 +6380,9 @@ impl Default for UsersUsersRoleRequestBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UsersUsersRoleRequestActions {
-    SetTable(Option<User>),
-    SetUser(Option<User>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<User>>),
+    SetUser(Option<Rc<User>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for UsersUsersRoleRequestActions {
@@ -6304,7 +6420,7 @@ impl Reducer<UsersUsersRoleRequestBuilder> for UsersUsersRoleRequestActions {
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -6318,7 +6434,7 @@ impl Reducer<UsersUsersRoleRequestBuilder> for UsersUsersRoleRequestActions {
                     state_mut.user = None;
                     break 'user;
                 }
-                state_mut.user = user;
+                state_mut.user = user.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'user;
@@ -6332,7 +6448,7 @@ impl Reducer<UsersUsersRoleRequestBuilder> for UsersUsersRoleRequestActions {
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -6356,15 +6472,15 @@ impl FormBuilder for UsersUsersRoleRequestBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(UsersUsersRoleRequestActions::SetTable(Some(
-            richest_variant.table,
-        )));
-        dispatcher.apply(UsersUsersRoleRequestActions::SetUser(Some(
-            richest_variant.user,
-        )));
-        dispatcher.apply(UsersUsersRoleRequestActions::SetRole(Some(
-            richest_variant.role,
-        )));
+        dispatcher.apply(UsersUsersRoleRequestActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(UsersUsersRoleRequestActions::SetUser(
+            Some(richest_variant.user).map(Rc::from),
+        ));
+        dispatcher.apply(UsersUsersRoleRequestActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -6378,7 +6494,7 @@ impl From<UsersUsersRoleRequestBuilder> for NewUsersUsersRoleRequest {
         Self {
             table_id: builder.table.as_ref().map(|table| table.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -6431,11 +6547,11 @@ pub fn create_users_users_role_request_form(props: &CreateUsersUsersRoleRequestF
         ));
     }
     let set_table = builder_dispatch
-        .apply_callback(|table: Option<User>| UsersUsersRoleRequestActions::SetTable(table));
+        .apply_callback(|table: Option<Rc<User>>| UsersUsersRoleRequestActions::SetTable(table));
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<User>| UsersUsersRoleRequestActions::SetUser(user));
+        .apply_callback(|user: Option<Rc<User>>| UsersUsersRoleRequestActions::SetUser(user));
     let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| UsersUsersRoleRequestActions::SetRole(role));
+        .apply_callback(|role: Option<Rc<NestedRole>>| UsersUsersRoleRequestActions::SetRole(role));
     html! {
         <BasicForm<NewUsersUsersRoleRequest>
             method={FormMethod::POST}
@@ -6450,9 +6566,9 @@ pub fn create_users_users_role_request_form(props: &CreateUsersUsersRoleRequestF
 #[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct UsersUsersRoleBuilder {
-    pub table: Option<User>,
-    pub user: Option<User>,
-    pub role: Option<NestedRole>,
+    pub table: Option<Rc<User>>,
+    pub user: Option<Rc<User>>,
+    pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -6475,9 +6591,9 @@ impl Default for UsersUsersRoleBuilder {
 
 #[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UsersUsersRoleActions {
-    SetTable(Option<User>),
-    SetUser(Option<User>),
-    SetRole(Option<NestedRole>),
+    SetTable(Option<Rc<User>>),
+    SetUser(Option<Rc<User>>),
+    SetRole(Option<Rc<NestedRole>>),
 }
 
 impl FromOperation for UsersUsersRoleActions {
@@ -6509,7 +6625,7 @@ impl Reducer<UsersUsersRoleBuilder> for UsersUsersRoleActions {
                     state_mut.table = None;
                     break 'table;
                 }
-                state_mut.table = table;
+                state_mut.table = table.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'table;
@@ -6523,7 +6639,7 @@ impl Reducer<UsersUsersRoleBuilder> for UsersUsersRoleActions {
                     state_mut.user = None;
                     break 'user;
                 }
-                state_mut.user = user;
+                state_mut.user = user.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'user;
@@ -6537,7 +6653,7 @@ impl Reducer<UsersUsersRoleBuilder> for UsersUsersRoleActions {
                     state_mut.role = None;
                     break 'role;
                 }
-                state_mut.role = role;
+                state_mut.role = role.map(Rc::from);
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'role;
@@ -6561,9 +6677,15 @@ impl FormBuilder for UsersUsersRoleBuilder {
         dispatcher: &Dispatch<Self>,
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
-        dispatcher.apply(UsersUsersRoleActions::SetTable(Some(richest_variant.table)));
-        dispatcher.apply(UsersUsersRoleActions::SetUser(Some(richest_variant.user)));
-        dispatcher.apply(UsersUsersRoleActions::SetRole(Some(richest_variant.role)));
+        dispatcher.apply(UsersUsersRoleActions::SetTable(
+            Some(richest_variant.table).map(Rc::from),
+        ));
+        dispatcher.apply(UsersUsersRoleActions::SetUser(
+            Some(richest_variant.user).map(Rc::from),
+        ));
+        dispatcher.apply(UsersUsersRoleActions::SetRole(
+            Some(richest_variant.role).map(Rc::from),
+        ));
         vec![]
     }
 
@@ -6577,7 +6699,7 @@ impl From<UsersUsersRoleBuilder> for NewUsersUsersRole {
         Self {
             table_id: builder.table.as_ref().map(|table| table.id).unwrap(),
             user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
-            role_id: builder.role.unwrap().inner.id,
+            role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
 }
@@ -6630,11 +6752,11 @@ pub fn create_users_users_role_form(props: &CreateUsersUsersRoleFormProp) -> Htm
         ));
     }
     let set_table = builder_dispatch
-        .apply_callback(|table: Option<User>| UsersUsersRoleActions::SetTable(table));
-    let set_user =
-        builder_dispatch.apply_callback(|user: Option<User>| UsersUsersRoleActions::SetUser(user));
+        .apply_callback(|table: Option<Rc<User>>| UsersUsersRoleActions::SetTable(table));
+    let set_user = builder_dispatch
+        .apply_callback(|user: Option<Rc<User>>| UsersUsersRoleActions::SetUser(user));
     let set_role = builder_dispatch
-        .apply_callback(|role: Option<NestedRole>| UsersUsersRoleActions::SetRole(role));
+        .apply_callback(|role: Option<Rc<NestedRole>>| UsersUsersRoleActions::SetRole(role));
     html! {
         <BasicForm<NewUsersUsersRole>
             method={FormMethod::POST}

@@ -6,6 +6,7 @@ use super::InputErrors;
 use super::Scanner;
 use chrono::NaiveDateTime;
 use gloo::utils::errors::JsError;
+use std::rc::Rc;
 use wasm_bindgen::JsCast;
 use web_common::api::ApiError;
 use yew::html::IntoPropValue;
@@ -101,7 +102,7 @@ pub struct InputProp<Data: Inputtable> {
     #[prop_or_default]
     pub placeholder: Option<String>,
     #[prop_or_default]
-    pub value: Option<Data>,
+    pub value: Option<Rc<Data>>,
     #[prop_or(false)]
     pub optional: bool,
 }
@@ -115,7 +116,7 @@ impl<Data: Inputtable> InputProp<Data> {
         self.label.replace(" ", "_").to_lowercase()
     }
 
-    pub fn value(&self) -> Option<Data> {
+    pub fn value(&self) -> Option<Rc<Data>> {
         self.value.clone()
     }
 }

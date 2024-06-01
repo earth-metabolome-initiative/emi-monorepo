@@ -1,4 +1,4 @@
-use super::{Badge, BadgeSize, RowToBadge};
+use super::RowToBadge;
 use web_common::database::NestedDocumentFormat;
 
 impl RowToBadge for NestedDocumentFormat {

@@ -26,6 +26,14 @@ impl From<Vec<u8>> for Image {
     }
 }
 
+impl From<&Vec<u8>> for Image {
+    fn from(data: &Vec<u8>) -> Self {
+        Self {
+            data: data.clone(),
+        }
+    }
+}
+
 impl From<&[u8]> for Image {
     fn from(data: &[u8]) -> Self {
         Self {

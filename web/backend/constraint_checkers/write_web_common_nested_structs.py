@@ -23,6 +23,7 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
     imports = [
         "use serde::Deserialize;",
         "use serde::Serialize;",
+        "use std::rc::Rc;",
         "use super::*;",
     ]
 
@@ -119,21 +120,32 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
                 attribute.data_type() == nested_struct.name
                 or flat_variant.has_attribute(attribute)
             ):
-                document.write(
-                    f"            {attribute.name}: flat_variant.{attribute.name},\n"
-                )
+                if attribute.rc:
+                    document.write(
+                        f"            {attribute.name}: Rc::new(flat_variant.{attribute.name}),\n"
+                    )
+                else:
+                    document.write(
+                        f"            {attribute.name}: flat_variant.{attribute.name},\n"
+                    )
                 continue
             if attribute.optional:
+                assert attribute.rc
                 document.write(
-                    f"            {attribute.name}: if let Some({attribute.original_name}) = flat_variant.{attribute.original_name} {{ {attribute.data_type()}::get({attribute.original_name}, connection).await? }} else {{ None }},\n"
+                    f"            {attribute.name}: if let Some({attribute.original_name}) = flat_variant.{attribute.original_name} {{ {attribute.data_type()}::get({attribute.original_name}, connection).await?.map(Rc::from) }} else {{ None }},\n"
                 )
             else:
+                assert attribute.rc
                 document.write(
-                    f"            {attribute.name}: {attribute.data_type()}::get(flat_variant.{attribute.original_name}, connection).await?.unwrap(),\n"
+                    f"            {attribute.name}: Rc::from({attribute.data_type()}::get(flat_variant.{attribute.original_name}, connection).await?.unwrap()),\n"
                 )
 
-        if any(attribute.name == "inner" for attribute in nested_struct.attributes):
-            document.write("            inner: flat_variant,\n")
+        inner_attribute = nested_struct.get_inner_attribute()
+        if inner_attribute is not None:
+            if inner_attribute.rc:
+                document.write("            inner: Rc::from(flat_variant),\n")
+            else:
+                document.write("            inner: flat_variant,\n")
 
         document.write("        })\n    }\n")
 
@@ -270,15 +282,19 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
         for attribute in nested_struct.attributes:
             assert attribute.has_struct_data_type()
 
+            rc_variant = ""
+            if attribute.rc:
+                rc_variant = ".as_ref().clone()"
+
             if attribute.optional:
                 document.write(
                     f"        if let Some({attribute.name}) = self.{attribute.name} {{\n"
-                    f"            {attribute.name}.update_or_insert(connection).await?;\n"
+                    f"            {attribute.name}{rc_variant}.update_or_insert(connection).await?;\n"
                     "        }\n"
                 )
             else:
                 document.write(
-                    f"        self.{attribute.name}.update_or_insert(connection).await?;\n"
+                    f"        self.{attribute.name}{rc_variant}.update_or_insert(connection).await?;\n"
                 )
 
         document.write("        Ok(())\n    }\n}\n")

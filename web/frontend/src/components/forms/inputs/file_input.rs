@@ -307,7 +307,7 @@ where
                 }
 
                 match data {
-                    Ok((file, data)) => {
+                    Ok((_file, data)) => {
                         self.is_valid = Some(true);
                         ctx.props().builder.emit(if ctx.props().multiple {
                             let mut files = ctx.props().values.clone();
@@ -604,7 +604,7 @@ where
 
     html! {
         <ul class={class}>
-            { for props.iter().enumerate().map(|(i, file)|{
+            { for props.iter().enumerate().map(|(_, file)|{
                 // let props = props.clone();
                 // let on_delete = Callback::from(move |_| {
                 //     let props = props.clone();

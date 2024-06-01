@@ -135,8 +135,8 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         description -> Text,
-        icon_id -> Nullable<Int4>,
-        color_id -> Nullable<Int4>,
+        icon_id -> Int4,
+        color_id -> Int4,
     }
 }
 
@@ -273,8 +273,8 @@ diesel::table! {
         id -> Int4,
         name -> Text,
         description -> Text,
-        icon_id -> Nullable<Int4>,
-        color_id -> Nullable<Int4>,
+        icon_id -> Int4,
+        color_id -> Int4,
     }
 }
 

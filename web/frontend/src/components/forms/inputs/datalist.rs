@@ -351,7 +351,7 @@ where
                         {for self.selections.iter().enumerate().map(|(i, selection)| {
                             let onclick = {
                                 let link = ctx.link().clone();
-                                Callback::from(move |e: MouseEvent| {
+                                Callback::from(move |_: MouseEvent| {
                                     link.send_message(DatalistMessage::StartDeleteSelectionTimeout(i));
                                 })
                             };
@@ -444,7 +444,7 @@ where
                                let candidate = &self.candidates[i];
                                 let onclick = {
                                     let link = ctx.link().clone();
-                                    Callback::from(move |e: MouseEvent| {
+                                    Callback::from(move |_: MouseEvent| {
                                         link.send_message(DatalistMessage::SelectCandidate(i));
                                     })
                                 };
@@ -469,14 +469,14 @@ where
     Data: 'static + Clone + PartialEq,
 {
     pub label: String,
-    pub builder: Callback<Option<Data>>,
+    pub builder: Callback<Option<Rc<Data>>>,
     pub errors: Vec<ApiError>,
     #[prop_or(true)]
     pub show_label: bool,
     #[prop_or_default]
     pub placeholder: Option<String>,
     #[prop_or_default]
-    pub value: Option<Data>,
+    pub value: Option<Rc<Data>>,
     #[prop_or(false)]
     pub optional: bool,
     #[prop_or(10)]
@@ -493,8 +493,7 @@ where
     let builder_callback = {
         let old_builder = props.builder.clone();
         Callback::from(move |mut data: Vec<Rc<Data>>| {
-            // TODO! HANDLE CLEANLY!
-            old_builder.emit(data.pop().as_deref().cloned());
+            old_builder.emit(data.pop());
         })
     };
 

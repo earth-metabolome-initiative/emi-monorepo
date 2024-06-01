@@ -1,5 +1,6 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::NestedNameplate;
+use web_common::database::{NestedNameplate, User, NestedProject, NestedNameplateCategory};
+use yew::prelude::*;
 
 impl RowToBadge for NestedNameplate {
     fn badge_title(&self) -> String {
@@ -12,5 +13,15 @@ impl RowToBadge for NestedNameplate {
 
     fn font_awesome_icon(&self) -> Option<&str> {
         self.category.font_awesome_icon()
+    }
+
+    fn children(&self, props: &super::BadgeProps<Self>) -> Option<yew::prelude::Html> {
+        Some(html! {
+            <>
+                <Badge<User> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+                <Badge<NestedProject> badge={self.project.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+                <Badge<NestedNameplateCategory> badge={self.category.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+            </>
+        })
     }
 }

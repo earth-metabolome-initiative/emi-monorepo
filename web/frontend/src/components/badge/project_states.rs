@@ -1,4 +1,4 @@
-use super::{Badge, BadgeSize, RowToBadge};
+use super::RowToBadge;
 use web_common::database::NestedProjectState;
 
 impl RowToBadge for NestedProjectState {

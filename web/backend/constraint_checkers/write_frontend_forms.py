@@ -5,7 +5,6 @@ import re
 from time import sleep
 from typing import List
 
-from constraint_checkers.indices import PGIndex
 from constraint_checkers.struct_metadata import AttributeMetadata, StructMetadata
 from insert_migration import insert_migration
 from tqdm.auto import tqdm
@@ -394,9 +393,14 @@ def write_frontend_builder_action_enumeration(
                 "                }\n"
             )
         else:
-            document.write(
-                f"                state_mut.{attribute.name} = {attribute.name};\n"
-            )
+            if attribute.rc:
+                document.write(
+                    f"                state_mut.{attribute.name} = {attribute.name}.map(Rc::from);\n"
+                )
+            else:
+                document.write(
+                    f"                state_mut.{attribute.name} = {attribute.name};\n"
+                )
 
         document.write(
             f"                // To avoid having a codesmell relative to the cases where we are not\n"
@@ -548,25 +552,36 @@ def write_frontend_form_builder_implementation(
         struct_attribute = richest_variant.get_attribute_by_name(attribute.name)
 
         if struct_attribute is not None:
+            rc_variant = ""
+            if not struct_attribute.implements_copy() and struct_attribute.data_type() != "String":
+                rc_variant = ".map(Rc::from)"
             if struct_attribute.optional:
                 document.write(
-                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(richest_variant.{attribute.name}));\n"
+                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(richest_variant.{attribute.name}{rc_variant}));\n"
                 )
             else:
                 document.write(
-                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some(richest_variant.{attribute.name})));\n"
+                    f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some(richest_variant.{attribute.name}){rc_variant}));\n"
                 )
         else:
             struct_attribute = flat_variant.get_attribute_by_name(attribute.name)
 
             if struct_attribute is not None:
+                rc_variant = ""
+                rc_variant_intermediate_option = ""
+                rc_variant_intermediate = ""
+                if not struct_attribute.implements_copy():
+                    rc_variant = ".map(Rc::from)"
+                    rc_variant_intermediate_option = ".as_deref().cloned()"                
+                    rc_variant_intermediate = ".as_ref().clone()"
+
                 if (
                     attribute.data_type() in INPUT_TYPE_MAP
                     or attribute.data_type() == "NaiveDateTime"
                 ):
                     if struct_attribute.optional:
                         document.write(
-                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(richest_variant.inner.{attribute.name}.map(|{attribute.name}| {attribute.name}.to_string())));\n"
+                            f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(richest_variant.inner.{attribute.name}.as_ref().map(|{attribute.name}| {attribute.name}.to_string())));\n"
                         )
                     else:
                         document.write(
@@ -574,11 +589,11 @@ def write_frontend_form_builder_implementation(
                         )
                 elif struct_attribute.optional:
                     document.write(
-                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(richest_variant.inner.{attribute.name}));\n"
+                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(richest_variant.inner{rc_variant_intermediate_option}.{attribute.name}{rc_variant}));\n"
                     )
                 else:
                     document.write(
-                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some(richest_variant.inner.{attribute.name})));"
+                        f"        dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some(richest_variant.inner{rc_variant_intermediate}.{attribute.name}){rc_variant}));"
                     )
             else:
                 raise RuntimeError(
@@ -677,7 +692,7 @@ def write_frontend_form_builder_implementation(
                     )
         elif variant.is_update_variant():
             for primary_key in primary_keys:
-                if builder.has_attribute(primary_key) and not builder.get_attribute_by_name(primary_key.name).has_struct_data_type():
+                if variant.is_update_variant() and builder.has_attribute(primary_key) and not builder.get_attribute_by_name(primary_key.name).has_struct_data_type():
                     document.write(
                         f"            {primary_key.name}: builder.{primary_key.name}.unwrap(),\n"
                     )
@@ -742,16 +757,21 @@ def write_frontend_form_builder_implementation(
                     inner_primary_key = inner_primary_keys[0]
                     if builder_attribute.raw_data_type().is_nested():
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.inner.{inner_primary_key.name}),\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.as_deref().cloned().map(|{builder_attribute.name}| {builder_attribute.name}.inner.{inner_primary_key.name}),\n"
                         )
                     else:
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.map(|{builder_attribute.name}| {builder_attribute.name}.{inner_primary_key.name}),\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.as_deref().cloned().map(|{builder_attribute.name}| {builder_attribute.name}.{inner_primary_key.name}),\n"
                         )
                 else:
-                    document.write(
-                        f"            {attribute.name}: builder.{attribute.name},\n"
-                    )
+                    if attribute.implements_copy():
+                        document.write(
+                            f"            {attribute.name}: builder.{attribute.name},\n"
+                        )
+                    else:
+                        document.write(
+                            f"            {attribute.name}: builder.{attribute.name}.as_deref().cloned(),\n"
+                        )
             else:
                 if builder_attribute.has_struct_data_type():
                     inner_primary_keys = (
@@ -763,16 +783,21 @@ def write_frontend_form_builder_implementation(
 
                     if builder_attribute.raw_data_type().is_nested():
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().inner.{inner_primary_key.name},\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.as_deref().cloned().unwrap().inner.{inner_primary_key.name},\n"
                         )
                     else:
                         document.write(
-                            f"            {attribute.name}: builder.{builder_attribute.name}.unwrap().{inner_primary_key.name},\n"
+                            f"            {attribute.name}: builder.{builder_attribute.name}.as_deref().cloned().unwrap().{inner_primary_key.name},\n"
                         )
                 else:
-                    document.write(
-                        f"            {attribute.name}: builder.{attribute.name}.unwrap(),\n"
-                    )
+                    if attribute.implements_copy():
+                        document.write(
+                            f"            {attribute.name}: builder.{attribute.name}.unwrap(),\n"
+                        )
+                    else:
+                        document.write(
+                            f"            {attribute.name}: builder.{attribute.name}.as_deref().cloned().unwrap(),\n"
+                        )
 
         document.write("        }\n    }\n}\n")
 
@@ -1114,7 +1139,7 @@ def write_frontend_yew_form(
                     if property_attribute.is_sampled_by():
                         document.write(
                             "    else if let Some(user) = user_state.as_ref().user() {\n"
-                            f"        builder_dispatch.apply({flat_variant.name}Actions::SetSampledBy(Some(user.as_ref().clone())));\n"
+                            f"        builder_dispatch.apply({flat_variant.name}Actions::SetSampledBy(Some(user)));\n"
                             "    }\n"
                         )
                 else:
@@ -1144,7 +1169,7 @@ def write_frontend_yew_form(
             elif attribute.data_type() == "Vec<u8>":
                 if "picture" in attribute.name:
                     document.write(
-                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.map(|{attribute.name}| {attribute.name}.into())));\n"
+                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.map(<Vec<u8>>::from).map(Rc::from)));\n"
                     )
                 else:
                     raise RuntimeError(
@@ -1202,7 +1227,10 @@ def write_frontend_yew_form(
                 attribute_conversion = f"builder_store.{attribute.name}.clone()"
 
                 if "barcode" in attribute.name:
-                    attribute_conversion = f"builder_store.{attribute.name}.clone().map(BarCode::from)"
+                    attribute_conversion = f"builder_store.{attribute.name}.as_deref().cloned().map(BarCode::from).map(Rc::from)"
+
+                if attribute.implements_copy():
+                    attribute_conversion = f"{attribute_conversion}.map(Rc::from)"
 
                 document.write(
                     f'            <BasicInput<{attribute_data_type}> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{{attribute_conversion}}} />\n'
@@ -1220,7 +1248,7 @@ def write_frontend_yew_form(
                     allowed_formats = ["GenericFileFormat::Image"]
 
                     document.write(
-                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.clone().map(|{attribute.name}| {attribute.name}.into())}} />\n'
+                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.as_deref().map(|{attribute.name}| {attribute.name}.into())}} />\n'
                     )
                 else:
                     raise RuntimeError(
