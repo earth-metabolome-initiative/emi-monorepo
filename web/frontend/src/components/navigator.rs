@@ -19,6 +19,7 @@
 //! user if they are offline by putting a badge with the text "Offline" on their avatar. Upon returning online,
 //! the badge will disappear.
 
+use crate::components::badge::BadgeSize;
 use crate::components::RowToBadge;
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
@@ -159,7 +160,7 @@ impl Component for Navigator {
                     <SearchBar />
                     if let Some(user) = self.user() {
                         if user.has_complete_profile() {
-                            <Badge<User> badge={user.clone()}/>
+                            <Badge<User> size={BadgeSize::Small} badge={user.clone()}/>
                         } else {
                             <Link<AppRoute> classes="right_nav_button" to={AppRoute::UsersUpdate { id: user.id }}>
                                 <i class="fas fa-clipboard-check"></i>

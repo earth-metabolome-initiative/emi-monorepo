@@ -47,6 +47,7 @@ $breakpoints: (
     box-sizing: border-box;
     padding: 0.25rem;
     min-width: 0;
+    min-height: 5em;
     transition: border-color 0.2s;
     animation: pop-in 0.3s;
 
@@ -55,11 +56,11 @@ $breakpoints: (
     }
 
     &.small {
-        border-radius: 0.5rem;
         border: 1px solid;
         width: auto;
         box-sizing: border-box;
         padding: 0.25rem;
+        min-height: 2em;
         border-color: $light_grey;
     }
 
@@ -74,17 +75,27 @@ $breakpoints: (
 
     &.has-image {
         position: relative;
-        padding-left: 2em;
+        padding-left: 5.25em;
         img.badge-image {
             position: absolute;
             width: auto;
             height: 100%;
-            max-width: 1.75em;
+            max-width: 5em;
+            object-fit: cover;
             max-height: fit-content;
-            border-radius: 0.25rem;
+            border-top-left-radius: inherit;
+            border-bottom-left-radius: inherit;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
             display: inline-block;
             top: 0;
             left: 0;
+        }
+        &.small {
+            padding-left: 2.25em;
+            img.badge-image {
+                max-width: 2em;
+            }
         }
     }
 
