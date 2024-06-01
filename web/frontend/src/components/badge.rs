@@ -96,7 +96,7 @@ where
     #[prop_or_default]
     pub query: Option<String>,
     #[prop_or_default]
-    pub on_close: Callback<()>,
+    pub onclick: Option<Callback<MouseEvent>>,
     #[prop_or(false)]
     pub li: bool
 }
@@ -107,17 +107,14 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
     let navigator = use_navigator().unwrap();
 
     let onclick = {
-        let closable = props.closable;
-        let on_close = props.on_close.clone();
+        let onclick: Option<Callback<MouseEvent>> = props.onclick.clone();
         let path = props.badge.path();
         Callback::from(move |e: MouseEvent| {
             e.prevent_default();
             e.stop_immediate_propagation();
-            if closable {
-                on_close.emit(());
-                return;
-            }
-            if let Some(path) = path {
+            if let Some(onclick) = onclick.as_ref() {
+                onclick.emit(e);
+            } else if let Some(path) = path {
                 navigator.push(&path);
             }
         })

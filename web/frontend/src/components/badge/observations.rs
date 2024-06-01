@@ -10,7 +10,7 @@ impl RowToBadge for NestedObservation {
         Some(<Self as crate::router::Viewable>::view_route(self))
     }
 
-    fn font_awesome_icon(&self) -> Option<&str> {
-        self.subject.font_awesome_icon()
+    fn primary_image_url(&self) -> Option<String> {
+        Some(self.inner.get_picture_as_url())
     }
 }

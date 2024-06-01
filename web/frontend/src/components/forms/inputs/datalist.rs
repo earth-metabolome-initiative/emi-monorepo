@@ -341,15 +341,15 @@ where
                     html! {
                         <ul class="selected-datalist-badges">
                         {for self.selections.iter().enumerate().map(|(i, selection)| {
-                            let on_click = {
+                            let onclick = {
                                 let link = ctx.link().clone();
-                                Callback::from(move |_: ()| {
+                                Callback::from(move |e: MouseEvent| {
                                     link.send_message(DatalistMessage::StartDeleteSelectionTimeout(i));
                                 })
                             };
                             html! {
                                 <li>
-                                    <Badge<Data> badge={selection.clone()} closable={true} on_close={on_click}/>
+                                    <Badge<Data> badge={selection.clone()} closable={true} onclick={onclick}/>
                                 </li>
                             }
                         })}
@@ -434,16 +434,14 @@ where
                             html!{<ul class="datalist-candidates">
                             {for filtered_indices.iter().rev().map(|&i| {
                                let candidate = &self.candidates[i];
-                                let on_click = {
+                                let onclick = {
                                     let link = ctx.link().clone();
                                     Callback::from(move |e: MouseEvent| {
-                                        e.prevent_default();
-                                        e.stop_propagation();
                                         link.send_message(DatalistMessage::SelectCandidate(i));
                                     })
                                 };
                                 html! {
-                                    <li onclick={on_click}><Badge<Data> badge={candidate.clone()} query={Some(current_value.clone())}/></li>
+                                    <Badge<Data> badge={candidate.clone()} query={Some(current_value.clone())} onclick={onclick} li={true}/>
                                 }
                             })}
                         </ul>

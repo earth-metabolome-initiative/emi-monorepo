@@ -92,6 +92,13 @@ $breakpoints: (
         cursor: pointer;
         position: relative;
         padding-right: 2em;
+        &:hover {
+            border-color: $red !important;
+            &:after {
+                color: $red;
+                font-size: 1.5em;
+            }
+        }
         &:after {
             content: "×";
             position: absolute;
@@ -99,6 +106,8 @@ $breakpoints: (
             right: 0;
             padding: 0.25em;
             cursor: pointer;
+            color: $light_grey;
+            transition: color 0.2s;
         }
     }
 
