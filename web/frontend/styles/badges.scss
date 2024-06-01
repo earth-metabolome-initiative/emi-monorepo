@@ -87,11 +87,11 @@ $breakpoints: (
     }
 
     p.badge-title {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
         strong {
             font-weight: 400;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
         }
     }
 
