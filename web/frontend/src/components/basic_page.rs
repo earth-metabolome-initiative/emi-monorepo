@@ -17,7 +17,9 @@ use yew_router::hooks::use_navigator;
 use yew_router::prelude::Link;
 use yewdux::Dispatch;
 
-pub(crate) trait PageLike: DeserializeOwned + Filtrable + Viewable + PartialEq + Clone + Tabular + 'static {
+pub(crate) trait PageLike:
+    DeserializeOwned + Filtrable + Viewable + PartialEq + Clone + Tabular + 'static
+{
     fn title(&self) -> String;
 
     fn section() -> String {
@@ -576,7 +578,11 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
-        if self.page.as_ref().map_or(true, |p| p.id() != ctx.props().id){
+        if self
+            .page
+            .as_ref()
+            .map_or(true, |p| p.id() != ctx.props().id)
+        {
             self.websocket
                 .send(ComponentMessage::can_view::<Page>(ctx.props().id));
             if self.user_state.has_user() {

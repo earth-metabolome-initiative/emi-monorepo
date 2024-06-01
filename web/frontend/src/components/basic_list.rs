@@ -25,7 +25,7 @@ pub struct BasicListProps<Page: Filtrable> {
 
 pub struct BasicList<Page> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
-    pages: Vec<Page>,
+    pages: Vec<Rc<Page>>,
     no_more_pages: bool,
     request_is_ongoing: bool,
     user_state: Rc<UserState>,
@@ -84,7 +84,7 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                     self.no_more_pages = new_pages.is_empty();
                     self.request_is_ongoing = false;
 
-                    self.pages.extend(new_pages);
+                    self.pages.extend(new_pages.into_iter().map(Rc::new));
                     true
                 }
                 _ => {
@@ -122,7 +122,7 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                     </h2>
                 }
                 <ul class="badges-container">
-                { for self.pages.iter().map(|page| html!{<Badge<Page> badge={page.clone()} li={true}/>}) }
+                { for self.pages.iter().map(|page| html!{<Badge<Page> badge={page} li={true}/>}) }
                 if self.no_more_pages {
                     <li>{"There are no more entries to load"}</li>
                 }

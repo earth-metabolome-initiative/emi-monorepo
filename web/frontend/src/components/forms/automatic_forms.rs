@@ -4031,7 +4031,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
             sampled_by.into(),
         ));
     } else if let Some(user) = user_state.as_ref().user() {
-        builder_dispatch.apply(SampleActions::SetSampledBy(Some(user.clone())));
+        builder_dispatch.apply(SampleActions::SetSampledBy(Some(user.as_ref().clone())));
     }
     named_requests.push(ComponentMessage::get_named::<&str, SampleState>(
         "state",

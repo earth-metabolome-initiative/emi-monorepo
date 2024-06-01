@@ -235,179 +235,7 @@ impl Team {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::teams;
-        if filter
-            .map(|f| {
-                f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.state_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::icon_id.eq(icon_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::color_id.eq(color_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::state_id.eq(state_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::created_by.eq(created_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::updated_by.eq(updated_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(
                 crate::sql_function_bindings::similarity_op(
@@ -430,6 +258,23 @@ impl Team {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -458,179 +303,7 @@ impl Team {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::teams;
-        if filter
-            .map(|f| {
-                f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.state_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::icon_id.eq(icon_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::color_id.eq(color_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::state_id.eq(state_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::created_by.eq(created_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::updated_by.eq(updated_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(
                 crate::sql_function_bindings::word_similarity_op(
@@ -653,6 +326,23 @@ impl Team {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -681,189 +371,7 @@ impl Team {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::teams;
-        if filter
-            .map(|f| {
-                f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.state_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::icon_id.eq(icon_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::color_id.eq(color_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::state_id.eq(state_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::created_by.eq(created_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::updated_by.eq(updated_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(
                 crate::sql_function_bindings::strict_word_similarity_op(
@@ -888,6 +396,23 @@ impl Team {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1043,199 +568,7 @@ impl Team {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::teams;
-        if filter
-            .map(|f| {
-                f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.state_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::icon_id.eq(icon_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::color_id.eq(color_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::state_id.eq(state_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::created_by.eq(created_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::updated_by.eq(updated_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_update_teams(
                 author_user_id,
@@ -1262,6 +595,23 @@ impl Team {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1292,199 +642,7 @@ impl Team {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::teams;
-        if filter
-            .map(|f| {
-                f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.state_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::icon_id.eq(icon_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::color_id.eq(color_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::state_id.eq(state_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::created_by.eq(created_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::updated_by.eq(updated_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_update_teams(
                 author_user_id,
@@ -1511,6 +669,23 @@ impl Team {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1541,209 +716,7 @@ impl Team {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::teams;
-        if filter
-            .map(|f| {
-                f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.state_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::icon_id.eq(icon_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::color_id.eq(color_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::state_id.eq(state_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::created_by.eq(created_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::updated_by.eq(updated_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_update_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_update_teams(
                 author_user_id,
@@ -1772,6 +745,23 @@ impl Team {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1927,199 +917,7 @@ impl Team {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::teams;
-        if filter
-            .map(|f| {
-                f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.state_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::icon_id.eq(icon_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::color_id.eq(color_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::state_id.eq(state_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::created_by.eq(created_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::updated_by.eq(updated_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_admin_teams(
                 author_user_id,
@@ -2146,6 +944,23 @@ impl Team {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -2176,199 +991,7 @@ impl Team {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::teams;
-        if filter
-            .map(|f| {
-                f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.state_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::icon_id.eq(icon_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::color_id.eq(color_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::state_id.eq(state_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::created_by.eq(created_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::updated_by.eq(updated_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_admin_teams(
                 author_user_id,
@@ -2395,6 +1018,23 @@ impl Team {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -2425,209 +1065,7 @@ impl Team {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::teams;
-        if filter
-            .map(|f| {
-                f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.state_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::icon_id.eq(icon_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::color_id.eq(color_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return teams::dsl::teams
-                .filter(teams::dsl::state_id.eq(state_id))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::created_by.eq(created_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return teams::dsl::teams
-                .filter(teams::dsl::updated_by.eq(updated_by))
-                .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
-                .filter(crate::sql_function_bindings::can_admin_teams(
-                    author_user_id,
-                    teams::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams::dsl::name,
-                            teams::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        teams::dsl::teams
+        let mut query = teams::dsl::teams
             .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_admin_teams(
                 author_user_id,
@@ -2656,6 +1094,23 @@ impl Team {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(teams::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(teams::dsl::color_id.eq(color_id));
+        }
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(teams::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(teams::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

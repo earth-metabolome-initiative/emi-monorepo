@@ -47,7 +47,6 @@ $breakpoints: (
     box-sizing: border-box;
     padding: 0.25rem;
     min-width: 0;
-    min-height: 5em;
     transition: border-color 0.2s;
     animation: pop-in 0.3s;
 
@@ -60,7 +59,6 @@ $breakpoints: (
         width: auto;
         box-sizing: border-box;
         padding: 0.25rem;
-        min-height: 2em;
         border-color: $light_grey;
     }
 
@@ -76,6 +74,7 @@ $breakpoints: (
     &.has-image {
         position: relative;
         padding-left: 5.25em;
+        min-height: 5em;
         img.badge-image {
             position: absolute;
             width: auto;
@@ -92,6 +91,7 @@ $breakpoints: (
             left: 0;
         }
         &.small {
+            min-height: 2em;
             padding-left: 2.25em;
             img.badge-image {
                 max-width: 2em;

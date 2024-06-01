@@ -297,209 +297,7 @@ impl Project {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
-        if filter
-            .map(|f| {
-                f.state_id.is_some()
-                    && f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::state_id.eq(state_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::icon_id.eq(icon_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::color_id.eq(color_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::created_by.eq(created_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::updated_by.eq(updated_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_view_projects(
                 author_user_id,
@@ -528,6 +326,23 @@ impl Project {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -558,209 +373,7 @@ impl Project {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
-        if filter
-            .map(|f| {
-                f.state_id.is_some()
-                    && f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::state_id.eq(state_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::icon_id.eq(icon_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::color_id.eq(color_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::created_by.eq(created_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::updated_by.eq(updated_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_view_projects(
                 author_user_id,
@@ -789,6 +402,23 @@ impl Project {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -819,219 +449,7 @@ impl Project {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
-        if filter
-            .map(|f| {
-                f.state_id.is_some()
-                    && f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::state_id.eq(state_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::icon_id.eq(icon_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::color_id.eq(color_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::created_by.eq(created_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::updated_by.eq(updated_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_view_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_view_projects(
                 author_user_id,
@@ -1062,6 +480,23 @@ impl Project {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1217,209 +652,7 @@ impl Project {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
-        if filter
-            .map(|f| {
-                f.state_id.is_some()
-                    && f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::state_id.eq(state_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::icon_id.eq(icon_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::color_id.eq(color_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::created_by.eq(created_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::updated_by.eq(updated_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_update_projects(
                 author_user_id,
@@ -1448,6 +681,23 @@ impl Project {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1478,209 +728,7 @@ impl Project {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
-        if filter
-            .map(|f| {
-                f.state_id.is_some()
-                    && f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::state_id.eq(state_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::icon_id.eq(icon_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::color_id.eq(color_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::created_by.eq(created_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::updated_by.eq(updated_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_update_projects(
                 author_user_id,
@@ -1709,6 +757,23 @@ impl Project {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1739,219 +804,7 @@ impl Project {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
-        if filter
-            .map(|f| {
-                f.state_id.is_some()
-                    && f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::state_id.eq(state_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::icon_id.eq(icon_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::color_id.eq(color_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::created_by.eq(created_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::updated_by.eq(updated_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_update_projects(
                 author_user_id,
@@ -1982,6 +835,23 @@ impl Project {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -2137,209 +1007,7 @@ impl Project {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
-        if filter
-            .map(|f| {
-                f.state_id.is_some()
-                    && f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::state_id.eq(state_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::icon_id.eq(icon_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::color_id.eq(color_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::created_by.eq(created_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::updated_by.eq(updated_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_admin_projects(
                 author_user_id,
@@ -2368,6 +1036,23 @@ impl Project {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -2398,209 +1083,7 @@ impl Project {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
-        if filter
-            .map(|f| {
-                f.state_id.is_some()
-                    && f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::state_id.eq(state_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::icon_id.eq(icon_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::color_id.eq(color_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::created_by.eq(created_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::updated_by.eq(updated_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_admin_projects(
                 author_user_id,
@@ -2629,6 +1112,23 @@ impl Project {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -2659,219 +1159,7 @@ impl Project {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::projects;
-        if filter
-            .map(|f| {
-                f.state_id.is_some()
-                    && f.icon_id.is_some()
-                    && f.color_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(state_id) = filter.and_then(|f| f.state_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::state_id.eq(state_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::icon_id.eq(icon_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return projects::dsl::projects
-                .filter(projects::dsl::color_id.eq(color_id))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::created_by.eq(created_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return projects::dsl::projects
-                .filter(projects::dsl::updated_by.eq(updated_by))
-                .filter(
-                    projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_projects(
-                    author_user_id,
-                    projects::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        projects::dsl::projects
+        let mut query = projects::dsl::projects
             .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_admin_projects(
                 author_user_id,
@@ -2902,6 +1190,23 @@ impl Project {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(state_id) = filter.and_then(|f| f.state_id) {
+            query = query.filter(projects::dsl::state_id.eq(state_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(projects::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(projects::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(projects::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

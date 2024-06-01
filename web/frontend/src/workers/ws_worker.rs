@@ -11,6 +11,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::rc::Rc;
 use uuid::Uuid;
 use web_common::api::ws::messages::BackendMessage;
 use web_common::api::ws::messages::CloseReason;
@@ -28,7 +29,7 @@ type DatabaseMessage = (Uuid, Option<UserId>, Operation);
 pub struct WebsocketWorker {
     subscribers: HashSet<HandlerId>,
     tasks: HashMap<Uuid, HandlerId>,
-    user: Option<User>,
+    user: Option<Rc<User>>,
     database_sender: futures::channel::mpsc::Sender<DatabaseMessage>,
     websocket_sender: Option<futures::channel::mpsc::Sender<FrontendMessage>>,
     reconnection_attempt: u32,
@@ -38,7 +39,7 @@ pub struct WebsocketWorker {
 /// Messages from the frontend to the web-worker.
 pub enum ComponentMessage {
     Operation(Operation),
-    UserState(Option<User>),
+    UserState(Option<Rc<User>>),
 }
 
 impl ComponentMessage {
@@ -109,14 +110,14 @@ pub enum WebsocketMessage {
     CanDelete(bool),
     Completed,
     Error(ApiError),
-    RefreshUser(User),
+    RefreshUser(Rc<User>),
 }
 
 pub enum InternalMessage {
     Backend(BackendMessage),
     Frontend(HandlerId, ComponentMessage),
     Disconnect(Option<CloseReason>),
-    User(Option<User>),
+    User(Option<Rc<User>>),
     Reconnect,
 }
 
@@ -414,11 +415,12 @@ impl Worker for WebsocketWorker {
                         }
                     }
                     BackendMessage::RefreshUser(user) => {
-                        self.user = Some(user.clone());
+                        let rc_user = Rc::from(user);
+                        self.user = Some(rc_user.clone());
 
                         // We need to update the access token in the user state.
                         for sub in &self.subscribers {
-                            scope.respond(*sub, WebsocketMessage::RefreshUser(user.clone()));
+                            scope.respond(*sub, WebsocketMessage::RefreshUser(rc_user.clone()));
                         }
                     }
                 };

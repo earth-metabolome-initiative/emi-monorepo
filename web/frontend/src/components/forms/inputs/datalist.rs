@@ -11,6 +11,7 @@ use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
 use gloo::utils::errors::JsError;
 use serde::de::DeserializeOwned;
+use std::rc::Rc;
 use wasm_bindgen::JsCast;
 
 use super::barcode_scanner::Scanner;
@@ -26,14 +27,14 @@ where
     Data: 'static + Clone + PartialEq,
 {
     pub label: String,
-    pub builder: Callback<Vec<Data>>,
+    pub builder: Callback<Vec<Rc<Data>>>,
     pub errors: Vec<ApiError>,
     #[prop_or(true)]
     pub show_label: bool,
     #[prop_or_default]
     pub placeholder: Option<String>,
     #[prop_or_default]
-    pub value: Vec<Data>,
+    pub value: Vec<Rc<Data>>,
     #[prop_or(false)]
     pub optional: bool,
     #[prop_or(1)]
@@ -58,7 +59,7 @@ where
         self.label.replace(" ", "_").to_lowercase()
     }
 
-    pub fn value(&self) -> Vec<Data> {
+    pub fn value(&self) -> Vec<Rc<Data>> {
         self.value.clone()
     }
 }
@@ -66,14 +67,14 @@ where
 pub struct MultiDatalist<Data, const EDIT: bool> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     errors: Vec<ApiError>,
-    current_value: Option<String>,
+    current_value: Option<Rc<String>>,
     is_valid: Option<bool>,
     validation_timeout: Option<Timeout>,
     search_timeout: Option<Timeout>,
     /// The candidates that are displayed in the datalist.
-    candidates: Vec<Data>,
+    candidates: Vec<Rc<Data>>,
     /// The selected candidates.
-    selections: Vec<Data>,
+    selections: Vec<Rc<Data>>,
     /// The list of selections being deleted.
     selections_to_delete: Vec<usize>,
     /// Whether it is currently on focus.
@@ -87,7 +88,7 @@ pub enum DatalistMessage<Data> {
     UpdateCurrentValue(String),
     SearchCandidatesTimeout,
     SearchCandidates,
-    UpdateCandidates(Vec<Data>),
+    UpdateCandidates(Vec<Rc<Data>>),
     SelectCandidate(usize),
     DeleteSelection(usize),
     StartDeleteSelectionTimeout(usize),
@@ -130,7 +131,11 @@ where
                 WebsocketMessage::SearchTable(results) => {
                     self.number_of_search_queries -= 1;
                     ctx.link().send_message(DatalistMessage::UpdateCandidates(
-                        bincode::deserialize(&results).expect("Failed to convert row to data"),
+                        bincode::deserialize::<Vec<Data>>(&results)
+                            .expect("Failed to convert row to data")
+                            .into_iter()
+                            .map(Rc::new)
+                            .collect::<Vec<Rc<Data>>>(),
                     ));
 
                     true
@@ -161,7 +166,11 @@ where
                 // {
                 //     return false;
                 // }
-                let query = self.current_value.clone().unwrap_or_else(|| "".to_string());
+                let query = self
+                    .current_value
+                    .as_ref()
+                    .map(|s| s.to_string())
+                    .unwrap_or_else(|| "".to_string());
                 self.websocket.send(ComponentMessage::Operation(
                     Data::search_task(None, query, ctx.props().number_of_candidates, 0).into(),
                 ));
@@ -206,7 +215,7 @@ where
                 true
             }
             DatalistMessage::UpdateCurrentValue(value) => {
-                self.current_value = Some(value);
+                self.current_value = Some(Rc::from(value));
                 ctx.link()
                     .send_message(DatalistMessage::SearchCandidatesTimeout);
 
@@ -297,12 +306,11 @@ where
             })
         };
 
-        let input_value = self.current_value.clone().unwrap_or_else(|| "".to_string());
-
-        let current_value = self
+        let input_value = self
             .current_value
-            .as_ref()
-            .map_or_else(|| "".to_string(), |value| value.clone());
+            .clone()
+            .map(|value| value.to_string())
+            .unwrap_or_else(|| "".to_string());
 
         let label_classes = format!(
             "input-label{}",
@@ -414,7 +422,7 @@ where
                     } else {
                         let mut total_candidate_score = 0.0;
                         let candidate_score: Vec<isize> = self.candidates.iter().map(|candidate| {
-                            let candidate_score = candidate.similarity_score(&current_value);
+                            let candidate_score = candidate.maybe_similarity_score(self.current_value.as_deref());
                             total_candidate_score += candidate_score as f64;
                             candidate_score
                         }).collect();
@@ -441,7 +449,7 @@ where
                                     })
                                 };
                                 html! {
-                                    <Badge<Data> badge={candidate.clone()} query={Some(current_value.clone())} onclick={onclick} li={true}/>
+                                    <Badge<Data> badge={candidate.clone()} query={self.current_value.clone()} onclick={onclick} li={true}/>
                                 }
                             })}
                         </ul>
@@ -484,12 +492,13 @@ where
 {
     let builder_callback = {
         let old_builder = props.builder.clone();
-        Callback::from(move |mut data: Vec<Data>| {
-            old_builder.emit(data.pop());
+        Callback::from(move |mut data: Vec<Rc<Data>>| {
+            // TODO! HANDLE CLEANLY!
+            old_builder.emit(data.pop().as_deref().cloned());
         })
     };
 
     html! {
-        <MultiDatalist<Data, EDIT> label={props.label.clone()} builder={builder_callback} errors={props.errors.clone()} show_label={props.show_label} placeholder={props.placeholder.clone()} value={props.value.clone().map_or_else(|| Vec::new(), |value| vec![value])} optional={props.optional} number_of_candidates={props.number_of_candidates} />
+        <MultiDatalist<Data, EDIT> label={props.label.clone()} builder={builder_callback} errors={props.errors.clone()} show_label={props.show_label} placeholder={props.placeholder.clone()} value={props.value.clone().map_or_else(|| Vec::new(), |value| vec![Rc::from(value)])} optional={props.optional} number_of_candidates={props.number_of_candidates} />
     }
 }

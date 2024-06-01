@@ -1114,7 +1114,7 @@ def write_frontend_yew_form(
                     if property_attribute.is_sampled_by():
                         document.write(
                             "    else if let Some(user) = user_state.as_ref().user() {\n"
-                            f"        builder_dispatch.apply(SampleActions::SetSampledBy(Some(user.clone())));\n"
+                            f"        builder_dispatch.apply({flat_variant.name}Actions::SetSampledBy(Some(user.as_ref().clone())));\n"
                             "    }\n"
                         )
                 else:

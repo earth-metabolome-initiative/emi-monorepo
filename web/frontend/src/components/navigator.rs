@@ -53,7 +53,7 @@ impl Navigator {
         self.app_state.sidebar_open()
     }
 
-    fn user(&self) -> Option<&User> {
+    fn user(&self) -> Option<Rc<User>> {
         self.user_state.user()
     }
 }
@@ -89,7 +89,7 @@ impl Component for Navigator {
             }
         }));
 
-        websocket.send(ComponentMessage::UserState(user_state.user().cloned()));
+        websocket.send(ComponentMessage::UserState(user_state.user()));
 
         Self {
             websocket,

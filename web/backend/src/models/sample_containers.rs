@@ -260,110 +260,7 @@ impl SampleContainer {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_containers::dsl::sample_containers
+        let mut query = sample_containers::dsl::sample_containers
             .filter(crate::sql_function_bindings::can_view_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -376,6 +273,20 @@ impl SampleContainer {
                 sample_containers::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -406,110 +317,7 @@ impl SampleContainer {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_containers::dsl::sample_containers
+        let mut query = sample_containers::dsl::sample_containers
             .filter(crate::sql_function_bindings::can_view_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -525,6 +333,20 @@ impl SampleContainer {
                 sample_containers::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -555,118 +377,7 @@ impl SampleContainer {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_view_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_containers::dsl::sample_containers
+        let mut query = sample_containers::dsl::sample_containers
             .filter(crate::sql_function_bindings::can_view_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -684,6 +395,20 @@ impl SampleContainer {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -827,110 +552,7 @@ impl SampleContainer {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_containers::dsl::sample_containers
+        let mut query = sample_containers::dsl::sample_containers
             .filter(crate::sql_function_bindings::can_update_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -943,6 +565,20 @@ impl SampleContainer {
                 sample_containers::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -973,110 +609,7 @@ impl SampleContainer {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_containers::dsl::sample_containers
+        let mut query = sample_containers::dsl::sample_containers
             .filter(crate::sql_function_bindings::can_update_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -1092,6 +625,20 @@ impl SampleContainer {
                 sample_containers::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1122,118 +669,7 @@ impl SampleContainer {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_update_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_containers::dsl::sample_containers
+        let mut query = sample_containers::dsl::sample_containers
             .filter(crate::sql_function_bindings::can_update_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -1251,6 +687,20 @@ impl SampleContainer {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1394,110 +844,7 @@ impl SampleContainer {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_containers::dsl::sample_containers
+        let mut query = sample_containers::dsl::sample_containers
             .filter(crate::sql_function_bindings::can_admin_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -1510,6 +857,20 @@ impl SampleContainer {
                 sample_containers::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1540,110 +901,7 @@ impl SampleContainer {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_containers::dsl::sample_containers
+        let mut query = sample_containers::dsl::sample_containers
             .filter(crate::sql_function_bindings::can_admin_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -1659,6 +917,20 @@ impl SampleContainer {
                 sample_containers::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1689,118 +961,7 @@ impl SampleContainer {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::sample_containers;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return sample_containers::dsl::sample_containers
-                .filter(sample_containers::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                    author_user_id,
-                    sample_containers::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_containers::dsl::sample_containers
+        let mut query = sample_containers::dsl::sample_containers
             .filter(crate::sql_function_bindings::can_admin_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -1818,6 +979,20 @@ impl SampleContainer {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

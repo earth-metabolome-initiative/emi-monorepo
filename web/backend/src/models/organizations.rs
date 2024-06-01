@@ -223,23 +223,7 @@ impl Organization {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::organizations;
-        if let Some(country_id) = filter.and_then(|f| f.country_id) {
-            return organizations::dsl::organizations
-                .filter(organizations::dsl::country_id.eq(country_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(organizations::dsl::name, query)
-                        .or(organizations::dsl::name.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    organizations::dsl::name,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        organizations::dsl::organizations
+        let mut query = organizations::dsl::organizations
             .filter(
                 crate::sql_function_bindings::similarity_op(organizations::dsl::name, query)
                     .or(organizations::dsl::name.ilike(format!("%{}%", query))),
@@ -248,6 +232,11 @@ impl Organization {
                 organizations::dsl::name,
                 query,
             ))
+            .into_boxed();
+        if let Some(country_id) = filter.and_then(|f| f.country_id) {
+            query = query.filter(organizations::dsl::country_id.eq(country_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -276,26 +265,7 @@ impl Organization {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::organizations;
-        if let Some(country_id) = filter.and_then(|f| f.country_id) {
-            return organizations::dsl::organizations
-                .filter(organizations::dsl::country_id.eq(country_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        organizations::dsl::name,
-                        query,
-                    )
-                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    organizations::dsl::name,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        organizations::dsl::organizations
+        let mut query = organizations::dsl::organizations
             .filter(
                 crate::sql_function_bindings::word_similarity_op(organizations::dsl::name, query)
                     .or(organizations::dsl::name.ilike(format!("%{}%", query))),
@@ -304,6 +274,11 @@ impl Organization {
                 organizations::dsl::name,
                 query,
             ))
+            .into_boxed();
+        if let Some(country_id) = filter.and_then(|f| f.country_id) {
+            query = query.filter(organizations::dsl::country_id.eq(country_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -332,28 +307,7 @@ impl Organization {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::organizations;
-        if let Some(country_id) = filter.and_then(|f| f.country_id) {
-            return organizations::dsl::organizations
-                .filter(organizations::dsl::country_id.eq(country_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        organizations::dsl::name,
-                        query,
-                    )
-                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        organizations::dsl::name,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        organizations::dsl::organizations
+        let mut query = organizations::dsl::organizations
             .filter(
                 crate::sql_function_bindings::strict_word_similarity_op(
                     organizations::dsl::name,
@@ -367,6 +321,11 @@ impl Organization {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(country_id) = filter.and_then(|f| f.country_id) {
+            query = query.filter(organizations::dsl::country_id.eq(country_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

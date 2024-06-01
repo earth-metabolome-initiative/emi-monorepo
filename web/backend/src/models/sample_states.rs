@@ -205,75 +205,7 @@ impl SampleState {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::sample_states;
-        if filter
-            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return sample_states::dsl::sample_states
-                .filter(sample_states::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return sample_states::dsl::sample_states
-                .filter(sample_states::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_states::dsl::sample_states
+        let mut query = sample_states::dsl::sample_states
             .filter(
                 crate::sql_function_bindings::similarity_op(
                     crate::sql_function_bindings::concat_sample_states_name_description(
@@ -297,6 +229,14 @@ impl SampleState {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_states::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_states::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -325,75 +265,7 @@ impl SampleState {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::sample_states;
-        if filter
-            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return sample_states::dsl::sample_states
-                .filter(sample_states::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return sample_states::dsl::sample_states
-                .filter(sample_states::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_states::dsl::sample_states
+        let mut query = sample_states::dsl::sample_states
             .filter(
                 crate::sql_function_bindings::word_similarity_op(
                     crate::sql_function_bindings::concat_sample_states_name_description(
@@ -417,6 +289,14 @@ impl SampleState {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_states::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_states::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -445,79 +325,7 @@ impl SampleState {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::sample_states;
-        if filter
-            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return sample_states::dsl::sample_states
-                .filter(sample_states::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return sample_states::dsl::sample_states
-                .filter(sample_states::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_states::dsl::sample_states
+        let mut query = sample_states::dsl::sample_states
             .filter(
                 crate::sql_function_bindings::strict_word_similarity_op(
                     crate::sql_function_bindings::concat_sample_states_name_description(
@@ -543,6 +351,14 @@ impl SampleState {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_states::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_states::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

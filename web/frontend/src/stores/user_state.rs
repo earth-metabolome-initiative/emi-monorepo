@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::rc::Rc;
 use web_common::database::User;
 use yewdux::prelude::*;
 
@@ -8,7 +9,7 @@ use super::app_state::AppState;
 /// The following macro will make sure that the store is saved across sessions.
 #[store(storage = "session", storage_tab_sync)]
 pub struct UserState {
-    user: Option<User>,
+    user: Option<Rc<User>>,
 }
 
 impl UserState {
@@ -16,8 +17,8 @@ impl UserState {
         self.user.is_some()
     }
 
-    pub fn user(&self) -> Option<&User> {
-        self.user.as_ref()
+    pub fn user(&self) -> Option<Rc<User>> {
+        self.user.clone()
     }
 
     pub fn id(&self) -> Option<i32> {
@@ -25,17 +26,14 @@ impl UserState {
     }
 
     /// Set the user to the provided value and returns whether any changes were made.
-    pub fn set_user(&mut self, user: User) -> bool {
-        if self.user.as_ref() != Some(&user) {
-            self.user = Some(user);
+    pub fn set_user(&mut self, user: Rc<User>) -> bool {
+        let maybe_user = Some(user);
+        if self.user != maybe_user {
+            self.user = maybe_user;
             true
         } else {
             false
         }
-    }
-
-    pub fn has_incomplete_profile(&self) -> bool {
-        self.user.as_ref().map_or(false, |user| false)
     }
 }
 

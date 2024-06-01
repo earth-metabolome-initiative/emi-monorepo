@@ -3,6 +3,7 @@
 use crate::router::AppRoute;
 use crate::traits::format_match::FormatMatch;
 use core::fmt::Debug;
+use std::rc::Rc;
 use web_common::database::{Colorable, Describable};
 use yew::prelude::*;
 use yew_router::prelude::*;
@@ -39,9 +40,15 @@ pub trait RowToBadge: Colorable + Describable + Sized + Clone + PartialEq + Debu
     ///
     /// # Arguments
     /// * `query` - The query to compare the implementing type with.
-    fn similarity_score(&self, query: &str) -> isize {
+    fn similarity_score<S: AsRef<str>>(&self, query: S) -> isize {
+        let query = query.as_ref();
         self.badge_title().similarity_score(query)
             + self.description().map_or(0, |d| d.similarity_score(query))
+    }
+
+    /// Returns the similarity score of the implementing type with respect to the query if the query is not empty.
+    fn maybe_similarity_score<S: AsRef<str>>(&self, query: Option<S>) -> isize {
+        query.map_or(0, |q| self.similarity_score(q))
     }
 
     /// Returns the title for the badge.
@@ -59,6 +66,14 @@ pub trait RowToBadge: Colorable + Describable + Sized + Clone + PartialEq + Debu
 
     /// Returns the optional font-awesome icon of the implementing type.
     fn font_awesome_icon(&self) -> Option<&str> {
+        None
+    }
+
+    /// Returns the child badges of the implementing type.
+    ///
+    /// # Arguments
+    /// * `props` - The properties to be used for the child badge component.
+    fn children(&self, _props: &BadgeProps<Self>) -> Option<Html> {
         None
     }
 }
@@ -88,24 +103,22 @@ pub struct BadgeProps<B>
 where
     B: RowToBadge,
 {
-    pub badge: B,
+    pub badge: Rc<B>,
     #[prop_or(false)]
     pub closable: bool,
     #[prop_or(BadgeSize::Large)]
     pub size: BadgeSize,
     #[prop_or_default]
-    pub query: Option<String>,
+    pub query: Option<Rc<String>>,
     #[prop_or_default]
     pub onclick: Option<Callback<MouseEvent>>,
     #[prop_or(false)]
-    pub li: bool
+    pub li: bool,
 }
 
-/// A badge component that can be used to display a badge.
 #[function_component(Badge)]
 pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
     let navigator = use_navigator().unwrap();
-
     let onclick = {
         let onclick: Option<Callback<MouseEvent>> = props.onclick.clone();
         let path = props.badge.path();
@@ -144,11 +157,7 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
         }
     );
 
-    let tag = if props.li {
-        "li"
-    } else {
-        "div"
-    };
+    let tag = if props.li { "li" } else { "div" };
 
     html! {
         <@{tag} class={badge_classes} onclick={onclick}>
@@ -165,13 +174,18 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
                         {'\u{00A0}'}
                     </>
                 }
-                <strong>{props.badge.badge_title().maybe_format_match(props.query.clone())}</strong>
+                <strong>{props.badge.badge_title().maybe_format_match(props.query.as_deref())}</strong>
             </p>
             if props.size.is_large() {
                 if let Some(description) = props.badge.description() {
                     <p class="badge-description">
-                        {description.to_owned().maybe_format_match(props.query.clone())}
+                        {description.to_owned().maybe_format_match(props.query.as_deref())}
                     </p>
+                }
+                if let Some(children) = props.badge.children(props) {
+                    <ul class="badges-list">
+                        {children}
+                    </ul>
                 }
             }
         </@>

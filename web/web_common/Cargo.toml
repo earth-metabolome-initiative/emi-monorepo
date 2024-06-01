@@ -13,7 +13,7 @@ description = "Utilities for the Earth Metabolome Initiative"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 uuid = { version = "1.7", features = ["serde", "v4", "js"] }
 validator = { version = "0.16", features = ["derive"] }

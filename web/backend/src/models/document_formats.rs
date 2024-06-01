@@ -192,75 +192,7 @@ impl DocumentFormat {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::document_formats;
-        if filter
-            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return document_formats::dsl::document_formats
-                .filter(document_formats::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return document_formats::dsl::document_formats
-                .filter(document_formats::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        document_formats::dsl::document_formats
+        let mut query = document_formats::dsl::document_formats
             .filter(
                 crate::sql_function_bindings::similarity_op(
                     crate::sql_function_bindings::concat_document_formats_extension_mime_type(
@@ -284,6 +216,14 @@ impl DocumentFormat {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(document_formats::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(document_formats::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -312,75 +252,7 @@ impl DocumentFormat {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::document_formats;
-        if filter
-            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return document_formats::dsl::document_formats
-                .filter(document_formats::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return document_formats::dsl::document_formats
-                .filter(document_formats::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        document_formats::dsl::document_formats
+        let mut query = document_formats::dsl::document_formats
             .filter(
                 crate::sql_function_bindings::word_similarity_op(
                     crate::sql_function_bindings::concat_document_formats_extension_mime_type(
@@ -404,6 +276,14 @@ impl DocumentFormat {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(document_formats::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(document_formats::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -432,79 +312,7 @@ impl DocumentFormat {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::document_formats;
-        if filter
-            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return document_formats::dsl::document_formats
-                .filter(document_formats::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return document_formats::dsl::document_formats
-                .filter(document_formats::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                            document_formats::dsl::extension,
-                            document_formats::dsl::mime_type,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        document_formats::dsl::document_formats
+        let mut query = document_formats::dsl::document_formats
             .filter(
                 crate::sql_function_bindings::strict_word_similarity_op(
                     crate::sql_function_bindings::concat_document_formats_extension_mime_type(
@@ -530,6 +338,14 @@ impl DocumentFormat {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(document_formats::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(document_formats::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

@@ -188,106 +188,7 @@ impl SampleContainerCategory {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::sample_container_categories;
-        if filter
-            .map(|f| f.material_id.is_some() && f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(material_id) = filter.and_then(|f| f.material_id) {
-            return sample_container_categories::dsl::sample_container_categories
-                .filter(sample_container_categories::dsl::material_id.eq(material_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return sample_container_categories::dsl::sample_container_categories
-                .filter(sample_container_categories::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return sample_container_categories::dsl::sample_container_categories
-                .filter(sample_container_categories::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_container_categories::dsl::sample_container_categories
+        let mut query = sample_container_categories::dsl::sample_container_categories
             .filter(
                 crate::sql_function_bindings::similarity_op(
                     crate::sql_function_bindings::concat_sample_container_categories_brand(
@@ -311,6 +212,17 @@ impl SampleContainerCategory {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(material_id) = filter.and_then(|f| f.material_id) {
+            query = query.filter(sample_container_categories::dsl::material_id.eq(material_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_container_categories::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_container_categories::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -339,106 +251,7 @@ impl SampleContainerCategory {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::sample_container_categories;
-        if filter
-            .map(|f| f.material_id.is_some() && f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(material_id) = filter.and_then(|f| f.material_id) {
-            return sample_container_categories::dsl::sample_container_categories
-                .filter(sample_container_categories::dsl::material_id.eq(material_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return sample_container_categories::dsl::sample_container_categories
-                .filter(sample_container_categories::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return sample_container_categories::dsl::sample_container_categories
-                .filter(sample_container_categories::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_container_categories::dsl::sample_container_categories
+        let mut query = sample_container_categories::dsl::sample_container_categories
             .filter(
                 crate::sql_function_bindings::word_similarity_op(
                     crate::sql_function_bindings::concat_sample_container_categories_brand(
@@ -462,6 +275,17 @@ impl SampleContainerCategory {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(material_id) = filter.and_then(|f| f.material_id) {
+            query = query.filter(sample_container_categories::dsl::material_id.eq(material_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_container_categories::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_container_categories::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -490,112 +314,7 @@ impl SampleContainerCategory {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::sample_container_categories;
-        if filter
-            .map(|f| f.material_id.is_some() && f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(material_id) = filter.and_then(|f| f.material_id) {
-            return sample_container_categories::dsl::sample_container_categories
-                .filter(sample_container_categories::dsl::material_id.eq(material_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return sample_container_categories::dsl::sample_container_categories
-                .filter(sample_container_categories::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return sample_container_categories::dsl::sample_container_categories
-                .filter(sample_container_categories::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_container_categories_brand(
-                            sample_container_categories::dsl::name,
-                            sample_container_categories::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        sample_container_categories::dsl::sample_container_categories
+        let mut query = sample_container_categories::dsl::sample_container_categories
             .filter(
                 crate::sql_function_bindings::strict_word_similarity_op(
                     crate::sql_function_bindings::concat_sample_container_categories_brand(
@@ -621,6 +340,17 @@ impl SampleContainerCategory {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(material_id) = filter.and_then(|f| f.material_id) {
+            query = query.filter(sample_container_categories::dsl::material_id.eq(material_id));
+        }
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(sample_container_categories::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(sample_container_categories::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

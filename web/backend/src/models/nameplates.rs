@@ -260,98 +260,7 @@ impl Nameplate {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::nameplates;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        nameplates::dsl::nameplates
+        let mut query = nameplates::dsl::nameplates
             .filter(crate::sql_function_bindings::can_view_nameplates(
                 author_user_id,
                 nameplates::dsl::id,
@@ -364,6 +273,20 @@ impl Nameplate {
                 nameplates::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -394,110 +317,7 @@ impl Nameplate {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::nameplates;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        nameplates::dsl::nameplates
+        let mut query = nameplates::dsl::nameplates
             .filter(crate::sql_function_bindings::can_view_nameplates(
                 author_user_id,
                 nameplates::dsl::id,
@@ -510,6 +330,20 @@ impl Nameplate {
                 nameplates::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -540,118 +374,7 @@ impl Nameplate {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::nameplates;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_view_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        nameplates::dsl::nameplates
+        let mut query = nameplates::dsl::nameplates
             .filter(crate::sql_function_bindings::can_view_nameplates(
                 author_user_id,
                 nameplates::dsl::id,
@@ -669,6 +392,20 @@ impl Nameplate {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -812,98 +549,7 @@ impl Nameplate {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::nameplates;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        nameplates::dsl::nameplates
+        let mut query = nameplates::dsl::nameplates
             .filter(crate::sql_function_bindings::can_update_nameplates(
                 author_user_id,
                 nameplates::dsl::id,
@@ -916,6 +562,20 @@ impl Nameplate {
                 nameplates::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -946,110 +606,7 @@ impl Nameplate {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::nameplates;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        nameplates::dsl::nameplates
+        let mut query = nameplates::dsl::nameplates
             .filter(crate::sql_function_bindings::can_update_nameplates(
                 author_user_id,
                 nameplates::dsl::id,
@@ -1062,6 +619,20 @@ impl Nameplate {
                 nameplates::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1092,118 +663,7 @@ impl Nameplate {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::nameplates;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_update_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        nameplates::dsl::nameplates
+        let mut query = nameplates::dsl::nameplates
             .filter(crate::sql_function_bindings::can_update_nameplates(
                 author_user_id,
                 nameplates::dsl::id,
@@ -1221,6 +681,20 @@ impl Nameplate {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1364,98 +838,7 @@ impl Nameplate {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::nameplates;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(nameplates::dsl::barcode, query)
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        nameplates::dsl::nameplates
+        let mut query = nameplates::dsl::nameplates
             .filter(crate::sql_function_bindings::can_admin_nameplates(
                 author_user_id,
                 nameplates::dsl::id,
@@ -1468,6 +851,20 @@ impl Nameplate {
                 nameplates::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1498,110 +895,7 @@ impl Nameplate {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::nameplates;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        nameplates::dsl::nameplates
+        let mut query = nameplates::dsl::nameplates
             .filter(crate::sql_function_bindings::can_admin_nameplates(
                 author_user_id,
                 nameplates::dsl::id,
@@ -1614,6 +908,20 @@ impl Nameplate {
                 nameplates::dsl::barcode,
                 query,
             ))
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1644,118 +952,7 @@ impl Nameplate {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::nameplates;
-        if filter
-            .map(|f| {
-                f.project_id.is_some()
-                    && f.category_id.is_some()
-                    && f.created_by.is_some()
-                    && f.updated_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::project_id.eq(project_id))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::category_id.eq(category_id))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::created_by.eq(created_by))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            return nameplates::dsl::nameplates
-                .filter(nameplates::dsl::updated_by.eq(updated_by))
-                .filter(crate::sql_function_bindings::can_admin_nameplates(
-                    author_user_id,
-                    nameplates::dsl::id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        nameplates::dsl::nameplates
+        let mut query = nameplates::dsl::nameplates
             .filter(crate::sql_function_bindings::can_admin_nameplates(
                 author_user_id,
                 nameplates::dsl::id,
@@ -1773,6 +970,20 @@ impl Nameplate {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(project_id) = filter.and_then(|f| f.project_id) {
+            query = query.filter(nameplates::dsl::project_id.eq(project_id));
+        }
+        if let Some(category_id) = filter.and_then(|f| f.category_id) {
+            query = query.filter(nameplates::dsl::category_id.eq(category_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(nameplates::dsl::created_by.eq(created_by));
+        }
+        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
+            query = query.filter(nameplates::dsl::updated_by.eq(updated_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

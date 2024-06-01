@@ -1,4 +1,4 @@
-use super::RowToBadge;
+use super::{Badge, BadgeSize, RowToBadge};
 use web_common::database::Color;
 use web_common::traits::CapitalizeString;
 

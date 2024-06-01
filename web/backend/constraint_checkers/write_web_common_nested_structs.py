@@ -29,7 +29,9 @@ def write_web_common_nested_structs(path: str, nested_structs: List[StructMetada
     document.write("\n".join(imports) + "\n\n")
 
     for nested_struct in nested_structs:
-        nested_struct.write_to(document)
+
+        rc_nested_struct = nested_struct.into_rc()
+        rc_nested_struct.write_to(document)
 
         document.write(
             f"impl Tabular for {nested_struct.name} {{\n"

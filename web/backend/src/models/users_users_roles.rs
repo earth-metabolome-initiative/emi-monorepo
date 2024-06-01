@@ -187,154 +187,7 @@ impl UsersUsersRole {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::users_users_roles;
-        if filter
-            .map(|f| {
-                f.table_id.is_some()
-                    && f.user_id.is_some()
-                    && f.role_id.is_some()
-                    && f.created_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(table_id) = filter.and_then(|f| f.table_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::table_id.eq(table_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::user_id.eq(user_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(role_id) = filter.and_then(|f| f.role_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::role_id.eq(role_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::created_by.eq(created_by))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
             .select(UsersUsersRole::as_select())
             // This operation is defined by a first order index linking users_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)))
@@ -359,6 +212,20 @@ impl UsersUsersRole {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -387,154 +254,7 @@ impl UsersUsersRole {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::users_users_roles;
-        if filter
-            .map(|f| {
-                f.table_id.is_some()
-                    && f.user_id.is_some()
-                    && f.role_id.is_some()
-                    && f.created_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(table_id) = filter.and_then(|f| f.table_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::table_id.eq(table_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::user_id.eq(user_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(role_id) = filter.and_then(|f| f.role_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::role_id.eq(role_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::created_by.eq(created_by))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
             .select(UsersUsersRole::as_select())
             // This operation is defined by a first order index linking users_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)))
@@ -559,6 +279,20 @@ impl UsersUsersRole {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -587,162 +321,7 @@ impl UsersUsersRole {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::users_users_roles;
-        if filter
-            .map(|f| {
-                f.table_id.is_some()
-                    && f.user_id.is_some()
-                    && f.role_id.is_some()
-                    && f.created_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(table_id) = filter.and_then(|f| f.table_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::table_id.eq(table_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::user_id.eq(user_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(role_id) = filter.and_then(|f| f.role_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::role_id.eq(role_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::created_by.eq(created_by))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
             .select(UsersUsersRole::as_select())
             // This operation is defined by a first order index linking users_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)))
@@ -769,6 +348,20 @@ impl UsersUsersRole {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -915,174 +508,7 @@ impl UsersUsersRole {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_roles;
-        if filter
-            .map(|f| {
-                f.table_id.is_some()
-                    && f.user_id.is_some()
-                    && f.role_id.is_some()
-                    && f.created_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(table_id) = filter.and_then(|f| f.table_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::table_id.eq(table_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::user_id.eq(user_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(role_id) = filter.and_then(|f| f.role_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::role_id.eq(role_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::created_by.eq(created_by))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
             .select(UsersUsersRole::as_select())
             // This operation is defined by a first order index linking users_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)))
@@ -1112,6 +538,20 @@ impl UsersUsersRole {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1142,174 +582,7 @@ impl UsersUsersRole {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_roles;
-        if filter
-            .map(|f| {
-                f.table_id.is_some()
-                    && f.user_id.is_some()
-                    && f.role_id.is_some()
-                    && f.created_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(table_id) = filter.and_then(|f| f.table_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::table_id.eq(table_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::user_id.eq(user_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(role_id) = filter.and_then(|f| f.role_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::role_id.eq(role_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::created_by.eq(created_by))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
             .select(UsersUsersRole::as_select())
             // This operation is defined by a first order index linking users_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)))
@@ -1339,6 +612,20 @@ impl UsersUsersRole {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1369,182 +656,7 @@ impl UsersUsersRole {
             return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_roles;
-        if filter
-            .map(|f| {
-                f.table_id.is_some()
-                    && f.user_id.is_some()
-                    && f.role_id.is_some()
-                    && f.created_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(table_id) = filter.and_then(|f| f.table_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::table_id.eq(table_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::user_id.eq(user_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(role_id) = filter.and_then(|f| f.role_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::role_id.eq(role_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::created_by.eq(created_by))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_update_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
             .select(UsersUsersRole::as_select())
             // This operation is defined by a first order index linking users_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)))
@@ -1576,6 +688,20 @@ impl UsersUsersRole {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1722,174 +848,7 @@ impl UsersUsersRole {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_roles;
-        if filter
-            .map(|f| {
-                f.table_id.is_some()
-                    && f.user_id.is_some()
-                    && f.role_id.is_some()
-                    && f.created_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(table_id) = filter.and_then(|f| f.table_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::table_id.eq(table_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::user_id.eq(user_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(role_id) = filter.and_then(|f| f.role_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::role_id.eq(role_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::created_by.eq(created_by))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
             .select(UsersUsersRole::as_select())
             // This operation is defined by a first order index linking users_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)))
@@ -1919,6 +878,20 @@ impl UsersUsersRole {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -1949,174 +922,7 @@ impl UsersUsersRole {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_roles;
-        if filter
-            .map(|f| {
-                f.table_id.is_some()
-                    && f.user_id.is_some()
-                    && f.role_id.is_some()
-                    && f.created_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(table_id) = filter.and_then(|f| f.table_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::table_id.eq(table_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::user_id.eq(user_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(role_id) = filter.and_then(|f| f.role_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::role_id.eq(role_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::created_by.eq(created_by))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
             .select(UsersUsersRole::as_select())
             // This operation is defined by a first order index linking users_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)))
@@ -2146,6 +952,20 @@ impl UsersUsersRole {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -2176,182 +996,7 @@ impl UsersUsersRole {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users_users_roles;
-        if filter
-            .map(|f| {
-                f.table_id.is_some()
-                    && f.user_id.is_some()
-                    && f.role_id.is_some()
-                    && f.created_by.is_some()
-            })
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(table_id) = filter.and_then(|f| f.table_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::table_id.eq(table_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::user_id.eq(user_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(role_id) = filter.and_then(|f| f.role_id) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::role_id.eq(role_id))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            return users_users_roles::dsl::users_users_roles
-                .filter(users_users_roles::dsl::created_by.eq(created_by))
-                .select(UsersUsersRole::as_select())
-                // This operation is defined by a first order index linking users_users_roles.role_id to roles.
-                .inner_join(
-                    roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)),
-                )
-                .filter(crate::sql_function_bindings::can_admin_users_users_roles(
-                    author_user_id,
-                    users_users_roles::dsl::table_id,
-                    users_users_roles::dsl::user_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query))),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        users_users_roles::dsl::users_users_roles
+        let mut query = users_users_roles::dsl::users_users_roles
             .select(UsersUsersRole::as_select())
             // This operation is defined by a first order index linking users_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(users_users_roles::dsl::role_id.eq(roles::dsl::id)))
@@ -2383,6 +1028,20 @@ impl UsersUsersRole {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(table_id) = filter.and_then(|f| f.table_id) {
+            query = query.filter(users_users_roles::dsl::table_id.eq(table_id));
+        }
+        if let Some(user_id) = filter.and_then(|f| f.user_id) {
+            query = query.filter(users_users_roles::dsl::user_id.eq(user_id));
+        }
+        if let Some(role_id) = filter.and_then(|f| f.role_id) {
+            query = query.filter(users_users_roles::dsl::role_id.eq(role_id));
+        }
+        if let Some(created_by) = filter.and_then(|f| f.created_by) {
+            query = query.filter(users_users_roles::dsl::created_by.eq(created_by));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

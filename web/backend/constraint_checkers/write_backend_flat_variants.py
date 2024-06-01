@@ -634,13 +634,6 @@ def write_backend_flat_variants(
 
                     struct_document.write(struct.format_diesel_search_aliases())
 
-                    if struct.has_derived_search_indices():
-
-                        filter_method_content += (
-                            f"            .select({struct.name}::as_select())\n"
-                            f"            {struct.format_diesel_search_join()}\n"
-                        )
-
                     if struct.has_filter_variant():
                         optional_filter_attributes = [
                             filter_attribute
@@ -657,47 +650,56 @@ def write_backend_flat_variants(
                             ).optional
                         ]
 
-                    # If more than one of the non-optional filter is Some in the filter struct,
-                    # we raise an unimplemented! macro panic, as I have no idea how to cleanly
-                    # handle this case in Diesel and for a while it should cover all the cases.
-                    if len(non_optional_filter_attributes) > 1:
+                    if len(non_optional_filter_attributes) > 0:
+                        struct_document.write("        let mut query = ")
+
+                    struct_document.write(f"{struct.table_name}::dsl::{struct.table_name}\n")
+
+                    if struct.has_derived_search_indices():
                         struct_document.write(
-                            f" if filter.map(|f| {'&&'.join(f'f.{filter_attribute.name}.is_some()' for filter_attribute in non_optional_filter_attributes)}).unwrap_or(false) {{\n"
-                            "       unimplemented!();\n"
-                            " }\n"
+                            f"            .select({struct.name}::as_select())\n"
+                            f"            {struct.format_diesel_search_join()}\n"
                         )
 
                     for filter_attribute in optional_filter_attributes:
-                        filter_method_content += f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq(filter.and_then(|f| f.{filter_attribute.name})))\n"
+                        struct_document.write(
+                            f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq(filter.and_then(|f| f.{filter_attribute.name})))\n"
+                        )
 
                     if struct.table_metadata.has_postgres_function(can_x_function_name):
                         primary_keys = ", ".join(
                             f"{struct.table_name}::dsl::{primary_key.name}"
                             for primary_key in struct.get_primary_keys()
                         )
-                        filter_method_content += f"            .filter(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
-
-                    filter_method_content += f"            {struct.format_diesel_search_filter('query', similarity_method_name)}\n"
-
-                    filter_method_content += f"            {struct.format_diesel_search_order('query', similarity_method_name)}\n"
-
-                    filter_method_content += (
-                        "            .limit(limit.unwrap_or(10))\n"
-                        "            .offset(offset.unwrap_or(0))\n"
-                        "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)"
-                    )
-
-                    for filter_attribute in non_optional_filter_attributes:
                         struct_document.write(
-                            f"if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
-                            f"        return {struct.table_name}::dsl::{struct.table_name}\n"
-                            f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}))\n"
-                            f"{filter_method_content};\n}}\n"
+                            f"            .filter(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
                         )
 
                     struct_document.write(
-                        f"        {struct.table_name}::dsl::{struct.table_name}\n"
-                        f"{filter_method_content}\n}}\n"
+                        f"            {struct.format_diesel_search_filter('query', similarity_method_name)}\n"
+                        f"            {struct.format_diesel_search_order('query', similarity_method_name)}\n"
+                    )
+
+                    if len(non_optional_filter_attributes) > 0:
+                        struct_document.write(
+                            "            .into_boxed();\n"
+                        )
+
+                    for filter_attribute in non_optional_filter_attributes:
+                        struct_document.write(
+                            f"       if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                            f"            query = query.filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
+                            "        }\n"
+                        )
+
+                    if len(non_optional_filter_attributes) > 0:
+                        struct_document.write("        query\n")
+
+                    struct_document.write(
+                        "            .limit(limit.unwrap_or(10))\n"
+                        "            .offset(offset.unwrap_or(0))\n"
+                        "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)"
+                        "}\n"
                     )
 
         if struct.is_insertable():

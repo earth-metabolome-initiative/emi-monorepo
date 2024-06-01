@@ -149,6 +149,7 @@ class AttributeMetadata:
         unique: bool = False,
         reference: bool = False,
         mutable: bool = False,
+        rc: bool = False,
         lifetime: Optional[str] = None,
     ):
         self.original_name = original_name
@@ -158,7 +159,14 @@ class AttributeMetadata:
         self.unique = unique
         self.reference = reference
         self.mutable = mutable
+        self.rc = rc
         self.lifetime = lifetime
+
+        if self.rc is not None:
+            assert lifetime is None, (
+                "The lifetime must be None if the RC is not None. "
+                f"The provided lifetime is {lifetime}."
+            )
 
         if self.lifetime is not None and not self.reference:
             raise ValueError("The lifetime must be set only for references.")
@@ -203,6 +211,21 @@ class AttributeMetadata:
             mutable=self.mutable,
         )
 
+    def as_rc(self) -> "AttributeMetadata":
+        """Returns the attribute as an Rc."""
+        return AttributeMetadata(
+            self.original_name,
+            self.name,
+            self._data_type,
+            self.optional,
+            reference=self.reference,
+            unique=self.unique,
+            mutable=self.mutable,
+            rc=True,
+            lifetime=self.lifetime,
+        )
+        
+
     def is_image_blob(self) -> bool:
         """Returns whether the attribute is an image blob."""
         return "picture" in self.name and self.data_type() == "Vec<u8>"
@@ -238,6 +261,9 @@ class AttributeMetadata:
 
         if self.reference:
             data_type = f"&{data_type}"
+
+        if self.rc:
+            data_type = f"Rc<{data_type}>"
 
         if self.optional:
             if diesel:
@@ -396,8 +422,8 @@ class AttributeMetadata:
 
         return self.name == other.name and self._data_type == other._data_type
 
-    def implements_clone(self) -> bool:
-        """Returns whether the attribute implements the Clone trait."""
+    def implements_copy(self) -> bool:
+        """Returns whether the attribute implements the Copy trait."""
         return (
             self._data_type
             in [
@@ -415,6 +441,17 @@ class AttributeMetadata:
                 "f32",
                 "f64",
                 "uuid::Uuid",
+            ]
+            or isinstance(self._data_type, StructMetadata)
+            and self._data_type.can_implement_copy()
+        )
+
+    def implements_clone(self) -> bool:
+        """Returns whether the attribute implements the Clone trait."""
+        return (
+            self.implements_copy() or 
+            self._data_type
+            in [
                 "String",
                 "Vec<ApiError>",
                 "Vec<u8>",
@@ -805,6 +842,14 @@ class StructMetadata:
             f"The provided table name is {index.table_name}, and the table name of the struct is {self.table_name}."
         )
         self._primary_search_index = index
+    
+    def into_rc(self) -> "StructMetadata":
+        """Returns the struct as an Rc."""
+        for attribute in self.attributes:
+            if not attribute.implements_copy():
+                attribute = attribute.as_rc()
+
+        return self
 
     def has_primary_search_index(self) -> bool:
         """Returns whether the struct has a primary search index."""
@@ -1779,18 +1824,27 @@ class StructMetadata:
         return derives
 
     def can_implement_clone(self) -> bool:
+        """Returns whether the struct can implement the Clone trait."""
         return all(attribute.implements_clone() for attribute in self.attributes)
 
+    def can_implement_copy(self) -> bool:
+        """Returns whether the struct can implement the Copy trait."""
+        return all(attribute.implements_copy() for attribute in self.attributes)
+
     def can_implement_eq(self) -> bool:
+        """Returns whether the struct can implement the Eq trait."""
         return all(attribute.implements_eq() for attribute in self.attributes)
 
     def can_implement_serialize(self) -> bool:
+        """Returns whether the struct can implement the Serialize trait."""
         return all(attribute.implements_serialize() for attribute in self.attributes)
 
     def can_implement_deserialize(self) -> bool:
+        """Returns whether the struct can implement the Deserialize trait."""
         return all(attribute.implements_deserialize() for attribute in self.attributes)
 
     def can_implement_default(self) -> bool:
+        """Returns whether the struct can implement the Default trait."""
         return all(attribute.implements_default() for attribute in self.attributes)
 
     def has_attribute(self, attribute: AttributeMetadata) -> bool:

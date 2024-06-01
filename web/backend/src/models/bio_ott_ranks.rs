@@ -189,75 +189,7 @@ impl BioOttRank {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::bio_ott_ranks;
-        if filter
-            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return bio_ott_ranks::dsl::bio_ott_ranks
-                .filter(bio_ott_ranks::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return bio_ott_ranks::dsl::bio_ott_ranks
-                .filter(bio_ott_ranks::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::similarity_dist(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        bio_ott_ranks::dsl::bio_ott_ranks
+        let mut query = bio_ott_ranks::dsl::bio_ott_ranks
             .filter(
                 crate::sql_function_bindings::similarity_op(
                     crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
@@ -281,6 +213,14 @@ impl BioOttRank {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(bio_ott_ranks::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_ranks::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -309,75 +249,7 @@ impl BioOttRank {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::bio_ott_ranks;
-        if filter
-            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return bio_ott_ranks::dsl::bio_ott_ranks
-                .filter(bio_ott_ranks::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return bio_ott_ranks::dsl::bio_ott_ranks
-                .filter(bio_ott_ranks::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(crate::sql_function_bindings::word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    ),
-                    query,
-                ))
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        bio_ott_ranks::dsl::bio_ott_ranks
+        let mut query = bio_ott_ranks::dsl::bio_ott_ranks
             .filter(
                 crate::sql_function_bindings::word_similarity_op(
                     crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
@@ -401,6 +273,14 @@ impl BioOttRank {
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(bio_ott_ranks::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_ranks::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -429,79 +309,7 @@ impl BioOttRank {
             return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::bio_ott_ranks;
-        if filter
-            .map(|f| f.icon_id.is_some() && f.color_id.is_some())
-            .unwrap_or(false)
-        {
-            unimplemented!();
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            return bio_ott_ranks::dsl::bio_ott_ranks
-                .filter(bio_ott_ranks::dsl::icon_id.eq(icon_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            return bio_ott_ranks::dsl::bio_ott_ranks
-                .filter(bio_ott_ranks::dsl::color_id.eq(color_id))
-                .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::strict_word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                            bio_ott_ranks::dsl::name,
-                            bio_ott_ranks::dsl::description,
-                        ),
-                        query,
-                    ),
-                )
-                .limit(limit.unwrap_or(10))
-                .offset(offset.unwrap_or(0))
-                .load::<Self>(connection)
-                .map_err(web_common::api::ApiError::from);
-        }
-        bio_ott_ranks::dsl::bio_ott_ranks
+        let mut query = bio_ott_ranks::dsl::bio_ott_ranks
             .filter(
                 crate::sql_function_bindings::strict_word_similarity_op(
                     crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
@@ -527,6 +335,14 @@ impl BioOttRank {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(bio_ott_ranks::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(bio_ott_ranks::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
