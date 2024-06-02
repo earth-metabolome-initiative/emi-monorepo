@@ -185,6 +185,8 @@ def write_frontend_router_page(
     document.write(
         "/// Trait defining a struct whose page is be visitable by the router.\n"
         "pub trait Viewable {\n"
+        "    /// Returns the route associated to the page with the overall struct list.\n"
+        "    fn list_route() -> AppRoute;\n"
         "    /// Returns the route associated with the struct.\n"
         "    fn view_route(&self) -> AppRoute;\n"
         "}\n\n"
@@ -211,32 +213,25 @@ def write_frontend_router_page(
         richest_variant = flat_variant.get_richest_variant()
         primary_keys = flat_variant.get_primary_keys()
 
-        document.write(
-            f"impl Viewable for {flat_variant.name} {{\n"
-            f"    fn view_route(&self) -> AppRoute {{\n"
-            f"        AppRoute::{flat_variant.get_capitalized_table_name()}View{{"
-        )
+        viewable_variant_names = [flat_variant]
 
-        for primary_key in primary_keys:
-            document.write(f"{primary_key.name}: self.{primary_key.name}, ")
+        if richest_variant.is_nested():
+            viewable_variant_names.append(richest_variant)
 
-        document.write("}\n    }\n}\n\n")
+        for variant in viewable_variant_names:
+            document.write(
+                f"impl Viewable for {variant.name} {{\n"
+                "    fn list_route() -> AppRoute {\n"
+                f"        AppRoute::{flat_variant.get_capitalized_table_name()}{{}}\n"
+                "    }\n"
+                "    fn view_route(&self) -> AppRoute {\n"
+                f"        AppRoute::{flat_variant.get_capitalized_table_name()}View{{"
+            )
 
-        if not richest_variant.is_nested():
-            continue
+            for primary_key in primary_keys:
+                document.write(f"{primary_key.name}: self.{variant.get_attribute_path(primary_key)}, ")
 
-        document.write(
-            f"impl Viewable for {richest_variant.name} {{\n"
-            f"    fn view_route(&self) -> AppRoute {{\n"
-            f"        AppRoute::{flat_variant.get_capitalized_table_name()}View{{"
-        )
-
-        # For some structs, the primary keys may not be trivially accessible.
-        # For this reason, we employ the path search to find the primary keys.
-        for primary_key in primary_keys:
-            document.write(f"{primary_key.name}: self.{richest_variant.get_attribute_path(primary_key)}, ")
-
-        document.write("}\n    }\n}\n\n")
+            document.write("}\n    }\n}\n\n")
 
     document.write(
         "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\npub enum AppRoute {\n"
