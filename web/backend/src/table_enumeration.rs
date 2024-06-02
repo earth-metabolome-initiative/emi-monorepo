@@ -6469,7 +6469,12 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::BioOttTaxonItems => unreachable!("Table `bio_ott_taxon_items` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Colors => unreachable!("Table `colors` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Countries => unreachable!("Table `countries` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::DerivedSamples => unreachable!("Table `derived_samples` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::DerivedSamples => {
+                let row: web_common::database::NewDerivedSample = bincode::deserialize::<web_common::database::NewDerivedSample>(&row)?;
+                let inserted_row: crate::models::DerivedSample = <web_common::database::NewDerivedSample as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedDerivedSample::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
             web_common::database::Table::DocumentFormats => unreachable!("Table `document_formats` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::LoginProviders => unreachable!("Table `login_providers` is not insertable as it does not have a known column associated to a creator user id."),
@@ -6489,7 +6494,12 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedObservation::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => unreachable!("Table `organism_bio_ott_taxon_items` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::OrganismBioOttTaxonItems => {
+                let row: web_common::database::NewOrganismBioOttTaxonItem = bincode::deserialize::<web_common::database::NewOrganismBioOttTaxonItem>(&row)?;
+                let inserted_row: crate::models::OrganismBioOttTaxonItem = <web_common::database::NewOrganismBioOttTaxonItem as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedOrganismBioOttTaxonItem::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
             web_common::database::Table::Organisms => {
                 let row: web_common::database::NewOrganism = bincode::deserialize::<web_common::database::NewOrganism>(&row)?;
                 let inserted_row: crate::models::Organism = <web_common::database::NewOrganism as InsertRow>::insert(row, user_id, connection)?;
@@ -6505,14 +6515,49 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedProject::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
-            web_common::database::Table::ProjectsTeamsRoleInvitations => unreachable!("Table `projects_teams_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::ProjectsTeamsRoleRequests => unreachable!("Table `projects_teams_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::ProjectsTeamsRoles => unreachable!("Table `projects_teams_roles` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::ProjectsUsersRoleInvitations => unreachable!("Table `projects_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::ProjectsUsersRoleRequests => unreachable!("Table `projects_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::ProjectsUsersRoles => unreachable!("Table `projects_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::ProjectsTeamsRoleInvitations => {
+                let row: web_common::database::NewProjectsTeamsRoleInvitation = bincode::deserialize::<web_common::database::NewProjectsTeamsRoleInvitation>(&row)?;
+                let inserted_row: crate::models::ProjectsTeamsRoleInvitation = <web_common::database::NewProjectsTeamsRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProjectsTeamsRoleInvitation::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::ProjectsTeamsRoleRequests => {
+                let row: web_common::database::NewProjectsTeamsRoleRequest = bincode::deserialize::<web_common::database::NewProjectsTeamsRoleRequest>(&row)?;
+                let inserted_row: crate::models::ProjectsTeamsRoleRequest = <web_common::database::NewProjectsTeamsRoleRequest as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProjectsTeamsRoleRequest::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::ProjectsTeamsRoles => {
+                let row: web_common::database::NewProjectsTeamsRole = bincode::deserialize::<web_common::database::NewProjectsTeamsRole>(&row)?;
+                let inserted_row: crate::models::ProjectsTeamsRole = <web_common::database::NewProjectsTeamsRole as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProjectsTeamsRole::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::ProjectsUsersRoleInvitations => {
+                let row: web_common::database::NewProjectsUsersRoleInvitation = bincode::deserialize::<web_common::database::NewProjectsUsersRoleInvitation>(&row)?;
+                let inserted_row: crate::models::ProjectsUsersRoleInvitation = <web_common::database::NewProjectsUsersRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProjectsUsersRoleInvitation::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::ProjectsUsersRoleRequests => {
+                let row: web_common::database::NewProjectsUsersRoleRequest = bincode::deserialize::<web_common::database::NewProjectsUsersRoleRequest>(&row)?;
+                let inserted_row: crate::models::ProjectsUsersRoleRequest = <web_common::database::NewProjectsUsersRoleRequest as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProjectsUsersRoleRequest::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::ProjectsUsersRoles => {
+                let row: web_common::database::NewProjectsUsersRole = bincode::deserialize::<web_common::database::NewProjectsUsersRole>(&row)?;
+                let inserted_row: crate::models::ProjectsUsersRole = <web_common::database::NewProjectsUsersRole as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedProjectsUsersRole::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
             web_common::database::Table::Roles => unreachable!("Table `roles` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::SampleBioOttTaxonItems => unreachable!("Table `sample_bio_ott_taxon_items` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampleBioOttTaxonItems => {
+                let row: web_common::database::NewSampleBioOttTaxonItem = bincode::deserialize::<web_common::database::NewSampleBioOttTaxonItem>(&row)?;
+                let inserted_row: crate::models::SampleBioOttTaxonItem = <web_common::database::NewSampleBioOttTaxonItem as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedSampleBioOttTaxonItem::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
             web_common::database::Table::SampleContainerCategories => unreachable!("Table `sample_container_categories` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampleContainers => {
                 let row: web_common::database::NewSampleContainer = bincode::deserialize::<web_common::database::NewSampleContainer>(&row)?;
@@ -6546,10 +6591,30 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedTeam::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
-            web_common::database::Table::TeamsTeamsRoleInvitations => unreachable!("Table `teams_teams_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::TeamsUsersRoleInvitations => unreachable!("Table `teams_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::TeamsUsersRoleRequests => unreachable!("Table `teams_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::TeamsUsersRoles => unreachable!("Table `teams_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::TeamsTeamsRoleInvitations => {
+                let row: web_common::database::NewTeamsTeamsRoleInvitation = bincode::deserialize::<web_common::database::NewTeamsTeamsRoleInvitation>(&row)?;
+                let inserted_row: crate::models::TeamsTeamsRoleInvitation = <web_common::database::NewTeamsTeamsRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedTeamsTeamsRoleInvitation::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::TeamsUsersRoleInvitations => {
+                let row: web_common::database::NewTeamsUsersRoleInvitation = bincode::deserialize::<web_common::database::NewTeamsUsersRoleInvitation>(&row)?;
+                let inserted_row: crate::models::TeamsUsersRoleInvitation = <web_common::database::NewTeamsUsersRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedTeamsUsersRoleInvitation::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::TeamsUsersRoleRequests => {
+                let row: web_common::database::NewTeamsUsersRoleRequest = bincode::deserialize::<web_common::database::NewTeamsUsersRoleRequest>(&row)?;
+                let inserted_row: crate::models::TeamsUsersRoleRequest = <web_common::database::NewTeamsUsersRoleRequest as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedTeamsUsersRoleRequest::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::TeamsUsersRoles => {
+                let row: web_common::database::NewTeamsUsersRole = bincode::deserialize::<web_common::database::NewTeamsUsersRole>(&row)?;
+                let inserted_row: crate::models::TeamsUsersRole = <web_common::database::NewTeamsUsersRole as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedTeamsUsersRole::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row)?
+            },
             web_common::database::Table::Units => unreachable!("Table `units` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::UserEmails => {
                 let row: web_common::database::NewUserEmail = bincode::deserialize::<web_common::database::NewUserEmail>(&row)?;
@@ -6562,9 +6627,24 @@ impl InsertableTable for web_common::database::Table {
                 let inserted_row: crate::models::User = <web_common::database::NewUser as InsertRow>::insert(row, user_id, connection)?;
                  bincode::serialize(&inserted_row)?
             },
-            web_common::database::Table::UsersUsersRoleInvitations => unreachable!("Table `users_users_role_invitations` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::UsersUsersRoleRequests => unreachable!("Table `users_users_role_requests` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::UsersUsersRoles => unreachable!("Table `users_users_roles` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::UsersUsersRoleInvitations => {
+                let row: web_common::database::NewUsersUsersRoleInvitation = bincode::deserialize::<web_common::database::NewUsersUsersRoleInvitation>(&row)?;
+                let inserted_row: crate::models::UsersUsersRoleInvitation = <web_common::database::NewUsersUsersRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedUsersUsersRoleInvitation::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::UsersUsersRoleRequests => {
+                let row: web_common::database::NewUsersUsersRoleRequest = bincode::deserialize::<web_common::database::NewUsersUsersRoleRequest>(&row)?;
+                let inserted_row: crate::models::UsersUsersRoleRequest = <web_common::database::NewUsersUsersRoleRequest as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedUsersUsersRoleRequest::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row)?
+            },
+            web_common::database::Table::UsersUsersRoles => {
+                let row: web_common::database::NewUsersUsersRole = bincode::deserialize::<web_common::database::NewUsersUsersRole>(&row)?;
+                let inserted_row: crate::models::UsersUsersRole = <web_common::database::NewUsersUsersRole as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedUsersUsersRole::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row)?
+            },
 })
     }
 }
@@ -6599,7 +6679,12 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::BioOttTaxonItems => unreachable!("Table `bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Colors => unreachable!("Table `colors` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Countries => unreachable!("Table `countries` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::DerivedSamples => unreachable!("Table `derived_samples` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::DerivedSamples => {
+                let row: web_common::database::UpdateDerivedSample = bincode::deserialize::<web_common::database::UpdateDerivedSample>(&row)?;
+                let updated_row: crate::models::DerivedSample = <web_common::database::UpdateDerivedSample as UpdateRow>::update(row, user_id, connection)?;
+                let nested_row = crate::nested_models::NestedDerivedSample::from_flat(updated_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
             web_common::database::Table::DocumentFormats => unreachable!("Table `document_formats` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::FontAwesomeIcons => unreachable!("Table `font_awesome_icons` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::LoginProviders => unreachable!("Table `login_providers` is not updatable as it does not have a known column associated to an updater user id."),

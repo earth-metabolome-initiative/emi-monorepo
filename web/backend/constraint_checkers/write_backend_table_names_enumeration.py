@@ -257,7 +257,7 @@ def write_backend_table_names_enumeration(
     )
 
     for table in tables:
-        if not table.is_insertable() or table.is_junktion_table():
+        if not table.is_insertable():
             document.write(
                 f'            web_common::database::Table::{table.camel_cased()} => unreachable!("Table `{table.name}` is not insertable as it does not have a known column associated to a creator user id."),\n'
             )
@@ -339,7 +339,7 @@ def write_backend_table_names_enumeration(
     )
 
     for table in tables:
-        if not table.is_updatable() or table.is_junktion_table():
+        if not table.is_updatable():
             document.write(
                 f'            web_common::database::Table::{table.camel_cased()} => unreachable!("Table `{table.name}` is not updatable as it does not have a known column associated to an updater user id."),\n'
             )
