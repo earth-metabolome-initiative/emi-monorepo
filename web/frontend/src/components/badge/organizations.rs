@@ -1,5 +1,8 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::{database::{NestedOrganization, Country}, traits::CapitalizeString};
+use web_common::{
+    database::{Country, NestedOrganization},
+    traits::CapitalizeString,
+};
 use yew::prelude::*;
 
 impl RowToBadge for NestedOrganization {

@@ -106,21 +106,29 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let header_type = if ctx.props().filters.is_some() {
+            "h3"
+        } else {
+            "h2"
+        };
+
         html! {
             <div class="page">
-                if ctx.props().filters.is_some() {
-                    <h3>
+                <@{header_type}>
+                    if ctx.props().filters.is_some() {
+                        // If we are currently in a subsection, we add the paragraph icon to allow
+                        // the user to refer directly to this subsection.
+                        <a href={format!("#{}", Page::section())}>
+                            <i class="fas fa-paragraph"></i>
+                        </a>
+                        {'\u{00a0}'}
+                    }
+                    <Link<AppRoute> to={Page::list_route()}>
                         <i class={format!("fas fa-{}", Page::icon())}></i>
                         {'\u{00a0}'}
                         <span>{Page::section()}</span>
-                    </h3>
-                } else {
-                    <h2>
-                        <i class={format!("fas fa-{}", Page::icon())}></i>
-                        {'\u{00a0}'}
-                        <span>{Page::section()}</span>
-                    </h2>
-                }
+                    </Link<AppRoute>>
+                </@>
                 <ul class="badges-container">
                 { for self.pages.iter().map(|page| html!{<Badge<Page> badge={page} li={true}/>}) }
                 if self.no_more_pages {

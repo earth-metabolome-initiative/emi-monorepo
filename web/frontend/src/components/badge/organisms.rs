@@ -1,6 +1,6 @@
 use super::{Badge, BadgeSize, RowToBadge};
 use web_common::database::NestedOrganism;
-use web_common::database::{NestedProject, User, NestedNameplate, NestedSample};
+use web_common::database::{NestedNameplate, NestedProject, NestedSample, User};
 use yew::prelude::*;
 
 impl RowToBadge for NestedOrganism {

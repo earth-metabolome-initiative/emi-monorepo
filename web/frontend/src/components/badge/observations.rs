@@ -1,5 +1,7 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::{NestedObservation, User, NestedProject, NestedSample, NestedObservationSubject, NestedOrganism};
+use web_common::database::{
+    NestedObservation, NestedObservationSubject, NestedOrganism, NestedProject, NestedSample, User,
+};
 use yew::prelude::*;
 
 impl RowToBadge for NestedObservation {

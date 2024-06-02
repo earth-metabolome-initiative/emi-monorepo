@@ -1,4 +1,4 @@
-use super:: RowToBadge;
+use super::RowToBadge;
 use web_common::database::NestedRole;
 
 impl RowToBadge for NestedRole {

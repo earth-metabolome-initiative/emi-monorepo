@@ -1,5 +1,5 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::{NestedSpectraCollection, NestedSample, User};
+use web_common::database::{NestedSample, NestedSpectraCollection, User};
 use yew::prelude::*;
 
 impl RowToBadge for NestedSpectraCollection {

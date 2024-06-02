@@ -34,13 +34,17 @@ pub(crate) trait PageLike:
 
     fn id(&self) -> PrimaryKey;
 
-    fn update_path(&self) -> Option<AppRoute>;
+    fn update_path(&self) -> Option<AppRoute> {
+        None
+    }
 
     /// Create a path to create a new item.
     ///
     /// # Arguments
     /// * `filter` - The filter to apply to the path.
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute>;
+    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        None
+    }
 
     /// Returns font-awesome icon associated with the page type.
     fn icon() -> &'static str;
@@ -57,14 +61,6 @@ impl PageLike for NestedBioOttRank {
 
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        None
-    }
-
-    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        None
     }
 
     fn icon() -> &'static str {
@@ -225,10 +221,6 @@ impl PageLike for NestedObservationSubject {
         None
     }
 
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        None
-    }
-
     fn icon() -> &'static str {
         "dna"
     }
@@ -306,21 +298,6 @@ impl PageLike for NestedSpectra {
 
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        None
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        // filter
-        //     .and_then(|f| {
-        //         f.spectra_collection_id.map(|spectra_collection_id| {
-        //             AppRoute::SpectraNewWithSpectraCollection { spectra_collection_id }
-        //         })
-        //     })
-        //     .or(Some(AppRoute::SpectraNew))
-        None
     }
 
     fn icon() -> &'static str {
@@ -443,10 +420,6 @@ impl PageLike for User {
 
     fn update_path(&self) -> Option<AppRoute> {
         Some(AppRoute::UsersUpdate { id: self.id })
-    }
-
-    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        None
     }
 
     fn icon() -> &'static str {

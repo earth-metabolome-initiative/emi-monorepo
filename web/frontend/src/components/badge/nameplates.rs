@@ -1,5 +1,5 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::{NestedNameplate, User, NestedProject, NestedNameplateCategory};
+use web_common::database::{NestedNameplate, NestedNameplateCategory, NestedProject, User};
 use yew::prelude::*;
 
 impl RowToBadge for NestedNameplate {

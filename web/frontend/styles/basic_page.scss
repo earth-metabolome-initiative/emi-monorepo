@@ -15,18 +15,35 @@
         font-size: 1.2em;
         border-top-left-radius: 0.5em;
         border-top-right-radius: 0.5em;
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
     }
 
     h3 {
         margin: 0;
         margin-bottom: 0.5em;
-        padding: 0.5em;
-        background-color: $near_black;
-        color: white;
+        padding-bottom: 0.25em;
+        color: $near_black;
         font-weight: 600;
         font-size: 1em;
-        border-bottom: 1px solid $near_black;
+        border-bottom: 1px dashed $near_black;
         border-top-left-radius: 0.5em;
         border-top-right-radius: 0.5em;
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .fas.fa-paragraph {
+            color: $grey;
+            transition: color 0.3s;
+            &:hover {
+                color: $near_black;
+            }
+        }
     }
 }

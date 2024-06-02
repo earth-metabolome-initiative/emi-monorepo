@@ -1,5 +1,5 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::{NestedTeam, User, NestedTeamState};
+use web_common::database::{NestedTeam, NestedTeamState, User};
 use yew::prelude::*;
 
 impl RowToBadge for NestedTeam {

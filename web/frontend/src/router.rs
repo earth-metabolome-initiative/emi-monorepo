@@ -10,185 +10,277 @@ use yew_router::prelude::*;
 
 /// Trait defining a struct whose page is be visitable by the router.
 pub trait Viewable {
+    /// Returns the route associated to the page with the overall struct list.
+    fn list_route() -> AppRoute;
     /// Returns the route associated with the struct.
     fn view_route(&self) -> AppRoute;
 }
 
 impl Viewable for BioOttRank {
+    fn list_route() -> AppRoute {
+        AppRoute::BioOttRanks {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::BioOttRanksView { id: self.id }
     }
 }
 
 impl Viewable for NestedBioOttRank {
+    fn list_route() -> AppRoute {
+        AppRoute::BioOttRanks {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::BioOttRanksView { id: self.inner.id }
     }
 }
 
 impl Viewable for BioOttTaxonItem {
+    fn list_route() -> AppRoute {
+        AppRoute::BioOttTaxonItems {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::BioOttTaxonItemsView { id: self.id }
     }
 }
 
 impl Viewable for NestedBioOttTaxonItem {
+    fn list_route() -> AppRoute {
+        AppRoute::BioOttTaxonItems {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::BioOttTaxonItemsView { id: self.inner.id }
     }
 }
 
 impl Viewable for Country {
+    fn list_route() -> AppRoute {
+        AppRoute::Countries {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::CountriesView { id: self.id }
     }
 }
 
 impl Viewable for Nameplate {
+    fn list_route() -> AppRoute {
+        AppRoute::Nameplates {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::NameplatesView { id: self.id }
     }
 }
 
 impl Viewable for NestedNameplate {
+    fn list_route() -> AppRoute {
+        AppRoute::Nameplates {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::NameplatesView { id: self.inner.id }
     }
 }
 
 impl Viewable for ObservationSubject {
+    fn list_route() -> AppRoute {
+        AppRoute::ObservationSubjects {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::ObservationSubjectsView { id: self.id }
     }
 }
 
 impl Viewable for NestedObservationSubject {
+    fn list_route() -> AppRoute {
+        AppRoute::ObservationSubjects {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::ObservationSubjectsView { id: self.inner.id }
     }
 }
 
 impl Viewable for Observation {
+    fn list_route() -> AppRoute {
+        AppRoute::Observations {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::ObservationsView { id: self.id }
     }
 }
 
 impl Viewable for NestedObservation {
+    fn list_route() -> AppRoute {
+        AppRoute::Observations {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::ObservationsView { id: self.inner.id }
     }
 }
 
 impl Viewable for Organism {
+    fn list_route() -> AppRoute {
+        AppRoute::Organisms {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::OrganismsView { id: self.id }
     }
 }
 
 impl Viewable for NestedOrganism {
+    fn list_route() -> AppRoute {
+        AppRoute::Organisms {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::OrganismsView { id: self.inner.id }
     }
 }
 
 impl Viewable for Organization {
+    fn list_route() -> AppRoute {
+        AppRoute::Organizations {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::OrganizationsView { id: self.id }
     }
 }
 
 impl Viewable for NestedOrganization {
+    fn list_route() -> AppRoute {
+        AppRoute::Organizations {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::OrganizationsView { id: self.inner.id }
     }
 }
 
 impl Viewable for Project {
+    fn list_route() -> AppRoute {
+        AppRoute::Projects {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::ProjectsView { id: self.id }
     }
 }
 
 impl Viewable for NestedProject {
+    fn list_route() -> AppRoute {
+        AppRoute::Projects {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::ProjectsView { id: self.inner.id }
     }
 }
 
 impl Viewable for SampleContainer {
+    fn list_route() -> AppRoute {
+        AppRoute::SampleContainers {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SampleContainersView { id: self.id }
     }
 }
 
 impl Viewable for NestedSampleContainer {
+    fn list_route() -> AppRoute {
+        AppRoute::SampleContainers {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SampleContainersView { id: self.inner.id }
     }
 }
 
 impl Viewable for SampleState {
+    fn list_route() -> AppRoute {
+        AppRoute::SampleStates {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SampleStatesView { id: self.id }
     }
 }
 
 impl Viewable for NestedSampleState {
+    fn list_route() -> AppRoute {
+        AppRoute::SampleStates {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SampleStatesView { id: self.inner.id }
     }
 }
 
 impl Viewable for Sample {
+    fn list_route() -> AppRoute {
+        AppRoute::Samples {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SamplesView { id: self.id }
     }
 }
 
 impl Viewable for NestedSample {
+    fn list_route() -> AppRoute {
+        AppRoute::Samples {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SamplesView { id: self.inner.id }
     }
 }
 
 impl Viewable for Spectra {
+    fn list_route() -> AppRoute {
+        AppRoute::Spectra {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SpectraView { id: self.id }
     }
 }
 
 impl Viewable for NestedSpectra {
+    fn list_route() -> AppRoute {
+        AppRoute::Spectra {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SpectraView { id: self.inner.id }
     }
 }
 
 impl Viewable for SpectraCollection {
+    fn list_route() -> AppRoute {
+        AppRoute::SpectraCollections {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SpectraCollectionsView { id: self.id }
     }
 }
 
 impl Viewable for NestedSpectraCollection {
+    fn list_route() -> AppRoute {
+        AppRoute::SpectraCollections {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::SpectraCollectionsView { id: self.inner.id }
     }
 }
 
 impl Viewable for Team {
+    fn list_route() -> AppRoute {
+        AppRoute::Teams {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::TeamsView { id: self.id }
     }
 }
 
 impl Viewable for NestedTeam {
+    fn list_route() -> AppRoute {
+        AppRoute::Teams {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::TeamsView { id: self.inner.id }
     }
 }
 
 impl Viewable for User {
+    fn list_route() -> AppRoute {
+        AppRoute::Users {}
+    }
     fn view_route(&self) -> AppRoute {
         AppRoute::UsersView { id: self.id }
     }
