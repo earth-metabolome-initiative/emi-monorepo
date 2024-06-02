@@ -770,7 +770,6 @@ class MethodDefinition:
                     document.write(
                         f"    /// * `{argument.name}` - {self.argument_descriptions[argument.name]}\n"
                     )
-            document.write("    ///\n")
 
         async_name = ""
         if self.is_async:
