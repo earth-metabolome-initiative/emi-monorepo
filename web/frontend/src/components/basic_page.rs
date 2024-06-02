@@ -623,7 +623,13 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
 
             html! {
                 <div class="page">
-                    <h2>{ page.badge_title() }</h2>
+                    <h2>
+                        if let Some(icon) = page.font_awesome_icon() {
+                            <i class={format!("fas fa-{}", icon)}></i>
+                            {'\u{00a0}'}
+                        }
+                        <span>{ page.badge_title() }</span>
+                    </h2>
                     if let Some(description) = page.description() {
                         <p>{ description }</p>
                     }
