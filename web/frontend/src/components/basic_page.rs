@@ -1,7 +1,7 @@
 //! Module providing a yew component for a basic page with a websocket connection.
 use std::rc::Rc;
 
-use crate::router::{AppRoute, Viewable};
+use crate::router::*;
 use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
@@ -65,6 +65,14 @@ impl PageLike for NestedDerivedSample {
     fn icon() -> &'static str {
         "vial"
     }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
+    }
+
+    fn update_path(&self) -> Option<AppRoute> {
+        Some(self.update_route())
+    }
 }
 
 impl PageLike for NestedBioOttTaxonItem {
@@ -85,6 +93,10 @@ impl PageLike for NestedOrganismBioOttTaxonItem {
     fn icon() -> &'static str {
         "dna"
     }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
+    }
 }
 
 impl PageLike for NestedSampleBioOttTaxonItem {
@@ -95,6 +107,10 @@ impl PageLike for NestedSampleBioOttTaxonItem {
     fn icon() -> &'static str {
         "dna"
     }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
+    }
 }
 
 impl PageLike for NestedTeamsUsersRoleRequest {
@@ -104,6 +120,10 @@ impl PageLike for NestedTeamsUsersRoleRequest {
 
     fn icon() -> &'static str {
         NestedTeam::icon()
+    }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
     }
 }
 
@@ -120,14 +140,6 @@ impl PageLike for Country {
 impl PageLike for NestedSampleState {
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        None
-    }
-
-    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        None
     }
 
     fn icon() -> &'static str {
@@ -163,6 +175,10 @@ impl PageLike for NestedUsersUsersRoleRequest {
     fn icon() -> &'static str {
         "users"
     }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
+    }
 }
 
 impl PageLike for NestedUsersUsersRoleInvitation {
@@ -172,6 +188,10 @@ impl PageLike for NestedUsersUsersRoleInvitation {
 
     fn icon() -> &'static str {
         "users"
+    }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
     }
 }
 
@@ -183,6 +203,10 @@ impl PageLike for NestedTeamsUsersRoleInvitation {
     fn icon() -> &'static str {
         NestedTeam::icon()
     }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
+    }
 }
 
 impl PageLike for NestedTeamsTeamsRoleInvitation {
@@ -192,6 +216,10 @@ impl PageLike for NestedTeamsTeamsRoleInvitation {
 
     fn icon() -> &'static str {
         NestedTeam::icon()
+    }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
     }
 }
 
@@ -203,6 +231,10 @@ impl PageLike for NestedProjectsUsersRoleRequest {
     fn icon() -> &'static str {
         NestedProject::icon()
     }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
+    }
 }
 
 impl PageLike for NestedProjectsUsersRoleInvitation {
@@ -212,6 +244,10 @@ impl PageLike for NestedProjectsUsersRoleInvitation {
 
     fn icon() -> &'static str {
         NestedProject::icon()
+    }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
     }
 }
 
@@ -233,6 +269,9 @@ impl PageLike for NestedProjectsTeamsRoleRequest {
     fn icon() -> &'static str {
         NestedProject::icon()
     }
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
+    }
 }
 
 impl PageLike for NestedProjectsTeamsRole {
@@ -253,6 +292,10 @@ impl PageLike for NestedProjectsTeamsRoleInvitation {
     fn icon() -> &'static str {
         NestedProject::icon()
     }
+
+    fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
+        Some(Self::new_route(filter))
+    }
 }
 
 impl PageLike for NestedProject {
@@ -261,17 +304,11 @@ impl PageLike for NestedProject {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::ProjectsUpdate { id: self.inner.id })
+        Some(self.update_route())
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        filter
-            .and_then(|f| {
-                f.parent_project_id.map(|parent_project_id| {
-                    AppRoute::ProjectsNewWithParentProject { parent_project_id }
-                })
-            })
-            .or(Some(AppRoute::ProjectsNew))
+        Some(Self::new_route(filter))
     }
 
     fn icon() -> &'static str {
@@ -284,14 +321,6 @@ impl PageLike for NestedOrganization {
         self.inner.id.into()
     }
 
-    fn update_path(&self) -> Option<AppRoute> {
-        None
-    }
-
-    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        None
-    }
-
     fn icon() -> &'static str {
         "sitemap"
     }
@@ -300,10 +329,6 @@ impl PageLike for NestedOrganization {
 impl PageLike for NestedObservationSubject {
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        None
     }
 
     fn icon() -> &'static str {
@@ -317,16 +342,11 @@ impl PageLike for NestedObservation {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::ObservationsUpdate { id: self.inner.id })
+        Some(self.update_route())
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        filter
-            .and_then(|f| {
-                f.project_id
-                    .map(|project_id| AppRoute::ObservationsNewWithProject { project_id })
-            })
-            .or(Some(AppRoute::ObservationsNew))
+        Some(Self::new_route(filter))
     }
 
     fn icon() -> &'static str {
@@ -340,15 +360,10 @@ impl PageLike for NestedSpectraCollection {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::SpectraCollectionsUpdate { id: self.inner.id })
+        Some(self.update_route())
     }
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        filter
-            .and_then(|f| {
-                f.sample_id
-                    .map(|sample_id| AppRoute::SpectraCollectionsNewWithSample { sample_id })
-            })
-            .or(Some(AppRoute::SpectraCollectionsNew))
+        Some(Self::new_route(filter))
     }
 
     fn icon() -> &'static str {
@@ -372,16 +387,11 @@ impl PageLike for NestedNameplate {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::NameplatesUpdate { id: self.inner.id })
+        Some(self.update_route())
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        filter
-            .and_then(|f| {
-                f.project_id
-                    .map(|project_id| AppRoute::NameplatesNewWithProject { project_id })
-            })
-            .or(Some(AppRoute::NameplatesNew))
+        Some(Self::new_route(filter))
     }
 
     fn icon() -> &'static str {
@@ -395,16 +405,11 @@ impl PageLike for NestedOrganism {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::OrganismsUpdate { id: self.inner.id })
+        Some(self.update_route())
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        filter
-            .and_then(|f| {
-                f.project_id
-                    .map(|project_id| AppRoute::OrganismsNewWithProject { project_id })
-            })
-            .or(Some(AppRoute::OrganismsNew))
+        Some(Self::new_route(filter))
     }
 
     fn icon() -> &'static str {
@@ -418,23 +423,11 @@ impl PageLike for NestedSample {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::SamplesUpdate { id: self.inner.id })
+        Some(self.update_route())
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        filter
-            .and_then(|f| {
-                if let Some(project_id) = f.project_id {
-                    Some(AppRoute::SamplesNewWithProject { project_id })
-                } else if let Some(container_id) = f.container_id {
-                    Some(AppRoute::SamplesNewWithContainer { container_id })
-                } else if let Some(sampled_by) = f.sampled_by {
-                    Some(AppRoute::SamplesNewWithSampledBy { sampled_by })
-                } else {
-                    None
-                }
-            })
-            .or(Some(AppRoute::SamplesNew))
+        Some(Self::new_route(filter))
     }
 
     fn icon() -> &'static str {
@@ -448,7 +441,7 @@ impl PageLike for User {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::UsersUpdate { id: self.id })
+        Some(self.update_route())
     }
 
     fn icon() -> &'static str {
@@ -462,16 +455,11 @@ impl PageLike for NestedTeam {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::TeamsUpdate { id: self.inner.id })
+        Some(self.update_route())
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        filter
-            .and_then(|f| {
-                f.parent_team_id
-                    .map(|parent_team_id| AppRoute::TeamsNewWithParentTeam { parent_team_id })
-            })
-            .or(Some(AppRoute::TeamsNew))
+        Some(Self::new_route(filter))
     }
 
     fn icon() -> &'static str {
@@ -485,16 +473,11 @@ impl PageLike for NestedSampleContainer {
     }
 
     fn update_path(&self) -> Option<AppRoute> {
-        Some(AppRoute::SampleContainersUpdate { id: self.inner.id })
+        Some(self.update_route())
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        filter
-            .and_then(|f| {
-                f.project_id
-                    .map(|project_id| AppRoute::SampleContainersNewWithProject { project_id })
-            })
-            .or(Some(AppRoute::SampleContainersNew))
+        Some(Self::new_route(filter))
     }
 
     fn icon() -> &'static str {

@@ -166,11 +166,24 @@ def write_frontend_router_page(
 
     document.write(
         "/// Trait defining a struct whose page is be visitable by the router.\n"
-        "pub trait Viewable {\n"
+        "pub(crate) trait Viewable {\n"
         "    /// Returns the route associated to the page with the overall struct list.\n"
         "    fn list_route() -> AppRoute;\n"
         "    /// Returns the route associated with the struct.\n"
         "    fn view_route(&self) -> AppRoute;\n"
+        "}\n\n"
+        "/// Trait defining a struct that can be created, and therefore has a new page.\n"
+        "pub(crate) trait Insertable: Filtrable {\n"
+        "    /// Returns the route associated with the struct new page.\n"
+        "    ///\n"
+        "    /// # Arguments\n"
+        "    /// * `filter` - The optional filter to use to populate part of the form.\n"
+        "    fn new_route(filter: Option<&Self::Filter>) -> AppRoute;\n"
+        "}\n\n"
+        "/// Trait defining a struct that can be updated, and therefore has an update page.\n"
+        "pub(crate) trait Updatable {\n"
+        "    /// Returns the route associated with the struct update page.\n"
+        "    fn update_route(&self) -> AppRoute;\n"
         "}\n\n"
     )
 
@@ -205,6 +218,59 @@ def write_frontend_router_page(
                 document.write(f"{primary_key.name}: self.{variant.get_attribute_path(primary_key)}, ")
 
             document.write("}\n    }\n}\n\n")
+
+            if flat_variant.is_insertable() and flat_variant.table_name != "users":
+                document.write(
+                    f"impl Insertable for {variant.name} {{\n"
+                    "    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {\n"
+                    "        if let Some(filter) = filter {\n"
+                )
+                for foreign_key in flat_variant.get_foreign_keys():
+                    # We retrieve from the rich variant the struct associated with the foreign key.
+                    normalized_foreign_key_name = foreign_key.normalized_name()
+                    foreign_key_attribute: AttributeMetadata = richest_variant.get_attribute_by_name(normalized_foreign_key_name)
+
+                    assert foreign_key_attribute.has_struct_data_type()
+
+                    if foreign_key.is_automatically_determined_column():
+                        continue
+
+                    foreign_key_struct: StructMetadata = foreign_key_attribute.raw_data_type()
+
+                    if not foreign_key_struct.is_updatable():
+                        continue
+
+                    capitalized_normalized_foreign_key_name = "".join(
+                        word.capitalize() for word in normalized_foreign_key_name.split("_")
+                    )
+
+                    enum_variant_name = f"{flat_variant.get_capitalized_table_name()}NewWith{capitalized_normalized_foreign_key_name}"
+
+                    document.write(
+                        f"            if let Some({foreign_key.name}) = filter.{foreign_key.name} {{\n"
+                        f"                return AppRoute::{enum_variant_name}{{{foreign_key.name}}};\n"
+                        "            }\n"
+                    )
+                
+                document.write(
+                    "        }\n"
+                    f"        AppRoute::{flat_variant.get_capitalized_table_name()}New\n"
+                    "    }\n"
+                    "}\n\n"
+                )
+
+            if flat_variant.is_updatable():
+                document.write(
+                    f"impl Updatable for {variant.name} {{\n"
+                    "    fn update_route(&self) -> AppRoute {\n"
+                    f"        AppRoute::{flat_variant.get_capitalized_table_name()}Update{{"
+                )
+
+                for primary_key in primary_keys:
+                    document.write(f"{primary_key.name}: self.{variant.get_attribute_path(primary_key)}, ")
+
+                document.write("}\n    }\n}\n\n")
+
 
     document.write(
         "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\npub enum AppRoute {\n"

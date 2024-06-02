@@ -9,11 +9,26 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 /// Trait defining a struct whose page is be visitable by the router.
-pub trait Viewable {
+pub(crate) trait Viewable {
     /// Returns the route associated to the page with the overall struct list.
     fn list_route() -> AppRoute;
     /// Returns the route associated with the struct.
     fn view_route(&self) -> AppRoute;
+}
+
+/// Trait defining a struct that can be created, and therefore has a new page.
+pub(crate) trait Insertable: Filtrable {
+    /// Returns the route associated with the struct new page.
+    ///
+    /// # Arguments
+    /// * `filter` - The optional filter to use to populate part of the form.
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute;
+}
+
+/// Trait defining a struct that can be updated, and therefore has an update page.
+pub(crate) trait Updatable {
+    /// Returns the route associated with the struct update page.
+    fn update_route(&self) -> AppRoute;
 }
 
 impl Viewable for BioOttRank {
@@ -73,12 +88,58 @@ impl Viewable for DerivedSample {
     }
 }
 
+impl Insertable for DerivedSample {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(parent_sample_id) = filter.parent_sample_id {
+                return AppRoute::DerivedSamplesNewWithParentSample { parent_sample_id };
+            }
+            if let Some(child_sample_id) = filter.child_sample_id {
+                return AppRoute::DerivedSamplesNewWithChildSample { child_sample_id };
+            }
+        }
+        AppRoute::DerivedSamplesNew
+    }
+}
+
+impl Updatable for DerivedSample {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::DerivedSamplesUpdate {
+            parent_sample_id: self.parent_sample_id,
+            child_sample_id: self.child_sample_id,
+        }
+    }
+}
+
 impl Viewable for NestedDerivedSample {
     fn list_route() -> AppRoute {
         AppRoute::DerivedSamples {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::DerivedSamplesView {
+            parent_sample_id: self.inner.parent_sample_id,
+            child_sample_id: self.inner.child_sample_id,
+        }
+    }
+}
+
+impl Insertable for NestedDerivedSample {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(parent_sample_id) = filter.parent_sample_id {
+                return AppRoute::DerivedSamplesNewWithParentSample { parent_sample_id };
+            }
+            if let Some(child_sample_id) = filter.child_sample_id {
+                return AppRoute::DerivedSamplesNewWithChildSample { child_sample_id };
+            }
+        }
+        AppRoute::DerivedSamplesNew
+    }
+}
+
+impl Updatable for NestedDerivedSample {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::DerivedSamplesUpdate {
             parent_sample_id: self.inner.parent_sample_id,
             child_sample_id: self.inner.child_sample_id,
         }
@@ -94,12 +155,46 @@ impl Viewable for Nameplate {
     }
 }
 
+impl Insertable for Nameplate {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::NameplatesNewWithProject { project_id };
+            }
+        }
+        AppRoute::NameplatesNew
+    }
+}
+
+impl Updatable for Nameplate {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::NameplatesUpdate { id: self.id }
+    }
+}
+
 impl Viewable for NestedNameplate {
     fn list_route() -> AppRoute {
         AppRoute::Nameplates {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::NameplatesView { id: self.inner.id }
+    }
+}
+
+impl Insertable for NestedNameplate {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::NameplatesNewWithProject { project_id };
+            }
+        }
+        AppRoute::NameplatesNew
+    }
+}
+
+impl Updatable for NestedNameplate {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::NameplatesUpdate { id: self.inner.id }
     }
 }
 
@@ -130,12 +225,68 @@ impl Viewable for Observation {
     }
 }
 
+impl Insertable for Observation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(parent_observation_id) = filter.parent_observation_id {
+                return AppRoute::ObservationsNewWithParentObservation {
+                    parent_observation_id,
+                };
+            }
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::ObservationsNewWithProject { project_id };
+            }
+            if let Some(organism_id) = filter.organism_id {
+                return AppRoute::ObservationsNewWithOrganism { organism_id };
+            }
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::ObservationsNewWithSample { sample_id };
+            }
+        }
+        AppRoute::ObservationsNew
+    }
+}
+
+impl Updatable for Observation {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::ObservationsUpdate { id: self.id }
+    }
+}
+
 impl Viewable for NestedObservation {
     fn list_route() -> AppRoute {
         AppRoute::Observations {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::ObservationsView { id: self.inner.id }
+    }
+}
+
+impl Insertable for NestedObservation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(parent_observation_id) = filter.parent_observation_id {
+                return AppRoute::ObservationsNewWithParentObservation {
+                    parent_observation_id,
+                };
+            }
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::ObservationsNewWithProject { project_id };
+            }
+            if let Some(organism_id) = filter.organism_id {
+                return AppRoute::ObservationsNewWithOrganism { organism_id };
+            }
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::ObservationsNewWithSample { sample_id };
+            }
+        }
+        AppRoute::ObservationsNew
+    }
+}
+
+impl Updatable for NestedObservation {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::ObservationsUpdate { id: self.inner.id }
     }
 }
 
@@ -151,6 +302,17 @@ impl Viewable for OrganismBioOttTaxonItem {
     }
 }
 
+impl Insertable for OrganismBioOttTaxonItem {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(organism_id) = filter.organism_id {
+                return AppRoute::OrganismBioOttTaxonItemsNewWithOrganism { organism_id };
+            }
+        }
+        AppRoute::OrganismBioOttTaxonItemsNew
+    }
+}
+
 impl Viewable for NestedOrganismBioOttTaxonItem {
     fn list_route() -> AppRoute {
         AppRoute::OrganismBioOttTaxonItems {}
@@ -163,6 +325,17 @@ impl Viewable for NestedOrganismBioOttTaxonItem {
     }
 }
 
+impl Insertable for NestedOrganismBioOttTaxonItem {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(organism_id) = filter.organism_id {
+                return AppRoute::OrganismBioOttTaxonItemsNewWithOrganism { organism_id };
+            }
+        }
+        AppRoute::OrganismBioOttTaxonItemsNew
+    }
+}
+
 impl Viewable for Organism {
     fn list_route() -> AppRoute {
         AppRoute::Organisms {}
@@ -172,12 +345,64 @@ impl Viewable for Organism {
     }
 }
 
+impl Insertable for Organism {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(host_organism_id) = filter.host_organism_id {
+                return AppRoute::OrganismsNewWithHostOrganism { host_organism_id };
+            }
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::OrganismsNewWithSample { sample_id };
+            }
+            if let Some(nameplate_id) = filter.nameplate_id {
+                return AppRoute::OrganismsNewWithNameplate { nameplate_id };
+            }
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::OrganismsNewWithProject { project_id };
+            }
+        }
+        AppRoute::OrganismsNew
+    }
+}
+
+impl Updatable for Organism {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::OrganismsUpdate { id: self.id }
+    }
+}
+
 impl Viewable for NestedOrganism {
     fn list_route() -> AppRoute {
         AppRoute::Organisms {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::OrganismsView { id: self.inner.id }
+    }
+}
+
+impl Insertable for NestedOrganism {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(host_organism_id) = filter.host_organism_id {
+                return AppRoute::OrganismsNewWithHostOrganism { host_organism_id };
+            }
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::OrganismsNewWithSample { sample_id };
+            }
+            if let Some(nameplate_id) = filter.nameplate_id {
+                return AppRoute::OrganismsNewWithNameplate { nameplate_id };
+            }
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::OrganismsNewWithProject { project_id };
+            }
+        }
+        AppRoute::OrganismsNew
+    }
+}
+
+impl Updatable for NestedOrganism {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::OrganismsUpdate { id: self.inner.id }
     }
 }
 
@@ -208,12 +433,46 @@ impl Viewable for Project {
     }
 }
 
+impl Insertable for Project {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(parent_project_id) = filter.parent_project_id {
+                return AppRoute::ProjectsNewWithParentProject { parent_project_id };
+            }
+        }
+        AppRoute::ProjectsNew
+    }
+}
+
+impl Updatable for Project {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::ProjectsUpdate { id: self.id }
+    }
+}
+
 impl Viewable for NestedProject {
     fn list_route() -> AppRoute {
         AppRoute::Projects {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::ProjectsView { id: self.inner.id }
+    }
+}
+
+impl Insertable for NestedProject {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(parent_project_id) = filter.parent_project_id {
+                return AppRoute::ProjectsNewWithParentProject { parent_project_id };
+            }
+        }
+        AppRoute::ProjectsNew
+    }
+}
+
+impl Updatable for NestedProject {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::ProjectsUpdate { id: self.inner.id }
     }
 }
 
@@ -229,6 +488,20 @@ impl Viewable for ProjectsTeamsRoleInvitation {
     }
 }
 
+impl Insertable for ProjectsTeamsRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsTeamsRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(team_id) = filter.team_id {
+                return AppRoute::ProjectsTeamsRoleInvitationsNewWithTeam { team_id };
+            }
+        }
+        AppRoute::ProjectsTeamsRoleInvitationsNew
+    }
+}
+
 impl Viewable for NestedProjectsTeamsRoleInvitation {
     fn list_route() -> AppRoute {
         AppRoute::ProjectsTeamsRoleInvitations {}
@@ -238,6 +511,20 @@ impl Viewable for NestedProjectsTeamsRoleInvitation {
             table_id: self.inner.table_id,
             team_id: self.inner.team_id,
         }
+    }
+}
+
+impl Insertable for NestedProjectsTeamsRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsTeamsRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(team_id) = filter.team_id {
+                return AppRoute::ProjectsTeamsRoleInvitationsNewWithTeam { team_id };
+            }
+        }
+        AppRoute::ProjectsTeamsRoleInvitationsNew
     }
 }
 
@@ -253,6 +540,20 @@ impl Viewable for ProjectsTeamsRoleRequest {
     }
 }
 
+impl Insertable for ProjectsTeamsRoleRequest {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsTeamsRoleRequestsNewWithTable { table_id };
+            }
+            if let Some(team_id) = filter.team_id {
+                return AppRoute::ProjectsTeamsRoleRequestsNewWithTeam { team_id };
+            }
+        }
+        AppRoute::ProjectsTeamsRoleRequestsNew
+    }
+}
+
 impl Viewable for NestedProjectsTeamsRoleRequest {
     fn list_route() -> AppRoute {
         AppRoute::ProjectsTeamsRoleRequests {}
@@ -262,6 +563,20 @@ impl Viewable for NestedProjectsTeamsRoleRequest {
             table_id: self.inner.table_id,
             team_id: self.inner.team_id,
         }
+    }
+}
+
+impl Insertable for NestedProjectsTeamsRoleRequest {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsTeamsRoleRequestsNewWithTable { table_id };
+            }
+            if let Some(team_id) = filter.team_id {
+                return AppRoute::ProjectsTeamsRoleRequestsNewWithTeam { team_id };
+            }
+        }
+        AppRoute::ProjectsTeamsRoleRequestsNew
     }
 }
 
@@ -277,6 +592,20 @@ impl Viewable for ProjectsTeamsRole {
     }
 }
 
+impl Insertable for ProjectsTeamsRole {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsTeamsRolesNewWithTable { table_id };
+            }
+            if let Some(team_id) = filter.team_id {
+                return AppRoute::ProjectsTeamsRolesNewWithTeam { team_id };
+            }
+        }
+        AppRoute::ProjectsTeamsRolesNew
+    }
+}
+
 impl Viewable for NestedProjectsTeamsRole {
     fn list_route() -> AppRoute {
         AppRoute::ProjectsTeamsRoles {}
@@ -286,6 +615,20 @@ impl Viewable for NestedProjectsTeamsRole {
             table_id: self.inner.table_id,
             team_id: self.inner.team_id,
         }
+    }
+}
+
+impl Insertable for NestedProjectsTeamsRole {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsTeamsRolesNewWithTable { table_id };
+            }
+            if let Some(team_id) = filter.team_id {
+                return AppRoute::ProjectsTeamsRolesNewWithTeam { team_id };
+            }
+        }
+        AppRoute::ProjectsTeamsRolesNew
     }
 }
 
@@ -301,6 +644,20 @@ impl Viewable for ProjectsUsersRoleInvitation {
     }
 }
 
+impl Insertable for ProjectsUsersRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsUsersRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::ProjectsUsersRoleInvitationsNewWithUser { user_id };
+            }
+        }
+        AppRoute::ProjectsUsersRoleInvitationsNew
+    }
+}
+
 impl Viewable for NestedProjectsUsersRoleInvitation {
     fn list_route() -> AppRoute {
         AppRoute::ProjectsUsersRoleInvitations {}
@@ -310,6 +667,20 @@ impl Viewable for NestedProjectsUsersRoleInvitation {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
+    }
+}
+
+impl Insertable for NestedProjectsUsersRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsUsersRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::ProjectsUsersRoleInvitationsNewWithUser { user_id };
+            }
+        }
+        AppRoute::ProjectsUsersRoleInvitationsNew
     }
 }
 
@@ -325,6 +696,20 @@ impl Viewable for ProjectsUsersRoleRequest {
     }
 }
 
+impl Insertable for ProjectsUsersRoleRequest {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsUsersRoleRequestsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::ProjectsUsersRoleRequestsNewWithUser { user_id };
+            }
+        }
+        AppRoute::ProjectsUsersRoleRequestsNew
+    }
+}
+
 impl Viewable for NestedProjectsUsersRoleRequest {
     fn list_route() -> AppRoute {
         AppRoute::ProjectsUsersRoleRequests {}
@@ -334,6 +719,20 @@ impl Viewable for NestedProjectsUsersRoleRequest {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
+    }
+}
+
+impl Insertable for NestedProjectsUsersRoleRequest {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsUsersRoleRequestsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::ProjectsUsersRoleRequestsNewWithUser { user_id };
+            }
+        }
+        AppRoute::ProjectsUsersRoleRequestsNew
     }
 }
 
@@ -349,6 +748,20 @@ impl Viewable for ProjectsUsersRole {
     }
 }
 
+impl Insertable for ProjectsUsersRole {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsUsersRolesNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::ProjectsUsersRolesNewWithUser { user_id };
+            }
+        }
+        AppRoute::ProjectsUsersRolesNew
+    }
+}
+
 impl Viewable for NestedProjectsUsersRole {
     fn list_route() -> AppRoute {
         AppRoute::ProjectsUsersRoles {}
@@ -358,6 +771,20 @@ impl Viewable for NestedProjectsUsersRole {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
+    }
+}
+
+impl Insertable for NestedProjectsUsersRole {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::ProjectsUsersRolesNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::ProjectsUsersRolesNewWithUser { user_id };
+            }
+        }
+        AppRoute::ProjectsUsersRolesNew
     }
 }
 
@@ -373,6 +800,17 @@ impl Viewable for SampleBioOttTaxonItem {
     }
 }
 
+impl Insertable for SampleBioOttTaxonItem {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::SampleBioOttTaxonItemsNewWithSample { sample_id };
+            }
+        }
+        AppRoute::SampleBioOttTaxonItemsNew
+    }
+}
+
 impl Viewable for NestedSampleBioOttTaxonItem {
     fn list_route() -> AppRoute {
         AppRoute::SampleBioOttTaxonItems {}
@@ -385,6 +823,17 @@ impl Viewable for NestedSampleBioOttTaxonItem {
     }
 }
 
+impl Insertable for NestedSampleBioOttTaxonItem {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::SampleBioOttTaxonItemsNewWithSample { sample_id };
+            }
+        }
+        AppRoute::SampleBioOttTaxonItemsNew
+    }
+}
+
 impl Viewable for SampleContainer {
     fn list_route() -> AppRoute {
         AppRoute::SampleContainers {}
@@ -394,12 +843,46 @@ impl Viewable for SampleContainer {
     }
 }
 
+impl Insertable for SampleContainer {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::SampleContainersNewWithProject { project_id };
+            }
+        }
+        AppRoute::SampleContainersNew
+    }
+}
+
+impl Updatable for SampleContainer {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::SampleContainersUpdate { id: self.id }
+    }
+}
+
 impl Viewable for NestedSampleContainer {
     fn list_route() -> AppRoute {
         AppRoute::SampleContainers {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::SampleContainersView { id: self.inner.id }
+    }
+}
+
+impl Insertable for NestedSampleContainer {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::SampleContainersNewWithProject { project_id };
+            }
+        }
+        AppRoute::SampleContainersNew
+    }
+}
+
+impl Updatable for NestedSampleContainer {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::SampleContainersUpdate { id: self.inner.id }
     }
 }
 
@@ -430,12 +913,58 @@ impl Viewable for Sample {
     }
 }
 
+impl Insertable for Sample {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(container_id) = filter.container_id {
+                return AppRoute::SamplesNewWithContainer { container_id };
+            }
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::SamplesNewWithProject { project_id };
+            }
+            if let Some(sampled_by) = filter.sampled_by {
+                return AppRoute::SamplesNewWithSampledBy { sampled_by };
+            }
+        }
+        AppRoute::SamplesNew
+    }
+}
+
+impl Updatable for Sample {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::SamplesUpdate { id: self.id }
+    }
+}
+
 impl Viewable for NestedSample {
     fn list_route() -> AppRoute {
         AppRoute::Samples {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::SamplesView { id: self.inner.id }
+    }
+}
+
+impl Insertable for NestedSample {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(container_id) = filter.container_id {
+                return AppRoute::SamplesNewWithContainer { container_id };
+            }
+            if let Some(project_id) = filter.project_id {
+                return AppRoute::SamplesNewWithProject { project_id };
+            }
+            if let Some(sampled_by) = filter.sampled_by {
+                return AppRoute::SamplesNewWithSampledBy { sampled_by };
+            }
+        }
+        AppRoute::SamplesNew
+    }
+}
+
+impl Updatable for NestedSample {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::SamplesUpdate { id: self.inner.id }
     }
 }
 
@@ -448,12 +977,50 @@ impl Viewable for Spectra {
     }
 }
 
+impl Insertable for Spectra {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(spectra_collection_id) = filter.spectra_collection_id {
+                return AppRoute::SpectraNewWithSpectraCollection {
+                    spectra_collection_id,
+                };
+            }
+        }
+        AppRoute::SpectraNew
+    }
+}
+
+impl Updatable for Spectra {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::SpectraUpdate { id: self.id }
+    }
+}
+
 impl Viewable for NestedSpectra {
     fn list_route() -> AppRoute {
         AppRoute::Spectra {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::SpectraView { id: self.inner.id }
+    }
+}
+
+impl Insertable for NestedSpectra {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(spectra_collection_id) = filter.spectra_collection_id {
+                return AppRoute::SpectraNewWithSpectraCollection {
+                    spectra_collection_id,
+                };
+            }
+        }
+        AppRoute::SpectraNew
+    }
+}
+
+impl Updatable for NestedSpectra {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::SpectraUpdate { id: self.inner.id }
     }
 }
 
@@ -466,12 +1033,46 @@ impl Viewable for SpectraCollection {
     }
 }
 
+impl Insertable for SpectraCollection {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::SpectraCollectionsNewWithSample { sample_id };
+            }
+        }
+        AppRoute::SpectraCollectionsNew
+    }
+}
+
+impl Updatable for SpectraCollection {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::SpectraCollectionsUpdate { id: self.id }
+    }
+}
+
 impl Viewable for NestedSpectraCollection {
     fn list_route() -> AppRoute {
         AppRoute::SpectraCollections {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::SpectraCollectionsView { id: self.inner.id }
+    }
+}
+
+impl Insertable for NestedSpectraCollection {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::SpectraCollectionsNewWithSample { sample_id };
+            }
+        }
+        AppRoute::SpectraCollectionsNew
+    }
+}
+
+impl Updatable for NestedSpectraCollection {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::SpectraCollectionsUpdate { id: self.inner.id }
     }
 }
 
@@ -484,12 +1085,46 @@ impl Viewable for Team {
     }
 }
 
+impl Insertable for Team {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(parent_team_id) = filter.parent_team_id {
+                return AppRoute::TeamsNewWithParentTeam { parent_team_id };
+            }
+        }
+        AppRoute::TeamsNew
+    }
+}
+
+impl Updatable for Team {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::TeamsUpdate { id: self.id }
+    }
+}
+
 impl Viewable for NestedTeam {
     fn list_route() -> AppRoute {
         AppRoute::Teams {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::TeamsView { id: self.inner.id }
+    }
+}
+
+impl Insertable for NestedTeam {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(parent_team_id) = filter.parent_team_id {
+                return AppRoute::TeamsNewWithParentTeam { parent_team_id };
+            }
+        }
+        AppRoute::TeamsNew
+    }
+}
+
+impl Updatable for NestedTeam {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::TeamsUpdate { id: self.inner.id }
     }
 }
 
@@ -505,6 +1140,20 @@ impl Viewable for TeamsTeamsRoleInvitation {
     }
 }
 
+impl Insertable for TeamsTeamsRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::TeamsTeamsRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(team_id) = filter.team_id {
+                return AppRoute::TeamsTeamsRoleInvitationsNewWithTeam { team_id };
+            }
+        }
+        AppRoute::TeamsTeamsRoleInvitationsNew
+    }
+}
+
 impl Viewable for NestedTeamsTeamsRoleInvitation {
     fn list_route() -> AppRoute {
         AppRoute::TeamsTeamsRoleInvitations {}
@@ -514,6 +1163,20 @@ impl Viewable for NestedTeamsTeamsRoleInvitation {
             table_id: self.inner.table_id,
             team_id: self.inner.team_id,
         }
+    }
+}
+
+impl Insertable for NestedTeamsTeamsRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::TeamsTeamsRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(team_id) = filter.team_id {
+                return AppRoute::TeamsTeamsRoleInvitationsNewWithTeam { team_id };
+            }
+        }
+        AppRoute::TeamsTeamsRoleInvitationsNew
     }
 }
 
@@ -529,6 +1192,20 @@ impl Viewable for TeamsUsersRoleInvitation {
     }
 }
 
+impl Insertable for TeamsUsersRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::TeamsUsersRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::TeamsUsersRoleInvitationsNewWithUser { user_id };
+            }
+        }
+        AppRoute::TeamsUsersRoleInvitationsNew
+    }
+}
+
 impl Viewable for NestedTeamsUsersRoleInvitation {
     fn list_route() -> AppRoute {
         AppRoute::TeamsUsersRoleInvitations {}
@@ -538,6 +1215,20 @@ impl Viewable for NestedTeamsUsersRoleInvitation {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
+    }
+}
+
+impl Insertable for NestedTeamsUsersRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::TeamsUsersRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::TeamsUsersRoleInvitationsNewWithUser { user_id };
+            }
+        }
+        AppRoute::TeamsUsersRoleInvitationsNew
     }
 }
 
@@ -553,6 +1244,20 @@ impl Viewable for TeamsUsersRoleRequest {
     }
 }
 
+impl Insertable for TeamsUsersRoleRequest {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::TeamsUsersRoleRequestsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::TeamsUsersRoleRequestsNewWithUser { user_id };
+            }
+        }
+        AppRoute::TeamsUsersRoleRequestsNew
+    }
+}
+
 impl Viewable for NestedTeamsUsersRoleRequest {
     fn list_route() -> AppRoute {
         AppRoute::TeamsUsersRoleRequests {}
@@ -562,6 +1267,20 @@ impl Viewable for NestedTeamsUsersRoleRequest {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
+    }
+}
+
+impl Insertable for NestedTeamsUsersRoleRequest {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::TeamsUsersRoleRequestsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::TeamsUsersRoleRequestsNewWithUser { user_id };
+            }
+        }
+        AppRoute::TeamsUsersRoleRequestsNew
     }
 }
 
@@ -577,6 +1296,20 @@ impl Viewable for TeamsUsersRole {
     }
 }
 
+impl Insertable for TeamsUsersRole {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::TeamsUsersRolesNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::TeamsUsersRolesNewWithUser { user_id };
+            }
+        }
+        AppRoute::TeamsUsersRolesNew
+    }
+}
+
 impl Viewable for NestedTeamsUsersRole {
     fn list_route() -> AppRoute {
         AppRoute::TeamsUsersRoles {}
@@ -589,12 +1322,32 @@ impl Viewable for NestedTeamsUsersRole {
     }
 }
 
+impl Insertable for NestedTeamsUsersRole {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::TeamsUsersRolesNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::TeamsUsersRolesNewWithUser { user_id };
+            }
+        }
+        AppRoute::TeamsUsersRolesNew
+    }
+}
+
 impl Viewable for User {
     fn list_route() -> AppRoute {
         AppRoute::Users {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::UsersView { id: self.id }
+    }
+}
+
+impl Updatable for User {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::UsersUpdate { id: self.id }
     }
 }
 
@@ -610,6 +1363,20 @@ impl Viewable for UsersUsersRoleInvitation {
     }
 }
 
+impl Insertable for UsersUsersRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::UsersUsersRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::UsersUsersRoleInvitationsNewWithUser { user_id };
+            }
+        }
+        AppRoute::UsersUsersRoleInvitationsNew
+    }
+}
+
 impl Viewable for NestedUsersUsersRoleInvitation {
     fn list_route() -> AppRoute {
         AppRoute::UsersUsersRoleInvitations {}
@@ -619,6 +1386,20 @@ impl Viewable for NestedUsersUsersRoleInvitation {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
+    }
+}
+
+impl Insertable for NestedUsersUsersRoleInvitation {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::UsersUsersRoleInvitationsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::UsersUsersRoleInvitationsNewWithUser { user_id };
+            }
+        }
+        AppRoute::UsersUsersRoleInvitationsNew
     }
 }
 
@@ -634,6 +1415,20 @@ impl Viewable for UsersUsersRoleRequest {
     }
 }
 
+impl Insertable for UsersUsersRoleRequest {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::UsersUsersRoleRequestsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::UsersUsersRoleRequestsNewWithUser { user_id };
+            }
+        }
+        AppRoute::UsersUsersRoleRequestsNew
+    }
+}
+
 impl Viewable for NestedUsersUsersRoleRequest {
     fn list_route() -> AppRoute {
         AppRoute::UsersUsersRoleRequests {}
@@ -643,6 +1438,20 @@ impl Viewable for NestedUsersUsersRoleRequest {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
+    }
+}
+
+impl Insertable for NestedUsersUsersRoleRequest {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::UsersUsersRoleRequestsNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::UsersUsersRoleRequestsNewWithUser { user_id };
+            }
+        }
+        AppRoute::UsersUsersRoleRequestsNew
     }
 }
 
@@ -658,6 +1467,20 @@ impl Viewable for UsersUsersRole {
     }
 }
 
+impl Insertable for UsersUsersRole {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::UsersUsersRolesNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::UsersUsersRolesNewWithUser { user_id };
+            }
+        }
+        AppRoute::UsersUsersRolesNew
+    }
+}
+
 impl Viewable for NestedUsersUsersRole {
     fn list_route() -> AppRoute {
         AppRoute::UsersUsersRoles {}
@@ -667,6 +1490,20 @@ impl Viewable for NestedUsersUsersRole {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
+    }
+}
+
+impl Insertable for NestedUsersUsersRole {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(table_id) = filter.table_id {
+                return AppRoute::UsersUsersRolesNewWithTable { table_id };
+            }
+            if let Some(user_id) = filter.user_id {
+                return AppRoute::UsersUsersRolesNewWithUser { user_id };
+            }
+        }
+        AppRoute::UsersUsersRolesNew
     }
 }
 
