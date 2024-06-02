@@ -374,7 +374,6 @@ def write_frontend_router_page(
         "///\n"
         "/// # Arguments\n"
         "/// * `route` - The route to map.\n"
-        "///\n"
         "pub fn switch(route: AppRoute) -> Html {\n"
         "    match route {\n"
     )
