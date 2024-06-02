@@ -93,7 +93,10 @@ impl Unit {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::units;
-        let mut query = units::dsl::units.into_boxed();
+        let query = units::dsl::units
+            .select(Unit::as_select())
+            .order_by(units::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(units::dsl::icon_id.eq(icon_id));
         }
@@ -101,8 +104,8 @@ impl Unit {
             query = query.filter(units::dsl::color_id.eq(color_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -120,19 +123,7 @@ impl Unit {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::units;
-        let mut query = units::dsl::units.into_boxed();
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(units::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(units::dsl::color_id.eq(color_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -191,18 +182,11 @@ impl Unit {
         use crate::schema::units;
         let mut query = units::dsl::units
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_units_name_unit(
-                        units::dsl::name,
-                        units::dsl::unit,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_units_name_unit(
+                crate::sql_function_bindings::concat_units_name_unit(
                     units::dsl::name,
                     units::dsl::unit,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_units_name_unit(
@@ -249,18 +233,11 @@ impl Unit {
         use crate::schema::units;
         let mut query = units::dsl::units
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_units_name_unit(
-                        units::dsl::name,
-                        units::dsl::unit,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_units_name_unit(
+                crate::sql_function_bindings::concat_units_name_unit(
                     units::dsl::name,
                     units::dsl::unit,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_units_name_unit(
@@ -307,18 +284,11 @@ impl Unit {
         use crate::schema::units;
         let mut query = units::dsl::units
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_units_name_unit(
-                        units::dsl::name,
-                        units::dsl::unit,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_units_name_unit(
+                crate::sql_function_bindings::concat_units_name_unit(
                     units::dsl::name,
                     units::dsl::unit,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

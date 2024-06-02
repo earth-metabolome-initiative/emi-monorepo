@@ -154,7 +154,14 @@ impl Project {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects.into_boxed();
+        let query = projects::dsl::projects
+            .select(Project::as_select())
+            .filter(crate::sql_function_bindings::can_view_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
+            .order_by(projects::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -174,12 +181,8 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_view_projects(
-                author_user_id,
-                projects::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -200,7 +203,14 @@ impl Project {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects.into_boxed();
+        let query = projects::dsl::projects
+            .select(Project::as_select())
+            .filter(crate::sql_function_bindings::can_view_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
+            .order_by(projects::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -220,13 +230,8 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_view_projects(
-                author_user_id,
-                projects::dsl::id,
-            ))
-            .order_by(projects::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -298,26 +303,16 @@ impl Project {
         }
         use crate::schema::projects;
         let mut query = projects::dsl::projects
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_view_projects(
                 author_user_id,
                 projects::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_projects_name_description(
@@ -335,6 +330,9 @@ impl Project {
         }
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(projects::dsl::created_by.eq(created_by));
@@ -374,26 +372,16 @@ impl Project {
         }
         use crate::schema::projects;
         let mut query = projects::dsl::projects
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_view_projects(
                 author_user_id,
                 projects::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_projects_name_description(
@@ -411,6 +399,9 @@ impl Project {
         }
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(projects::dsl::created_by.eq(created_by));
@@ -450,26 +441,16 @@ impl Project {
         }
         use crate::schema::projects;
         let mut query = projects::dsl::projects
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_view_projects(
                 author_user_id,
                 projects::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -489,6 +470,9 @@ impl Project {
         }
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(projects::dsl::created_by.eq(created_by));
@@ -551,7 +535,14 @@ impl Project {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects.into_boxed();
+        let query = projects::dsl::projects
+            .select(Project::as_select())
+            .filter(crate::sql_function_bindings::can_update_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
+            .order_by(projects::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -571,12 +562,8 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_projects(
-                author_user_id,
-                projects::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -597,7 +584,14 @@ impl Project {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects.into_boxed();
+        let query = projects::dsl::projects
+            .select(Project::as_select())
+            .filter(crate::sql_function_bindings::can_update_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
+            .order_by(projects::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -617,13 +611,8 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_projects(
-                author_user_id,
-                projects::dsl::id,
-            ))
-            .order_by(projects::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -653,26 +642,16 @@ impl Project {
         }
         use crate::schema::projects;
         let mut query = projects::dsl::projects
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_update_projects(
                 author_user_id,
                 projects::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_projects_name_description(
@@ -690,6 +669,9 @@ impl Project {
         }
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(projects::dsl::created_by.eq(created_by));
@@ -729,26 +711,16 @@ impl Project {
         }
         use crate::schema::projects;
         let mut query = projects::dsl::projects
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_update_projects(
                 author_user_id,
                 projects::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_projects_name_description(
@@ -766,6 +738,9 @@ impl Project {
         }
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(projects::dsl::created_by.eq(created_by));
@@ -805,26 +780,16 @@ impl Project {
         }
         use crate::schema::projects;
         let mut query = projects::dsl::projects
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_update_projects(
                 author_user_id,
                 projects::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -844,6 +809,9 @@ impl Project {
         }
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(projects::dsl::created_by.eq(created_by));
@@ -906,7 +874,14 @@ impl Project {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects.into_boxed();
+        let query = projects::dsl::projects
+            .select(Project::as_select())
+            .filter(crate::sql_function_bindings::can_admin_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
+            .order_by(projects::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -926,12 +901,8 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_projects(
-                author_user_id,
-                projects::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -952,7 +923,14 @@ impl Project {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::projects;
-        let mut query = projects::dsl::projects.into_boxed();
+        let query = projects::dsl::projects
+            .select(Project::as_select())
+            .filter(crate::sql_function_bindings::can_admin_projects(
+                author_user_id,
+                projects::dsl::id,
+            ))
+            .order_by(projects::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(projects::dsl::state_id.eq(state_id));
         }
@@ -972,13 +950,8 @@ impl Project {
             query = query.filter(projects::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_projects(
-                author_user_id,
-                projects::dsl::id,
-            ))
-            .order_by(projects::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -1008,26 +981,16 @@ impl Project {
         }
         use crate::schema::projects;
         let mut query = projects::dsl::projects
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_admin_projects(
                 author_user_id,
                 projects::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_projects_name_description(
@@ -1045,6 +1008,9 @@ impl Project {
         }
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(projects::dsl::created_by.eq(created_by));
@@ -1084,26 +1050,16 @@ impl Project {
         }
         use crate::schema::projects;
         let mut query = projects::dsl::projects
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_admin_projects(
                 author_user_id,
                 projects::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_projects_name_description(
@@ -1121,6 +1077,9 @@ impl Project {
         }
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(projects::dsl::created_by.eq(created_by));
@@ -1160,26 +1119,16 @@ impl Project {
         }
         use crate::schema::projects;
         let mut query = projects::dsl::projects
-            .filter(projects::dsl::parent_project_id.eq(filter.and_then(|f| f.parent_project_id)))
             .filter(crate::sql_function_bindings::can_admin_projects(
                 author_user_id,
                 projects::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_projects_name_description(
+                    projects::dsl::name,
+                    projects::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -1199,6 +1148,9 @@ impl Project {
         }
         if let Some(color_id) = filter.and_then(|f| f.color_id) {
             query = query.filter(projects::dsl::color_id.eq(color_id));
+        }
+        if let Some(parent_project_id) = filter.and_then(|f| f.parent_project_id) {
+            query = query.filter(projects::dsl::parent_project_id.eq(parent_project_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(projects::dsl::created_by.eq(created_by));

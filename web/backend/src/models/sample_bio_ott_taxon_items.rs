@@ -120,7 +120,17 @@ impl SampleBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_bio_ott_taxon_items;
-        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items.into_boxed();
+        let query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .select(SampleBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_view_sample_bio_ott_taxon_items(
+                    author_user_id,
+                    sample_bio_ott_taxon_items::dsl::sample_id,
+                    sample_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(sample_bio_ott_taxon_items::dsl::sample_id);
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -131,15 +141,8 @@ impl SampleBioOttTaxonItem {
             query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_view_sample_bio_ott_taxon_items(
-                    author_user_id,
-                    sample_bio_ott_taxon_items::dsl::sample_id,
-                    sample_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -160,7 +163,17 @@ impl SampleBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_bio_ott_taxon_items;
-        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items.into_boxed();
+        let query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .select(SampleBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_view_sample_bio_ott_taxon_items(
+                    author_user_id,
+                    sample_bio_ott_taxon_items::dsl::sample_id,
+                    sample_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(sample_bio_ott_taxon_items::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -171,16 +184,8 @@ impl SampleBioOttTaxonItem {
             query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_view_sample_bio_ott_taxon_items(
-                    author_user_id,
-                    sample_bio_ott_taxon_items::dsl::sample_id,
-                    sample_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .order_by(sample_bio_ott_taxon_items::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -281,33 +286,15 @@ impl SampleBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::similarity_op(bio_ott_taxon_items::dsl::name, query)
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
                         .ilike(format!("%{}%", query)),
-                    ))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
                     )
                     .or(
                         crate::sql_function_bindings::concat_sample_states_name_description(
@@ -315,7 +302,7 @@ impl SampleBioOttTaxonItem {
                             sample_states::dsl::description,
                         )
                         .ilike(format!("%{}%", query)),
-                    )),
+                    ),
             )
             .order(
                 crate::sql_function_bindings::similarity_dist(
@@ -429,44 +416,23 @@ impl SampleBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                .or(crate::sql_function_bindings::word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
-                .or(crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )
-                    .ilike(format!("%{}%", query)),
-                ))
-                .or(crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                )),
             )
             .order(
                 crate::sql_function_bindings::word_similarity_dist_op(
@@ -580,44 +546,23 @@ impl SampleBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )
-                    .ilike(format!("%{}%", query)),
-                ))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                )),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -708,7 +653,17 @@ impl SampleBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_bio_ott_taxon_items;
-        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items.into_boxed();
+        let query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .select(SampleBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_update_sample_bio_ott_taxon_items(
+                    author_user_id,
+                    sample_bio_ott_taxon_items::dsl::sample_id,
+                    sample_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(sample_bio_ott_taxon_items::dsl::sample_id);
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -719,15 +674,8 @@ impl SampleBioOttTaxonItem {
             query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_update_sample_bio_ott_taxon_items(
-                    author_user_id,
-                    sample_bio_ott_taxon_items::dsl::sample_id,
-                    sample_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -748,7 +696,17 @@ impl SampleBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_bio_ott_taxon_items;
-        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items.into_boxed();
+        let query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .select(SampleBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_update_sample_bio_ott_taxon_items(
+                    author_user_id,
+                    sample_bio_ott_taxon_items::dsl::sample_id,
+                    sample_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(sample_bio_ott_taxon_items::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -759,16 +717,8 @@ impl SampleBioOttTaxonItem {
             query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_update_sample_bio_ott_taxon_items(
-                    author_user_id,
-                    sample_bio_ott_taxon_items::dsl::sample_id,
-                    sample_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .order_by(sample_bio_ott_taxon_items::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -847,33 +797,15 @@ impl SampleBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::similarity_op(bio_ott_taxon_items::dsl::name, query)
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
                         .ilike(format!("%{}%", query)),
-                    ))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
                     )
                     .or(
                         crate::sql_function_bindings::concat_sample_states_name_description(
@@ -881,7 +813,7 @@ impl SampleBioOttTaxonItem {
                             sample_states::dsl::description,
                         )
                         .ilike(format!("%{}%", query)),
-                    )),
+                    ),
             )
             .order(
                 crate::sql_function_bindings::similarity_dist(
@@ -995,44 +927,23 @@ impl SampleBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                .or(crate::sql_function_bindings::word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
-                .or(crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )
-                    .ilike(format!("%{}%", query)),
-                ))
-                .or(crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                )),
             )
             .order(
                 crate::sql_function_bindings::word_similarity_dist_op(
@@ -1146,44 +1057,23 @@ impl SampleBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )
-                    .ilike(format!("%{}%", query)),
-                ))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                )),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -1274,7 +1164,17 @@ impl SampleBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_bio_ott_taxon_items;
-        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items.into_boxed();
+        let query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .select(SampleBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_admin_sample_bio_ott_taxon_items(
+                    author_user_id,
+                    sample_bio_ott_taxon_items::dsl::sample_id,
+                    sample_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(sample_bio_ott_taxon_items::dsl::sample_id);
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -1285,15 +1185,8 @@ impl SampleBioOttTaxonItem {
             query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_admin_sample_bio_ott_taxon_items(
-                    author_user_id,
-                    sample_bio_ott_taxon_items::dsl::sample_id,
-                    sample_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -1314,7 +1207,17 @@ impl SampleBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_bio_ott_taxon_items;
-        let mut query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items.into_boxed();
+        let query = sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items
+            .select(SampleBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_admin_sample_bio_ott_taxon_items(
+                    author_user_id,
+                    sample_bio_ott_taxon_items::dsl::sample_id,
+                    sample_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(sample_bio_ott_taxon_items::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(sample_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -1325,16 +1228,8 @@ impl SampleBioOttTaxonItem {
             query = query.filter(sample_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_admin_sample_bio_ott_taxon_items(
-                    author_user_id,
-                    sample_bio_ott_taxon_items::dsl::sample_id,
-                    sample_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .order_by(sample_bio_ott_taxon_items::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -1413,33 +1308,15 @@ impl SampleBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::similarity_op(bio_ott_taxon_items::dsl::name, query)
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        sample_containers::dsl::barcode,
-                        query,
-                    )
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
                         .ilike(format!("%{}%", query)),
-                    ))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states::dsl::name,
-                            sample_states::dsl::description,
-                        ),
-                        query,
                     )
                     .or(
                         crate::sql_function_bindings::concat_sample_states_name_description(
@@ -1447,7 +1324,7 @@ impl SampleBioOttTaxonItem {
                             sample_states::dsl::description,
                         )
                         .ilike(format!("%{}%", query)),
-                    )),
+                    ),
             )
             .order(
                 crate::sql_function_bindings::similarity_dist(
@@ -1561,44 +1438,23 @@ impl SampleBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                .or(crate::sql_function_bindings::word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
-                .or(crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )
-                    .ilike(format!("%{}%", query)),
-                ))
-                .or(crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                )),
             )
             .order(
                 crate::sql_function_bindings::word_similarity_dist_op(
@@ -1712,44 +1568,23 @@ impl SampleBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+                    .or(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     )
-                    .ilike(format!("%{}%", query)),
-                ))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
+                    .or(
+                        crate::sql_function_bindings::concat_sample_states_name_description(
+                            sample_states::dsl::name,
+                            sample_states::dsl::description,
+                        )
+                        .ilike(format!("%{}%", query)),
                     ),
-                    query,
-                )
-                .or(
-                    crate::sql_function_bindings::concat_sample_states_name_description(
-                        sample_states::dsl::name,
-                        sample_states::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                )),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

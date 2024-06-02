@@ -129,7 +129,14 @@ impl SampleContainer {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers.into_boxed();
+        let query = sample_containers::dsl::sample_containers
+            .select(SampleContainer::as_select())
+            .filter(crate::sql_function_bindings::can_view_sample_containers(
+                author_user_id,
+                sample_containers::dsl::id,
+            ))
+            .order_by(sample_containers::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sample_containers::dsl::project_id.eq(project_id));
         }
@@ -143,12 +150,8 @@ impl SampleContainer {
             query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_view_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -169,7 +172,14 @@ impl SampleContainer {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers.into_boxed();
+        let query = sample_containers::dsl::sample_containers
+            .select(SampleContainer::as_select())
+            .filter(crate::sql_function_bindings::can_view_sample_containers(
+                author_user_id,
+                sample_containers::dsl::id,
+            ))
+            .order_by(sample_containers::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sample_containers::dsl::project_id.eq(project_id));
         }
@@ -183,13 +193,8 @@ impl SampleContainer {
             query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_view_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .order_by(sample_containers::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -265,10 +270,7 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(
-                crate::sql_function_bindings::similarity_op(sample_containers::dsl::barcode, query)
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-            )
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::similarity_dist(
                 sample_containers::dsl::barcode,
                 query,
@@ -322,13 +324,7 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-            )
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 sample_containers::dsl::barcode,
                 query,
@@ -382,13 +378,7 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-            )
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     sample_containers::dsl::barcode,
@@ -463,7 +453,14 @@ impl SampleContainer {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers.into_boxed();
+        let query = sample_containers::dsl::sample_containers
+            .select(SampleContainer::as_select())
+            .filter(crate::sql_function_bindings::can_update_sample_containers(
+                author_user_id,
+                sample_containers::dsl::id,
+            ))
+            .order_by(sample_containers::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sample_containers::dsl::project_id.eq(project_id));
         }
@@ -477,12 +474,8 @@ impl SampleContainer {
             query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -503,7 +496,14 @@ impl SampleContainer {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers.into_boxed();
+        let query = sample_containers::dsl::sample_containers
+            .select(SampleContainer::as_select())
+            .filter(crate::sql_function_bindings::can_update_sample_containers(
+                author_user_id,
+                sample_containers::dsl::id,
+            ))
+            .order_by(sample_containers::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sample_containers::dsl::project_id.eq(project_id));
         }
@@ -517,13 +517,8 @@ impl SampleContainer {
             query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .order_by(sample_containers::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -557,10 +552,7 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(
-                crate::sql_function_bindings::similarity_op(sample_containers::dsl::barcode, query)
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-            )
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::similarity_dist(
                 sample_containers::dsl::barcode,
                 query,
@@ -614,13 +606,7 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-            )
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 sample_containers::dsl::barcode,
                 query,
@@ -674,13 +660,7 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-            )
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     sample_containers::dsl::barcode,
@@ -755,7 +735,14 @@ impl SampleContainer {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers.into_boxed();
+        let query = sample_containers::dsl::sample_containers
+            .select(SampleContainer::as_select())
+            .filter(crate::sql_function_bindings::can_admin_sample_containers(
+                author_user_id,
+                sample_containers::dsl::id,
+            ))
+            .order_by(sample_containers::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sample_containers::dsl::project_id.eq(project_id));
         }
@@ -769,12 +756,8 @@ impl SampleContainer {
             query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -795,7 +778,14 @@ impl SampleContainer {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers.into_boxed();
+        let query = sample_containers::dsl::sample_containers
+            .select(SampleContainer::as_select())
+            .filter(crate::sql_function_bindings::can_admin_sample_containers(
+                author_user_id,
+                sample_containers::dsl::id,
+            ))
+            .order_by(sample_containers::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(project_id) = filter.and_then(|f| f.project_id) {
             query = query.filter(sample_containers::dsl::project_id.eq(project_id));
         }
@@ -809,13 +799,8 @@ impl SampleContainer {
             query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .order_by(sample_containers::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -849,10 +834,7 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(
-                crate::sql_function_bindings::similarity_op(sample_containers::dsl::barcode, query)
-                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-            )
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::similarity_dist(
                 sample_containers::dsl::barcode,
                 query,
@@ -906,13 +888,7 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-            )
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 sample_containers::dsl::barcode,
                 query,
@@ -966,13 +942,7 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    sample_containers::dsl::barcode,
-                    query,
-                )
-                .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
-            )
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     sample_containers::dsl::barcode,

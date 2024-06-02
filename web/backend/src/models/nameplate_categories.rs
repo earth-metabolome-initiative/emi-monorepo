@@ -101,7 +101,10 @@ impl NameplateCategory {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::nameplate_categories;
-        let mut query = nameplate_categories::dsl::nameplate_categories.into_boxed();
+        let query = nameplate_categories::dsl::nameplate_categories
+            .select(NameplateCategory::as_select())
+            .order_by(nameplate_categories::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
             query = query.filter(nameplate_categories::dsl::permanence_id.eq(permanence_id));
         }
@@ -115,8 +118,8 @@ impl NameplateCategory {
             query = query.filter(nameplate_categories::dsl::color_id.eq(color_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -134,25 +137,7 @@ impl NameplateCategory {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::nameplate_categories;
-        let mut query = nameplate_categories::dsl::nameplate_categories.into_boxed();
-        if let Some(permanence_id) = filter.and_then(|f| f.permanence_id) {
-            query = query.filter(nameplate_categories::dsl::permanence_id.eq(permanence_id));
-        }
-        if let Some(material_id) = filter.and_then(|f| f.material_id) {
-            query = query.filter(nameplate_categories::dsl::material_id.eq(material_id));
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(nameplate_categories::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(nameplate_categories::dsl::color_id.eq(color_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -195,20 +180,11 @@ impl NameplateCategory {
         use crate::schema::nameplate_categories;
         let mut query = nameplate_categories::dsl::nameplate_categories
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_nameplate_categories_brand(
+                    nameplate_categories::dsl::name,
+                    nameplate_categories::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_nameplate_categories_brand(
@@ -261,20 +237,11 @@ impl NameplateCategory {
         use crate::schema::nameplate_categories;
         let mut query = nameplate_categories::dsl::nameplate_categories
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_nameplate_categories_brand(
+                    nameplate_categories::dsl::name,
+                    nameplate_categories::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_nameplate_categories_brand(
@@ -327,20 +294,11 @@ impl NameplateCategory {
         use crate::schema::nameplate_categories;
         let mut query = nameplate_categories::dsl::nameplate_categories
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_nameplate_categories_brand(
+                    nameplate_categories::dsl::name,
+                    nameplate_categories::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_nameplate_categories_brand(
-                        nameplate_categories::dsl::name,
-                        nameplate_categories::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

@@ -81,9 +81,12 @@ impl FontAwesomeIcon {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::font_awesome_icons;
-        font_awesome_icons::dsl::font_awesome_icons
-            .offset(offset.unwrap_or(0))
+        let query = font_awesome_icons::dsl::font_awesome_icons
+            .select(FontAwesomeIcon::as_select())
+            .order_by(font_awesome_icons::dsl::id);
+        query
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -99,12 +102,7 @@ impl FontAwesomeIcon {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::font_awesome_icons;
-        font_awesome_icons::dsl::font_awesome_icons
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -161,20 +159,11 @@ impl FontAwesomeIcon {
         use crate::schema::font_awesome_icons;
         font_awesome_icons::dsl::font_awesome_icons
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_font_awesome_icons_name(
-                        font_awesome_icons::dsl::name,
-                        font_awesome_icons::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_font_awesome_icons_name(
+                    font_awesome_icons::dsl::name,
+                    font_awesome_icons::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_font_awesome_icons_name(
-                        font_awesome_icons::dsl::name,
-                        font_awesome_icons::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_font_awesome_icons_name(
@@ -211,20 +200,11 @@ impl FontAwesomeIcon {
         use crate::schema::font_awesome_icons;
         font_awesome_icons::dsl::font_awesome_icons
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_font_awesome_icons_name(
-                        font_awesome_icons::dsl::name,
-                        font_awesome_icons::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_font_awesome_icons_name(
+                    font_awesome_icons::dsl::name,
+                    font_awesome_icons::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_font_awesome_icons_name(
-                        font_awesome_icons::dsl::name,
-                        font_awesome_icons::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_font_awesome_icons_name(
@@ -261,20 +241,11 @@ impl FontAwesomeIcon {
         use crate::schema::font_awesome_icons;
         font_awesome_icons::dsl::font_awesome_icons
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_font_awesome_icons_name(
-                        font_awesome_icons::dsl::name,
-                        font_awesome_icons::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_font_awesome_icons_name(
+                    font_awesome_icons::dsl::name,
+                    font_awesome_icons::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_font_awesome_icons_name(
-                        font_awesome_icons::dsl::name,
-                        font_awesome_icons::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

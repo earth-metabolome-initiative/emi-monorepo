@@ -95,13 +95,16 @@ impl Organization {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::organizations;
-        let mut query = organizations::dsl::organizations.into_boxed();
+        let query = organizations::dsl::organizations
+            .select(Organization::as_select())
+            .order_by(organizations::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(country_id) = filter.and_then(|f| f.country_id) {
             query = query.filter(organizations::dsl::country_id.eq(country_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -119,16 +122,7 @@ impl Organization {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::organizations;
-        let mut query = organizations::dsl::organizations.into_boxed();
-        if let Some(country_id) = filter.and_then(|f| f.country_id) {
-            query = query.filter(organizations::dsl::country_id.eq(country_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -224,10 +218,7 @@ impl Organization {
         }
         use crate::schema::organizations;
         let mut query = organizations::dsl::organizations
-            .filter(
-                crate::sql_function_bindings::similarity_op(organizations::dsl::name, query)
-                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
-            )
+            .filter(organizations::dsl::name.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::similarity_dist(
                 organizations::dsl::name,
                 query,
@@ -266,10 +257,7 @@ impl Organization {
         }
         use crate::schema::organizations;
         let mut query = organizations::dsl::organizations
-            .filter(
-                crate::sql_function_bindings::word_similarity_op(organizations::dsl::name, query)
-                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
-            )
+            .filter(organizations::dsl::name.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 organizations::dsl::name,
                 query,
@@ -308,13 +296,7 @@ impl Organization {
         }
         use crate::schema::organizations;
         let mut query = organizations::dsl::organizations
-            .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    organizations::dsl::name,
-                    query,
-                )
-                .or(organizations::dsl::name.ilike(format!("%{}%", query))),
-            )
+            .filter(organizations::dsl::name.ilike(format!("%{}%", query)))
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     organizations::dsl::name,

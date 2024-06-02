@@ -102,7 +102,10 @@ impl LoginProvider {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::login_providers;
-        let mut query = login_providers::dsl::login_providers.into_boxed();
+        let query = login_providers::dsl::login_providers
+            .select(LoginProvider::as_select())
+            .order_by(login_providers::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(login_providers::dsl::icon_id.eq(icon_id));
         }
@@ -110,8 +113,8 @@ impl LoginProvider {
             query = query.filter(login_providers::dsl::color_id.eq(color_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -129,19 +132,7 @@ impl LoginProvider {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::login_providers;
-        let mut query = login_providers::dsl::login_providers.into_boxed();
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(login_providers::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(login_providers::dsl::color_id.eq(color_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///

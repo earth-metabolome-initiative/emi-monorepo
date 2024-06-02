@@ -122,7 +122,17 @@ impl UsersUsersRoleRequest {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_requests;
-        let mut query = users_users_role_requests::dsl::users_users_role_requests.into_boxed();
+        let query = users_users_role_requests::dsl::users_users_role_requests
+            .select(UsersUsersRoleRequest::as_select())
+            .filter(
+                crate::sql_function_bindings::can_view_users_users_role_requests(
+                    author_user_id,
+                    users_users_role_requests::dsl::table_id,
+                    users_users_role_requests::dsl::user_id,
+                ),
+            )
+            .order_by(users_users_role_requests::dsl::table_id);
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_requests::dsl::table_id.eq(table_id));
         }
@@ -136,15 +146,8 @@ impl UsersUsersRoleRequest {
             query = query.filter(users_users_role_requests::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_view_users_users_role_requests(
-                    author_user_id,
-                    users_users_role_requests::dsl::table_id,
-                    users_users_role_requests::dsl::user_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -165,7 +168,17 @@ impl UsersUsersRoleRequest {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_requests;
-        let mut query = users_users_role_requests::dsl::users_users_role_requests.into_boxed();
+        let query = users_users_role_requests::dsl::users_users_role_requests
+            .select(UsersUsersRoleRequest::as_select())
+            .filter(
+                crate::sql_function_bindings::can_view_users_users_role_requests(
+                    author_user_id,
+                    users_users_role_requests::dsl::table_id,
+                    users_users_role_requests::dsl::user_id,
+                ),
+            )
+            .order_by(users_users_role_requests::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_requests::dsl::table_id.eq(table_id));
         }
@@ -179,16 +192,8 @@ impl UsersUsersRoleRequest {
             query = query.filter(users_users_role_requests::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_view_users_users_role_requests(
-                    author_user_id,
-                    users_users_role_requests::dsl::table_id,
-                    users_users_role_requests::dsl::user_id,
-                ),
-            )
-            .order_by(users_users_role_requests::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -253,18 +258,11 @@ impl UsersUsersRoleRequest {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_roles_name(
+                crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_roles_name(
@@ -331,18 +329,11 @@ impl UsersUsersRoleRequest {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_roles_name(
+                crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_roles_name(
@@ -409,18 +400,11 @@ impl UsersUsersRoleRequest {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_roles_name(
+                crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -502,7 +486,17 @@ impl UsersUsersRoleRequest {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_requests;
-        let mut query = users_users_role_requests::dsl::users_users_role_requests.into_boxed();
+        let query = users_users_role_requests::dsl::users_users_role_requests
+            .select(UsersUsersRoleRequest::as_select())
+            .filter(
+                crate::sql_function_bindings::can_update_users_users_role_requests(
+                    author_user_id,
+                    users_users_role_requests::dsl::table_id,
+                    users_users_role_requests::dsl::user_id,
+                ),
+            )
+            .order_by(users_users_role_requests::dsl::table_id);
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_requests::dsl::table_id.eq(table_id));
         }
@@ -516,15 +510,8 @@ impl UsersUsersRoleRequest {
             query = query.filter(users_users_role_requests::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_update_users_users_role_requests(
-                    author_user_id,
-                    users_users_role_requests::dsl::table_id,
-                    users_users_role_requests::dsl::user_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -545,7 +532,17 @@ impl UsersUsersRoleRequest {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_requests;
-        let mut query = users_users_role_requests::dsl::users_users_role_requests.into_boxed();
+        let query = users_users_role_requests::dsl::users_users_role_requests
+            .select(UsersUsersRoleRequest::as_select())
+            .filter(
+                crate::sql_function_bindings::can_update_users_users_role_requests(
+                    author_user_id,
+                    users_users_role_requests::dsl::table_id,
+                    users_users_role_requests::dsl::user_id,
+                ),
+            )
+            .order_by(users_users_role_requests::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_requests::dsl::table_id.eq(table_id));
         }
@@ -559,16 +556,8 @@ impl UsersUsersRoleRequest {
             query = query.filter(users_users_role_requests::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_update_users_users_role_requests(
-                    author_user_id,
-                    users_users_role_requests::dsl::table_id,
-                    users_users_role_requests::dsl::user_id,
-                ),
-            )
-            .order_by(users_users_role_requests::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -611,18 +600,11 @@ impl UsersUsersRoleRequest {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_roles_name(
+                crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_roles_name(
@@ -689,18 +671,11 @@ impl UsersUsersRoleRequest {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_roles_name(
+                crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_roles_name(
@@ -767,18 +742,11 @@ impl UsersUsersRoleRequest {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_roles_name(
+                crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -860,7 +828,17 @@ impl UsersUsersRoleRequest {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_requests;
-        let mut query = users_users_role_requests::dsl::users_users_role_requests.into_boxed();
+        let query = users_users_role_requests::dsl::users_users_role_requests
+            .select(UsersUsersRoleRequest::as_select())
+            .filter(
+                crate::sql_function_bindings::can_admin_users_users_role_requests(
+                    author_user_id,
+                    users_users_role_requests::dsl::table_id,
+                    users_users_role_requests::dsl::user_id,
+                ),
+            )
+            .order_by(users_users_role_requests::dsl::table_id);
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_requests::dsl::table_id.eq(table_id));
         }
@@ -874,15 +852,8 @@ impl UsersUsersRoleRequest {
             query = query.filter(users_users_role_requests::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_admin_users_users_role_requests(
-                    author_user_id,
-                    users_users_role_requests::dsl::table_id,
-                    users_users_role_requests::dsl::user_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -903,7 +874,17 @@ impl UsersUsersRoleRequest {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users_users_role_requests;
-        let mut query = users_users_role_requests::dsl::users_users_role_requests.into_boxed();
+        let query = users_users_role_requests::dsl::users_users_role_requests
+            .select(UsersUsersRoleRequest::as_select())
+            .filter(
+                crate::sql_function_bindings::can_admin_users_users_role_requests(
+                    author_user_id,
+                    users_users_role_requests::dsl::table_id,
+                    users_users_role_requests::dsl::user_id,
+                ),
+            )
+            .order_by(users_users_role_requests::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(users_users_role_requests::dsl::table_id.eq(table_id));
         }
@@ -917,16 +898,8 @@ impl UsersUsersRoleRequest {
             query = query.filter(users_users_role_requests::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_admin_users_users_role_requests(
-                    author_user_id,
-                    users_users_role_requests::dsl::table_id,
-                    users_users_role_requests::dsl::user_id,
-                ),
-            )
-            .order_by(users_users_role_requests::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -969,18 +942,11 @@ impl UsersUsersRoleRequest {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_roles_name(
+                crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_roles_name(
@@ -1047,18 +1013,11 @@ impl UsersUsersRoleRequest {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_roles_name(
+                crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_roles_name(
@@ -1125,18 +1084,11 @@ impl UsersUsersRoleRequest {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_roles_name(
-                        roles::dsl::name,
-                        roles::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_roles_name(
+                crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

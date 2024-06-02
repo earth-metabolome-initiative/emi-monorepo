@@ -9,13 +9,13 @@
 //! Therefore, all parameters are wrapped in an Option, and the check of whether the
 //! parameter is null or not is done in the postgres function itself.
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn addauth(
         arg_0: diesel::sql_types::Text,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_derived_samples(
         author_user_id: diesel::sql_types::Integer,
         this_derived_samples_parent_sample_id: diesel::sql_types::Uuid,
@@ -23,21 +23,21 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_nameplates(
         author_user_id: diesel::sql_types::Integer,
         this_nameplates_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_observations(
         author_user_id: diesel::sql_types::Integer,
         this_observations_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_organism_bio_ott_taxon_items(
         author_user_id: diesel::sql_types::Integer,
         this_organism_bio_ott_taxon_items_organism_id: diesel::sql_types::Uuid,
@@ -45,21 +45,21 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_organisms(
         author_user_id: diesel::sql_types::Integer,
         this_organisms_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_projects(
         author_user_id: diesel::sql_types::Integer,
         this_projects_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_projects_teams_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_projects_teams_role_invitations_table_id: diesel::sql_types::Integer,
@@ -67,7 +67,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_projects_teams_role_requests(
         author_user_id: diesel::sql_types::Integer,
         this_projects_teams_role_requests_table_id: diesel::sql_types::Integer,
@@ -75,7 +75,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_projects_teams_roles(
         author_user_id: diesel::sql_types::Integer,
         this_projects_teams_roles_table_id: diesel::sql_types::Integer,
@@ -83,7 +83,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_projects_users_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_projects_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -91,7 +91,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_projects_users_role_requests(
         author_user_id: diesel::sql_types::Integer,
         this_projects_users_role_requests_table_id: diesel::sql_types::Integer,
@@ -99,7 +99,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_projects_users_roles(
         author_user_id: diesel::sql_types::Integer,
         this_projects_users_roles_table_id: diesel::sql_types::Integer,
@@ -107,7 +107,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_sample_bio_ott_taxon_items(
         author_user_id: diesel::sql_types::Integer,
         this_sample_bio_ott_taxon_items_sample_id: diesel::sql_types::Uuid,
@@ -115,42 +115,42 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_sample_containers(
         author_user_id: diesel::sql_types::Integer,
         this_sample_containers_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_samples(
         author_user_id: diesel::sql_types::Integer,
         this_samples_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_spectra(
         author_user_id: diesel::sql_types::Integer,
         this_spectra_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_spectra_collections(
         author_user_id: diesel::sql_types::Integer,
         this_spectra_collections_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_teams(
         author_user_id: diesel::sql_types::Integer,
         this_teams_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_teams_teams_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_teams_teams_role_invitations_table_id: diesel::sql_types::Integer,
@@ -158,7 +158,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_teams_users_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_teams_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -166,7 +166,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_teams_users_role_requests(
         author_user_id: diesel::sql_types::Integer,
         this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
@@ -174,7 +174,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_teams_users_roles(
         author_user_id: diesel::sql_types::Integer,
         this_teams_users_roles_table_id: diesel::sql_types::Integer,
@@ -182,21 +182,21 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_user_emails(
         author_user_id: diesel::sql_types::Integer,
         this_user_emails_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_users(
         author_user_id: diesel::sql_types::Integer,
         this_users_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_users_users_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_users_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -204,7 +204,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_users_users_role_requests(
         author_user_id: diesel::sql_types::Integer,
         this_users_users_role_requests_table_id: diesel::sql_types::Integer,
@@ -212,7 +212,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_admin_users_users_roles(
         author_user_id: diesel::sql_types::Integer,
         this_users_users_roles_table_id: diesel::sql_types::Integer,
@@ -220,7 +220,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_derived_samples(
         author_user_id: diesel::sql_types::Integer,
         this_derived_samples_parent_sample_id: diesel::sql_types::Uuid,
@@ -228,21 +228,21 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_nameplates(
         author_user_id: diesel::sql_types::Integer,
         this_nameplates_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_observations(
         author_user_id: diesel::sql_types::Integer,
         this_observations_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_organism_bio_ott_taxon_items(
         author_user_id: diesel::sql_types::Integer,
         this_organism_bio_ott_taxon_items_organism_id: diesel::sql_types::Uuid,
@@ -250,21 +250,21 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_organisms(
         author_user_id: diesel::sql_types::Integer,
         this_organisms_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_projects(
         author_user_id: diesel::sql_types::Integer,
         this_projects_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_projects_teams_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_projects_teams_role_invitations_table_id: diesel::sql_types::Integer,
@@ -272,7 +272,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_projects_teams_role_requests(
         author_user_id: diesel::sql_types::Integer,
         this_projects_teams_role_requests_table_id: diesel::sql_types::Integer,
@@ -280,7 +280,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_projects_teams_roles(
         author_user_id: diesel::sql_types::Integer,
         this_projects_teams_roles_table_id: diesel::sql_types::Integer,
@@ -288,7 +288,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_projects_users_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_projects_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -296,7 +296,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_projects_users_role_requests(
         author_user_id: diesel::sql_types::Integer,
         this_projects_users_role_requests_table_id: diesel::sql_types::Integer,
@@ -304,7 +304,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_projects_users_roles(
         author_user_id: diesel::sql_types::Integer,
         this_projects_users_roles_table_id: diesel::sql_types::Integer,
@@ -312,7 +312,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_sample_bio_ott_taxon_items(
         author_user_id: diesel::sql_types::Integer,
         this_sample_bio_ott_taxon_items_sample_id: diesel::sql_types::Uuid,
@@ -320,42 +320,42 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_sample_containers(
         author_user_id: diesel::sql_types::Integer,
         this_sample_containers_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_samples(
         author_user_id: diesel::sql_types::Integer,
         this_samples_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_spectra(
         author_user_id: diesel::sql_types::Integer,
         this_spectra_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_spectra_collections(
         author_user_id: diesel::sql_types::Integer,
         this_spectra_collections_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_teams(
         author_user_id: diesel::sql_types::Integer,
         this_teams_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_teams_teams_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_teams_teams_role_invitations_table_id: diesel::sql_types::Integer,
@@ -363,7 +363,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_teams_users_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_teams_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -371,7 +371,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_teams_users_role_requests(
         author_user_id: diesel::sql_types::Integer,
         this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
@@ -379,7 +379,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_teams_users_roles(
         author_user_id: diesel::sql_types::Integer,
         this_teams_users_roles_table_id: diesel::sql_types::Integer,
@@ -387,21 +387,21 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_user_emails(
         author_user_id: diesel::sql_types::Integer,
         this_user_emails_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_users(
         author_user_id: diesel::sql_types::Integer,
         this_users_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_users_users_role_invitations(
         author_user_id: diesel::sql_types::Integer,
         this_users_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -409,7 +409,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_users_users_role_requests(
         author_user_id: diesel::sql_types::Integer,
         this_users_users_role_requests_table_id: diesel::sql_types::Integer,
@@ -417,7 +417,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_update_users_users_roles(
         author_user_id: diesel::sql_types::Integer,
         this_users_users_roles_table_id: diesel::sql_types::Integer,
@@ -425,7 +425,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_derived_samples(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_derived_samples_parent_sample_id: diesel::sql_types::Uuid,
@@ -433,21 +433,21 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_nameplates(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_nameplates_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_observations(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_observations_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_organism_bio_ott_taxon_items(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_organism_bio_ott_taxon_items_organism_id: diesel::sql_types::Uuid,
@@ -455,21 +455,21 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_organisms(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_organisms_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_projects(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_projects_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_projects_teams_role_invitations(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_projects_teams_role_invitations_table_id: diesel::sql_types::Integer,
@@ -477,7 +477,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_projects_teams_role_requests(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_projects_teams_role_requests_table_id: diesel::sql_types::Integer,
@@ -485,7 +485,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_projects_teams_roles(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_projects_teams_roles_table_id: diesel::sql_types::Integer,
@@ -493,7 +493,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_projects_users_role_invitations(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_projects_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -501,7 +501,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_projects_users_role_requests(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_projects_users_role_requests_table_id: diesel::sql_types::Integer,
@@ -509,7 +509,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_projects_users_roles(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_projects_users_roles_table_id: diesel::sql_types::Integer,
@@ -517,7 +517,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_sample_bio_ott_taxon_items(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_sample_bio_ott_taxon_items_sample_id: diesel::sql_types::Uuid,
@@ -525,35 +525,35 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_sample_containers(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_sample_containers_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_samples(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_samples_id: diesel::sql_types::Uuid,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_spectra(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_spectra_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_spectra_collections(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_spectra_collections_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_teams_teams_role_invitations(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_teams_teams_role_invitations_table_id: diesel::sql_types::Integer,
@@ -561,7 +561,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_teams_users_role_invitations(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_teams_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -569,7 +569,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_teams_users_role_requests(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
@@ -577,14 +577,14 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_user_emails(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_user_emails_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_users_users_role_invitations(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_users_users_role_invitations_table_id: diesel::sql_types::Integer,
@@ -592,7 +592,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn can_view_users_users_role_requests(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
         this_users_users_role_requests_table_id: diesel::sql_types::Integer,
@@ -600,105 +600,105 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_bio_ott_ranks_name_description(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_colors_name(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_document_formats_extension_mime_type(
         extension: diesel::sql_types::Text,
         mime_type: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_font_awesome_icons_name(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_nameplate_categories_brand(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_observation_subjects_name_description(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_project_states_name_description(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_projects_name_description(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_roles_name(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_sample_container_categories_brand(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_sample_states_name_description(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_team_states_name_description(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_teams_name_description(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_units_name_unit(
         name: diesel::sql_types::Text,
         unit: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn concat_users_name(
         first_name: diesel::sql_types::Text,
         middle_name: diesel::sql_types::Nullable<diesel::sql_types::Text>,
@@ -706,24 +706,24 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn disablelongtransactions(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn enablelongtransactions(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn equals(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn find_srid(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
@@ -731,42 +731,42 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_cmp(
         arg_0: postgis_diesel::sql_types::Geography,
         arg_1: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_distance_knn(
         arg_0: postgis_diesel::sql_types::Geography,
         arg_1: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_eq(
         arg_0: postgis_diesel::sql_types::Geography,
         arg_1: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_ge(
         arg_0: postgis_diesel::sql_types::Geography,
         arg_1: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_gt(
         arg_0: postgis_diesel::sql_types::Geography,
         arg_1: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_in(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Oid,
@@ -774,351 +774,351 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geography;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_le(
         arg_0: postgis_diesel::sql_types::Geography,
         arg_1: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_lt(
         arg_0: postgis_diesel::sql_types::Geography,
         arg_1: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_out(
         arg_0: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_overlaps(
         arg_0: postgis_diesel::sql_types::Geography,
         arg_1: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_send(
         arg_0: postgis_diesel::sql_types::Geography,
     ) -> diesel::sql_types::Binary;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_typmod_in(
         arg_0: diesel::pg::sql_types::Array<diesel::sql_types::Text>,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geography_typmod_out(
         arg_0: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_above(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_below(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_cmp(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_contained_3d(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_contains(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_contains_3d(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_contains_nd(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_distance_box(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_distance_centroid(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_distance_centroid_nd(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_distance_cpa(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_eq(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_ge(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_gt(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_hash(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_in(
         arg_0: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_le(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_left(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_lt(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_out(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_overabove(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_overbelow(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_overlaps(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_overlaps_3d(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_overlaps_nd(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_overleft(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_overright(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_right(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_same(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_same_3d(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_same_nd(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_send(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Binary;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_typmod_in(
         arg_0: diesel::pg::sql_types::Array<diesel::sql_types::Text>,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_typmod_out(
         arg_0: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_within(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geometry_within_nd(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geomfromewkb(
         arg_0: diesel::sql_types::Binary,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn geomfromewkt(
         arg_0: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn get_proj4_from_srid(
         arg_0: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn json(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Json;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn jsonb(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Jsonb;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn longtransactionsenabled(
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn point(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn polygon(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_addbbox(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_constraint_dims(
         geomschema: diesel::sql_types::Text,
         geomtable: diesel::sql_types::Text,
@@ -1126,7 +1126,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_constraint_srid(
         geomschema: diesel::sql_types::Text,
         geomtable: diesel::sql_types::Text,
@@ -1134,7 +1134,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_constraint_type(
         geomschema: diesel::sql_types::Text,
         geomtable: diesel::sql_types::Text,
@@ -1142,112 +1142,112 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_dropbbox(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_extensions_upgrade(
         target_version: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_full_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_geos_compiled_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_geos_noop(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_geos_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_hasbbox(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_lib_build_date(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_lib_revision(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_lib_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_libjson_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_liblwgeom_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_libprotobuf_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_libxml_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_noop(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_proj_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_scripts_build_date(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_scripts_installed(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_scripts_released(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_svn_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_transform_geometry(
         geom: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Text,
@@ -1256,7 +1256,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_transform_pipeline_geometry(
         geom: postgis_diesel::sql_types::Geometry,
         pipeline: diesel::sql_types::Text,
@@ -1265,7 +1265,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_type_name(
         geomname: diesel::sql_types::Text,
         coord_dimension: diesel::sql_types::Integer,
@@ -1273,63 +1273,63 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_typmod_dims(
         arg_0: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_typmod_srid(
         arg_0: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_typmod_type(
         arg_0: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn postgis_wagyu_version(
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn similarity(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Float;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn similarity_dist(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Float;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn similarity_op(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3dclosestpoint(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3ddfullywithin(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
@@ -1337,14 +1337,14 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3ddistance(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3ddwithin(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
@@ -1352,54 +1352,54 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3dintersects(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3dlength(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3dlineinterpolatepoint(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3dlongestline(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3dmaxdistance(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3dperimeter(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_3dshortestline(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_addmeasure(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
@@ -1407,34 +1407,34 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_area2d(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_asencodedpolyline(
         geom: postgis_diesel::sql_types::Geometry,
         nprecision: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_aslatlontext(
         geom: postgis_diesel::sql_types::Geometry,
         tmpl: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_asmarc21(
         geom: postgis_diesel::sql_types::Geometry,
         format: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_asx3d(
         geom: postgis_diesel::sql_types::Geometry,
         maxdecimaldigits: diesel::sql_types::Integer,
@@ -1442,40 +1442,40 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_bdmpolyfromtext(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_bdpolyfromtext(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_boundary(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_boundingdiagonal(
         geom: postgis_diesel::sql_types::Geometry,
         fits: diesel::sql_types::Bool,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_buildarea(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_chaikinsmoothing(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Integer,
@@ -1483,20 +1483,20 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_cleangeometry(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_closestpointofapproach(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_clusterdbscan(
         arg_0: postgis_diesel::sql_types::Geometry,
         eps: diesel::sql_types::Double,
@@ -1504,13 +1504,13 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_clusterintersectingwin(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_clusterkmeans(
         geom: postgis_diesel::sql_types::Geometry,
         k: diesel::sql_types::Integer,
@@ -1518,20 +1518,20 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_clusterwithinwin(
         arg_0: postgis_diesel::sql_types::Geometry,
         distance: diesel::sql_types::Double,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_collectionhomogenize(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_concavehull(
         param_geom: postgis_diesel::sql_types::Geometry,
         param_pctconvex: diesel::sql_types::Double,
@@ -1539,40 +1539,40 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_contains(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_containsproperly(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_convexhull(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_coorddim(
         geometry: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::SmallInt;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_coverageinvalidedges(
         geom: postgis_diesel::sql_types::Geometry,
         tolerance: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_coveragesimplify(
         geom: postgis_diesel::sql_types::Geometry,
         tolerance: diesel::sql_types::Double,
@@ -1580,7 +1580,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_cpawithin(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
@@ -1588,14 +1588,14 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_crosses(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_curvetoline(
         geom: postgis_diesel::sql_types::Geometry,
         tol: diesel::sql_types::Double,
@@ -1604,7 +1604,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_delaunaytriangles(
         g1: postgis_diesel::sql_types::Geometry,
         tolerance: diesel::sql_types::Double,
@@ -1612,7 +1612,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_dfullywithin(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
@@ -1620,7 +1620,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_difference(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
@@ -1628,59 +1628,59 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_dimension(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_disjoint(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_distancecpa(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_distancespheroid(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_endpoint(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_envelope(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_equals(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_exteriorring(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_filterbym(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
@@ -1689,40 +1689,40 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_flipcoordinates(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_force2d(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_force3d(
         geom: postgis_diesel::sql_types::Geometry,
         zvalue: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_force3dm(
         geom: postgis_diesel::sql_types::Geometry,
         mvalue: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_force3dz(
         geom: postgis_diesel::sql_types::Geometry,
         zvalue: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_force4d(
         geom: postgis_diesel::sql_types::Geometry,
         zvalue: diesel::sql_types::Double,
@@ -1730,37 +1730,37 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_forcecollection(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_forcecurve(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_forcepolygonccw(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_forcepolygoncw(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_forcerhr(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_frechetdistance(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
@@ -1768,7 +1768,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_fromflatgeobuftotable(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
@@ -1776,25 +1776,25 @@ diesel::expression::functions::sql_function! {
     );
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geogfromtext(
         arg_0: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geography;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geogfromwkb(
         arg_0: diesel::sql_types::Binary,
     ) -> postgis_diesel::sql_types::Geography;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geographyfromtext(
         arg_0: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geography;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geometricmedian(
         g: postgis_diesel::sql_types::Geometry,
         tolerance: diesel::sql_types::Double,
@@ -1803,63 +1803,63 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geometryn(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geometrytype(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geomfromewkb(
         arg_0: diesel::sql_types::Binary,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geomfromewkt(
         arg_0: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geomfromgeohash(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geomfromkml(
         arg_0: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geomfrommarc21(
         marc21xml: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_geomfromtwkb(
         arg_0: diesel::sql_types::Binary,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_hasarc(
         geometry: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_hexagon(
         size: diesel::sql_types::Double,
         cell_i: diesel::sql_types::Integer,
@@ -1868,21 +1868,21 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_interiorringn(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_interpolatepoint(
         line: postgis_diesel::sql_types::Geometry,
         point: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_inversetransformpipeline(
         geom: postgis_diesel::sql_types::Geometry,
         pipeline: diesel::sql_types::Text,
@@ -1890,75 +1890,75 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_isclosed(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_iscollection(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_isempty(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_ispolygonccw(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_ispolygoncw(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_isring(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_issimple(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_isvalidtrajectory(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_length2d(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_letters(
         letters: diesel::sql_types::Text,
         font: diesel::sql_types::Json,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_linecrossingdirection(
         line1: postgis_diesel::sql_types::Geometry,
         line2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_lineextend(
         geom: postgis_diesel::sql_types::Geometry,
         distance_forward: diesel::sql_types::Double,
@@ -1966,26 +1966,26 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_linefromencodedpolyline(
         txtin: diesel::sql_types::Text,
         nprecision: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_linefrommultipoint(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_linetocurve(
         geometry: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_locatealong(
         geometry: postgis_diesel::sql_types::Geometry,
         measure: diesel::sql_types::Double,
@@ -1993,7 +1993,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_locatebetween(
         geometry: postgis_diesel::sql_types::Geometry,
         frommeasure: diesel::sql_types::Double,
@@ -2002,7 +2002,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_locatebetweenelevations(
         geometry: postgis_diesel::sql_types::Geometry,
         fromelevation: diesel::sql_types::Double,
@@ -2010,20 +2010,20 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_longestline(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_m(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_makeenvelope(
         arg_0: diesel::sql_types::Double,
         arg_1: diesel::sql_types::Double,
@@ -2033,7 +2033,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_makepointm(
         arg_0: diesel::sql_types::Double,
         arg_1: diesel::sql_types::Double,
@@ -2041,129 +2041,129 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_maxdistance(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_memcollect(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_memsize(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_memunion(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_minimumboundingcircle(
         inputgeom: postgis_diesel::sql_types::Geometry,
         segs_per_quarter: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_minimumclearance(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_minimumclearanceline(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_multi(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_multilinefromwkb(
         arg_0: diesel::sql_types::Binary,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_multipointfromtext(
         arg_0: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_ndims(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::SmallInt;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_node(
         g: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_normalize(
         geom: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_npoints(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_nrings(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_numgeometries(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_numinteriorring(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_numinteriorrings(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_numpatches(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_numpoints(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_offsetcurve(
         line: postgis_diesel::sql_types::Geometry,
         distance: diesel::sql_types::Double,
@@ -2171,47 +2171,47 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_orderingequals(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_orientedenvelope(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_overlaps(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_patchn(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_perimeter2d(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_pointfromgeohash(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_pointinsidecircle(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
@@ -2220,7 +2220,7 @@ diesel::expression::functions::sql_function! {
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_pointm(
         xcoordinate: diesel::sql_types::Double,
         ycoordinate: diesel::sql_types::Double,
@@ -2229,26 +2229,26 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_pointn(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_pointonsurface(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_points(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_pointz(
         xcoordinate: diesel::sql_types::Double,
         ycoordinate: diesel::sql_types::Double,
@@ -2257,7 +2257,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_pointzm(
         xcoordinate: diesel::sql_types::Double,
         ycoordinate: diesel::sql_types::Double,
@@ -2267,14 +2267,14 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_polygon(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_quantizecoordinates(
         g: postgis_diesel::sql_types::Geometry,
         prec_x: diesel::sql_types::Integer,
@@ -2284,69 +2284,69 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_reduceprecision(
         geom: postgis_diesel::sql_types::Geometry,
         gridsize: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_relatematch(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_removepoint(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Integer,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_removerepeatedpoints(
         geom: postgis_diesel::sql_types::Geometry,
         tolerance: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_reverse(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_rotatex(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_rotatey(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_rotatez(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_scroll(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_seteffectivearea(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
@@ -2354,7 +2354,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_setpoint(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Integer,
@@ -2362,20 +2362,20 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_sharedpaths(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_shiftlongitude(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_simplifypolygonhull(
         geom: postgis_diesel::sql_types::Geometry,
         vertex_fraction: diesel::sql_types::Double,
@@ -2383,21 +2383,21 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_simplifypreservetopology(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_simplifyvw(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_snap(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
@@ -2405,14 +2405,14 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_split(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_square(
         size: diesel::sql_types::Double,
         cell_i: diesel::sql_types::Integer,
@@ -2421,20 +2421,20 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_startpoint(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_swapordinates(
         geom: postgis_diesel::sql_types::Geometry,
         ords: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_symdifference(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
@@ -2442,14 +2442,14 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_symmetricdifference(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_tileenvelope(
         zoom: diesel::sql_types::Integer,
         x: diesel::sql_types::Integer,
@@ -2459,14 +2459,14 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_touches(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_transformpipeline(
         geom: postgis_diesel::sql_types::Geometry,
         pipeline: diesel::sql_types::Text,
@@ -2474,7 +2474,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_transscale(
         arg_0: postgis_diesel::sql_types::Geometry,
         arg_1: diesel::sql_types::Double,
@@ -2484,20 +2484,20 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_triangulatepolygon(
         g1: postgis_diesel::sql_types::Geometry,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_unaryunion(
         arg_0: postgis_diesel::sql_types::Geometry,
         gridsize: diesel::sql_types::Double,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_voronoilines(
         g1: postgis_diesel::sql_types::Geometry,
         tolerance: diesel::sql_types::Double,
@@ -2505,7 +2505,7 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_voronoipolygons(
         g1: postgis_diesel::sql_types::Geometry,
         tolerance: diesel::sql_types::Double,
@@ -2513,26 +2513,26 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_within(
         geom1: postgis_diesel::sql_types::Geometry,
         geom2: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_wkbtosql(
         wkb: diesel::sql_types::Binary,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_wkttosql(
         arg_0: diesel::sql_types::Text,
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_wrapx(
         geom: postgis_diesel::sql_types::Geometry,
         wrap: diesel::sql_types::Double,
@@ -2540,106 +2540,106 @@ diesel::expression::functions::sql_function! {
     ) -> postgis_diesel::sql_types::Geometry;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_x(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_y(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_z(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Double;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn st_zmflag(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::SmallInt;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn strict_word_similarity(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Float;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn strict_word_similarity_commutator_op(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn strict_word_similarity_dist_commutator_op(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Float;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn strict_word_similarity_dist_op(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Float;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn strict_word_similarity_op(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn text(
         arg_0: postgis_diesel::sql_types::Geometry,
     ) -> diesel::sql_types::Text;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn unlockrows(
         arg_0: diesel::sql_types::Text,
     ) -> diesel::sql_types::Integer;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn word_similarity(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Float;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn word_similarity_commutator_op(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Bool;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn word_similarity_dist_commutator_op(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Float;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn word_similarity_dist_op(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,
     ) -> diesel::sql_types::Float;
 }
 
-diesel::expression::functions::sql_function! {
+diesel::define_sql_function! {
    fn word_similarity_op(
         arg_0: diesel::sql_types::Text,
         arg_1: diesel::sql_types::Text,

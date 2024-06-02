@@ -1828,7 +1828,6 @@ pub enum AppRoute {
 ///
 /// # Arguments
 /// * `route` - The route to map.
-///
 pub fn switch(route: AppRoute) -> Html {
     match route {
         AppRoute::BioOttRanks => {

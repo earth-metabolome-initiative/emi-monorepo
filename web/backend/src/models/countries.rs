@@ -87,9 +87,12 @@ impl Country {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::countries;
-        countries::dsl::countries
-            .offset(offset.unwrap_or(0))
+        let query = countries::dsl::countries
+            .select(Country::as_select())
+            .order_by(countries::dsl::id);
+        query
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -105,12 +108,7 @@ impl Country {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::countries;
-        countries::dsl::countries
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -214,10 +212,7 @@ impl Country {
         }
         use crate::schema::countries;
         countries::dsl::countries
-            .filter(
-                crate::sql_function_bindings::similarity_op(countries::dsl::name, query)
-                    .or(countries::dsl::name.ilike(format!("%{}%", query))),
-            )
+            .filter(countries::dsl::name.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::similarity_dist(
                 countries::dsl::name,
                 query,
@@ -249,10 +244,7 @@ impl Country {
         }
         use crate::schema::countries;
         countries::dsl::countries
-            .filter(
-                crate::sql_function_bindings::word_similarity_op(countries::dsl::name, query)
-                    .or(countries::dsl::name.ilike(format!("%{}%", query))),
-            )
+            .filter(countries::dsl::name.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 countries::dsl::name,
                 query,
@@ -284,13 +276,7 @@ impl Country {
         }
         use crate::schema::countries;
         countries::dsl::countries
-            .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    countries::dsl::name,
-                    query,
-                )
-                .or(countries::dsl::name.ilike(format!("%{}%", query))),
-            )
+            .filter(countries::dsl::name.ilike(format!("%{}%", query)))
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     countries::dsl::name,

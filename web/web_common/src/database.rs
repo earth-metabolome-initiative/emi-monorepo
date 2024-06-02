@@ -4,7 +4,6 @@ pub use selects::*;
 pub mod tables;
 pub mod views;
 pub use tables::*;
-pub use views::*;
 pub mod operations;
 pub use operations::*;
 pub mod notification_message;

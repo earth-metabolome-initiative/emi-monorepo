@@ -102,7 +102,10 @@ impl SampleContainerCategory {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::sample_container_categories;
-        let mut query = sample_container_categories::dsl::sample_container_categories.into_boxed();
+        let query = sample_container_categories::dsl::sample_container_categories
+            .select(SampleContainerCategory::as_select())
+            .order_by(sample_container_categories::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(material_id) = filter.and_then(|f| f.material_id) {
             query = query.filter(sample_container_categories::dsl::material_id.eq(material_id));
         }
@@ -113,8 +116,8 @@ impl SampleContainerCategory {
             query = query.filter(sample_container_categories::dsl::color_id.eq(color_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -132,22 +135,7 @@ impl SampleContainerCategory {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::sample_container_categories;
-        let mut query = sample_container_categories::dsl::sample_container_categories.into_boxed();
-        if let Some(material_id) = filter.and_then(|f| f.material_id) {
-            query = query.filter(sample_container_categories::dsl::material_id.eq(material_id));
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(sample_container_categories::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(sample_container_categories::dsl::color_id.eq(color_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -190,20 +178,11 @@ impl SampleContainerCategory {
         use crate::schema::sample_container_categories;
         let mut query = sample_container_categories::dsl::sample_container_categories
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_sample_container_categories_brand(
+                    sample_container_categories::dsl::name,
+                    sample_container_categories::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_sample_container_categories_brand(
@@ -253,20 +232,11 @@ impl SampleContainerCategory {
         use crate::schema::sample_container_categories;
         let mut query = sample_container_categories::dsl::sample_container_categories
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_sample_container_categories_brand(
+                    sample_container_categories::dsl::name,
+                    sample_container_categories::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_sample_container_categories_brand(
@@ -316,20 +286,11 @@ impl SampleContainerCategory {
         use crate::schema::sample_container_categories;
         let mut query = sample_container_categories::dsl::sample_container_categories
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_sample_container_categories_brand(
+                    sample_container_categories::dsl::name,
+                    sample_container_categories::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_sample_container_categories_brand(
-                        sample_container_categories::dsl::name,
-                        sample_container_categories::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

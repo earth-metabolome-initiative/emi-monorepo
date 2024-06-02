@@ -96,7 +96,10 @@ impl DocumentFormat {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::document_formats;
-        let mut query = document_formats::dsl::document_formats.into_boxed();
+        let query = document_formats::dsl::document_formats
+            .select(DocumentFormat::as_select())
+            .order_by(document_formats::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(document_formats::dsl::icon_id.eq(icon_id));
         }
@@ -104,8 +107,8 @@ impl DocumentFormat {
             query = query.filter(document_formats::dsl::color_id.eq(color_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -123,19 +126,7 @@ impl DocumentFormat {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::document_formats;
-        let mut query = document_formats::dsl::document_formats.into_boxed();
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(document_formats::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(document_formats::dsl::color_id.eq(color_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -194,20 +185,11 @@ impl DocumentFormat {
         use crate::schema::document_formats;
         let mut query = document_formats::dsl::document_formats
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_document_formats_extension_mime_type(
+                    document_formats::dsl::extension,
+                    document_formats::dsl::mime_type,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_document_formats_extension_mime_type(
@@ -254,20 +236,11 @@ impl DocumentFormat {
         use crate::schema::document_formats;
         let mut query = document_formats::dsl::document_formats
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_document_formats_extension_mime_type(
+                    document_formats::dsl::extension,
+                    document_formats::dsl::mime_type,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_document_formats_extension_mime_type(
@@ -314,20 +287,11 @@ impl DocumentFormat {
         use crate::schema::document_formats;
         let mut query = document_formats::dsl::document_formats
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_document_formats_extension_mime_type(
+                    document_formats::dsl::extension,
+                    document_formats::dsl::mime_type,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                        document_formats::dsl::extension,
-                        document_formats::dsl::mime_type,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

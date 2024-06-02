@@ -137,7 +137,10 @@ impl BioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::bio_ott_taxon_items;
-        let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items.into_boxed();
+        let query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
+            .select(BioOttTaxonItem::as_select())
+            .order_by(bio_ott_taxon_items::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
             query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(ott_rank_id));
         }
@@ -172,8 +175,8 @@ impl BioOttTaxonItem {
             query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(color_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -191,46 +194,7 @@ impl BioOttTaxonItem {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::bio_ott_taxon_items;
-        let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items.into_boxed();
-        if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(ott_rank_id));
-        }
-        if let Some(domain_id) = filter.and_then(|f| f.domain_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(domain_id));
-        }
-        if let Some(kingdom_id) = filter.and_then(|f| f.kingdom_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(kingdom_id));
-        }
-        if let Some(phylum_id) = filter.and_then(|f| f.phylum_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(phylum_id));
-        }
-        if let Some(class_id) = filter.and_then(|f| f.class_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(class_id));
-        }
-        if let Some(order_id) = filter.and_then(|f| f.order_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(order_id));
-        }
-        if let Some(family_id) = filter.and_then(|f| f.family_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(family_id));
-        }
-        if let Some(genus_id) = filter.and_then(|f| f.genus_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(genus_id));
-        }
-        if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id));
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(color_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -288,17 +252,7 @@ impl BioOttTaxonItem {
         }
         use crate::schema::bio_ott_taxon_items;
         let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
-            .filter(bio_ott_taxon_items::dsl::domain_id.eq(filter.and_then(|f| f.domain_id)))
-            .filter(bio_ott_taxon_items::dsl::kingdom_id.eq(filter.and_then(|f| f.kingdom_id)))
-            .filter(bio_ott_taxon_items::dsl::phylum_id.eq(filter.and_then(|f| f.phylum_id)))
-            .filter(bio_ott_taxon_items::dsl::class_id.eq(filter.and_then(|f| f.class_id)))
-            .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
-            .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
-            .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-            .filter(
-                crate::sql_function_bindings::similarity_op(bio_ott_taxon_items::dsl::name, query)
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
-            )
+            .filter(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::similarity_dist(
                 bio_ott_taxon_items::dsl::name,
                 query,
@@ -306,6 +260,27 @@ impl BioOttTaxonItem {
             .into_boxed();
         if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
             query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(ott_rank_id));
+        }
+        if let Some(domain_id) = filter.and_then(|f| f.domain_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(domain_id));
+        }
+        if let Some(kingdom_id) = filter.and_then(|f| f.kingdom_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(kingdom_id));
+        }
+        if let Some(phylum_id) = filter.and_then(|f| f.phylum_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(phylum_id));
+        }
+        if let Some(class_id) = filter.and_then(|f| f.class_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(class_id));
+        }
+        if let Some(order_id) = filter.and_then(|f| f.order_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(order_id));
+        }
+        if let Some(family_id) = filter.and_then(|f| f.family_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(family_id));
+        }
+        if let Some(genus_id) = filter.and_then(|f| f.genus_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(genus_id));
         }
         if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
             query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id));
@@ -346,20 +321,7 @@ impl BioOttTaxonItem {
         }
         use crate::schema::bio_ott_taxon_items;
         let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
-            .filter(bio_ott_taxon_items::dsl::domain_id.eq(filter.and_then(|f| f.domain_id)))
-            .filter(bio_ott_taxon_items::dsl::kingdom_id.eq(filter.and_then(|f| f.kingdom_id)))
-            .filter(bio_ott_taxon_items::dsl::phylum_id.eq(filter.and_then(|f| f.phylum_id)))
-            .filter(bio_ott_taxon_items::dsl::class_id.eq(filter.and_then(|f| f.class_id)))
-            .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
-            .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
-            .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-            .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
-            )
+            .filter(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 bio_ott_taxon_items::dsl::name,
                 query,
@@ -367,6 +329,27 @@ impl BioOttTaxonItem {
             .into_boxed();
         if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
             query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(ott_rank_id));
+        }
+        if let Some(domain_id) = filter.and_then(|f| f.domain_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(domain_id));
+        }
+        if let Some(kingdom_id) = filter.and_then(|f| f.kingdom_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(kingdom_id));
+        }
+        if let Some(phylum_id) = filter.and_then(|f| f.phylum_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(phylum_id));
+        }
+        if let Some(class_id) = filter.and_then(|f| f.class_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(class_id));
+        }
+        if let Some(order_id) = filter.and_then(|f| f.order_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(order_id));
+        }
+        if let Some(family_id) = filter.and_then(|f| f.family_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(family_id));
+        }
+        if let Some(genus_id) = filter.and_then(|f| f.genus_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(genus_id));
         }
         if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
             query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id));
@@ -407,20 +390,7 @@ impl BioOttTaxonItem {
         }
         use crate::schema::bio_ott_taxon_items;
         let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
-            .filter(bio_ott_taxon_items::dsl::domain_id.eq(filter.and_then(|f| f.domain_id)))
-            .filter(bio_ott_taxon_items::dsl::kingdom_id.eq(filter.and_then(|f| f.kingdom_id)))
-            .filter(bio_ott_taxon_items::dsl::phylum_id.eq(filter.and_then(|f| f.phylum_id)))
-            .filter(bio_ott_taxon_items::dsl::class_id.eq(filter.and_then(|f| f.class_id)))
-            .filter(bio_ott_taxon_items::dsl::order_id.eq(filter.and_then(|f| f.order_id)))
-            .filter(bio_ott_taxon_items::dsl::family_id.eq(filter.and_then(|f| f.family_id)))
-            .filter(bio_ott_taxon_items::dsl::genus_id.eq(filter.and_then(|f| f.genus_id)))
-            .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
-            )
+            .filter(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     bio_ott_taxon_items::dsl::name,
@@ -430,6 +400,27 @@ impl BioOttTaxonItem {
             .into_boxed();
         if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
             query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(ott_rank_id));
+        }
+        if let Some(domain_id) = filter.and_then(|f| f.domain_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(domain_id));
+        }
+        if let Some(kingdom_id) = filter.and_then(|f| f.kingdom_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(kingdom_id));
+        }
+        if let Some(phylum_id) = filter.and_then(|f| f.phylum_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(phylum_id));
+        }
+        if let Some(class_id) = filter.and_then(|f| f.class_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(class_id));
+        }
+        if let Some(order_id) = filter.and_then(|f| f.order_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(order_id));
+        }
+        if let Some(family_id) = filter.and_then(|f| f.family_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(family_id));
+        }
+        if let Some(genus_id) = filter.and_then(|f| f.genus_id) {
+            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(genus_id));
         }
         if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
             query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id));

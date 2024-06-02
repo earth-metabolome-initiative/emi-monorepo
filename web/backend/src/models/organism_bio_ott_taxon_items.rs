@@ -124,8 +124,17 @@ impl OrganismBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::organism_bio_ott_taxon_items;
-        let mut query =
-            organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items.into_boxed();
+        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+            .select(OrganismBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_view_organism_bio_ott_taxon_items(
+                    author_user_id,
+                    organism_bio_ott_taxon_items::dsl::organism_id,
+                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(organism_bio_ott_taxon_items::dsl::organism_id);
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -136,15 +145,8 @@ impl OrganismBioOttTaxonItem {
             query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_view_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -165,8 +167,17 @@ impl OrganismBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::organism_bio_ott_taxon_items;
-        let mut query =
-            organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items.into_boxed();
+        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+            .select(OrganismBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_view_organism_bio_ott_taxon_items(
+                    author_user_id,
+                    organism_bio_ott_taxon_items::dsl::organism_id,
+                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(organism_bio_ott_taxon_items::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -177,16 +188,8 @@ impl OrganismBioOttTaxonItem {
             query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_view_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .order_by(organism_bio_ott_taxon_items::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -279,27 +282,16 @@ impl OrganismBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::similarity_op(bio_ott_taxon_items::dsl::name, query)
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
                         .ilike(format!("%{}%", query)),
-                    )),
+                    ),
             )
             .order(
                 crate::sql_function_bindings::similarity_dist(
@@ -396,30 +388,16 @@ impl OrganismBioOttTaxonItem {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        bio_ott_taxon_items::dsl::name,
-                        query,
-                    )
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
+                    bio_ott_taxon_items::dsl::name
+                        .ilike(format!("%{}%", query))
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )),
                 )
                 .order(
                     crate::sql_function_bindings::word_similarity_dist_op(
@@ -481,85 +459,70 @@ impl OrganismBioOttTaxonItem {
             crate::schema::organisms as organisms0,
             crate::schema::organisms as organisms1
         );
-        let mut query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
-            .select(OrganismBioOttTaxonItem::as_select())
-            // This operation is defined by a first order index linking organism_bio_ott_taxon_items.taxon_id to bio_ott_taxon_items.
-            .inner_join(
-                bio_ott_taxon_items::dsl::bio_ott_taxon_items
-                    .on(organism_bio_ott_taxon_items::dsl::taxon_id
-                        .eq(bio_ott_taxon_items::dsl::id)),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
-            .inner_join(
-                organisms0.on(organism_bio_ott_taxon_items::dsl::organism_id
-                    .eq(organisms0.field(organisms::dsl::id))),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
-            .inner_join(
-                nameplates::dsl::nameplates.on(organisms0
-                    .field(organisms::dsl::nameplate_id)
-                    .eq(nameplates::dsl::id)),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
-            .inner_join(
-                organisms1.on(organism_bio_ott_taxon_items::dsl::organism_id
-                    .eq(organisms1.field(organisms::dsl::id))),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
-            .inner_join(
-                projects::dsl::projects.on(organisms1
-                    .field(organisms::dsl::project_id)
-                    .eq(projects::dsl::id)),
-            )
-            .filter(
-                crate::sql_function_bindings::can_view_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
+        let mut query =
+            organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+                .select(OrganismBioOttTaxonItem::as_select())
+                // This operation is defined by a first order index linking organism_bio_ott_taxon_items.taxon_id to bio_ott_taxon_items.
+                .inner_join(bio_ott_taxon_items::dsl::bio_ott_taxon_items.on(
+                    organism_bio_ott_taxon_items::dsl::taxon_id.eq(bio_ott_taxon_items::dsl::id),
+                ))
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(organism_bio_ott_taxon_items::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id))),
                 )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    nameplates::dsl::barcode,
-                    query,
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
                 )
-                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(organism_bio_ott_taxon_items::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id))),
+                )
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects::dsl::projects.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects::dsl::id)),
+                )
+                .filter(
+                    crate::sql_function_bindings::can_view_organism_bio_ott_taxon_items(
+                        author_user_id,
+                        organism_bio_ott_taxon_items::dsl::organism_id,
+                        organism_bio_ott_taxon_items::dsl::taxon_id,
                     ),
-                    query,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                )),
-            )
-            .order(
-                crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    bio_ott_taxon_items::dsl::name
+                        .ilike(format!("%{}%", query))
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
                     ),
-                    query,
-                ),
-            )
-            .into_boxed();
+                )
+                .into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -631,8 +594,17 @@ impl OrganismBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::organism_bio_ott_taxon_items;
-        let mut query =
-            organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items.into_boxed();
+        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+            .select(OrganismBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_update_organism_bio_ott_taxon_items(
+                    author_user_id,
+                    organism_bio_ott_taxon_items::dsl::organism_id,
+                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(organism_bio_ott_taxon_items::dsl::organism_id);
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -643,15 +615,8 @@ impl OrganismBioOttTaxonItem {
             query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_update_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -672,8 +637,17 @@ impl OrganismBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::organism_bio_ott_taxon_items;
-        let mut query =
-            organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items.into_boxed();
+        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+            .select(OrganismBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_update_organism_bio_ott_taxon_items(
+                    author_user_id,
+                    organism_bio_ott_taxon_items::dsl::organism_id,
+                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(organism_bio_ott_taxon_items::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -684,16 +658,8 @@ impl OrganismBioOttTaxonItem {
             query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_update_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .order_by(organism_bio_ott_taxon_items::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -764,27 +730,16 @@ impl OrganismBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::similarity_op(bio_ott_taxon_items::dsl::name, query)
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
                         .ilike(format!("%{}%", query)),
-                    )),
+                    ),
             )
             .order(
                 crate::sql_function_bindings::similarity_dist(
@@ -881,30 +836,16 @@ impl OrganismBioOttTaxonItem {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        bio_ott_taxon_items::dsl::name,
-                        query,
-                    )
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
+                    bio_ott_taxon_items::dsl::name
+                        .ilike(format!("%{}%", query))
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )),
                 )
                 .order(
                     crate::sql_function_bindings::word_similarity_dist_op(
@@ -966,85 +907,70 @@ impl OrganismBioOttTaxonItem {
             crate::schema::organisms as organisms0,
             crate::schema::organisms as organisms1
         );
-        let mut query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
-            .select(OrganismBioOttTaxonItem::as_select())
-            // This operation is defined by a first order index linking organism_bio_ott_taxon_items.taxon_id to bio_ott_taxon_items.
-            .inner_join(
-                bio_ott_taxon_items::dsl::bio_ott_taxon_items
-                    .on(organism_bio_ott_taxon_items::dsl::taxon_id
-                        .eq(bio_ott_taxon_items::dsl::id)),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
-            .inner_join(
-                organisms0.on(organism_bio_ott_taxon_items::dsl::organism_id
-                    .eq(organisms0.field(organisms::dsl::id))),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
-            .inner_join(
-                nameplates::dsl::nameplates.on(organisms0
-                    .field(organisms::dsl::nameplate_id)
-                    .eq(nameplates::dsl::id)),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
-            .inner_join(
-                organisms1.on(organism_bio_ott_taxon_items::dsl::organism_id
-                    .eq(organisms1.field(organisms::dsl::id))),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
-            .inner_join(
-                projects::dsl::projects.on(organisms1
-                    .field(organisms::dsl::project_id)
-                    .eq(projects::dsl::id)),
-            )
-            .filter(
-                crate::sql_function_bindings::can_update_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
+        let mut query =
+            organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+                .select(OrganismBioOttTaxonItem::as_select())
+                // This operation is defined by a first order index linking organism_bio_ott_taxon_items.taxon_id to bio_ott_taxon_items.
+                .inner_join(bio_ott_taxon_items::dsl::bio_ott_taxon_items.on(
+                    organism_bio_ott_taxon_items::dsl::taxon_id.eq(bio_ott_taxon_items::dsl::id),
+                ))
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(organism_bio_ott_taxon_items::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id))),
                 )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    nameplates::dsl::barcode,
-                    query,
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
                 )
-                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(organism_bio_ott_taxon_items::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id))),
+                )
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects::dsl::projects.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects::dsl::id)),
+                )
+                .filter(
+                    crate::sql_function_bindings::can_update_organism_bio_ott_taxon_items(
+                        author_user_id,
+                        organism_bio_ott_taxon_items::dsl::organism_id,
+                        organism_bio_ott_taxon_items::dsl::taxon_id,
                     ),
-                    query,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                )),
-            )
-            .order(
-                crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    bio_ott_taxon_items::dsl::name
+                        .ilike(format!("%{}%", query))
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
                     ),
-                    query,
-                ),
-            )
-            .into_boxed();
+                )
+                .into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -1116,8 +1042,17 @@ impl OrganismBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::organism_bio_ott_taxon_items;
-        let mut query =
-            organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items.into_boxed();
+        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+            .select(OrganismBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(
+                    author_user_id,
+                    organism_bio_ott_taxon_items::dsl::organism_id,
+                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(organism_bio_ott_taxon_items::dsl::organism_id);
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -1128,15 +1063,8 @@ impl OrganismBioOttTaxonItem {
             query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -1157,8 +1085,17 @@ impl OrganismBioOttTaxonItem {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::organism_bio_ott_taxon_items;
-        let mut query =
-            organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items.into_boxed();
+        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+            .select(OrganismBioOttTaxonItem::as_select())
+            .filter(
+                crate::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(
+                    author_user_id,
+                    organism_bio_ott_taxon_items::dsl::organism_id,
+                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                ),
+            )
+            .order_by(organism_bio_ott_taxon_items::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }
@@ -1169,16 +1106,8 @@ impl OrganismBioOttTaxonItem {
             query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .order_by(organism_bio_ott_taxon_items::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -1249,27 +1178,16 @@ impl OrganismBioOttTaxonItem {
                 ),
             )
             .filter(
-                crate::sql_function_bindings::similarity_op(bio_ott_taxon_items::dsl::name, query)
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        ),
-                        query,
-                    )
+                bio_ott_taxon_items::dsl::name
+                    .ilike(format!("%{}%", query))
+                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
                         .ilike(format!("%{}%", query)),
-                    )),
+                    ),
             )
             .order(
                 crate::sql_function_bindings::similarity_dist(
@@ -1366,30 +1284,16 @@ impl OrganismBioOttTaxonItem {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        bio_ott_taxon_items::dsl::name,
-                        query,
-                    )
-                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        nameplates::dsl::barcode,
-                        query,
-                    )
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
+                    bio_ott_taxon_items::dsl::name
+                        .ilike(format!("%{}%", query))
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
                         ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects::dsl::name,
-                            projects::dsl::description,
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )),
                 )
                 .order(
                     crate::sql_function_bindings::word_similarity_dist_op(
@@ -1451,85 +1355,70 @@ impl OrganismBioOttTaxonItem {
             crate::schema::organisms as organisms0,
             crate::schema::organisms as organisms1
         );
-        let mut query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
-            .select(OrganismBioOttTaxonItem::as_select())
-            // This operation is defined by a first order index linking organism_bio_ott_taxon_items.taxon_id to bio_ott_taxon_items.
-            .inner_join(
-                bio_ott_taxon_items::dsl::bio_ott_taxon_items
-                    .on(organism_bio_ott_taxon_items::dsl::taxon_id
-                        .eq(bio_ott_taxon_items::dsl::id)),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
-            .inner_join(
-                organisms0.on(organism_bio_ott_taxon_items::dsl::organism_id
-                    .eq(organisms0.field(organisms::dsl::id))),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
-            .inner_join(
-                nameplates::dsl::nameplates.on(organisms0
-                    .field(organisms::dsl::nameplate_id)
-                    .eq(nameplates::dsl::id)),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
-            .inner_join(
-                organisms1.on(organism_bio_ott_taxon_items::dsl::organism_id
-                    .eq(organisms1.field(organisms::dsl::id))),
-            )
-            // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
-            .inner_join(
-                projects::dsl::projects.on(organisms1
-                    .field(organisms::dsl::project_id)
-                    .eq(projects::dsl::id)),
-            )
-            .filter(
-                crate::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
-            .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
+        let mut query =
+            organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+                .select(OrganismBioOttTaxonItem::as_select())
+                // This operation is defined by a first order index linking organism_bio_ott_taxon_items.taxon_id to bio_ott_taxon_items.
+                .inner_join(bio_ott_taxon_items::dsl::bio_ott_taxon_items.on(
+                    organism_bio_ott_taxon_items::dsl::taxon_id.eq(bio_ott_taxon_items::dsl::id),
+                ))
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    organisms0.on(organism_bio_ott_taxon_items::dsl::organism_id
+                        .eq(organisms0.field(organisms::dsl::id))),
                 )
-                .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    nameplates::dsl::barcode,
-                    query,
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+                .inner_join(
+                    nameplates::dsl::nameplates.on(organisms0
+                        .field(organisms::dsl::nameplate_id)
+                        .eq(nameplates::dsl::id)),
                 )
-                .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
-                .or(crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    organisms1.on(organism_bio_ott_taxon_items::dsl::organism_id
+                        .eq(organisms1.field(organisms::dsl::id))),
+                )
+                // This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+                .inner_join(
+                    projects::dsl::projects.on(organisms1
+                        .field(organisms::dsl::project_id)
+                        .eq(projects::dsl::id)),
+                )
+                .filter(
+                    crate::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(
+                        author_user_id,
+                        organism_bio_ott_taxon_items::dsl::organism_id,
+                        organism_bio_ott_taxon_items::dsl::taxon_id,
                     ),
-                    query,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                )),
-            )
-            .order(
-                crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    bio_ott_taxon_items::dsl::name,
-                    query,
-                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    nameplates::dsl::barcode,
-                    query,
-                ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_projects_name_description(
-                        projects::dsl::name,
-                        projects::dsl::description,
+                .filter(
+                    bio_ott_taxon_items::dsl::name
+                        .ilike(format!("%{}%", query))
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
+                )
+                .order(
+                    crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        bio_ott_taxon_items::dsl::name,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        nameplates::dsl::barcode,
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_projects_name_description(
+                            projects::dsl::name,
+                            projects::dsl::description,
+                        ),
+                        query,
                     ),
-                    query,
-                ),
-            )
-            .into_boxed();
+                )
+                .into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
         }

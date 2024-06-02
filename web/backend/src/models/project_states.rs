@@ -93,7 +93,10 @@ impl ProjectState {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::project_states;
-        let mut query = project_states::dsl::project_states.into_boxed();
+        let query = project_states::dsl::project_states
+            .select(ProjectState::as_select())
+            .order_by(project_states::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(project_states::dsl::icon_id.eq(icon_id));
         }
@@ -101,8 +104,8 @@ impl ProjectState {
             query = query.filter(project_states::dsl::color_id.eq(color_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -120,19 +123,7 @@ impl ProjectState {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::project_states;
-        let mut query = project_states::dsl::project_states.into_boxed();
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(project_states::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(project_states::dsl::color_id.eq(color_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -223,20 +214,11 @@ impl ProjectState {
         use crate::schema::project_states;
         let mut query = project_states::dsl::project_states
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_project_states_name_description(
-                        project_states::dsl::name,
-                        project_states::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_project_states_name_description(
+                    project_states::dsl::name,
+                    project_states::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_project_states_name_description(
-                        project_states::dsl::name,
-                        project_states::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_project_states_name_description(
@@ -283,20 +265,11 @@ impl ProjectState {
         use crate::schema::project_states;
         let mut query = project_states::dsl::project_states
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_project_states_name_description(
-                        project_states::dsl::name,
-                        project_states::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_project_states_name_description(
+                    project_states::dsl::name,
+                    project_states::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_project_states_name_description(
-                        project_states::dsl::name,
-                        project_states::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_project_states_name_description(
@@ -343,20 +316,11 @@ impl ProjectState {
         use crate::schema::project_states;
         let mut query = project_states::dsl::project_states
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_project_states_name_description(
-                        project_states::dsl::name,
-                        project_states::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_project_states_name_description(
+                    project_states::dsl::name,
+                    project_states::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_project_states_name_description(
-                        project_states::dsl::name,
-                        project_states::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

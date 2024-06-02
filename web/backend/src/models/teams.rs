@@ -114,7 +114,10 @@ impl Team {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams;
-        let mut query = teams::dsl::teams.into_boxed();
+        let query = teams::dsl::teams
+            .select(Team::as_select())
+            .order_by(teams::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(teams::dsl::icon_id.eq(icon_id));
         }
@@ -134,8 +137,8 @@ impl Team {
             query = query.filter(teams::dsl::updated_by.eq(updated_by));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -154,7 +157,10 @@ impl Team {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams;
-        let mut query = teams::dsl::teams.into_boxed();
+        let query = teams::dsl::teams
+            .select(Team::as_select())
+            .order_by(teams::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(teams::dsl::icon_id.eq(icon_id));
         }
@@ -174,9 +180,8 @@ impl Team {
             query = query.filter(teams::dsl::updated_by.eq(updated_by));
         }
         query
-            .order_by(teams::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -236,20 +241,12 @@ impl Team {
         }
         use crate::schema::teams;
         let mut query = teams::dsl::teams
-            .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_teams_name_description(
+                crate::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
                     teams::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_teams_name_description(
@@ -267,6 +264,9 @@ impl Team {
         }
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(teams::dsl::created_by.eq(created_by));
@@ -304,20 +304,12 @@ impl Team {
         }
         use crate::schema::teams;
         let mut query = teams::dsl::teams
-            .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_teams_name_description(
+                crate::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
                     teams::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_teams_name_description(
@@ -335,6 +327,9 @@ impl Team {
         }
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(teams::dsl::created_by.eq(created_by));
@@ -372,20 +367,12 @@ impl Team {
         }
         use crate::schema::teams;
         let mut query = teams::dsl::teams
-            .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_teams_name_description(
+                crate::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
                     teams::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -405,6 +392,9 @@ impl Team {
         }
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(teams::dsl::created_by.eq(created_by));
@@ -467,7 +457,14 @@ impl Team {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams;
-        let mut query = teams::dsl::teams.into_boxed();
+        let query = teams::dsl::teams
+            .select(Team::as_select())
+            .filter(crate::sql_function_bindings::can_update_teams(
+                author_user_id,
+                teams::dsl::id,
+            ))
+            .order_by(teams::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(teams::dsl::icon_id.eq(icon_id));
         }
@@ -487,12 +484,8 @@ impl Team {
             query = query.filter(teams::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_teams(
-                author_user_id,
-                teams::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -513,7 +506,14 @@ impl Team {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams;
-        let mut query = teams::dsl::teams.into_boxed();
+        let query = teams::dsl::teams
+            .select(Team::as_select())
+            .filter(crate::sql_function_bindings::can_update_teams(
+                author_user_id,
+                teams::dsl::id,
+            ))
+            .order_by(teams::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(teams::dsl::icon_id.eq(icon_id));
         }
@@ -533,13 +533,8 @@ impl Team {
             query = query.filter(teams::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_teams(
-                author_user_id,
-                teams::dsl::id,
-            ))
-            .order_by(teams::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -569,24 +564,16 @@ impl Team {
         }
         use crate::schema::teams;
         let mut query = teams::dsl::teams
-            .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_update_teams(
                 author_user_id,
                 teams::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_teams_name_description(
+                crate::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
                     teams::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_teams_name_description(
@@ -604,6 +591,9 @@ impl Team {
         }
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(teams::dsl::created_by.eq(created_by));
@@ -643,24 +633,16 @@ impl Team {
         }
         use crate::schema::teams;
         let mut query = teams::dsl::teams
-            .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_update_teams(
                 author_user_id,
                 teams::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_teams_name_description(
+                crate::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
                     teams::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_teams_name_description(
@@ -678,6 +660,9 @@ impl Team {
         }
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(teams::dsl::created_by.eq(created_by));
@@ -717,24 +702,16 @@ impl Team {
         }
         use crate::schema::teams;
         let mut query = teams::dsl::teams
-            .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_update_teams(
                 author_user_id,
                 teams::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_teams_name_description(
+                crate::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
                     teams::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -754,6 +731,9 @@ impl Team {
         }
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(teams::dsl::created_by.eq(created_by));
@@ -816,7 +796,14 @@ impl Team {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams;
-        let mut query = teams::dsl::teams.into_boxed();
+        let query = teams::dsl::teams
+            .select(Team::as_select())
+            .filter(crate::sql_function_bindings::can_admin_teams(
+                author_user_id,
+                teams::dsl::id,
+            ))
+            .order_by(teams::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(teams::dsl::icon_id.eq(icon_id));
         }
@@ -836,12 +823,8 @@ impl Team {
             query = query.filter(teams::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_teams(
-                author_user_id,
-                teams::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -862,7 +845,14 @@ impl Team {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams;
-        let mut query = teams::dsl::teams.into_boxed();
+        let query = teams::dsl::teams
+            .select(Team::as_select())
+            .filter(crate::sql_function_bindings::can_admin_teams(
+                author_user_id,
+                teams::dsl::id,
+            ))
+            .order_by(teams::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(teams::dsl::icon_id.eq(icon_id));
         }
@@ -882,13 +872,8 @@ impl Team {
             query = query.filter(teams::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_teams(
-                author_user_id,
-                teams::dsl::id,
-            ))
-            .order_by(teams::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -918,24 +903,16 @@ impl Team {
         }
         use crate::schema::teams;
         let mut query = teams::dsl::teams
-            .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_admin_teams(
                 author_user_id,
                 teams::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_teams_name_description(
+                crate::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
                     teams::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_teams_name_description(
@@ -953,6 +930,9 @@ impl Team {
         }
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(teams::dsl::created_by.eq(created_by));
@@ -992,24 +972,16 @@ impl Team {
         }
         use crate::schema::teams;
         let mut query = teams::dsl::teams
-            .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_admin_teams(
                 author_user_id,
                 teams::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_teams_name_description(
+                crate::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
                     teams::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_teams_name_description(
@@ -1027,6 +999,9 @@ impl Team {
         }
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(teams::dsl::created_by.eq(created_by));
@@ -1066,24 +1041,16 @@ impl Team {
         }
         use crate::schema::teams;
         let mut query = teams::dsl::teams
-            .filter(teams::dsl::parent_team_id.eq(filter.and_then(|f| f.parent_team_id)))
             .filter(crate::sql_function_bindings::can_admin_teams(
                 author_user_id,
                 teams::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_teams_name_description(
-                        teams::dsl::name,
-                        teams::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_teams_name_description(
+                crate::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
                     teams::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -1103,6 +1070,9 @@ impl Team {
         }
         if let Some(state_id) = filter.and_then(|f| f.state_id) {
             query = query.filter(teams::dsl::state_id.eq(state_id));
+        }
+        if let Some(parent_team_id) = filter.and_then(|f| f.parent_team_id) {
+            query = query.filter(teams::dsl::parent_team_id.eq(parent_team_id));
         }
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(teams::dsl::created_by.eq(created_by));

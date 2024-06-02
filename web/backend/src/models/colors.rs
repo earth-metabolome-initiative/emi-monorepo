@@ -84,9 +84,12 @@ impl Color {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::colors;
-        colors::dsl::colors
-            .offset(offset.unwrap_or(0))
+        let query = colors::dsl::colors
+            .select(Color::as_select())
+            .order_by(colors::dsl::id);
+        query
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -102,12 +105,7 @@ impl Color {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::colors;
-        colors::dsl::colors
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -180,18 +178,11 @@ impl Color {
         use crate::schema::colors;
         colors::dsl::colors
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_colors_name(
-                        colors::dsl::name,
-                        colors::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_colors_name(
+                crate::sql_function_bindings::concat_colors_name(
                     colors::dsl::name,
                     colors::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_colors_name(
@@ -228,18 +219,11 @@ impl Color {
         use crate::schema::colors;
         colors::dsl::colors
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_colors_name(
-                        colors::dsl::name,
-                        colors::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_colors_name(
+                crate::sql_function_bindings::concat_colors_name(
                     colors::dsl::name,
                     colors::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_colors_name(
@@ -276,18 +260,11 @@ impl Color {
         use crate::schema::colors;
         colors::dsl::colors
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_colors_name(
-                        colors::dsl::name,
-                        colors::dsl::description,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_colors_name(
+                crate::sql_function_bindings::concat_colors_name(
                     colors::dsl::name,
                     colors::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

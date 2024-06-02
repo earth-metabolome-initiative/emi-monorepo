@@ -130,9 +130,9 @@ class PGIndex:
         formatted_function = self._format_function(alias_number)
         
         return (
-            f"{self._format_diesel(query, similarity_method, 'op', alias_number)}.or(\n"
+            # f"{self._format_diesel(query, similarity_method, 'op', alias_number)}.or(\n"
             f"    {formatted_function}.ilike(format!(\"%{{}}%\", {query}))\n"
-            ")\n"
+            # ")\n"
         )
 
     def format_distance_operator_diesel(

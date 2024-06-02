@@ -95,13 +95,16 @@ impl Notification {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::notifications;
-        let mut query = notifications::dsl::notifications.into_boxed();
+        let query = notifications::dsl::notifications
+            .select(Notification::as_select())
+            .order_by(notifications::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(user_id) = filter.and_then(|f| f.user_id) {
             query = query.filter(notifications::dsl::user_id.eq(user_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -119,16 +122,7 @@ impl Notification {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::notifications;
-        let mut query = notifications::dsl::notifications.into_boxed();
-        if let Some(user_id) = filter.and_then(|f| f.user_id) {
-            query = query.filter(notifications::dsl::user_id.eq(user_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///

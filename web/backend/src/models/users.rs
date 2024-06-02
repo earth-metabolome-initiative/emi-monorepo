@@ -96,9 +96,12 @@ impl User {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
-        users::dsl::users
-            .offset(offset.unwrap_or(0))
+        let query = users::dsl::users
+            .select(User::as_select())
+            .order_by(users::dsl::id);
+        query
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -115,10 +118,12 @@ impl User {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
-        users::dsl::users
-            .order_by(users::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
+        let query = users::dsl::users
+            .select(User::as_select())
+            .order_by(users::dsl::updated_at.desc());
+        query
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -161,20 +166,12 @@ impl User {
         use crate::schema::users;
         users::dsl::users
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_users_name(
-                        users::dsl::first_name,
-                        users::dsl::middle_name,
-                        users::dsl::last_name,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_users_name(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_users_name(
@@ -212,20 +209,12 @@ impl User {
         use crate::schema::users;
         users::dsl::users
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_users_name(
-                        users::dsl::first_name,
-                        users::dsl::middle_name,
-                        users::dsl::last_name,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_users_name(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_users_name(
@@ -263,20 +252,12 @@ impl User {
         use crate::schema::users;
         users::dsl::users
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_users_name(
-                        users::dsl::first_name,
-                        users::dsl::middle_name,
-                        users::dsl::last_name,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_users_name(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -340,13 +321,16 @@ impl User {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
-        users::dsl::users
+        let query = users::dsl::users
+            .select(User::as_select())
             .filter(crate::sql_function_bindings::can_update_users(
                 author_user_id,
                 users::dsl::id,
             ))
-            .offset(offset.unwrap_or(0))
+            .order_by(users::dsl::id);
+        query
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -365,14 +349,16 @@ impl User {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
-        users::dsl::users
+        let query = users::dsl::users
+            .select(User::as_select())
             .filter(crate::sql_function_bindings::can_update_users(
                 author_user_id,
                 users::dsl::id,
             ))
-            .order_by(users::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
+            .order_by(users::dsl::updated_at.desc());
+        query
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -405,20 +391,12 @@ impl User {
                 users::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_users_name(
-                        users::dsl::first_name,
-                        users::dsl::middle_name,
-                        users::dsl::last_name,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_users_name(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_users_name(
@@ -462,20 +440,12 @@ impl User {
                 users::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_users_name(
-                        users::dsl::first_name,
-                        users::dsl::middle_name,
-                        users::dsl::last_name,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_users_name(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_users_name(
@@ -519,20 +489,12 @@ impl User {
                 users::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_users_name(
-                        users::dsl::first_name,
-                        users::dsl::middle_name,
-                        users::dsl::last_name,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_users_name(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -596,13 +558,16 @@ impl User {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
-        users::dsl::users
+        let query = users::dsl::users
+            .select(User::as_select())
             .filter(crate::sql_function_bindings::can_admin_users(
                 author_user_id,
                 users::dsl::id,
             ))
-            .offset(offset.unwrap_or(0))
+            .order_by(users::dsl::id);
+        query
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -621,14 +586,16 @@ impl User {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::users;
-        users::dsl::users
+        let query = users::dsl::users
+            .select(User::as_select())
             .filter(crate::sql_function_bindings::can_admin_users(
                 author_user_id,
                 users::dsl::id,
             ))
-            .order_by(users::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
+            .order_by(users::dsl::updated_at.desc());
+        query
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -661,20 +628,12 @@ impl User {
                 users::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_users_name(
-                        users::dsl::first_name,
-                        users::dsl::middle_name,
-                        users::dsl::last_name,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_users_name(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_users_name(
@@ -718,20 +677,12 @@ impl User {
                 users::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_users_name(
-                        users::dsl::first_name,
-                        users::dsl::middle_name,
-                        users::dsl::last_name,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_users_name(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_users_name(
@@ -775,20 +726,12 @@ impl User {
                 users::dsl::id,
             ))
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_users_name(
-                        users::dsl::first_name,
-                        users::dsl::middle_name,
-                        users::dsl::last_name,
-                    ),
-                    query,
-                )
-                .or(crate::sql_function_bindings::concat_users_name(
+                crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
                     users::dsl::middle_name,
                     users::dsl::last_name,
                 )
-                .ilike(format!("%{}%", query))),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

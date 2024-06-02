@@ -122,7 +122,14 @@ impl UserEmail {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails.into_boxed();
+        let query = user_emails::dsl::user_emails
+            .select(UserEmail::as_select())
+            .filter(crate::sql_function_bindings::can_view_user_emails(
+                author_user_id,
+                user_emails::dsl::id,
+            ))
+            .order_by(user_emails::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -130,12 +137,8 @@ impl UserEmail {
             query = query.filter(user_emails::dsl::login_provider_id.eq(login_provider_id));
         }
         query
-            .filter(crate::sql_function_bindings::can_view_user_emails(
-                author_user_id,
-                user_emails::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -156,7 +159,14 @@ impl UserEmail {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails.into_boxed();
+        let query = user_emails::dsl::user_emails
+            .select(UserEmail::as_select())
+            .filter(crate::sql_function_bindings::can_view_user_emails(
+                author_user_id,
+                user_emails::dsl::id,
+            ))
+            .order_by(user_emails::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -164,13 +174,8 @@ impl UserEmail {
             query = query.filter(user_emails::dsl::login_provider_id.eq(login_provider_id));
         }
         query
-            .filter(crate::sql_function_bindings::can_view_user_emails(
-                author_user_id,
-                user_emails::dsl::id,
-            ))
-            .order_by(user_emails::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -268,7 +273,14 @@ impl UserEmail {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails.into_boxed();
+        let query = user_emails::dsl::user_emails
+            .select(UserEmail::as_select())
+            .filter(crate::sql_function_bindings::can_update_user_emails(
+                author_user_id,
+                user_emails::dsl::id,
+            ))
+            .order_by(user_emails::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -276,12 +288,8 @@ impl UserEmail {
             query = query.filter(user_emails::dsl::login_provider_id.eq(login_provider_id));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_user_emails(
-                author_user_id,
-                user_emails::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -302,7 +310,14 @@ impl UserEmail {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails.into_boxed();
+        let query = user_emails::dsl::user_emails
+            .select(UserEmail::as_select())
+            .filter(crate::sql_function_bindings::can_update_user_emails(
+                author_user_id,
+                user_emails::dsl::id,
+            ))
+            .order_by(user_emails::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -310,13 +325,8 @@ impl UserEmail {
             query = query.filter(user_emails::dsl::login_provider_id.eq(login_provider_id));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_user_emails(
-                author_user_id,
-                user_emails::dsl::id,
-            ))
-            .order_by(user_emails::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -369,7 +379,14 @@ impl UserEmail {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails.into_boxed();
+        let query = user_emails::dsl::user_emails
+            .select(UserEmail::as_select())
+            .filter(crate::sql_function_bindings::can_admin_user_emails(
+                author_user_id,
+                user_emails::dsl::id,
+            ))
+            .order_by(user_emails::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -377,12 +394,8 @@ impl UserEmail {
             query = query.filter(user_emails::dsl::login_provider_id.eq(login_provider_id));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_user_emails(
-                author_user_id,
-                user_emails::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -403,7 +416,14 @@ impl UserEmail {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::user_emails;
-        let mut query = user_emails::dsl::user_emails.into_boxed();
+        let query = user_emails::dsl::user_emails
+            .select(UserEmail::as_select())
+            .filter(crate::sql_function_bindings::can_admin_user_emails(
+                author_user_id,
+                user_emails::dsl::id,
+            ))
+            .order_by(user_emails::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
             query = query.filter(user_emails::dsl::created_by.eq(created_by));
         }
@@ -411,13 +431,8 @@ impl UserEmail {
             query = query.filter(user_emails::dsl::login_provider_id.eq(login_provider_id));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_user_emails(
-                author_user_id,
-                user_emails::dsl::id,
-            ))
-            .order_by(user_emails::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }

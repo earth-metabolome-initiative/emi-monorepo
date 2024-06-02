@@ -125,7 +125,14 @@ impl Spectra {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
-        let mut query = spectra::dsl::spectra.into_boxed();
+        let query = spectra::dsl::spectra
+            .select(Spectra::as_select())
+            .filter(crate::sql_function_bindings::can_view_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
+            .order_by(spectra::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
             query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
         }
@@ -136,12 +143,8 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_view_spectra(
-                author_user_id,
-                spectra::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -162,7 +165,14 @@ impl Spectra {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
-        let mut query = spectra::dsl::spectra.into_boxed();
+        let query = spectra::dsl::spectra
+            .select(Spectra::as_select())
+            .filter(crate::sql_function_bindings::can_view_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
+            .order_by(spectra::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
             query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
         }
@@ -173,13 +183,8 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_view_spectra(
-                author_user_id,
-                spectra::dsl::id,
-            ))
-            .order_by(spectra::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -253,7 +258,14 @@ impl Spectra {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
-        let mut query = spectra::dsl::spectra.into_boxed();
+        let query = spectra::dsl::spectra
+            .select(Spectra::as_select())
+            .filter(crate::sql_function_bindings::can_update_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
+            .order_by(spectra::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
             query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
         }
@@ -264,12 +276,8 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_spectra(
-                author_user_id,
-                spectra::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -290,7 +298,14 @@ impl Spectra {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
-        let mut query = spectra::dsl::spectra.into_boxed();
+        let query = spectra::dsl::spectra
+            .select(Spectra::as_select())
+            .filter(crate::sql_function_bindings::can_update_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
+            .order_by(spectra::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
             query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
         }
@@ -301,13 +316,8 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_update_spectra(
-                author_user_id,
-                spectra::dsl::id,
-            ))
-            .order_by(spectra::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -360,7 +370,14 @@ impl Spectra {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
-        let mut query = spectra::dsl::spectra.into_boxed();
+        let query = spectra::dsl::spectra
+            .select(Spectra::as_select())
+            .filter(crate::sql_function_bindings::can_admin_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
+            .order_by(spectra::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
             query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
         }
@@ -371,12 +388,8 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_spectra(
-                author_user_id,
-                spectra::dsl::id,
-            ))
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -397,7 +410,14 @@ impl Spectra {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::spectra;
-        let mut query = spectra::dsl::spectra.into_boxed();
+        let query = spectra::dsl::spectra
+            .select(Spectra::as_select())
+            .filter(crate::sql_function_bindings::can_admin_spectra(
+                author_user_id,
+                spectra::dsl::id,
+            ))
+            .order_by(spectra::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
         if let Some(spectra_collection_id) = filter.and_then(|f| f.spectra_collection_id) {
             query = query.filter(spectra::dsl::spectra_collection_id.eq(spectra_collection_id));
         }
@@ -408,13 +428,8 @@ impl Spectra {
             query = query.filter(spectra::dsl::updated_by.eq(updated_by));
         }
         query
-            .filter(crate::sql_function_bindings::can_admin_spectra(
-                author_user_id,
-                spectra::dsl::id,
-            ))
-            .order_by(spectra::dsl::updated_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }

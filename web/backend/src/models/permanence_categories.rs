@@ -93,7 +93,10 @@ impl PermanenceCategory {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::permanence_categories;
-        let mut query = permanence_categories::dsl::permanence_categories.into_boxed();
+        let query = permanence_categories::dsl::permanence_categories
+            .select(PermanenceCategory::as_select())
+            .order_by(permanence_categories::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(permanence_categories::dsl::icon_id.eq(icon_id));
         }
@@ -101,8 +104,8 @@ impl PermanenceCategory {
             query = query.filter(permanence_categories::dsl::color_id.eq(color_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -120,19 +123,7 @@ impl PermanenceCategory {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::permanence_categories;
-        let mut query = permanence_categories::dsl::permanence_categories.into_boxed();
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(permanence_categories::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(permanence_categories::dsl::color_id.eq(color_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///

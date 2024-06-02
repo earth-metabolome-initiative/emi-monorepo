@@ -123,8 +123,17 @@ impl TeamsTeamsRoleInvitation {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams_teams_role_invitations;
-        let mut query =
-            teams_teams_role_invitations::dsl::teams_teams_role_invitations.into_boxed();
+        let query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .select(TeamsTeamsRoleInvitation::as_select())
+            .filter(
+                crate::sql_function_bindings::can_view_teams_teams_role_invitations(
+                    author_user_id,
+                    teams_teams_role_invitations::dsl::table_id,
+                    teams_teams_role_invitations::dsl::team_id,
+                ),
+            )
+            .order_by(teams_teams_role_invitations::dsl::table_id);
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -138,15 +147,8 @@ impl TeamsTeamsRoleInvitation {
             query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_view_teams_teams_role_invitations(
-                    author_user_id,
-                    teams_teams_role_invitations::dsl::table_id,
-                    teams_teams_role_invitations::dsl::team_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -167,8 +169,17 @@ impl TeamsTeamsRoleInvitation {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams_teams_role_invitations;
-        let mut query =
-            teams_teams_role_invitations::dsl::teams_teams_role_invitations.into_boxed();
+        let query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .select(TeamsTeamsRoleInvitation::as_select())
+            .filter(
+                crate::sql_function_bindings::can_view_teams_teams_role_invitations(
+                    author_user_id,
+                    teams_teams_role_invitations::dsl::table_id,
+                    teams_teams_role_invitations::dsl::team_id,
+                ),
+            )
+            .order_by(teams_teams_role_invitations::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -182,16 +193,8 @@ impl TeamsTeamsRoleInvitation {
             query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_view_teams_teams_role_invitations(
-                    author_user_id,
-                    teams_teams_role_invitations::dsl::table_id,
-                    teams_teams_role_invitations::dsl::team_id,
-                ),
-            )
-            .order_by(teams_teams_role_invitations::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -270,44 +273,21 @@ impl TeamsTeamsRoleInvitation {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams0.field(teams::dsl::name),
-                            teams0.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                    crate::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
+                    .ilike(format!("%{}%", query))
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams1.field(teams::dsl::name),
+                        teams1.field(teams::dsl::description),
+                    )
                     .ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
                     .or(crate::sql_function_bindings::concat_roles_name(
                         roles::dsl::name,
                         roles::dsl::description,
                     )
-                    .ilike(format!("%{}%", query)))),
+                    .ilike(format!("%{}%", query))),
                 )
                 .order(
                     crate::sql_function_bindings::similarity_dist(
@@ -402,44 +382,21 @@ impl TeamsTeamsRoleInvitation {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams0.field(teams::dsl::name),
-                            teams0.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                    crate::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
+                    .ilike(format!("%{}%", query))
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams1.field(teams::dsl::name),
+                        teams1.field(teams::dsl::description),
+                    )
                     .ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
                     .or(crate::sql_function_bindings::concat_roles_name(
                         roles::dsl::name,
                         roles::dsl::description,
                     )
-                    .ilike(format!("%{}%", query)))),
+                    .ilike(format!("%{}%", query))),
                 )
                 .order(
                     crate::sql_function_bindings::word_similarity_dist_op(
@@ -534,48 +491,21 @@ impl TeamsTeamsRoleInvitation {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams0.field(teams::dsl::name),
-                            teams0.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                    crate::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
-                    .ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        ),
-                        query,
+                    .ilike(format!("%{}%", query))
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams1.field(teams::dsl::name),
+                        teams1.field(teams::dsl::description),
                     )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ))
-                    .or(
-                        crate::sql_function_bindings::strict_word_similarity_op(
-                            crate::sql_function_bindings::concat_roles_name(
-                                roles::dsl::name,
-                                roles::dsl::description,
-                            ),
-                            query,
-                        )
-                        .or(
-                            crate::sql_function_bindings::concat_roles_name(
-                                roles::dsl::name,
-                                roles::dsl::description,
-                            )
-                            .ilike(format!("%{}%", query)),
-                        ),
-                    ),
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
                 )
                 .order(
                     crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -669,8 +599,17 @@ impl TeamsTeamsRoleInvitation {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams_teams_role_invitations;
-        let mut query =
-            teams_teams_role_invitations::dsl::teams_teams_role_invitations.into_boxed();
+        let query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .select(TeamsTeamsRoleInvitation::as_select())
+            .filter(
+                crate::sql_function_bindings::can_update_teams_teams_role_invitations(
+                    author_user_id,
+                    teams_teams_role_invitations::dsl::table_id,
+                    teams_teams_role_invitations::dsl::team_id,
+                ),
+            )
+            .order_by(teams_teams_role_invitations::dsl::table_id);
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -684,15 +623,8 @@ impl TeamsTeamsRoleInvitation {
             query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_update_teams_teams_role_invitations(
-                    author_user_id,
-                    teams_teams_role_invitations::dsl::table_id,
-                    teams_teams_role_invitations::dsl::team_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -713,8 +645,17 @@ impl TeamsTeamsRoleInvitation {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams_teams_role_invitations;
-        let mut query =
-            teams_teams_role_invitations::dsl::teams_teams_role_invitations.into_boxed();
+        let query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .select(TeamsTeamsRoleInvitation::as_select())
+            .filter(
+                crate::sql_function_bindings::can_update_teams_teams_role_invitations(
+                    author_user_id,
+                    teams_teams_role_invitations::dsl::table_id,
+                    teams_teams_role_invitations::dsl::team_id,
+                ),
+            )
+            .order_by(teams_teams_role_invitations::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -728,16 +669,8 @@ impl TeamsTeamsRoleInvitation {
             query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_update_teams_teams_role_invitations(
-                    author_user_id,
-                    teams_teams_role_invitations::dsl::table_id,
-                    teams_teams_role_invitations::dsl::team_id,
-                ),
-            )
-            .order_by(teams_teams_role_invitations::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -794,44 +727,21 @@ impl TeamsTeamsRoleInvitation {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams0.field(teams::dsl::name),
-                            teams0.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                    crate::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
+                    .ilike(format!("%{}%", query))
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams1.field(teams::dsl::name),
+                        teams1.field(teams::dsl::description),
+                    )
                     .ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
                     .or(crate::sql_function_bindings::concat_roles_name(
                         roles::dsl::name,
                         roles::dsl::description,
                     )
-                    .ilike(format!("%{}%", query)))),
+                    .ilike(format!("%{}%", query))),
                 )
                 .order(
                     crate::sql_function_bindings::similarity_dist(
@@ -926,44 +836,21 @@ impl TeamsTeamsRoleInvitation {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams0.field(teams::dsl::name),
-                            teams0.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                    crate::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
+                    .ilike(format!("%{}%", query))
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams1.field(teams::dsl::name),
+                        teams1.field(teams::dsl::description),
+                    )
                     .ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
                     .or(crate::sql_function_bindings::concat_roles_name(
                         roles::dsl::name,
                         roles::dsl::description,
                     )
-                    .ilike(format!("%{}%", query)))),
+                    .ilike(format!("%{}%", query))),
                 )
                 .order(
                     crate::sql_function_bindings::word_similarity_dist_op(
@@ -1058,48 +945,21 @@ impl TeamsTeamsRoleInvitation {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams0.field(teams::dsl::name),
-                            teams0.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                    crate::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
-                    .ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        ),
-                        query,
+                    .ilike(format!("%{}%", query))
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams1.field(teams::dsl::name),
+                        teams1.field(teams::dsl::description),
                     )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ))
-                    .or(
-                        crate::sql_function_bindings::strict_word_similarity_op(
-                            crate::sql_function_bindings::concat_roles_name(
-                                roles::dsl::name,
-                                roles::dsl::description,
-                            ),
-                            query,
-                        )
-                        .or(
-                            crate::sql_function_bindings::concat_roles_name(
-                                roles::dsl::name,
-                                roles::dsl::description,
-                            )
-                            .ilike(format!("%{}%", query)),
-                        ),
-                    ),
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
                 )
                 .order(
                     crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -1193,8 +1053,17 @@ impl TeamsTeamsRoleInvitation {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams_teams_role_invitations;
-        let mut query =
-            teams_teams_role_invitations::dsl::teams_teams_role_invitations.into_boxed();
+        let query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .select(TeamsTeamsRoleInvitation::as_select())
+            .filter(
+                crate::sql_function_bindings::can_admin_teams_teams_role_invitations(
+                    author_user_id,
+                    teams_teams_role_invitations::dsl::table_id,
+                    teams_teams_role_invitations::dsl::team_id,
+                ),
+            )
+            .order_by(teams_teams_role_invitations::dsl::table_id);
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -1208,15 +1077,8 @@ impl TeamsTeamsRoleInvitation {
             query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_admin_teams_teams_role_invitations(
-                    author_user_id,
-                    teams_teams_role_invitations::dsl::table_id,
-                    teams_teams_role_invitations::dsl::team_id,
-                ),
-            )
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -1237,8 +1099,17 @@ impl TeamsTeamsRoleInvitation {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::teams_teams_role_invitations;
-        let mut query =
-            teams_teams_role_invitations::dsl::teams_teams_role_invitations.into_boxed();
+        let query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
+            .select(TeamsTeamsRoleInvitation::as_select())
+            .filter(
+                crate::sql_function_bindings::can_admin_teams_teams_role_invitations(
+                    author_user_id,
+                    teams_teams_role_invitations::dsl::table_id,
+                    teams_teams_role_invitations::dsl::team_id,
+                ),
+            )
+            .order_by(teams_teams_role_invitations::dsl::created_at.desc());
+        let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
             query = query.filter(teams_teams_role_invitations::dsl::table_id.eq(table_id));
         }
@@ -1252,16 +1123,8 @@ impl TeamsTeamsRoleInvitation {
             query = query.filter(teams_teams_role_invitations::dsl::created_by.eq(created_by));
         }
         query
-            .filter(
-                crate::sql_function_bindings::can_admin_teams_teams_role_invitations(
-                    author_user_id,
-                    teams_teams_role_invitations::dsl::table_id,
-                    teams_teams_role_invitations::dsl::team_id,
-                ),
-            )
-            .order_by(teams_teams_role_invitations::dsl::created_at.desc())
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -1318,44 +1181,21 @@ impl TeamsTeamsRoleInvitation {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams0.field(teams::dsl::name),
-                            teams0.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                    crate::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
+                    .ilike(format!("%{}%", query))
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams1.field(teams::dsl::name),
+                        teams1.field(teams::dsl::description),
+                    )
                     .ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ))
-                    .or(crate::sql_function_bindings::similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
                     .or(crate::sql_function_bindings::concat_roles_name(
                         roles::dsl::name,
                         roles::dsl::description,
                     )
-                    .ilike(format!("%{}%", query)))),
+                    .ilike(format!("%{}%", query))),
                 )
                 .order(
                     crate::sql_function_bindings::similarity_dist(
@@ -1450,44 +1290,21 @@ impl TeamsTeamsRoleInvitation {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams0.field(teams::dsl::name),
-                            teams0.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                    crate::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
+                    .ilike(format!("%{}%", query))
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams1.field(teams::dsl::name),
+                        teams1.field(teams::dsl::description),
+                    )
                     .ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ))
-                    .or(crate::sql_function_bindings::word_similarity_op(
-                        crate::sql_function_bindings::concat_roles_name(
-                            roles::dsl::name,
-                            roles::dsl::description,
-                        ),
-                        query,
-                    )
                     .or(crate::sql_function_bindings::concat_roles_name(
                         roles::dsl::name,
                         roles::dsl::description,
                     )
-                    .ilike(format!("%{}%", query)))),
+                    .ilike(format!("%{}%", query))),
                 )
                 .order(
                     crate::sql_function_bindings::word_similarity_dist_op(
@@ -1582,48 +1399,21 @@ impl TeamsTeamsRoleInvitation {
                     ),
                 )
                 .filter(
-                    crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams0.field(teams::dsl::name),
-                            teams0.field(teams::dsl::description),
-                        ),
-                        query,
-                    )
-                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                    crate::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
-                    .ilike(format!("%{}%", query)))
-                    .or(crate::sql_function_bindings::strict_word_similarity_op(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        ),
-                        query,
+                    .ilike(format!("%{}%", query))
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams1.field(teams::dsl::name),
+                        teams1.field(teams::dsl::description),
                     )
-                    .or(
-                        crate::sql_function_bindings::concat_teams_name_description(
-                            teams1.field(teams::dsl::name),
-                            teams1.field(teams::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ))
-                    .or(
-                        crate::sql_function_bindings::strict_word_similarity_op(
-                            crate::sql_function_bindings::concat_roles_name(
-                                roles::dsl::name,
-                                roles::dsl::description,
-                            ),
-                            query,
-                        )
-                        .or(
-                            crate::sql_function_bindings::concat_roles_name(
-                                roles::dsl::name,
-                                roles::dsl::description,
-                            )
-                            .ilike(format!("%{}%", query)),
-                        ),
-                    ),
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query))),
                 )
                 .order(
                     crate::sql_function_bindings::strict_word_similarity_dist_op(

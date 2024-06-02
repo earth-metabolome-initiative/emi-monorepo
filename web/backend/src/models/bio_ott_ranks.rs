@@ -93,7 +93,10 @@ impl BioOttRank {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::bio_ott_ranks;
-        let mut query = bio_ott_ranks::dsl::bio_ott_ranks.into_boxed();
+        let query = bio_ott_ranks::dsl::bio_ott_ranks
+            .select(BioOttRank::as_select())
+            .order_by(bio_ott_ranks::dsl::id);
+        let mut query = query.into_boxed();
         if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
             query = query.filter(bio_ott_ranks::dsl::icon_id.eq(icon_id));
         }
@@ -101,8 +104,8 @@ impl BioOttRank {
             query = query.filter(bio_ott_ranks::dsl::color_id.eq(color_id));
         }
         query
-            .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -120,19 +123,7 @@ impl BioOttRank {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::schema::bio_ott_ranks;
-        let mut query = bio_ott_ranks::dsl::bio_ott_ranks.into_boxed();
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(bio_ott_ranks::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(bio_ott_ranks::dsl::color_id.eq(color_id));
-        }
-        query
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
+        Self::all_viewable(filter, limit, offset, connection)
     }
     /// Get the struct from the database by its ID.
     ///
@@ -191,20 +182,11 @@ impl BioOttRank {
         use crate::schema::bio_ott_ranks;
         let mut query = bio_ott_ranks::dsl::bio_ott_ranks
             .filter(
-                crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
+                    bio_ott_ranks::dsl::name,
+                    bio_ott_ranks::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::similarity_dist(
                 crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
@@ -251,20 +233,11 @@ impl BioOttRank {
         use crate::schema::bio_ott_ranks;
         let mut query = bio_ott_ranks::dsl::bio_ott_ranks
             .filter(
-                crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
+                    bio_ott_ranks::dsl::name,
+                    bio_ott_ranks::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
                 crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
@@ -311,20 +284,11 @@ impl BioOttRank {
         use crate::schema::bio_ott_ranks;
         let mut query = bio_ott_ranks::dsl::bio_ott_ranks
             .filter(
-                crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    ),
-                    query,
+                crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
+                    bio_ott_ranks::dsl::name,
+                    bio_ott_ranks::dsl::description,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
-                        bio_ott_ranks::dsl::name,
-                        bio_ott_ranks::dsl::description,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .ilike(format!("%{}%", query)),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

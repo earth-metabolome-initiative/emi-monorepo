@@ -334,6 +334,22 @@ def write_backend_flat_variants(
 
                 method.write_header_to(struct_document)
 
+                # If the current struct does not have neither an updated_at nor a created_at
+                # field, and the sorted variant is requested, we dispatch the call to the
+                # all_{operation_able} method without the sorted variant.
+                if sorted_variant and not struct.has_updated_at() and not struct.has_created_at():
+                    struct_document.write(
+                        f"{{\n        Self::all_{operation_able}("
+                    )
+                    if struct.has_filter_variant():
+                        struct_document.write("filter, ")
+
+                    if requires_author:
+                        struct_document.write(f"{author_user_id.name}, ")
+
+                    struct_document.write("limit, offset, connection)\n    }\n")
+                    continue
+
                 struct_document.write("{\n")
                 if table_type == "tables":
                     struct_document.write(f"        use crate::schema::{struct.table_name};\n")
@@ -343,32 +359,10 @@ def write_backend_flat_variants(
                     )
                 # If the limit is None, we do not apply any limit to the query.
 
-                if struct.has_filter_variant():
-                    struct_document.write(
-                        f"        let mut query = {struct.table_name}::dsl::{struct.table_name}\n"
-                    )
-                else:
-                    struct_document.write(
-                        f"        {struct.table_name}::dsl::{struct.table_name}\n"
-                    )
-
-                if struct.has_filter_variant():
-                    # We need to filter the query by the filter struct,
-                    # but these filters are composed by several optional fields
-                    # and therefore we need to box the query and apply the filters
-                    # only if they are not None.
-                    struct_document.write("            .into_boxed();\n")
-
-                    filter_struct = struct.get_filter_variant()
-
-                    for filter_attribute in filter_struct.attributes:
-                        struct_document.write(
-                            f"        if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
-                            f"            query = query.filter({filter_struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
-                            "        }\n"
-                        )
-
-                    struct_document.write("        query\n")
+                struct_document.write(
+                    f"        let query = {struct.table_name}::dsl::{struct.table_name}\n"
+                    f"            .select({struct.name}::as_select())\n"
+                )
 
                 if struct.table_metadata.has_postgres_function(can_x_function_name):
                     diesel_primary_keys = ", ".join(
@@ -382,16 +376,31 @@ def write_backend_flat_variants(
                 if sorted_variant:
                     if struct.has_updated_at():
                         struct_document.write(
-                            f"            .order_by({struct.table_name}::dsl::updated_at.desc())\n"
+                            f"            .order_by({struct.table_name}::dsl::updated_at.desc());"
                         )
                     elif struct.has_created_at():
                         struct_document.write(
-                            f"            .order_by({struct.table_name}::dsl::created_at.desc())\n"
+                            f"            .order_by({struct.table_name}::dsl::created_at.desc());"
+                        )
+                else:
+                    primary_key = struct.get_primary_keys()[0]
+                    struct_document.write(
+                        f"            .order_by({struct.table_name}::dsl::{primary_key.name});"
+                    )
+
+                if struct.has_filter_variant():
+                    struct_document.write("        let mut query = query.into_boxed();\n")
+                    for filter_attribute in struct.get_filter_variant().attributes:
+                        struct_document.write(
+                            f"       if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                            f"            query = query.filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
+                            "        }\n"
                         )
 
                 struct_document.write(
-                    "            .offset(offset.unwrap_or(0))\n"
+                    "        query\n"
                     "            .limit(limit.unwrap_or(10))\n"
+                    "            .offset(offset.unwrap_or(0))\n"
                     "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)\n"
                     "    }\n"
                 )
@@ -624,10 +633,6 @@ def write_backend_flat_variants(
                             "The search method is not implemented for views."
                         )
 
-                    optional_filter_attributes = []
-                    non_optional_filter_attributes = []
-                    filter_method_content = ""
-
                     # If the current struct has derived search indices, we will need to
                     # execute joins. As such, we also need to add the select method to the
                     # query builder.
@@ -635,22 +640,6 @@ def write_backend_flat_variants(
                     struct_document.write(struct.format_diesel_search_aliases())
 
                     if struct.has_filter_variant():
-                        optional_filter_attributes = [
-                            filter_attribute
-                            for filter_attribute in struct.get_filter_variant().attributes
-                            if struct.get_attribute_by_name(
-                                filter_attribute.name
-                            ).optional
-                        ]
-                        non_optional_filter_attributes = [
-                            filter_attribute
-                            for filter_attribute in struct.get_filter_variant().attributes
-                            if not struct.get_attribute_by_name(
-                                filter_attribute.name
-                            ).optional
-                        ]
-
-                    if len(non_optional_filter_attributes) > 0:
                         struct_document.write("        let mut query = ")
 
                     struct_document.write(f"{struct.table_name}::dsl::{struct.table_name}\n")
@@ -659,11 +648,6 @@ def write_backend_flat_variants(
                         struct_document.write(
                             f"            .select({struct.name}::as_select())\n"
                             f"            {struct.format_diesel_search_join()}\n"
-                        )
-
-                    for filter_attribute in optional_filter_attributes:
-                        struct_document.write(
-                            f"            .filter({struct.table_name}::dsl::{filter_attribute.name}.eq(filter.and_then(|f| f.{filter_attribute.name})))\n"
                         )
 
                     if struct.table_metadata.has_postgres_function(can_x_function_name):
@@ -680,26 +664,27 @@ def write_backend_flat_variants(
                         f"            {struct.format_diesel_search_order('query', similarity_method_name)}\n"
                     )
 
-                    if len(non_optional_filter_attributes) > 0:
+                    if struct.has_filter_variant():
                         struct_document.write(
                             "            .into_boxed();\n"
                         )
 
-                    for filter_attribute in non_optional_filter_attributes:
-                        struct_document.write(
-                            f"       if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
-                            f"            query = query.filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
-                            "        }\n"
-                        )
+                        for filter_attribute in struct.get_filter_variant().attributes:
+                            struct_document.write(
+                                f"       if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                                f"            query = query.filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
+                                "        }\n"
+                            )
 
-                    if len(non_optional_filter_attributes) > 0:
-                        struct_document.write("        query\n")
+                        struct_document.write(
+                            "        query\n"
+                        )
 
                     struct_document.write(
                         "            .limit(limit.unwrap_or(10))\n"
                         "            .offset(offset.unwrap_or(0))\n"
-                        "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)"
-                        "}\n"
+                        "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)\n"
+                        "    }\n"
                     )
 
         if struct.is_insertable():
