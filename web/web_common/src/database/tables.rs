@@ -1097,7 +1097,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct DerivedSample {
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
@@ -1105,6 +1105,8 @@ pub struct DerivedSample {
     pub updated_at: chrono::NaiveDateTime,
     pub parent_sample_id: uuid::Uuid,
     pub child_sample_id: uuid::Uuid,
+    pub quantity: f64,
+    pub unit_id: i32,
 }
 
 impl Tabular for DerivedSample {
@@ -1134,6 +1136,8 @@ impl DerivedSample {
             gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
             gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()),
             gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()),
+            gluesql::core::ast_builder::num(self.quantity),
+            gluesql::core::ast_builder::num(self.unit_id),
         ]
     }
 
@@ -1147,7 +1151,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         table("derived_samples")
             .insert()
-            .columns("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+            .columns("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id, quantity, unit_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -1174,7 +1178,7 @@ connection: &mut gluesql::prelude::Glue<C>,
             .select()
             .filter(col("parent_sample_id").eq(parent_sample_id.to_string()))
             .filter(col("child_sample_id").eq(child_sample_id.to_string()))
-            .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+            .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id, quantity, unit_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -1248,7 +1252,9 @@ connection: &mut gluesql::prelude::Glue<C>,
 .set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
 .set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
 .set("parent_sample_id", gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()))        
-.set("child_sample_id", gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()))            .execute(connection)
+.set("child_sample_id", gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()))        
+.set("quantity", gluesql::core::ast_builder::num(self.quantity))        
+.set("unit_id", gluesql::core::ast_builder::num(self.unit_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -1296,7 +1302,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("derived_samples")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+           .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id, quantity, unit_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -1326,7 +1332,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("derived_samples")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id")
+           .project("created_by, created_at, updated_by, updated_at, parent_sample_id, child_sample_id, quantity, unit_id")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -1362,6 +1368,14 @@ connection: &mut gluesql::prelude::Glue<C>,
             child_sample_id: match row.get("child_sample_id").unwrap() {
                 gluesql::prelude::Value::Uuid(child_sample_id) => uuid::Uuid::from_u128(*child_sample_id),
                 _ => unreachable!("Expected Uuid"),
+            },
+            quantity: match row.get("quantity").unwrap() {
+                gluesql::prelude::Value::F64(quantity) => quantity.clone(),
+                _ => unreachable!("Expected F64")
+            },
+            unit_id: match row.get("unit_id").unwrap() {
+                gluesql::prelude::Value::I32(unit_id) => unit_id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }
@@ -10179,8 +10193,9 @@ connection: &mut gluesql::prelude::Glue<C>,
 pub struct Unit {
     pub id: i32,
     pub name: String,
-    pub description: String,
-    pub symbol: String,
+    pub unit: String,
+    pub icon_id: i32,
+    pub color_id: i32,
 }
 
 impl Tabular for Unit {
@@ -10188,7 +10203,7 @@ impl Tabular for Unit {
 }
 impl Describable for Unit {
     fn description(&self) -> Option<&str> {
-        Some(self.description.as_str())
+        None
     }
 }
 impl Colorable for Unit {
@@ -10198,7 +10213,7 @@ impl Colorable for Unit {
 }
 
 impl Filtrable for Unit {
-    type Filter = EmptyFilter;
+    type Filter = UnitFilter;
 }
 #[cfg(feature = "frontend")]
 impl Unit {
@@ -10206,8 +10221,9 @@ impl Unit {
         vec![
             gluesql::core::ast_builder::num(self.id),
             gluesql::core::ast_builder::text(self.name),
-            gluesql::core::ast_builder::text(self.description),
-            gluesql::core::ast_builder::text(self.symbol),
+            gluesql::core::ast_builder::text(self.unit),
+            gluesql::core::ast_builder::num(self.icon_id),
+            gluesql::core::ast_builder::num(self.color_id),
         ]
     }
 
@@ -10221,7 +10237,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         table("units")
             .insert()
-            .columns("id, name, description, symbol")
+            .columns("id, name, unit, icon_id, color_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -10247,7 +10263,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("units")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, name, description, symbol")
+            .project("id, name, unit, icon_id, color_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -10317,8 +10333,9 @@ connection: &mut gluesql::prelude::Glue<C>,
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("name", gluesql::core::ast_builder::text(self.name))        
-.set("description", gluesql::core::ast_builder::text(self.description))        
-.set("symbol", gluesql::core::ast_builder::text(self.symbol))            .execute(connection)
+.set("unit", gluesql::core::ast_builder::text(self.unit))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -10349,11 +10366,13 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// Get all Unit from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&UnitFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -10363,7 +10382,8 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         let select_row = table("units")
             .select()
-           .project("id, name, description, symbol")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, name, unit, icon_id, color_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -10383,13 +10403,17 @@ connection: &mut gluesql::prelude::Glue<C>,
                 gluesql::prelude::Value::Str(name) => name.clone(),
                 _ => unreachable!("Expected Str")
             },
-            description: match row.get("description").unwrap() {
-                gluesql::prelude::Value::Str(description) => description.clone(),
+            unit: match row.get("unit").unwrap() {
+                gluesql::prelude::Value::Str(unit) => unit.clone(),
                 _ => unreachable!("Expected Str")
             },
-            symbol: match row.get("symbol").unwrap() {
-                gluesql::prelude::Value::Str(symbol) => symbol.clone(),
-                _ => unreachable!("Expected Str")
+            icon_id: match row.get("icon_id").unwrap() {
+                gluesql::prelude::Value::I32(icon_id) => icon_id.clone(),
+                _ => unreachable!("Expected I32")
+            },
+            color_id: match row.get("color_id").unwrap() {
+                gluesql::prelude::Value::I32(color_id) => color_id.clone(),
+                _ => unreachable!("Expected I32")
             },
         }
     }

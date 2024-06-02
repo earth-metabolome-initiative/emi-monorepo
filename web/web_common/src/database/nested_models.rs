@@ -243,6 +243,7 @@ pub struct NestedDerivedSample {
     pub updated_by: Rc<User>,
     pub parent_sample: Rc<NestedSample>,
     pub child_sample: Rc<NestedSample>,
+    pub unit: Rc<NestedUnit>,
 }
 
 impl Tabular for NestedDerivedSample {
@@ -277,6 +278,7 @@ impl NestedDerivedSample {
             updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
             parent_sample: Rc::from(NestedSample::get(flat_variant.parent_sample_id, connection).await?.unwrap()),
             child_sample: Rc::from(NestedSample::get(flat_variant.child_sample_id, connection).await?.unwrap()),
+            unit: Rc::from(NestedUnit::get(flat_variant.unit_id, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -355,6 +357,7 @@ impl NestedDerivedSample {
         self.updated_by.as_ref().clone().update_or_insert(connection).await?;
         self.parent_sample.as_ref().clone().update_or_insert(connection).await?;
         self.child_sample.as_ref().clone().update_or_insert(connection).await?;
+        self.unit.as_ref().clone().update_or_insert(connection).await?;
         Ok(())
     }
 }
@@ -3913,6 +3916,100 @@ impl NestedTeamsUsersRole {
         self.user.as_ref().clone().update_or_insert(connection).await?;
         self.role.as_ref().clone().update_or_insert(connection).await?;
         self.created_by.as_ref().clone().update_or_insert(connection).await?;
+        Ok(())
+    }
+}
+#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedUnit {
+    pub inner: Rc<Unit>,
+    pub icon: Rc<FontAwesomeIcon>,
+    pub color: Rc<Color>,
+}
+
+impl Tabular for NestedUnit {
+    const TABLE: Table = Table::Units;
+}
+impl Filtrable for NestedUnit {
+    type Filter = UnitFilter;
+}
+impl Describable for NestedUnit {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedUnit {
+    fn color(&self) -> Option<&str> {
+        Some(self.color.name.as_str())
+    }
+}
+#[cfg(feature = "frontend")]
+impl NestedUnit {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub async fn from_flat(
+        flat_variant: Unit,
+        connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
+    ) -> Result<Self, gluesql::prelude::Error> {
+        Ok(Self {
+            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            inner: Rc::from(flat_variant),
+        })
+    }
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+       let flat_variant = Unit::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
+            None => Ok(None),
+        }
+    }
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all<C>(
+        filter: Option<&UnitFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = Unit::all(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.as_ref().clone().update_or_insert(connection).await?;
+        self.icon.as_ref().clone().update_or_insert(connection).await?;
+        self.color.as_ref().clone().update_or_insert(connection).await?;
         Ok(())
     }
 }

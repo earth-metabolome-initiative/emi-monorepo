@@ -6,10 +6,12 @@
 use serde::{Deserialize, Serialize};
 use super::*;
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateDerivedSample {
     pub parent_sample_id: uuid::Uuid,
     pub child_sample_id: uuid::Uuid,
+    pub quantity: f64,
+    pub unit_id: i32,
 }
 
 impl Tabular for UpdateDerivedSample {
@@ -22,6 +24,8 @@ impl UpdateDerivedSample {
             gluesql::core::ast_builder::num(updated_by),
             gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()),
             gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()),
+            gluesql::core::ast_builder::num(self.quantity),
+            gluesql::core::ast_builder::num(self.unit_id),
         ]
     }
 
@@ -45,6 +49,8 @@ impl UpdateDerivedSample {
             .update()        
 .set("parent_sample_id", gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()))        
 .set("child_sample_id", gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()))        
+.set("quantity", gluesql::core::ast_builder::num(self.quantity))        
+.set("unit_id", gluesql::core::ast_builder::num(self.unit_id))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
             .await
              .map(|payload| match payload {

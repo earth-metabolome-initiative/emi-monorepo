@@ -5,10 +5,12 @@
 use serde::{Deserialize, Serialize};
 use super::*;
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct NewDerivedSample {
     pub parent_sample_id: uuid::Uuid,
     pub child_sample_id: uuid::Uuid,
+    pub quantity: f64,
+    pub unit_id: i32,
 }
 
 impl Tabular for NewDerivedSample {

@@ -458,6 +458,17 @@ impl Searchable<false> for NestedTeamsUsersRole {
         )
     }
 }
+impl Searchable<false> for NestedUnit {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Units,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedUsersUsersRoleInvitation {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(

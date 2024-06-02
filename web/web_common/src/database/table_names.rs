@@ -390,7 +390,7 @@ impl Table {
             Table::TeamsUsersRoleInvitations => crate::database::NestedTeamsUsersRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::TeamsUsersRoleRequests => crate::database::NestedTeamsUsersRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::TeamsUsersRoles => crate::database::NestedTeamsUsersRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::Units => crate::database::Unit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Units => crate::database::NestedUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::UserEmails => crate::database::NestedUserEmail::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Users => crate::database::User::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::UsersUsersRoleInvitations => crate::database::NestedUsersUsersRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -579,8 +579,8 @@ impl Table {
                 crate::database::NestedTeamsUsersRole::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::Units => {
-                 assert!(filter.is_none(), "Filter not implemented for this table.");
-                crate::database::Unit::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+                let filter: Option<crate::database::UnitFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedUnit::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::UserEmails => {
                 let filter: Option<crate::database::UserEmailFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
@@ -1178,7 +1178,7 @@ impl Table {
             },
             Table::Units => {
                 for row in rows {
-                    let row: super::Unit = bincode::deserialize::<super::Unit>(&row).map_err(crate::api::ApiError::from)?;
+                    let row: super::NestedUnit = bincode::deserialize::<super::NestedUnit>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },
