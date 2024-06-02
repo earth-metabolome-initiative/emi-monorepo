@@ -130,7 +130,7 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
 
                 document.write(
                     f"            // Linked with foreign key {child_struct.table_name}.{foreign_key.name}\n"
-                    f"            <BasicList<{child_struct.name}> filters={{props.filter_{child_struct.table_name}_by_{foreign_key.name}()}}/>\n"
+                    f"            <BasicList<{child_struct.name}> column_name={{\"{foreign_key.name}\"}} filters={{props.filter_{child_struct.table_name}_by_{foreign_key.name}()}}/>\n"
                 )
 
         if not has_content:

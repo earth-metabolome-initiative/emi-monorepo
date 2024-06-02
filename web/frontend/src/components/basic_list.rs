@@ -18,6 +18,8 @@ use yewdux::prelude::*;
 #[derive(Clone, Debug, PartialEq, Properties)]
 /// Properties for a BasicList component.
 pub struct BasicListProps<Page: Filtrable> {
+    #[prop_or_default]
+    pub column_name: Option<String>,
     /// The filters to apply to the list.
     #[prop_or_default]
     pub filters: Option<Page::Filter>,
@@ -127,6 +129,10 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                         <i class={format!("fas fa-{}", Page::icon())}></i>
                         {'\u{00a0}'}
                         <span>{Page::section()}</span>
+                        if let Some(column) = ctx.props().column_name.as_ref() {
+                            {'\u{00a0}'}
+                            <span>{column.clone()}</span>
+                        }
                     </Link<AppRoute>>
                 </@>
                 <ul class="badges-container">
