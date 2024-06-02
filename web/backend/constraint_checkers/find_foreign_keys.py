@@ -1163,6 +1163,9 @@ class TableMetadata:
             sql_function.set_return_type(function[1])
             sql_functions.append(sql_function)
 
+        # We sort the SQL functions by name.
+        sql_functions = sorted(sql_functions, key=lambda x: x.name)
+
         for function in sql_functions:
             self._register_flat_variant_associated_with_function(function)
 
