@@ -18,7 +18,6 @@ pub trait BackendTable {
     /// * `primary_key` - The primary key(s) of the struct to check.
     /// * `author_user_id` - The ID of the user to check.
     /// * `connection` - The connection to the database.
-    /// 
     fn can_view_by_id(
         &self,
         primary_key: PrimaryKey,

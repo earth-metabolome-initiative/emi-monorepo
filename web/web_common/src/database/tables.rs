@@ -64,7 +64,6 @@ impl BioOttRank {
     /// Insert the BioOttRank into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: BioOttRank,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -358,7 +357,6 @@ impl BioOttTaxonItem {
     /// Insert the BioOttTaxonItem into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: BioOttTaxonItem,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -693,7 +691,6 @@ impl Color {
     /// Insert the Color into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Color,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -915,7 +912,6 @@ impl Country {
     /// Insert the Country into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Country,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -1144,7 +1140,6 @@ impl DerivedSample {
     /// Insert the DerivedSample into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: DerivedSample,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -1414,7 +1409,6 @@ impl DocumentFormat {
     /// Insert the DocumentFormat into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: DocumentFormat,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -1645,7 +1639,6 @@ impl FontAwesomeIcon {
     /// Insert the FontAwesomeIcon into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: FontAwesomeIcon,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -1868,7 +1861,6 @@ impl LoginProvider {
     /// Insert the LoginProvider into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: LoginProvider,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -2113,7 +2105,6 @@ impl Material {
     /// Insert the Material into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Material,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -2347,7 +2338,6 @@ impl NameplateCategory {
     /// Insert the NameplateCategory into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: NameplateCategory,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -2593,7 +2583,6 @@ impl Nameplate {
     /// Insert the Nameplate into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Nameplate,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -2871,7 +2860,6 @@ impl Notification {
     /// Insert the Notification into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Notification,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -3106,7 +3094,6 @@ impl ObservationSubject {
     /// Insert the ObservationSubject into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: ObservationSubject,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -3372,7 +3359,6 @@ impl Observation {
     /// Insert the Observation into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Observation,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -3685,7 +3671,6 @@ impl OrganismBioOttTaxonItem {
     /// Insert the OrganismBioOttTaxonItem into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: OrganismBioOttTaxonItem,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -3937,7 +3922,6 @@ impl Organism {
     /// Insert the Organism into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Organism,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -4243,7 +4227,6 @@ impl Organization {
     /// Insert the Organization into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Organization,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -4482,7 +4465,6 @@ impl PermanenceCategory {
     /// Insert the PermanenceCategory into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: PermanenceCategory,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -4712,7 +4694,6 @@ impl ProjectState {
     /// Insert the ProjectState into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: ProjectState,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -4979,7 +4960,6 @@ impl Project {
     /// Insert the Project into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Project,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -5311,7 +5291,6 @@ impl ProjectsTeamsRoleInvitation {
     /// Insert the ProjectsTeamsRoleInvitation into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: ProjectsTeamsRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -5543,7 +5522,6 @@ impl ProjectsTeamsRoleRequest {
     /// Insert the ProjectsTeamsRoleRequest into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: ProjectsTeamsRoleRequest,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -5775,7 +5753,6 @@ impl ProjectsTeamsRole {
     /// Insert the ProjectsTeamsRole into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: ProjectsTeamsRole,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -6007,7 +5984,6 @@ impl ProjectsUsersRoleInvitation {
     /// Insert the ProjectsUsersRoleInvitation into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: ProjectsUsersRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -6239,7 +6215,6 @@ impl ProjectsUsersRoleRequest {
     /// Insert the ProjectsUsersRoleRequest into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: ProjectsUsersRoleRequest,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -6471,7 +6446,6 @@ impl ProjectsUsersRole {
     /// Insert the ProjectsUsersRole into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: ProjectsUsersRole,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -6703,7 +6677,6 @@ impl Role {
     /// Insert the Role into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Role,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -6931,7 +6904,6 @@ impl SampleBioOttTaxonItem {
     /// Insert the SampleBioOttTaxonItem into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: SampleBioOttTaxonItem,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -7164,7 +7136,6 @@ impl SampleContainerCategory {
     /// Insert the SampleContainerCategory into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: SampleContainerCategory,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -7415,7 +7386,6 @@ impl SampleContainer {
     /// Insert the SampleContainer into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: SampleContainer,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -7691,7 +7661,6 @@ impl SampleState {
     /// Insert the SampleState into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: SampleState,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -7934,7 +7903,6 @@ impl Sample {
     /// Insert the Sample into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Sample,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -8231,7 +8199,6 @@ impl Spectra {
     /// Insert the Spectra into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Spectra,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -8513,7 +8480,6 @@ impl SpectraCollection {
     /// Insert the SpectraCollection into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: SpectraCollection,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -8788,7 +8754,6 @@ impl TeamState {
     /// Insert the TeamState into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: TeamState,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -9033,7 +8998,6 @@ impl Team {
     /// Insert the Team into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Team,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -9328,7 +9292,6 @@ impl TeamsTeamsRoleInvitation {
     /// Insert the TeamsTeamsRoleInvitation into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: TeamsTeamsRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -9560,7 +9523,6 @@ impl TeamsUsersRoleInvitation {
     /// Insert the TeamsUsersRoleInvitation into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: TeamsUsersRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -9792,7 +9754,6 @@ impl TeamsUsersRoleRequest {
     /// Insert the TeamsUsersRoleRequest into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: TeamsUsersRoleRequest,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -10024,7 +9985,6 @@ impl TeamsUsersRole {
     /// Insert the TeamsUsersRole into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: TeamsUsersRole,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -10254,7 +10214,6 @@ impl Unit {
     /// Insert the Unit into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: Unit,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -10478,7 +10437,6 @@ impl UserEmail {
     /// Insert the UserEmail into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: UserEmail,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -10729,7 +10687,6 @@ impl User {
     /// Insert the User into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: User,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -11006,7 +10963,6 @@ impl UsersUsersRoleInvitation {
     /// Insert the UsersUsersRoleInvitation into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: UsersUsersRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -11238,7 +11194,6 @@ impl UsersUsersRoleRequest {
     /// Insert the UsersUsersRoleRequest into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: UsersUsersRoleRequest,
 connection: &mut gluesql::prelude::Glue<C>,
@@ -11470,7 +11425,6 @@ impl UsersUsersRole {
     /// Insert the UsersUsersRole into the database.
     ///
     /// * `connection` - The connection to the database.
-    ///
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
 self: UsersUsersRole,
 connection: &mut gluesql::prelude::Glue<C>,
