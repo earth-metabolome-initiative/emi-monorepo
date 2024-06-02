@@ -186,7 +186,7 @@ class SQLFunction:
 
     def write_diesel_binding_to_file(self, f):
         """Writes the Diesel binding for the SQL function to a file."""
-        f.write("diesel::expression::functions::sql_function! {\n")
+        f.write("diesel::define_sql_function! {\n")
         f.write(f"   fn {self.name}(\n")
         try:
             for argument, argument_type in zip(self.arguments, self.argument_types):
