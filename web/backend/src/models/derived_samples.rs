@@ -21,7 +21,6 @@ use web_common::database::filter_structs::*;
     Queryable,
     Debug,
     Identifiable,
-    Eq,
     PartialEq,
     Clone,
     Serialize,
@@ -36,6 +35,7 @@ use web_common::database::filter_structs::*;
 #[diesel(table_name = derived_samples)]
 #[diesel(belongs_to(crate::models::users::User, foreign_key = created_by))]
 #[diesel(belongs_to(crate::models::samples::Sample, foreign_key = parent_sample_id))]
+#[diesel(belongs_to(crate::models::units::Unit, foreign_key = unit_id))]
 #[diesel(primary_key(parent_sample_id, child_sample_id))]
 pub struct DerivedSample {
     pub created_by: i32,
@@ -44,6 +44,8 @@ pub struct DerivedSample {
     pub updated_at: chrono::NaiveDateTime,
     pub parent_sample_id: uuid::Uuid,
     pub child_sample_id: uuid::Uuid,
+    pub quantity: f64,
+    pub unit_id: i32,
 }
 
 impl From<DerivedSample> for web_common::database::tables::DerivedSample {
@@ -55,6 +57,8 @@ impl From<DerivedSample> for web_common::database::tables::DerivedSample {
             updated_at: item.updated_at,
             parent_sample_id: item.parent_sample_id,
             child_sample_id: item.child_sample_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
         }
     }
 }
@@ -68,6 +72,8 @@ impl From<web_common::database::tables::DerivedSample> for DerivedSample {
             updated_at: item.updated_at,
             parent_sample_id: item.parent_sample_id,
             child_sample_id: item.child_sample_id,
+            quantity: item.quantity,
+            unit_id: item.unit_id,
         }
     }
 }
@@ -140,6 +146,9 @@ impl DerivedSample {
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
         }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
+        }
         query
             .filter(crate::sql_function_bindings::can_view_derived_samples(
                 author_user_id,
@@ -180,6 +189,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .filter(crate::sql_function_bindings::can_view_derived_samples(
@@ -267,6 +279,8 @@ impl DerivedSample {
         let mut query =
             derived_samples::dsl::derived_samples
                 .select(DerivedSample::as_select())
+                // This operation is defined by a first order index linking derived_samples.unit_id to units.
+                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
                 .inner_join(samples0.on(
                     derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
@@ -340,12 +354,24 @@ impl DerivedSample {
                 ))
                 .filter(
                     crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_units_name_unit(
+                        units::dsl::name,
+                        units::dsl::unit,
+                    )
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::similarity_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     )
                     .or(sample_containers0
                         .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
+                        .ilike(format!("%{}%", query))))
                     .or(crate::sql_function_bindings::similarity_op(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
@@ -412,6 +438,12 @@ impl DerivedSample {
                 )
                 .order(
                     crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     ) + crate::sql_function_bindings::similarity_dist(
@@ -455,6 +487,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -510,6 +545,8 @@ impl DerivedSample {
         let mut query =
             derived_samples::dsl::derived_samples
                 .select(DerivedSample::as_select())
+                // This operation is defined by a first order index linking derived_samples.unit_id to units.
+                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
                 .inner_join(samples0.on(
                     derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
@@ -583,12 +620,24 @@ impl DerivedSample {
                 ))
                 .filter(
                     crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_units_name_unit(
+                        units::dsl::name,
+                        units::dsl::unit,
+                    )
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::word_similarity_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     )
                     .or(sample_containers0
                         .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
+                        .ilike(format!("%{}%", query))))
                     .or(crate::sql_function_bindings::word_similarity_op(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
@@ -655,6 +704,12 @@ impl DerivedSample {
                 )
                 .order(
                     crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     ) + crate::sql_function_bindings::word_similarity_dist_op(
@@ -698,6 +753,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -753,6 +811,8 @@ impl DerivedSample {
         let mut query =
             derived_samples::dsl::derived_samples
                 .select(DerivedSample::as_select())
+                // This operation is defined by a first order index linking derived_samples.unit_id to units.
+                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
                 .inner_join(samples0.on(
                     derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
@@ -826,12 +886,24 @@ impl DerivedSample {
                 ))
                 .filter(
                     crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_units_name_unit(
+                        units::dsl::name,
+                        units::dsl::unit,
+                    )
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     )
                     .or(sample_containers0
                         .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
+                        .ilike(format!("%{}%", query))))
                     .or(crate::sql_function_bindings::strict_word_similarity_op(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
@@ -900,6 +972,12 @@ impl DerivedSample {
                 )
                 .order(
                     crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -943,6 +1021,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -1017,6 +1098,9 @@ impl DerivedSample {
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
         }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
+        }
         query
             .filter(crate::sql_function_bindings::can_update_derived_samples(
                 author_user_id,
@@ -1057,6 +1141,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .filter(crate::sql_function_bindings::can_update_derived_samples(
@@ -1118,6 +1205,8 @@ impl DerivedSample {
         let mut query =
             derived_samples::dsl::derived_samples
                 .select(DerivedSample::as_select())
+                // This operation is defined by a first order index linking derived_samples.unit_id to units.
+                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
                 .inner_join(samples0.on(
                     derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
@@ -1191,12 +1280,24 @@ impl DerivedSample {
                 ))
                 .filter(
                     crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_units_name_unit(
+                        units::dsl::name,
+                        units::dsl::unit,
+                    )
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::similarity_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     )
                     .or(sample_containers0
                         .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
+                        .ilike(format!("%{}%", query))))
                     .or(crate::sql_function_bindings::similarity_op(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
@@ -1263,6 +1364,12 @@ impl DerivedSample {
                 )
                 .order(
                     crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     ) + crate::sql_function_bindings::similarity_dist(
@@ -1306,6 +1413,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -1361,6 +1471,8 @@ impl DerivedSample {
         let mut query =
             derived_samples::dsl::derived_samples
                 .select(DerivedSample::as_select())
+                // This operation is defined by a first order index linking derived_samples.unit_id to units.
+                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
                 .inner_join(samples0.on(
                     derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
@@ -1434,12 +1546,24 @@ impl DerivedSample {
                 ))
                 .filter(
                     crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_units_name_unit(
+                        units::dsl::name,
+                        units::dsl::unit,
+                    )
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::word_similarity_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     )
                     .or(sample_containers0
                         .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
+                        .ilike(format!("%{}%", query))))
                     .or(crate::sql_function_bindings::word_similarity_op(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
@@ -1506,6 +1630,12 @@ impl DerivedSample {
                 )
                 .order(
                     crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     ) + crate::sql_function_bindings::word_similarity_dist_op(
@@ -1549,6 +1679,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -1604,6 +1737,8 @@ impl DerivedSample {
         let mut query =
             derived_samples::dsl::derived_samples
                 .select(DerivedSample::as_select())
+                // This operation is defined by a first order index linking derived_samples.unit_id to units.
+                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
                 .inner_join(samples0.on(
                     derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
@@ -1677,12 +1812,24 @@ impl DerivedSample {
                 ))
                 .filter(
                     crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_units_name_unit(
+                        units::dsl::name,
+                        units::dsl::unit,
+                    )
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     )
                     .or(sample_containers0
                         .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
+                        .ilike(format!("%{}%", query))))
                     .or(crate::sql_function_bindings::strict_word_similarity_op(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
@@ -1751,6 +1898,12 @@ impl DerivedSample {
                 )
                 .order(
                     crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -1794,6 +1947,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -1868,6 +2024,9 @@ impl DerivedSample {
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
         }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
+        }
         query
             .filter(crate::sql_function_bindings::can_admin_derived_samples(
                 author_user_id,
@@ -1908,6 +2067,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .filter(crate::sql_function_bindings::can_admin_derived_samples(
@@ -1969,6 +2131,8 @@ impl DerivedSample {
         let mut query =
             derived_samples::dsl::derived_samples
                 .select(DerivedSample::as_select())
+                // This operation is defined by a first order index linking derived_samples.unit_id to units.
+                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
                 .inner_join(samples0.on(
                     derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
@@ -2042,12 +2206,24 @@ impl DerivedSample {
                 ))
                 .filter(
                     crate::sql_function_bindings::similarity_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_units_name_unit(
+                        units::dsl::name,
+                        units::dsl::unit,
+                    )
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::similarity_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     )
                     .or(sample_containers0
                         .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
+                        .ilike(format!("%{}%", query))))
                     .or(crate::sql_function_bindings::similarity_op(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
@@ -2114,6 +2290,12 @@ impl DerivedSample {
                 )
                 .order(
                     crate::sql_function_bindings::similarity_dist(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::similarity_dist(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     ) + crate::sql_function_bindings::similarity_dist(
@@ -2157,6 +2339,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -2212,6 +2397,8 @@ impl DerivedSample {
         let mut query =
             derived_samples::dsl::derived_samples
                 .select(DerivedSample::as_select())
+                // This operation is defined by a first order index linking derived_samples.unit_id to units.
+                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
                 .inner_join(samples0.on(
                     derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
@@ -2285,12 +2472,24 @@ impl DerivedSample {
                 ))
                 .filter(
                     crate::sql_function_bindings::word_similarity_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_units_name_unit(
+                        units::dsl::name,
+                        units::dsl::unit,
+                    )
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::word_similarity_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     )
                     .or(sample_containers0
                         .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
+                        .ilike(format!("%{}%", query))))
                     .or(crate::sql_function_bindings::word_similarity_op(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
@@ -2357,6 +2556,12 @@ impl DerivedSample {
                 )
                 .order(
                     crate::sql_function_bindings::word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::word_similarity_dist_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     ) + crate::sql_function_bindings::word_similarity_dist_op(
@@ -2400,6 +2605,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -2455,6 +2663,8 @@ impl DerivedSample {
         let mut query =
             derived_samples::dsl::derived_samples
                 .select(DerivedSample::as_select())
+                // This operation is defined by a first order index linking derived_samples.unit_id to units.
+                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
                 .inner_join(samples0.on(
                     derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
@@ -2528,12 +2738,24 @@ impl DerivedSample {
                 ))
                 .filter(
                     crate::sql_function_bindings::strict_word_similarity_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    )
+                    .or(crate::sql_function_bindings::concat_units_name_unit(
+                        units::dsl::name,
+                        units::dsl::unit,
+                    )
+                    .ilike(format!("%{}%", query)))
+                    .or(crate::sql_function_bindings::strict_word_similarity_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     )
                     .or(sample_containers0
                         .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
+                        .ilike(format!("%{}%", query))))
                     .or(crate::sql_function_bindings::strict_word_similarity_op(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects0.field(projects::dsl::name),
@@ -2602,6 +2824,12 @@ impl DerivedSample {
                 )
                 .order(
                     crate::sql_function_bindings::strict_word_similarity_dist_op(
+                        crate::sql_function_bindings::concat_units_name_unit(
+                            units::dsl::name,
+                            units::dsl::unit,
+                        ),
+                        query,
+                    ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
                         sample_containers0.field(sample_containers::dsl::barcode),
                         query,
                     ) + crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -2645,6 +2873,9 @@ impl DerivedSample {
         }
         if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
             query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
+        }
+        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
+            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
         }
         query
             .limit(limit.unwrap_or(10))

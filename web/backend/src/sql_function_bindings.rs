@@ -692,10 +692,9 @@ diesel::expression::functions::sql_function! {
 }
 
 diesel::expression::functions::sql_function! {
-   fn concat_units_name_description_symbol(
+   fn concat_units_name_unit(
         name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-        symbol: diesel::sql_types::Text,
+        unit: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
 

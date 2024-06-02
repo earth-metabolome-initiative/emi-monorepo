@@ -76,6 +76,8 @@ diesel::table! {
         updated_at -> Timestamp,
         parent_sample_id -> Uuid,
         child_sample_id -> Uuid,
+        quantity -> Float8,
+        unit_id -> Int4,
     }
 }
 
@@ -618,8 +620,9 @@ diesel::table! {
     units (id) {
         id -> Int4,
         name -> Text,
-        description -> Text,
-        symbol -> Text,
+        unit -> Text,
+        icon_id -> Int4,
+        color_id -> Int4,
     }
 }
 
@@ -698,6 +701,7 @@ diesel::joinable!(bio_ott_ranks -> font_awesome_icons (icon_id));
 diesel::joinable!(bio_ott_taxon_items -> bio_ott_ranks (ott_rank_id));
 diesel::joinable!(bio_ott_taxon_items -> colors (color_id));
 diesel::joinable!(bio_ott_taxon_items -> font_awesome_icons (icon_id));
+diesel::joinable!(derived_samples -> units (unit_id));
 diesel::joinable!(document_formats -> colors (color_id));
 diesel::joinable!(document_formats -> font_awesome_icons (icon_id));
 diesel::joinable!(login_providers -> colors (color_id));
@@ -779,6 +783,8 @@ diesel::joinable!(teams_users_role_requests -> roles (role_id));
 diesel::joinable!(teams_users_role_requests -> teams (table_id));
 diesel::joinable!(teams_users_roles -> roles (role_id));
 diesel::joinable!(teams_users_roles -> teams (table_id));
+diesel::joinable!(units -> colors (color_id));
+diesel::joinable!(units -> font_awesome_icons (icon_id));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));
 diesel::joinable!(user_emails -> users (created_by));
 diesel::joinable!(users_users_role_invitations -> roles (role_id));

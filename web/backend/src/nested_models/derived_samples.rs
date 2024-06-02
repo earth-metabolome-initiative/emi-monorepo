@@ -12,6 +12,7 @@ pub struct NestedDerivedSample {
     pub updated_by: User,
     pub parent_sample: NestedSample,
     pub child_sample: NestedSample,
+    pub unit: NestedUnit,
 }
 
 impl NestedDerivedSample {
@@ -41,6 +42,7 @@ impl NestedDerivedSample {
                 author_user_id,
                 connection,
             )?,
+            unit: NestedUnit::get(flat_variant.unit_id, connection)?,
             inner: flat_variant,
         })
     }
@@ -592,6 +594,7 @@ impl From<web_common::database::nested_models::NestedDerivedSample> for NestedDe
             updated_by: User::from(item.updated_by.as_ref().clone()),
             parent_sample: NestedSample::from(item.parent_sample.as_ref().clone()),
             child_sample: NestedSample::from(item.child_sample.as_ref().clone()),
+            unit: NestedUnit::from(item.unit.as_ref().clone()),
         }
     }
 }
@@ -603,6 +606,7 @@ impl From<NestedDerivedSample> for web_common::database::nested_models::NestedDe
             updated_by: Rc::from(web_common::database::User::from(item.updated_by)),
             parent_sample: Rc::from(web_common::database::NestedSample::from(item.parent_sample)),
             child_sample: Rc::from(web_common::database::NestedSample::from(item.child_sample)),
+            unit: Rc::from(web_common::database::NestedUnit::from(item.unit)),
         }
     }
 }

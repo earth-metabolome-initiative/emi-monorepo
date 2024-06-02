@@ -15,6 +15,7 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
+use web_common::database::filter_structs::*;
 
 #[derive(
     Queryable,
@@ -27,17 +28,21 @@ use serde::Serialize;
     Deserialize,
     Default,
     QueryableByName,
+    Associations,
     Insertable,
     Selectable,
     AsChangeset,
 )]
 #[diesel(table_name = units)]
+#[diesel(belongs_to(crate::models::font_awesome_icons::FontAwesomeIcon, foreign_key = icon_id))]
+#[diesel(belongs_to(crate::models::colors::Color, foreign_key = color_id))]
 #[diesel(primary_key(id))]
 pub struct Unit {
     pub id: i32,
     pub name: String,
-    pub description: String,
-    pub symbol: String,
+    pub unit: String,
+    pub icon_id: i32,
+    pub color_id: i32,
 }
 
 impl From<Unit> for web_common::database::tables::Unit {
@@ -45,8 +50,9 @@ impl From<Unit> for web_common::database::tables::Unit {
         Self {
             id: item.id,
             name: item.name,
-            description: item.description,
-            symbol: item.symbol,
+            unit: item.unit,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -56,8 +62,9 @@ impl From<web_common::database::tables::Unit> for Unit {
         Self {
             id: item.id,
             name: item.name,
-            description: item.description,
-            symbol: item.symbol,
+            unit: item.unit,
+            icon_id: item.icon_id,
+            color_id: item.color_id,
         }
     }
 }
@@ -73,10 +80,12 @@ impl Unit {
     }
     /// Get all of the viewable structs from the database.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
+        filter: Option<&UnitFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -84,7 +93,14 @@ impl Unit {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::units;
-        units::dsl::units
+        let mut query = units::dsl::units.into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(units::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(units::dsl::color_id.eq(color_id));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -92,10 +108,12 @@ impl Unit {
     }
     /// Get all of the sorted viewable structs from the database.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
+        filter: Option<&UnitFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -103,7 +121,14 @@ impl Unit {
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::schema::units;
-        units::dsl::units
+        let mut query = units::dsl::units.into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(units::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(units::dsl::color_id.eq(color_id));
+        }
+        query
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .load::<Self>(connection)
@@ -143,11 +168,13 @@ impl Unit {
     }
     /// Search for the viewable structs by a given string by Postgres's `similarity`.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn similarity_search_viewable(
+        filter: Option<&UnitFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -159,36 +186,39 @@ impl Unit {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_viewable(limit, offset, connection);
+            return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::units;
-        units::dsl::units
+        let mut query = units::dsl::units
             .filter(
                 crate::sql_function_bindings::similarity_op(
-                    crate::sql_function_bindings::concat_units_name_description_symbol(
+                    crate::sql_function_bindings::concat_units_name_unit(
                         units::dsl::name,
-                        units::dsl::description,
-                        units::dsl::symbol,
+                        units::dsl::unit,
                     ),
                     query,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_units_name_description_symbol(
-                        units::dsl::name,
-                        units::dsl::description,
-                        units::dsl::symbol,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .or(crate::sql_function_bindings::concat_units_name_unit(
+                    units::dsl::name,
+                    units::dsl::unit,
+                )
+                .ilike(format!("%{}%", query))),
             )
             .order(crate::sql_function_bindings::similarity_dist(
-                crate::sql_function_bindings::concat_units_name_description_symbol(
+                crate::sql_function_bindings::concat_units_name_unit(
                     units::dsl::name,
-                    units::dsl::description,
-                    units::dsl::symbol,
+                    units::dsl::unit,
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(units::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(units::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -196,11 +226,13 @@ impl Unit {
     }
     /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn word_similarity_search_viewable(
+        filter: Option<&UnitFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -212,36 +244,39 @@ impl Unit {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_viewable(limit, offset, connection);
+            return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::units;
-        units::dsl::units
+        let mut query = units::dsl::units
             .filter(
                 crate::sql_function_bindings::word_similarity_op(
-                    crate::sql_function_bindings::concat_units_name_description_symbol(
+                    crate::sql_function_bindings::concat_units_name_unit(
                         units::dsl::name,
-                        units::dsl::description,
-                        units::dsl::symbol,
+                        units::dsl::unit,
                     ),
                     query,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_units_name_description_symbol(
-                        units::dsl::name,
-                        units::dsl::description,
-                        units::dsl::symbol,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .or(crate::sql_function_bindings::concat_units_name_unit(
+                    units::dsl::name,
+                    units::dsl::unit,
+                )
+                .ilike(format!("%{}%", query))),
             )
             .order(crate::sql_function_bindings::word_similarity_dist_op(
-                crate::sql_function_bindings::concat_units_name_description_symbol(
+                crate::sql_function_bindings::concat_units_name_unit(
                     units::dsl::name,
-                    units::dsl::description,
-                    units::dsl::symbol,
+                    units::dsl::unit,
                 ),
                 query,
             ))
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(units::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(units::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -249,11 +284,13 @@ impl Unit {
     }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
+        filter: Option<&UnitFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -265,38 +302,41 @@ impl Unit {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_viewable(limit, offset, connection);
+            return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::units;
-        units::dsl::units
+        let mut query = units::dsl::units
             .filter(
                 crate::sql_function_bindings::strict_word_similarity_op(
-                    crate::sql_function_bindings::concat_units_name_description_symbol(
+                    crate::sql_function_bindings::concat_units_name_unit(
                         units::dsl::name,
-                        units::dsl::description,
-                        units::dsl::symbol,
+                        units::dsl::unit,
                     ),
                     query,
                 )
-                .or(
-                    crate::sql_function_bindings::concat_units_name_description_symbol(
-                        units::dsl::name,
-                        units::dsl::description,
-                        units::dsl::symbol,
-                    )
-                    .ilike(format!("%{}%", query)),
-                ),
+                .or(crate::sql_function_bindings::concat_units_name_unit(
+                    units::dsl::name,
+                    units::dsl::unit,
+                )
+                .ilike(format!("%{}%", query))),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
-                    crate::sql_function_bindings::concat_units_name_description_symbol(
+                    crate::sql_function_bindings::concat_units_name_unit(
                         units::dsl::name,
-                        units::dsl::description,
-                        units::dsl::symbol,
+                        units::dsl::unit,
                     ),
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
+            query = query.filter(units::dsl::icon_id.eq(icon_id));
+        }
+        if let Some(color_id) = filter.and_then(|f| f.color_id) {
+            query = query.filter(units::dsl::color_id.eq(color_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

@@ -35,6 +35,8 @@ pub(super) struct IntermediateUpdateDerivedSample {
     updated_by: i32,
     parent_sample_id: uuid::Uuid,
     child_sample_id: uuid::Uuid,
+    quantity: f64,
+    unit_id: i32,
 }
 
 impl UpdateRow for web_common::database::UpdateDerivedSample {
@@ -46,6 +48,8 @@ impl UpdateRow for web_common::database::UpdateDerivedSample {
             updated_by: user_id,
             parent_sample_id: self.parent_sample_id,
             child_sample_id: self.child_sample_id,
+            quantity: self.quantity,
+            unit_id: self.unit_id,
         }
     }
 

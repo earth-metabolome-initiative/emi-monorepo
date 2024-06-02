@@ -4,7 +4,7 @@
 -- and calls the parent column's can_update function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the derived_samples_users_roles table or
 -- the derived_samples_teams_users table with an appropriate role id.
-CREATE FUNCTION can_update_derived_samples(author_user_id INTEGER, this_derived_samples_parent_sample_id UUID, this_derived_samples_child_sample_id UUID)
+CREATE OR REPLACE FUNCTION can_update_derived_samples(author_user_id INTEGER, this_derived_samples_parent_sample_id UUID, this_derived_samples_child_sample_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
@@ -43,7 +43,7 @@ $$
 LANGUAGE plpgsql;
 
 -- The function `can_update_derived_samples_trigger` is a trigger function that checks whether the user can update the row.
-CREATE FUNCTION can_update_derived_samples_trigger()
+CREATE OR REPLACE FUNCTION can_update_derived_samples_trigger()
 RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'UPDATE' THEN
@@ -79,7 +79,7 @@ EXECUTE FUNCTION can_update_derived_samples_trigger();
 -- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the derived_samples_users_roles table or
 -- the derived_samples_teams_users table with an appropriate role id.
-CREATE FUNCTION can_admin_derived_samples(author_user_id INTEGER, this_derived_samples_parent_sample_id UUID, this_derived_samples_child_sample_id UUID)
+CREATE OR REPLACE FUNCTION can_admin_derived_samples(author_user_id INTEGER, this_derived_samples_parent_sample_id UUID, this_derived_samples_child_sample_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.
@@ -123,7 +123,7 @@ LANGUAGE plpgsql;
 -- and calls the parent column's can_view function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the derived_samples_users_roles table or
 -- the derived_samples_teams_users table with an appropriate role id.
-CREATE FUNCTION can_view_derived_samples(author_user_id INTEGER, this_derived_samples_parent_sample_id UUID, this_derived_samples_child_sample_id UUID)
+CREATE OR REPLACE FUNCTION can_view_derived_samples(author_user_id INTEGER, this_derived_samples_parent_sample_id UUID, this_derived_samples_child_sample_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
     canary INTEGER; -- Value used to check whether the row we are queering for actually exists, so to distinguish when the parent column is NULL and when the row is missing.

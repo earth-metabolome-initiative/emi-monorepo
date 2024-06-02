@@ -527,7 +527,7 @@ impl BackendTable for web_common::database::Table {
                 )?
             }
             web_common::database::Table::TeamsUsersRoles => NestedTeamsUsersRole::can_view_by_id()?,
-            web_common::database::Table::Units => Unit::can_view_by_id()?,
+            web_common::database::Table::Units => NestedUnit::can_view_by_id()?,
             web_common::database::Table::UserEmails => {
                 NestedUserEmail::can_view_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -1016,9 +1016,15 @@ impl BackendTable for web_common::database::Table {
                     connection,
                 )?)?
             }
-            web_common::database::Table::Units => {
-                bincode::serialize(&Unit::all_viewable(limit, offset, connection)?)?
-            }
+            web_common::database::Table::Units => bincode::serialize(&NestedUnit::all_viewable(
+                filter
+                    .map(|filter| bincode::deserialize::<UnitFilter>(&filter))
+                    .transpose()?
+                    .as_ref(),
+                limit,
+                offset,
+                connection,
+            )?)?,
             web_common::database::Table::UserEmails => {
                 bincode::serialize(&NestedUserEmail::all_viewable(
                     filter
@@ -1545,7 +1551,15 @@ impl BackendTable for web_common::database::Table {
                 )?)?
             }
             web_common::database::Table::Units => {
-                bincode::serialize(&Unit::all_viewable_sorted(limit, offset, connection)?)?
+                bincode::serialize(&NestedUnit::all_viewable_sorted(
+                    filter
+                        .map(|filter| bincode::deserialize::<UnitFilter>(&filter))
+                        .transpose()?
+                        .as_ref(),
+                    limit,
+                    offset,
+                    connection,
+                )?)?
             }
             web_common::database::Table::UserEmails => {
                 bincode::serialize(&NestedUserEmail::all_viewable_sorted(
@@ -1775,7 +1789,7 @@ impl BackendTable for web_common::database::Table {
                 bincode::serialize(&NestedTeamsUsersRole::get(primary_key.into(), connection)?)?
             }
             web_common::database::Table::Units => {
-                bincode::serialize(&Unit::get(primary_key.into(), connection)?)?
+                bincode::serialize(&NestedUnit::get(primary_key.into(), connection)?)?
             }
             web_common::database::Table::UserEmails => bincode::serialize(&NestedUserEmail::get(
                 primary_key.into(),
@@ -2123,7 +2137,8 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Units => {
-bincode::serialize(&Unit::similarity_search_viewable(
+bincode::serialize(&NestedUnit::similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UnitFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -2488,7 +2503,8 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Units => {
-bincode::serialize(&Unit::word_similarity_search_viewable(
+bincode::serialize(&NestedUnit::word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UnitFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -2853,7 +2869,8 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Units => {
-bincode::serialize(&Unit::strict_word_similarity_search_viewable(
+bincode::serialize(&NestedUnit::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UnitFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -3062,7 +3079,7 @@ connection)?)?
                 author_user_id,
                 connection,
             )?,
-            web_common::database::Table::Units => Unit::can_update_by_id()?,
+            web_common::database::Table::Units => NestedUnit::can_update_by_id()?,
             web_common::database::Table::UserEmails => {
                 NestedUserEmail::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -3257,7 +3274,7 @@ connection)?)?
                 author_user_id,
                 connection,
             )?,
-            web_common::database::Table::Units => Unit::can_admin_by_id()?,
+            web_common::database::Table::Units => NestedUnit::can_admin_by_id()?,
             web_common::database::Table::UserEmails => {
                 NestedUserEmail::can_admin_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -7095,7 +7112,11 @@ impl FromFlatStrTable for web_common::database::Table {
                 bincode::serialize(&richest_row)?
             }
             web_common::database::Table::Units => {
-                bincode::serialize(&serde_json::from_str::<crate::models::Unit>(row)?)?
+                let flat_row: crate::models::Unit =
+                    serde_json::from_str::<crate::models::Unit>(row)?;
+                let richest_row =
+                    crate::nested_models::NestedUnit::from_flat(flat_row, connection)?;
+                bincode::serialize(&richest_row)?
             }
             web_common::database::Table::UserEmails => {
                 let flat_row: crate::models::UserEmail =
