@@ -9,7 +9,6 @@ use serde::de::DeserializeOwned;
 use web_common::api::form_traits::FormMethod;
 use web_common::database::PrimaryKey;
 use web_common::database::*;
-use web_common::traits::CapitalizeString;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -17,11 +16,11 @@ use yew_router::hooks::use_navigator;
 use yew_router::prelude::Link;
 use yewdux::Dispatch;
 
-pub(crate) trait PageLike:
-    DeserializeOwned + Filtrable + Viewable + PartialEq + Clone + Tabular + 'static
-{
-    fn title(&self) -> String;
+use super::RowToBadge;
 
+pub(crate) trait PageLike:
+    RowToBadge + DeserializeOwned + Filtrable + Viewable + PartialEq + Clone + Tabular + 'static
+{
     fn section() -> String {
         let mut section = Self::TABLE.to_string().replace("_", " ");
         if let Some(r) = section.get_mut(0..1) {
@@ -29,8 +28,6 @@ pub(crate) trait PageLike:
         }
         section
     }
-
-    fn description(&self) -> Option<&str>;
 
     fn id(&self) -> PrimaryKey;
 
@@ -51,14 +48,6 @@ pub(crate) trait PageLike:
 }
 
 impl PageLike for NestedBioOttRank {
-    fn title(&self) -> String {
-        self.inner.name.capitalize()
-    }
-
-    fn description(&self) -> Option<&str> {
-        Some(self.inner.description.as_ref())
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -69,14 +58,6 @@ impl PageLike for NestedBioOttRank {
 }
 
 impl PageLike for NestedBioOttTaxonItem {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn description(&self) -> Option<&str> {
-        None
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -95,14 +76,6 @@ impl PageLike for NestedBioOttTaxonItem {
 }
 
 impl PageLike for Country {
-    fn title(&self) -> String {
-        self.name.clone()
-    }
-
-    fn description(&self) -> Option<&str> {
-        None
-    }
-
     fn id(&self) -> PrimaryKey {
         self.id.into()
     }
@@ -121,14 +94,6 @@ impl PageLike for Country {
 }
 
 impl PageLike for NestedSampleState {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn description(&self) -> Option<&str> {
-        Some(self.inner.description.as_ref())
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -147,14 +112,6 @@ impl PageLike for NestedSampleState {
 }
 
 impl PageLike for NestedProject {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn description(&self) -> Option<&str> {
-        Some(&self.inner.description)
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -179,14 +136,6 @@ impl PageLike for NestedProject {
 }
 
 impl PageLike for NestedOrganization {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn description(&self) -> Option<&str> {
-        None
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -205,14 +154,6 @@ impl PageLike for NestedOrganization {
 }
 
 impl PageLike for NestedObservationSubject {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn description(&self) -> Option<&str> {
-        Some(&self.inner.description)
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -227,14 +168,6 @@ impl PageLike for NestedObservationSubject {
 }
 
 impl PageLike for NestedObservation {
-    fn title(&self) -> String {
-        format!("Observation {}", self.inner.id)
-    }
-
-    fn description(&self) -> Option<&str> {
-        self.inner.notes.as_deref()
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -258,14 +191,6 @@ impl PageLike for NestedObservation {
 }
 
 impl PageLike for NestedSpectraCollection {
-    fn title(&self) -> String {
-        format!("Spectra collection {}", self.inner.id)
-    }
-
-    fn description(&self) -> Option<&str> {
-        self.inner.notes.as_deref()
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -288,14 +213,6 @@ impl PageLike for NestedSpectraCollection {
 }
 
 impl PageLike for NestedSpectra {
-    fn title(&self) -> String {
-        format!("Spectra {}", self.inner.id)
-    }
-
-    fn description(&self) -> Option<&str> {
-        self.inner.notes.as_deref()
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -306,14 +223,6 @@ impl PageLike for NestedSpectra {
 }
 
 impl PageLike for NestedNameplate {
-    fn title(&self) -> String {
-        self.inner.barcode.clone()
-    }
-
-    fn description(&self) -> Option<&str> {
-        None
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -337,14 +246,6 @@ impl PageLike for NestedNameplate {
 }
 
 impl PageLike for NestedOrganism {
-    fn title(&self) -> String {
-        format!("Sampled individual {}", self.inner.id)
-    }
-
-    fn description(&self) -> Option<&str> {
-        self.inner.notes.as_deref()
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -368,14 +269,6 @@ impl PageLike for NestedOrganism {
 }
 
 impl PageLike for NestedSample {
-    fn title(&self) -> String {
-        format!("{}", self.inner.id)
-    }
-
-    fn description(&self) -> Option<&str> {
-        self.inner.notes.as_deref()
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -406,14 +299,6 @@ impl PageLike for NestedSample {
 }
 
 impl PageLike for User {
-    fn title(&self) -> String {
-        self.full_name()
-    }
-
-    fn description(&self) -> Option<&str> {
-        self.description.as_deref()
-    }
-
     fn id(&self) -> PrimaryKey {
         self.id.into()
     }
@@ -428,14 +313,6 @@ impl PageLike for User {
 }
 
 impl PageLike for NestedTeam {
-    fn title(&self) -> String {
-        self.inner.name.clone()
-    }
-
-    fn description(&self) -> Option<&str> {
-        Some(self.inner.description.as_str())
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -459,14 +336,6 @@ impl PageLike for NestedTeam {
 }
 
 impl PageLike for NestedSampleContainer {
-    fn title(&self) -> String {
-        self.inner.barcode.clone()
-    }
-
-    fn description(&self) -> Option<&str> {
-        None
-    }
-
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -621,13 +490,13 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
                 .unwrap()
                 .document()
                 .unwrap()
-                .set_title(&page.title());
+                .set_title(&page.badge_title());
 
             // We render the page.
 
             html! {
                 <div class="page">
-                    <h2>{ page.title() }</h2>
+                    <h2>{ page.badge_title() }</h2>
                     if let Some(description) = page.description() {
                         <p>{ description }</p>
                     }
