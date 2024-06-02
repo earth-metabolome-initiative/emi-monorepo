@@ -290,6 +290,12 @@ where
         }
     }
 
+    fn destroy(&mut self, ctx: &Context<Self>) {
+        ctx.props().builder_dispatch.reduce_mut(|state| {
+            *state = Default::default();
+        });
+    }
+
     fn view(&self, ctx: &Context<Self>) -> Html {
         if Data::requires_authentication() && (!self.user_state.has_user() || !is_logged_in()) {
             log::info!("No access token found, redirecting to login page.");
