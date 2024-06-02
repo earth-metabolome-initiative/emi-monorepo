@@ -8,7 +8,7 @@
     position: absolute;
     bottom: 0;
     width: 100%; // Full width
-    padding-left: $sidebar-width + 10px; // Add padding to the left to account for the sidebar
+    padding-left: $sidebar-width + 1; // Add padding to the left to account for the sidebar
     margin-left: -$sidebar-width;
 
     @media screen and (max-width: $small-screen-width) {

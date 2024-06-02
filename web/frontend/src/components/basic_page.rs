@@ -57,17 +57,19 @@ impl PageLike for NestedBioOttRank {
     }
 }
 
+impl PageLike for NestedDerivedSample {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.parent_sample_id, self.inner.child_sample_id).into()
+    }
+
+    fn icon() -> &'static str {
+        "vial"
+    }
+}
+
 impl PageLike for NestedBioOttTaxonItem {
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        None
-    }
-
-    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        None
     }
 
     fn icon() -> &'static str {
@@ -75,17 +77,39 @@ impl PageLike for NestedBioOttTaxonItem {
     }
 }
 
+impl PageLike for NestedOrganismBioOttTaxonItem {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.organism_id, self.inner.taxon_id).into()
+    }
+
+    fn icon() -> &'static str {
+        "dna"
+    }
+}
+
+impl PageLike for NestedSampleBioOttTaxonItem {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.sample_id, self.inner.taxon_id).into()
+    }
+
+    fn icon() -> &'static str {
+        "dna"
+    }
+}
+
+impl PageLike for NestedTeamsUsersRoleRequest {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.user_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedTeam::icon()
+    }
+}
+
 impl PageLike for Country {
     fn id(&self) -> PrimaryKey {
         self.id.into()
-    }
-
-    fn update_path(&self) -> Option<AppRoute> {
-        None
-    }
-
-    fn create_path(_filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        None
     }
 
     fn icon() -> &'static str {
@@ -108,6 +132,126 @@ impl PageLike for NestedSampleState {
 
     fn icon() -> &'static str {
         "vial"
+    }
+}
+
+impl PageLike for NestedUsersUsersRole {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.user_id).into()
+    }
+
+    fn icon() -> &'static str {
+        "users"
+    }
+}
+
+impl PageLike for NestedTeamsUsersRole {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.user_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedTeam::icon()
+    }
+}
+
+impl PageLike for NestedUsersUsersRoleRequest {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.user_id).into()
+    }
+
+    fn icon() -> &'static str {
+        "users"
+    }
+}
+
+impl PageLike for NestedUsersUsersRoleInvitation {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.user_id).into()
+    }
+
+    fn icon() -> &'static str {
+        "users"
+    }
+}
+
+impl PageLike for NestedTeamsUsersRoleInvitation {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.user_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedTeam::icon()
+    }
+}
+
+impl PageLike for NestedTeamsTeamsRoleInvitation {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.team_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedTeam::icon()
+    }
+}
+
+impl PageLike for NestedProjectsUsersRoleRequest {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.user_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedProject::icon()
+    }
+}
+
+impl PageLike for NestedProjectsUsersRoleInvitation {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.user_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedProject::icon()
+    }
+}
+
+impl PageLike for NestedProjectsUsersRole {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.user_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedProject::icon()
+    }
+}
+
+impl PageLike for NestedProjectsTeamsRoleRequest {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.team_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedProject::icon()
+    }
+}
+
+impl PageLike for NestedProjectsTeamsRole {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.team_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedProject::icon()
+    }
+}
+
+impl PageLike for NestedProjectsTeamsRoleInvitation {
+    fn id(&self) -> PrimaryKey {
+        (self.inner.table_id, self.inner.team_id).into()
+    }
+
+    fn icon() -> &'static str {
+        NestedProject::icon()
     }
 }
 

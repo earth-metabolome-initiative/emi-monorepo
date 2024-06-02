@@ -1,7 +1,8 @@
 .app {
     padding-top: $navigator-height;
-    padding-left: $sidebar-width;
+    padding-left: $sidebar-width + 1;
     padding-bottom: 2.25em;
+    padding-right: 1em;
     min-width: 100%;
     min-height: 100%;
     box-sizing: border-box;

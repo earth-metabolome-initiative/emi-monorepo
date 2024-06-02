@@ -39,6 +39,7 @@ SUPPORT_TABLE_NAMES = [
     "login_providers",
     "materials",
     "notifications",
+    "roles",
     "team_states",
     "project_states",
     "sample_container_categories",

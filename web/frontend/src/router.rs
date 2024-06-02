@@ -61,6 +61,30 @@ impl Viewable for Country {
     }
 }
 
+impl Viewable for DerivedSample {
+    fn list_route() -> AppRoute {
+        AppRoute::DerivedSamples {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::DerivedSamplesView {
+            parent_sample_id: self.parent_sample_id,
+            child_sample_id: self.child_sample_id,
+        }
+    }
+}
+
+impl Viewable for NestedDerivedSample {
+    fn list_route() -> AppRoute {
+        AppRoute::DerivedSamples {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::DerivedSamplesView {
+            parent_sample_id: self.inner.parent_sample_id,
+            child_sample_id: self.inner.child_sample_id,
+        }
+    }
+}
+
 impl Viewable for Nameplate {
     fn list_route() -> AppRoute {
         AppRoute::Nameplates {}
@@ -115,6 +139,30 @@ impl Viewable for NestedObservation {
     }
 }
 
+impl Viewable for OrganismBioOttTaxonItem {
+    fn list_route() -> AppRoute {
+        AppRoute::OrganismBioOttTaxonItems {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::OrganismBioOttTaxonItemsView {
+            organism_id: self.organism_id,
+            taxon_id: self.taxon_id,
+        }
+    }
+}
+
+impl Viewable for NestedOrganismBioOttTaxonItem {
+    fn list_route() -> AppRoute {
+        AppRoute::OrganismBioOttTaxonItems {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::OrganismBioOttTaxonItemsView {
+            organism_id: self.inner.organism_id,
+            taxon_id: self.inner.taxon_id,
+        }
+    }
+}
+
 impl Viewable for Organism {
     fn list_route() -> AppRoute {
         AppRoute::Organisms {}
@@ -166,6 +214,174 @@ impl Viewable for NestedProject {
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::ProjectsView { id: self.inner.id }
+    }
+}
+
+impl Viewable for ProjectsTeamsRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsTeamsRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsTeamsRoleInvitationsView {
+            table_id: self.table_id,
+            team_id: self.team_id,
+        }
+    }
+}
+
+impl Viewable for NestedProjectsTeamsRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsTeamsRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsTeamsRoleInvitationsView {
+            table_id: self.inner.table_id,
+            team_id: self.inner.team_id,
+        }
+    }
+}
+
+impl Viewable for ProjectsTeamsRoleRequest {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsTeamsRoleRequests {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsTeamsRoleRequestsView {
+            table_id: self.table_id,
+            team_id: self.team_id,
+        }
+    }
+}
+
+impl Viewable for NestedProjectsTeamsRoleRequest {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsTeamsRoleRequests {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsTeamsRoleRequestsView {
+            table_id: self.inner.table_id,
+            team_id: self.inner.team_id,
+        }
+    }
+}
+
+impl Viewable for ProjectsTeamsRole {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsTeamsRoles {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsTeamsRolesView {
+            table_id: self.table_id,
+            team_id: self.team_id,
+        }
+    }
+}
+
+impl Viewable for NestedProjectsTeamsRole {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsTeamsRoles {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsTeamsRolesView {
+            table_id: self.inner.table_id,
+            team_id: self.inner.team_id,
+        }
+    }
+}
+
+impl Viewable for ProjectsUsersRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsUsersRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsUsersRoleInvitationsView {
+            table_id: self.table_id,
+            user_id: self.user_id,
+        }
+    }
+}
+
+impl Viewable for NestedProjectsUsersRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsUsersRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsUsersRoleInvitationsView {
+            table_id: self.inner.table_id,
+            user_id: self.inner.user_id,
+        }
+    }
+}
+
+impl Viewable for ProjectsUsersRoleRequest {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsUsersRoleRequests {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsUsersRoleRequestsView {
+            table_id: self.table_id,
+            user_id: self.user_id,
+        }
+    }
+}
+
+impl Viewable for NestedProjectsUsersRoleRequest {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsUsersRoleRequests {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsUsersRoleRequestsView {
+            table_id: self.inner.table_id,
+            user_id: self.inner.user_id,
+        }
+    }
+}
+
+impl Viewable for ProjectsUsersRole {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsUsersRoles {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsUsersRolesView {
+            table_id: self.table_id,
+            user_id: self.user_id,
+        }
+    }
+}
+
+impl Viewable for NestedProjectsUsersRole {
+    fn list_route() -> AppRoute {
+        AppRoute::ProjectsUsersRoles {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::ProjectsUsersRolesView {
+            table_id: self.inner.table_id,
+            user_id: self.inner.user_id,
+        }
+    }
+}
+
+impl Viewable for SampleBioOttTaxonItem {
+    fn list_route() -> AppRoute {
+        AppRoute::SampleBioOttTaxonItems {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SampleBioOttTaxonItemsView {
+            sample_id: self.sample_id,
+            taxon_id: self.taxon_id,
+        }
+    }
+}
+
+impl Viewable for NestedSampleBioOttTaxonItem {
+    fn list_route() -> AppRoute {
+        AppRoute::SampleBioOttTaxonItems {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SampleBioOttTaxonItemsView {
+            sample_id: self.inner.sample_id,
+            taxon_id: self.inner.taxon_id,
+        }
     }
 }
 
@@ -277,12 +493,180 @@ impl Viewable for NestedTeam {
     }
 }
 
+impl Viewable for TeamsTeamsRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::TeamsTeamsRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsTeamsRoleInvitationsView {
+            table_id: self.table_id,
+            team_id: self.team_id,
+        }
+    }
+}
+
+impl Viewable for NestedTeamsTeamsRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::TeamsTeamsRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsTeamsRoleInvitationsView {
+            table_id: self.inner.table_id,
+            team_id: self.inner.team_id,
+        }
+    }
+}
+
+impl Viewable for TeamsUsersRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::TeamsUsersRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsUsersRoleInvitationsView {
+            table_id: self.table_id,
+            user_id: self.user_id,
+        }
+    }
+}
+
+impl Viewable for NestedTeamsUsersRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::TeamsUsersRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsUsersRoleInvitationsView {
+            table_id: self.inner.table_id,
+            user_id: self.inner.user_id,
+        }
+    }
+}
+
+impl Viewable for TeamsUsersRoleRequest {
+    fn list_route() -> AppRoute {
+        AppRoute::TeamsUsersRoleRequests {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsUsersRoleRequestsView {
+            table_id: self.table_id,
+            user_id: self.user_id,
+        }
+    }
+}
+
+impl Viewable for NestedTeamsUsersRoleRequest {
+    fn list_route() -> AppRoute {
+        AppRoute::TeamsUsersRoleRequests {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsUsersRoleRequestsView {
+            table_id: self.inner.table_id,
+            user_id: self.inner.user_id,
+        }
+    }
+}
+
+impl Viewable for TeamsUsersRole {
+    fn list_route() -> AppRoute {
+        AppRoute::TeamsUsersRoles {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsUsersRolesView {
+            table_id: self.table_id,
+            user_id: self.user_id,
+        }
+    }
+}
+
+impl Viewable for NestedTeamsUsersRole {
+    fn list_route() -> AppRoute {
+        AppRoute::TeamsUsersRoles {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TeamsUsersRolesView {
+            table_id: self.inner.table_id,
+            user_id: self.inner.user_id,
+        }
+    }
+}
+
 impl Viewable for User {
     fn list_route() -> AppRoute {
         AppRoute::Users {}
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::UsersView { id: self.id }
+    }
+}
+
+impl Viewable for UsersUsersRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::UsersUsersRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::UsersUsersRoleInvitationsView {
+            table_id: self.table_id,
+            user_id: self.user_id,
+        }
+    }
+}
+
+impl Viewable for NestedUsersUsersRoleInvitation {
+    fn list_route() -> AppRoute {
+        AppRoute::UsersUsersRoleInvitations {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::UsersUsersRoleInvitationsView {
+            table_id: self.inner.table_id,
+            user_id: self.inner.user_id,
+        }
+    }
+}
+
+impl Viewable for UsersUsersRoleRequest {
+    fn list_route() -> AppRoute {
+        AppRoute::UsersUsersRoleRequests {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::UsersUsersRoleRequestsView {
+            table_id: self.table_id,
+            user_id: self.user_id,
+        }
+    }
+}
+
+impl Viewable for NestedUsersUsersRoleRequest {
+    fn list_route() -> AppRoute {
+        AppRoute::UsersUsersRoleRequests {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::UsersUsersRoleRequestsView {
+            table_id: self.inner.table_id,
+            user_id: self.inner.user_id,
+        }
+    }
+}
+
+impl Viewable for UsersUsersRole {
+    fn list_route() -> AppRoute {
+        AppRoute::UsersUsersRoles {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::UsersUsersRolesView {
+            table_id: self.table_id,
+            user_id: self.user_id,
+        }
+    }
+}
+
+impl Viewable for NestedUsersUsersRole {
+    fn list_route() -> AppRoute {
+        AppRoute::UsersUsersRoles {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::UsersUsersRolesView {
+            table_id: self.inner.table_id,
+            user_id: self.inner.user_id,
+        }
     }
 }
 
@@ -300,6 +684,24 @@ pub enum AppRoute {
     Countries,
     #[at("/countries/:id")]
     CountriesView { id: i32 },
+    #[at("/derived_samples")]
+    DerivedSamples,
+    #[at("/derived_samples/:parent_sample_id/:child_sample_id")]
+    DerivedSamplesView {
+        parent_sample_id: uuid::Uuid,
+        child_sample_id: uuid::Uuid,
+    },
+    #[at("/derived_samples/new")]
+    DerivedSamplesNew,
+    #[at("/derived_samples/new/parent_sample/:parent_sample_id")]
+    DerivedSamplesNewWithParentSample { parent_sample_id: uuid::Uuid },
+    #[at("/derived_samples/new/child_sample/:child_sample_id")]
+    DerivedSamplesNewWithChildSample { child_sample_id: uuid::Uuid },
+    #[at("/derived_samples/:parent_sample_id/:child_sample_id/update")]
+    DerivedSamplesUpdate {
+        parent_sample_id: uuid::Uuid,
+        child_sample_id: uuid::Uuid,
+    },
     #[at("/nameplates")]
     Nameplates,
     #[at("/nameplates/:id")]
@@ -330,6 +732,17 @@ pub enum AppRoute {
     ObservationsNewWithSample { sample_id: uuid::Uuid },
     #[at("/observations/:id/update")]
     ObservationsUpdate { id: uuid::Uuid },
+    #[at("/organism_bio_ott_taxon_items")]
+    OrganismBioOttTaxonItems,
+    #[at("/organism_bio_ott_taxon_items/:organism_id/:taxon_id")]
+    OrganismBioOttTaxonItemsView {
+        organism_id: uuid::Uuid,
+        taxon_id: i32,
+    },
+    #[at("/organism_bio_ott_taxon_items/new")]
+    OrganismBioOttTaxonItemsNew,
+    #[at("/organism_bio_ott_taxon_items/new/organism/:organism_id")]
+    OrganismBioOttTaxonItemsNewWithOrganism { organism_id: uuid::Uuid },
     #[at("/organisms")]
     Organisms,
     #[at("/organisms/:id")]
@@ -360,6 +773,77 @@ pub enum AppRoute {
     ProjectsNewWithParentProject { parent_project_id: i32 },
     #[at("/projects/:id/update")]
     ProjectsUpdate { id: i32 },
+    #[at("/projects_teams_role_invitations")]
+    ProjectsTeamsRoleInvitations,
+    #[at("/projects_teams_role_invitations/:table_id/:team_id")]
+    ProjectsTeamsRoleInvitationsView { table_id: i32, team_id: i32 },
+    #[at("/projects_teams_role_invitations/new")]
+    ProjectsTeamsRoleInvitationsNew,
+    #[at("/projects_teams_role_invitations/new/table/:table_id")]
+    ProjectsTeamsRoleInvitationsNewWithTable { table_id: i32 },
+    #[at("/projects_teams_role_invitations/new/team/:team_id")]
+    ProjectsTeamsRoleInvitationsNewWithTeam { team_id: i32 },
+    #[at("/projects_teams_role_requests")]
+    ProjectsTeamsRoleRequests,
+    #[at("/projects_teams_role_requests/:table_id/:team_id")]
+    ProjectsTeamsRoleRequestsView { table_id: i32, team_id: i32 },
+    #[at("/projects_teams_role_requests/new")]
+    ProjectsTeamsRoleRequestsNew,
+    #[at("/projects_teams_role_requests/new/table/:table_id")]
+    ProjectsTeamsRoleRequestsNewWithTable { table_id: i32 },
+    #[at("/projects_teams_role_requests/new/team/:team_id")]
+    ProjectsTeamsRoleRequestsNewWithTeam { team_id: i32 },
+    #[at("/projects_teams_roles")]
+    ProjectsTeamsRoles,
+    #[at("/projects_teams_roles/:table_id/:team_id")]
+    ProjectsTeamsRolesView { table_id: i32, team_id: i32 },
+    #[at("/projects_teams_roles/new")]
+    ProjectsTeamsRolesNew,
+    #[at("/projects_teams_roles/new/table/:table_id")]
+    ProjectsTeamsRolesNewWithTable { table_id: i32 },
+    #[at("/projects_teams_roles/new/team/:team_id")]
+    ProjectsTeamsRolesNewWithTeam { team_id: i32 },
+    #[at("/projects_users_role_invitations")]
+    ProjectsUsersRoleInvitations,
+    #[at("/projects_users_role_invitations/:table_id/:user_id")]
+    ProjectsUsersRoleInvitationsView { table_id: i32, user_id: i32 },
+    #[at("/projects_users_role_invitations/new")]
+    ProjectsUsersRoleInvitationsNew,
+    #[at("/projects_users_role_invitations/new/table/:table_id")]
+    ProjectsUsersRoleInvitationsNewWithTable { table_id: i32 },
+    #[at("/projects_users_role_invitations/new/user/:user_id")]
+    ProjectsUsersRoleInvitationsNewWithUser { user_id: i32 },
+    #[at("/projects_users_role_requests")]
+    ProjectsUsersRoleRequests,
+    #[at("/projects_users_role_requests/:table_id/:user_id")]
+    ProjectsUsersRoleRequestsView { table_id: i32, user_id: i32 },
+    #[at("/projects_users_role_requests/new")]
+    ProjectsUsersRoleRequestsNew,
+    #[at("/projects_users_role_requests/new/table/:table_id")]
+    ProjectsUsersRoleRequestsNewWithTable { table_id: i32 },
+    #[at("/projects_users_role_requests/new/user/:user_id")]
+    ProjectsUsersRoleRequestsNewWithUser { user_id: i32 },
+    #[at("/projects_users_roles")]
+    ProjectsUsersRoles,
+    #[at("/projects_users_roles/:table_id/:user_id")]
+    ProjectsUsersRolesView { table_id: i32, user_id: i32 },
+    #[at("/projects_users_roles/new")]
+    ProjectsUsersRolesNew,
+    #[at("/projects_users_roles/new/table/:table_id")]
+    ProjectsUsersRolesNewWithTable { table_id: i32 },
+    #[at("/projects_users_roles/new/user/:user_id")]
+    ProjectsUsersRolesNewWithUser { user_id: i32 },
+    #[at("/sample_bio_ott_taxon_items")]
+    SampleBioOttTaxonItems,
+    #[at("/sample_bio_ott_taxon_items/:sample_id/:taxon_id")]
+    SampleBioOttTaxonItemsView {
+        sample_id: uuid::Uuid,
+        taxon_id: i32,
+    },
+    #[at("/sample_bio_ott_taxon_items/new")]
+    SampleBioOttTaxonItemsNew,
+    #[at("/sample_bio_ott_taxon_items/new/sample/:sample_id")]
+    SampleBioOttTaxonItemsNewWithSample { sample_id: uuid::Uuid },
     #[at("/sample_containers")]
     SampleContainers,
     #[at("/sample_containers/:id")]
@@ -418,12 +902,82 @@ pub enum AppRoute {
     TeamsNewWithParentTeam { parent_team_id: i32 },
     #[at("/teams/:id/update")]
     TeamsUpdate { id: i32 },
+    #[at("/teams_teams_role_invitations")]
+    TeamsTeamsRoleInvitations,
+    #[at("/teams_teams_role_invitations/:table_id/:team_id")]
+    TeamsTeamsRoleInvitationsView { table_id: i32, team_id: i32 },
+    #[at("/teams_teams_role_invitations/new")]
+    TeamsTeamsRoleInvitationsNew,
+    #[at("/teams_teams_role_invitations/new/table/:table_id")]
+    TeamsTeamsRoleInvitationsNewWithTable { table_id: i32 },
+    #[at("/teams_teams_role_invitations/new/team/:team_id")]
+    TeamsTeamsRoleInvitationsNewWithTeam { team_id: i32 },
+    #[at("/teams_users_role_invitations")]
+    TeamsUsersRoleInvitations,
+    #[at("/teams_users_role_invitations/:table_id/:user_id")]
+    TeamsUsersRoleInvitationsView { table_id: i32, user_id: i32 },
+    #[at("/teams_users_role_invitations/new")]
+    TeamsUsersRoleInvitationsNew,
+    #[at("/teams_users_role_invitations/new/table/:table_id")]
+    TeamsUsersRoleInvitationsNewWithTable { table_id: i32 },
+    #[at("/teams_users_role_invitations/new/user/:user_id")]
+    TeamsUsersRoleInvitationsNewWithUser { user_id: i32 },
+    #[at("/teams_users_role_requests")]
+    TeamsUsersRoleRequests,
+    #[at("/teams_users_role_requests/:table_id/:user_id")]
+    TeamsUsersRoleRequestsView { table_id: i32, user_id: i32 },
+    #[at("/teams_users_role_requests/new")]
+    TeamsUsersRoleRequestsNew,
+    #[at("/teams_users_role_requests/new/table/:table_id")]
+    TeamsUsersRoleRequestsNewWithTable { table_id: i32 },
+    #[at("/teams_users_role_requests/new/user/:user_id")]
+    TeamsUsersRoleRequestsNewWithUser { user_id: i32 },
+    #[at("/teams_users_roles")]
+    TeamsUsersRoles,
+    #[at("/teams_users_roles/:table_id/:user_id")]
+    TeamsUsersRolesView { table_id: i32, user_id: i32 },
+    #[at("/teams_users_roles/new")]
+    TeamsUsersRolesNew,
+    #[at("/teams_users_roles/new/table/:table_id")]
+    TeamsUsersRolesNewWithTable { table_id: i32 },
+    #[at("/teams_users_roles/new/user/:user_id")]
+    TeamsUsersRolesNewWithUser { user_id: i32 },
     #[at("/users")]
     Users,
     #[at("/users/:id")]
     UsersView { id: i32 },
     #[at("/users/:id/update")]
     UsersUpdate { id: i32 },
+    #[at("/users_users_role_invitations")]
+    UsersUsersRoleInvitations,
+    #[at("/users_users_role_invitations/:table_id/:user_id")]
+    UsersUsersRoleInvitationsView { table_id: i32, user_id: i32 },
+    #[at("/users_users_role_invitations/new")]
+    UsersUsersRoleInvitationsNew,
+    #[at("/users_users_role_invitations/new/table/:table_id")]
+    UsersUsersRoleInvitationsNewWithTable { table_id: i32 },
+    #[at("/users_users_role_invitations/new/user/:user_id")]
+    UsersUsersRoleInvitationsNewWithUser { user_id: i32 },
+    #[at("/users_users_role_requests")]
+    UsersUsersRoleRequests,
+    #[at("/users_users_role_requests/:table_id/:user_id")]
+    UsersUsersRoleRequestsView { table_id: i32, user_id: i32 },
+    #[at("/users_users_role_requests/new")]
+    UsersUsersRoleRequestsNew,
+    #[at("/users_users_role_requests/new/table/:table_id")]
+    UsersUsersRoleRequestsNewWithTable { table_id: i32 },
+    #[at("/users_users_role_requests/new/user/:user_id")]
+    UsersUsersRoleRequestsNewWithUser { user_id: i32 },
+    #[at("/users_users_roles")]
+    UsersUsersRoles,
+    #[at("/users_users_roles/:table_id/:user_id")]
+    UsersUsersRolesView { table_id: i32, user_id: i32 },
+    #[at("/users_users_roles/new")]
+    UsersUsersRolesNew,
+    #[at("/users_users_roles/new/table/:table_id")]
+    UsersUsersRolesNewWithTable { table_id: i32 },
+    #[at("/users_users_roles/new/user/:user_id")]
+    UsersUsersRolesNewWithUser { user_id: i32 },
     #[at("/")]
     Home,
     #[at("/login")]
@@ -456,6 +1010,30 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::CountriesView { id } => {
             html! { <CountryPage id = {id} /> }
+        }
+        AppRoute::DerivedSamples => {
+            html! { <BasicList<NestedDerivedSample> /> }
+        }
+        AppRoute::DerivedSamplesView {
+            parent_sample_id,
+            child_sample_id,
+        } => {
+            html! { <DerivedSamplePage parent_sample_id = {parent_sample_id} child_sample_id = {child_sample_id} /> }
+        }
+        AppRoute::DerivedSamplesNew => {
+            html! { <CreateDerivedSampleForm /> }
+        }
+        AppRoute::DerivedSamplesNewWithParentSample { parent_sample_id } => {
+            html! { <CreateDerivedSampleForm parent_sample_id={parent_sample_id} /> }
+        }
+        AppRoute::DerivedSamplesNewWithChildSample { child_sample_id } => {
+            html! { <CreateDerivedSampleForm child_sample_id={child_sample_id} /> }
+        }
+        AppRoute::DerivedSamplesUpdate {
+            parent_sample_id,
+            child_sample_id,
+        } => {
+            html! { <UpdateDerivedSampleForm parent_sample_id={parent_sample_id} child_sample_id={child_sample_id} /> }
         }
         AppRoute::Nameplates => {
             html! { <BasicList<NestedNameplate> /> }
@@ -504,6 +1082,21 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::ObservationsUpdate { id } => {
             html! { <UpdateObservationForm id={id} /> }
         }
+        AppRoute::OrganismBioOttTaxonItems => {
+            html! { <BasicList<NestedOrganismBioOttTaxonItem> /> }
+        }
+        AppRoute::OrganismBioOttTaxonItemsView {
+            organism_id,
+            taxon_id,
+        } => {
+            html! { <OrganismBioOttTaxonItemPage organism_id = {organism_id} taxon_id = {taxon_id} /> }
+        }
+        AppRoute::OrganismBioOttTaxonItemsNew => {
+            html! { <CreateOrganismBioOttTaxonItemForm /> }
+        }
+        AppRoute::OrganismBioOttTaxonItemsNewWithOrganism { organism_id } => {
+            html! { <CreateOrganismBioOttTaxonItemForm organism_id={organism_id} /> }
+        }
         AppRoute::Organisms => {
             html! { <BasicList<NestedOrganism> /> }
         }
@@ -548,6 +1141,111 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::ProjectsUpdate { id } => {
             html! { <UpdateProjectForm id={id} /> }
+        }
+        AppRoute::ProjectsTeamsRoleInvitations => {
+            html! { <BasicList<NestedProjectsTeamsRoleInvitation> /> }
+        }
+        AppRoute::ProjectsTeamsRoleInvitationsView { table_id, team_id } => {
+            html! { <ProjectsTeamsRoleInvitationPage table_id = {table_id} team_id = {team_id} /> }
+        }
+        AppRoute::ProjectsTeamsRoleInvitationsNew => {
+            html! { <CreateProjectsTeamsRoleInvitationForm /> }
+        }
+        AppRoute::ProjectsTeamsRoleInvitationsNewWithTable { table_id } => {
+            html! { <CreateProjectsTeamsRoleInvitationForm table_id={table_id} /> }
+        }
+        AppRoute::ProjectsTeamsRoleInvitationsNewWithTeam { team_id } => {
+            html! { <CreateProjectsTeamsRoleInvitationForm team_id={team_id} /> }
+        }
+        AppRoute::ProjectsTeamsRoleRequests => {
+            html! { <BasicList<NestedProjectsTeamsRoleRequest> /> }
+        }
+        AppRoute::ProjectsTeamsRoleRequestsView { table_id, team_id } => {
+            html! { <ProjectsTeamsRoleRequestPage table_id = {table_id} team_id = {team_id} /> }
+        }
+        AppRoute::ProjectsTeamsRoleRequestsNew => {
+            html! { <CreateProjectsTeamsRoleRequestForm /> }
+        }
+        AppRoute::ProjectsTeamsRoleRequestsNewWithTable { table_id } => {
+            html! { <CreateProjectsTeamsRoleRequestForm table_id={table_id} /> }
+        }
+        AppRoute::ProjectsTeamsRoleRequestsNewWithTeam { team_id } => {
+            html! { <CreateProjectsTeamsRoleRequestForm team_id={team_id} /> }
+        }
+        AppRoute::ProjectsTeamsRoles => {
+            html! { <BasicList<NestedProjectsTeamsRole> /> }
+        }
+        AppRoute::ProjectsTeamsRolesView { table_id, team_id } => {
+            html! { <ProjectsTeamsRolePage table_id = {table_id} team_id = {team_id} /> }
+        }
+        AppRoute::ProjectsTeamsRolesNew => {
+            html! { <CreateProjectsTeamsRoleForm /> }
+        }
+        AppRoute::ProjectsTeamsRolesNewWithTable { table_id } => {
+            html! { <CreateProjectsTeamsRoleForm table_id={table_id} /> }
+        }
+        AppRoute::ProjectsTeamsRolesNewWithTeam { team_id } => {
+            html! { <CreateProjectsTeamsRoleForm team_id={team_id} /> }
+        }
+        AppRoute::ProjectsUsersRoleInvitations => {
+            html! { <BasicList<NestedProjectsUsersRoleInvitation> /> }
+        }
+        AppRoute::ProjectsUsersRoleInvitationsView { table_id, user_id } => {
+            html! { <ProjectsUsersRoleInvitationPage table_id = {table_id} user_id = {user_id} /> }
+        }
+        AppRoute::ProjectsUsersRoleInvitationsNew => {
+            html! { <CreateProjectsUsersRoleInvitationForm /> }
+        }
+        AppRoute::ProjectsUsersRoleInvitationsNewWithTable { table_id } => {
+            html! { <CreateProjectsUsersRoleInvitationForm table_id={table_id} /> }
+        }
+        AppRoute::ProjectsUsersRoleInvitationsNewWithUser { user_id } => {
+            html! { <CreateProjectsUsersRoleInvitationForm user_id={user_id} /> }
+        }
+        AppRoute::ProjectsUsersRoleRequests => {
+            html! { <BasicList<NestedProjectsUsersRoleRequest> /> }
+        }
+        AppRoute::ProjectsUsersRoleRequestsView { table_id, user_id } => {
+            html! { <ProjectsUsersRoleRequestPage table_id = {table_id} user_id = {user_id} /> }
+        }
+        AppRoute::ProjectsUsersRoleRequestsNew => {
+            html! { <CreateProjectsUsersRoleRequestForm /> }
+        }
+        AppRoute::ProjectsUsersRoleRequestsNewWithTable { table_id } => {
+            html! { <CreateProjectsUsersRoleRequestForm table_id={table_id} /> }
+        }
+        AppRoute::ProjectsUsersRoleRequestsNewWithUser { user_id } => {
+            html! { <CreateProjectsUsersRoleRequestForm user_id={user_id} /> }
+        }
+        AppRoute::ProjectsUsersRoles => {
+            html! { <BasicList<NestedProjectsUsersRole> /> }
+        }
+        AppRoute::ProjectsUsersRolesView { table_id, user_id } => {
+            html! { <ProjectsUsersRolePage table_id = {table_id} user_id = {user_id} /> }
+        }
+        AppRoute::ProjectsUsersRolesNew => {
+            html! { <CreateProjectsUsersRoleForm /> }
+        }
+        AppRoute::ProjectsUsersRolesNewWithTable { table_id } => {
+            html! { <CreateProjectsUsersRoleForm table_id={table_id} /> }
+        }
+        AppRoute::ProjectsUsersRolesNewWithUser { user_id } => {
+            html! { <CreateProjectsUsersRoleForm user_id={user_id} /> }
+        }
+        AppRoute::SampleBioOttTaxonItems => {
+            html! { <BasicList<NestedSampleBioOttTaxonItem> /> }
+        }
+        AppRoute::SampleBioOttTaxonItemsView {
+            sample_id,
+            taxon_id,
+        } => {
+            html! { <SampleBioOttTaxonItemPage sample_id = {sample_id} taxon_id = {taxon_id} /> }
+        }
+        AppRoute::SampleBioOttTaxonItemsNew => {
+            html! { <CreateSampleBioOttTaxonItemForm /> }
+        }
+        AppRoute::SampleBioOttTaxonItemsNewWithSample { sample_id } => {
+            html! { <CreateSampleBioOttTaxonItemForm sample_id={sample_id} /> }
         }
         AppRoute::SampleContainers => {
             html! { <BasicList<NestedSampleContainer> /> }
@@ -638,6 +1336,66 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::TeamsUpdate { id } => {
             html! { <UpdateTeamForm id={id} /> }
         }
+        AppRoute::TeamsTeamsRoleInvitations => {
+            html! { <BasicList<NestedTeamsTeamsRoleInvitation> /> }
+        }
+        AppRoute::TeamsTeamsRoleInvitationsView { table_id, team_id } => {
+            html! { <TeamsTeamsRoleInvitationPage table_id = {table_id} team_id = {team_id} /> }
+        }
+        AppRoute::TeamsTeamsRoleInvitationsNew => {
+            html! { <CreateTeamsTeamsRoleInvitationForm /> }
+        }
+        AppRoute::TeamsTeamsRoleInvitationsNewWithTable { table_id } => {
+            html! { <CreateTeamsTeamsRoleInvitationForm table_id={table_id} /> }
+        }
+        AppRoute::TeamsTeamsRoleInvitationsNewWithTeam { team_id } => {
+            html! { <CreateTeamsTeamsRoleInvitationForm team_id={team_id} /> }
+        }
+        AppRoute::TeamsUsersRoleInvitations => {
+            html! { <BasicList<NestedTeamsUsersRoleInvitation> /> }
+        }
+        AppRoute::TeamsUsersRoleInvitationsView { table_id, user_id } => {
+            html! { <TeamsUsersRoleInvitationPage table_id = {table_id} user_id = {user_id} /> }
+        }
+        AppRoute::TeamsUsersRoleInvitationsNew => {
+            html! { <CreateTeamsUsersRoleInvitationForm /> }
+        }
+        AppRoute::TeamsUsersRoleInvitationsNewWithTable { table_id } => {
+            html! { <CreateTeamsUsersRoleInvitationForm table_id={table_id} /> }
+        }
+        AppRoute::TeamsUsersRoleInvitationsNewWithUser { user_id } => {
+            html! { <CreateTeamsUsersRoleInvitationForm user_id={user_id} /> }
+        }
+        AppRoute::TeamsUsersRoleRequests => {
+            html! { <BasicList<NestedTeamsUsersRoleRequest> /> }
+        }
+        AppRoute::TeamsUsersRoleRequestsView { table_id, user_id } => {
+            html! { <TeamsUsersRoleRequestPage table_id = {table_id} user_id = {user_id} /> }
+        }
+        AppRoute::TeamsUsersRoleRequestsNew => {
+            html! { <CreateTeamsUsersRoleRequestForm /> }
+        }
+        AppRoute::TeamsUsersRoleRequestsNewWithTable { table_id } => {
+            html! { <CreateTeamsUsersRoleRequestForm table_id={table_id} /> }
+        }
+        AppRoute::TeamsUsersRoleRequestsNewWithUser { user_id } => {
+            html! { <CreateTeamsUsersRoleRequestForm user_id={user_id} /> }
+        }
+        AppRoute::TeamsUsersRoles => {
+            html! { <BasicList<NestedTeamsUsersRole> /> }
+        }
+        AppRoute::TeamsUsersRolesView { table_id, user_id } => {
+            html! { <TeamsUsersRolePage table_id = {table_id} user_id = {user_id} /> }
+        }
+        AppRoute::TeamsUsersRolesNew => {
+            html! { <CreateTeamsUsersRoleForm /> }
+        }
+        AppRoute::TeamsUsersRolesNewWithTable { table_id } => {
+            html! { <CreateTeamsUsersRoleForm table_id={table_id} /> }
+        }
+        AppRoute::TeamsUsersRolesNewWithUser { user_id } => {
+            html! { <CreateTeamsUsersRoleForm user_id={user_id} /> }
+        }
         AppRoute::Users => {
             html! { <BasicList<User> /> }
         }
@@ -646,6 +1404,51 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::UsersUpdate { id } => {
             html! { <UpdateUserForm id={id} /> }
+        }
+        AppRoute::UsersUsersRoleInvitations => {
+            html! { <BasicList<NestedUsersUsersRoleInvitation> /> }
+        }
+        AppRoute::UsersUsersRoleInvitationsView { table_id, user_id } => {
+            html! { <UsersUsersRoleInvitationPage table_id = {table_id} user_id = {user_id} /> }
+        }
+        AppRoute::UsersUsersRoleInvitationsNew => {
+            html! { <CreateUsersUsersRoleInvitationForm /> }
+        }
+        AppRoute::UsersUsersRoleInvitationsNewWithTable { table_id } => {
+            html! { <CreateUsersUsersRoleInvitationForm table_id={table_id} /> }
+        }
+        AppRoute::UsersUsersRoleInvitationsNewWithUser { user_id } => {
+            html! { <CreateUsersUsersRoleInvitationForm user_id={user_id} /> }
+        }
+        AppRoute::UsersUsersRoleRequests => {
+            html! { <BasicList<NestedUsersUsersRoleRequest> /> }
+        }
+        AppRoute::UsersUsersRoleRequestsView { table_id, user_id } => {
+            html! { <UsersUsersRoleRequestPage table_id = {table_id} user_id = {user_id} /> }
+        }
+        AppRoute::UsersUsersRoleRequestsNew => {
+            html! { <CreateUsersUsersRoleRequestForm /> }
+        }
+        AppRoute::UsersUsersRoleRequestsNewWithTable { table_id } => {
+            html! { <CreateUsersUsersRoleRequestForm table_id={table_id} /> }
+        }
+        AppRoute::UsersUsersRoleRequestsNewWithUser { user_id } => {
+            html! { <CreateUsersUsersRoleRequestForm user_id={user_id} /> }
+        }
+        AppRoute::UsersUsersRoles => {
+            html! { <BasicList<NestedUsersUsersRole> /> }
+        }
+        AppRoute::UsersUsersRolesView { table_id, user_id } => {
+            html! { <UsersUsersRolePage table_id = {table_id} user_id = {user_id} /> }
+        }
+        AppRoute::UsersUsersRolesNew => {
+            html! { <CreateUsersUsersRoleForm /> }
+        }
+        AppRoute::UsersUsersRolesNewWithTable { table_id } => {
+            html! { <CreateUsersUsersRoleForm table_id={table_id} /> }
+        }
+        AppRoute::UsersUsersRolesNewWithUser { user_id } => {
+            html! { <CreateUsersUsersRoleForm user_id={user_id} /> }
         }
         AppRoute::Home => {
             html! { <Home /> }

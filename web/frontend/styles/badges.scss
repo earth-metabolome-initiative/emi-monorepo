@@ -128,10 +128,10 @@ $breakpoints: (
                 color: $red;
                 font-size: 1.5em;
             }
-        }
-        ul.badges-list {
-            li.badge.small {
-                border-color: $red !important;
+            ul.badges-list {
+                li.badge.small {
+                    border-color: $red !important;
+                }
             }
         }
         &:after {

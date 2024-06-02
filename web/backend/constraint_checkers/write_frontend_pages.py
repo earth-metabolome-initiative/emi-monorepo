@@ -6,21 +6,9 @@ from constraint_checkers.struct_metadata import StructMetadata
 from constraint_checkers.regroup_tables import SUPPORT_TABLE_NAMES
 
 
-def is_deny_listed(foreign_key: StructMetadata, struct: StructMetadata) -> bool:
+def is_deny_listed(struct: StructMetadata) -> bool:
     """Check whether we skip the current section."""
-    denied_desinences = [
-        "invitations",
-        "roles",
-        "notifications",
-        "user_emails",
-        "requests",
-    ] + SUPPORT_TABLE_NAMES
-
-    for denied_desinence in denied_desinences:
-        if struct.table_name.endswith(denied_desinence):
-            return True
-
-    return False
+    return struct.table_name in SUPPORT_TABLE_NAMES
 
 
 def write_frontend_pages(flat_variants: List[StructMetadata]):
@@ -58,10 +46,7 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
         flat_variants, desc="Writing frontend pages", unit="page", leave=False
     ):
 
-        if is_deny_listed(None, flat_variant):
-            continue
-
-        if flat_variant.is_junktion_table():
+        if is_deny_listed(flat_variant):
             continue
 
         has_content = False
@@ -109,7 +94,7 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
                 ), f"Child struct {child_struct.name} does not have a filter variant."
                 filter_variant = child_struct.get_filter_variant()
 
-                if is_deny_listed(foreign_key, child_struct):
+                if is_deny_listed(child_struct):
                     continue
 
                 document.write(
@@ -138,10 +123,7 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
                     child_struct.has_filter_variant()
                 ), f"Child struct {child_struct.name} does not have a filter variant."
 
-                if child_struct.is_junktion_table():
-                    continue
-
-                if is_deny_listed(foreign_key, child_struct):
+                if is_deny_listed(child_struct):
                     continue
 
                 has_content = True

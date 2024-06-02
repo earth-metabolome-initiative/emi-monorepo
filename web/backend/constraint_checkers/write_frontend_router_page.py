@@ -70,25 +70,13 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "                <ul>\n"
     )
 
-    deny_list = [
-        "roles",
-        "invitations",
-        "requests",
-    ] + SUPPORT_TABLE_NAMES
-
     for flat_variant in tqdm(
         flat_variants, desc="Writing frontend sidebar", unit="page", leave=False
     ):
 
-        found_skip = False
-        for deny in deny_list:
-            if flat_variant.table_name.endswith(deny):
-                found_skip = True
-                break
-        
-        if found_skip:
+        if flat_variant.table_name in SUPPORT_TABLE_NAMES:
             continue
-
+    
         if flat_variant.is_junktion_table():
             continue
 
@@ -171,12 +159,6 @@ def write_frontend_router_page(
         "use crate::components::forms::automatic_forms::*;",
     ]
 
-    deny_list = [
-        "roles",
-        "invitations",
-        "requests",
-    ] + SUPPORT_TABLE_NAMES
-
     document.write("\n".join(imports) + "\n\n")
 
     # We define the traits to tightly integrate the structs with the router and avoid
@@ -198,16 +180,7 @@ def write_frontend_router_page(
         unit="page",
         leave=False,
     ):
-        found_skip = False
-        for deny in deny_list:
-            if flat_variant.table_name.endswith(deny):
-                found_skip = True
-                break
-        
-        if found_skip:
-            continue
-
-        if flat_variant.is_junktion_table():
+        if flat_variant.table_name in SUPPORT_TABLE_NAMES:
             continue
 
         richest_variant = flat_variant.get_richest_variant()
@@ -248,16 +221,7 @@ def write_frontend_router_page(
         richest_variant = flat_variant.get_richest_variant()
         primary_keys = flat_variant.get_primary_keys()
 
-        found_skip = False
-        for deny in deny_list:
-            if flat_variant.table_name.endswith(deny):
-                found_skip = True
-                break
-        
-        if found_skip:
-            continue
-
-        if flat_variant.is_junktion_table():
+        if flat_variant.table_name in SUPPORT_TABLE_NAMES:
             continue
 
         ids_url = "".join([f"/:{primary_key.name}" for primary_key in primary_keys])
@@ -355,16 +319,7 @@ def write_frontend_router_page(
         richest_variant = flat_variant.get_richest_variant()
         primary_keys = flat_variant.get_primary_keys()
 
-        found_skip = False
-        for deny in deny_list:
-            if flat_variant.table_name.endswith(deny):
-                found_skip = True
-                break
-        
-        if found_skip:
-            continue
-
-        if flat_variant.is_junktion_table():
+        if flat_variant.table_name in SUPPORT_TABLE_NAMES:
             continue
 
         properties = []
