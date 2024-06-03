@@ -50,6 +50,16 @@ div {
     cursor: pointer;
 }
 
+.close {
+    bottom: 10px;
+    right: 10px;
+}
+
+.toggle-flashlight {
+    bottom: 10px;
+    left: 10px;
+}
+
 @media screen and (max-width: $small-screen-width) {
 
     // Mobile version of the scanner
@@ -99,7 +109,7 @@ div {
         z-index: 10000;
         border: none;
         color: #000;
-        font-size: 5em;
+        font-size: 150px;
         background: rgba(211, 211, 211, 0.5);
     }
 
