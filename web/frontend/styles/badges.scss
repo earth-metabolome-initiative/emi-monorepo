@@ -37,9 +37,27 @@ $breakpoints: (
     @include respond-to("large") {
         grid-template-columns: repeat(3, 1fr); // 4 columns for large devices
     }
-
+    
     @include respond-to("extra-large") {
         grid-template-columns: repeat(4, 1fr); // 6 columns for extra-large devices
+    }
+}
+
+form {
+    .badges-container {
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        @include respond-to("medium") {
+            grid-template-columns: repeat(2, 1fr); // 3 columns for medium devices
+        }
+    
+        @include respond-to("large") {
+            grid-template-columns: repeat(2, 1fr); // 4 columns for large devices
+        }
+    
+        @include respond-to("extra-large") {
+            grid-template-columns: repeat(2, 1fr); // 6 columns for extra-large devices
+        }
     }
 }
 
