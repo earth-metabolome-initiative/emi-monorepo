@@ -80,6 +80,9 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         if flat_variant.is_junktion_table():
             continue
 
+        if not flat_variant.is_searchable():
+            continue
+
         rich_variant = flat_variant.get_richest_variant()
 
         document.write(
@@ -196,6 +199,9 @@ def write_frontend_router_page(
         if flat_variant.table_name in SUPPORT_TABLE_NAMES:
             continue
 
+        if not flat_variant.is_searchable():
+            continue
+
         richest_variant = flat_variant.get_richest_variant()
         primary_keys = flat_variant.get_primary_keys()
 
@@ -288,6 +294,9 @@ def write_frontend_router_page(
         primary_keys = flat_variant.get_primary_keys()
 
         if flat_variant.table_name in SUPPORT_TABLE_NAMES:
+            continue
+
+        if not flat_variant.is_searchable():
             continue
 
         ids_url = "".join([f"/:{primary_key.name}" for primary_key in primary_keys])
@@ -385,6 +394,9 @@ def write_frontend_router_page(
         primary_keys = flat_variant.get_primary_keys()
 
         if flat_variant.table_name in SUPPORT_TABLE_NAMES:
+            continue
+
+        if not flat_variant.is_searchable():
             continue
 
         properties = []

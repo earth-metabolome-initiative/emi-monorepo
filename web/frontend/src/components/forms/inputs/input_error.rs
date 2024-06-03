@@ -18,19 +18,32 @@ pub fn input_errors(props: &InputErrorsProp) -> Html {
         <ul class="input-errors">
             { for props.errors.iter().map(|error| {
                 let font_awesome_icon = error.font_awesome_icon();
-                let errors: Vec<String> = error.clone().into();
-                html! {
-                    { for errors.iter().map(|error| {
-                        html! {
-                            <li class="input-error">
-                                <p>
-                                    <i class={format!("fas fa-{}", font_awesome_icon)}></i>
-                                    {'\u{00a0}'}
-                                    <span>{error}</span>
-                                </p>
-                            </li>
-                        }
-                    })}
+
+                if error == &ApiError::NoResults {
+                    html! {
+                        <li class="input-warning">
+                            <p>
+                                <i class={format!("fas fa-{}", font_awesome_icon)}></i>
+                                {'\u{00a0}'}
+                                <span>{"No Results"}</span>
+                            </p>
+                        </li>
+                    }
+                } else {
+                    let errors: Vec<String> = error.clone().into();
+                    html! {
+                        { for errors.iter().map(|error| {
+                            html! {
+                                <li class="input-error">
+                                    <p>
+                                        <i class={format!("fas fa-{}", font_awesome_icon)}></i>
+                                        {'\u{00a0}'}
+                                        <span>{error}</span>
+                                    </p>
+                                </li>
+                            }
+                        })}
+                    }
                 }
             })}
         </ul>

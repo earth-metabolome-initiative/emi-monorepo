@@ -14,6 +14,7 @@ import shutil
 from jaro import jaro_winkler_metric
 from userinput import userinput
 from userinput.utils import set_validator
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 ALLOW_LISTED_MIGRATIONS = [
     "00000000000000_diesel_initial_setup",
@@ -307,6 +308,9 @@ def detect_singleton_tables():
 
 def regroup_tables():
     """Regroup the tables."""
+    if not are_migrations_changed():
+        print("Migrations have not changed. Skipping the regrouping of tables.")
+        return
 
     detect_singleton_tables()
 

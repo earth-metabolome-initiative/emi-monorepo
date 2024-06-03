@@ -1,17 +1,13 @@
 //! Module providing a yew component for a basic page with a websocket connection.
 use super::RowToBadge;
-use crate::components::Badge;
+use crate::components::forms::Datalist;
 use crate::components::PageLike;
 use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
-use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
-use crate::workers::WebsocketWorker;
 use std::rc::Rc;
 use web_common::api::form_traits::FormMethod;
 use web_common::database::*;
 use yew::prelude::*;
-use yew_agent::prelude::WorkerBridgeHandle;
-use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::Link;
 use yewdux::prelude::*;
 
@@ -26,21 +22,17 @@ pub struct BasicListProps<Page: Filtrable> {
 }
 
 pub struct BasicList<Page> {
-    websocket: WorkerBridgeHandle<WebsocketWorker>,
-    pages: Vec<Rc<Page>>,
-    no_more_pages: bool,
-    request_is_ongoing: bool,
+    // websocket: WorkerBridgeHandle<WebsocketWorker>,
     user_state: Rc<UserState>,
     _dispatcher: Dispatch<UserState>,
+    _phantom: std::marker::PhantomData<Page>,
 }
 
 pub enum PagesMessage {
-    Backend(WebsocketMessage),
-    LoadMore,
     UserState(Rc<UserState>),
 }
 
-impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
+impl<Page: Filtrable + Searchable<false> + PageLike + RowToBadge> Component for BasicList<Page> {
     type Message = PagesMessage;
     type Properties = BasicListProps<Page>;
 
@@ -50,58 +42,22 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
         let user_state = user_dispatch.get();
 
         Self {
-            websocket: ctx.link().bridge_worker(Callback::from({
-                let link = ctx.link().clone();
-                move |message: WebsocketMessage| {
-                    link.send_message(PagesMessage::Backend(message));
-                }
-            })),
+            // websocket: ctx.link().bridge_worker(Callback::from({
+            //     let link = ctx.link().clone();
+            //     move |message: WebsocketMessage| {
+            //         link.send_message(PagesMessage::Backend(message));
+            //     }
+            // })),
             user_state,
             _dispatcher: user_dispatch,
-            no_more_pages: false,
-            request_is_ongoing: false,
-            pages: Vec::new(),
+            _phantom: std::marker::PhantomData,
         }
     }
 
-    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
-        if first_render {
-            ctx.link().send_message(PagesMessage::LoadMore);
-        }
-    }
-
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             PagesMessage::UserState(user_state) => {
                 self.user_state = user_state;
-                true
-            }
-            PagesMessage::Backend(message) => match message {
-                WebsocketMessage::AllTable(rows) => {
-                    let mut new_pages: Vec<Page> = bincode::deserialize(&rows).unwrap();
-                    new_pages.retain(|page| {
-                        self.pages.iter().all(|old_page| old_page.id() != page.id())
-                    });
-
-                    self.no_more_pages = new_pages.is_empty();
-                    self.request_is_ongoing = false;
-
-                    self.pages.extend(new_pages.into_iter().map(Rc::new));
-                    true
-                }
-                _ => {
-                    log::info!("Received message: {:?}", message);
-                    false
-                }
-            },
-            PagesMessage::LoadMore => {
-                self.request_is_ongoing = true;
-                self.websocket
-                    .send(ComponentMessage::all_by_updated_at::<Page>(
-                        ctx.props().filters.clone(),
-                        24,
-                        self.pages.len() as i64,
-                    ));
                 true
             }
         }
@@ -135,12 +91,7 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                         }
                     </Link<AppRoute>>
                 </@>
-                <ul class="badges-container">
-                { for self.pages.iter().map(|page| html!{<Badge<Page> badge={page} li={true}/>}) }
-                if self.no_more_pages {
-                    <li>{"There are no more entries to load"}</li>
-                }
-                </ul>
+                <Datalist<Page, false> label={format!("Search {}", Page::section())} filters={ctx.props().filters.clone()} always_shows_candidates={true} />
                 if self.user_state.has_user() {
                     if let Some(create_path) = Page::create_path(ctx.props().filters.as_ref()) {
                         <Link<AppRoute> classes={"button-like create"} to={create_path}>
@@ -150,15 +101,6 @@ impl<Page: Filtrable + PageLike + RowToBadge> Component for BasicList<Page> {
                         </Link<AppRoute>>
                     }
                 }
-                <button class="retrieve" onclick={ctx.link().callback(|_| PagesMessage::LoadMore)} disabled={self.request_is_ongoing}>
-                    if self.request_is_ongoing {
-                        <i class="fas fa-arrows-rotate fa-spin"></i>
-                    } else {
-                        <i class="fas fa-arrows-rotate"></i>
-                    }
-                    {'\u{00a0}'}
-                    <span>{"Load more entries"}</span>
-                </button>
                 <div class="clear"></div>
             </div>
         }

@@ -4,3 +4,4 @@ backend.building
 downloads
 cache
 migration_hashes.json
+migrations_metadata.json

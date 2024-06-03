@@ -1,8 +1,178 @@
 @import "./button.scss";
 @import "./scanner.scss";
 
+.input-group {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 0.5em;
+
+    label {
+        display: block;
+        font-size: 0.8em;
+        margin-bottom: 0.2em;
+
+        color: $grey;
+        font-weight: 100;
+        padding-right: 0.5em;
+        display: inline-block;
+        min-width: 100px;
+
+        &.input-label-mandatory::after {
+            content: "*";
+            color: $red;
+        }
+    }
+
+    &.textarea {
+        padding-top: 0.25em;
+    }
+
+    input[type="number"],
+    input[type="search"],
+    input[type="datetime-local"],
+    input[type="text"] {
+        width: 100%;
+    }
+
+    &.text,
+    &.scanner,
+    &.number,
+    &.datalist,
+    &.datetime-local {
+        .input-container {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            transition: width 0.2s;
+        }
+    }
+
+    &.datalist {
+        input[type="search"] {
+            animation: pop-in 0.2s;
+        }
+
+        .input-container {
+            grid-template-columns: auto 1fr auto;
+        }
+    }
+
+    input[type="text"],
+    input[type="search"],
+    input[type="datetime-local"],
+    textarea,
+    input[type="number"] {
+        padding: 0.5em;
+        box-sizing: border-box;
+        max-width: 100%;
+        transition: border-color 0.2s;
+        border: 1px solid $light_grey;
+        border-radius: 0.5em;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+        }
+    }
+
+    textarea {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        font-family: inherit;
+        display: block;
+        min-height: 50px;
+        max-height: 200px;
+        margin-top: 0.5em;
+    }
+
+    &.scanner {
+        .input-container {
+            grid-template-columns: auto 1fr auto;
+        }
+
+        .start-scanner {
+            border: none;
+            animation: fade-in-right 0.2s;
+
+            i {
+                font-size: 1.5em;
+                color: $light_grey;
+                transition: color 0.2s;
+            }
+
+            &:hover {
+                i {
+                    color: inherit;
+                }
+            }
+        }
+    }
+}
+
+ul.input-errors {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    font-size: inherit;
+    font-weight: 100;
+    margin-top: 0.5em;
+
+    li.input-error {
+        background-color: $error;
+    }
+    li.input-warning {
+        background-color: $warning;
+    }
+    
+    li.input-error, li.input-warning {
+        color: white;
+        padding: 0.5em;
+        box-sizing: border-box;
+        border-radius: 0.5em;
+        position: relative;
+        padding-right: 1.5em;
+        animation: pop-in 0.2s;
+        transition: margin 0.2s;
+
+        &:not(:first-child) {
+            margin-top: 0.5em;
+        }
+
+        &.hiding {
+            animation: pop-out 0.2s;
+        }
+
+        button {
+            background-color: transparent;
+            border: none;
+            box-sizing: border-box;
+            color: white;
+            cursor: pointer;
+            float: right;
+            font-size: inherit;
+            padding: 0.5em;
+            position: absolute;
+            right: 0;
+            top: 0;
+
+            i {
+                transition: color 0.2s;
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            &:hover {
+                i {
+                    color: white;
+                }
+            }
+        }
+    }
+}
+
 form.standard-form {
-    width: 600px;
+    width: 800px;
     max-width: 100%;
     margin: 1em auto;
     animation: slide-in-from-bottom 0.3s;
@@ -38,25 +208,6 @@ form.standard-form {
         >li {
             flex: 1;
             padding: 0;
-
-            .input-group {
-                flex: 1;
-                margin: 0;
-                padding: 0;
-
-                label {
-                    display: block;
-                    font-size: 0.8em;
-                    margin-bottom: 0.2em;
-                }
-
-                input[type="number"],
-                input[type="search"],
-                input[type="datetime-local"],
-                input[type="text"] {
-                    width: 100%;
-                }
-            }
         }
     }
 
@@ -105,9 +256,6 @@ form.standard-form {
     }
 
     .input-group {
-        padding-top: 0.5em;
-        padding-bottom: 0.5em;
-
         &.input-group-invalid {
 
             input[type="text"],
@@ -122,10 +270,6 @@ form.standard-form {
         }
 
         &.datalist {
-            input[type="search"] {
-                animation: pop-in 0.2s;
-            }
-
             ul.selected-datalist-badges {
                 display: inline-block;
                 flex-wrap: wrap;
@@ -192,77 +336,6 @@ form.standard-form {
                         animation: pop-out 0.2s;
                     }
 
-                    &:hover {
-                        &.blue {
-                            border-color: $blue;
-                        }
-
-                        &.orange {
-                            border-color: $orange;
-                        }
-
-                        &.red {
-                            border-color: $red;
-                        }
-
-                        &.teal {
-                            border-color: $teal;
-                        }
-
-                        &.green {
-                            border-color: $green;
-                        }
-
-                        &.yellow {
-                            border-color: $yellow;
-                        }
-
-                        &.purple {
-                            border-color: $purple;
-                        }
-
-                        &.pink {
-                            border-color: $pink;
-                        }
-
-                        &.brown {
-                            border-color: $brown;
-                        }
-
-                        &.grey {
-                            border-color: $grey;
-                        }
-
-                        &.black {
-                            border-color: $black;
-                        }
-
-                        &.near-black {
-                            border-color: $near_black;
-                        }
-
-                        &.grey {
-                            border-color: $grey;
-                        }
-
-                        &.primary {
-                            border-color: $primary;
-                        }
-                    }
-
-                    p {
-                        img {
-                            width: 2em;
-                            height: 2em;
-                            border-radius: 100%;
-                            margin-right: 0.5em;
-                        }
-
-                        i {
-                            margin-right: 0.5em;
-                        }
-                    }
-
                     button {
                         padding: 0;
                         position: absolute;
@@ -294,147 +367,6 @@ form.standard-form {
                         }
                     }
 
-                }
-            }
-
-            ul.datalist-candidates {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-                margin-top: 0.5em;
-                width: 100%;
-                max-height: 200px;
-                overflow-y: scroll;
-                border-radius: 0.5em;
-                border: 1px solid $light_grey;
-                box-sizing: border-box;
-                animation: fade-in-up 0.3s;
-
-                li.datalist-candidate {
-                    padding: 0.5em;
-                    width: 100%;
-                    cursor: pointer;
-                    transition: border-color 0.2s;
-                    box-sizing: border-box;
-                    border-bottom: 1px solid transparent;
-                    border-top: 1px solid transparent;
-
-                    &:first-child {
-                        border-top-left-radius: 0.5em;
-                        border-top-right-radius: 0.5em;
-                    }
-
-                    &:last-child {
-                        border-bottom-left-radius: 0.5em;
-                        border-bottom-right-radius: 0.5em;
-                    }
-
-                    &:hover {
-                        &.blue {
-                            border-color: $blue;
-                        }
-
-                        &.orange {
-                            border-color: $orange;
-                        }
-
-                        &.red {
-                            border-color: $red;
-                        }
-
-                        &.teal {
-                            border-color: $teal;
-                        }
-
-                        &.green {
-                            border-color: $green;
-                        }
-
-                        &.yellow {
-                            border-color: $yellow;
-                        }
-
-                        &.purple {
-                            border-color: $purple;
-                        }
-
-                        &.pink {
-                            border-color: $pink;
-                        }
-
-                        &.brown {
-                            border-color: $brown;
-                        }
-
-                        &.grey {
-                            border-color: $grey;
-                        }
-
-                        &.black {
-                            border-color: $black;
-                        }
-
-                        &.near-black {
-                            border-color: $near_black;
-                        }
-
-                        &.grey {
-                            border-color: $grey;
-                        }
-
-                        &.primary {
-                            border-color: $primary;
-                        }
-                    }
-
-                    &:first-child {
-                        border-top: none;
-                    }
-
-                    &:last-child {
-                        border-bottom: none;
-                    }
-
-                    strong {
-                        font-weight: 800;
-                    }
-
-                    p {
-                        &:first-child {
-                            margin-bottom: 0.5em;
-                        }
-
-                        strong {
-                            color: $black;
-                        }
-                    }
-
-                    p.description {
-                        color: $grey;
-
-                        strong {
-                            color: $black;
-                        }
-                    }
-
-                    span {
-                        color: $near_black;
-
-                        strong {
-                            color: $black;
-                        }
-                    }
-
-                    i {
-                        margin-right: 0.5em;
-                    }
-
-                    img {
-                        width: 1.6em;
-                        height: 1.6em;
-                        border-radius: 100%;
-                        margin-right: 0.5em;
-                    }
                 }
             }
         }
@@ -606,87 +538,6 @@ form.standard-form {
             border-radius: 0.5em;
         }
 
-        label.input-label {
-            color: $grey;
-            font-weight: 100;
-            padding-right: 0.5em;
-            display: inline-block;
-            min-width: 100px;
-
-            &.input-label-mandatory::after {
-                content: "*";
-                color: $red;
-            }
-        }
-
-        &.text,
-        &.scanner,
-        &.number,
-        &.datalist,
-        &.datetime-local {
-            .input-container {
-                display: grid;
-                grid-template-columns: auto 1fr;
-                align-items: center;
-                transition: width 0.2s;
-            }
-        }
-
-        &.scanner {
-            .input-container {
-                grid-template-columns: auto 1fr auto;
-            }
-
-            .start-scanner {
-                border: none;
-                animation: fade-in-right 0.2s;
-
-                i {
-                    font-size: 1.5em;
-                    color: $light_grey;
-                    transition: color 0.2s;
-                }
-
-                &:hover {
-                    i {
-                        color: inherit;
-                    }
-                }
-            }
-        }
-
-        &.textarea {
-            padding-top: 0.25em;
-        }
-
-        input[type="text"],
-        input[type="search"],
-        input[type="datetime-local"],
-        textarea,
-        input[type="number"] {
-            padding: 0.5em;
-            box-sizing: border-box;
-            max-width: 100%;
-            transition: border-color 0.2s;
-            border: 1px solid $light_grey;
-            border-radius: 0.5em;
-
-            &:focus {
-                outline: none;
-                border-color: $primary;
-            }
-        }
-
-        textarea {
-            width: 100%;
-            min-width: 100%;
-            max-width: 100%;
-            font-family: inherit;
-            display: block;
-            min-height: 50px;
-            max-height: 200px;
-            margin-top: 0.5em;
-        }
 
         // We style inputs of type checkbox in such
         // a way that they look like switches.
@@ -873,60 +724,6 @@ form.standard-form {
                         transparent,
                         rgba($blue, 0.2),
                         transparent);
-            }
-        }
-    }
-
-    ul.input-errors {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-        font-size: inherit;
-        font-weight: 100;
-        margin-top: 0.5em;
-
-        li.input-error {
-            background-color: $error;
-            color: white;
-            padding: 0.5em;
-            box-sizing: border-box;
-            border-radius: 0.5em;
-            position: relative;
-            padding-right: 1.5em;
-            animation: pop-in 0.2s;
-            transition: margin 0.2s;
-
-            &:not(:first-child) {
-                margin-top: 0.5em;
-            }
-
-            &.hiding {
-                animation: pop-out 0.2s;
-            }
-
-            button {
-                background-color: transparent;
-                border: none;
-                box-sizing: border-box;
-                color: white;
-                cursor: pointer;
-                float: right;
-                font-size: inherit;
-                padding: 0.5em;
-                position: absolute;
-                right: 0;
-                top: 0;
-
-                i {
-                    transition: color 0.2s;
-                    color: rgba(255, 255, 255, 0.8);
-                }
-
-                &:hover {
-                    i {
-                        color: white;
-                    }
-                }
             }
         }
     }

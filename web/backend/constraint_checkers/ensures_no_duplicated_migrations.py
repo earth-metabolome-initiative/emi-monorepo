@@ -4,10 +4,14 @@ from typing import List, Tuple
 import shutil
 import os
 from userinput import userinput
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def ensures_no_duplicated_migrations():
     """Ensures that there are not migrations that are equal one another by quadratically comparing them."""
+    if not are_migrations_changed():
+        print("Migrations have not changed. Skipping the check for duplicated migrations.")
+        return
     # List containing the names of the migration files and their content
     migration_files: List[Tuple[str, str]] = []
 

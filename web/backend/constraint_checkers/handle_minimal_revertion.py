@@ -1,11 +1,11 @@
 """Keeps track with hashes of changes of migrations and reverts to the last edited migration if needed
 so to avoid reverting every time all of the migrations."""
 
-from typing import List, Dict
-from dict_hash import sha256
-import compress_json
 import os
 import sys
+from dict_hash import sha256
+import compress_json
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def hash_migration(migration: str) -> str:
@@ -22,6 +22,10 @@ def hash_migration(migration: str) -> str:
 def handle_minimal_revertion():
     """Keeps track with hashes of changes of migrations and reverts to the last edited migration if needed
     so to avoid reverting every time all of the migrations."""
+    if not are_migrations_changed():
+        print("Migrations have not changed. Minimal revertion is not needed.")
+        return
+
     try:
         # We try to load the migration hashes.
         stored_migration_hashes = compress_json.load("migration_hashes.json")

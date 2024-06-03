@@ -19,6 +19,7 @@ pub const FULL_ENDPOINT: &str = ENDPOINT;
 pub enum ApiError {
     Unauthorized,
     BadGateway,
+    NoResults,
     BadRequest(Vec<String>),
     InternalServerError,
     InvalidFileFormat(String),
@@ -31,6 +32,7 @@ impl ApiError {
             Self::BadGateway => "dungeon",
             Self::BadRequest(_) => "circle-exclamation",
             Self::InternalServerError => "bomb",
+            Self::NoResults => "search",
             Self::InvalidFileFormat(_) => "file-circle-exclamation",
         }
     }
@@ -103,6 +105,7 @@ impl Into<Vec<String>> for ApiError {
     fn into(self) -> Vec<String> {
         match self {
             ApiError::BadRequest(errors) => errors,
+            ApiError::NoResults => vec!["No results".to_string()],
             ApiError::Unauthorized => vec!["Unauthorized".to_string()],
             ApiError::BadGateway => vec!["Bad Gateway".to_string()],
             ApiError::InternalServerError => vec!["Internal Server Error".to_string()],
@@ -187,6 +190,7 @@ impl From<ApiError> for actix_web::HttpResponse {
             ApiError::Unauthorized => actix_web::HttpResponse::Unauthorized().finish(),
             ApiError::BadGateway => actix_web::HttpResponse::BadGateway().finish(),
             ApiError::BadRequest(errors) => actix_web::HttpResponse::BadRequest().json(errors),
+            ApiError::NoResults => actix_web::HttpResponse::NotFound().finish(),
             ApiError::InternalServerError => {
                 actix_web::HttpResponse::InternalServerError().finish()
             }

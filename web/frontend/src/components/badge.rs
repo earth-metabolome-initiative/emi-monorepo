@@ -192,7 +192,7 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
                         {'\u{00A0}'}
                     </>
                 }
-                <strong>{props.badge.badge_title().maybe_format_match(props.query.as_deref())}</strong>
+                <span>{props.badge.badge_title().maybe_format_match(props.query.as_deref())}</span>
             </p>
             if props.size.is_large() {
                 if let Some(description) = props.badge.description() {

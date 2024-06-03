@@ -1,10 +1,14 @@
 """Ensures that the migrations are GlueSQL compliant."""
 
 import os
-
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 def ensures_gluesql_compliance():
     """Ensures that the migrations are GlueSQL compliant."""
+    if not are_migrations_changed():
+        print("Migrations have not changed. Skipping the check for GlueSQL compliance.")
+        return
+
     for directory in os.listdir("migrations"):
         if not os.path.isdir(f"migrations/{directory}"):
             continue

@@ -4,6 +4,7 @@ from constraint_checkers.find_foreign_keys import (
     TableMetadata,
     ViewColumn,
 )
+from constraint_checkers.migrations_changed import are_migrations_changed
 from constraint_checkers.cursor import get_cursor
 from constraint_checkers.ensure_created_at_columns import ensure_created_at_columns
 from constraint_checkers.ensure_updated_at_columns import ensure_updated_at_columns

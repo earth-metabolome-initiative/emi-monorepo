@@ -1,21 +1,13 @@
 """Submodule containing the enforcement of the migration naming convention."""
 import os
-
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def enforce_migration_naming_convention():
     """Check that the migrations are named according to the convention."""
-
-    # We check that if a migration directory contains a population of a given table,
-    # we verify that if there is also another migration that creates a search index
-    # as indicated by the suffix `_index`, the migration that populates the table must
-    # have a lower number than the migration that creates the search index.
-    migrations = [
-        directory
-        for directory in os.listdir("migrations")
-        if os.path.isdir(f"migrations/{directory}")
-        and os.path.exists(f"migrations/{directory}/up.sql")
-    ]
+    if not are_migrations_changed():
+        print("Migrations have not changed. Skipping the check for the migration naming convention.")
+        return
 
     for directory in os.listdir("migrations"):
         if not os.path.isdir(f"migrations/{directory}"):

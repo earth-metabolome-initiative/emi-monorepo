@@ -1,4 +1,7 @@
+"""Replaces SERIAL indices with INTEGER indices in the migrations."""
 import os
+from constraint_checkers.migrations_changed import are_migrations_changed
+from insert_migration import insert_migration
 
 def replace_serial_indices():
     """Replaces SERIAL indices with INTEGER indices in the migrations.
@@ -13,6 +16,9 @@ def replace_serial_indices():
     in two parts, we ensure that the first migration can be used as-is in the
     frontend as well, while the second migration can be used in the backend.
     """
+    if not are_migrations_changed():
+        print("Migrations have not changed. Skipping the replacement of SERIAL indices.")
+        return
 
     serial_index_updated = True
 
@@ -31,7 +37,7 @@ def replace_serial_indices():
             if directory == "00000000000000_diesel_initial_setup":
                 continue
 
-            with open(f"migrations/{directory}/up.sql", "r") as up_file:
+            with open(f"migrations/{directory}/up.sql", "r", encoding="utf8") as up_file:
                 up_content = up_file.read()
 
             if "SERIAL PRIMARY KEY" in up_content:
@@ -61,7 +67,7 @@ def replace_serial_indices():
                     "SERIAL PRIMARY KEY", "INTEGER PRIMARY KEY"
                 )
 
-                with open(f"migrations/{directory}/up.sql", "w") as up_file:
+                with open(f"migrations/{directory}/up.sql", "w", encoding="utf8") as up_file:
                     up_file.write(up_content)
 
                 padded_migration_code = str(current_migration_code + 1).zfill(14)

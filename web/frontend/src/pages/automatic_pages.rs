@@ -726,28 +726,6 @@ pub fn sample_page(props: &SamplePageProp) -> Html {
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct SpectraPageProp {
-    pub id: i32,
-}
-
-impl From<&SpectraPageProp> for PrimaryKey {
-    fn from(prop: &SpectraPageProp) -> Self {
-        prop.id.into()
-    }
-}
-
-impl SpectraPageProp {}
-
-#[function_component(SpectraPage)]
-pub fn spectra_page(props: &SpectraPageProp) -> Html {
-    html! {
-        <BasicPage<NestedSpectra> id={PrimaryKey::from(props)}>
-            <span>{"No content available yet."}</span>
-        </BasicPage<NestedSpectra>>
-    }
-}
-
-#[derive(Clone, PartialEq, Properties)]
 pub struct SpectraCollectionPageProp {
     pub id: i32,
 }
@@ -770,8 +748,7 @@ impl SpectraCollectionPageProp {
 pub fn spectra_collection_page(props: &SpectraCollectionPageProp) -> Html {
     html! {
         <BasicPage<NestedSpectraCollection> id={PrimaryKey::from(props)}>
-            // Linked with foreign key spectra.spectra_collection_id
-            <BasicList<NestedSpectra> column_name={"spectra_collection_id"} filters={props.filter_spectra_by_spectra_collection_id()}/>
+            <span>{"No content available yet."}</span>
         </BasicPage<NestedSpectraCollection>>
     }
 }
@@ -1263,10 +1240,6 @@ pub fn user_page(props: &UserPageProp) -> Html {
             <BasicList<NestedSample> column_name={"sampled_by"} filters={props.filter_samples_by_sampled_by()}/>
             // Linked with foreign key samples.updated_by
             <BasicList<NestedSample> column_name={"updated_by"} filters={props.filter_samples_by_updated_by()}/>
-            // Linked with foreign key spectra.created_by
-            <BasicList<NestedSpectra> column_name={"created_by"} filters={props.filter_spectra_by_created_by()}/>
-            // Linked with foreign key spectra.updated_by
-            <BasicList<NestedSpectra> column_name={"updated_by"} filters={props.filter_spectra_by_updated_by()}/>
             // Linked with foreign key spectra_collections.created_by
             <BasicList<NestedSpectraCollection> column_name={"created_by"} filters={props.filter_spectra_collections_by_created_by()}/>
             // Linked with foreign key spectra_collections.updated_by

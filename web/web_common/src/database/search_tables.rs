@@ -2,9 +2,11 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
+use serde::de::DeserializeOwned;
+
 use crate::database::*;
 
-pub trait Searchable<const EDIT: bool>: Filtrable {
+pub trait Searchable<const EDIT: bool>: Filtrable + DeserializeOwned {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select;
 }
 impl Searchable<false> for NestedBioOttRank {

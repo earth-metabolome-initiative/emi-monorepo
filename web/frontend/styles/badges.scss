@@ -121,12 +121,10 @@ $breakpoints: (
     &.closable {
         cursor: pointer;
         position: relative;
-        padding-right: 2em;
         &:hover {
             border-color: $red !important;
             &:after {
                 color: $red;
-                font-size: 1.5em;
             }
             ul.badges-list {
                 li.badge.small {
@@ -139,7 +137,6 @@ $breakpoints: (
             position: absolute;
             top: 0;
             right: 0;
-            padding: 0.25em;
             cursor: pointer;
             color: $light_grey;
             transition: color 0.2s;
@@ -155,8 +152,11 @@ $breakpoints: (
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
-        strong {
+        span {
             font-weight: 400;
+        }
+        strong {
+            font-weight: 800;
         }
     }
 
@@ -171,6 +171,9 @@ $breakpoints: (
         margin-top: 0.5rem;
         text-align: justify;
         text-justify: inter-word;
+        strong {
+            font-weight: 800;
+        }
     }
 
     &.blue {

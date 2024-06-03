@@ -49,6 +49,9 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
         if is_deny_listed(flat_variant):
             continue
 
+        if not flat_variant.is_searchable():
+            continue
+
         has_content = False
 
         richest_variant = flat_variant.get_richest_variant()
@@ -124,6 +127,9 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
                 ), f"Child struct {child_struct.name} does not have a filter variant."
 
                 if is_deny_listed(child_struct):
+                    continue
+
+                if not child_struct.is_searchable():
                     continue
 
                 has_content = True

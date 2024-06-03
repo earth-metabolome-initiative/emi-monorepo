@@ -968,62 +968,6 @@ impl Updatable for NestedSample {
     }
 }
 
-impl Viewable for Spectra {
-    fn list_route() -> AppRoute {
-        AppRoute::Spectra {}
-    }
-    fn view_route(&self) -> AppRoute {
-        AppRoute::SpectraView { id: self.id }
-    }
-}
-
-impl Insertable for Spectra {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(spectra_collection_id) = filter.spectra_collection_id {
-                return AppRoute::SpectraNewWithSpectraCollection {
-                    spectra_collection_id,
-                };
-            }
-        }
-        AppRoute::SpectraNew
-    }
-}
-
-impl Updatable for Spectra {
-    fn update_route(&self) -> AppRoute {
-        AppRoute::SpectraUpdate { id: self.id }
-    }
-}
-
-impl Viewable for NestedSpectra {
-    fn list_route() -> AppRoute {
-        AppRoute::Spectra {}
-    }
-    fn view_route(&self) -> AppRoute {
-        AppRoute::SpectraView { id: self.inner.id }
-    }
-}
-
-impl Insertable for NestedSpectra {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(spectra_collection_id) = filter.spectra_collection_id {
-                return AppRoute::SpectraNewWithSpectraCollection {
-                    spectra_collection_id,
-                };
-            }
-        }
-        AppRoute::SpectraNew
-    }
-}
-
-impl Updatable for NestedSpectra {
-    fn update_route(&self) -> AppRoute {
-        AppRoute::SpectraUpdate { id: self.inner.id }
-    }
-}
-
 impl Viewable for SpectraCollection {
     fn list_route() -> AppRoute {
         AppRoute::SpectraCollections {}
@@ -1709,16 +1653,6 @@ pub enum AppRoute {
     SamplesNewWithSampledBy { sampled_by: i32 },
     #[at("/samples/:id/update")]
     SamplesUpdate { id: uuid::Uuid },
-    #[at("/spectra")]
-    Spectra,
-    #[at("/spectra/:id")]
-    SpectraView { id: i32 },
-    #[at("/spectra/new")]
-    SpectraNew,
-    #[at("/spectra/new/spectra_collection/:spectra_collection_id")]
-    SpectraNewWithSpectraCollection { spectra_collection_id: i32 },
-    #[at("/spectra/:id/update")]
-    SpectraUpdate { id: i32 },
     #[at("/spectra_collections")]
     SpectraCollections,
     #[at("/spectra_collections/:id")]
@@ -2125,23 +2059,6 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::SamplesUpdate { id } => {
             html! { <UpdateSampleForm id={id} /> }
-        }
-        AppRoute::Spectra => {
-            html! { <BasicList<NestedSpectra> /> }
-        }
-        AppRoute::SpectraView { id } => {
-            html! { <SpectraPage id = {id} /> }
-        }
-        AppRoute::SpectraNew => {
-            html! { <CreateSpectraForm /> }
-        }
-        AppRoute::SpectraNewWithSpectraCollection {
-            spectra_collection_id,
-        } => {
-            html! { <CreateSpectraForm spectra_collection_id={spectra_collection_id} /> }
-        }
-        AppRoute::SpectraUpdate { id } => {
-            html! { <UpdateSpectraForm id={id} /> }
         }
         AppRoute::SpectraCollections => {
             html! { <BasicList<NestedSpectraCollection> /> }

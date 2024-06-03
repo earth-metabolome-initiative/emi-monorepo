@@ -371,16 +371,6 @@ impl PageLike for NestedSpectraCollection {
     }
 }
 
-impl PageLike for NestedSpectra {
-    fn id(&self) -> PrimaryKey {
-        self.inner.id.into()
-    }
-
-    fn icon() -> &'static str {
-        "vials"
-    }
-}
-
 impl PageLike for NestedNameplate {
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()

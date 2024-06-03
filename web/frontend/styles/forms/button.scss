@@ -3,11 +3,13 @@ a.button-like, button {
     border: none;
     cursor: pointer;
     background-color: transparent;
+    box-sizing: border-box;
     border: 1px solid;
     border-radius: 0.5em;
     float: right;
-    font-size: 1em;
     margin-left: 0.5em;
+    font-weight: 300;
+    width: auto;
     transition: background-color 0.2s, border-color 0.2s, color 0.2s;
     text-decoration: none;
 
@@ -16,7 +18,7 @@ a.button-like, button {
 
     &.logout {
         float: none;
-        margin: none;
+        margin: 0;
     }
 
     &::before {
@@ -55,6 +57,7 @@ a.button-like, button {
     }
 
     &.retrieve {
+        float: none;
         border-color: $primary;
         color: $primary;
 
