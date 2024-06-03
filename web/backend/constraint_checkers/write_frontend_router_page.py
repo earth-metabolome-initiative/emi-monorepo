@@ -89,7 +89,6 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
             f'                    <li class={{if route == AppRoute::{flat_variant.get_capitalized_table_name()} {{ "active" }} else {{ "" }}}}>\n'
             f"                        <Link<AppRoute> to={{AppRoute::{flat_variant.get_capitalized_table_name()}}}>\n"
             f"                            <i class={{format!(\"fas fa-{{}}\", {rich_variant.name}::icon())}}></i>\n"
-            "                             {'\\u{00a0}'}\n"
             f'                            <span>{{{rich_variant.name}::section()}}</span>\n'
             "                        </Link<AppRoute>>\n"
             "                    </li>\n"

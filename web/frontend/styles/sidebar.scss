@@ -1,5 +1,5 @@
 // Define variables for easy customization
-$sidebar-width: 15em;
+$sidebar-width: 16em;
 $sidebar-hover-color: #f76a00;
 
 .sidebar {
@@ -26,9 +26,14 @@ $sidebar-hover-color: #f76a00;
             li {
                 margin-bottom: 15px;
 
+                i {
+                    display: inline-block;
+                    width: 1.25em;
+                    text-align: right;
+                }
                 a, button {
                     text-decoration: none;
-                    font-size: 1.2rem;
+                    font-size: 1.1rem;
                     font-weight: 300;
                     color: inherit;
                     transition: color 0.3s ease;
