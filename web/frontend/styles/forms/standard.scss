@@ -7,7 +7,7 @@
     padding: 0;
     padding-bottom: 0.5em;
 
-    label {
+    label.input-label {
         display: block;
         font-size: 0.8em;
         margin-bottom: 0.2em;
@@ -537,7 +537,6 @@ form.standard-form {
             width: 100%;
             border-radius: 0.5em;
         }
-
 
         // We style inputs of type checkbox in such
         // a way that they look like switches.
