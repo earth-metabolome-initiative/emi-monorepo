@@ -108,6 +108,11 @@ if __name__ == "__main__":
     view_structs: List[StructMetadata] = extract_structs("src/views/views.rs")
     flat_variants = table_structs + view_structs
 
+    assert len(table_structs) > 0, (
+        "No table structs were extracted. This is likely due some error in the "
+        "generation process. Please rerun the generation script."
+    )
+
     print(
         f"Extracted {len(table_structs)} tables and {len(view_structs)} views from the backend."
     )

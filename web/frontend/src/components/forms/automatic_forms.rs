@@ -18,7 +18,7 @@ use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{use_store, use_store_value, Reducer, Store};
 
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct DerivedSampleBuilder {
     pub quantity: Option<f64>,
@@ -48,7 +48,7 @@ impl Default for DerivedSampleBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum DerivedSampleActions {
     SetQuantity(Option<String>),
     SetParentSample(Option<Rc<NestedSample>>),
@@ -374,7 +374,7 @@ pub fn update_derived_sample_form(props: &UpdateDerivedSampleFormProp) -> Html {
         </BasicForm<UpdateDerivedSample>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct NameplateBuilder {
     pub id: Option<i32>,
@@ -402,7 +402,7 @@ impl Default for NameplateBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum NameplateActions {
     SetBarcode(Option<String>),
     SetProject(Option<Rc<NestedProject>>),
@@ -641,7 +641,7 @@ pub fn update_nameplate_form(props: &UpdateNameplateFormProp) -> Html {
         </BasicForm<UpdateNameplate>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ObservationBuilder {
     pub id: Option<uuid::Uuid>,
@@ -685,7 +685,7 @@ impl Default for ObservationBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ObservationActions {
     SetNotes(Option<String>),
     SetPicture(Option<Rc<Vec<u8>>>),
@@ -1054,7 +1054,7 @@ pub fn update_observation_form(props: &UpdateObservationFormProp) -> Html {
         </BasicForm<NewObservation>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct OrganismBioOttTaxonItemBuilder {
     pub organism: Option<Rc<NestedOrganism>>,
@@ -1076,7 +1076,7 @@ impl Default for OrganismBioOttTaxonItemBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum OrganismBioOttTaxonItemActions {
     SetOrganism(Option<Rc<NestedOrganism>>),
     SetTaxon(Option<Rc<NestedBioOttTaxonItem>>),
@@ -1234,7 +1234,7 @@ pub fn create_organism_bio_ott_taxon_item_form(
         </BasicForm<NewOrganismBioOttTaxonItem>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct OrganismBuilder {
     pub id: Option<uuid::Uuid>,
@@ -1274,7 +1274,7 @@ impl Default for OrganismBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum OrganismActions {
     SetNotes(Option<String>),
     SetPicture(Option<Rc<Vec<u8>>>),
@@ -1608,7 +1608,7 @@ pub fn update_organism_form(props: &UpdateOrganismFormProp) -> Html {
         </BasicForm<NewOrganism>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectBuilder {
     pub id: Option<i32>,
@@ -1668,7 +1668,7 @@ impl Default for ProjectBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
@@ -2211,7 +2211,7 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
         </BasicForm<UpdateProject>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsTeamsRoleInvitationBuilder {
     pub table: Option<Rc<NestedProject>>,
@@ -2237,7 +2237,7 @@ impl Default for ProjectsTeamsRoleInvitationBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsTeamsRoleInvitationActions {
     SetTable(Option<Rc<NestedProject>>),
     SetTeam(Option<Rc<NestedTeam>>),
@@ -2427,7 +2427,7 @@ pub fn create_projects_teams_role_invitation_form(
         </BasicForm<NewProjectsTeamsRoleInvitation>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsTeamsRoleRequestBuilder {
     pub table: Option<Rc<NestedProject>>,
@@ -2453,7 +2453,7 @@ impl Default for ProjectsTeamsRoleRequestBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsTeamsRoleRequestActions {
     SetTable(Option<Rc<NestedProject>>),
     SetTeam(Option<Rc<NestedTeam>>),
@@ -2643,7 +2643,7 @@ pub fn create_projects_teams_role_request_form(
         </BasicForm<NewProjectsTeamsRoleRequest>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsTeamsRoleBuilder {
     pub table: Option<Rc<NestedProject>>,
@@ -2669,7 +2669,7 @@ impl Default for ProjectsTeamsRoleBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsTeamsRoleActions {
     SetTable(Option<Rc<NestedProject>>),
     SetTeam(Option<Rc<NestedTeam>>),
@@ -2851,7 +2851,7 @@ pub fn create_projects_teams_role_form(props: &CreateProjectsTeamsRoleFormProp) 
         </BasicForm<NewProjectsTeamsRole>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleInvitationBuilder {
     pub table: Option<Rc<NestedProject>>,
@@ -2877,7 +2877,7 @@ impl Default for ProjectsUsersRoleInvitationBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsUsersRoleInvitationActions {
     SetTable(Option<Rc<NestedProject>>),
     SetUser(Option<Rc<User>>),
@@ -3066,7 +3066,7 @@ pub fn create_projects_users_role_invitation_form(
         </BasicForm<NewProjectsUsersRoleInvitation>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleRequestBuilder {
     pub table: Option<Rc<NestedProject>>,
@@ -3092,7 +3092,7 @@ impl Default for ProjectsUsersRoleRequestBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsUsersRoleRequestActions {
     SetTable(Option<Rc<NestedProject>>),
     SetUser(Option<Rc<User>>),
@@ -3281,7 +3281,7 @@ pub fn create_projects_users_role_request_form(
         </BasicForm<NewProjectsUsersRoleRequest>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleBuilder {
     pub table: Option<Rc<NestedProject>>,
@@ -3307,7 +3307,7 @@ impl Default for ProjectsUsersRoleBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsUsersRoleActions {
     SetTable(Option<Rc<NestedProject>>),
     SetUser(Option<Rc<User>>),
@@ -3489,7 +3489,7 @@ pub fn create_projects_users_role_form(props: &CreateProjectsUsersRoleFormProp) 
         </BasicForm<NewProjectsUsersRole>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBioOttTaxonItemBuilder {
     pub sample: Option<Rc<NestedSample>>,
@@ -3511,7 +3511,7 @@ impl Default for SampleBioOttTaxonItemBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleBioOttTaxonItemActions {
     SetSample(Option<Rc<NestedSample>>),
     SetTaxon(Option<Rc<NestedBioOttTaxonItem>>),
@@ -3667,7 +3667,7 @@ pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItem
         </BasicForm<NewSampleBioOttTaxonItem>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleContainerBuilder {
     pub id: Option<i32>,
@@ -3695,7 +3695,7 @@ impl Default for SampleContainerBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleContainerActions {
     SetBarcode(Option<String>),
     SetProject(Option<Rc<NestedProject>>),
@@ -3947,7 +3947,7 @@ pub fn update_sample_container_form(props: &UpdateSampleContainerFormProp) -> Ht
         </BasicForm<UpdateSampleContainer>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SampleBuilder {
     pub id: Option<uuid::Uuid>,
@@ -3983,7 +3983,7 @@ impl Default for SampleBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SampleActions {
     SetNotes(Option<String>),
     SetContainer(Option<Rc<NestedSampleContainer>>),
@@ -4268,7 +4268,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
         </BasicForm<NewSample>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SpectraBuilder {
     pub id: Option<i32>,
@@ -4292,7 +4292,7 @@ impl Default for SpectraBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SpectraActions {
     SetNotes(Option<String>),
     SetSpectraCollection(Option<Rc<NestedSpectraCollection>>),
@@ -4508,7 +4508,7 @@ pub fn update_spectra_form(props: &UpdateSpectraFormProp) -> Html {
         </BasicForm<UpdateSpectra>>
     }
 }
-#[derive(Store, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct SpectraCollectionBuilder {
     pub id: Option<i32>,
@@ -4532,7 +4532,7 @@ impl Default for SpectraCollectionBuilder {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum SpectraCollectionActions {
     SetNotes(Option<String>),
     SetSample(Option<Rc<NestedSample>>),
@@ -4735,7 +4735,7 @@ pub fn update_spectra_collection_form(props: &UpdateSpectraCollectionFormProp) -
         </BasicForm<UpdateSpectraCollection>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamBuilder {
     pub id: Option<i32>,
@@ -4775,7 +4775,7 @@ impl Default for TeamBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
@@ -5137,7 +5137,7 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
         </BasicForm<UpdateTeam>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamsTeamsRoleInvitationBuilder {
     pub table: Option<Rc<NestedTeam>>,
@@ -5163,7 +5163,7 @@ impl Default for TeamsTeamsRoleInvitationBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsTeamsRoleInvitationActions {
     SetTable(Option<Rc<NestedTeam>>),
     SetTeam(Option<Rc<NestedTeam>>),
@@ -5353,7 +5353,7 @@ pub fn create_teams_teams_role_invitation_form(
         </BasicForm<NewTeamsTeamsRoleInvitation>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamsUsersRoleInvitationBuilder {
     pub table: Option<Rc<NestedTeam>>,
@@ -5379,7 +5379,7 @@ impl Default for TeamsUsersRoleInvitationBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsUsersRoleInvitationActions {
     SetTable(Option<Rc<NestedTeam>>),
     SetUser(Option<Rc<User>>),
@@ -5568,7 +5568,7 @@ pub fn create_teams_users_role_invitation_form(
         </BasicForm<NewTeamsUsersRoleInvitation>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamsUsersRoleRequestBuilder {
     pub table: Option<Rc<NestedTeam>>,
@@ -5594,7 +5594,7 @@ impl Default for TeamsUsersRoleRequestBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsUsersRoleRequestActions {
     SetTable(Option<Rc<NestedTeam>>),
     SetUser(Option<Rc<User>>),
@@ -5780,7 +5780,7 @@ pub fn create_teams_users_role_request_form(props: &CreateTeamsUsersRoleRequestF
         </BasicForm<NewTeamsUsersRoleRequest>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct TeamsUsersRoleBuilder {
     pub table: Option<Rc<NestedTeam>>,
@@ -5806,7 +5806,7 @@ impl Default for TeamsUsersRoleBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsUsersRoleActions {
     SetTable(Option<Rc<NestedTeam>>),
     SetUser(Option<Rc<User>>),
@@ -5985,7 +5985,7 @@ pub fn create_teams_users_role_form(props: &CreateTeamsUsersRoleFormProp) -> Htm
         </BasicForm<NewTeamsUsersRole>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Store, Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct UserBuilder {
     pub id: Option<i32>,
@@ -6021,7 +6021,7 @@ impl Default for UserBuilder {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize)]
 pub(super) enum UserActions {
     SetFirstName(Option<String>),
     SetMiddleName(Option<String>),
@@ -6240,7 +6240,7 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
         </BasicForm<UpdateUser>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct UsersUsersRoleInvitationBuilder {
     pub table: Option<Rc<User>>,
@@ -6266,7 +6266,7 @@ impl Default for UsersUsersRoleInvitationBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UsersUsersRoleInvitationActions {
     SetTable(Option<Rc<User>>),
     SetUser(Option<Rc<User>>),
@@ -6454,7 +6454,7 @@ pub fn create_users_users_role_invitation_form(
         </BasicForm<NewUsersUsersRoleInvitation>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct UsersUsersRoleRequestBuilder {
     pub table: Option<Rc<User>>,
@@ -6480,7 +6480,7 @@ impl Default for UsersUsersRoleRequestBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UsersUsersRoleRequestActions {
     SetTable(Option<Rc<User>>),
     SetUser(Option<Rc<User>>),
@@ -6665,7 +6665,7 @@ pub fn create_users_users_role_request_form(props: &CreateUsersUsersRoleRequestF
         </BasicForm<NewUsersUsersRoleRequest>>
     }
 }
-#[derive(Store, Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 #[store(storage = "local", storage_tab_sync)]
 pub struct UsersUsersRoleBuilder {
     pub table: Option<Rc<User>>,
@@ -6691,7 +6691,7 @@ impl Default for UsersUsersRoleBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UsersUsersRoleActions {
     SetTable(Option<Rc<User>>),
     SetUser(Option<Rc<User>>),

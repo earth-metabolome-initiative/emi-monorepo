@@ -6,7 +6,7 @@
 use serde::{Deserialize, Serialize};
 use super::*;
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct UpdateDerivedSample {
     pub parent_sample_id: uuid::Uuid,
     pub child_sample_id: uuid::Uuid,
@@ -60,7 +60,7 @@ impl UpdateDerivedSample {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateNameplate {
     pub id: i32,
     pub barcode: String,
@@ -114,7 +114,7 @@ impl UpdateNameplate {
     }
 
 }
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateProject {
     pub id: i32,
     pub name: String,
@@ -218,7 +218,7 @@ impl UpdateProject {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateSampleContainer {
     pub id: i32,
     pub barcode: String,
@@ -272,7 +272,7 @@ impl UpdateSampleContainer {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateSpectra {
     pub id: i32,
     pub notes: Option<String>,
@@ -329,7 +329,7 @@ impl UpdateSpectra {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateSpectraCollection {
     pub id: i32,
     pub notes: Option<String>,
@@ -386,7 +386,7 @@ impl UpdateSpectraCollection {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateTeam {
     pub id: i32,
     pub name: String,
@@ -455,7 +455,7 @@ impl UpdateTeam {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateUser {
     pub id: i32,
     pub first_name: String,

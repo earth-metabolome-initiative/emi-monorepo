@@ -163,6 +163,19 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
                     f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)}).and_then(|flat_variant| Self::from_flat(flat_variant, {this_author_user_id_argument}connection))\n"
                     "}\n"
                 )
+            elif return_type.format_data_type() == "Result<Vec<(Self, f32)>, web_common::api::ApiError>":
+                method.write_header_to(document)
+                document.write(
+                    "{\n"
+                    f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)})?.into_iter().map(|(flat_variant, score)| Ok((Self::from_flat(flat_variant, {this_author_user_id_argument}connection)?, score))).collect()\n"
+                    "}\n"
+                )
+            elif "Self" in return_type.format_data_type():
+                raise NotImplementedError(
+                    "All cases returning a Self must be handled. "
+                    f"The method {method.name} returns {return_type.format_data_type()}. "
+                    f"The method {method.name} is in the struct {nested_struct.name}."
+                )
             elif method.has_self_reference():
                 assert any(attr.is_inner() for attr in nested_struct.attributes), (
                     "The struct must have at least one inner attribute, which is the flat struct. "

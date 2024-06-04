@@ -23,6 +23,7 @@ use web_common::database::filter_structs::*;
     Identifiable,
     Eq,
     PartialEq,
+    PartialOrd,
     Clone,
     Serialize,
     Deserialize,
@@ -240,114 +241,6 @@ impl SampleContainer {
         }
         Ok(flat_variant)
     }
-    /// Search for the viewable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_viewable(
-        filter: Option<&SampleContainerFilter>,
-        author_user_id: Option<i32>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers
-            .filter(crate::sql_function_bindings::can_view_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::similarity_dist(
-                sample_containers::dsl::barcode,
-                query,
-            ))
-            .into_boxed();
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_viewable(
-        filter: Option<&SampleContainerFilter>,
-        author_user_id: Option<i32>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers
-            .filter(crate::sql_function_bindings::can_view_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::word_similarity_dist_op(
-                sample_containers::dsl::barcode,
-                query,
-            ))
-            .into_boxed();
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -374,6 +267,7 @@ impl SampleContainer {
         }
         use crate::schema::sample_containers;
         let mut query = sample_containers::dsl::sample_containers
+            .select(SampleContainer::as_select())
             .filter(crate::sql_function_bindings::can_view_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -402,6 +296,47 @@ impl SampleContainer {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn strict_word_similarity_search_with_score_viewable(
+        author_user_id: Option<i32>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<Vec<(Self, f32)>, web_common::api::ApiError> {
+        use crate::schema::sample_containers;
+        sample_containers::dsl::sample_containers
+            .select((
+                SampleContainer::as_select(),
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                ),
+            ))
+            .filter(crate::sql_function_bindings::can_view_sample_containers(
+                author_user_id,
+                sample_containers::dsl::id,
+            ))
+            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    sample_containers::dsl::barcode,
+                    query,
+                ),
+            )
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<(Self, f32)>(connection)
             .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.
@@ -522,114 +457,6 @@ impl SampleContainer {
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
-    /// Search for the updatable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_updatable(
-        filter: Option<&SampleContainerFilter>,
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers
-            .filter(crate::sql_function_bindings::can_update_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::similarity_dist(
-                sample_containers::dsl::barcode,
-                query,
-            ))
-            .into_boxed();
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_updatable(
-        filter: Option<&SampleContainerFilter>,
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers
-            .filter(crate::sql_function_bindings::can_update_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::word_similarity_dist_op(
-                sample_containers::dsl::barcode,
-                query,
-            ))
-            .into_boxed();
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -656,6 +483,7 @@ impl SampleContainer {
         }
         use crate::schema::sample_containers;
         let mut query = sample_containers::dsl::sample_containers
+            .select(SampleContainer::as_select())
             .filter(crate::sql_function_bindings::can_update_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,
@@ -804,114 +632,6 @@ impl SampleContainer {
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
-    /// Search for the administrable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_administrable(
-        filter: Option<&SampleContainerFilter>,
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers
-            .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::similarity_dist(
-                sample_containers::dsl::barcode,
-                query,
-            ))
-            .into_boxed();
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_administrable(
-        filter: Option<&SampleContainerFilter>,
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::sample_containers;
-        let mut query = sample_containers::dsl::sample_containers
-            .filter(crate::sql_function_bindings::can_admin_sample_containers(
-                author_user_id,
-                sample_containers::dsl::id,
-            ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::word_similarity_dist_op(
-                sample_containers::dsl::barcode,
-                query,
-            ))
-            .into_boxed();
-        if let Some(project_id) = filter.and_then(|f| f.project_id) {
-            query = query.filter(sample_containers::dsl::project_id.eq(project_id));
-        }
-        if let Some(category_id) = filter.and_then(|f| f.category_id) {
-            query = query.filter(sample_containers::dsl::category_id.eq(category_id));
-        }
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(sample_containers::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(sample_containers::dsl::updated_by.eq(updated_by));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -938,6 +658,7 @@ impl SampleContainer {
         }
         use crate::schema::sample_containers;
         let mut query = sample_containers::dsl::sample_containers
+            .select(SampleContainer::as_select())
             .filter(crate::sql_function_bindings::can_admin_sample_containers(
                 author_user_id,
                 sample_containers::dsl::id,

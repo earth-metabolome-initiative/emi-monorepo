@@ -5,7 +5,7 @@ use serde::Serialize;
 use std::rc::Rc;
 use web_common::database::filter_structs::*;
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttTaxonItem {
     pub inner: BioOttTaxonItem,
     pub ott_rank: NestedBioOttRank,
@@ -141,48 +141,6 @@ impl NestedBioOttTaxonItem {
         BioOttTaxonItem::from_ott_id(ott_id, connection)
             .and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
-    /// Search for the viewable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_viewable(
-        filter: Option<&BioOttTaxonItemFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        BioOttTaxonItem::similarity_search_viewable(filter, query, limit, offset, connection)?
-            .into_iter()
-            .map(|flat_variant| Self::from_flat(flat_variant, connection))
-            .collect()
-    }
-    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_viewable(
-        filter: Option<&BioOttTaxonItemFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        BioOttTaxonItem::word_similarity_search_viewable(filter, query, limit, offset, connection)?
-            .into_iter()
-            .map(|flat_variant| Self::from_flat(flat_variant, connection))
-            .collect()
-    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -204,6 +162,27 @@ impl NestedBioOttTaxonItem {
         )?
         .into_iter()
         .map(|flat_variant| Self::from_flat(flat_variant, connection))
+        .collect()
+    }
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn strict_word_similarity_search_with_score_viewable(
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<Vec<(Self, f32)>, web_common::api::ApiError> {
+        BioOttTaxonItem::strict_word_similarity_search_with_score_viewable(
+            query, limit, offset, connection,
+        )?
+        .into_iter()
+        .map(|(flat_variant, score)| Ok((Self::from_flat(flat_variant, connection)?, score)))
         .collect()
     }
     /// Check whether the user can update the struct.

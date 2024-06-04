@@ -64,6 +64,10 @@ def write_backend_table_names_enumeration(
                 continue
             if method.name.startswith("from_"):
                 continue
+
+            # For the time being, we skip the search methods that return a score.
+            if "with_score" in method.name:
+                continue
             if method not in method_counts:
                 method_counts[method] = (0, method)
 

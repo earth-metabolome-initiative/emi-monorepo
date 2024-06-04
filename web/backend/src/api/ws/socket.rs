@@ -243,6 +243,25 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 }
                             }
                             web_common::database::Operation::Select(select) => match select {
+                                web_common::database::Select::SearchAll { query, limit } => {
+                                    match crate::search_all::search_all(
+                                        self.user().map(|user| user.id),
+                                        &query,
+                                        Some(limit),
+                                        &mut self.diesel_connection,
+                                    ) {
+                                        Ok(results) => {
+                                            ctx.address().do_send(BackendMessage::SearchTable(
+                                                task_id,
+                                                bincode::serialize(&results).unwrap(),
+                                            ));
+                                        }
+                                        Err(err) => {
+                                            ctx.address()
+                                                .do_send(BackendMessage::Error(task_id, err));
+                                        }
+                                    }
+                                }
                                 web_common::database::Select::CanView {
                                     table_name,
                                     primary_key,

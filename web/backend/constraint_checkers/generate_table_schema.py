@@ -1,13 +1,8 @@
 """Generate the table schema from the database."""
 import os
-from constraint_checkers.migrations_changed import are_migrations_changed
 
 def generate_table_schema():
     """Generate the table schema from the database."""
-    if not are_migrations_changed():
-        print("Migrations have not changed. Skipping the generation of the table schema.")
-        return
-
     # We make sure the migrations were fully executed
     status = os.system("diesel migration run")
 

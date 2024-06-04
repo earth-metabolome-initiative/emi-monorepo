@@ -23,7 +23,7 @@ pub trait Colorable {
     fn color(&self) -> Option<&str>;
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct BioOttRank {
     pub id: i32,
     pub name: String,
@@ -252,7 +252,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct BioOttTaxonItem {
     pub id: i32,
     pub name: String,
@@ -652,7 +652,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Color {
     pub id: i32,
     pub name: String,
@@ -871,7 +871,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Country {
     pub id: i32,
     pub iso: String,
@@ -1097,7 +1097,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct DerivedSample {
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
@@ -1380,7 +1380,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct DocumentFormat {
     pub id: i32,
     pub extension: String,
@@ -1616,7 +1616,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct FontAwesomeIcon {
     pub id: i32,
     pub name: String,
@@ -1828,7 +1828,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct LoginProvider {
     pub id: i32,
     pub name: String,
@@ -2078,7 +2078,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Material {
     pub id: i32,
     pub name: String,
@@ -2307,7 +2307,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NameplateCategory {
     pub id: i32,
     pub name: String,
@@ -2550,7 +2550,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Nameplate {
     pub id: i32,
     pub barcode: String,
@@ -2831,7 +2831,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Notification {
     pub id: i32,
     pub user_id: i32,
@@ -3067,7 +3067,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct ObservationSubject {
     pub id: i32,
     pub name: String,
@@ -3296,7 +3296,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Observation {
     pub id: uuid::Uuid,
     pub parent_observation_id: Option<uuid::Uuid>,
@@ -3646,7 +3646,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct OrganismBioOttTaxonItem {
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
@@ -3870,7 +3870,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Organism {
     pub id: uuid::Uuid,
     pub host_organism_id: Option<uuid::Uuid>,
@@ -4195,7 +4195,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Organization {
     pub id: i32,
     pub name: String,
@@ -4438,7 +4438,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct PermanenceCategory {
     pub id: i32,
     pub name: String,
@@ -4667,7 +4667,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct ProjectState {
     pub id: i32,
     pub name: String,
@@ -4896,7 +4896,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Project {
     pub id: i32,
     pub name: String,
@@ -5264,7 +5264,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
@@ -5495,7 +5495,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsTeamsRoleRequest {
     pub table_id: i32,
     pub team_id: i32,
@@ -5726,7 +5726,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsTeamsRole {
     pub table_id: i32,
     pub team_id: i32,
@@ -5957,7 +5957,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -6188,7 +6188,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -6419,7 +6419,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
@@ -6650,7 +6650,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Role {
     pub id: i32,
     pub name: String,
@@ -6879,7 +6879,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct SampleBioOttTaxonItem {
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
@@ -7103,7 +7103,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct SampleContainerCategory {
     pub id: i32,
     pub name: String,
@@ -7353,7 +7353,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct SampleContainer {
     pub id: i32,
     pub barcode: String,
@@ -7634,7 +7634,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct SampleState {
     pub id: i32,
     pub name: String,
@@ -7863,7 +7863,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Sample {
     pub id: uuid::Uuid,
     pub container_id: i32,
@@ -8165,7 +8165,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Spectra {
     pub id: i32,
     pub notes: Option<String>,
@@ -8446,7 +8446,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct SpectraCollection {
     pub id: i32,
     pub notes: Option<String>,
@@ -8727,7 +8727,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct TeamState {
     pub id: i32,
     pub name: String,
@@ -8956,7 +8956,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Team {
     pub id: i32,
     pub name: String,
@@ -9265,7 +9265,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct TeamsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
@@ -9496,7 +9496,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct TeamsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -9727,7 +9727,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct TeamsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -9958,7 +9958,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct TeamsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
@@ -10189,7 +10189,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct Unit {
     pub id: i32,
     pub name: String,
@@ -10418,7 +10418,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct UserEmail {
     pub id: i32,
     pub email: String,
@@ -10654,7 +10654,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct User {
     pub id: i32,
     pub first_name: String,
@@ -10946,7 +10946,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct UsersUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -11177,7 +11177,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct UsersUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -11408,7 +11408,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct UsersUsersRole {
     pub table_id: i32,
     pub user_id: i32,

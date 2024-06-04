@@ -5,7 +5,7 @@
 use serde::{Deserialize, Serialize};
 use super::*;
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct NewDerivedSample {
     pub parent_sample_id: uuid::Uuid,
     pub child_sample_id: uuid::Uuid,
@@ -16,7 +16,7 @@ pub struct NewDerivedSample {
 impl Tabular for NewDerivedSample {
     const TABLE: Table = Table::DerivedSamples;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewNameplate {
     pub barcode: String,
     pub project_id: i32,
@@ -26,7 +26,7 @@ pub struct NewNameplate {
 impl Tabular for NewNameplate {
     const TABLE: Table = Table::Nameplates;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewObservation {
     pub id: uuid::Uuid,
     pub parent_observation_id: Option<uuid::Uuid>,
@@ -144,7 +144,7 @@ impl NewObservation {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct NewOrganismBioOttTaxonItem {
     pub organism_id: uuid::Uuid,
     pub taxon_id: i32,
@@ -153,7 +153,7 @@ pub struct NewOrganismBioOttTaxonItem {
 impl Tabular for NewOrganismBioOttTaxonItem {
     const TABLE: Table = Table::OrganismBioOttTaxonItems;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewOrganism {
     pub id: uuid::Uuid,
     pub host_organism_id: Option<uuid::Uuid>,
@@ -263,7 +263,7 @@ impl NewOrganism {
     }
 
 }
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewProject {
     pub name: String,
     pub description: String,
@@ -281,7 +281,7 @@ pub struct NewProject {
 impl Tabular for NewProject {
     const TABLE: Table = Table::Projects;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewProjectsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
@@ -291,7 +291,7 @@ pub struct NewProjectsTeamsRoleInvitation {
 impl Tabular for NewProjectsTeamsRoleInvitation {
     const TABLE: Table = Table::ProjectsTeamsRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewProjectsTeamsRoleRequest {
     pub table_id: i32,
     pub team_id: i32,
@@ -301,7 +301,7 @@ pub struct NewProjectsTeamsRoleRequest {
 impl Tabular for NewProjectsTeamsRoleRequest {
     const TABLE: Table = Table::ProjectsTeamsRoleRequests;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewProjectsTeamsRole {
     pub table_id: i32,
     pub team_id: i32,
@@ -311,7 +311,7 @@ pub struct NewProjectsTeamsRole {
 impl Tabular for NewProjectsTeamsRole {
     const TABLE: Table = Table::ProjectsTeamsRoles;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewProjectsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -321,7 +321,7 @@ pub struct NewProjectsUsersRoleInvitation {
 impl Tabular for NewProjectsUsersRoleInvitation {
     const TABLE: Table = Table::ProjectsUsersRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewProjectsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -331,7 +331,7 @@ pub struct NewProjectsUsersRoleRequest {
 impl Tabular for NewProjectsUsersRoleRequest {
     const TABLE: Table = Table::ProjectsUsersRoleRequests;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewProjectsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
@@ -341,7 +341,7 @@ pub struct NewProjectsUsersRole {
 impl Tabular for NewProjectsUsersRole {
     const TABLE: Table = Table::ProjectsUsersRoles;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct NewSampleBioOttTaxonItem {
     pub sample_id: uuid::Uuid,
     pub taxon_id: i32,
@@ -350,7 +350,7 @@ pub struct NewSampleBioOttTaxonItem {
 impl Tabular for NewSampleBioOttTaxonItem {
     const TABLE: Table = Table::SampleBioOttTaxonItems;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewSampleContainer {
     pub barcode: String,
     pub project_id: i32,
@@ -360,7 +360,7 @@ pub struct NewSampleContainer {
 impl Tabular for NewSampleContainer {
     const TABLE: Table = Table::SampleContainers;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewSample {
     pub id: uuid::Uuid,
     pub container_id: i32,
@@ -457,7 +457,7 @@ impl NewSample {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewSpectra {
     pub notes: Option<String>,
     pub spectra_collection_id: i32,
@@ -466,7 +466,7 @@ pub struct NewSpectra {
 impl Tabular for NewSpectra {
     const TABLE: Table = Table::Spectra;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewSpectraCollection {
     pub notes: Option<String>,
     pub sample_id: uuid::Uuid,
@@ -475,7 +475,7 @@ pub struct NewSpectraCollection {
 impl Tabular for NewSpectraCollection {
     const TABLE: Table = Table::SpectraCollections;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewTeam {
     pub name: String,
     pub description: String,
@@ -488,7 +488,7 @@ pub struct NewTeam {
 impl Tabular for NewTeam {
     const TABLE: Table = Table::Teams;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewTeamsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
@@ -498,7 +498,7 @@ pub struct NewTeamsTeamsRoleInvitation {
 impl Tabular for NewTeamsTeamsRoleInvitation {
     const TABLE: Table = Table::TeamsTeamsRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewTeamsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -508,7 +508,7 @@ pub struct NewTeamsUsersRoleInvitation {
 impl Tabular for NewTeamsUsersRoleInvitation {
     const TABLE: Table = Table::TeamsUsersRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewTeamsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -518,7 +518,7 @@ pub struct NewTeamsUsersRoleRequest {
 impl Tabular for NewTeamsUsersRoleRequest {
     const TABLE: Table = Table::TeamsUsersRoleRequests;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewTeamsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
@@ -528,7 +528,7 @@ pub struct NewTeamsUsersRole {
 impl Tabular for NewTeamsUsersRole {
     const TABLE: Table = Table::TeamsUsersRoles;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewUserEmail {
     pub email: String,
     pub login_provider_id: i32,
@@ -538,7 +538,7 @@ pub struct NewUserEmail {
 impl Tabular for NewUserEmail {
     const TABLE: Table = Table::UserEmails;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct NewUser {
     pub first_name: String,
     pub middle_name: Option<String>,
@@ -550,7 +550,7 @@ pub struct NewUser {
 impl Tabular for NewUser {
     const TABLE: Table = Table::Users;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewUsersUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -560,7 +560,7 @@ pub struct NewUsersUsersRoleInvitation {
 impl Tabular for NewUsersUsersRoleInvitation {
     const TABLE: Table = Table::UsersUsersRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewUsersUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -570,7 +570,7 @@ pub struct NewUsersUsersRoleRequest {
 impl Tabular for NewUsersUsersRoleRequest {
     const TABLE: Table = Table::UsersUsersRoleRequests;
 }
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct NewUsersUsersRole {
     pub table_id: i32,
     pub user_id: i32,

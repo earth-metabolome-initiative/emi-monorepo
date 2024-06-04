@@ -374,9 +374,12 @@ class DerivedPGIndex:
 class PGIndices:
     """Represents a list of PostgreSQL indices."""
 
+    # Since in practice we are actually only using the strict word similarity method,
+    # we can remove the other methods so to avoid generating dead code and reducing
+    # the size of the overall code base.
     SIMILARITY_METHODS = (
-        "similarity",
-        "word_similarity",
+        # "similarity",
+        # "word_similarity",
         "strict_word_similarity",
     )
     table_metadata: TableMetadata = None

@@ -22,6 +22,7 @@ use web_common::database::filter_structs::*;
     Debug,
     Identifiable,
     PartialEq,
+    PartialOrd,
     Clone,
     Serialize,
     Deserialize,
@@ -153,114 +154,6 @@ impl SampleContainerCategory {
             .first::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
-    /// Search for the viewable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_viewable(
-        filter: Option<&SampleContainerCategoryFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, limit, offset, connection);
-        }
-        use crate::schema::sample_container_categories;
-        let mut query = sample_container_categories::dsl::sample_container_categories
-            .filter(
-                crate::sql_function_bindings::concat_sample_container_categories_brand(
-                    sample_container_categories::dsl::name,
-                    sample_container_categories::dsl::description,
-                )
-                .ilike(format!("%{}%", query)),
-            )
-            .order(crate::sql_function_bindings::similarity_dist(
-                crate::sql_function_bindings::concat_sample_container_categories_brand(
-                    sample_container_categories::dsl::name,
-                    sample_container_categories::dsl::description,
-                ),
-                query,
-            ))
-            .into_boxed();
-        if let Some(material_id) = filter.and_then(|f| f.material_id) {
-            query = query.filter(sample_container_categories::dsl::material_id.eq(material_id));
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(sample_container_categories::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(sample_container_categories::dsl::color_id.eq(color_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_viewable(
-        filter: Option<&SampleContainerCategoryFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, limit, offset, connection);
-        }
-        use crate::schema::sample_container_categories;
-        let mut query = sample_container_categories::dsl::sample_container_categories
-            .filter(
-                crate::sql_function_bindings::concat_sample_container_categories_brand(
-                    sample_container_categories::dsl::name,
-                    sample_container_categories::dsl::description,
-                )
-                .ilike(format!("%{}%", query)),
-            )
-            .order(crate::sql_function_bindings::word_similarity_dist_op(
-                crate::sql_function_bindings::concat_sample_container_categories_brand(
-                    sample_container_categories::dsl::name,
-                    sample_container_categories::dsl::description,
-                ),
-                query,
-            ))
-            .into_boxed();
-        if let Some(material_id) = filter.and_then(|f| f.material_id) {
-            query = query.filter(sample_container_categories::dsl::material_id.eq(material_id));
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(sample_container_categories::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(sample_container_categories::dsl::color_id.eq(color_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -285,6 +178,7 @@ impl SampleContainerCategory {
         }
         use crate::schema::sample_container_categories;
         let mut query = sample_container_categories::dsl::sample_container_categories
+            .select(SampleContainerCategory::as_select())
             .filter(
                 crate::sql_function_bindings::concat_sample_container_categories_brand(
                     sample_container_categories::dsl::name,
@@ -315,6 +209,53 @@ impl SampleContainerCategory {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn strict_word_similarity_search_with_score_viewable(
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<Vec<(Self, f32)>, web_common::api::ApiError> {
+        use crate::schema::sample_container_categories;
+        sample_container_categories::dsl::sample_container_categories
+            .select((
+                SampleContainerCategory::as_select(),
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_container_categories_brand(
+                        sample_container_categories::dsl::name,
+                        sample_container_categories::dsl::description,
+                    ),
+                    query,
+                ),
+            ))
+            .filter(
+                crate::sql_function_bindings::concat_sample_container_categories_brand(
+                    sample_container_categories::dsl::name,
+                    sample_container_categories::dsl::description,
+                )
+                .ilike(format!("%{}%", query)),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_sample_container_categories_brand(
+                        sample_container_categories::dsl::name,
+                        sample_container_categories::dsl::description,
+                    ),
+                    query,
+                ),
+            )
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<(Self, f32)>(connection)
             .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.

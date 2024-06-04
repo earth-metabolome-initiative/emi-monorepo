@@ -23,6 +23,7 @@ use web_common::database::filter_structs::*;
     Identifiable,
     Eq,
     PartialEq,
+    PartialOrd,
     Clone,
     Serialize,
     Deserialize,
@@ -228,144 +229,6 @@ impl BioOttTaxonItem {
             .first::<Self>(connection)?;
         Ok(flat_variant)
     }
-    /// Search for the viewable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_viewable(
-        filter: Option<&BioOttTaxonItemFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, limit, offset, connection);
-        }
-        use crate::schema::bio_ott_taxon_items;
-        let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
-            .filter(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::similarity_dist(
-                bio_ott_taxon_items::dsl::name,
-                query,
-            ))
-            .into_boxed();
-        if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(ott_rank_id));
-        }
-        if let Some(domain_id) = filter.and_then(|f| f.domain_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(domain_id));
-        }
-        if let Some(kingdom_id) = filter.and_then(|f| f.kingdom_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(kingdom_id));
-        }
-        if let Some(phylum_id) = filter.and_then(|f| f.phylum_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(phylum_id));
-        }
-        if let Some(class_id) = filter.and_then(|f| f.class_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(class_id));
-        }
-        if let Some(order_id) = filter.and_then(|f| f.order_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(order_id));
-        }
-        if let Some(family_id) = filter.and_then(|f| f.family_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(family_id));
-        }
-        if let Some(genus_id) = filter.and_then(|f| f.genus_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(genus_id));
-        }
-        if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id));
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(color_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_viewable(
-        filter: Option<&BioOttTaxonItemFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, limit, offset, connection);
-        }
-        use crate::schema::bio_ott_taxon_items;
-        let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
-            .filter(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::word_similarity_dist_op(
-                bio_ott_taxon_items::dsl::name,
-                query,
-            ))
-            .into_boxed();
-        if let Some(ott_rank_id) = filter.and_then(|f| f.ott_rank_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::ott_rank_id.eq(ott_rank_id));
-        }
-        if let Some(domain_id) = filter.and_then(|f| f.domain_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::domain_id.eq(domain_id));
-        }
-        if let Some(kingdom_id) = filter.and_then(|f| f.kingdom_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::kingdom_id.eq(kingdom_id));
-        }
-        if let Some(phylum_id) = filter.and_then(|f| f.phylum_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::phylum_id.eq(phylum_id));
-        }
-        if let Some(class_id) = filter.and_then(|f| f.class_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::class_id.eq(class_id));
-        }
-        if let Some(order_id) = filter.and_then(|f| f.order_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::order_id.eq(order_id));
-        }
-        if let Some(family_id) = filter.and_then(|f| f.family_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::family_id.eq(family_id));
-        }
-        if let Some(genus_id) = filter.and_then(|f| f.genus_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::genus_id.eq(genus_id));
-        }
-        if let Some(parent_id) = filter.and_then(|f| f.parent_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::parent_id.eq(parent_id));
-        }
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(bio_ott_taxon_items::dsl::color_id.eq(color_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -390,6 +253,7 @@ impl BioOttTaxonItem {
         }
         use crate::schema::bio_ott_taxon_items;
         let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
+            .select(BioOttTaxonItem::as_select())
             .filter(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -435,6 +299,41 @@ impl BioOttTaxonItem {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn strict_word_similarity_search_with_score_viewable(
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<Vec<(Self, f32)>, web_common::api::ApiError> {
+        use crate::schema::bio_ott_taxon_items;
+        bio_ott_taxon_items::dsl::bio_ott_taxon_items
+            .select((
+                BioOttTaxonItem::as_select(),
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    bio_ott_taxon_items::dsl::name,
+                    query,
+                ),
+            ))
+            .filter(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    bio_ott_taxon_items::dsl::name,
+                    query,
+                ),
+            )
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<(Self, f32)>(connection)
             .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.

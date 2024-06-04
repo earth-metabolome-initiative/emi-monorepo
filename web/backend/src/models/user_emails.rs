@@ -23,6 +23,7 @@ use web_common::database::filter_structs::*;
     Identifiable,
     Eq,
     PartialEq,
+    PartialOrd,
     Clone,
     Serialize,
     Deserialize,

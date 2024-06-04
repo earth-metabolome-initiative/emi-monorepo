@@ -556,136 +556,157 @@ def write_backend_flat_variants(
             # parameter to limit the number of results.
             if struct.is_searchable():
                 for similarity_method_name in PGIndices.SIMILARITY_METHODS:
+                    for with_score in [False, True]:
+                        if operation != "view" and with_score:
+                            continue
 
-                    similarity_method = struct.add_backend_method(
-                        MethodDefinition(
-                            name=f"{similarity_method_name}_search_{operation_able}",
-                            summary=f"Search for the {operation_able} structs by a given string by Postgres's `{similarity_method_name}`.",
+                        with_score_suffix = "_with_score" if with_score else ""
+
+                        similarity_method = struct.add_backend_method(
+                            MethodDefinition(
+                                name=f"{similarity_method_name}_search{with_score_suffix}_{operation_able}",
+                                summary=f"Search for the {operation_able} structs by a given string by Postgres's `{similarity_method_name}`.",
+                            )
                         )
-                    )
 
-                    if struct.has_filter_variant():
+                        if struct.has_filter_variant() and not with_score:
+                            similarity_method.add_argument(
+                                AttributeMetadata(
+                                    original_name="filter",
+                                    name="filter",
+                                    data_type=struct.get_filter_variant(),
+                                    optional=True,
+                                    reference=True,
+                                ),
+                                description="The optional filter to apply to the query.",
+                            )
+
+                        if requires_author:
+                            similarity_method.add_argument(
+                                author_user_id,
+                                description="The ID of the user who is performing the search.",
+                            )
+
                         similarity_method.add_argument(
                             AttributeMetadata(
-                                original_name="filter",
-                                name="filter",
-                                data_type=struct.get_filter_variant(),
-                                optional=True,
+                                original_name="query",
+                                name="query",
+                                data_type="str",
+                                optional=False,
                                 reference=True,
                             ),
-                            description="The optional filter to apply to the query.",
+                            description="The string to search for.",
                         )
 
-                    if requires_author:
-                        similarity_method.add_argument(
-                            author_user_id,
-                            description="The ID of the user who is performing the search.",
+                        for arg_and_desc in limit_and_offset_arguments_and_description:
+                            similarity_method.add_argument(*arg_and_desc)
+
+                        similarity_method.add_argument(*connection_argument_and_description)
+
+                        return_type = "(Self, f32)" if with_score else "Self"
+
+                        similarity_method.set_return_type(
+                            AttributeMetadata(
+                                original_name="_",
+                                name="_",
+                                data_type=f"Result<Vec<{return_type}>, web_common::api::ApiError>",
+                                optional=False,
+                            )
                         )
 
-                    similarity_method.add_argument(
-                        AttributeMetadata(
-                            original_name="query",
-                            name="query",
-                            data_type="str",
-                            optional=False,
-                            reference=True,
-                        ),
-                        description="The string to search for.",
-                    )
+                        similarity_method.write_header_to(struct_document)
 
-                    for arg_and_desc in limit_and_offset_arguments_and_description:
-                        similarity_method.add_argument(*arg_and_desc)
-
-                    similarity_method.add_argument(*connection_argument_and_description)
-
-                    similarity_method.set_return_type(
-                        AttributeMetadata(
-                            original_name="_",
-                            name="_",
-                            data_type="Result<Vec<Self>, web_common::api::ApiError>",
-                            optional=False,
-                        )
-                    )
-
-                    similarity_method.write_header_to(struct_document)
-
-                    struct_document.write(
-                        "{\n"
-                        "        // If the query string is empty, we run an all query with the\n"
-                        "        // limit parameter provided instead of a more complex similarity\n"
-                        "        // search.\n"
-                        "        if query.is_empty() {\n"
-                        f"            return Self::all_{operation_able}("
-                    )
-                    if struct.has_filter_variant():
-                        struct_document.write("filter, ")
-
-                    if requires_author:
-                        struct_document.write(f"{author_user_id.name}, ")
-
-                    struct_document.write("limit, offset, connection);\n        }\n")
-
-                    # We start a query using the diesel query builder.
-                    if table_type == "tables":
-                        struct_document.write(f"        use crate::schema::{struct.table_name};\n")
-                    else:
-                        raise NotImplementedError(
-                            "The search method is not implemented for views."
-                        )
-
-                    # If the current struct has derived search indices, we will need to
-                    # execute joins. As such, we also need to add the select method to the
-                    # query builder.
-
-                    struct_document.write(struct.format_diesel_search_aliases())
-
-                    if struct.has_filter_variant():
-                        struct_document.write("        let mut query = ")
-
-                    struct_document.write(f"{struct.table_name}::dsl::{struct.table_name}\n")
-
-                    if struct.has_derived_search_indices():
                         struct_document.write(
-                            f"            .select({struct.name}::as_select())\n"
-                            f"            {struct.format_diesel_search_join()}\n"
+                            "{\n"
                         )
-
-                    if struct.table_metadata.has_postgres_function(can_x_function_name):
-                        primary_keys = ", ".join(
-                            f"{struct.table_name}::dsl::{primary_key.name}"
-                            for primary_key in struct.get_primary_keys()
-                        )
-                        struct_document.write(
-                            f"            .filter(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
-                        )
-
-                    struct_document.write(
-                        f"            {struct.format_diesel_search_filter('query', similarity_method_name)}\n"
-                        f"            {struct.format_diesel_search_order('query', similarity_method_name)}\n"
-                    )
-
-                    if struct.has_filter_variant():
-                        struct_document.write(
-                            "            .into_boxed();\n"
-                        )
-
-                        for filter_attribute in struct.get_filter_variant().attributes:
+                        if not with_score:
                             struct_document.write(
-                                f"       if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
-                                f"            query = query.filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
-                                "        }\n"
+                                "        // If the query string is empty, we run an all query with the\n"
+                                "        // limit parameter provided instead of a more complex similarity\n"
+                                "        // search.\n"
+                                "        if query.is_empty() {\n"
+                                f"            return Self::all_{operation_able}("
+                            )
+                            if struct.has_filter_variant():
+                                struct_document.write("filter, ")
+
+                            if requires_author:
+                                struct_document.write(f"{author_user_id.name}, ")
+
+                            struct_document.write("limit, offset, connection);\n        }\n")
+
+                        # We start a query using the diesel query builder.
+                        if table_type == "tables":
+                            struct_document.write(f"        use crate::schema::{struct.table_name};\n")
+                        else:
+                            raise NotImplementedError(
+                                "The search method is not implemented for views."
+                            )
+
+                        # If the current struct has derived search indices, we will need to
+                        # execute joins. As such, we also need to add the select method to the
+                        # query builder.
+
+                        struct_document.write(struct.format_diesel_search_aliases())
+
+                        if struct.has_filter_variant() and not with_score:
+                            struct_document.write("        let mut query = ")
+
+                        struct_document.write(f"{struct.table_name}::dsl::{struct.table_name}\n")
+
+                        if struct.has_derived_search_indices():
+                            struct_document.write(
+                                f"            {struct.format_diesel_search_join()}\n"
+                            )
+
+                        if with_score:
+                            struct_document.write(
+                                f"            .select((\n"
+                                f"    {struct.name}::as_select(),\n"
+                                f"    {struct.format_diesel_search_score('query', similarity_method_name)}\n"
+                                "))\n"
+                            )
+                        else:
+                            struct_document.write(
+                                f"            .select({struct.name}::as_select())\n"
+                            )
+
+                        if struct.table_metadata.has_postgres_function(can_x_function_name):
+                            primary_keys = ", ".join(
+                                f"{struct.table_name}::dsl::{primary_key.name}"
+                                for primary_key in struct.get_primary_keys()
+                            )
+                            struct_document.write(
+                                f"            .filter(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
                             )
 
                         struct_document.write(
-                            "        query\n"
+                            f"            {struct.format_diesel_search_filter('query', similarity_method_name)}\n"
+                            f"            {struct.format_diesel_search_order('query', similarity_method_name)}\n"
                         )
 
-                    struct_document.write(
-                        "            .limit(limit.unwrap_or(10))\n"
-                        "            .offset(offset.unwrap_or(0))\n"
-                        "            .load::<Self>(connection).map_err(web_common::api::ApiError::from)\n"
-                        "    }\n"
-                    )
+                        if struct.has_filter_variant() and not with_score:
+                            struct_document.write(
+                                "            .into_boxed();\n"
+                            )
+
+                            for filter_attribute in struct.get_filter_variant().attributes:
+                                struct_document.write(
+                                    f"       if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
+                                    f"            query = query.filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
+                                    "        }\n"
+                                )
+
+                            struct_document.write(
+                                "        query\n"
+                            )
+
+                        struct_document.write(
+                            "            .limit(limit.unwrap_or(10))\n"
+                            "            .offset(offset.unwrap_or(0))\n"
+                            f"            .load::<{return_type}>(connection).map_err(web_common::api::ApiError::from)\n"
+                            "    }\n"
+                        )
 
         if struct.is_insertable():
             delete_method = struct.add_backend_method(

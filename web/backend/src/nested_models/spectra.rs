@@ -5,7 +5,7 @@ use serde::Serialize;
 use std::rc::Rc;
 use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSpectra {
     pub inner: Spectra,
     pub spectra_collection: NestedSpectraCollection,

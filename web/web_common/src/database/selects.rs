@@ -35,6 +35,10 @@ pub enum Select {
         limit: i64,
         offset: i64,
     },
+    SearchAll {
+        query: String,
+        limit: i64,
+    },
     SearchTable {
         filter: Option<Vec<u8>>,
         table_name: String,
@@ -63,6 +67,7 @@ impl Select {
             Self::AllByUpdatedAt { .. } => false,
             Self::SearchTable { .. } => false,
             Self::SearchEditableTable { .. } => true,
+            Self::SearchAll { .. } => false,
         }
     }
 
@@ -122,6 +127,7 @@ impl Select {
     /// * `filter` - The filter to apply to the query.
     /// * `query` - The query to search for.
     /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
     pub fn search_updatables<F: Serialize>(table: super::Table, filter: Option<&F>, query: String, limit: i64, offset: i64) -> Self {
         Self::SearchEditableTable {
             table_name: table.into(),
@@ -129,6 +135,18 @@ impl Select {
             query,
             limit,
             offset,
+        }
+    }
+
+    /// Create a new `Select` query for all tables.
+    /// 
+    /// # Arguments
+    /// * `query` - The query to search for.
+    /// * `limit` - The maximum number of results to return.
+    pub fn search_all(query: String, limit: i64) -> Self {
+        Self::SearchAll {
+            query,
+            limit,
         }
     }
 

@@ -58,6 +58,12 @@
         }
     }
 
+    &.no-label {
+        .input-container {
+            grid-template-columns: auto;
+        }
+    }
+
     input[type="text"],
     input[type="search"],
     input[type="datetime-local"],
@@ -66,7 +72,7 @@
         padding: 0.5em;
         box-sizing: border-box;
         max-width: 100%;
-        transition: border-color 0.2s;
+        transition: border-color 0.2s, border-radius 0.2s;
         border: 1px solid $light_grey;
         border-radius: 0.5em;
 
@@ -118,6 +124,7 @@ ul.input-errors {
     font-size: inherit;
     font-weight: 100;
     margin-top: 0.5em;
+    width: 100%;
 
     li.input-error {
         background-color: $error;

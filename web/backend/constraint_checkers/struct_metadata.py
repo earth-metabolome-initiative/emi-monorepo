@@ -463,6 +463,21 @@ class AttributeMetadata:
             and self._data_type.can_implement_clone()
         )
 
+    def implements_ord(self) -> bool:
+        """Returns whether the attribute implements the Ord trait."""
+        return (
+            self._data_type
+            in [
+                "i32",
+                "i64",
+                "f32",
+                "f64",
+                "chrono::NaiveDateTime",
+            ]
+            or isinstance(self._data_type, StructMetadata)
+            and self._data_type.can_implement_ord()
+        )
+
     def is_uuid(self) -> bool:
         """Returns whether the attribute is a UUID."""
         return self.data_type() == "uuid::Uuid"
@@ -1112,6 +1127,28 @@ class StructMetadata:
 
         return search_filter
 
+    def format_diesel_search_score(self, query: str, similarity_method: str) -> str:
+        """Returns the index in Diesel format.
+
+        Parameters
+        ----------
+        query : str
+            The query to search for.
+        similarity_method : str
+            The similarity method to use.
+        """
+        assert (
+            self.has_derived_search_indices() or self.has_primary_search_index()
+        ), "The struct must have derived search indices or a primary search index to format the diesel search order."
+
+        search_order = ""
+        for i, index in enumerate(self.get_all_search_indices()):
+            if i > 0:
+                search_order += "    +\n"
+            search_order += index.format_distance_operator_diesel(query, similarity_method)
+
+        return search_order
+    
     def format_diesel_search_order(self, query: str, similarity_method: str) -> str:
         """Returns the index in Diesel format.
 
@@ -1126,16 +1163,7 @@ class StructMetadata:
             self.has_derived_search_indices() or self.has_primary_search_index()
         ), "The struct must have derived search indices or a primary search index to format the diesel search order."
 
-        search_order = ".order(\n"
-        for i, index in enumerate(self.get_all_search_indices()):
-            if i > 0:
-                search_order += "    +\n"
-            search_order += index.format_distance_operator_diesel(query, similarity_method)
-            # if i > 0:
-            #     search_order += "    )\n"
-        search_order += ")"
-
-        return search_order
+        return f".order({self.format_diesel_search_score(query, similarity_method)})"
         
 
     def backend_methods(self) -> List[MethodDefinition]:
@@ -1790,10 +1818,16 @@ class StructMetadata:
             derives.append("Eq")
         if "PartialEq" not in self._derives:
             derives.append("PartialEq")
+        if "PartialOrd" not in self._derives:
+            derives.append("PartialOrd")
         if "Debug" not in self._derives:
             derives.append("Debug")
         if self.can_implement_clone() and "Clone" not in self._derives:
             derives.append("Clone")
+        if self.can_implement_copy() and "Copy" not in self._derives:
+            derives.append("Copy")
+        if self.can_implement_ord() and "Ord" not in self._derives:
+            derives.append("Ord")
         if self.can_implement_serialize() and "Serialize" not in self._derives:
             derives.append("Serialize")
         if self.can_implement_deserialize() and "Deserialize" not in self._derives:
@@ -1834,6 +1868,10 @@ class StructMetadata:
     def can_implement_copy(self) -> bool:
         """Returns whether the struct can implement the Copy trait."""
         return all(attribute.implements_copy() for attribute in self.attributes)
+
+    def can_implement_ord(self) -> bool:
+        """Returns whether the struct can implement the Ord trait."""
+        return all(attribute.implements_ord() for attribute in self.attributes)
 
     def can_implement_eq(self) -> bool:
         """Returns whether the struct can implement the Eq trait."""

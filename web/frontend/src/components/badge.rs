@@ -38,6 +38,7 @@ pub mod sample_container_categories;
 pub mod sample_containers;
 pub mod sample_states;
 pub mod samples;
+pub mod searchable_struct;
 pub mod spectra;
 pub mod spectra_collections;
 pub mod team_states;
@@ -132,6 +133,19 @@ where
     pub onclick: Option<Callback<MouseEvent>>,
     #[prop_or(false)]
     pub li: bool,
+}
+
+impl<B: RowToBadge> BadgeProps<B> {
+    pub fn to_child_props<C: RowToBadge>(&self, child: Rc<C>) -> BadgeProps<C> {
+        BadgeProps {
+            badge: child,
+            closable: self.closable,
+            size: BadgeSize::Small,
+            query: self.query.clone(),
+            onclick: self.onclick.clone(),
+            li: self.li,
+        }
+    }
 }
 
 #[function_component(Badge)]

@@ -22,7 +22,9 @@ use web_common::database::filter_structs::*;
     Debug,
     Identifiable,
     PartialEq,
+    PartialOrd,
     Clone,
+    Copy,
     Serialize,
     Deserialize,
     Default,
@@ -236,452 +238,6 @@ impl DerivedSample {
             .first::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
-    /// Search for the viewable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_viewable(
-        filter: Option<&DerivedSampleFilter>,
-        author_user_id: Option<i32>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::derived_samples;
-        let (samples0, samples1, samples2, samples3, samples4, samples5) = diesel::alias!(
-            crate::schema::samples as samples0,
-            crate::schema::samples as samples1,
-            crate::schema::samples as samples2,
-            crate::schema::samples as samples3,
-            crate::schema::samples as samples4,
-            crate::schema::samples as samples5
-        );
-        let (sample_containers0, sample_containers1) = diesel::alias!(
-            crate::schema::sample_containers as sample_containers0,
-            crate::schema::sample_containers as sample_containers1
-        );
-        let (projects0, projects1) = diesel::alias!(
-            crate::schema::projects as projects0,
-            crate::schema::projects as projects1
-        );
-        let (sample_states0, sample_states1) = diesel::alias!(
-            crate::schema::sample_states as sample_states0,
-            crate::schema::sample_states as sample_states1
-        );
-        let mut query =
-            derived_samples::dsl::derived_samples
-                .select(DerivedSample::as_select())
-                // This operation is defined by a first order index linking derived_samples.unit_id to units.
-                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(samples0.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers0.on(samples0
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers0.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(samples1.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples1.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects0.on(samples1
-                        .field(samples::dsl::project_id)
-                        .eq(projects0.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(samples2.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples2.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states0.on(samples2
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states0.field(sample_states::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    samples3
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples3.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers1.on(samples3
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers1.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    samples4
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples4.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects1.on(samples4
-                        .field(samples::dsl::project_id)
-                        .eq(projects1.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    samples5
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples5.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states1.on(samples5
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states1.field(sample_states::dsl::id))),
-                )
-                .filter(crate::sql_function_bindings::can_view_derived_samples(
-                    author_user_id,
-                    derived_samples::dsl::parent_sample_id,
-                    derived_samples::dsl::child_sample_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::concat_units_name_unit(
-                        units::dsl::name,
-                        units::dsl::unit,
-                    )
-                    .ilike(format!("%{}%", query))
-                    .or(sample_containers0
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(sample_containers1
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_units_name_unit(
-                            units::dsl::name,
-                            units::dsl::unit,
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        sample_containers0.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        sample_containers1.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ),
-                )
-                .into_boxed();
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(derived_samples::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
-        }
-        if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
-            query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
-        }
-        if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
-            query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
-        }
-        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
-            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_viewable(
-        filter: Option<&DerivedSampleFilter>,
-        author_user_id: Option<i32>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::derived_samples;
-        let (samples0, samples1, samples2, samples3, samples4, samples5) = diesel::alias!(
-            crate::schema::samples as samples0,
-            crate::schema::samples as samples1,
-            crate::schema::samples as samples2,
-            crate::schema::samples as samples3,
-            crate::schema::samples as samples4,
-            crate::schema::samples as samples5
-        );
-        let (sample_containers0, sample_containers1) = diesel::alias!(
-            crate::schema::sample_containers as sample_containers0,
-            crate::schema::sample_containers as sample_containers1
-        );
-        let (projects0, projects1) = diesel::alias!(
-            crate::schema::projects as projects0,
-            crate::schema::projects as projects1
-        );
-        let (sample_states0, sample_states1) = diesel::alias!(
-            crate::schema::sample_states as sample_states0,
-            crate::schema::sample_states as sample_states1
-        );
-        let mut query =
-            derived_samples::dsl::derived_samples
-                .select(DerivedSample::as_select())
-                // This operation is defined by a first order index linking derived_samples.unit_id to units.
-                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(samples0.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers0.on(samples0
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers0.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(samples1.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples1.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects0.on(samples1
-                        .field(samples::dsl::project_id)
-                        .eq(projects0.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(samples2.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples2.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states0.on(samples2
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states0.field(sample_states::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    samples3
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples3.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers1.on(samples3
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers1.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    samples4
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples4.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects1.on(samples4
-                        .field(samples::dsl::project_id)
-                        .eq(projects1.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    samples5
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples5.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states1.on(samples5
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states1.field(sample_states::dsl::id))),
-                )
-                .filter(crate::sql_function_bindings::can_view_derived_samples(
-                    author_user_id,
-                    derived_samples::dsl::parent_sample_id,
-                    derived_samples::dsl::child_sample_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::concat_units_name_unit(
-                        units::dsl::name,
-                        units::dsl::unit,
-                    )
-                    .ilike(format!("%{}%", query))
-                    .or(sample_containers0
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(sample_containers1
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_units_name_unit(
-                            units::dsl::name,
-                            units::dsl::unit,
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        sample_containers0.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        sample_containers1.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ),
-                )
-                .into_boxed();
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(derived_samples::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
-        }
-        if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
-            query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
-        }
-        if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
-            query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
-        }
-        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
-            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -729,7 +285,6 @@ impl DerivedSample {
         );
         let mut query =
             derived_samples::dsl::derived_samples
-                .select(DerivedSample::as_select())
                 // This operation is defined by a first order index linking derived_samples.unit_id to units.
                 .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
@@ -798,6 +353,7 @@ impl DerivedSample {
                         .field(samples::dsl::state_id)
                         .eq(sample_states1.field(sample_states::dsl::id))),
                 )
+                .select(DerivedSample::as_select())
                 .filter(crate::sql_function_bindings::can_view_derived_samples(
                     author_user_id,
                     derived_samples::dsl::parent_sample_id,
@@ -904,6 +460,198 @@ impl DerivedSample {
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `author_user_id` - The ID of the user who is performing the search.
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn strict_word_similarity_search_with_score_viewable(
+        author_user_id: Option<i32>,
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<Vec<(Self, f32)>, web_common::api::ApiError> {
+        use crate::schema::derived_samples;
+        let (samples0, samples1, samples2, samples3, samples4, samples5) = diesel::alias!(
+            crate::schema::samples as samples0,
+            crate::schema::samples as samples1,
+            crate::schema::samples as samples2,
+            crate::schema::samples as samples3,
+            crate::schema::samples as samples4,
+            crate::schema::samples as samples5
+        );
+        let (sample_containers0, sample_containers1) = diesel::alias!(
+            crate::schema::sample_containers as sample_containers0,
+            crate::schema::sample_containers as sample_containers1
+        );
+        let (projects0, projects1) = diesel::alias!(
+            crate::schema::projects as projects0,
+            crate::schema::projects as projects1
+        );
+        let (sample_states0, sample_states1) = diesel::alias!(
+            crate::schema::sample_states as sample_states0,
+            crate::schema::sample_states as sample_states1
+        );
+        derived_samples::dsl::derived_samples
+            // This operation is defined by a first order index linking derived_samples.unit_id to units.
+.inner_join(
+   units::dsl::units.on(
+       derived_samples::dsl::unit_id.eq(
+           units::dsl::id
+        )
+    )
+)
+
+// This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
+.inner_join(
+   samples0.on(
+       derived_samples::dsl::parent_sample_id.eq(
+           samples0.field(samples::dsl::id)
+        )
+    )
+)
+// This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
+.inner_join(
+   sample_containers0.on(
+       samples0.field(samples::dsl::container_id).eq(
+           sample_containers0.field(sample_containers::dsl::id)
+        )
+    )
+)
+
+// This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
+.inner_join(
+   samples1.on(
+       derived_samples::dsl::parent_sample_id.eq(
+           samples1.field(samples::dsl::id)
+        )
+    )
+)
+// This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
+.inner_join(
+   projects0.on(
+       samples1.field(samples::dsl::project_id).eq(
+           projects0.field(projects::dsl::id)
+        )
+    )
+)
+
+// This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
+.inner_join(
+   samples2.on(
+       derived_samples::dsl::parent_sample_id.eq(
+           samples2.field(samples::dsl::id)
+        )
+    )
+)
+// This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
+.inner_join(
+   sample_states0.on(
+       samples2.field(samples::dsl::state_id).eq(
+           sample_states0.field(sample_states::dsl::id)
+        )
+    )
+)
+
+// This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
+.inner_join(
+   samples3.on(
+       derived_samples::dsl::child_sample_id.eq(
+           samples3.field(samples::dsl::id)
+        )
+    )
+)
+// This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
+.inner_join(
+   sample_containers1.on(
+       samples3.field(samples::dsl::container_id).eq(
+           sample_containers1.field(sample_containers::dsl::id)
+        )
+    )
+)
+
+// This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
+.inner_join(
+   samples4.on(
+       derived_samples::dsl::child_sample_id.eq(
+           samples4.field(samples::dsl::id)
+        )
+    )
+)
+// This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
+.inner_join(
+   projects1.on(
+       samples4.field(samples::dsl::project_id).eq(
+           projects1.field(projects::dsl::id)
+        )
+    )
+)
+
+// This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
+.inner_join(
+   samples5.on(
+       derived_samples::dsl::child_sample_id.eq(
+           samples5.field(samples::dsl::id)
+        )
+    )
+)
+// This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
+.inner_join(
+   sample_states1.on(
+       samples5.field(samples::dsl::state_id).eq(
+           sample_states1.field(sample_states::dsl::id)
+        )
+    )
+)
+
+            .select((
+    DerivedSample::as_select(),
+    crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_units_name_unit(units::dsl::name, units::dsl::unit), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(sample_containers0.field(sample_containers::dsl::barcode), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_projects_name_description(projects0.field(projects::dsl::name), projects0.field(projects::dsl::description)), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_sample_states_name_description(sample_states0.field(sample_states::dsl::name), sample_states0.field(sample_states::dsl::description)), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(sample_containers1.field(sample_containers::dsl::barcode), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_projects_name_description(projects1.field(projects::dsl::name), projects1.field(projects::dsl::description)), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_sample_states_name_description(sample_states1.field(sample_states::dsl::name), sample_states1.field(sample_states::dsl::description)), query)
+))
+            .filter(crate::sql_function_bindings::can_view_derived_samples(author_user_id, derived_samples::dsl::parent_sample_id, derived_samples::dsl::child_sample_id))
+            .filter(
+    crate::sql_function_bindings::concat_units_name_unit(units::dsl::name, units::dsl::unit).ilike(format!("%{}%", query))
+    .or(
+    sample_containers0.field(sample_containers::dsl::barcode).ilike(format!("%{}%", query))
+    )
+    .or(
+    crate::sql_function_bindings::concat_projects_name_description(projects0.field(projects::dsl::name), projects0.field(projects::dsl::description)).ilike(format!("%{}%", query))
+    )
+    .or(
+    crate::sql_function_bindings::concat_sample_states_name_description(sample_states0.field(sample_states::dsl::name), sample_states0.field(sample_states::dsl::description)).ilike(format!("%{}%", query))
+    )
+    .or(
+    sample_containers1.field(sample_containers::dsl::barcode).ilike(format!("%{}%", query))
+    )
+    .or(
+    crate::sql_function_bindings::concat_projects_name_description(projects1.field(projects::dsl::name), projects1.field(projects::dsl::description)).ilike(format!("%{}%", query))
+    )
+    .or(
+    crate::sql_function_bindings::concat_sample_states_name_description(sample_states1.field(sample_states::dsl::name), sample_states1.field(sample_states::dsl::description)).ilike(format!("%{}%", query))
+    )
+)
+            .order(crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_units_name_unit(units::dsl::name, units::dsl::unit), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(sample_containers0.field(sample_containers::dsl::barcode), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_projects_name_description(projects0.field(projects::dsl::name), projects0.field(projects::dsl::description)), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_sample_states_name_description(sample_states0.field(sample_states::dsl::name), sample_states0.field(sample_states::dsl::description)), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(sample_containers1.field(sample_containers::dsl::barcode), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_projects_name_description(projects1.field(projects::dsl::name), projects1.field(projects::dsl::description)), query)    +
+crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_sample_states_name_description(sample_states1.field(sample_states::dsl::name), sample_states1.field(sample_states::dsl::description)), query))
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<(Self, f32)>(connection).map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.
     ///
@@ -1036,452 +784,6 @@ impl DerivedSample {
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
-    /// Search for the updatable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_updatable(
-        filter: Option<&DerivedSampleFilter>,
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::derived_samples;
-        let (samples0, samples1, samples2, samples3, samples4, samples5) = diesel::alias!(
-            crate::schema::samples as samples0,
-            crate::schema::samples as samples1,
-            crate::schema::samples as samples2,
-            crate::schema::samples as samples3,
-            crate::schema::samples as samples4,
-            crate::schema::samples as samples5
-        );
-        let (sample_containers0, sample_containers1) = diesel::alias!(
-            crate::schema::sample_containers as sample_containers0,
-            crate::schema::sample_containers as sample_containers1
-        );
-        let (projects0, projects1) = diesel::alias!(
-            crate::schema::projects as projects0,
-            crate::schema::projects as projects1
-        );
-        let (sample_states0, sample_states1) = diesel::alias!(
-            crate::schema::sample_states as sample_states0,
-            crate::schema::sample_states as sample_states1
-        );
-        let mut query =
-            derived_samples::dsl::derived_samples
-                .select(DerivedSample::as_select())
-                // This operation is defined by a first order index linking derived_samples.unit_id to units.
-                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(samples0.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers0.on(samples0
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers0.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(samples1.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples1.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects0.on(samples1
-                        .field(samples::dsl::project_id)
-                        .eq(projects0.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(samples2.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples2.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states0.on(samples2
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states0.field(sample_states::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    samples3
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples3.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers1.on(samples3
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers1.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    samples4
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples4.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects1.on(samples4
-                        .field(samples::dsl::project_id)
-                        .eq(projects1.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    samples5
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples5.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states1.on(samples5
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states1.field(sample_states::dsl::id))),
-                )
-                .filter(crate::sql_function_bindings::can_update_derived_samples(
-                    author_user_id,
-                    derived_samples::dsl::parent_sample_id,
-                    derived_samples::dsl::child_sample_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::concat_units_name_unit(
-                        units::dsl::name,
-                        units::dsl::unit,
-                    )
-                    .ilike(format!("%{}%", query))
-                    .or(sample_containers0
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(sample_containers1
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_units_name_unit(
-                            units::dsl::name,
-                            units::dsl::unit,
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        sample_containers0.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        sample_containers1.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ),
-                )
-                .into_boxed();
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(derived_samples::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
-        }
-        if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
-            query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
-        }
-        if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
-            query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
-        }
-        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
-            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the updatable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_updatable(
-        filter: Option<&DerivedSampleFilter>,
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::derived_samples;
-        let (samples0, samples1, samples2, samples3, samples4, samples5) = diesel::alias!(
-            crate::schema::samples as samples0,
-            crate::schema::samples as samples1,
-            crate::schema::samples as samples2,
-            crate::schema::samples as samples3,
-            crate::schema::samples as samples4,
-            crate::schema::samples as samples5
-        );
-        let (sample_containers0, sample_containers1) = diesel::alias!(
-            crate::schema::sample_containers as sample_containers0,
-            crate::schema::sample_containers as sample_containers1
-        );
-        let (projects0, projects1) = diesel::alias!(
-            crate::schema::projects as projects0,
-            crate::schema::projects as projects1
-        );
-        let (sample_states0, sample_states1) = diesel::alias!(
-            crate::schema::sample_states as sample_states0,
-            crate::schema::sample_states as sample_states1
-        );
-        let mut query =
-            derived_samples::dsl::derived_samples
-                .select(DerivedSample::as_select())
-                // This operation is defined by a first order index linking derived_samples.unit_id to units.
-                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(samples0.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers0.on(samples0
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers0.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(samples1.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples1.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects0.on(samples1
-                        .field(samples::dsl::project_id)
-                        .eq(projects0.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(samples2.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples2.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states0.on(samples2
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states0.field(sample_states::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    samples3
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples3.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers1.on(samples3
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers1.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    samples4
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples4.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects1.on(samples4
-                        .field(samples::dsl::project_id)
-                        .eq(projects1.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    samples5
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples5.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states1.on(samples5
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states1.field(sample_states::dsl::id))),
-                )
-                .filter(crate::sql_function_bindings::can_update_derived_samples(
-                    author_user_id,
-                    derived_samples::dsl::parent_sample_id,
-                    derived_samples::dsl::child_sample_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::concat_units_name_unit(
-                        units::dsl::name,
-                        units::dsl::unit,
-                    )
-                    .ilike(format!("%{}%", query))
-                    .or(sample_containers0
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(sample_containers1
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_units_name_unit(
-                            units::dsl::name,
-                            units::dsl::unit,
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        sample_containers0.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        sample_containers1.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ),
-                )
-                .into_boxed();
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(derived_samples::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
-        }
-        if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
-            query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
-        }
-        if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
-            query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
-        }
-        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
-            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -1529,7 +831,6 @@ impl DerivedSample {
         );
         let mut query =
             derived_samples::dsl::derived_samples
-                .select(DerivedSample::as_select())
                 // This operation is defined by a first order index linking derived_samples.unit_id to units.
                 .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
@@ -1598,6 +899,7 @@ impl DerivedSample {
                         .field(samples::dsl::state_id)
                         .eq(sample_states1.field(sample_states::dsl::id))),
                 )
+                .select(DerivedSample::as_select())
                 .filter(crate::sql_function_bindings::can_update_derived_samples(
                     author_user_id,
                     derived_samples::dsl::parent_sample_id,
@@ -1836,452 +1138,6 @@ impl DerivedSample {
             .load::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
-    /// Search for the administrable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_administrable(
-        filter: Option<&DerivedSampleFilter>,
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::derived_samples;
-        let (samples0, samples1, samples2, samples3, samples4, samples5) = diesel::alias!(
-            crate::schema::samples as samples0,
-            crate::schema::samples as samples1,
-            crate::schema::samples as samples2,
-            crate::schema::samples as samples3,
-            crate::schema::samples as samples4,
-            crate::schema::samples as samples5
-        );
-        let (sample_containers0, sample_containers1) = diesel::alias!(
-            crate::schema::sample_containers as sample_containers0,
-            crate::schema::sample_containers as sample_containers1
-        );
-        let (projects0, projects1) = diesel::alias!(
-            crate::schema::projects as projects0,
-            crate::schema::projects as projects1
-        );
-        let (sample_states0, sample_states1) = diesel::alias!(
-            crate::schema::sample_states as sample_states0,
-            crate::schema::sample_states as sample_states1
-        );
-        let mut query =
-            derived_samples::dsl::derived_samples
-                .select(DerivedSample::as_select())
-                // This operation is defined by a first order index linking derived_samples.unit_id to units.
-                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(samples0.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers0.on(samples0
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers0.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(samples1.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples1.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects0.on(samples1
-                        .field(samples::dsl::project_id)
-                        .eq(projects0.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(samples2.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples2.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states0.on(samples2
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states0.field(sample_states::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    samples3
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples3.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers1.on(samples3
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers1.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    samples4
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples4.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects1.on(samples4
-                        .field(samples::dsl::project_id)
-                        .eq(projects1.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    samples5
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples5.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states1.on(samples5
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states1.field(sample_states::dsl::id))),
-                )
-                .filter(crate::sql_function_bindings::can_admin_derived_samples(
-                    author_user_id,
-                    derived_samples::dsl::parent_sample_id,
-                    derived_samples::dsl::child_sample_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::concat_units_name_unit(
-                        units::dsl::name,
-                        units::dsl::unit,
-                    )
-                    .ilike(format!("%{}%", query))
-                    .or(sample_containers0
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(sample_containers1
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_units_name_unit(
-                            units::dsl::name,
-                            units::dsl::unit,
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        sample_containers0.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        sample_containers1.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::similarity_dist(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ),
-                )
-                .into_boxed();
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(derived_samples::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
-        }
-        if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
-            query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
-        }
-        if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
-            query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
-        }
-        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
-            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the administrable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_administrable(
-        filter: Option<&DerivedSampleFilter>,
-        author_user_id: i32,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
-        }
-        use crate::schema::derived_samples;
-        let (samples0, samples1, samples2, samples3, samples4, samples5) = diesel::alias!(
-            crate::schema::samples as samples0,
-            crate::schema::samples as samples1,
-            crate::schema::samples as samples2,
-            crate::schema::samples as samples3,
-            crate::schema::samples as samples4,
-            crate::schema::samples as samples5
-        );
-        let (sample_containers0, sample_containers1) = diesel::alias!(
-            crate::schema::sample_containers as sample_containers0,
-            crate::schema::sample_containers as sample_containers1
-        );
-        let (projects0, projects1) = diesel::alias!(
-            crate::schema::projects as projects0,
-            crate::schema::projects as projects1
-        );
-        let (sample_states0, sample_states1) = diesel::alias!(
-            crate::schema::sample_states as sample_states0,
-            crate::schema::sample_states as sample_states1
-        );
-        let mut query =
-            derived_samples::dsl::derived_samples
-                .select(DerivedSample::as_select())
-                // This operation is defined by a first order index linking derived_samples.unit_id to units.
-                .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(samples0.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples0.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers0.on(samples0
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers0.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(samples1.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples1.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects0.on(samples1
-                        .field(samples::dsl::project_id)
-                        .eq(projects0.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(samples2.on(
-                    derived_samples::dsl::parent_sample_id.eq(samples2.field(samples::dsl::id)),
-                ))
-                // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states0.on(samples2
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states0.field(sample_states::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    samples3
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples3.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.container_id to sample_containers.
-                .inner_join(
-                    sample_containers1.on(samples3
-                        .field(samples::dsl::container_id)
-                        .eq(sample_containers1.field(sample_containers::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    samples4
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples4.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.project_id to projects.
-                .inner_join(
-                    projects1.on(samples4
-                        .field(samples::dsl::project_id)
-                        .eq(projects1.field(projects::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    samples5
-                        .on(derived_samples::dsl::child_sample_id
-                            .eq(samples5.field(samples::dsl::id))),
-                )
-                // This operation is defined by a second order index linking derived_samples.child_sample_id to samples and samples.state_id to sample_states.
-                .inner_join(
-                    sample_states1.on(samples5
-                        .field(samples::dsl::state_id)
-                        .eq(sample_states1.field(sample_states::dsl::id))),
-                )
-                .filter(crate::sql_function_bindings::can_admin_derived_samples(
-                    author_user_id,
-                    derived_samples::dsl::parent_sample_id,
-                    derived_samples::dsl::child_sample_id,
-                ))
-                .filter(
-                    crate::sql_function_bindings::concat_units_name_unit(
-                        units::dsl::name,
-                        units::dsl::unit,
-                    )
-                    .ilike(format!("%{}%", query))
-                    .or(sample_containers0
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(sample_containers1
-                        .field(sample_containers::dsl::barcode)
-                        .ilike(format!("%{}%", query)))
-                    .or(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    )
-                    .or(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        )
-                        .ilike(format!("%{}%", query)),
-                    ),
-                )
-                .order(
-                    crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_units_name_unit(
-                            units::dsl::name,
-                            units::dsl::unit,
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        sample_containers0.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects0.field(projects::dsl::name),
-                            projects0.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states0.field(sample_states::dsl::name),
-                            sample_states0.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        sample_containers1.field(sample_containers::dsl::barcode),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_projects_name_description(
-                            projects1.field(projects::dsl::name),
-                            projects1.field(projects::dsl::description),
-                        ),
-                        query,
-                    ) + crate::sql_function_bindings::word_similarity_dist_op(
-                        crate::sql_function_bindings::concat_sample_states_name_description(
-                            sample_states1.field(sample_states::dsl::name),
-                            sample_states1.field(sample_states::dsl::description),
-                        ),
-                        query,
-                    ),
-                )
-                .into_boxed();
-        if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(derived_samples::dsl::created_by.eq(created_by));
-        }
-        if let Some(updated_by) = filter.and_then(|f| f.updated_by) {
-            query = query.filter(derived_samples::dsl::updated_by.eq(updated_by));
-        }
-        if let Some(parent_sample_id) = filter.and_then(|f| f.parent_sample_id) {
-            query = query.filter(derived_samples::dsl::parent_sample_id.eq(parent_sample_id));
-        }
-        if let Some(child_sample_id) = filter.and_then(|f| f.child_sample_id) {
-            query = query.filter(derived_samples::dsl::child_sample_id.eq(child_sample_id));
-        }
-        if let Some(unit_id) = filter.and_then(|f| f.unit_id) {
-            query = query.filter(derived_samples::dsl::unit_id.eq(unit_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -2329,7 +1185,6 @@ impl DerivedSample {
         );
         let mut query =
             derived_samples::dsl::derived_samples
-                .select(DerivedSample::as_select())
                 // This operation is defined by a first order index linking derived_samples.unit_id to units.
                 .inner_join(units::dsl::units.on(derived_samples::dsl::unit_id.eq(units::dsl::id)))
                 // This operation is defined by a second order index linking derived_samples.parent_sample_id to samples and samples.container_id to sample_containers.
@@ -2398,6 +1253,7 @@ impl DerivedSample {
                         .field(samples::dsl::state_id)
                         .eq(sample_states1.field(sample_states::dsl::id))),
                 )
+                .select(DerivedSample::as_select())
                 .filter(crate::sql_function_bindings::can_admin_derived_samples(
                     author_user_id,
                     derived_samples::dsl::parent_sample_id,

@@ -1,4 +1,3 @@
--- This is a no-op SQL statement
 CREATE TABLE IF NOT EXISTS colors (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE, -- the name of the color

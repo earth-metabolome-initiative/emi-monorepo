@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 pub struct EmptyFilter;
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct BioOttRankFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -27,7 +27,7 @@ impl BioOttRankFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct BioOttTaxonItemFilter {
     pub ott_rank_id: Option<i32>,
     pub domain_id: Option<i32>,
@@ -96,7 +96,7 @@ impl BioOttTaxonItemFilter {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default, Eq)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default, Eq)]
 pub struct DerivedSampleFilter {
     pub created_by: Option<i32>,
     pub updated_by: Option<i32>,
@@ -135,7 +135,7 @@ impl DerivedSampleFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct DocumentFormatFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -159,7 +159,7 @@ impl DocumentFormatFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct LoginProviderFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -183,7 +183,7 @@ impl LoginProviderFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct MaterialFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -207,7 +207,7 @@ impl MaterialFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct NameplateCategoryFilter {
     pub permanence_id: Option<i32>,
     pub material_id: Option<i32>,
@@ -241,7 +241,7 @@ impl NameplateCategoryFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct NameplateFilter {
     pub project_id: Option<i32>,
     pub category_id: Option<i32>,
@@ -275,7 +275,7 @@ impl NameplateFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct NotificationFilter {
     pub user_id: Option<i32>,
 }
@@ -294,7 +294,7 @@ impl NotificationFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct ObservationSubjectFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -318,7 +318,7 @@ impl ObservationSubjectFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy)]
 pub struct ObservationFilter {
     pub parent_observation_id: Option<uuid::Uuid>,
     pub created_by: Option<i32>,
@@ -367,7 +367,7 @@ impl ObservationFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct OrganismBioOttTaxonItemFilter {
     pub created_by: Option<i32>,
     pub organism_id: Option<uuid::Uuid>,
@@ -396,7 +396,7 @@ impl OrganismBioOttTaxonItemFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy)]
 pub struct OrganismFilter {
     pub host_organism_id: Option<uuid::Uuid>,
     pub sample_id: Option<uuid::Uuid>,
@@ -440,7 +440,7 @@ impl OrganismFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct OrganizationFilter {
     pub country_id: Option<i32>,
 }
@@ -459,7 +459,7 @@ impl OrganizationFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct PermanenceCategoryFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -483,7 +483,7 @@ impl PermanenceCategoryFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct ProjectStateFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -507,7 +507,7 @@ impl ProjectStateFilter {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default, Eq)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Eq, Copy, Ord)]
 pub struct ProjectFilter {
     pub state_id: Option<i32>,
     pub icon_id: Option<i32>,
@@ -551,7 +551,7 @@ impl ProjectFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsTeamsRoleInvitationFilter {
     pub table_id: Option<i32>,
     pub team_id: Option<i32>,
@@ -585,7 +585,7 @@ impl ProjectsTeamsRoleInvitationFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsTeamsRoleRequestFilter {
     pub table_id: Option<i32>,
     pub team_id: Option<i32>,
@@ -619,7 +619,7 @@ impl ProjectsTeamsRoleRequestFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsTeamsRoleFilter {
     pub table_id: Option<i32>,
     pub team_id: Option<i32>,
@@ -653,7 +653,7 @@ impl ProjectsTeamsRoleFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsUsersRoleInvitationFilter {
     pub table_id: Option<i32>,
     pub user_id: Option<i32>,
@@ -687,7 +687,7 @@ impl ProjectsUsersRoleInvitationFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsUsersRoleRequestFilter {
     pub table_id: Option<i32>,
     pub user_id: Option<i32>,
@@ -721,7 +721,7 @@ impl ProjectsUsersRoleRequestFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct ProjectsUsersRoleFilter {
     pub table_id: Option<i32>,
     pub user_id: Option<i32>,
@@ -755,7 +755,7 @@ impl ProjectsUsersRoleFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct RoleFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -779,7 +779,7 @@ impl RoleFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
 pub struct SampleBioOttTaxonItemFilter {
     pub created_by: Option<i32>,
     pub sample_id: Option<uuid::Uuid>,
@@ -808,7 +808,7 @@ impl SampleBioOttTaxonItemFilter {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default, Eq)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Eq, Copy, Ord)]
 pub struct SampleContainerCategoryFilter {
     pub material_id: Option<i32>,
     pub icon_id: Option<i32>,
@@ -837,7 +837,7 @@ impl SampleContainerCategoryFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct SampleContainerFilter {
     pub project_id: Option<i32>,
     pub category_id: Option<i32>,
@@ -871,7 +871,7 @@ impl SampleContainerFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct SampleStateFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -895,7 +895,7 @@ impl SampleStateFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct SampleFilter {
     pub container_id: Option<i32>,
     pub project_id: Option<i32>,
@@ -939,7 +939,7 @@ impl SampleFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct SpectraFilter {
     pub spectra_collection_id: Option<i32>,
     pub created_by: Option<i32>,
@@ -968,7 +968,7 @@ impl SpectraFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy)]
 pub struct SpectraCollectionFilter {
     pub sample_id: Option<uuid::Uuid>,
     pub created_by: Option<i32>,
@@ -997,7 +997,7 @@ impl SpectraCollectionFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct TeamStateFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -1021,7 +1021,7 @@ impl TeamStateFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct TeamFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -1065,7 +1065,7 @@ impl TeamFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct TeamsTeamsRoleInvitationFilter {
     pub table_id: Option<i32>,
     pub team_id: Option<i32>,
@@ -1099,7 +1099,7 @@ impl TeamsTeamsRoleInvitationFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct TeamsUsersRoleInvitationFilter {
     pub table_id: Option<i32>,
     pub user_id: Option<i32>,
@@ -1133,7 +1133,7 @@ impl TeamsUsersRoleInvitationFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct TeamsUsersRoleRequestFilter {
     pub table_id: Option<i32>,
     pub user_id: Option<i32>,
@@ -1167,7 +1167,7 @@ impl TeamsUsersRoleRequestFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct TeamsUsersRoleFilter {
     pub table_id: Option<i32>,
     pub user_id: Option<i32>,
@@ -1201,7 +1201,7 @@ impl TeamsUsersRoleFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct UnitFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -1225,7 +1225,7 @@ impl UnitFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
 pub struct UserEmailFilter {
     pub created_by: Option<i32>,
     pub login_provider_id: Option<i32>,
@@ -1249,7 +1249,7 @@ impl UserEmailFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct UsersUsersRoleInvitationFilter {
     pub table_id: Option<i32>,
     pub user_id: Option<i32>,
@@ -1283,7 +1283,7 @@ impl UsersUsersRoleInvitationFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct UsersUsersRoleRequestFilter {
     pub table_id: Option<i32>,
     pub user_id: Option<i32>,
@@ -1317,7 +1317,7 @@ impl UsersUsersRoleRequestFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct UsersUsersRoleFilter {
     pub table_id: Option<i32>,
     pub user_id: Option<i32>,

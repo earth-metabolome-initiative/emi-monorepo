@@ -5,7 +5,7 @@ use serde::Serialize;
 use std::rc::Rc;
 use web_common::database::filter_structs::*;
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUserEmail {
     pub inner: UserEmail,
     pub created_by: User,

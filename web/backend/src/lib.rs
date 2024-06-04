@@ -3,6 +3,7 @@ pub mod models;
 pub mod nested_models;
 pub mod new_variants;
 pub mod schema;
+pub mod search_all;
 pub mod sql_function_bindings;
 pub mod table_enumeration;
 pub mod transactions;

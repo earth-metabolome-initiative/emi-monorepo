@@ -23,6 +23,7 @@ use web_common::database::filter_structs::*;
     Identifiable,
     Eq,
     PartialEq,
+    PartialOrd,
     Clone,
     Serialize,
     Deserialize,
@@ -160,108 +161,6 @@ impl DocumentFormat {
             .first::<Self>(connection)?;
         Ok(flat_variant)
     }
-    /// Search for the viewable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_viewable(
-        filter: Option<&DocumentFormatFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, limit, offset, connection);
-        }
-        use crate::schema::document_formats;
-        let mut query = document_formats::dsl::document_formats
-            .filter(
-                crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                    document_formats::dsl::extension,
-                    document_formats::dsl::mime_type,
-                )
-                .ilike(format!("%{}%", query)),
-            )
-            .order(crate::sql_function_bindings::similarity_dist(
-                crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                    document_formats::dsl::extension,
-                    document_formats::dsl::mime_type,
-                ),
-                query,
-            ))
-            .into_boxed();
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(document_formats::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(document_formats::dsl::color_id.eq(color_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_viewable(
-        filter: Option<&DocumentFormatFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, limit, offset, connection);
-        }
-        use crate::schema::document_formats;
-        let mut query = document_formats::dsl::document_formats
-            .filter(
-                crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                    document_formats::dsl::extension,
-                    document_formats::dsl::mime_type,
-                )
-                .ilike(format!("%{}%", query)),
-            )
-            .order(crate::sql_function_bindings::word_similarity_dist_op(
-                crate::sql_function_bindings::concat_document_formats_extension_mime_type(
-                    document_formats::dsl::extension,
-                    document_formats::dsl::mime_type,
-                ),
-                query,
-            ))
-            .into_boxed();
-        if let Some(icon_id) = filter.and_then(|f| f.icon_id) {
-            query = query.filter(document_formats::dsl::icon_id.eq(icon_id));
-        }
-        if let Some(color_id) = filter.and_then(|f| f.color_id) {
-            query = query.filter(document_formats::dsl::color_id.eq(color_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -286,6 +185,7 @@ impl DocumentFormat {
         }
         use crate::schema::document_formats;
         let mut query = document_formats::dsl::document_formats
+            .select(DocumentFormat::as_select())
             .filter(
                 crate::sql_function_bindings::concat_document_formats_extension_mime_type(
                     document_formats::dsl::extension,
@@ -313,6 +213,53 @@ impl DocumentFormat {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn strict_word_similarity_search_with_score_viewable(
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<Vec<(Self, f32)>, web_common::api::ApiError> {
+        use crate::schema::document_formats;
+        document_formats::dsl::document_formats
+            .select((
+                DocumentFormat::as_select(),
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
+                        document_formats::dsl::extension,
+                        document_formats::dsl::mime_type,
+                    ),
+                    query,
+                ),
+            ))
+            .filter(
+                crate::sql_function_bindings::concat_document_formats_extension_mime_type(
+                    document_formats::dsl::extension,
+                    document_formats::dsl::mime_type,
+                )
+                .ilike(format!("%{}%", query)),
+            )
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    crate::sql_function_bindings::concat_document_formats_extension_mime_type(
+                        document_formats::dsl::extension,
+                        document_formats::dsl::mime_type,
+                    ),
+                    query,
+                ),
+            )
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<(Self, f32)>(connection)
             .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.

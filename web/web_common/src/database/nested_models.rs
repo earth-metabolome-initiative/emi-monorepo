@@ -7,7 +7,7 @@ use serde::Serialize;
 use std::rc::Rc;
 use super::*;
 
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttRank {
     pub inner: Rc<BioOttRank>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -101,7 +101,7 @@ impl NestedBioOttRank {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedBioOttTaxonItem {
     pub inner: Rc<BioOttTaxonItem>,
     pub ott_rank: Rc<NestedBioOttRank>,
@@ -236,7 +236,7 @@ impl NestedBioOttTaxonItem {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
     pub created_by: Rc<User>,
@@ -361,7 +361,7 @@ impl NestedDerivedSample {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedDocumentFormat {
     pub inner: Rc<DocumentFormat>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -455,7 +455,7 @@ impl NestedDocumentFormat {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedLoginProvider {
     pub inner: Rc<LoginProvider>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -549,7 +549,7 @@ impl NestedLoginProvider {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedMaterial {
     pub inner: Rc<Material>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -643,7 +643,7 @@ impl NestedMaterial {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedNameplateCategory {
     pub inner: Rc<NameplateCategory>,
     pub permanence: Rc<NestedPermanenceCategory>,
@@ -743,7 +743,7 @@ impl NestedNameplateCategory {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedNameplate {
     pub inner: Rc<Nameplate>,
     pub project: Rc<NestedProject>,
@@ -865,7 +865,7 @@ impl NestedNameplate {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedNotification {
     pub inner: Rc<Notification>,
     pub user: Rc<User>,
@@ -956,7 +956,7 @@ impl NestedNotification {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedObservationSubject {
     pub inner: Rc<ObservationSubject>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -1050,7 +1050,7 @@ impl NestedObservationSubject {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedObservation {
     pub inner: Rc<Observation>,
     pub parent_observation: Option<Rc<Observation>>,
@@ -1187,7 +1187,7 @@ impl NestedObservation {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedOrganismBioOttTaxonItem {
     pub inner: OrganismBioOttTaxonItem,
     pub created_by: Rc<User>,
@@ -1284,7 +1284,7 @@ impl NestedOrganismBioOttTaxonItem {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedOrganism {
     pub inner: Rc<Organism>,
     pub host_organism: Option<Rc<Organism>>,
@@ -1416,7 +1416,7 @@ impl NestedOrganism {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedOrganization {
     pub inner: Rc<Organization>,
     pub country: Rc<Country>,
@@ -1507,7 +1507,7 @@ impl NestedOrganization {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedPermanenceCategory {
     pub inner: Rc<PermanenceCategory>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -1601,7 +1601,7 @@ impl NestedPermanenceCategory {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProjectState {
     pub inner: Rc<ProjectState>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -1695,7 +1695,7 @@ impl NestedProjectState {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProject {
     pub inner: Rc<Project>,
     pub state: Rc<NestedProjectState>,
@@ -1825,7 +1825,7 @@ impl NestedProject {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProjectsTeamsRoleInvitation {
     pub inner: ProjectsTeamsRoleInvitation,
     pub table: Rc<NestedProject>,
@@ -1925,7 +1925,7 @@ impl NestedProjectsTeamsRoleInvitation {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProjectsTeamsRoleRequest {
     pub inner: ProjectsTeamsRoleRequest,
     pub table: Rc<NestedProject>,
@@ -2025,7 +2025,7 @@ impl NestedProjectsTeamsRoleRequest {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProjectsTeamsRole {
     pub inner: ProjectsTeamsRole,
     pub table: Rc<NestedProject>,
@@ -2125,7 +2125,7 @@ impl NestedProjectsTeamsRole {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProjectsUsersRoleInvitation {
     pub inner: ProjectsUsersRoleInvitation,
     pub table: Rc<NestedProject>,
@@ -2225,7 +2225,7 @@ impl NestedProjectsUsersRoleInvitation {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProjectsUsersRoleRequest {
     pub inner: ProjectsUsersRoleRequest,
     pub table: Rc<NestedProject>,
@@ -2325,7 +2325,7 @@ impl NestedProjectsUsersRoleRequest {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedProjectsUsersRole {
     pub inner: ProjectsUsersRole,
     pub table: Rc<NestedProject>,
@@ -2425,7 +2425,7 @@ impl NestedProjectsUsersRole {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedRole {
     pub inner: Rc<Role>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -2519,7 +2519,7 @@ impl NestedRole {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
     pub created_by: Rc<User>,
@@ -2616,7 +2616,7 @@ impl NestedSampleBioOttTaxonItem {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleContainerCategory {
     pub inner: Rc<SampleContainerCategory>,
     pub material: Rc<NestedMaterial>,
@@ -2713,7 +2713,7 @@ impl NestedSampleContainerCategory {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleContainer {
     pub inner: Rc<SampleContainer>,
     pub project: Rc<NestedProject>,
@@ -2835,7 +2835,7 @@ impl NestedSampleContainer {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleState {
     pub inner: Rc<SampleState>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -2929,7 +2929,7 @@ impl NestedSampleState {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSample {
     pub inner: Rc<Sample>,
     pub container: Rc<NestedSampleContainer>,
@@ -3057,7 +3057,7 @@ impl NestedSample {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSpectra {
     pub inner: Rc<Spectra>,
     pub spectra_collection: Rc<NestedSpectraCollection>,
@@ -3176,7 +3176,7 @@ impl NestedSpectra {
         Ok(())
     }
 }
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSpectraCollection {
     pub inner: Rc<SpectraCollection>,
     pub sample: Rc<NestedSample>,
@@ -3295,7 +3295,7 @@ impl NestedSpectraCollection {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeamState {
     pub inner: Rc<TeamState>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -3389,7 +3389,7 @@ impl NestedTeamState {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeam {
     pub inner: Rc<Team>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -3519,7 +3519,7 @@ impl NestedTeam {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeamsTeamsRoleInvitation {
     pub inner: TeamsTeamsRoleInvitation,
     pub table: Rc<NestedTeam>,
@@ -3619,7 +3619,7 @@ impl NestedTeamsTeamsRoleInvitation {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeamsUsersRoleInvitation {
     pub inner: TeamsUsersRoleInvitation,
     pub table: Rc<NestedTeam>,
@@ -3719,7 +3719,7 @@ impl NestedTeamsUsersRoleInvitation {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeamsUsersRoleRequest {
     pub inner: TeamsUsersRoleRequest,
     pub table: Rc<NestedTeam>,
@@ -3819,7 +3819,7 @@ impl NestedTeamsUsersRoleRequest {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedTeamsUsersRole {
     pub inner: TeamsUsersRole,
     pub table: Rc<NestedTeam>,
@@ -3919,7 +3919,7 @@ impl NestedTeamsUsersRole {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUnit {
     pub inner: Rc<Unit>,
     pub icon: Rc<FontAwesomeIcon>,
@@ -4013,7 +4013,7 @@ impl NestedUnit {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUserEmail {
     pub inner: Rc<UserEmail>,
     pub created_by: Rc<User>,
@@ -4107,7 +4107,7 @@ impl NestedUserEmail {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUsersUsersRoleInvitation {
     pub inner: UsersUsersRoleInvitation,
     pub table: Rc<User>,
@@ -4207,7 +4207,7 @@ impl NestedUsersUsersRoleInvitation {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUsersUsersRoleRequest {
     pub inner: UsersUsersRoleRequest,
     pub table: Rc<User>,
@@ -4307,7 +4307,7 @@ impl NestedUsersUsersRoleRequest {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUsersUsersRole {
     pub inner: UsersUsersRole,
     pub table: Rc<User>,

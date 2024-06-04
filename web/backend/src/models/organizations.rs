@@ -23,6 +23,7 @@ use web_common::database::filter_structs::*;
     Identifiable,
     Eq,
     PartialEq,
+    PartialOrd,
     Clone,
     Serialize,
     Deserialize,
@@ -194,84 +195,6 @@ impl Organization {
             .first::<Self>(connection)?;
         Ok(flat_variant)
     }
-    /// Search for the viewable structs by a given string by Postgres's `similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn similarity_search_viewable(
-        filter: Option<&OrganizationFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, limit, offset, connection);
-        }
-        use crate::schema::organizations;
-        let mut query = organizations::dsl::organizations
-            .filter(organizations::dsl::name.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::similarity_dist(
-                organizations::dsl::name,
-                query,
-            ))
-            .into_boxed();
-        if let Some(country_id) = filter.and_then(|f| f.country_id) {
-            query = query.filter(organizations::dsl::country_id.eq(country_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
-    /// Search for the viewable structs by a given string by Postgres's `word_similarity`.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `query` - The string to search for.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn word_similarity_search_viewable(
-        filter: Option<&OrganizationFilter>,
-        query: &str,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        // If the query string is empty, we run an all query with the
-        // limit parameter provided instead of a more complex similarity
-        // search.
-        if query.is_empty() {
-            return Self::all_viewable(filter, limit, offset, connection);
-        }
-        use crate::schema::organizations;
-        let mut query = organizations::dsl::organizations
-            .filter(organizations::dsl::name.ilike(format!("%{}%", query)))
-            .order(crate::sql_function_bindings::word_similarity_dist_op(
-                organizations::dsl::name,
-                query,
-            ))
-            .into_boxed();
-        if let Some(country_id) = filter.and_then(|f| f.country_id) {
-            query = query.filter(organizations::dsl::country_id.eq(country_id));
-        }
-        query
-            .limit(limit.unwrap_or(10))
-            .offset(offset.unwrap_or(0))
-            .load::<Self>(connection)
-            .map_err(web_common::api::ApiError::from)
-    }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
     /// * `filter` - The optional filter to apply to the query.
@@ -296,6 +219,7 @@ impl Organization {
         }
         use crate::schema::organizations;
         let mut query = organizations::dsl::organizations
+            .select(Organization::as_select())
             .filter(organizations::dsl::name.ilike(format!("%{}%", query)))
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -311,6 +235,41 @@ impl Organization {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
+            .map_err(web_common::api::ApiError::from)
+    }
+    /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
+    ///
+    /// * `query` - The string to search for.
+    /// * `limit` - The maximum number of results to return.
+    /// * `offset` - The number of results to skip.
+    /// * `connection` - The connection to the database.
+    pub fn strict_word_similarity_search_with_score_viewable(
+        query: &str,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<Vec<(Self, f32)>, web_common::api::ApiError> {
+        use crate::schema::organizations;
+        organizations::dsl::organizations
+            .select((
+                Organization::as_select(),
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    organizations::dsl::name,
+                    query,
+                ),
+            ))
+            .filter(organizations::dsl::name.ilike(format!("%{}%", query)))
+            .order(
+                crate::sql_function_bindings::strict_word_similarity_dist_op(
+                    organizations::dsl::name,
+                    query,
+                ),
+            )
+            .limit(limit.unwrap_or(10))
+            .offset(offset.unwrap_or(0))
+            .load::<(Self, f32)>(connection)
             .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.

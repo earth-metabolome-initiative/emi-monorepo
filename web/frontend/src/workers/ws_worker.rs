@@ -220,6 +220,9 @@ impl WebsocketWorker {
 
                             todo!()
                         }
+                        Select::SearchAll { query, limit } => {
+                            todo!()
+                        }
                         Select::CanView {
                             table_name,
                             primary_key,

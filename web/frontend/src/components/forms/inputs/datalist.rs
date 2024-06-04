@@ -32,6 +32,8 @@ where
     pub errors: Vec<ApiError>,
     #[prop_or(true)]
     pub show_label: bool,
+    #[prop_or(true)]
+    pub show_load_more: bool,
     #[prop_or_default]
     pub placeholder: Option<String>,
     #[prop_or_default]
@@ -44,6 +46,8 @@ where
     pub maximum_number_of_choices: usize,
     #[prop_or(24)]
     pub number_of_candidates: i64,
+    #[prop_or(500)]
+    pub delay_before_search: u32,
     #[prop_or(false)]
     pub always_shows_candidates: bool,
     #[prop_or(false)]
@@ -69,7 +73,10 @@ where
     }
 }
 
-pub struct MultiDatalist<Data, const EDIT: bool> {
+pub struct MultiDatalist<Data, const EDIT: bool>
+where
+    Data: Filtrable,
+{
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     errors: Vec<ApiError>,
     current_value: Option<Rc<String>>,
@@ -86,6 +93,8 @@ pub struct MultiDatalist<Data, const EDIT: bool> {
     is_focused: bool,
     /// The number of search queries that are currently being processed.
     number_of_search_queries: usize,
+    /// Last executed filter
+    last_filter: Option<Data::Filter>,
 }
 
 pub enum DatalistMessage<Data> {
@@ -105,7 +114,7 @@ pub enum DatalistMessage<Data> {
 
 impl<Data, const EDIT: bool> Component for MultiDatalist<Data, EDIT>
 where
-    Data: 'static + Clone + PartialEq + DeserializeOwned + Searchable<EDIT> + RowToBadge + Debug,
+    Data: 'static + DeserializeOwned + Searchable<EDIT> + RowToBadge,
 {
     type Message = DatalistMessage<Data>;
     type Properties = MultiDatalistProp<Data, EDIT>;
@@ -128,6 +137,7 @@ where
             selections_to_delete: Vec::new(),
             is_focused: false,
             number_of_search_queries: 0,
+            last_filter: None,
         }
     }
 
@@ -149,15 +159,29 @@ where
                 _ => false,
             },
             DatalistMessage::UpdateCandidates(candidates) => {
-                let filtered = candidates.into_iter().filter(|candidate| {
-                    // If the current candidate has already been selected,
-                    // we do not want to display it.
-                    !self.candidates.iter().any(|selection| selection == candidate)
-                }).collect::<Vec<Rc<Data>>>();
+                let filtered = candidates
+                    .into_iter()
+                    .filter(|candidate| {
+                        // If the current candidate has already been selected,
+                        // we do not want to display it.
+                        !self
+                            .candidates
+                            .iter()
+                            .any(|selection| selection == candidate)
+                    })
+                    .collect::<Vec<Rc<Data>>>();
                 self.candidates.extend(filtered);
-                
-                if self.candidates.is_empty() && self.errors.iter().all(|error| error != &ApiError::NoResults) {
-                    self.errors.push(ApiError::NoResults);
+
+                if self.candidates.is_empty() {
+                    if self
+                        .errors
+                        .iter()
+                        .all(|error| error != &ApiError::NoResults)
+                    {
+                        self.errors.push(ApiError::NoResults);
+                    }
+                } else {
+                    self.errors.retain(|error| error != &ApiError::NoResults);
                 }
 
                 true
@@ -171,6 +195,7 @@ where
                 // {
                 //     return false;
                 // }
+                self.last_filter = ctx.props().filters.clone();
                 let query = self
                     .current_value
                     .as_ref()
@@ -211,9 +236,10 @@ where
                 if let Some(timeout) = self.search_timeout.take() {
                     timeout.cancel();
                 }
-                self.search_timeout = Some(Timeout::new(100, move || {
-                    link.send_message(DatalistMessage::SearchCandidates);
-                }));
+                self.search_timeout =
+                    Some(Timeout::new(ctx.props().delay_before_search, move || {
+                        link.send_message(DatalistMessage::SearchCandidates);
+                    }));
                 false
             }
             DatalistMessage::SelectCandidate(index) => {
@@ -287,14 +313,56 @@ where
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         // If this is the first time the component is rendered, we want to
         // send a message to the server to get the list of candidates.
-        if first_render {
+        if first_render || self.last_filter != ctx.props().filters {
             ctx.link().send_message(DatalistMessage::SearchCandidates);
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
-        let classes = "input-group datalist";
+
+        let candidate_score: Vec<isize> = self
+            .candidates
+            .iter()
+            .map(|candidate| candidate.maybe_similarity_score(self.current_value.as_deref()))
+            .collect();
+        let total_candidate_score: isize = candidate_score.iter().sum();
+        let mean_candidate_score = total_candidate_score / (self.candidates.len() + 1) as isize;
+        let mut indices_to_sort: Vec<usize> = (0..self.candidates.len()).collect::<Vec<usize>>();
+        indices_to_sort.sort_by_key(|&i| candidate_score[i]);
+        let filtered_indices = indices_to_sort
+            .into_iter()
+            .filter(|&i| candidate_score[i] >= mean_candidate_score)
+            .filter(|&i| {
+                // If the current candidate has already been selected,
+                // we do not want to display it.
+                !self
+                    .selections
+                    .iter()
+                    .any(|selection| selection == &self.candidates[i])
+            })
+            .collect::<Vec<usize>>();
+
+        let classes = format!(
+            "input-group datalist{}{}",
+            if ctx.props().show_label {
+                ""
+            } else {
+                " no-label"
+            },
+            if filtered_indices.is_empty() {
+                " no-candidates".to_string()
+            } else {
+                format!(
+                    " has-candidates has-{}-candidates",
+                    match filtered_indices.len() {
+                        1 => "one",
+                        2 => "two",
+                        _ => "many",
+                    }
+                )
+            }
+        );
 
         // We create a timeout so that when the user stops typing for at least
         // 500ms, the input field is validated.
@@ -347,7 +415,7 @@ where
 
         let label_classes = format!(
             "input-label{}",
-            if props.optional || props.builder.is_none(){
+            if props.optional || props.builder.is_none() {
                 ""
             } else {
                 " input-label-mandatory"
@@ -357,9 +425,9 @@ where
         let input_field = html! {
             <>
                 if props.show_label {
-                        <label for={props.normalized_label()} class={label_classes}>
-                            {props.label()}
-                        </label>
+                    <label for={props.normalized_label()} class={label_classes}>
+                        {props.label()}
+                    </label>
                 }
                 if self.is_focused || self.selections.is_empty(){
                     <input
@@ -374,15 +442,17 @@ where
                         id={props.normalized_label()}
                         name={props.normalized_label()}
                     />
-                    <button class="retrieve" onclick={ctx.link().callback(|_| DatalistMessage::<Data>::LoadMore)} disabled={self.number_of_search_queries > 0 || self.candidates.is_empty()}>
-                        if self.number_of_search_queries >0 {
-                            <i class="fas fa-arrows-rotate fa-spin"></i>
-                        } else {
-                            <i class="fas fa-arrows-rotate"></i>
-                        }
-                        {'\u{00a0}'}
-                        <span>{"Load more"}</span>
-                    </button>
+                    if ctx.props().show_load_more {
+                        <button class="retrieve" onclick={ctx.link().callback(|_| DatalistMessage::<Data>::LoadMore)} disabled={self.number_of_search_queries > 0 || self.candidates.is_empty()}>
+                            if self.number_of_search_queries >0 {
+                                <i class="fas fa-arrows-rotate fa-spin"></i>
+                            } else {
+                                <i class="fas fa-arrows-rotate"></i>
+                            }
+                            {'\u{00a0}'}
+                            <span>{"Load more"}</span>
+                        </button>
+                    }
                     if ctx.props().scanner {
                         <Scanner onscan={on_scan} onerror={on_scan_error}/>
                     }
@@ -450,22 +520,6 @@ where
                 {if !ctx.props().always_shows_candidates && (!self.is_focused || self.candidates.is_empty() || self.selections.len() == ctx.props().maximum_number_of_choices){
                     html! {}
                 } else {
-                    let mut total_candidate_score = 0.0;
-                    let candidate_score: Vec<isize> = self.candidates.iter().map(|candidate| {
-                        let candidate_score = candidate.maybe_similarity_score(self.current_value.as_deref());
-                        total_candidate_score += candidate_score as f64;
-                        candidate_score
-                    }).collect();
-                    let mean_candidate_score = total_candidate_score / self.candidates.len() as f64;
-                    let mut indices_to_sort: Vec<usize> = (0..self.candidates.len()).collect::<Vec<usize>>();
-                    indices_to_sort.sort_by_key(|&i| candidate_score[i]);
-                    let filtered_indices = indices_to_sort.into_iter().filter(|&i| {
-                        candidate_score[i] as f64 >= mean_candidate_score
-                    }).filter(|&i|{
-                        // If the current candidate has already been selected,
-                        // we do not want to display it.
-                        !self.selections.iter().any(|selection| selection == &self.candidates[i])
-                    }).collect::<Vec<usize>>();
                     html!{
                         <ul class="badges-container">
                             {for filtered_indices.iter().rev().map(|&i| {
@@ -501,6 +555,8 @@ where
     pub builder: Option<Callback<Option<Rc<Data>>>>,
     #[prop_or(true)]
     pub show_label: bool,
+    #[prop_or(true)]
+    pub show_load_more: bool,
     #[prop_or_default]
     pub placeholder: Option<String>,
     #[prop_or_default]
@@ -520,7 +576,7 @@ where
 #[function_component(Datalist)]
 pub fn datalist<Data, const EDIT: bool>(props: &DatalistProp<Data, EDIT>) -> Html
 where
-    Data: 'static + Searchable<EDIT> + RowToBadge,
+    Data: 'static + Searchable<EDIT> + RowToBadge + DeserializeOwned,
 {
     let builder_callback = props.builder.clone().map(|builder| {
         Callback::from(move |mut data: Vec<Rc<Data>>| {
@@ -529,6 +585,6 @@ where
     });
 
     html! {
-        <MultiDatalist<Data, EDIT> label={props.label.clone()} always_shows_candidates={props.always_shows_candidates} builder={builder_callback} errors={props.errors.clone()} show_label={props.show_label} placeholder={props.placeholder.clone()} value={props.value.clone().map_or_else(|| Vec::new(), |value| vec![Rc::from(value)])} optional={props.optional} number_of_candidates={props.number_of_candidates} filters={props.filters.clone()} />
+        <MultiDatalist<Data, EDIT> label={props.label.clone()} always_shows_candidates={props.always_shows_candidates} builder={builder_callback} errors={props.errors.clone()} show_label={props.show_label} placeholder={props.placeholder.clone()} value={props.value.clone().map_or_else(|| Vec::new(), |value| vec![Rc::from(value)])} optional={props.optional} number_of_candidates={props.number_of_candidates} filters={props.filters.clone()} show_load_more={props.show_load_more} />
     }
 }
