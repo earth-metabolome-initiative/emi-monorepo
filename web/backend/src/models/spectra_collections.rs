@@ -7,6 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
+use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;
 use diesel::prelude::*;
 use diesel::Identifiable;
 use diesel::Insertable;
@@ -281,20 +282,35 @@ impl SpectraCollection {
             ))
             .filter(
                 sample_containers::dsl::barcode
-                    .ilike(format!("%{}%", query))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
-                        .ilike(format!("%{}%", query)),
+                        .strict_word_similarity_commutator_op(query)
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
                     )
                     .or(
                         crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         )
-                        .ilike(format!("%{}%", query)),
+                        .strict_word_similarity_commutator_op(query)
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
                     ),
             )
             .order(
@@ -412,20 +428,35 @@ impl SpectraCollection {
             ))
             .filter(
                 sample_containers::dsl::barcode
-                    .ilike(format!("%{}%", query))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
-                        .ilike(format!("%{}%", query)),
+                        .strict_word_similarity_commutator_op(query)
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
                     )
                     .or(
                         crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         )
-                        .ilike(format!("%{}%", query)),
+                        .strict_word_similarity_commutator_op(query)
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
                     ),
             )
             .order(
@@ -639,20 +670,35 @@ impl SpectraCollection {
             )
             .filter(
                 sample_containers::dsl::barcode
-                    .ilike(format!("%{}%", query))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
-                        .ilike(format!("%{}%", query)),
+                        .strict_word_similarity_commutator_op(query)
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
                     )
                     .or(
                         crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         )
-                        .ilike(format!("%{}%", query)),
+                        .strict_word_similarity_commutator_op(query)
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
                     ),
             )
             .order(
@@ -872,20 +918,35 @@ impl SpectraCollection {
             ))
             .filter(
                 sample_containers::dsl::barcode
-                    .ilike(format!("%{}%", query))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
-                        .ilike(format!("%{}%", query)),
+                        .strict_word_similarity_commutator_op(query)
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
                     )
                     .or(
                         crate::sql_function_bindings::concat_sample_states_name_description(
                             sample_states::dsl::name,
                             sample_states::dsl::description,
                         )
-                        .ilike(format!("%{}%", query)),
+                        .strict_word_similarity_commutator_op(query)
+                        .or(
+                            crate::sql_function_bindings::concat_sample_states_name_description(
+                                sample_states::dsl::name,
+                                sample_states::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
                     ),
             )
             .order(

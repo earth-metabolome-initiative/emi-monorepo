@@ -107,10 +107,13 @@ class PGIndex:
     ) -> str:
         """Returns the index in Diesel format."""
         assert similarity_method in PGIndices.SIMILARITY_METHODS
-        assert desinence in ("op", "dist", "dist_op")
+        assert desinence in ("commutator_op", "dist", "dist_op")
 
         formatted_function = self._format_function(alias_number)
-        return f"crate::sql_function_bindings::{similarity_method}_{desinence}({formatted_function}, {query})"
+        if "dist" in desinence:
+            return f"crate::sql_function_bindings::{similarity_method}_{desinence}({formatted_function}, {query})"
+        return f"{formatted_function}.{similarity_method}_{desinence}({query})"
+
 
     def format_diesel_search_filter(
         self, query: str, similarity_method: str, alias_number: Optional[int] = None
@@ -130,9 +133,9 @@ class PGIndex:
         formatted_function = self._format_function(alias_number)
         
         return (
-            # f"{self._format_diesel(query, similarity_method, 'op', alias_number)}.or(\n"
+            f"{self._format_diesel(query, similarity_method, 'commutator_op', alias_number)}.or(\n"
             f"    {formatted_function}.ilike(format!(\"%{{}}%\", {query}))\n"
-            # ")\n"
+            ")\n"
         )
 
     def format_distance_operator_diesel(

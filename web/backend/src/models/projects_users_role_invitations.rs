@@ -7,6 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
+use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;
 use diesel::prelude::*;
 use diesel::Identifiable;
 use diesel::Insertable;
@@ -276,12 +277,24 @@ impl ProjectsUsersRoleInvitation {
                     projects::dsl::name,
                     projects::dsl::description,
                 )
-                .ilike(format!("%{}%", query))
+                .strict_word_similarity_commutator_op(query)
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
                 .or(crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .strict_word_similarity_commutator_op(query)
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query)))),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -373,12 +386,24 @@ impl ProjectsUsersRoleInvitation {
                     projects::dsl::name,
                     projects::dsl::description,
                 )
-                .ilike(format!("%{}%", query))
+                .strict_word_similarity_commutator_op(query)
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
                 .or(crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .strict_word_similarity_commutator_op(query)
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query)))),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -576,12 +601,24 @@ impl ProjectsUsersRoleInvitation {
                     projects::dsl::name,
                     projects::dsl::description,
                 )
-                .ilike(format!("%{}%", query))
+                .strict_word_similarity_commutator_op(query)
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
                 .or(crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .strict_word_similarity_commutator_op(query)
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query)))),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -793,12 +830,24 @@ impl ProjectsUsersRoleInvitation {
                     projects::dsl::name,
                     projects::dsl::description,
                 )
-                .ilike(format!("%{}%", query))
+                .strict_word_similarity_commutator_op(query)
+                .or(
+                    crate::sql_function_bindings::concat_projects_name_description(
+                        projects::dsl::name,
+                        projects::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                )
                 .or(crate::sql_function_bindings::concat_roles_name(
                     roles::dsl::name,
                     roles::dsl::description,
                 )
-                .ilike(format!("%{}%", query))),
+                .strict_word_similarity_commutator_op(query)
+                .or(crate::sql_function_bindings::concat_roles_name(
+                    roles::dsl::name,
+                    roles::dsl::description,
+                )
+                .ilike(format!("%{}%", query)))),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

@@ -8,8 +8,14 @@ import pandas as pd
 from constraint_checkers.regroup_tables import get_desinences
 from constraint_checkers.cursor import get_cursor
 
-SPACED_ARGUMENT_TYPES = ("double precision", "character varying", "center geometry", "timestamp without time zone")
+SPACED_ARGUMENT_TYPES = (
+    "double precision",
+    "character varying",
+    "center geometry",
+    "timestamp without time zone",
+)
 
+# Types that Diesel does not support.
 UNSUPPORTED_DATA_TYPES = [
     "internal",
     "anyelement",
@@ -20,9 +26,31 @@ UNSUPPORTED_DATA_TYPES = [
     "box2df",
     "box3df",
     "spheroid",
+    "circle",
     "path",
     "xid",
-    "gidx"
+    "gidx",
+    "name",
+    "anycompatible",
+    "anycompatiblearray",
+    "xid8",
+    "cid",
+    "tid",
+    "-",
+    "anyarray",
+    "anynonarray",
+    "oidvector",
+    "aclitem",
+    "macaddr8",
+    "aclitem[]",
+    "bit",
+    "bit varying",
+    "pg_lsn",
+    "anyenum",
+    "anyrange",
+    "record",
+    "anymultirange",
+    "jsonpath"
 ]
 
 DENY_FUNCTION_NAMES = []
@@ -102,13 +130,21 @@ class ViewColumn:
 
 
 def postgres_type_to_diesel_type(postgres_type: str) -> str:
-    """Converts a Postgres type to a Diesel type."""
+    """Converts a Postgres type to a Diesel type.
+    
+    Parameters
+    ----------
+    postgres_type : str
+        The Postgres type.
+    """
     if postgres_type == "integer":
         return "diesel::sql_types::Integer"
     if postgres_type == "text":
         return "diesel::sql_types::Text"
-    if postgres_type == "timestamp without time zone":
+    if postgres_type in ("timestamp without time zone", "timestamp with time zone"):
         return "diesel::sql_types::Timestamp"
+    if postgres_type in ("time without time zone", "time with time zone"):
+        return "diesel::sql_types::Time"
     if postgres_type == "uuid":
         return "diesel::sql_types::Uuid"
     if postgres_type == "boolean":
@@ -119,14 +155,20 @@ def postgres_type_to_diesel_type(postgres_type: str) -> str:
         return "diesel::sql_types::Double"
     if postgres_type == "character varying":
         return "diesel::sql_types::Text"
+    if postgres_type in ("char", "character"):
+        return "diesel::sql_types::CChar"
     if postgres_type == "bytea":
         return "diesel::sql_types::Binary"
     if postgres_type == "json":
         return "diesel::sql_types::Json"
     if postgres_type == "jsonb":
         return "diesel::sql_types::Jsonb"
-    if postgres_type == "record":
-        return "diesel::sql_types::Record"
+    if postgres_type == "macaddr":
+        return "diesel::sql_types::MacAddr"
+    if postgres_type == "inet":
+        return "diesel::sql_types::Inet"
+    if postgres_type == "numeric":
+        return "diesel::sql_types::Numeric"
     if postgres_type == "oid":
         return "diesel::sql_types::Oid"
     if postgres_type == "smallint":
@@ -137,6 +179,10 @@ def postgres_type_to_diesel_type(postgres_type: str) -> str:
         return "diesel::sql_types::Text"
     if postgres_type == "interval":
         return "diesel::sql_types::Interval"
+    if postgres_type == "date":
+        return "diesel::sql_types::Date"
+    if postgres_type == "money":
+        return "diesel::pg::sql_types::Money"
     if postgres_type == "geometry":
         return "postgis_diesel::sql_types::Geometry"
     if postgres_type == "geography":
@@ -144,15 +190,25 @@ def postgres_type_to_diesel_type(postgres_type: str) -> str:
     if postgres_type == "point":
         return "postgis_diesel::sql_types::Geometry"
         # return "postgis_diesel::types::Point"
+    if postgres_type == "line":
+        return "postgis_diesel::sql_types::Geometry"
+        # return "postgis_diesel::types::LineString"
+    if postgres_type == "lseg":
+        return "postgis_diesel::sql_types::Geometry"
+        # return "postgis_diesel::types::LineString"
     if postgres_type == "polygon":
         return "postgis_diesel::sql_types::Geometry"
         # return "postgis_diesel::types::Polygon<postgis_diesel::types::Point>"
+    if postgres_type == "tsvector":
+        return "diesel_full_text_search::TsVector"
+    if postgres_type == "tsquery":
+        return "diesel_full_text_search::TsQuery"
 
     # Here we handle the recursive case of arrays.
     if postgres_type.endswith("[]"):
         return f"diesel::pg::sql_types::Array<{postgres_type_to_diesel_type(postgres_type[:-2])}>"
 
-    raise NotImplementedError(f"Unknown Postgres type: {postgres_type}")
+    raise NotImplementedError(f"Unknown Postgres type: '{postgres_type}'")
 
 
 class SQLFunction:
@@ -224,6 +280,89 @@ class SQLFunction:
             raise NotImplementedError(
                 f"Error writing Diesel binding for function {self.name}. "
                 f"Arguments: {argument_names}. Return type: {self.return_type}."
+            ) from e
+
+
+class SQLOperator:
+    """Class providing metadata for a SQL operator.
+
+    Parameters
+    ----------
+    operator_name : str
+        The name of the operator.
+    left_type : str
+        The type of the left operand.
+    right_type : str
+        The type of the right operand.
+    return_type : str
+        The return type of the operator.
+
+    """
+
+    def __init__(
+        self,
+        operator_symbol: str,
+        operator_name: str,
+        left_type: str,
+        right_type: str,
+        return_type: str,
+    ):
+        assert len(operator_symbol) > 0, "The operator symbol must not be empty."
+        assert len(operator_name) > 0, "The operator name must not be empty."
+        assert len(left_type) > 0, "The left type must not be empty."
+        assert len(right_type) > 0, "The right type must not be empty."
+        assert len(return_type) > 0, "The return type must not be empty."
+        self.symbol = operator_symbol
+        self.name = operator_name
+        self.left_type = left_type.strip('"')
+        self.right_type = right_type.strip('"')
+        self.return_type = return_type.strip('"')
+
+    def sanitize_name(self) -> str:
+        """Sanitizes the operator name."""
+        return self.name.replace(".", "_")
+
+    def struct_name(self) -> str:
+        """Converts the operator name to the trait name."""
+        return "".join(part.capitalize() for part in self.sanitize_name().split("_"))
+
+    def trait_name(self) -> str:
+        """Converts the operator name to the trait name."""
+        return f"Has{self.struct_name()}"
+
+    def write_diesel_binding_to_file(self, f):
+        """Writes the Diesel binding for the SQL operator to a file."""
+
+        try:
+            f.write(
+                f"diesel::infix_operator!({self.struct_name()}, \" {self.symbol} \", {postgres_type_to_diesel_type(self.return_type)}, backend: diesel::pg::Pg);\n"
+            )
+            
+            # Next, we define the trait for the operator.
+            f.write(
+                f"/// Trait for the `{self.symbol}` operator.\n"
+                f"pub trait {self.trait_name()}: Sized + diesel::expression::Expression<SqlType={postgres_type_to_diesel_type(self.left_type)}> {{\n"
+                f"    /// The function to create the `{self.struct_name()}` struct representing the `{self.symbol}` operator.\n"
+                f"    fn {self.sanitize_name()}<Rhs>(self, rhs: Rhs) -> {self.struct_name()}<Self, Rhs::Expression>\n"
+                f"    where\n"
+                f"        Rhs: diesel::expression::AsExpression<{postgres_type_to_diesel_type(self.right_type)}>,\n"
+                f"    {{\n"
+                f"        {self.struct_name()}::new(self, rhs.as_expression())\n"
+                f"    }}\n"
+                f"}}\n\n"
+            )
+
+            # Next, we implement it for all structs that respect the types.
+            f.write(
+                f"impl<T> {self.trait_name()} for T\n"
+                f"where\n"
+                f"    T: Sized + diesel::expression::Expression<SqlType={postgres_type_to_diesel_type(self.left_type)}>,\n"
+                "{}\n\n"
+            )
+        except NotImplementedError as e:
+            raise NotImplementedError(
+                f"Error writing Diesel binding for operator {self.name}, with symbol {self.symbol}. "
+                f"Left type: {self.left_type}. Right type: {self.right_type}. Return type: {self.return_type}."
             ) from e
 
 
@@ -1103,24 +1242,24 @@ class TableMetadata:
             ):
                 continue
 
-            if any(
-                funct.name == function_name
-                for funct in sql_functions
-            ):
+            if any(funct.name == function_name for funct in sql_functions):
                 # We remove the function from the list of functions, as it is overloaded
                 # and at this time we do not support overloading.
                 sql_functions.remove(
                     next(
-                        funct
-                        for funct in sql_functions
-                        if funct.name == function_name
+                        funct for funct in sql_functions if funct.name == function_name
                     )
                 )
 
                 overloading_functions.append(sql_function)
                 continue
 
-            if "OUT" in function[2] or "SETOF" in function[2] or "SETOF" in function[1] or "TABLE" in function[1]:
+            if (
+                "OUT" in function[2]
+                or "SETOF" in function[2]
+                or "SETOF" in function[1]
+                or "TABLE" in function[1]
+            ):
                 # For the moment, we do not support functions with OUT, SETOF or TABLE.
                 continue
 
@@ -1170,6 +1309,65 @@ class TableMetadata:
             self._register_flat_variant_associated_with_function(function)
 
         return sql_functions
+
+    def get_all_postgres_operators(self) -> List[SQLOperator]:
+        """Returns the list of all Postgres operators."""
+        _conn, cursor = get_cursor()
+        cursor.execute(
+            """
+            SELECT
+                oprname AS operator_name,
+                oprleft::regtype AS left_operand_type,
+                oprright::regtype AS right_operand_type,
+                oprresult::regtype AS result_type,
+                oprcode AS function_name
+            FROM
+                pg_operator;
+            """
+        )
+
+        postgres_operators = cursor.fetchall()
+        cursor.close()
+
+        assert len(postgres_operators) > 0, (
+            "There are no Postgres operators in the database. "
+            "We expect the database to contain several operators, such "
+            "as the similarity operator."
+        )
+
+        sql_operators: List[SQLOperator] = []
+
+        for operator in postgres_operators:
+            operator_symbol = operator[0]
+            left_type = operator[1]
+            right_type = operator[2]
+            return_type = operator[3]
+            function_name = operator[4]
+
+            if (
+                left_type in UNSUPPORTED_DATA_TYPES
+                or right_type in UNSUPPORTED_DATA_TYPES
+            ):
+                continue
+
+            if return_type in UNSUPPORTED_DATA_TYPES:
+                continue
+
+            # If the function name already appears in the list of functions, we skip it.
+            if any(operator.name == function_name for operator in sql_operators):
+                continue
+
+            sql_operators.append(
+                SQLOperator(
+                    operator_symbol=operator_symbol,
+                    operator_name=function_name,
+                    left_type=left_type,
+                    right_type=right_type,
+                    return_type=return_type,
+                )
+            )
+
+        return sql_operators
 
     @cache
     def has_postgres_function(self, function_name: str) -> bool:

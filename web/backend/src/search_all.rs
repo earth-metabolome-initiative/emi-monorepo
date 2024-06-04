@@ -46,14 +46,6 @@ pub(crate) fn search_all(
     }
 
     let user_results =
-        User::strict_word_similarity_search_viewable(query, limit, None, connection)?;
-    log::info!(
-        "Found {} users for no-score query '{}' with limit {:?}",
-        user_results.len(),
-        query,
-        limit
-    );
-    let user_results =
         User::strict_word_similarity_search_with_score_viewable(query, limit, None, connection)?;
     log::info!("Found {} users for query '{}'", user_results.len(), query);
 
@@ -107,6 +99,34 @@ pub(crate) fn search_all(
         query,
         NestedBioOttTaxonItem::strict_word_similarity_search_with_score_viewable(
             query, limit, None, connection,
+        )?,
+    ));
+
+    results.extend(convert::<
+        NestedNameplate,
+        web_common::database::NestedNameplate,
+    >(
+        query,
+        NestedNameplate::strict_word_similarity_search_with_score_viewable(
+            author_user_id,
+            query,
+            limit,
+            None,
+            connection,
+        )?,
+    ));
+
+    results.extend(convert::<
+        NestedSampleContainer,
+        web_common::database::NestedSampleContainer,
+    >(
+        query,
+        NestedSampleContainer::strict_word_similarity_search_with_score_viewable(
+            author_user_id,
+            query,
+            limit,
+            None,
+            connection,
         )?,
     ));
 

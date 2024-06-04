@@ -145,14 +145,16 @@ impl From<gluesql::prelude::Error> for ApiError {
 #[cfg(feature = "backend")]
 impl From<diesel::result::Error> for ApiError {
     fn from(e: diesel::result::Error) -> Self {
-        log::error!("Database error: {:?}", e);
         match e {
-            diesel::result::Error::DatabaseError(
-                diesel::result::DatabaseErrorKind::UniqueViolation,
-                _,
-            ) => Self::BadRequest(vec![
-                "You are attempting to insert a duplicated entry".to_string()
-            ]),
+            diesel::result::Error::DatabaseError(kind, information) => {
+                log::error!("Database error {:?}: message: {:?}, details: {:?}, hint: {:?}, table_name: {:?}, column_name: {:?}, constraint_name: {:?}, statement_position: {:?}", kind, information.message(), information.details(), information.hint(), information.table_name(), information.column_name(), information.constraint_name(), information.statement_position());
+                match kind {
+                    diesel::result::DatabaseErrorKind::UniqueViolation => Self::BadRequest(vec![
+                        "You are attempting to create a duplicate entry".to_string(),
+                    ]),
+                    _ => Self::InternalServerError,
+                }
+            }
             diesel::result::Error::NotFound => Self::BadRequest(vec!["Not found".to_string()]),
             _ => Self::InternalServerError,
         }

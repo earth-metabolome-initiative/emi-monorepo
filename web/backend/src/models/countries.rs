@@ -7,6 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
+use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;
 use diesel::prelude::*;
 use diesel::Identifiable;
 use diesel::Insertable;
@@ -214,7 +215,11 @@ impl Country {
         use crate::schema::countries;
         countries::dsl::countries
             .select(Country::as_select())
-            .filter(countries::dsl::name.ilike(format!("%{}%", query)))
+            .filter(
+                countries::dsl::name
+                    .strict_word_similarity_commutator_op(query)
+                    .or(countries::dsl::name.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     countries::dsl::name,
@@ -249,7 +254,11 @@ impl Country {
                     query,
                 ),
             ))
-            .filter(countries::dsl::name.ilike(format!("%{}%", query)))
+            .filter(
+                countries::dsl::name
+                    .strict_word_similarity_commutator_op(query)
+                    .or(countries::dsl::name.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     countries::dsl::name,

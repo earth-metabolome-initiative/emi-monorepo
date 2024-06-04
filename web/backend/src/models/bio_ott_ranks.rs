@@ -7,6 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
+use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;
 use diesel::prelude::*;
 use diesel::Identifiable;
 use diesel::Insertable;
@@ -188,7 +189,14 @@ impl BioOttRank {
                     bio_ott_ranks::dsl::name,
                     bio_ott_ranks::dsl::description,
                 )
-                .ilike(format!("%{}%", query)),
+                .strict_word_similarity_commutator_op(query)
+                .or(
+                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
+                        bio_ott_ranks::dsl::name,
+                        bio_ott_ranks::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -243,7 +251,14 @@ impl BioOttRank {
                     bio_ott_ranks::dsl::name,
                     bio_ott_ranks::dsl::description,
                 )
-                .ilike(format!("%{}%", query)),
+                .strict_word_similarity_commutator_op(query)
+                .or(
+                    crate::sql_function_bindings::concat_bio_ott_ranks_name_description(
+                        bio_ott_ranks::dsl::name,
+                        bio_ott_ranks::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)),
+                ),
             )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(

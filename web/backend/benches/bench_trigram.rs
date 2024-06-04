@@ -197,87 +197,87 @@ fn ngrammatic_bitvec_trigram_par_search_lowercased(c: &mut Criterion) {
     );
 }
 
-fn postgres_similarity(c: &mut Criterion) {
-    dotenvy::dotenv().ok();
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+// fn postgres_similarity(c: &mut Criterion) {
+//     dotenvy::dotenv().ok();
+//     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    // create db connection pool
-    let manager: ConnectionManager<_> = ConnectionManager::<PgConnection>::new(&database_url);
-    let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
-        // We set the maximum number of connections in the pool to 10
-        .max_size(10)
-        .build(manager)
-        .unwrap();
+//     // create db connection pool
+//     let manager: ConnectionManager<_> = ConnectionManager::<PgConnection>::new(&database_url);
+//     let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
+//         // We set the maximum number of connections in the pool to 10
+//         .max_size(10)
+//         .build(manager)
+//         .unwrap();
 
-    let mut connection = pool.get().unwrap();
+//     let mut connection = pool.get().unwrap();
 
-    c.bench_function("postgres_similarity", |b| {
-        b.iter(|| {
-            let _ = BioOttTaxonItem::similarity_search_viewable(
-                None,
-                "Acanthocephala",
-                Some(10),
-                None,
-                &mut connection,
-            );
-            let _ = BioOttTaxonItem::similarity_search_viewable(
-                None,
-                "Doggus Lionenus",
-                Some(10),
-                None,
-                &mut connection,
-            );
-            let _ = BioOttTaxonItem::similarity_search_viewable(
-                None,
-                "Felis Caninus",
-                Some(10),
-                None,
-                &mut connection,
-            );
-        });
-    });
-}
+//     c.bench_function("postgres_similarity", |b| {
+//         b.iter(|| {
+//             let _ = BioOttTaxonItem::similarity_search_viewable(
+//                 None,
+//                 "Acanthocephala",
+//                 Some(10),
+//                 None,
+//                 &mut connection,
+//             );
+//             let _ = BioOttTaxonItem::similarity_search_viewable(
+//                 None,
+//                 "Doggus Lionenus",
+//                 Some(10),
+//                 None,
+//                 &mut connection,
+//             );
+//             let _ = BioOttTaxonItem::similarity_search_viewable(
+//                 None,
+//                 "Felis Caninus",
+//                 Some(10),
+//                 None,
+//                 &mut connection,
+//             );
+//         });
+//     });
+// }
 
-fn postgres_word_similarity(c: &mut Criterion) {
-    dotenvy::dotenv().ok();
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+// fn postgres_word_similarity(c: &mut Criterion) {
+//     dotenvy::dotenv().ok();
+//     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    // create db connection pool
-    let manager: ConnectionManager<_> = ConnectionManager::<PgConnection>::new(&database_url);
-    let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
-        // We set the maximum number of connections in the pool to 10
-        .max_size(10)
-        .build(manager)
-        .unwrap();
+//     // create db connection pool
+//     let manager: ConnectionManager<_> = ConnectionManager::<PgConnection>::new(&database_url);
+//     let pool: r2d2::Pool<ConnectionManager<PgConnection>> = r2d2::Pool::builder()
+//         // We set the maximum number of connections in the pool to 10
+//         .max_size(10)
+//         .build(manager)
+//         .unwrap();
 
-    let mut connection = pool.get().unwrap();
+//     let mut connection = pool.get().unwrap();
 
-    c.bench_function("postgres_word_similarity", |b| {
-        b.iter(|| {
-            let _ = BioOttTaxonItem::word_similarity_search_viewable(
-                None,
-                "Acanthocephala",
-                Some(10),
-                None,
-                &mut connection,
-            );
-            let _ = BioOttTaxonItem::word_similarity_search_viewable(
-                None,
-                "Doggus Lionenus",
-                Some(10),
-                None,
-                &mut connection,
-            );
-            let _ = BioOttTaxonItem::word_similarity_search_viewable(
-                None,
-                "Felis Caninus",
-                Some(10),
-                None,
-                &mut connection,
-            );
-        });
-    });
-}
+//     c.bench_function("postgres_word_similarity", |b| {
+//         b.iter(|| {
+//             let _ = BioOttTaxonItem::word_similarity_search_viewable(
+//                 None,
+//                 "Acanthocephala",
+//                 Some(10),
+//                 None,
+//                 &mut connection,
+//             );
+//             let _ = BioOttTaxonItem::word_similarity_search_viewable(
+//                 None,
+//                 "Doggus Lionenus",
+//                 Some(10),
+//                 None,
+//                 &mut connection,
+//             );
+//             let _ = BioOttTaxonItem::word_similarity_search_viewable(
+//                 None,
+//                 "Felis Caninus",
+//                 Some(10),
+//                 None,
+//                 &mut connection,
+//             );
+//         });
+//     });
+// }
 
 fn postgres_strict_word_similarity(c: &mut Criterion) {
     dotenvy::dotenv().ok();
@@ -329,7 +329,7 @@ criterion_group!(
 criterion_group!(
     name = postgres_benches;
     config = Criterion::default().measurement_time(std::time::Duration::from_secs(100));
-    targets = postgres_similarity, postgres_word_similarity, postgres_strict_word_similarity
+    targets = postgres_strict_word_similarity //, postgres_similarity, postgres_word_similarity,
 );
 
 criterion_main!(postgres_benches);

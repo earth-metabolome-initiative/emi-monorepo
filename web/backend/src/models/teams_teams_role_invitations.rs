@@ -7,6 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
+use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;
 use diesel::prelude::*;
 use diesel::Identifiable;
 use diesel::Insertable;
@@ -280,17 +281,34 @@ impl TeamsTeamsRoleInvitation {
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
-                    .ilike(format!("%{}%", query))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams0.field(teams::dsl::name),
+                        teams0.field(teams::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)))
                     .or(crate::sql_function_bindings::concat_teams_name_description(
                         teams1.field(teams::dsl::name),
                         teams1.field(teams::dsl::description),
                     )
-                    .ilike(format!("%{}%", query)))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(
+                        crate::sql_function_bindings::concat_teams_name_description(
+                            teams1.field(teams::dsl::name),
+                            teams1.field(teams::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ))
                     .or(crate::sql_function_bindings::concat_roles_name(
                         roles::dsl::name,
                         roles::dsl::description,
                     )
-                    .ilike(format!("%{}%", query))),
+                    .strict_word_similarity_commutator_op(query)
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)))),
                 )
                 .order(
                     crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -389,12 +407,18 @@ crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function
 ))
             .filter(crate::sql_function_bindings::can_view_teams_teams_role_invitations(author_user_id, teams_teams_role_invitations::dsl::table_id, teams_teams_role_invitations::dsl::team_id))
             .filter(
+crate::sql_function_bindings::concat_teams_name_description(teams0.field(teams::dsl::name), teams0.field(teams::dsl::description)).strict_word_similarity_commutator_op(query).or(
     crate::sql_function_bindings::concat_teams_name_description(teams0.field(teams::dsl::name), teams0.field(teams::dsl::description)).ilike(format!("%{}%", query))
+)
     .or(
+crate::sql_function_bindings::concat_teams_name_description(teams1.field(teams::dsl::name), teams1.field(teams::dsl::description)).strict_word_similarity_commutator_op(query).or(
     crate::sql_function_bindings::concat_teams_name_description(teams1.field(teams::dsl::name), teams1.field(teams::dsl::description)).ilike(format!("%{}%", query))
+)
     )
     .or(
+crate::sql_function_bindings::concat_roles_name(roles::dsl::name, roles::dsl::description).strict_word_similarity_commutator_op(query).or(
     crate::sql_function_bindings::concat_roles_name(roles::dsl::name, roles::dsl::description).ilike(format!("%{}%", query))
+)
     )
 )
             .order(crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_teams_name_description(teams0.field(teams::dsl::name), teams0.field(teams::dsl::description)), query)    +
@@ -588,17 +612,34 @@ crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
-                    .ilike(format!("%{}%", query))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams0.field(teams::dsl::name),
+                        teams0.field(teams::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)))
                     .or(crate::sql_function_bindings::concat_teams_name_description(
                         teams1.field(teams::dsl::name),
                         teams1.field(teams::dsl::description),
                     )
-                    .ilike(format!("%{}%", query)))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(
+                        crate::sql_function_bindings::concat_teams_name_description(
+                            teams1.field(teams::dsl::name),
+                            teams1.field(teams::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ))
                     .or(crate::sql_function_bindings::concat_roles_name(
                         roles::dsl::name,
                         roles::dsl::description,
                     )
-                    .ilike(format!("%{}%", query))),
+                    .strict_word_similarity_commutator_op(query)
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)))),
                 )
                 .order(
                     crate::sql_function_bindings::strict_word_similarity_dist_op(
@@ -824,17 +865,34 @@ crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function
                         teams0.field(teams::dsl::name),
                         teams0.field(teams::dsl::description),
                     )
-                    .ilike(format!("%{}%", query))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(crate::sql_function_bindings::concat_teams_name_description(
+                        teams0.field(teams::dsl::name),
+                        teams0.field(teams::dsl::description),
+                    )
+                    .ilike(format!("%{}%", query)))
                     .or(crate::sql_function_bindings::concat_teams_name_description(
                         teams1.field(teams::dsl::name),
                         teams1.field(teams::dsl::description),
                     )
-                    .ilike(format!("%{}%", query)))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(
+                        crate::sql_function_bindings::concat_teams_name_description(
+                            teams1.field(teams::dsl::name),
+                            teams1.field(teams::dsl::description),
+                        )
+                        .ilike(format!("%{}%", query)),
+                    ))
                     .or(crate::sql_function_bindings::concat_roles_name(
                         roles::dsl::name,
                         roles::dsl::description,
                     )
-                    .ilike(format!("%{}%", query))),
+                    .strict_word_similarity_commutator_op(query)
+                    .or(crate::sql_function_bindings::concat_roles_name(
+                        roles::dsl::name,
+                        roles::dsl::description,
+                    )
+                    .ilike(format!("%{}%", query)))),
                 )
                 .order(
                     crate::sql_function_bindings::strict_word_similarity_dist_op(

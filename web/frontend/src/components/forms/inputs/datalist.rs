@@ -159,18 +159,7 @@ where
                 _ => false,
             },
             DatalistMessage::UpdateCandidates(candidates) => {
-                let filtered = candidates
-                    .into_iter()
-                    .filter(|candidate| {
-                        // If the current candidate has already been selected,
-                        // we do not want to display it.
-                        !self
-                            .candidates
-                            .iter()
-                            .any(|selection| selection == candidate)
-                    })
-                    .collect::<Vec<Rc<Data>>>();
-                self.candidates.extend(filtered);
+                self.candidates = candidates;
 
                 if self.candidates.is_empty() {
                     if self
@@ -324,7 +313,7 @@ where
         let candidate_score: Vec<isize> = self
             .candidates
             .iter()
-            .map(|candidate| candidate.maybe_similarity_score(self.current_value.as_deref()))
+            .map(|candidate| -candidate.maybe_similarity_score(self.current_value.as_deref()))
             .collect();
         let total_candidate_score: isize = candidate_score.iter().sum();
         let mean_candidate_score = total_candidate_score / (self.candidates.len() + 1) as isize;
@@ -332,7 +321,7 @@ where
         indices_to_sort.sort_by_key(|&i| candidate_score[i]);
         let filtered_indices = indices_to_sort
             .into_iter()
-            .filter(|&i| candidate_score[i] >= mean_candidate_score)
+            .filter(|&i| candidate_score[i] <= mean_candidate_score)
             .filter(|&i| {
                 // If the current candidate has already been selected,
                 // we do not want to display it.
@@ -341,6 +330,7 @@ where
                     .iter()
                     .any(|selection| selection == &self.candidates[i])
             })
+            .take(ctx.props().number_of_candidates as usize)
             .collect::<Vec<usize>>();
 
         let classes = format!(
@@ -522,7 +512,7 @@ where
                 } else {
                     html!{
                         <ul class="badges-container">
-                            {for filtered_indices.iter().rev().map(|&i| {
+                            {for filtered_indices.iter().map(|&i| {
                             let candidate = &self.candidates[i];
                                 let onclick = ctx.props().builder.as_ref().map(|_| {
                                     let link = ctx.link().clone();

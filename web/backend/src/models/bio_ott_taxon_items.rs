@@ -7,6 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
+use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;
 use diesel::prelude::*;
 use diesel::Identifiable;
 use diesel::Insertable;
@@ -254,7 +255,11 @@ impl BioOttTaxonItem {
         use crate::schema::bio_ott_taxon_items;
         let mut query = bio_ott_taxon_items::dsl::bio_ott_taxon_items
             .select(BioOttTaxonItem::as_select())
-            .filter(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
+            .filter(
+                bio_ott_taxon_items::dsl::name
+                    .strict_word_similarity_commutator_op(query)
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     bio_ott_taxon_items::dsl::name,
@@ -324,7 +329,11 @@ impl BioOttTaxonItem {
                     query,
                 ),
             ))
-            .filter(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
+            .filter(
+                bio_ott_taxon_items::dsl::name
+                    .strict_word_similarity_commutator_op(query)
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     bio_ott_taxon_items::dsl::name,

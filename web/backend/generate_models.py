@@ -51,7 +51,8 @@ from constraint_checkers import (
     derive_webcommon_new_variants,
     derive_webcommon_update_variants,
     write_web_common_search_trait_implementations,
-    write_diesel_sql_function_bindings
+    write_diesel_sql_function_bindings,
+    write_diesel_sql_operator_bindings
 )
 from constraint_checkers import (
     ensure_can_x_function_existance,
@@ -147,6 +148,7 @@ if __name__ == "__main__":
     )
 
     write_diesel_sql_function_bindings(StructMetadata.table_metadata)
+    write_diesel_sql_operator_bindings(StructMetadata.table_metadata)
     ensure_updatable_tables_have_roles_tables(tables, StructMetadata.table_metadata)
     ensure_can_x_function_existance(tables)
     ensure_tables_have_creation_notification_trigger(tables, StructMetadata.table_metadata)

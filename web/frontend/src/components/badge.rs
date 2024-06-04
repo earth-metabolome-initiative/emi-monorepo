@@ -61,8 +61,8 @@ pub trait RowToBadge: Colorable + Describable + Sized + Clone + PartialEq + Debu
     /// * `query` - The query to compare the implementing type with.
     fn similarity_score<S: AsRef<str>>(&self, query: S) -> isize {
         let query = query.as_ref();
-        self.badge_title().similarity_score(query)
-            + self.description().map_or(0, |d| d.similarity_score(query))
+        (self.badge_title().similarity_score(query)
+            + self.description().map_or(0, |d| d.similarity_score(query))) / 2
     }
 
     /// Returns the similarity score of the implementing type with respect to the query if the query is not empty.

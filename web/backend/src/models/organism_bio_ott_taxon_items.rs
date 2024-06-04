@@ -7,6 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
+use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;
 use diesel::prelude::*;
 use diesel::Identifiable;
 use diesel::Insertable;
@@ -284,14 +285,24 @@ impl OrganismBioOttTaxonItem {
                 )
                 .filter(
                     bio_ott_taxon_items::dsl::name
-                        .ilike(format!("%{}%", query))
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                        .strict_word_similarity_commutator_op(query)
+                        .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
+                        .or(nameplates::dsl::barcode
+                            .strict_word_similarity_commutator_op(query)
+                            .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
                         .or(
                             crate::sql_function_bindings::concat_projects_name_description(
                                 projects::dsl::name,
                                 projects::dsl::description,
                             )
-                            .ilike(format!("%{}%", query)),
+                            .strict_word_similarity_commutator_op(query)
+                            .or(
+                                crate::sql_function_bindings::concat_projects_name_description(
+                                    projects::dsl::name,
+                                    projects::dsl::description,
+                                )
+                                .ilike(format!("%{}%", query)),
+                            ),
                         ),
                 )
                 .order(
@@ -400,14 +411,24 @@ impl OrganismBioOttTaxonItem {
             )
             .filter(
                 bio_ott_taxon_items::dsl::name
-                    .ilike(format!("%{}%", query))
-                    .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                    .strict_word_similarity_commutator_op(query)
+                    .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
+                    .or(nameplates::dsl::barcode
+                        .strict_word_similarity_commutator_op(query)
+                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
                     .or(
                         crate::sql_function_bindings::concat_projects_name_description(
                             projects::dsl::name,
                             projects::dsl::description,
                         )
-                        .ilike(format!("%{}%", query)),
+                        .strict_word_similarity_commutator_op(query)
+                        .or(
+                            crate::sql_function_bindings::concat_projects_name_description(
+                                projects::dsl::name,
+                                projects::dsl::description,
+                            )
+                            .ilike(format!("%{}%", query)),
+                        ),
                     ),
             )
             .order(
@@ -622,14 +643,24 @@ impl OrganismBioOttTaxonItem {
                 )
                 .filter(
                     bio_ott_taxon_items::dsl::name
-                        .ilike(format!("%{}%", query))
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                        .strict_word_similarity_commutator_op(query)
+                        .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
+                        .or(nameplates::dsl::barcode
+                            .strict_word_similarity_commutator_op(query)
+                            .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
                         .or(
                             crate::sql_function_bindings::concat_projects_name_description(
                                 projects::dsl::name,
                                 projects::dsl::description,
                             )
-                            .ilike(format!("%{}%", query)),
+                            .strict_word_similarity_commutator_op(query)
+                            .or(
+                                crate::sql_function_bindings::concat_projects_name_description(
+                                    projects::dsl::name,
+                                    projects::dsl::description,
+                                )
+                                .ilike(format!("%{}%", query)),
+                            ),
                         ),
                 )
                 .order(
@@ -855,14 +886,24 @@ impl OrganismBioOttTaxonItem {
                 )
                 .filter(
                     bio_ott_taxon_items::dsl::name
-                        .ilike(format!("%{}%", query))
-                        .or(nameplates::dsl::barcode.ilike(format!("%{}%", query)))
+                        .strict_word_similarity_commutator_op(query)
+                        .or(bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query)))
+                        .or(nameplates::dsl::barcode
+                            .strict_word_similarity_commutator_op(query)
+                            .or(nameplates::dsl::barcode.ilike(format!("%{}%", query))))
                         .or(
                             crate::sql_function_bindings::concat_projects_name_description(
                                 projects::dsl::name,
                                 projects::dsl::description,
                             )
-                            .ilike(format!("%{}%", query)),
+                            .strict_word_similarity_commutator_op(query)
+                            .or(
+                                crate::sql_function_bindings::concat_projects_name_description(
+                                    projects::dsl::name,
+                                    projects::dsl::description,
+                                )
+                                .ilike(format!("%{}%", query)),
+                            ),
                         ),
                 )
                 .order(

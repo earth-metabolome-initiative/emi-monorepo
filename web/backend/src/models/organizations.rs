@@ -7,6 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
+use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;
 use diesel::prelude::*;
 use diesel::Identifiable;
 use diesel::Insertable;
@@ -220,7 +221,11 @@ impl Organization {
         use crate::schema::organizations;
         let mut query = organizations::dsl::organizations
             .select(Organization::as_select())
-            .filter(organizations::dsl::name.ilike(format!("%{}%", query)))
+            .filter(
+                organizations::dsl::name
+                    .strict_word_similarity_commutator_op(query)
+                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     organizations::dsl::name,
@@ -260,7 +265,11 @@ impl Organization {
                     query,
                 ),
             ))
-            .filter(organizations::dsl::name.ilike(format!("%{}%", query)))
+            .filter(
+                organizations::dsl::name
+                    .strict_word_similarity_commutator_op(query)
+                    .or(organizations::dsl::name.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     organizations::dsl::name,

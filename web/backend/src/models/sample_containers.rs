@@ -7,6 +7,7 @@
 //! document in the `migrations` folder.
 
 use crate::schema::*;
+use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;
 use diesel::prelude::*;
 use diesel::Identifiable;
 use diesel::Insertable;
@@ -272,7 +273,11 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+            .filter(
+                sample_containers::dsl::barcode
+                    .strict_word_similarity_commutator_op(query)
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     sample_containers::dsl::barcode,
@@ -327,7 +332,11 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+            .filter(
+                sample_containers::dsl::barcode
+                    .strict_word_similarity_commutator_op(query)
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     sample_containers::dsl::barcode,
@@ -488,7 +497,11 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+            .filter(
+                sample_containers::dsl::barcode
+                    .strict_word_similarity_commutator_op(query)
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     sample_containers::dsl::barcode,
@@ -663,7 +676,11 @@ impl SampleContainer {
                 author_user_id,
                 sample_containers::dsl::id,
             ))
-            .filter(sample_containers::dsl::barcode.ilike(format!("%{}%", query)))
+            .filter(
+                sample_containers::dsl::barcode
+                    .strict_word_similarity_commutator_op(query)
+                    .or(sample_containers::dsl::barcode.ilike(format!("%{}%", query))),
+            )
             .order(
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     sample_containers::dsl::barcode,

@@ -109,6 +109,11 @@ def write_backend_flat_variants(
         if struct.has_filter_variant():
             this_imports.append("use web_common::database::filter_structs::*;")
 
+        if struct.is_searchable():
+            this_imports.append(
+                "use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;"
+            )
+
         struct_document = open(f"{path_directory}/{struct.table_name}.rs", "w", encoding="utf8")
         struct_document.write(warning_header)
         # Then, we write the import statements.
