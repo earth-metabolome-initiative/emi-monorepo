@@ -55,14 +55,10 @@ pub(crate) fn search_all(
         )?,
     ));
 
-    let users = convert::<User, web_common::database::User>(
+    results.extend(convert::<User, web_common::database::User>(
         query,
         User::strict_word_similarity_search_with_score_viewable(query, limit, None, connection)?,
-    );
-
-    log::info!("users: {:?} with query: {}", users, query);
-
-    results.extend(users);
+    ));
 
     results.extend(
         convert::<NestedProject, web_common::database::NestedProject>(
@@ -160,8 +156,6 @@ pub(crate) fn search_all(
             query, limit, None, connection,
         )?,
     ));
-
-    log::info!("total results: {}", results.len());
 
     // Finally, we sort the results by relevance.
     results.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());

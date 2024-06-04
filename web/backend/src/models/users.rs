@@ -171,13 +171,11 @@ impl User {
             .filter(
                 crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
-                    users::dsl::middle_name,
                     users::dsl::last_name,
                 )
                 .strict_word_similarity_commutator_op(query)
                 .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
-                    users::dsl::middle_name,
                     users::dsl::last_name,
                 )
                 .ilike(format!("%{}%", query))),
@@ -186,7 +184,6 @@ impl User {
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     crate::sql_function_bindings::concat_users_name(
                         users::dsl::first_name,
-                        users::dsl::middle_name,
                         users::dsl::last_name,
                     ),
                     query,
@@ -218,7 +215,6 @@ impl User {
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     crate::sql_function_bindings::concat_users_name(
                         users::dsl::first_name,
-                        users::dsl::middle_name,
                         users::dsl::last_name,
                     ),
                     query,
@@ -227,13 +223,11 @@ impl User {
             .filter(
                 crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
-                    users::dsl::middle_name,
                     users::dsl::last_name,
                 )
                 .strict_word_similarity_commutator_op(query)
                 .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
-                    users::dsl::middle_name,
                     users::dsl::last_name,
                 )
                 .ilike(format!("%{}%", query))),
@@ -242,7 +236,6 @@ impl User {
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     crate::sql_function_bindings::concat_users_name(
                         users::dsl::first_name,
-                        users::dsl::middle_name,
                         users::dsl::last_name,
                     ),
                     query,
@@ -373,13 +366,11 @@ impl User {
             .filter(
                 crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
-                    users::dsl::middle_name,
                     users::dsl::last_name,
                 )
                 .strict_word_similarity_commutator_op(query)
                 .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
-                    users::dsl::middle_name,
                     users::dsl::last_name,
                 )
                 .ilike(format!("%{}%", query))),
@@ -388,7 +379,6 @@ impl User {
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     crate::sql_function_bindings::concat_users_name(
                         users::dsl::first_name,
-                        users::dsl::middle_name,
                         users::dsl::last_name,
                     ),
                     query,
@@ -519,13 +509,11 @@ impl User {
             .filter(
                 crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
-                    users::dsl::middle_name,
                     users::dsl::last_name,
                 )
                 .strict_word_similarity_commutator_op(query)
                 .or(crate::sql_function_bindings::concat_users_name(
                     users::dsl::first_name,
-                    users::dsl::middle_name,
                     users::dsl::last_name,
                 )
                 .ilike(format!("%{}%", query))),
@@ -534,7 +522,6 @@ impl User {
                 crate::sql_function_bindings::strict_word_similarity_dist_op(
                     crate::sql_function_bindings::concat_users_name(
                         users::dsl::first_name,
-                        users::dsl::middle_name,
                         users::dsl::last_name,
                     ),
                     query,

@@ -701,7 +701,6 @@ diesel::define_sql_function! {
 diesel::define_sql_function! {
    fn concat_users_name(
         first_name: diesel::sql_types::Text,
-        middle_name: diesel::sql_types::Nullable<diesel::sql_types::Text>,
         last_name: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;
 }
