@@ -706,10 +706,23 @@ def write_backend_flat_variants(
                                 "        query\n"
                             )
 
+                        number_of_indices = struct.number_of_search_indices()
+
+                        normalization_procedure = ""
+                        if number_of_indices > 1 and with_score:
+                            normalization_procedure = (
+                                "\n.map(|mut entries| {\n"
+                                "    entries.iter_mut().for_each(|entry| {\n"
+                                f"        entry.1 /= {number_of_indices}.0;\n"
+                                "    });\n"
+                                "    entries\n"
+                                "})\n\n"
+                            )
+
                         struct_document.write(
                             "            .limit(limit.unwrap_or(10))\n"
                             "            .offset(offset.unwrap_or(0))\n"
-                            f"            .load::<{return_type}>(connection).map_err(web_common::api::ApiError::from)\n"
+                            f"            .load::<{return_type}>(connection){normalization_procedure}.map_err(web_common::api::ApiError::from)\n"
                             "    }\n"
                         )
 

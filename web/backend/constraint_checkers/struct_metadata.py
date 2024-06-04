@@ -1050,6 +1050,10 @@ class StructMetadata:
             + self.get_second_order_derived_search_indices()
         )
 
+    def number_of_search_indices(self) -> int:
+        """Returns the number of search indices of the struct."""
+        return len(self.get_all_search_indices())
+
     def format_diesel_search_aliases(self) -> str:
         """Returns the diesel search aliases for the struct.
         

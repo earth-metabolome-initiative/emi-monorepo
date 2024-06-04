@@ -1,6 +1,6 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::{NestedProject, NestedProjectState, User};
 use crate::traits::format_match::FormatMatch;
+use web_common::database::{NestedProject, NestedProjectState, User};
 use yew::prelude::*;
 
 impl RowToBadge for NestedProject {

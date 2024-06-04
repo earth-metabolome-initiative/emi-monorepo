@@ -1367,6 +1367,9 @@ class TableMetadata:
                 )
             )
 
+        # We sort the SQL operators by name.
+        sql_operators = sorted(sql_operators, key=lambda x: x.name)
+
         return sql_operators
 
     @cache

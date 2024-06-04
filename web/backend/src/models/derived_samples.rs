@@ -705,7 +705,15 @@ crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function
 crate::sql_function_bindings::strict_word_similarity_dist_op(crate::sql_function_bindings::concat_sample_states_name_description(sample_states1.field(sample_states::dsl::name), sample_states1.field(sample_states::dsl::description)), query))
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
-            .load::<(Self, f32)>(connection).map_err(web_common::api::ApiError::from)
+            .load::<(Self, f32)>(connection)
+.map(|mut entries| {
+    entries.iter_mut().for_each(|entry| {
+        entry.1 /= 7.0;
+    });
+    entries
+})
+
+.map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.
     ///

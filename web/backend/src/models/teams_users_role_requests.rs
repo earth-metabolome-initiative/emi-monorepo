@@ -411,6 +411,12 @@ impl TeamsUsersRoleRequest {
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<(Self, f32)>(connection)
+            .map(|mut entries| {
+                entries.iter_mut().for_each(|entry| {
+                    entry.1 /= 2.0;
+                });
+                entries
+            })
             .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.

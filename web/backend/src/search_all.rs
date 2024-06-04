@@ -45,14 +45,24 @@ pub(crate) fn search_all(
         return Ok(Vec::new());
     }
 
-    let user_results =
-        User::strict_word_similarity_search_with_score_viewable(query, limit, None, connection)?;
-    log::info!("Found {} users for query '{}'", user_results.len(), query);
-
-    results.extend(convert::<User, web_common::database::User>(
+    results.extend(convert::<
+        NestedBioOttRank,
+        web_common::database::NestedBioOttRank,
+    >(
         query,
-        user_results,
+        NestedBioOttRank::strict_word_similarity_search_with_score_viewable(
+            query, limit, None, connection,
+        )?,
     ));
+
+    let users = convert::<User, web_common::database::User>(
+        query,
+        User::strict_word_similarity_search_with_score_viewable(query, limit, None, connection)?,
+    );
+
+    log::info!("users: {:?} with query: {}", users, query);
+
+    results.extend(users);
 
     results.extend(
         convert::<NestedProject, web_common::database::NestedProject>(
@@ -73,6 +83,20 @@ pub(crate) fn search_all(
     >(
         query,
         NestedObservation::strict_word_similarity_search_with_score_viewable(
+            author_user_id,
+            query,
+            limit,
+            None,
+            connection,
+        )?,
+    ));
+
+    results.extend(convert::<
+        NestedOrganism,
+        web_common::database::NestedOrganism,
+    >(
+        query,
+        NestedOrganism::strict_word_similarity_search_with_score_viewable(
             author_user_id,
             query,
             limit,
@@ -130,10 +154,17 @@ pub(crate) fn search_all(
         )?,
     ));
 
+    results.extend(convert::<NestedTeam, web_common::database::NestedTeam>(
+        query,
+        NestedTeam::strict_word_similarity_search_with_score_viewable(
+            query, limit, None, connection,
+        )?,
+    ));
+
+    log::info!("total results: {}", results.len());
+
     // Finally, we sort the results by relevance.
     results.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-
-    log::info!("Found {} results for query '{}'", results.len(), query);
 
     Ok(results
         .into_iter()

@@ -103,6 +103,7 @@ impl From<Box<bincode::ErrorKind>> for ApiError {
 
 impl Into<Vec<String>> for ApiError {
     fn into(self) -> Vec<String> {
+        log::error!("ApiError: {:?}", self);
         match self {
             ApiError::BadRequest(errors) => errors,
             ApiError::NoResults => vec!["No results".to_string()],
@@ -145,6 +146,7 @@ impl From<gluesql::prelude::Error> for ApiError {
 #[cfg(feature = "backend")]
 impl From<diesel::result::Error> for ApiError {
     fn from(e: diesel::result::Error) -> Self {
+        
         match e {
             diesel::result::Error::DatabaseError(kind, information) => {
                 log::error!("Database error {:?}: message: {:?}, details: {:?}, hint: {:?}, table_name: {:?}, column_name: {:?}, constraint_name: {:?}, statement_position: {:?}", kind, information.message(), information.details(), information.hint(), information.table_name(), information.column_name(), information.constraint_name(), information.statement_position());
@@ -156,7 +158,10 @@ impl From<diesel::result::Error> for ApiError {
                 }
             }
             diesel::result::Error::NotFound => Self::BadRequest(vec!["Not found".to_string()]),
-            _ => Self::InternalServerError,
+            e => {
+                log::error!("Database error: {:?}", e);
+                Self::InternalServerError
+            }
         }
     }
 }

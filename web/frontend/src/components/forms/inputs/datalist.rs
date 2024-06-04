@@ -315,13 +315,10 @@ where
             .iter()
             .map(|candidate| -candidate.maybe_similarity_score(self.current_value.as_deref()))
             .collect();
-        let total_candidate_score: isize = candidate_score.iter().sum();
-        let mean_candidate_score = total_candidate_score / (self.candidates.len() + 1) as isize;
         let mut indices_to_sort: Vec<usize> = (0..self.candidates.len()).collect::<Vec<usize>>();
         indices_to_sort.sort_by_key(|&i| candidate_score[i]);
         let filtered_indices = indices_to_sort
             .into_iter()
-            .filter(|&i| candidate_score[i] <= mean_candidate_score)
             .filter(|&i| {
                 // If the current candidate has already been selected,
                 // we do not want to display it.
