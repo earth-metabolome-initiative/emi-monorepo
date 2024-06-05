@@ -1628,17 +1628,7 @@ class StructMetadata:
             The derive to add to the struct.
         """
         self._derives.append(derive)
-
-    def add_decorator(self, decorator: str):
-        """Adds a decorator to the struct.
-
-        Parameters
-        ----------
-        decorator : str
-            The decorator to add to the struct.
-        """
-        self._decorators.append(decorator)
-
+    
     def contains_optional_fields(self) -> bool:
         """Returns whether the struct contains optional fields."""
         return any(attribute.optional for attribute in self.attributes)

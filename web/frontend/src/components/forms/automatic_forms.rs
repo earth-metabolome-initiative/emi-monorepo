@@ -19,7 +19,6 @@ use yewdux::Dispatch;
 use yewdux::{use_store, use_store_value, Reducer, Store};
 
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct DerivedSampleBuilder {
     pub quantity: Option<f64>,
     pub parent_sample: Option<Rc<NestedSample>>,
@@ -375,7 +374,6 @@ pub fn update_derived_sample_form(props: &UpdateDerivedSampleFormProp) -> Html {
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct NameplateBuilder {
     pub id: Option<i32>,
     pub barcode: Option<Rc<String>>,
@@ -642,7 +640,6 @@ pub fn update_nameplate_form(props: &UpdateNameplateFormProp) -> Html {
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct ObservationBuilder {
     pub id: Option<uuid::Uuid>,
     pub notes: Option<Rc<String>>,
@@ -1055,7 +1052,6 @@ pub fn update_observation_form(props: &UpdateObservationFormProp) -> Html {
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct OrganismBioOttTaxonItemBuilder {
     pub organism: Option<Rc<NestedOrganism>>,
     pub taxon: Option<Rc<NestedBioOttTaxonItem>>,
@@ -1235,7 +1231,6 @@ pub fn create_organism_bio_ott_taxon_item_form(
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct OrganismBuilder {
     pub id: Option<uuid::Uuid>,
     pub notes: Option<Rc<String>>,
@@ -1609,7 +1604,6 @@ pub fn update_organism_form(props: &UpdateOrganismFormProp) -> Html {
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct ProjectBuilder {
     pub id: Option<i32>,
     pub name: Option<Rc<String>>,
@@ -2212,7 +2206,6 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsTeamsRoleInvitationBuilder {
     pub table: Option<Rc<NestedProject>>,
     pub team: Option<Rc<NestedTeam>>,
@@ -2428,7 +2421,6 @@ pub fn create_projects_teams_role_invitation_form(
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsTeamsRoleRequestBuilder {
     pub table: Option<Rc<NestedProject>>,
     pub team: Option<Rc<NestedTeam>>,
@@ -2644,7 +2636,6 @@ pub fn create_projects_teams_role_request_form(
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsTeamsRoleBuilder {
     pub table: Option<Rc<NestedProject>>,
     pub team: Option<Rc<NestedTeam>>,
@@ -2852,7 +2843,6 @@ pub fn create_projects_teams_role_form(props: &CreateProjectsTeamsRoleFormProp) 
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleInvitationBuilder {
     pub table: Option<Rc<NestedProject>>,
     pub user: Option<Rc<User>>,
@@ -3067,7 +3057,6 @@ pub fn create_projects_users_role_invitation_form(
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleRequestBuilder {
     pub table: Option<Rc<NestedProject>>,
     pub user: Option<Rc<User>>,
@@ -3282,7 +3271,6 @@ pub fn create_projects_users_role_request_form(
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleBuilder {
     pub table: Option<Rc<NestedProject>>,
     pub user: Option<Rc<User>>,
@@ -3490,7 +3478,6 @@ pub fn create_projects_users_role_form(props: &CreateProjectsUsersRoleFormProp) 
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct SampleBioOttTaxonItemBuilder {
     pub sample: Option<Rc<NestedSample>>,
     pub taxon: Option<Rc<NestedBioOttTaxonItem>>,
@@ -3668,7 +3655,6 @@ pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItem
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct SampleContainerBuilder {
     pub id: Option<i32>,
     pub barcode: Option<Rc<String>>,
@@ -3948,7 +3934,6 @@ pub fn update_sample_container_form(props: &UpdateSampleContainerFormProp) -> Ht
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct SampleBuilder {
     pub id: Option<uuid::Uuid>,
     pub notes: Option<Rc<String>>,
@@ -4269,247 +4254,6 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
     }
 }
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
-pub struct SpectraBuilder {
-    pub id: Option<i32>,
-    pub notes: Option<Rc<String>>,
-    pub spectra_collection: Option<Rc<NestedSpectraCollection>>,
-    pub errors_notes: Vec<ApiError>,
-    pub errors_spectra_collection: Vec<ApiError>,
-    pub form_updated_at: chrono::NaiveDateTime,
-}
-
-impl Default for SpectraBuilder {
-    fn default() -> Self {
-        Self {
-            id: None,
-            notes: None,
-            spectra_collection: Default::default(),
-            errors_notes: Default::default(),
-            errors_spectra_collection: Default::default(),
-            form_updated_at: Default::default(),
-        }
-    }
-}
-
-#[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-pub(super) enum SpectraActions {
-    SetNotes(Option<String>),
-    SetSpectraCollection(Option<Rc<NestedSpectraCollection>>),
-}
-
-impl FromOperation for SpectraActions {
-    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
-        match operation.as_ref() {
-            "spectra_collection" => {
-                SpectraActions::SetSpectraCollection(Some(bincode::deserialize(&row).unwrap()))
-            }
-            operation_name => {
-                unreachable!("The operation name '{}' is not supported.", operation_name)
-            }
-        }
-    }
-}
-
-impl Reducer<SpectraBuilder> for SpectraActions {
-    fn apply(self, mut state: std::rc::Rc<SpectraBuilder>) -> std::rc::Rc<SpectraBuilder> {
-        let state_mut = Rc::make_mut(&mut state);
-        match self {
-            SpectraActions::SetNotes(notes) => 'notes: {
-                state_mut.errors_notes.clear();
-                if let Some(value) = notes.as_ref() {
-                    if value.is_empty() {
-                        state_mut.errors_notes.push(ApiError::BadRequest(vec![
-                            "The Notes field cannot be left empty.".to_string(),
-                        ]));
-                        state_mut.notes = None;
-                        break 'notes;
-                    }
-                }
-                state_mut.notes = notes.map(Rc::from);
-                // To avoid having a codesmell relative to the cases where we are not
-                // yet handling more corner cases, we always use the break here.
-                break 'notes;
-            }
-            SpectraActions::SetSpectraCollection(spectra_collection) => 'spectra_collection: {
-                state_mut.errors_spectra_collection.clear();
-                if spectra_collection.is_none() {
-                    state_mut
-                        .errors_spectra_collection
-                        .push(ApiError::BadRequest(vec![
-                            "The Spectra collection field is required.".to_string(),
-                        ]));
-                    state_mut.spectra_collection = None;
-                    break 'spectra_collection;
-                }
-                state_mut.spectra_collection = spectra_collection.map(Rc::from);
-                // To avoid having a codesmell relative to the cases where we are not
-                // yet handling more corner cases, we always use the break here.
-                break 'spectra_collection;
-            }
-        }
-        state
-    }
-}
-impl FormBuilder for SpectraBuilder {
-    type Actions = SpectraActions;
-
-    type RichVariant = NestedSpectra;
-
-    fn has_errors(&self) -> bool {
-        !self.errors_notes.is_empty() || !self.errors_spectra_collection.is_empty()
-    }
-
-    fn update(
-        dispatcher: &Dispatch<Self>,
-        richest_variant: Self::RichVariant,
-    ) -> Vec<ComponentMessage> {
-        dispatcher.reduce_mut(|state| {
-            state.id = Some(richest_variant.inner.id);
-        });
-        dispatcher.apply(SpectraActions::SetNotes(
-            richest_variant
-                .inner
-                .notes
-                .as_ref()
-                .map(|notes| notes.to_string()),
-        ));
-        dispatcher.apply(SpectraActions::SetSpectraCollection(
-            Some(richest_variant.spectra_collection).map(Rc::from),
-        ));
-        vec![]
-    }
-
-    fn can_submit(&self) -> bool {
-        !self.has_errors() && self.spectra_collection.is_some()
-    }
-}
-
-impl From<SpectraBuilder> for NewSpectra {
-    fn from(builder: SpectraBuilder) -> Self {
-        Self {
-            notes: builder.notes.as_deref().cloned(),
-            spectra_collection_id: builder
-                .spectra_collection
-                .as_deref()
-                .cloned()
-                .unwrap()
-                .inner
-                .id,
-        }
-    }
-}
-impl From<SpectraBuilder> for UpdateSpectra {
-    fn from(builder: SpectraBuilder) -> Self {
-        Self {
-            id: builder.id.unwrap(),
-            notes: builder.notes.as_deref().cloned(),
-            spectra_collection_id: builder
-                .spectra_collection
-                .as_deref()
-                .cloned()
-                .unwrap()
-                .inner
-                .id,
-        }
-    }
-}
-impl FormBuildable for NewSpectra {
-    type Builder = SpectraBuilder;
-    fn title() -> &'static str {
-        "Spectra"
-    }
-    fn task_target() -> &'static str {
-        "Spectra"
-    }
-    fn requires_authentication() -> bool {
-        true
-    }
-    fn can_operate_offline() -> bool {
-        false
-    }
-}
-
-impl FormBuildable for UpdateSpectra {
-    type Builder = SpectraBuilder;
-    fn title() -> &'static str {
-        "Spectra"
-    }
-    fn task_target() -> &'static str {
-        "Spectra"
-    }
-    fn requires_authentication() -> bool {
-        true
-    }
-    fn can_operate_offline() -> bool {
-        true
-    }
-}
-
-#[derive(Clone, PartialEq, Properties)]
-pub struct CreateSpectraFormProp {
-    #[prop_or_default]
-    pub spectra_collection_id: Option<i32>,
-}
-
-#[function_component(CreateSpectraForm)]
-pub fn create_spectra_form(props: &CreateSpectraFormProp) -> Html {
-    let mut named_requests: Vec<ComponentMessage> = Vec::new();
-    let (builder_store, builder_dispatch) = use_store::<SpectraBuilder>();
-    if let Some(spectra_collection_id) = props.spectra_collection_id {
-        named_requests.push(ComponentMessage::get_named::<&str, SpectraCollection>(
-            "spectra_collection",
-            spectra_collection_id.into(),
-        ));
-    }
-    let set_notes =
-        builder_dispatch.apply_callback(|notes: Option<String>| SpectraActions::SetNotes(notes));
-    let set_spectra_collection = builder_dispatch.apply_callback(
-        |spectra_collection: Option<Rc<NestedSpectraCollection>>| {
-            SpectraActions::SetSpectraCollection(spectra_collection)
-        },
-    );
-    html! {
-        <BasicForm<NewSpectra>
-            method={FormMethod::POST}
-            named_requests={named_requests}
-            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <Datalist<NestedSpectraCollection, false> builder={set_spectra_collection} optional={false} errors={builder_store.errors_spectra_collection.clone()} value={builder_store.spectra_collection.clone()} label="Spectra collection" scanner={false} />
-        </BasicForm<NewSpectra>>
-    }
-}
-#[derive(Clone, PartialEq, Properties)]
-pub struct UpdateSpectraFormProp {
-    pub id: i32,
-}
-
-#[function_component(UpdateSpectraForm)]
-pub fn update_spectra_form(props: &UpdateSpectraFormProp) -> Html {
-    let mut named_requests: Vec<ComponentMessage> = Vec::new();
-    let (builder_store, builder_dispatch) = use_store::<SpectraBuilder>();
-    // We push the ID of the row to the named requests.
-    let props = props.clone();
-    named_requests.push(ComponentMessage::get::<UpdateSpectra>(props.id.into()));
-    let set_notes =
-        builder_dispatch.apply_callback(|notes: Option<String>| SpectraActions::SetNotes(notes));
-    let set_spectra_collection = builder_dispatch.apply_callback(
-        |spectra_collection: Option<Rc<NestedSpectraCollection>>| {
-            SpectraActions::SetSpectraCollection(spectra_collection)
-        },
-    );
-    html! {
-        <BasicForm<UpdateSpectra>
-            method={FormMethod::PUT}
-            named_requests={named_requests}
-            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <Datalist<NestedSpectraCollection, false> builder={set_spectra_collection} optional={false} errors={builder_store.errors_spectra_collection.clone()} value={builder_store.spectra_collection.clone()} label="Spectra collection" scanner={false} />
-        </BasicForm<UpdateSpectra>>
-    }
-}
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct SpectraCollectionBuilder {
     pub id: Option<i32>,
     pub notes: Option<Rc<String>>,
@@ -4736,7 +4480,6 @@ pub fn update_spectra_collection_form(props: &UpdateSpectraCollectionFormProp) -
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct TeamBuilder {
     pub id: Option<i32>,
     pub name: Option<Rc<String>>,
@@ -5138,7 +4881,6 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct TeamsTeamsRoleInvitationBuilder {
     pub table: Option<Rc<NestedTeam>>,
     pub team: Option<Rc<NestedTeam>>,
@@ -5354,7 +5096,6 @@ pub fn create_teams_teams_role_invitation_form(
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct TeamsUsersRoleInvitationBuilder {
     pub table: Option<Rc<NestedTeam>>,
     pub user: Option<Rc<User>>,
@@ -5569,7 +5310,6 @@ pub fn create_teams_users_role_invitation_form(
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct TeamsUsersRoleRequestBuilder {
     pub table: Option<Rc<NestedTeam>>,
     pub user: Option<Rc<User>>,
@@ -5781,7 +5521,6 @@ pub fn create_teams_users_role_request_form(props: &CreateTeamsUsersRoleRequestF
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct TeamsUsersRoleBuilder {
     pub table: Option<Rc<NestedTeam>>,
     pub user: Option<Rc<User>>,
@@ -5986,7 +5725,6 @@ pub fn create_teams_users_role_form(props: &CreateTeamsUsersRoleFormProp) -> Htm
     }
 }
 #[derive(Store, Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct UserBuilder {
     pub id: Option<i32>,
     pub first_name: Option<Rc<String>>,
@@ -6241,7 +5979,6 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct UsersUsersRoleInvitationBuilder {
     pub table: Option<Rc<User>>,
     pub user: Option<Rc<User>>,
@@ -6455,7 +6192,6 @@ pub fn create_users_users_role_invitation_form(
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct UsersUsersRoleRequestBuilder {
     pub table: Option<Rc<User>>,
     pub user: Option<Rc<User>>,
@@ -6666,7 +6402,6 @@ pub fn create_users_users_role_request_form(props: &CreateUsersUsersRoleRequestF
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
-#[store(storage = "local", storage_tab_sync)]
 pub struct UsersUsersRoleBuilder {
     pub table: Option<Rc<User>>,
     pub user: Option<Rc<User>>,

@@ -273,63 +273,6 @@ impl UpdateSampleContainer {
 
 }
 #[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
-pub struct UpdateSpectra {
-    pub id: i32,
-    pub notes: Option<String>,
-    pub spectra_collection_id: i32,
-}
-
-impl Tabular for UpdateSpectra {
-    const TABLE: Table = Table::Spectra;
-}
-#[cfg(feature = "frontend")]
-impl UpdateSpectra {
-    pub fn into_row(self, updated_by: i32) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
-        vec![
-            gluesql::core::ast_builder::num(updated_by),
-            gluesql::core::ast_builder::num(self.id),
-            match self.notes {
-                Some(notes) => gluesql::core::ast_builder::text(notes),
-                None => gluesql::core::ast_builder::null(),
-            },
-            gluesql::core::ast_builder::num(self.spectra_collection_id),
-        ]
-    }
-
-    /// Update the struct in the database.
-    ///
-    /// # Arguments
-    /// * `user_id` - The ID of the user who is updating the struct.
-    /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
-        self,
-        user_id: i32,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let mut update_row = table("spectra")
-            .update()        
-.set("id", gluesql::core::ast_builder::num(self.id))        
-.set("spectra_collection_id", gluesql::core::ast_builder::num(self.spectra_collection_id))        
-.set("updated_by", gluesql::core::ast_builder::num(user_id));
-        if let Some(notes) = self.notes {
-            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
-        }
-            update_row.execute(connection)
-            .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
-    }
-
-}
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
 pub struct UpdateSpectraCollection {
     pub id: i32,
     pub notes: Option<String>,

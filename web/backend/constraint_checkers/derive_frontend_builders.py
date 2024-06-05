@@ -86,8 +86,6 @@ def derive_frontend_builders(
         for derive in richest_variant.derives():
             builder.add_derive(derive)
 
-        builder.add_decorator('store(storage = "local", storage_tab_sync)')
-
         foreign_keys = flat_variant.get_foreign_keys()
         primary_keys = flat_variant.get_primary_keys()
 

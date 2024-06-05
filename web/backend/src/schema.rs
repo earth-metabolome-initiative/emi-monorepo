@@ -505,12 +505,7 @@ diesel::table! {
 
     spectra (id) {
         id -> Int4,
-        notes -> Nullable<Text>,
         spectra_collection_id -> Int4,
-        created_by -> Int4,
-        created_at -> Timestamp,
-        updated_by -> Int4,
-        updated_at -> Timestamp,
     }
 }
 

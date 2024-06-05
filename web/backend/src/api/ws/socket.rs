@@ -208,8 +208,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     self.user().map(|user| user.id).unwrap(),
                                     &mut self.diesel_connection,
                                 ) {
-                                    Ok(_) => {
-                                        ctx.address().do_send(BackendMessage::Completed(task_id));
+                                    Ok(row) => {
+                                        ctx.address()
+                                            .do_send(BackendMessage::Completed(task_id, Some(row)));
                                     }
                                     Err(err) => {
                                         ctx.address().do_send(BackendMessage::Error(task_id, err));
@@ -234,8 +235,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     self.user().map(|user| user.id).unwrap(),
                                     &mut self.diesel_connection,
                                 ) {
-                                    Ok(_) => {
-                                        ctx.address().do_send(BackendMessage::Completed(task_id));
+                                    Ok(row) => {
+                                        ctx.address()
+                                            .do_send(BackendMessage::Completed(task_id, Some(row)));
                                     }
                                     Err(err) => {
                                         ctx.address().do_send(BackendMessage::Error(task_id, err));
@@ -586,7 +588,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     &mut self.diesel_connection,
                                 ) {
                                     Ok(_) => {
-                                        ctx.address().do_send(BackendMessage::Completed(task_id));
+                                        ctx.address()
+                                            .do_send(BackendMessage::Completed(task_id, None));
                                     }
                                     Err(err) => {
                                         ctx.address().do_send(BackendMessage::Error(task_id, err));

@@ -39,7 +39,6 @@ pub mod sample_containers;
 pub mod sample_states;
 pub mod samples;
 pub mod searchable_struct;
-pub mod spectra;
 pub mod spectra_collections;
 pub mod team_states;
 pub mod teams;

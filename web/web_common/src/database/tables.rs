@@ -8165,15 +8165,10 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct Spectra {
     pub id: i32,
-    pub notes: Option<String>,
     pub spectra_collection_id: i32,
-    pub created_by: i32,
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_by: i32,
-    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl Tabular for Spectra {
@@ -8181,7 +8176,7 @@ impl Tabular for Spectra {
 }
 impl Describable for Spectra {
     fn description(&self) -> Option<&str> {
-        self.notes.as_deref()
+        None
     }
 }
 impl Colorable for Spectra {
@@ -8198,15 +8193,7 @@ impl Spectra {
     pub fn into_row(self) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {
         vec![
             gluesql::core::ast_builder::num(self.id),
-            match self.notes {
-                Some(notes) => gluesql::core::ast_builder::text(notes),
-                None => gluesql::core::ast_builder::null(),
-            },
             gluesql::core::ast_builder::num(self.spectra_collection_id),
-            gluesql::core::ast_builder::num(self.created_by),
-            gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
-            gluesql::core::ast_builder::num(self.updated_by),
-            gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
     }
 
@@ -8220,7 +8207,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         table("spectra")
             .insert()
-            .columns("id, notes, spectra_collection_id, created_by, created_at, updated_by, updated_at")
+            .columns("id, spectra_collection_id")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -8246,7 +8233,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("spectra")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, notes, spectra_collection_id, created_by, created_at, updated_by, updated_at")
+            .project("id, spectra_collection_id")
             .limit(1)
             .execute(connection)
             .await?;
@@ -8312,18 +8299,10 @@ connection: &mut gluesql::prelude::Glue<C>,
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
-        let mut update_row = table("spectra")
+        table("spectra")
             .update()        
 .set("id", gluesql::core::ast_builder::num(self.id))        
-.set("spectra_collection_id", gluesql::core::ast_builder::num(self.spectra_collection_id))        
-.set("created_by", gluesql::core::ast_builder::num(self.created_by))        
-.set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
-.set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()));
-        if let Some(notes) = self.notes {
-            update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
-        }
-            update_row.execute(connection)
+.set("spectra_collection_id", gluesql::core::ast_builder::num(self.spectra_collection_id))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -8371,38 +8350,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("spectra")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, notes, spectra_collection_id, created_by, created_at, updated_by, updated_at")
-            .offset(offset.unwrap_or(0))
-            .limit(limit.unwrap_or(10))
-            .execute(connection)
-            .await?;
-        Ok(select_row.select()
-            .unwrap()
-            .map(Self::from_row)
-            .collect::<Vec<_>>())
-    }
-    /// Get all Spectra from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of results, by default `10`.
-    /// * `offset` - The offset of the results, by default `0`.
-    /// * `connection` - The connection to the database.
-    ///
-    pub async fn all_by_updated_at<C>(
-        filter: Option<&SpectraFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        use gluesql::core::ast_builder::*;
-        let select_row = table("spectra")
-            .select()
-            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, notes, spectra_collection_id, created_by, created_at, updated_by, updated_at")
-            .order_by("updated_at desc")
+           .project("id, spectra_collection_id")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -8418,30 +8366,9 @@ connection: &mut gluesql::prelude::Glue<C>,
                 gluesql::prelude::Value::I32(id) => id.clone(),
                 _ => unreachable!("Expected I32")
             },
-            notes: match row.get("notes").unwrap() {
-                gluesql::prelude::Value::Null => None,
-                gluesql::prelude::Value::Str(notes) => Some(notes.clone()),
-                _ => unreachable!("Expected Str")
-            },
             spectra_collection_id: match row.get("spectra_collection_id").unwrap() {
                 gluesql::prelude::Value::I32(spectra_collection_id) => spectra_collection_id.clone(),
                 _ => unreachable!("Expected I32")
-            },
-            created_by: match row.get("created_by").unwrap() {
-                gluesql::prelude::Value::I32(created_by) => created_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            created_at: match row.get("created_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),
-                _ => unreachable!("Expected Timestamp")
-            },
-            updated_by: match row.get("updated_by").unwrap() {
-                gluesql::prelude::Value::I32(updated_by) => updated_by.clone(),
-                _ => unreachable!("Expected I32")
-            },
-            updated_at: match row.get("updated_at").unwrap() {
-                gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
-                _ => unreachable!("Expected Timestamp")
             },
         }
     }

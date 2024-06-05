@@ -677,10 +677,7 @@ impl Table {
                 let filter: Option<crate::database::SampleFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedSample::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
-            Table::Spectra => {
-                let filter: Option<crate::database::SpectraFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
-                crate::database::NestedSpectra::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
-            },
+            Table::Spectra => unimplemented!("all_by_updated_at not implemented for spectra."),
             Table::SpectraCollections => {
                 let filter: Option<crate::database::SpectraCollectionFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
                 crate::database::NestedSpectraCollection::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
@@ -770,7 +767,7 @@ impl Table {
                 let nested_row = super::NestedSample::from_flat(inserted_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
-            Table::Spectra => unimplemented!("Insert not implemented for spectra in frontend as it does not have a UUID primary key."),
+            Table::Spectra => unimplemented!("Insert not implemented for spectra."),
             Table::SpectraCollections => unimplemented!("Insert not implemented for spectra_collections in frontend as it does not have a UUID primary key."),
             Table::TeamStates => unimplemented!("Insert not implemented for team_states."),
             Table::Teams => unimplemented!("Insert not implemented for teams in frontend as it does not have a UUID primary key."),
@@ -878,14 +875,7 @@ impl Table {
                 let nested_row = super::NestedSample::from_flat(updated_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
-            Table::Spectra => {
-                let update_row: super::UpdateSpectra = bincode::deserialize::<super::UpdateSpectra>(&update_row).map_err(crate::api::ApiError::from)?;
-                let id = update_row.id;
-                update_row.update(user_id, connection).await?;
-                let updated_row: super::Spectra = super::Spectra::get(id, connection).await?.unwrap();
-                let nested_row = super::NestedSpectra::from_flat(updated_row, connection).await?;
-                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
-            },
+            Table::Spectra => unimplemented!("Update not implemented for spectra."),
             Table::SpectraCollections => {
                 let update_row: super::UpdateSpectraCollection = bincode::deserialize::<super::UpdateSpectraCollection>(&update_row).map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;

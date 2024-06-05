@@ -194,42 +194,6 @@ impl UpdateRow for web_common::database::UpdateSampleContainer {
     }
 }
 
-/// Intermediate representation of the update variant UpdateSpectra.
-#[derive(Identifiable, AsChangeset)]
-#[diesel(table_name = spectra)]
-#[diesel(treat_none_as_null = true)]
-#[diesel(primary_key(id))]
-pub(super) struct IntermediateUpdateSpectra {
-    updated_by: i32,
-    id: i32,
-    notes: Option<String>,
-    spectra_collection_id: i32,
-}
-
-impl UpdateRow for web_common::database::UpdateSpectra {
-    type Intermediate = IntermediateUpdateSpectra;
-    type Flat = Spectra;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateUpdateSpectra {
-            updated_by: user_id,
-            id: self.id,
-            notes: self.notes,
-            spectra_collection_id: self.spectra_collection_id,
-        }
-    }
-
-    fn update(
-        self,
-        user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
-        self.to_intermediate(user_id).save_changes(connection)
-    }
-}
-
 /// Intermediate representation of the update variant UpdateSpectraCollection.
 #[derive(Identifiable, AsChangeset)]
 #[diesel(table_name = spectra_collections)]

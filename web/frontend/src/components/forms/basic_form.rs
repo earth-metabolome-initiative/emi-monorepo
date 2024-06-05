@@ -2,7 +2,7 @@
 
 use crate::components::forms::InputErrors;
 use crate::cookies::is_logged_in;
-use crate::router::AppRoute;
+use crate::router::{AppRoute, Viewable};
 use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 use crate::workers::WebsocketWorker;
@@ -17,7 +17,7 @@ use web_common::database::*;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
-use yew_router::prelude::use_navigator;
+use yew_router::scope_ext::RouterScopeExt;
 use yewdux::prelude::*;
 
 /// Trait defining something that can be built from a named get operation.
@@ -31,7 +31,7 @@ pub(super) trait FormBuilder:
     Clone + Store + PartialEq + Serialize + Debug + Default
 {
     type Actions: Reducer<Self> + FromOperation;
-    type RichVariant: DeserializeOwned + Debug;
+    type RichVariant: DeserializeOwned + Debug + Viewable;
 
     /// Returns whether the form contains errors.
     fn has_errors(&self) -> bool;
@@ -81,32 +81,18 @@ pub trait FormBuildable:
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct InnerBasicFormProp<Data>
-where
-    Data: FormBuildable,
-{
-    pub builder: Data::Builder,
-    pub builder_dispatch: Dispatch<Data::Builder>,
-    pub named_requests: Vec<ComponentMessage>,
-    pub children: Html,
-    pub method: FormMethod,
-    pub navigator: yew_router::navigator::Navigator,
-}
-
-#[derive(Clone, PartialEq, Properties)]
 pub struct BasicFormProp<Data>
 where
     Data: FormBuildable,
 {
     pub builder: Data::Builder,
     pub builder_dispatch: Dispatch<Data::Builder>,
-    #[prop_or_default]
     pub named_requests: Vec<ComponentMessage>,
     pub children: Html,
     pub method: FormMethod,
 }
 
-pub struct InnerBasicForm<Data> {
+pub struct BasicForm<Data> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     waiting_for_reply: bool,
     validate_timeout: Option<Timeout>,
@@ -130,12 +116,12 @@ impl From<ComponentMessage> for FormMessage {
     }
 }
 
-impl<Data> Component for InnerBasicForm<Data>
+impl<Data> Component for BasicForm<Data>
 where
     Data: FormBuildable,
 {
     type Message = FormMessage;
-    type Properties = InnerBasicFormProp<Data>;
+    type Properties = BasicFormProp<Data>;
 
     fn create(ctx: &Context<Self>) -> Self {
         let user_dispatch =
@@ -180,7 +166,7 @@ where
                     log::info!(
                         "User does not have permission to view the form, redirecting to home page."
                     );
-                    ctx.props().navigator.push(&AppRoute::Home);
+                    ctx.link().navigator().unwrap().push(&AppRoute::Home);
                 }
                 true
             }
@@ -238,9 +224,30 @@ where
 
                 true
             }
-            FormMessage::Backend(WebsocketMessage::Completed) => {
+            FormMessage::Backend(WebsocketMessage::Completed(maybe_row)) => {
                 self.waiting_for_reply = false;
                 self.errors.clear();
+                // If we received a row, it means we have successfully inserted/updated the data
+                // and we can redirect to the page associated to the provided row. If we have
+                // not received a row and the current operation is NOT a delete, we have an error.
+                if let Some(row) = maybe_row {
+                    assert!(
+                        ctx.props().method.is_post() || ctx.props().method.is_update(),
+                        "Received a row from the backend for a non-insert operation"
+                    );
+                    let entry: <<Data as FormBuildable>::Builder as FormBuilder>::RichVariant =
+                        bincode::deserialize(&row).unwrap();
+                    ctx.link().navigator().unwrap().push(&entry.view_route());
+                } else {
+                    if ctx.props().method.is_delete() {
+                        log::info!("Successfully deleted the data, redirecting to home page.");
+                        ctx.link().navigator().unwrap().push(&AppRoute::Home);
+                    } else {
+                        unreachable!(
+                            "Received a completion message with ROW for a non-insert operation"
+                        );
+                    }
+                }
                 true
             }
             FormMessage::Backend(_) => false,
@@ -299,7 +306,7 @@ where
     fn view(&self, ctx: &Context<Self>) -> Html {
         if Data::requires_authentication() && (!self.user_state.has_user() || !is_logged_in()) {
             log::info!("No access token found, redirecting to login page.");
-            ctx.props().navigator.push(&AppRoute::Login);
+            ctx.link().navigator().unwrap().push(&AppRoute::Login);
         }
 
         let on_submit = {
@@ -399,18 +406,5 @@ where
                 <div class="clear"></div>
             </form>
         }
-    }
-}
-
-#[function_component(BasicForm)]
-pub fn basic_form<Data>(props: &BasicFormProp<Data>) -> Html
-where
-    Data: FormBuildable,
-{
-    let navigator = use_navigator().unwrap();
-    html! {
-        <InnerBasicForm<Data> navigator={navigator} named_requests={props.named_requests.clone()} method={props.method.clone()} builder={props.builder.clone()} builder_dispatch={props.builder_dispatch.clone()}>
-            { props.children.clone() }
-        </InnerBasicForm<Data>>
     }
 }

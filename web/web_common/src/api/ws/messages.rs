@@ -35,7 +35,7 @@ pub enum BackendMessage {
     SearchTable(uuid::Uuid, Vec<u8>),
     GetTable(uuid::Uuid, Option<String>, Vec<u8>),
     AllTable(uuid::Uuid, Vec<u8>),
-    Completed(uuid::Uuid),
+    Completed(uuid::Uuid, Option<Vec<u8>>),
     CanView(uuid::Uuid, bool),
     CanUpdate(uuid::Uuid, bool),
     CanDelete(uuid::Uuid, bool),

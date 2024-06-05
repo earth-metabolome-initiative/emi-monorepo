@@ -939,11 +939,9 @@ impl SampleFilter {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct SpectraFilter {
     pub spectra_collection_id: Option<i32>,
-    pub created_by: Option<i32>,
-    pub updated_by: Option<i32>,
 }
 
 
@@ -954,14 +952,6 @@ impl SpectraFilter {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
         if let Some(spectra_collection_id) = &self.spectra_collection_id {
             filter = filter.and(gluesql::core::ast_builder::col("spectra.spectra_collection_id").eq(spectra_collection_id.to_string()));
-        }
-
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(gluesql::core::ast_builder::col("spectra.created_by").eq(created_by.to_string()));
-        }
-
-        if let Some(updated_by) = &self.updated_by {
-            filter = filter.and(gluesql::core::ast_builder::col("spectra.updated_by").eq(updated_by.to_string()));
         }
 
         filter

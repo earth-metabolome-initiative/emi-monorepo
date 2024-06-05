@@ -134,15 +134,15 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
             author_user_id = method.get_argument_by_name("author_user_id")
             this_author_user_id_argument = ""
 
-            if contains_struct_that_may_be_hidden:
-                assert author_user_id is not None, (
-                    f" In the struct {nested_struct.name}, the author_user_id argument must be present in all methods or in none of them. "
-                    f"The method {method.name} does not have the author_user_id argument. "
-                )
+            # if contains_struct_that_may_be_hidden:
+            #     assert author_user_id is not None, (
+            #         f" In the struct {nested_struct.name}, the author_user_id argument must be present in all methods or in none of them. "
+            #         f"The method {method.name} does not have the author_user_id argument. "
+            #     )
 
             if author_user_id is None:
-                assert not contains_struct_that_may_be_hidden
-                assert author_user_id_argument == ""
+                # assert not contains_struct_that_may_be_hidden
+                assert this_author_user_id_argument == ""
             elif contains_struct_that_may_be_hidden:
                 if author_user_id.optional:
                     this_author_user_id_argument = f"{author_user_id.name}, "

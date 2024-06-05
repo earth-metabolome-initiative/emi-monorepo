@@ -1072,16 +1072,6 @@ impl UserPageProp {
         filter.updated_by = Some(self.id);
         filter
     }
-    fn filter_spectra_by_created_by(&self) -> SpectraFilter {
-        let mut filter = SpectraFilter::default();
-        filter.created_by = Some(self.id);
-        filter
-    }
-    fn filter_spectra_by_updated_by(&self) -> SpectraFilter {
-        let mut filter = SpectraFilter::default();
-        filter.updated_by = Some(self.id);
-        filter
-    }
     fn filter_spectra_collections_by_created_by(&self) -> SpectraCollectionFilter {
         let mut filter = SpectraCollectionFilter::default();
         filter.created_by = Some(self.id);

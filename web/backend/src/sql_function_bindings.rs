@@ -130,13 +130,6 @@ diesel::define_sql_function! {
 }
 
 diesel::define_sql_function! {
-   fn can_admin_spectra(
-        author_user_id: diesel::sql_types::Integer,
-        this_spectra_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
    fn can_admin_spectra_collections(
         author_user_id: diesel::sql_types::Integer,
         this_spectra_collections_id: diesel::sql_types::Integer,
@@ -331,13 +324,6 @@ diesel::define_sql_function! {
    fn can_update_samples(
         author_user_id: diesel::sql_types::Integer,
         this_samples_id: diesel::sql_types::Uuid,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_spectra(
-        author_user_id: diesel::sql_types::Integer,
-        this_spectra_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 

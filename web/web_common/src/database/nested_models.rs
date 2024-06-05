@@ -3059,10 +3059,8 @@ impl NestedSample {
 }
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSpectra {
-    pub inner: Rc<Spectra>,
+    pub inner: Spectra,
     pub spectra_collection: Rc<NestedSpectraCollection>,
-    pub created_by: Rc<User>,
-    pub updated_by: Rc<User>,
 }
 
 impl Tabular for NestedSpectra {
@@ -3094,9 +3092,7 @@ impl NestedSpectra {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             spectra_collection: Rc::from(NestedSpectraCollection::get(flat_variant.spectra_collection_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
-            inner: Rc::from(flat_variant),
+            inner: flat_variant,
         })
     }
     /// Get the nested struct from the provided primary key.
@@ -3137,28 +3133,6 @@ impl NestedSpectra {
          }
          Ok(nested_structs)
     }
-    /// Get all the nested structs from the database ordered by the `updated_at` column.
-    ///
-    /// # Arguments
-    /// * `filter` - The filter to apply to the results.
-    /// * `limit` - The maximum number of rows to return.
-    /// * `offset` - The number of rows to skip.
-    /// * `connection` - The database connection.
-    pub async fn all_by_updated_at<C>(
-        filter: Option<&SpectraFilter>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
-        let flat_variants = Spectra::all_by_updated_at(filter, limit, offset, connection).await?;
-         let mut nested_structs = Vec::with_capacity(flat_variants.len());
-         for flat_variant in flat_variants {
-             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
-         }
-         Ok(nested_structs)
-    }
     /// Update or insert the nested struct into the database.
     ///
     /// # Arguments
@@ -3169,10 +3143,8 @@ impl NestedSpectra {
     ) -> Result<(), gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
-        self.inner.as_ref().clone().update_or_insert(connection).await?;
+        self.inner.update_or_insert(connection).await?;
         self.spectra_collection.as_ref().clone().update_or_insert(connection).await?;
-        self.created_by.as_ref().clone().update_or_insert(connection).await?;
-        self.updated_by.as_ref().clone().update_or_insert(connection).await?;
         Ok(())
     }
 }

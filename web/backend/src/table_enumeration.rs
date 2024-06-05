@@ -2187,9 +2187,7 @@ connection)?)?
             web_common::database::Table::Samples => {
                 NestedSample::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::Spectra => {
-                NestedSpectra::can_update_by_id(primary_key.into(), author_user_id, connection)?
-            }
+            web_common::database::Table::Spectra => NestedSpectra::can_update_by_id()?,
             web_common::database::Table::SpectraCollections => {
                 NestedSpectraCollection::can_update_by_id(
                     primary_key.into(),
@@ -2382,9 +2380,7 @@ connection)?)?
             web_common::database::Table::Samples => {
                 NestedSample::can_admin_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::Spectra => {
-                NestedSpectra::can_admin_by_id(primary_key.into(), author_user_id, connection)?
-            }
+            web_common::database::Table::Spectra => NestedSpectra::can_admin_by_id()?,
             web_common::database::Table::SpectraCollections => {
                 NestedSpectraCollection::can_admin_by_id(
                     primary_key.into(),
@@ -2711,16 +2707,7 @@ connection)?)?
                 )?)?
             }
             web_common::database::Table::Spectra => {
-                bincode::serialize(&NestedSpectra::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SpectraFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
+                unimplemented!("Method all_updatable not implemented for table spectra.")
             }
             web_common::database::Table::SpectraCollections => {
                 bincode::serialize(&NestedSpectraCollection::all_updatable(
@@ -3016,14 +3003,7 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Spectra => {
-bincode::serialize(&NestedSpectra::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<SpectraFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
+            web_common::database::Table::Spectra => unimplemented!("Method all_updatable_sorted not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => {
 bincode::serialize(&NestedSpectraCollection::all_updatable_sorted(
 filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
@@ -3644,16 +3624,7 @@ connection)?)?
                 )?)?
             }
             web_common::database::Table::Spectra => {
-                bincode::serialize(&NestedSpectra::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SpectraFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
+                unimplemented!("Method all_administrable not implemented for table spectra.")
             }
             web_common::database::Table::SpectraCollections => {
                 bincode::serialize(&NestedSpectraCollection::all_administrable(
@@ -3951,14 +3922,7 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Spectra => {
-bincode::serialize(&NestedSpectra::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<SpectraFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
+            web_common::database::Table::Spectra => unimplemented!("Method all_administrable_sorted not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => {
 bincode::serialize(&NestedSpectraCollection::all_administrable_sorted(
 filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
@@ -4462,7 +4426,7 @@ connection)?)?
                 NestedSample::delete_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::Spectra => {
-                NestedSpectra::delete_by_id(primary_key.into(), author_user_id, connection)?
+                unimplemented!("Method delete_by_id not implemented for table spectra.")
             }
             web_common::database::Table::SpectraCollections => {
                 NestedSpectraCollection::delete_by_id(
@@ -4665,12 +4629,7 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedSample::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
-            web_common::database::Table::Spectra => {
-                let row: web_common::database::NewSpectra = bincode::deserialize::<web_common::database::NewSpectra>(&row)?;
-                let inserted_row: crate::models::Spectra = <web_common::database::NewSpectra as InsertRow>::insert(row, user_id, connection)?;
-                let nested_row = crate::nested_models::NestedSpectra::from_flat(inserted_row, Some(user_id), connection)?;
-                 bincode::serialize(&nested_row)?
-            },
+            web_common::database::Table::Spectra => unreachable!("Table `spectra` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SpectraCollections => {
                 let row: web_common::database::NewSpectraCollection = bincode::deserialize::<web_common::database::NewSpectraCollection>(&row)?;
                 let inserted_row: crate::models::SpectraCollection = <web_common::database::NewSpectraCollection as InsertRow>::insert(row, user_id, connection)?;
@@ -4835,12 +4794,7 @@ impl UpdatableTable for web_common::database::Table {
                 let nested_row = crate::nested_models::NestedSample::from_flat(updated_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
-            web_common::database::Table::Spectra => {
-                let row: web_common::database::UpdateSpectra = bincode::deserialize::<web_common::database::UpdateSpectra>(&row)?;
-                let updated_row: crate::models::Spectra = <web_common::database::UpdateSpectra as UpdateRow>::update(row, user_id, connection)?;
-                let nested_row = crate::nested_models::NestedSpectra::from_flat(updated_row, Some(user_id), connection)?;
-                 bincode::serialize(&nested_row)?
-            },
+            web_common::database::Table::Spectra => unreachable!("Table `spectra` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SpectraCollections => {
                 let row: web_common::database::UpdateSpectraCollection = bincode::deserialize::<web_common::database::UpdateSpectraCollection>(&row)?;
                 let updated_row: crate::models::SpectraCollection = <web_common::database::UpdateSpectraCollection as UpdateRow>::update(row, user_id, connection)?;

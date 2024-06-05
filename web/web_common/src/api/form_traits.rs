@@ -90,6 +90,13 @@ impl FormMethod {
             _ => false,
         }
     }
+
+    pub fn is_delete(&self) -> bool {
+        match self {
+            FormMethod::DELETE => true,
+            _ => false,
+        }
+    }
 }
 
 impl Display for FormMethod {

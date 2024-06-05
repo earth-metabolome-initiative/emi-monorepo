@@ -108,7 +108,10 @@ pub enum WebsocketMessage {
     CanView(bool),
     CanUpdate(bool),
     CanDelete(bool),
-    Completed,
+    /// Contains the serialized object in the cases
+    /// where the operation was an update of get, and
+    /// None in the case of a delete operation.
+    Completed(Option<Vec<u8>>),
     Error(ApiError),
     RefreshUser(Rc<User>),
 }
@@ -378,11 +381,11 @@ impl Worker for WebsocketWorker {
                         // TODO! HANDLE UPDATE OF THE DATABASE!
                         log::debug!("Notification received: {:?}", notification);
                     }
-                    BackendMessage::Completed(task_id) => {
+                    BackendMessage::Completed(task_id, maybe_row) => {
                         log::debug!("Task completed: {:?}", task_id);
                         // We can remove this task from the queue.
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::Completed);
+                            scope.respond(subscriber_id, WebsocketMessage::Completed(maybe_row));
                         }
                     }
                     BackendMessage::Error(task_id, error) => {
