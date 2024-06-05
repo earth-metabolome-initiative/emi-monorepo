@@ -50,6 +50,7 @@ base64 = "0.22.1"
 rxing = { version = "0.5.9", features = [
   "wasm_support",
 ], default-features = false }
+yew-hooks = "0.3.2"
 # syntect = "5.2.0"
 
 [dependencies.web-sys]

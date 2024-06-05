@@ -156,7 +156,7 @@ impl Component for Navigator {
                             {"EMI"}
                         </Link<AppRoute>>
                     </h1>
-                    // <SearchBar />
+                    <SearchBar />
                     if let Some(user) = self.user() {
                         if user.inner.has_complete_profile() {
                             <Badge<NestedUser> size={BadgeSize::Small} badge={user.clone()}/>

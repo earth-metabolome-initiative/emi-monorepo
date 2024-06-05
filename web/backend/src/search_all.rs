@@ -1,6 +1,7 @@
-use crate::models::*;
 use crate::nested_models::*;
+use diesel::RunQueryDsl;
 use strsim::normalized_damerau_levenshtein;
+use web_common::api::ApiError;
 use web_common::database::search_tables::SearchableStruct;
 
 /// Converts into a vector of SearchableStructs.
@@ -25,6 +26,28 @@ where
         .collect()
 }
 
+/// Set the strict word similarity threshold for the search.
+///
+/// # Arguments
+/// * `threshold` - The new threshold.
+/// * `connection` - The database connection.
+///
+/// # Implementative details
+/// The threshold is stored in the `pg_trgm.strict_word_similarity_threshold` configuration
+/// parameter. By default, this is 0.5.
+fn set_threshold(
+    threshold: f64,
+    connection: &mut diesel::r2d2::PooledConnection<
+        diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+    >,
+) -> Result<(), web_common::api::ApiError> {
+    diesel::sql_query("SET pg_trgm.strict_word_similarity_threshold = $1")
+        .bind::<diesel::sql_types::Float8, _>(threshold)
+        .execute(connection)
+        .map_err(ApiError::from)?;
+    Ok(())
+}
+
 /// Returns a list of all records that match the query.
 ///
 /// # Arguments
@@ -45,22 +68,27 @@ pub(crate) fn search_all(
         return Ok(Vec::new());
     }
 
-    results.extend(convert::<
-        NestedBioOttRank,
-        web_common::database::NestedBioOttRank,
-    >(
-        query,
-        NestedBioOttRank::strict_word_similarity_search_with_score_viewable(
-            query, limit, None, connection,
-        )?,
-    ));
+    let limit = limit.unwrap_or(10);
 
     results.extend(convert::<NestedUser, web_common::database::NestedUser>(
         query,
         NestedUser::strict_word_similarity_search_with_score_viewable(
-            query, limit, None, connection,
+            query,
+            Some(limit),
+            None,
+            connection,
         )?,
     ));
+
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1 as f64, connection)?;
+    }
 
     results.extend(
         convert::<NestedProject, web_common::database::NestedProject>(
@@ -68,12 +96,22 @@ pub(crate) fn search_all(
             NestedProject::strict_word_similarity_search_with_score_viewable(
                 author_user_id,
                 query,
-                limit,
+                Some(limit),
                 None,
                 connection,
             )?,
         ),
     );
+
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1 as f64, connection)?;
+    }
 
     results.extend(convert::<
         NestedObservation,
@@ -83,11 +121,21 @@ pub(crate) fn search_all(
         NestedObservation::strict_word_similarity_search_with_score_viewable(
             author_user_id,
             query,
-            limit,
+            Some(limit),
             None,
             connection,
         )?,
     ));
+
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1 as f64, connection)?;
+    }
 
     results.extend(convert::<
         NestedOrganism,
@@ -97,32 +145,42 @@ pub(crate) fn search_all(
         NestedOrganism::strict_word_similarity_search_with_score_viewable(
             author_user_id,
             query,
-            limit,
+            Some(limit),
             None,
             connection,
         )?,
     ));
+
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1 as f64, connection)?;
+    }
 
     results.extend(convert::<NestedSample, web_common::database::NestedSample>(
         query,
         NestedSample::strict_word_similarity_search_with_score_viewable(
             author_user_id,
             query,
-            limit,
+            Some(limit),
             None,
             connection,
         )?,
     ));
 
-    results.extend(convert::<
-        NestedBioOttTaxonItem,
-        web_common::database::NestedBioOttTaxonItem,
-    >(
-        query,
-        NestedBioOttTaxonItem::strict_word_similarity_search_with_score_viewable(
-            query, limit, None, connection,
-        )?,
-    ));
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1 as f64, connection)?;
+    }
 
     results.extend(convert::<
         NestedNameplate,
@@ -132,11 +190,21 @@ pub(crate) fn search_all(
         NestedNameplate::strict_word_similarity_search_with_score_viewable(
             author_user_id,
             query,
-            limit,
+            Some(limit),
             None,
             connection,
         )?,
     ));
+
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1 as f64, connection)?;
+    }
 
     results.extend(convert::<
         NestedSampleContainer,
@@ -146,16 +214,75 @@ pub(crate) fn search_all(
         NestedSampleContainer::strict_word_similarity_search_with_score_viewable(
             author_user_id,
             query,
-            limit,
+            Some(limit),
             None,
             connection,
         )?,
     ));
 
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1 as f64, connection)?;
+    }
+
     results.extend(convert::<NestedTeam, web_common::database::NestedTeam>(
         query,
         NestedTeam::strict_word_similarity_search_with_score_viewable(
-            query, limit, None, connection,
+            query,
+            Some(limit),
+            None,
+            connection,
+        )?,
+    ));
+
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1 as f64, connection)?;
+    }
+
+    results.extend(convert::<
+        NestedBioOttRank,
+        web_common::database::NestedBioOttRank,
+    >(
+        query,
+        NestedBioOttRank::strict_word_similarity_search_with_score_viewable(
+            query,
+            Some(limit),
+            None,
+            connection,
+        )?,
+    ));
+
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1 as f64, connection)?;
+    }
+
+    results.extend(convert::<
+        NestedBioOttTaxonItem,
+        web_common::database::NestedBioOttTaxonItem,
+    >(
+        query,
+        NestedBioOttTaxonItem::strict_word_similarity_search_with_score_viewable(
+            query,
+            Some(limit),
+            None,
+            connection,
         )?,
     ));
 
@@ -164,7 +291,7 @@ pub(crate) fn search_all(
 
     Ok(results
         .into_iter()
-        .take(limit.unwrap_or(10) as usize)
+        .take(limit as usize)
         .map(|(result, _)| result)
         .collect())
 }
