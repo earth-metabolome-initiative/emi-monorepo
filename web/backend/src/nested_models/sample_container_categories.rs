@@ -13,6 +13,8 @@ pub struct NestedSampleContainerCategory {
     pub color: Color,
 }
 
+unsafe impl Send for NestedSampleContainerCategory {}
+unsafe impl Sync for NestedSampleContainerCategory {}
 impl NestedSampleContainerCategory {
     /// Convert the flat struct to the nested struct.
     ///

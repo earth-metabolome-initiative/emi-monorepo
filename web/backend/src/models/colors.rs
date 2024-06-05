@@ -42,6 +42,8 @@ pub struct Color {
     pub description: String,
 }
 
+unsafe impl Send for Color {}
+unsafe impl Sync for Color {}
 impl From<Color> for web_common::database::tables::Color {
     fn from(item: Color) -> Self {
         Self {

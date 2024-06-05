@@ -10,6 +10,8 @@ pub struct NestedOrganization {
     pub country: Country,
 }
 
+unsafe impl Send for NestedOrganization {}
+unsafe impl Sync for NestedOrganization {}
 impl NestedOrganization {
     /// Convert the flat struct to the nested struct.
     ///

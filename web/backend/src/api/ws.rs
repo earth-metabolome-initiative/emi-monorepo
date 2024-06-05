@@ -31,7 +31,10 @@ async fn start_websocket(
 
     let websocket = match refresh_access_token(&req, &diesel_pool, &redis_client).await {
         Ok((user, access_code)) => {
-            log::info!("Starting authenticated websocket for user {}", user.id);
+            log::info!(
+                "Starting authenticated websocket for user {}",
+                user.inner.id
+            );
             frame_size = Some(5 * 1024 * 1024);
             socket::WebSocket::authenticated(
                 diesel_pool.get_ref().clone(),

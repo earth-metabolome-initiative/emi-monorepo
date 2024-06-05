@@ -51,6 +51,8 @@ pub struct Nameplate {
     pub updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for Nameplate {}
+unsafe impl Sync for Nameplate {}
 impl From<Nameplate> for web_common::database::tables::Nameplate {
     fn from(item: Nameplate) -> Self {
         Self {

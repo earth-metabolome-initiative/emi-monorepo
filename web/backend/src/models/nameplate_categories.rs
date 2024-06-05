@@ -51,6 +51,8 @@ pub struct NameplateCategory {
     pub color_id: i32,
 }
 
+unsafe impl Send for NameplateCategory {}
+unsafe impl Sync for NameplateCategory {}
 impl From<NameplateCategory> for web_common::database::tables::NameplateCategory {
     fn from(item: NameplateCategory) -> Self {
         Self {

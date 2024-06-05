@@ -47,6 +47,8 @@ pub struct Organization {
     pub domain: String,
 }
 
+unsafe impl Send for Organization {}
+unsafe impl Sync for Organization {}
 impl From<Organization> for web_common::database::tables::Organization {
     fn from(item: Organization) -> Self {
         Self {

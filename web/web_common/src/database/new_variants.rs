@@ -13,6 +13,8 @@ pub struct NewDerivedSample {
     pub unit_id: i32,
 }
 
+unsafe impl Send for NewDerivedSample {}
+unsafe impl Sync for NewDerivedSample {}
 impl Tabular for NewDerivedSample {
     const TABLE: Table = Table::DerivedSamples;
 }
@@ -23,6 +25,8 @@ pub struct NewNameplate {
     pub category_id: i32,
 }
 
+unsafe impl Send for NewNameplate {}
+unsafe impl Sync for NewNameplate {}
 impl Tabular for NewNameplate {
     const TABLE: Table = Table::Nameplates;
 }
@@ -38,6 +42,8 @@ pub struct NewObservation {
     pub picture: Vec<u8>,
 }
 
+unsafe impl Send for NewObservation {}
+unsafe impl Sync for NewObservation {}
 impl Tabular for NewObservation {
     const TABLE: Table = Table::Observations;
 }
@@ -150,6 +156,8 @@ pub struct NewOrganismBioOttTaxonItem {
     pub taxon_id: i32,
 }
 
+unsafe impl Send for NewOrganismBioOttTaxonItem {}
+unsafe impl Sync for NewOrganismBioOttTaxonItem {}
 impl Tabular for NewOrganismBioOttTaxonItem {
     const TABLE: Table = Table::OrganismBioOttTaxonItems;
 }
@@ -164,6 +172,8 @@ pub struct NewOrganism {
     pub picture: Vec<u8>,
 }
 
+unsafe impl Send for NewOrganism {}
+unsafe impl Sync for NewOrganism {}
 impl Tabular for NewOrganism {
     const TABLE: Table = Table::Organisms;
 }
@@ -278,6 +288,8 @@ pub struct NewProject {
     pub end_date: Option<chrono::NaiveDateTime>,
 }
 
+unsafe impl Send for NewProject {}
+unsafe impl Sync for NewProject {}
 impl Tabular for NewProject {
     const TABLE: Table = Table::Projects;
 }
@@ -288,6 +300,8 @@ pub struct NewProjectsTeamsRoleInvitation {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewProjectsTeamsRoleInvitation {}
+unsafe impl Sync for NewProjectsTeamsRoleInvitation {}
 impl Tabular for NewProjectsTeamsRoleInvitation {
     const TABLE: Table = Table::ProjectsTeamsRoleInvitations;
 }
@@ -298,6 +312,8 @@ pub struct NewProjectsTeamsRoleRequest {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewProjectsTeamsRoleRequest {}
+unsafe impl Sync for NewProjectsTeamsRoleRequest {}
 impl Tabular for NewProjectsTeamsRoleRequest {
     const TABLE: Table = Table::ProjectsTeamsRoleRequests;
 }
@@ -308,6 +324,8 @@ pub struct NewProjectsTeamsRole {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewProjectsTeamsRole {}
+unsafe impl Sync for NewProjectsTeamsRole {}
 impl Tabular for NewProjectsTeamsRole {
     const TABLE: Table = Table::ProjectsTeamsRoles;
 }
@@ -318,6 +336,8 @@ pub struct NewProjectsUsersRoleInvitation {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewProjectsUsersRoleInvitation {}
+unsafe impl Sync for NewProjectsUsersRoleInvitation {}
 impl Tabular for NewProjectsUsersRoleInvitation {
     const TABLE: Table = Table::ProjectsUsersRoleInvitations;
 }
@@ -328,6 +348,8 @@ pub struct NewProjectsUsersRoleRequest {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewProjectsUsersRoleRequest {}
+unsafe impl Sync for NewProjectsUsersRoleRequest {}
 impl Tabular for NewProjectsUsersRoleRequest {
     const TABLE: Table = Table::ProjectsUsersRoleRequests;
 }
@@ -338,6 +360,8 @@ pub struct NewProjectsUsersRole {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewProjectsUsersRole {}
+unsafe impl Sync for NewProjectsUsersRole {}
 impl Tabular for NewProjectsUsersRole {
     const TABLE: Table = Table::ProjectsUsersRoles;
 }
@@ -347,6 +371,8 @@ pub struct NewSampleBioOttTaxonItem {
     pub taxon_id: i32,
 }
 
+unsafe impl Send for NewSampleBioOttTaxonItem {}
+unsafe impl Sync for NewSampleBioOttTaxonItem {}
 impl Tabular for NewSampleBioOttTaxonItem {
     const TABLE: Table = Table::SampleBioOttTaxonItems;
 }
@@ -357,6 +383,8 @@ pub struct NewSampleContainer {
     pub category_id: i32,
 }
 
+unsafe impl Send for NewSampleContainer {}
+unsafe impl Sync for NewSampleContainer {}
 impl Tabular for NewSampleContainer {
     const TABLE: Table = Table::SampleContainers;
 }
@@ -370,6 +398,8 @@ pub struct NewSample {
     pub state_id: i32,
 }
 
+unsafe impl Send for NewSample {}
+unsafe impl Sync for NewSample {}
 impl Tabular for NewSample {
     const TABLE: Table = Table::Samples;
 }
@@ -463,6 +493,8 @@ pub struct NewSpectraCollection {
     pub sample_id: uuid::Uuid,
 }
 
+unsafe impl Send for NewSpectraCollection {}
+unsafe impl Sync for NewSpectraCollection {}
 impl Tabular for NewSpectraCollection {
     const TABLE: Table = Table::SpectraCollections;
 }
@@ -476,6 +508,8 @@ pub struct NewTeam {
     pub parent_team_id: Option<i32>,
 }
 
+unsafe impl Send for NewTeam {}
+unsafe impl Sync for NewTeam {}
 impl Tabular for NewTeam {
     const TABLE: Table = Table::Teams;
 }
@@ -486,6 +520,8 @@ pub struct NewTeamsTeamsRoleInvitation {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewTeamsTeamsRoleInvitation {}
+unsafe impl Sync for NewTeamsTeamsRoleInvitation {}
 impl Tabular for NewTeamsTeamsRoleInvitation {
     const TABLE: Table = Table::TeamsTeamsRoleInvitations;
 }
@@ -496,6 +532,8 @@ pub struct NewTeamsUsersRoleInvitation {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewTeamsUsersRoleInvitation {}
+unsafe impl Sync for NewTeamsUsersRoleInvitation {}
 impl Tabular for NewTeamsUsersRoleInvitation {
     const TABLE: Table = Table::TeamsUsersRoleInvitations;
 }
@@ -506,6 +544,8 @@ pub struct NewTeamsUsersRoleRequest {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewTeamsUsersRoleRequest {}
+unsafe impl Sync for NewTeamsUsersRoleRequest {}
 impl Tabular for NewTeamsUsersRoleRequest {
     const TABLE: Table = Table::TeamsUsersRoleRequests;
 }
@@ -516,6 +556,8 @@ pub struct NewTeamsUsersRole {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewTeamsUsersRole {}
+unsafe impl Sync for NewTeamsUsersRole {}
 impl Tabular for NewTeamsUsersRole {
     const TABLE: Table = Table::TeamsUsersRoles;
 }
@@ -526,6 +568,8 @@ pub struct NewUserEmail {
     pub primary_email: bool,
 }
 
+unsafe impl Send for NewUserEmail {}
+unsafe impl Sync for NewUserEmail {}
 impl Tabular for NewUserEmail {
     const TABLE: Table = Table::UserEmails;
 }
@@ -539,6 +583,8 @@ pub struct NewUser {
     pub organization_id: Option<i32>,
 }
 
+unsafe impl Send for NewUser {}
+unsafe impl Sync for NewUser {}
 impl Tabular for NewUser {
     const TABLE: Table = Table::Users;
 }
@@ -549,6 +595,8 @@ pub struct NewUsersUsersRoleInvitation {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewUsersUsersRoleInvitation {}
+unsafe impl Sync for NewUsersUsersRoleInvitation {}
 impl Tabular for NewUsersUsersRoleInvitation {
     const TABLE: Table = Table::UsersUsersRoleInvitations;
 }
@@ -559,6 +607,8 @@ pub struct NewUsersUsersRoleRequest {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewUsersUsersRoleRequest {}
+unsafe impl Sync for NewUsersUsersRoleRequest {}
 impl Tabular for NewUsersUsersRoleRequest {
     const TABLE: Table = Table::UsersUsersRoleRequests;
 }
@@ -569,6 +619,8 @@ pub struct NewUsersUsersRole {
     pub role_id: i32,
 }
 
+unsafe impl Send for NewUsersUsersRole {}
+unsafe impl Sync for NewUsersUsersRole {}
 impl Tabular for NewUsersUsersRole {
     const TABLE: Table = Table::UsersUsersRoles;
 }

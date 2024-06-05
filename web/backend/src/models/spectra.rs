@@ -44,6 +44,8 @@ pub struct Spectra {
     pub spectra_collection_id: i32,
 }
 
+unsafe impl Send for Spectra {}
+unsafe impl Sync for Spectra {}
 impl From<Spectra> for web_common::database::tables::Spectra {
     fn from(item: Spectra) -> Self {
         Self {

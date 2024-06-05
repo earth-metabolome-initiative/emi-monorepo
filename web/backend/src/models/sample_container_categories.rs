@@ -50,6 +50,8 @@ pub struct SampleContainerCategory {
     pub color_id: i32,
 }
 
+unsafe impl Send for SampleContainerCategory {}
+unsafe impl Sync for SampleContainerCategory {}
 impl From<SampleContainerCategory> for web_common::database::tables::SampleContainerCategory {
     fn from(item: SampleContainerCategory) -> Self {
         Self {

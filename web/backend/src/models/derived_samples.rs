@@ -51,6 +51,8 @@ pub struct DerivedSample {
     pub unit_id: i32,
 }
 
+unsafe impl Send for DerivedSample {}
+unsafe impl Sync for DerivedSample {}
 impl From<DerivedSample> for web_common::database::tables::DerivedSample {
     fn from(item: DerivedSample) -> Self {
         Self {

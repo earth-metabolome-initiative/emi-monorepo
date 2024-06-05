@@ -11,6 +11,8 @@ pub struct NestedBioOttRank {
     pub color: Color,
 }
 
+unsafe impl Send for NestedBioOttRank {}
+unsafe impl Sync for NestedBioOttRank {}
 impl NestedBioOttRank {
     /// Convert the flat struct to the nested struct.
     ///

@@ -14,6 +14,8 @@ pub struct NestedNameplateCategory {
     pub color: Color,
 }
 
+unsafe impl Send for NestedNameplateCategory {}
+unsafe impl Sync for NestedNameplateCategory {}
 impl NestedNameplateCategory {
     /// Convert the flat struct to the nested struct.
     ///

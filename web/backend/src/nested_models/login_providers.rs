@@ -11,6 +11,8 @@ pub struct NestedLoginProvider {
     pub color: Color,
 }
 
+unsafe impl Send for NestedLoginProvider {}
+unsafe impl Sync for NestedLoginProvider {}
 impl NestedLoginProvider {
     /// Convert the flat struct to the nested struct.
     ///

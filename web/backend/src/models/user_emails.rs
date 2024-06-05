@@ -47,6 +47,8 @@ pub struct UserEmail {
     pub primary_email: bool,
 }
 
+unsafe impl Send for UserEmail {}
+unsafe impl Sync for UserEmail {}
 impl From<UserEmail> for web_common::database::tables::UserEmail {
     fn from(item: UserEmail) -> Self {
         Self {

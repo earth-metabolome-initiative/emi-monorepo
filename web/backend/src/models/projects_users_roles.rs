@@ -50,6 +50,8 @@ pub struct ProjectsUsersRole {
     pub created_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectsUsersRole {}
+unsafe impl Sync for ProjectsUsersRole {}
 impl From<ProjectsUsersRole> for web_common::database::tables::ProjectsUsersRole {
     fn from(item: ProjectsUsersRole) -> Self {
         Self {

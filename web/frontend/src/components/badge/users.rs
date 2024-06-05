@@ -2,7 +2,6 @@ use super::{Badge, BadgeSize, RowToBadge};
 use web_common::database::*;
 use yew::prelude::*;
 
-
 impl RowToBadge for NestedUser {
     fn badge_title(&self) -> String {
         self.inner.full_name()

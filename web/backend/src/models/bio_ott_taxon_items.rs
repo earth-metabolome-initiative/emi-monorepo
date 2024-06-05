@@ -63,6 +63,8 @@ pub struct BioOttTaxonItem {
     pub color_id: i32,
 }
 
+unsafe impl Send for BioOttTaxonItem {}
+unsafe impl Sync for BioOttTaxonItem {}
 impl From<BioOttTaxonItem> for web_common::database::tables::BioOttTaxonItem {
     fn from(item: BioOttTaxonItem) -> Self {
         Self {

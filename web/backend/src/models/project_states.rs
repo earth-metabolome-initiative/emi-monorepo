@@ -47,6 +47,8 @@ pub struct ProjectState {
     pub color_id: i32,
 }
 
+unsafe impl Send for ProjectState {}
+unsafe impl Sync for ProjectState {}
 impl From<ProjectState> for web_common::database::tables::ProjectState {
     fn from(item: ProjectState) -> Self {
         Self {

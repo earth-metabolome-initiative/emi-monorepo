@@ -13,6 +13,8 @@ pub struct NestedSampleBioOttTaxonItem {
     pub taxon: NestedBioOttTaxonItem,
 }
 
+unsafe impl Send for NestedSampleBioOttTaxonItem {}
+unsafe impl Sync for NestedSampleBioOttTaxonItem {}
 impl NestedSampleBioOttTaxonItem {
     /// Convert the flat struct to the nested struct.
     ///

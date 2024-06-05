@@ -51,6 +51,8 @@ pub struct SampleContainer {
     pub updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for SampleContainer {}
+unsafe impl Sync for SampleContainer {}
 impl From<SampleContainer> for web_common::database::tables::SampleContainer {
     fn from(item: SampleContainer) -> Self {
         Self {

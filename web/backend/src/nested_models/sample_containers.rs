@@ -14,6 +14,8 @@ pub struct NestedSampleContainer {
     pub updated_by: NestedUser,
 }
 
+unsafe impl Send for NestedSampleContainer {}
+unsafe impl Sync for NestedSampleContainer {}
 impl NestedSampleContainer {
     /// Convert the flat struct to the nested struct.
     ///

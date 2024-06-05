@@ -57,7 +57,9 @@ pub(crate) fn search_all(
 
     results.extend(convert::<NestedUser, web_common::database::NestedUser>(
         query,
-        NestedUser::strict_word_similarity_search_with_score_viewable(query, limit, None, connection)?,
+        NestedUser::strict_word_similarity_search_with_score_viewable(
+            query, limit, None, connection,
+        )?,
     ));
 
     results.extend(

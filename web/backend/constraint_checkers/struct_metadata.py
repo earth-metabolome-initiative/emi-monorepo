@@ -1328,6 +1328,11 @@ class StructMetadata:
             file.write(f"    pub {attribute.name}: {attribute.format_data_type()},\n")
         file.write("}\n\n")
 
+        # Next, we always implement the Send and Sync traits for the struct.
+        file.write(f"unsafe impl Send for {self.name} {{}}\n")
+        file.write(f"unsafe impl Sync for {self.name} {{}}\n")
+        
+
     def is_new_variant(self) -> bool:
         return (
             self.is_insertable()

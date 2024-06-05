@@ -56,6 +56,8 @@ pub struct Organism {
     pub picture: Vec<u8>,
 }
 
+unsafe impl Send for Organism {}
+unsafe impl Sync for Organism {}
 impl From<Organism> for web_common::database::tables::Organism {
     fn from(item: Organism) -> Self {
         Self {

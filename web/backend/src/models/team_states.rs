@@ -47,6 +47,8 @@ pub struct TeamState {
     pub color_id: i32,
 }
 
+unsafe impl Send for TeamState {}
+unsafe impl Sync for TeamState {}
 impl From<TeamState> for web_common::database::tables::TeamState {
     fn from(item: TeamState) -> Self {
         Self {

@@ -50,6 +50,8 @@ pub struct ProjectsUsersRoleInvitation {
     pub created_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectsUsersRoleInvitation {}
+unsafe impl Sync for ProjectsUsersRoleInvitation {}
 impl From<ProjectsUsersRoleInvitation>
     for web_common::database::tables::ProjectsUsersRoleInvitation
 {

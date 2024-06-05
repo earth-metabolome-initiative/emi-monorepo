@@ -54,6 +54,8 @@ pub struct Sample {
     pub state_id: i32,
 }
 
+unsafe impl Send for Sample {}
+unsafe impl Sync for Sample {}
 impl From<Sample> for web_common::database::tables::Sample {
     fn from(item: Sample) -> Self {
         Self {

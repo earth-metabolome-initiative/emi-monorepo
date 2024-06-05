@@ -46,6 +46,8 @@ pub struct PermanenceCategory {
     pub color_id: i32,
 }
 
+unsafe impl Send for PermanenceCategory {}
+unsafe impl Sync for PermanenceCategory {}
 impl From<PermanenceCategory> for web_common::database::tables::PermanenceCategory {
     fn from(item: PermanenceCategory) -> Self {
         Self {

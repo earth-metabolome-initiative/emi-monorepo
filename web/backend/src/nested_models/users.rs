@@ -11,6 +11,8 @@ pub struct NestedUser {
     pub organization: Option<NestedOrganization>,
 }
 
+unsafe impl Send for NestedUser {}
+unsafe impl Sync for NestedUser {}
 impl NestedUser {
     /// Convert the flat struct to the nested struct.
     ///

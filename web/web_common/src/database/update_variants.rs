@@ -14,6 +14,8 @@ pub struct UpdateDerivedSample {
     pub unit_id: i32,
 }
 
+unsafe impl Send for UpdateDerivedSample {}
+unsafe impl Sync for UpdateDerivedSample {}
 impl Tabular for UpdateDerivedSample {
     const TABLE: Table = Table::DerivedSamples;
 }
@@ -68,6 +70,8 @@ pub struct UpdateNameplate {
     pub category_id: i32,
 }
 
+unsafe impl Send for UpdateNameplate {}
+unsafe impl Sync for UpdateNameplate {}
 impl Tabular for UpdateNameplate {
     const TABLE: Table = Table::Nameplates;
 }
@@ -130,6 +134,8 @@ pub struct UpdateProject {
     pub end_date: Option<chrono::NaiveDateTime>,
 }
 
+unsafe impl Send for UpdateProject {}
+unsafe impl Sync for UpdateProject {}
 impl Tabular for UpdateProject {
     const TABLE: Table = Table::Projects;
 }
@@ -226,6 +232,8 @@ pub struct UpdateSampleContainer {
     pub category_id: i32,
 }
 
+unsafe impl Send for UpdateSampleContainer {}
+unsafe impl Sync for UpdateSampleContainer {}
 impl Tabular for UpdateSampleContainer {
     const TABLE: Table = Table::SampleContainers;
 }
@@ -279,6 +287,8 @@ pub struct UpdateSpectraCollection {
     pub sample_id: uuid::Uuid,
 }
 
+unsafe impl Send for UpdateSpectraCollection {}
+unsafe impl Sync for UpdateSpectraCollection {}
 impl Tabular for UpdateSpectraCollection {
     const TABLE: Table = Table::SpectraCollections;
 }
@@ -340,6 +350,8 @@ pub struct UpdateTeam {
     pub parent_team_id: Option<i32>,
 }
 
+unsafe impl Send for UpdateTeam {}
+unsafe impl Sync for UpdateTeam {}
 impl Tabular for UpdateTeam {
     const TABLE: Table = Table::Teams;
 }
@@ -409,6 +421,8 @@ pub struct UpdateUser {
     pub organization_id: Option<i32>,
 }
 
+unsafe impl Send for UpdateUser {}
+unsafe impl Sync for UpdateUser {}
 impl Tabular for UpdateUser {
     const TABLE: Table = Table::Users;
 }

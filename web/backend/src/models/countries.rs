@@ -43,6 +43,8 @@ pub struct Country {
     pub name: String,
 }
 
+unsafe impl Send for Country {}
+unsafe impl Sync for Country {}
 impl From<Country> for web_common::database::tables::Country {
     fn from(item: Country) -> Self {
         Self {

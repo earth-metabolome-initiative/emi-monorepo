@@ -11,6 +11,8 @@ pub struct NestedMaterial {
     pub color: Color,
 }
 
+unsafe impl Send for NestedMaterial {}
+unsafe impl Sync for NestedMaterial {}
 impl NestedMaterial {
     /// Convert the flat struct to the nested struct.
     ///

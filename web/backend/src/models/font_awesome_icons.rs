@@ -41,6 +41,8 @@ pub struct FontAwesomeIcon {
     pub description: String,
 }
 
+unsafe impl Send for FontAwesomeIcon {}
+unsafe impl Sync for FontAwesomeIcon {}
 impl From<FontAwesomeIcon> for web_common::database::tables::FontAwesomeIcon {
     fn from(item: FontAwesomeIcon) -> Self {
         Self {

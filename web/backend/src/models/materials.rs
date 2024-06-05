@@ -46,6 +46,8 @@ pub struct Material {
     pub color_id: i32,
 }
 
+unsafe impl Send for Material {}
+unsafe impl Sync for Material {}
 impl From<Material> for web_common::database::tables::Material {
     fn from(item: Material) -> Self {
         Self {

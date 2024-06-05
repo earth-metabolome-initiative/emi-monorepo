@@ -50,6 +50,8 @@ pub struct User {
     pub updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for User {}
+unsafe impl Sync for User {}
 impl From<User> for web_common::database::tables::User {
     fn from(item: User) -> Self {
         Self {

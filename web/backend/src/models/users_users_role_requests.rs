@@ -49,6 +49,8 @@ pub struct UsersUsersRoleRequest {
     pub created_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for UsersUsersRoleRequest {}
+unsafe impl Sync for UsersUsersRoleRequest {}
 impl From<UsersUsersRoleRequest> for web_common::database::tables::UsersUsersRoleRequest {
     fn from(item: UsersUsersRoleRequest) -> Self {
         Self {

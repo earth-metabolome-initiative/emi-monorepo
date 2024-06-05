@@ -11,6 +11,8 @@ pub struct NestedSpectra {
     pub spectra_collection: NestedSpectraCollection,
 }
 
+unsafe impl Send for NestedSpectra {}
+unsafe impl Sync for NestedSpectra {}
 impl NestedSpectra {
     /// Convert the flat struct to the nested struct.
     ///

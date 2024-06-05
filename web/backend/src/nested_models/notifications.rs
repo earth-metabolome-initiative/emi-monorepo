@@ -11,6 +11,8 @@ pub struct NestedNotification {
     pub user: NestedUser,
 }
 
+unsafe impl Send for NestedNotification {}
+unsafe impl Sync for NestedNotification {}
 impl NestedNotification {
     /// Convert the flat struct to the nested struct.
     ///

@@ -47,6 +47,8 @@ pub struct SampleState {
     pub color_id: i32,
 }
 
+unsafe impl Send for SampleState {}
+unsafe impl Sync for SampleState {}
 impl From<SampleState> for web_common::database::tables::SampleState {
     fn from(item: SampleState) -> Self {
         Self {

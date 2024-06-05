@@ -49,6 +49,8 @@ pub struct SpectraCollection {
     pub updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for SpectraCollection {}
+unsafe impl Sync for SpectraCollection {}
 impl From<SpectraCollection> for web_common::database::tables::SpectraCollection {
     fn from(item: SpectraCollection) -> Self {
         Self {

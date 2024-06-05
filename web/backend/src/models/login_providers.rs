@@ -49,6 +49,8 @@ pub struct LoginProvider {
     pub scope: String,
 }
 
+unsafe impl Send for LoginProvider {}
+unsafe impl Sync for LoginProvider {}
 impl From<LoginProvider> for web_common::database::tables::LoginProvider {
     fn from(item: LoginProvider) -> Self {
         Self {

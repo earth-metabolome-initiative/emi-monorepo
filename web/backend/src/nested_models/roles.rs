@@ -11,6 +11,8 @@ pub struct NestedRole {
     pub color: Color,
 }
 
+unsafe impl Send for NestedRole {}
+unsafe impl Sync for NestedRole {}
 impl NestedRole {
     /// Convert the flat struct to the nested struct.
     ///

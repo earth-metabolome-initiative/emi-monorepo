@@ -14,6 +14,8 @@ pub struct NestedNameplate {
     pub updated_by: NestedUser,
 }
 
+unsafe impl Send for NestedNameplate {}
+unsafe impl Sync for NestedNameplate {}
 impl NestedNameplate {
     /// Convert the flat struct to the nested struct.
     ///

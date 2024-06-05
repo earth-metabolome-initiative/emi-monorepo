@@ -15,6 +15,8 @@ pub struct NestedDerivedSample {
     pub unit: NestedUnit,
 }
 
+unsafe impl Send for NestedDerivedSample {}
+unsafe impl Sync for NestedDerivedSample {}
 impl NestedDerivedSample {
     /// Convert the flat struct to the nested struct.
     ///

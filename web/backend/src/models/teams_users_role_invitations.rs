@@ -50,6 +50,8 @@ pub struct TeamsUsersRoleInvitation {
     pub created_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for TeamsUsersRoleInvitation {}
+unsafe impl Sync for TeamsUsersRoleInvitation {}
 impl From<TeamsUsersRoleInvitation> for web_common::database::tables::TeamsUsersRoleInvitation {
     fn from(item: TeamsUsersRoleInvitation) -> Self {
         Self {

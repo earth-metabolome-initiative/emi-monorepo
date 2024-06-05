@@ -47,6 +47,8 @@ pub struct ObservationSubject {
     pub color_id: i32,
 }
 
+unsafe impl Send for ObservationSubject {}
+unsafe impl Sync for ObservationSubject {}
 impl From<ObservationSubject> for web_common::database::tables::ObservationSubject {
     fn from(item: ObservationSubject) -> Self {
         Self {

@@ -16,6 +16,8 @@ pub struct NestedTeam {
     pub updated_by: NestedUser,
 }
 
+unsafe impl Send for NestedTeam {}
+unsafe impl Sync for NestedTeam {}
 impl NestedTeam {
     /// Convert the flat struct to the nested struct.
     ///

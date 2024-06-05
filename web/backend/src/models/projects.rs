@@ -60,6 +60,8 @@ pub struct Project {
     pub end_date: Option<chrono::NaiveDateTime>,
 }
 
+unsafe impl Send for Project {}
+unsafe impl Sync for Project {}
 impl From<Project> for web_common::database::tables::Project {
     fn from(item: Project) -> Self {
         Self {

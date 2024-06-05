@@ -56,6 +56,8 @@ pub struct Team {
     pub updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for Team {}
+unsafe impl Sync for Team {}
 impl From<Team> for web_common::database::tables::Team {
     fn from(item: Team) -> Self {
         Self {

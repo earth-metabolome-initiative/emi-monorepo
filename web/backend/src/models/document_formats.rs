@@ -48,6 +48,8 @@ pub struct DocumentFormat {
     pub color_id: i32,
 }
 
+unsafe impl Send for DocumentFormat {}
+unsafe impl Sync for DocumentFormat {}
 impl From<DocumentFormat> for web_common::database::tables::DocumentFormat {
     fn from(item: DocumentFormat) -> Self {
         Self {

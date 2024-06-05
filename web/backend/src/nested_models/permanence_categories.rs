@@ -11,6 +11,8 @@ pub struct NestedPermanenceCategory {
     pub color: Color,
 }
 
+unsafe impl Send for NestedPermanenceCategory {}
+unsafe impl Sync for NestedPermanenceCategory {}
 impl NestedPermanenceCategory {
     /// Convert the flat struct to the nested struct.
     ///

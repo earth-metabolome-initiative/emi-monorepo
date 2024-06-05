@@ -47,6 +47,8 @@ pub struct Unit {
     pub color_id: i32,
 }
 
+unsafe impl Send for Unit {}
+unsafe impl Sync for Unit {}
 impl From<Unit> for web_common::database::tables::Unit {
     fn from(item: Unit) -> Self {
         Self {

@@ -47,6 +47,8 @@ pub struct BioOttRank {
     pub color_id: i32,
 }
 
+unsafe impl Send for BioOttRank {}
+unsafe impl Sync for BioOttRank {}
 impl From<BioOttRank> for web_common::database::tables::BioOttRank {
     fn from(item: BioOttRank) -> Self {
         Self {

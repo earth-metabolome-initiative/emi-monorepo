@@ -14,6 +14,8 @@ pub struct NestedBioOttRank {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedBioOttRank {}
+unsafe impl Sync for NestedBioOttRank {}
 impl Tabular for NestedBioOttRank {
     const TABLE: Table = Table::BioOttRanks;
 }
@@ -117,6 +119,8 @@ pub struct NestedBioOttTaxonItem {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedBioOttTaxonItem {}
+unsafe impl Sync for NestedBioOttTaxonItem {}
 impl Tabular for NestedBioOttTaxonItem {
     const TABLE: Table = Table::BioOttTaxonItems;
 }
@@ -246,6 +250,8 @@ pub struct NestedDerivedSample {
     pub unit: Rc<NestedUnit>,
 }
 
+unsafe impl Send for NestedDerivedSample {}
+unsafe impl Sync for NestedDerivedSample {}
 impl Tabular for NestedDerivedSample {
     const TABLE: Table = Table::DerivedSamples;
 }
@@ -368,6 +374,8 @@ pub struct NestedDocumentFormat {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedDocumentFormat {}
+unsafe impl Sync for NestedDocumentFormat {}
 impl Tabular for NestedDocumentFormat {
     const TABLE: Table = Table::DocumentFormats;
 }
@@ -462,6 +470,8 @@ pub struct NestedLoginProvider {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedLoginProvider {}
+unsafe impl Sync for NestedLoginProvider {}
 impl Tabular for NestedLoginProvider {
     const TABLE: Table = Table::LoginProviders;
 }
@@ -556,6 +566,8 @@ pub struct NestedMaterial {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedMaterial {}
+unsafe impl Sync for NestedMaterial {}
 impl Tabular for NestedMaterial {
     const TABLE: Table = Table::Materials;
 }
@@ -652,6 +664,8 @@ pub struct NestedNameplateCategory {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedNameplateCategory {}
+unsafe impl Sync for NestedNameplateCategory {}
 impl Tabular for NestedNameplateCategory {
     const TABLE: Table = Table::NameplateCategories;
 }
@@ -752,6 +766,8 @@ pub struct NestedNameplate {
     pub updated_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedNameplate {}
+unsafe impl Sync for NestedNameplate {}
 impl Tabular for NestedNameplate {
     const TABLE: Table = Table::Nameplates;
 }
@@ -871,6 +887,8 @@ pub struct NestedNotification {
     pub user: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedNotification {}
+unsafe impl Sync for NestedNotification {}
 impl Tabular for NestedNotification {
     const TABLE: Table = Table::Notifications;
 }
@@ -963,6 +981,8 @@ pub struct NestedObservationSubject {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedObservationSubject {}
+unsafe impl Sync for NestedObservationSubject {}
 impl Tabular for NestedObservationSubject {
     const TABLE: Table = Table::ObservationSubjects;
 }
@@ -1062,6 +1082,8 @@ pub struct NestedObservation {
     pub subject: Rc<NestedObservationSubject>,
 }
 
+unsafe impl Send for NestedObservation {}
+unsafe impl Sync for NestedObservation {}
 impl Tabular for NestedObservation {
     const TABLE: Table = Table::Observations;
 }
@@ -1195,6 +1217,8 @@ pub struct NestedOrganismBioOttTaxonItem {
     pub taxon: Rc<NestedBioOttTaxonItem>,
 }
 
+unsafe impl Send for NestedOrganismBioOttTaxonItem {}
+unsafe impl Sync for NestedOrganismBioOttTaxonItem {}
 impl Tabular for NestedOrganismBioOttTaxonItem {
     const TABLE: Table = Table::OrganismBioOttTaxonItems;
 }
@@ -1295,6 +1319,8 @@ pub struct NestedOrganism {
     pub updated_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedOrganism {}
+unsafe impl Sync for NestedOrganism {}
 impl Tabular for NestedOrganism {
     const TABLE: Table = Table::Organisms;
 }
@@ -1422,6 +1448,8 @@ pub struct NestedOrganization {
     pub country: Rc<Country>,
 }
 
+unsafe impl Send for NestedOrganization {}
+unsafe impl Sync for NestedOrganization {}
 impl Tabular for NestedOrganization {
     const TABLE: Table = Table::Organizations;
 }
@@ -1514,6 +1542,8 @@ pub struct NestedPermanenceCategory {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedPermanenceCategory {}
+unsafe impl Sync for NestedPermanenceCategory {}
 impl Tabular for NestedPermanenceCategory {
     const TABLE: Table = Table::PermanenceCategories;
 }
@@ -1608,6 +1638,8 @@ pub struct NestedProjectState {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedProjectState {}
+unsafe impl Sync for NestedProjectState {}
 impl Tabular for NestedProjectState {
     const TABLE: Table = Table::ProjectStates;
 }
@@ -1706,6 +1738,8 @@ pub struct NestedProject {
     pub updated_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedProject {}
+unsafe impl Sync for NestedProject {}
 impl Tabular for NestedProject {
     const TABLE: Table = Table::Projects;
 }
@@ -1834,6 +1868,8 @@ pub struct NestedProjectsTeamsRoleInvitation {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedProjectsTeamsRoleInvitation {}
+unsafe impl Sync for NestedProjectsTeamsRoleInvitation {}
 impl Tabular for NestedProjectsTeamsRoleInvitation {
     const TABLE: Table = Table::ProjectsTeamsRoleInvitations;
 }
@@ -1934,6 +1970,8 @@ pub struct NestedProjectsTeamsRoleRequest {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedProjectsTeamsRoleRequest {}
+unsafe impl Sync for NestedProjectsTeamsRoleRequest {}
 impl Tabular for NestedProjectsTeamsRoleRequest {
     const TABLE: Table = Table::ProjectsTeamsRoleRequests;
 }
@@ -2034,6 +2072,8 @@ pub struct NestedProjectsTeamsRole {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedProjectsTeamsRole {}
+unsafe impl Sync for NestedProjectsTeamsRole {}
 impl Tabular for NestedProjectsTeamsRole {
     const TABLE: Table = Table::ProjectsTeamsRoles;
 }
@@ -2134,6 +2174,8 @@ pub struct NestedProjectsUsersRoleInvitation {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedProjectsUsersRoleInvitation {}
+unsafe impl Sync for NestedProjectsUsersRoleInvitation {}
 impl Tabular for NestedProjectsUsersRoleInvitation {
     const TABLE: Table = Table::ProjectsUsersRoleInvitations;
 }
@@ -2234,6 +2276,8 @@ pub struct NestedProjectsUsersRoleRequest {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedProjectsUsersRoleRequest {}
+unsafe impl Sync for NestedProjectsUsersRoleRequest {}
 impl Tabular for NestedProjectsUsersRoleRequest {
     const TABLE: Table = Table::ProjectsUsersRoleRequests;
 }
@@ -2334,6 +2378,8 @@ pub struct NestedProjectsUsersRole {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedProjectsUsersRole {}
+unsafe impl Sync for NestedProjectsUsersRole {}
 impl Tabular for NestedProjectsUsersRole {
     const TABLE: Table = Table::ProjectsUsersRoles;
 }
@@ -2432,6 +2478,8 @@ pub struct NestedRole {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedRole {}
+unsafe impl Sync for NestedRole {}
 impl Tabular for NestedRole {
     const TABLE: Table = Table::Roles;
 }
@@ -2527,6 +2575,8 @@ pub struct NestedSampleBioOttTaxonItem {
     pub taxon: Rc<NestedBioOttTaxonItem>,
 }
 
+unsafe impl Send for NestedSampleBioOttTaxonItem {}
+unsafe impl Sync for NestedSampleBioOttTaxonItem {}
 impl Tabular for NestedSampleBioOttTaxonItem {
     const TABLE: Table = Table::SampleBioOttTaxonItems;
 }
@@ -2624,6 +2674,8 @@ pub struct NestedSampleContainerCategory {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedSampleContainerCategory {}
+unsafe impl Sync for NestedSampleContainerCategory {}
 impl Tabular for NestedSampleContainerCategory {
     const TABLE: Table = Table::SampleContainerCategories;
 }
@@ -2722,6 +2774,8 @@ pub struct NestedSampleContainer {
     pub updated_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedSampleContainer {}
+unsafe impl Sync for NestedSampleContainer {}
 impl Tabular for NestedSampleContainer {
     const TABLE: Table = Table::SampleContainers;
 }
@@ -2842,6 +2896,8 @@ pub struct NestedSampleState {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedSampleState {}
+unsafe impl Sync for NestedSampleState {}
 impl Tabular for NestedSampleState {
     const TABLE: Table = Table::SampleStates;
 }
@@ -2940,6 +2996,8 @@ pub struct NestedSample {
     pub state: Rc<NestedSampleState>,
 }
 
+unsafe impl Send for NestedSample {}
+unsafe impl Sync for NestedSample {}
 impl Tabular for NestedSample {
     const TABLE: Table = Table::Samples;
 }
@@ -3063,6 +3121,8 @@ pub struct NestedSpectra {
     pub spectra_collection: Rc<NestedSpectraCollection>,
 }
 
+unsafe impl Send for NestedSpectra {}
+unsafe impl Sync for NestedSpectra {}
 impl Tabular for NestedSpectra {
     const TABLE: Table = Table::Spectra;
 }
@@ -3156,6 +3216,8 @@ pub struct NestedSpectraCollection {
     pub updated_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedSpectraCollection {}
+unsafe impl Sync for NestedSpectraCollection {}
 impl Tabular for NestedSpectraCollection {
     const TABLE: Table = Table::SpectraCollections;
 }
@@ -3274,6 +3336,8 @@ pub struct NestedTeamState {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedTeamState {}
+unsafe impl Sync for NestedTeamState {}
 impl Tabular for NestedTeamState {
     const TABLE: Table = Table::TeamStates;
 }
@@ -3372,6 +3436,8 @@ pub struct NestedTeam {
     pub updated_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedTeam {}
+unsafe impl Sync for NestedTeam {}
 impl Tabular for NestedTeam {
     const TABLE: Table = Table::Teams;
 }
@@ -3500,6 +3566,8 @@ pub struct NestedTeamsTeamsRoleInvitation {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedTeamsTeamsRoleInvitation {}
+unsafe impl Sync for NestedTeamsTeamsRoleInvitation {}
 impl Tabular for NestedTeamsTeamsRoleInvitation {
     const TABLE: Table = Table::TeamsTeamsRoleInvitations;
 }
@@ -3600,6 +3668,8 @@ pub struct NestedTeamsUsersRoleInvitation {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedTeamsUsersRoleInvitation {}
+unsafe impl Sync for NestedTeamsUsersRoleInvitation {}
 impl Tabular for NestedTeamsUsersRoleInvitation {
     const TABLE: Table = Table::TeamsUsersRoleInvitations;
 }
@@ -3700,6 +3770,8 @@ pub struct NestedTeamsUsersRoleRequest {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedTeamsUsersRoleRequest {}
+unsafe impl Sync for NestedTeamsUsersRoleRequest {}
 impl Tabular for NestedTeamsUsersRoleRequest {
     const TABLE: Table = Table::TeamsUsersRoleRequests;
 }
@@ -3800,6 +3872,8 @@ pub struct NestedTeamsUsersRole {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedTeamsUsersRole {}
+unsafe impl Sync for NestedTeamsUsersRole {}
 impl Tabular for NestedTeamsUsersRole {
     const TABLE: Table = Table::TeamsUsersRoles;
 }
@@ -3898,6 +3972,8 @@ pub struct NestedUnit {
     pub color: Rc<Color>,
 }
 
+unsafe impl Send for NestedUnit {}
+unsafe impl Sync for NestedUnit {}
 impl Tabular for NestedUnit {
     const TABLE: Table = Table::Units;
 }
@@ -3992,6 +4068,8 @@ pub struct NestedUserEmail {
     pub login_provider: Rc<NestedLoginProvider>,
 }
 
+unsafe impl Send for NestedUserEmail {}
+unsafe impl Sync for NestedUserEmail {}
 impl Tabular for NestedUserEmail {
     const TABLE: Table = Table::UserEmails;
 }
@@ -4085,6 +4163,8 @@ pub struct NestedUser {
     pub organization: Option<Rc<NestedOrganization>>,
 }
 
+unsafe impl Send for NestedUser {}
+unsafe impl Sync for NestedUser {}
 impl Tabular for NestedUser {
     const TABLE: Table = Table::Users;
 }
@@ -4203,6 +4283,8 @@ pub struct NestedUsersUsersRoleInvitation {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedUsersUsersRoleInvitation {}
+unsafe impl Sync for NestedUsersUsersRoleInvitation {}
 impl Tabular for NestedUsersUsersRoleInvitation {
     const TABLE: Table = Table::UsersUsersRoleInvitations;
 }
@@ -4303,6 +4385,8 @@ pub struct NestedUsersUsersRoleRequest {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedUsersUsersRoleRequest {}
+unsafe impl Sync for NestedUsersUsersRoleRequest {}
 impl Tabular for NestedUsersUsersRoleRequest {
     const TABLE: Table = Table::UsersUsersRoleRequests;
 }
@@ -4403,6 +4487,8 @@ pub struct NestedUsersUsersRole {
     pub created_by: Rc<NestedUser>,
 }
 
+unsafe impl Send for NestedUsersUsersRole {}
+unsafe impl Sync for NestedUsersUsersRole {}
 impl Tabular for NestedUsersUsersRole {
     const TABLE: Table = Table::UsersUsersRoles;
 }

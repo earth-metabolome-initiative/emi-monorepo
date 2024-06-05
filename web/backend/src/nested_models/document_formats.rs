@@ -11,6 +11,8 @@ pub struct NestedDocumentFormat {
     pub color: Color,
 }
 
+unsafe impl Send for NestedDocumentFormat {}
+unsafe impl Sync for NestedDocumentFormat {}
 impl NestedDocumentFormat {
     /// Convert the flat struct to the nested struct.
     ///

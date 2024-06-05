@@ -48,6 +48,8 @@ pub struct SampleBioOttTaxonItem {
     pub taxon_id: i32,
 }
 
+unsafe impl Send for SampleBioOttTaxonItem {}
+unsafe impl Sync for SampleBioOttTaxonItem {}
 impl From<SampleBioOttTaxonItem> for web_common::database::tables::SampleBioOttTaxonItem {
     fn from(item: SampleBioOttTaxonItem) -> Self {
         Self {

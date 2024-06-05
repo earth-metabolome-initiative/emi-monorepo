@@ -58,6 +58,8 @@ pub struct Observation {
     pub picture: Vec<u8>,
 }
 
+unsafe impl Send for Observation {}
+unsafe impl Sync for Observation {}
 impl From<Observation> for web_common::database::tables::Observation {
     fn from(item: Observation) -> Self {
         Self {

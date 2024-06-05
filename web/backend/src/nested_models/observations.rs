@@ -17,6 +17,8 @@ pub struct NestedObservation {
     pub subject: NestedObservationSubject,
 }
 
+unsafe impl Send for NestedObservation {}
+unsafe impl Sync for NestedObservation {}
 impl NestedObservation {
     /// Convert the flat struct to the nested struct.
     ///

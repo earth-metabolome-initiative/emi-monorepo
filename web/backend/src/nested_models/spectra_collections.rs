@@ -13,6 +13,8 @@ pub struct NestedSpectraCollection {
     pub updated_by: NestedUser,
 }
 
+unsafe impl Send for NestedSpectraCollection {}
+unsafe impl Sync for NestedSpectraCollection {}
 impl NestedSpectraCollection {
     /// Convert the flat struct to the nested struct.
     ///

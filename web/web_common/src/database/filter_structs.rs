@@ -9,6 +9,8 @@ pub struct BioOttRankFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for BioOttRankFilter {}
+unsafe impl Sync for BioOttRankFilter {}
 
 #[cfg(feature = "frontend")]
 impl BioOttRankFilter {
@@ -42,6 +44,8 @@ pub struct BioOttTaxonItemFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for BioOttTaxonItemFilter {}
+unsafe impl Sync for BioOttTaxonItemFilter {}
 
 #[cfg(feature = "frontend")]
 impl BioOttTaxonItemFilter {
@@ -105,6 +109,8 @@ pub struct DerivedSampleFilter {
     pub unit_id: Option<i32>,
 }
 
+unsafe impl Send for DerivedSampleFilter {}
+unsafe impl Sync for DerivedSampleFilter {}
 
 #[cfg(feature = "frontend")]
 impl DerivedSampleFilter {
@@ -141,6 +147,8 @@ pub struct DocumentFormatFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for DocumentFormatFilter {}
+unsafe impl Sync for DocumentFormatFilter {}
 
 #[cfg(feature = "frontend")]
 impl DocumentFormatFilter {
@@ -165,6 +173,8 @@ pub struct LoginProviderFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for LoginProviderFilter {}
+unsafe impl Sync for LoginProviderFilter {}
 
 #[cfg(feature = "frontend")]
 impl LoginProviderFilter {
@@ -189,6 +199,8 @@ pub struct MaterialFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for MaterialFilter {}
+unsafe impl Sync for MaterialFilter {}
 
 #[cfg(feature = "frontend")]
 impl MaterialFilter {
@@ -215,6 +227,8 @@ pub struct NameplateCategoryFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for NameplateCategoryFilter {}
+unsafe impl Sync for NameplateCategoryFilter {}
 
 #[cfg(feature = "frontend")]
 impl NameplateCategoryFilter {
@@ -249,6 +263,8 @@ pub struct NameplateFilter {
     pub updated_by: Option<i32>,
 }
 
+unsafe impl Send for NameplateFilter {}
+unsafe impl Sync for NameplateFilter {}
 
 #[cfg(feature = "frontend")]
 impl NameplateFilter {
@@ -280,6 +296,8 @@ pub struct NotificationFilter {
     pub user_id: Option<i32>,
 }
 
+unsafe impl Send for NotificationFilter {}
+unsafe impl Sync for NotificationFilter {}
 
 #[cfg(feature = "frontend")]
 impl NotificationFilter {
@@ -300,6 +318,8 @@ pub struct ObservationSubjectFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for ObservationSubjectFilter {}
+unsafe impl Sync for ObservationSubjectFilter {}
 
 #[cfg(feature = "frontend")]
 impl ObservationSubjectFilter {
@@ -329,6 +349,8 @@ pub struct ObservationFilter {
     pub subject_id: Option<i32>,
 }
 
+unsafe impl Send for ObservationFilter {}
+unsafe impl Sync for ObservationFilter {}
 
 #[cfg(feature = "frontend")]
 impl ObservationFilter {
@@ -374,6 +396,8 @@ pub struct OrganismBioOttTaxonItemFilter {
     pub taxon_id: Option<i32>,
 }
 
+unsafe impl Send for OrganismBioOttTaxonItemFilter {}
+unsafe impl Sync for OrganismBioOttTaxonItemFilter {}
 
 #[cfg(feature = "frontend")]
 impl OrganismBioOttTaxonItemFilter {
@@ -406,6 +430,8 @@ pub struct OrganismFilter {
     pub updated_by: Option<i32>,
 }
 
+unsafe impl Send for OrganismFilter {}
+unsafe impl Sync for OrganismFilter {}
 
 #[cfg(feature = "frontend")]
 impl OrganismFilter {
@@ -445,6 +471,8 @@ pub struct OrganizationFilter {
     pub country_id: Option<i32>,
 }
 
+unsafe impl Send for OrganizationFilter {}
+unsafe impl Sync for OrganizationFilter {}
 
 #[cfg(feature = "frontend")]
 impl OrganizationFilter {
@@ -465,6 +493,8 @@ pub struct PermanenceCategoryFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for PermanenceCategoryFilter {}
+unsafe impl Sync for PermanenceCategoryFilter {}
 
 #[cfg(feature = "frontend")]
 impl PermanenceCategoryFilter {
@@ -489,6 +519,8 @@ pub struct ProjectStateFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for ProjectStateFilter {}
+unsafe impl Sync for ProjectStateFilter {}
 
 #[cfg(feature = "frontend")]
 impl ProjectStateFilter {
@@ -517,6 +549,8 @@ pub struct ProjectFilter {
     pub updated_by: Option<i32>,
 }
 
+unsafe impl Send for ProjectFilter {}
+unsafe impl Sync for ProjectFilter {}
 
 #[cfg(feature = "frontend")]
 impl ProjectFilter {
@@ -559,6 +593,8 @@ pub struct ProjectsTeamsRoleInvitationFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for ProjectsTeamsRoleInvitationFilter {}
+unsafe impl Sync for ProjectsTeamsRoleInvitationFilter {}
 
 #[cfg(feature = "frontend")]
 impl ProjectsTeamsRoleInvitationFilter {
@@ -593,6 +629,8 @@ pub struct ProjectsTeamsRoleRequestFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for ProjectsTeamsRoleRequestFilter {}
+unsafe impl Sync for ProjectsTeamsRoleRequestFilter {}
 
 #[cfg(feature = "frontend")]
 impl ProjectsTeamsRoleRequestFilter {
@@ -627,6 +665,8 @@ pub struct ProjectsTeamsRoleFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for ProjectsTeamsRoleFilter {}
+unsafe impl Sync for ProjectsTeamsRoleFilter {}
 
 #[cfg(feature = "frontend")]
 impl ProjectsTeamsRoleFilter {
@@ -661,6 +701,8 @@ pub struct ProjectsUsersRoleInvitationFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for ProjectsUsersRoleInvitationFilter {}
+unsafe impl Sync for ProjectsUsersRoleInvitationFilter {}
 
 #[cfg(feature = "frontend")]
 impl ProjectsUsersRoleInvitationFilter {
@@ -695,6 +737,8 @@ pub struct ProjectsUsersRoleRequestFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for ProjectsUsersRoleRequestFilter {}
+unsafe impl Sync for ProjectsUsersRoleRequestFilter {}
 
 #[cfg(feature = "frontend")]
 impl ProjectsUsersRoleRequestFilter {
@@ -729,6 +773,8 @@ pub struct ProjectsUsersRoleFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for ProjectsUsersRoleFilter {}
+unsafe impl Sync for ProjectsUsersRoleFilter {}
 
 #[cfg(feature = "frontend")]
 impl ProjectsUsersRoleFilter {
@@ -761,6 +807,8 @@ pub struct RoleFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for RoleFilter {}
+unsafe impl Sync for RoleFilter {}
 
 #[cfg(feature = "frontend")]
 impl RoleFilter {
@@ -786,6 +834,8 @@ pub struct SampleBioOttTaxonItemFilter {
     pub taxon_id: Option<i32>,
 }
 
+unsafe impl Send for SampleBioOttTaxonItemFilter {}
+unsafe impl Sync for SampleBioOttTaxonItemFilter {}
 
 #[cfg(feature = "frontend")]
 impl SampleBioOttTaxonItemFilter {
@@ -815,6 +865,8 @@ pub struct SampleContainerCategoryFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for SampleContainerCategoryFilter {}
+unsafe impl Sync for SampleContainerCategoryFilter {}
 
 #[cfg(feature = "frontend")]
 impl SampleContainerCategoryFilter {
@@ -845,6 +897,8 @@ pub struct SampleContainerFilter {
     pub updated_by: Option<i32>,
 }
 
+unsafe impl Send for SampleContainerFilter {}
+unsafe impl Sync for SampleContainerFilter {}
 
 #[cfg(feature = "frontend")]
 impl SampleContainerFilter {
@@ -877,6 +931,8 @@ pub struct SampleStateFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for SampleStateFilter {}
+unsafe impl Sync for SampleStateFilter {}
 
 #[cfg(feature = "frontend")]
 impl SampleStateFilter {
@@ -905,6 +961,8 @@ pub struct SampleFilter {
     pub state_id: Option<i32>,
 }
 
+unsafe impl Send for SampleFilter {}
+unsafe impl Sync for SampleFilter {}
 
 #[cfg(feature = "frontend")]
 impl SampleFilter {
@@ -944,6 +1002,8 @@ pub struct SpectraFilter {
     pub spectra_collection_id: Option<i32>,
 }
 
+unsafe impl Send for SpectraFilter {}
+unsafe impl Sync for SpectraFilter {}
 
 #[cfg(feature = "frontend")]
 impl SpectraFilter {
@@ -965,6 +1025,8 @@ pub struct SpectraCollectionFilter {
     pub updated_by: Option<i32>,
 }
 
+unsafe impl Send for SpectraCollectionFilter {}
+unsafe impl Sync for SpectraCollectionFilter {}
 
 #[cfg(feature = "frontend")]
 impl SpectraCollectionFilter {
@@ -993,6 +1055,8 @@ pub struct TeamStateFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for TeamStateFilter {}
+unsafe impl Sync for TeamStateFilter {}
 
 #[cfg(feature = "frontend")]
 impl TeamStateFilter {
@@ -1021,6 +1085,8 @@ pub struct TeamFilter {
     pub updated_by: Option<i32>,
 }
 
+unsafe impl Send for TeamFilter {}
+unsafe impl Sync for TeamFilter {}
 
 #[cfg(feature = "frontend")]
 impl TeamFilter {
@@ -1063,6 +1129,8 @@ pub struct TeamsTeamsRoleInvitationFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for TeamsTeamsRoleInvitationFilter {}
+unsafe impl Sync for TeamsTeamsRoleInvitationFilter {}
 
 #[cfg(feature = "frontend")]
 impl TeamsTeamsRoleInvitationFilter {
@@ -1097,6 +1165,8 @@ pub struct TeamsUsersRoleInvitationFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for TeamsUsersRoleInvitationFilter {}
+unsafe impl Sync for TeamsUsersRoleInvitationFilter {}
 
 #[cfg(feature = "frontend")]
 impl TeamsUsersRoleInvitationFilter {
@@ -1131,6 +1201,8 @@ pub struct TeamsUsersRoleRequestFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for TeamsUsersRoleRequestFilter {}
+unsafe impl Sync for TeamsUsersRoleRequestFilter {}
 
 #[cfg(feature = "frontend")]
 impl TeamsUsersRoleRequestFilter {
@@ -1165,6 +1237,8 @@ pub struct TeamsUsersRoleFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for TeamsUsersRoleFilter {}
+unsafe impl Sync for TeamsUsersRoleFilter {}
 
 #[cfg(feature = "frontend")]
 impl TeamsUsersRoleFilter {
@@ -1197,6 +1271,8 @@ pub struct UnitFilter {
     pub color_id: Option<i32>,
 }
 
+unsafe impl Send for UnitFilter {}
+unsafe impl Sync for UnitFilter {}
 
 #[cfg(feature = "frontend")]
 impl UnitFilter {
@@ -1221,6 +1297,8 @@ pub struct UserEmailFilter {
     pub login_provider_id: Option<i32>,
 }
 
+unsafe impl Send for UserEmailFilter {}
+unsafe impl Sync for UserEmailFilter {}
 
 #[cfg(feature = "frontend")]
 impl UserEmailFilter {
@@ -1244,6 +1322,8 @@ pub struct UserFilter {
     pub organization_id: Option<i32>,
 }
 
+unsafe impl Send for UserFilter {}
+unsafe impl Sync for UserFilter {}
 
 #[cfg(feature = "frontend")]
 impl UserFilter {
@@ -1266,6 +1346,8 @@ pub struct UsersUsersRoleInvitationFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for UsersUsersRoleInvitationFilter {}
+unsafe impl Sync for UsersUsersRoleInvitationFilter {}
 
 #[cfg(feature = "frontend")]
 impl UsersUsersRoleInvitationFilter {
@@ -1300,6 +1382,8 @@ pub struct UsersUsersRoleRequestFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for UsersUsersRoleRequestFilter {}
+unsafe impl Sync for UsersUsersRoleRequestFilter {}
 
 #[cfg(feature = "frontend")]
 impl UsersUsersRoleRequestFilter {
@@ -1334,6 +1418,8 @@ pub struct UsersUsersRoleFilter {
     pub created_by: Option<i32>,
 }
 
+unsafe impl Send for UsersUsersRoleFilter {}
+unsafe impl Sync for UsersUsersRoleFilter {}
 
 #[cfg(feature = "frontend")]
 impl UsersUsersRoleFilter {

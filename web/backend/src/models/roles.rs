@@ -47,6 +47,8 @@ pub struct Role {
     pub color_id: i32,
 }
 
+unsafe impl Send for Role {}
+unsafe impl Sync for Role {}
 impl From<Role> for web_common::database::tables::Role {
     fn from(item: Role) -> Self {
         Self {

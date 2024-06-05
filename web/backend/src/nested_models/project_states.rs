@@ -11,6 +11,8 @@ pub struct NestedProjectState {
     pub color: Color,
 }
 
+unsafe impl Send for NestedProjectState {}
+unsafe impl Sync for NestedProjectState {}
 impl NestedProjectState {
     /// Convert the flat struct to the nested struct.
     ///

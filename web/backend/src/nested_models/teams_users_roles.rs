@@ -14,6 +14,8 @@ pub struct NestedTeamsUsersRole {
     pub created_by: NestedUser,
 }
 
+unsafe impl Send for NestedTeamsUsersRole {}
+unsafe impl Sync for NestedTeamsUsersRole {}
 impl NestedTeamsUsersRole {
     /// Convert the flat struct to the nested struct.
     ///

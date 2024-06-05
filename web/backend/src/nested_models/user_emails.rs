@@ -12,6 +12,8 @@ pub struct NestedUserEmail {
     pub login_provider: NestedLoginProvider,
 }
 
+unsafe impl Send for NestedUserEmail {}
+unsafe impl Sync for NestedUserEmail {}
 impl NestedUserEmail {
     /// Convert the flat struct to the nested struct.
     ///

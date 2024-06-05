@@ -31,6 +31,8 @@ pub struct DerivedSampleBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for DerivedSampleBuilder {}
+unsafe impl Sync for DerivedSampleBuilder {}
 impl Default for DerivedSampleBuilder {
     fn default() -> Self {
         Self {
@@ -385,6 +387,8 @@ pub struct NameplateBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for NameplateBuilder {}
+unsafe impl Sync for NameplateBuilder {}
 impl Default for NameplateBuilder {
     fn default() -> Self {
         Self {
@@ -659,6 +663,8 @@ pub struct ObservationBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ObservationBuilder {}
+unsafe impl Sync for ObservationBuilder {}
 impl Default for ObservationBuilder {
     fn default() -> Self {
         Self {
@@ -1060,6 +1066,8 @@ pub struct OrganismBioOttTaxonItemBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for OrganismBioOttTaxonItemBuilder {}
+unsafe impl Sync for OrganismBioOttTaxonItemBuilder {}
 impl Default for OrganismBioOttTaxonItemBuilder {
     fn default() -> Self {
         Self {
@@ -1248,6 +1256,8 @@ pub struct OrganismBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for OrganismBuilder {}
+unsafe impl Sync for OrganismBuilder {}
 impl Default for OrganismBuilder {
     fn default() -> Self {
         Self {
@@ -1631,6 +1641,8 @@ pub struct ProjectBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectBuilder {}
+unsafe impl Sync for ProjectBuilder {}
 impl Default for ProjectBuilder {
     fn default() -> Self {
         Self {
@@ -2216,6 +2228,8 @@ pub struct ProjectsTeamsRoleInvitationBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectsTeamsRoleInvitationBuilder {}
+unsafe impl Sync for ProjectsTeamsRoleInvitationBuilder {}
 impl Default for ProjectsTeamsRoleInvitationBuilder {
     fn default() -> Self {
         Self {
@@ -2431,6 +2445,8 @@ pub struct ProjectsTeamsRoleRequestBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectsTeamsRoleRequestBuilder {}
+unsafe impl Sync for ProjectsTeamsRoleRequestBuilder {}
 impl Default for ProjectsTeamsRoleRequestBuilder {
     fn default() -> Self {
         Self {
@@ -2646,6 +2662,8 @@ pub struct ProjectsTeamsRoleBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectsTeamsRoleBuilder {}
+unsafe impl Sync for ProjectsTeamsRoleBuilder {}
 impl Default for ProjectsTeamsRoleBuilder {
     fn default() -> Self {
         Self {
@@ -2853,6 +2871,8 @@ pub struct ProjectsUsersRoleInvitationBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectsUsersRoleInvitationBuilder {}
+unsafe impl Sync for ProjectsUsersRoleInvitationBuilder {}
 impl Default for ProjectsUsersRoleInvitationBuilder {
     fn default() -> Self {
         Self {
@@ -3068,6 +3088,8 @@ pub struct ProjectsUsersRoleRequestBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectsUsersRoleRequestBuilder {}
+unsafe impl Sync for ProjectsUsersRoleRequestBuilder {}
 impl Default for ProjectsUsersRoleRequestBuilder {
     fn default() -> Self {
         Self {
@@ -3283,6 +3305,8 @@ pub struct ProjectsUsersRoleBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectsUsersRoleBuilder {}
+unsafe impl Sync for ProjectsUsersRoleBuilder {}
 impl Default for ProjectsUsersRoleBuilder {
     fn default() -> Self {
         Self {
@@ -3488,6 +3512,8 @@ pub struct SampleBioOttTaxonItemBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for SampleBioOttTaxonItemBuilder {}
+unsafe impl Sync for SampleBioOttTaxonItemBuilder {}
 impl Default for SampleBioOttTaxonItemBuilder {
     fn default() -> Self {
         Self {
@@ -3668,6 +3694,8 @@ pub struct SampleContainerBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for SampleContainerBuilder {}
+unsafe impl Sync for SampleContainerBuilder {}
 impl Default for SampleContainerBuilder {
     fn default() -> Self {
         Self {
@@ -3951,6 +3979,8 @@ pub struct SampleBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for SampleBuilder {}
+unsafe impl Sync for SampleBuilder {}
 impl Default for SampleBuilder {
     fn default() -> Self {
         Self {
@@ -4267,6 +4297,8 @@ pub struct SpectraCollectionBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for SpectraCollectionBuilder {}
+unsafe impl Sync for SpectraCollectionBuilder {}
 impl Default for SpectraCollectionBuilder {
     fn default() -> Self {
         Self {
@@ -4501,6 +4533,8 @@ pub struct TeamBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for TeamBuilder {}
+unsafe impl Sync for TeamBuilder {}
 impl Default for TeamBuilder {
     fn default() -> Self {
         Self {
@@ -4895,6 +4929,8 @@ pub struct TeamsTeamsRoleInvitationBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for TeamsTeamsRoleInvitationBuilder {}
+unsafe impl Sync for TeamsTeamsRoleInvitationBuilder {}
 impl Default for TeamsTeamsRoleInvitationBuilder {
     fn default() -> Self {
         Self {
@@ -5110,6 +5146,8 @@ pub struct TeamsUsersRoleInvitationBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for TeamsUsersRoleInvitationBuilder {}
+unsafe impl Sync for TeamsUsersRoleInvitationBuilder {}
 impl Default for TeamsUsersRoleInvitationBuilder {
     fn default() -> Self {
         Self {
@@ -5325,6 +5363,8 @@ pub struct TeamsUsersRoleRequestBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for TeamsUsersRoleRequestBuilder {}
+unsafe impl Sync for TeamsUsersRoleRequestBuilder {}
 impl Default for TeamsUsersRoleRequestBuilder {
     fn default() -> Self {
         Self {
@@ -5536,6 +5576,8 @@ pub struct TeamsUsersRoleBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for TeamsUsersRoleBuilder {}
+unsafe impl Sync for TeamsUsersRoleBuilder {}
 impl Default for TeamsUsersRoleBuilder {
     fn default() -> Self {
         Self {
@@ -5747,6 +5789,8 @@ pub struct UserBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for UserBuilder {}
+unsafe impl Sync for UserBuilder {}
 impl Default for UserBuilder {
     fn default() -> Self {
         Self {
@@ -6043,6 +6087,8 @@ pub struct UsersUsersRoleInvitationBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for UsersUsersRoleInvitationBuilder {}
+unsafe impl Sync for UsersUsersRoleInvitationBuilder {}
 impl Default for UsersUsersRoleInvitationBuilder {
     fn default() -> Self {
         Self {
@@ -6258,6 +6304,8 @@ pub struct UsersUsersRoleRequestBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for UsersUsersRoleRequestBuilder {}
+unsafe impl Sync for UsersUsersRoleRequestBuilder {}
 impl Default for UsersUsersRoleRequestBuilder {
     fn default() -> Self {
         Self {
@@ -6469,6 +6517,8 @@ pub struct UsersUsersRoleBuilder {
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for UsersUsersRoleBuilder {}
+unsafe impl Sync for UsersUsersRoleBuilder {}
 impl Default for UsersUsersRoleBuilder {
     fn default() -> Self {
         Self {

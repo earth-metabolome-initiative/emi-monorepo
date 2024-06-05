@@ -16,6 +16,8 @@ pub struct NestedSample {
     pub state: NestedSampleState,
 }
 
+unsafe impl Send for NestedSample {}
+unsafe impl Sync for NestedSample {}
 impl NestedSample {
     /// Convert the flat struct to the nested struct.
     ///

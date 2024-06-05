@@ -46,6 +46,8 @@ pub struct Notification {
     pub read: bool,
 }
 
+unsafe impl Send for Notification {}
+unsafe impl Sync for Notification {}
 impl From<Notification> for web_common::database::tables::Notification {
     fn from(item: Notification) -> Self {
         Self {

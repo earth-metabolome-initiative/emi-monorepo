@@ -51,6 +51,8 @@ pub struct ProjectsTeamsRoleRequest {
     pub created_at: chrono::NaiveDateTime,
 }
 
+unsafe impl Send for ProjectsTeamsRoleRequest {}
+unsafe impl Sync for ProjectsTeamsRoleRequest {}
 impl From<ProjectsTeamsRoleRequest> for web_common::database::tables::ProjectsTeamsRoleRequest {
     fn from(item: ProjectsTeamsRoleRequest) -> Self {
         Self {
