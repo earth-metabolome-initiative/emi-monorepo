@@ -28,7 +28,7 @@ pub fn search_bar() -> Html {
 
     html! {
         <div ref={node} id="search-bar" class={classes} onclick={onclick}>
-            <Datalist<SearchableStruct, false> label="Search" show_label={false} show_load_more={false} />
+            <Datalist<SearchableStruct, false> number_of_candidates={10} label="Search" show_label={false} show_load_more={false} />
         </div>
     }
 }
