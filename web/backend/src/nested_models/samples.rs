@@ -10,9 +10,9 @@ pub struct NestedSample {
     pub inner: Sample,
     pub container: NestedSampleContainer,
     pub project: NestedProject,
-    pub created_by: User,
-    pub sampled_by: User,
-    pub updated_by: User,
+    pub created_by: NestedUser,
+    pub sampled_by: NestedUser,
+    pub updated_by: NestedUser,
     pub state: NestedSampleState,
 }
 
@@ -37,9 +37,9 @@ impl NestedSample {
                 connection,
             )?,
             project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
-            created_by: User::get(flat_variant.created_by, connection)?,
-            sampled_by: User::get(flat_variant.sampled_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            sampled_by: NestedUser::get(flat_variant.sampled_by, connection)?,
+            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
             state: NestedSampleState::get(flat_variant.state_id, connection)?,
             inner: flat_variant,
         })
@@ -437,9 +437,9 @@ impl From<web_common::database::nested_models::NestedSample> for NestedSample {
             inner: Sample::from(item.inner.as_ref().clone()),
             container: NestedSampleContainer::from(item.container.as_ref().clone()),
             project: NestedProject::from(item.project.as_ref().clone()),
-            created_by: User::from(item.created_by.as_ref().clone()),
-            sampled_by: User::from(item.sampled_by.as_ref().clone()),
-            updated_by: User::from(item.updated_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            sampled_by: NestedUser::from(item.sampled_by.as_ref().clone()),
+            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
             state: NestedSampleState::from(item.state.as_ref().clone()),
         }
     }
@@ -452,9 +452,9 @@ impl From<NestedSample> for web_common::database::nested_models::NestedSample {
                 item.container,
             )),
             project: Rc::from(web_common::database::NestedProject::from(item.project)),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
-            sampled_by: Rc::from(web_common::database::User::from(item.sampled_by)),
-            updated_by: Rc::from(web_common::database::User::from(item.updated_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            sampled_by: Rc::from(web_common::database::NestedUser::from(item.sampled_by)),
+            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
             state: Rc::from(web_common::database::NestedSampleState::from(item.state)),
         }
     }

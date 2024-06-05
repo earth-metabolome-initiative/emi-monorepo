@@ -1,6 +1,6 @@
 use super::{Badge, BadgeSize, RowToBadge};
 use crate::traits::format_match::FormatMatch;
-use web_common::database::{NestedProject, NestedProjectState, User};
+use web_common::database::*;
 use yew::prelude::*;
 
 impl RowToBadge for NestedProject {
@@ -29,7 +29,7 @@ impl RowToBadge for NestedProject {
         Some(html! {
             <>
                 <Badge<NestedProjectState> badge={self.state.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
-                <Badge<User> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+                <Badge<NestedUser> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
             </>
         })
     }

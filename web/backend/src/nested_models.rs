@@ -80,6 +80,8 @@ mod units;
 pub use units::*;
 mod user_emails;
 pub use user_emails::*;
+mod users;
+pub use users::*;
 mod users_users_role_invitations;
 pub use users_users_role_invitations::*;
 mod users_users_role_requests;

@@ -51,6 +51,7 @@ pub(crate) fn create_user(
         description: None,
         last_name: "".to_string(),
         profile_picture: png_buffer,
+        organization_id: None,
     };
 
     let mut conn = pool.get().unwrap();

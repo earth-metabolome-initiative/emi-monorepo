@@ -392,7 +392,7 @@ impl Table {
             Table::TeamsUsersRoles => crate::database::NestedTeamsUsersRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::Units => crate::database::NestedUnit::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::UserEmails => crate::database::NestedUserEmail::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
-            Table::Users => crate::database::User::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
+            Table::Users => crate::database::NestedUser::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::UsersUsersRoleInvitations => crate::database::NestedUsersUsersRoleInvitation::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::UsersUsersRoleRequests => crate::database::NestedUsersUsersRoleRequest::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
             Table::UsersUsersRoles => crate::database::NestedUsersUsersRole::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,
@@ -587,8 +587,8 @@ impl Table {
                 crate::database::NestedUserEmail::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::Users => {
-                 assert!(filter.is_none(), "Filter not implemented for this table.");
-                crate::database::User::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+                let filter: Option<crate::database::UserFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedUser::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::UsersUsersRoleInvitations => {
                 let filter: Option<crate::database::UsersUsersRoleInvitationFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
@@ -694,8 +694,8 @@ impl Table {
             Table::Units => unimplemented!("all_by_updated_at not implemented for units."),
             Table::UserEmails => unimplemented!("all_by_updated_at not implemented for user_emails."),
             Table::Users => {
-                 assert!(filter.is_none(), "Filter not implemented for this table.");
-                crate::database::User::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
+                let filter: Option<crate::database::UserFilter> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;
+                crate::database::NestedUser::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()
             },
             Table::UsersUsersRoleInvitations => unimplemented!("all_by_updated_at not implemented for users_users_role_invitations."),
             Table::UsersUsersRoleRequests => unimplemented!("all_by_updated_at not implemented for users_users_role_requests."),
@@ -904,7 +904,8 @@ impl Table {
                 let id = update_row.id;
                 update_row.update(connection).await?;
                 let updated_row: super::User = super::User::get(id, connection).await?.unwrap();
-                bincode::serialize(&updated_row).map_err(crate::api::ApiError::from)?
+                let nested_row = super::NestedUser::from_flat(updated_row, connection).await?;
+                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::UsersUsersRoleInvitations => unimplemented!("Update not implemented for users_users_role_invitations."),
             Table::UsersUsersRoleRequests => unimplemented!("Update not implemented for users_users_role_requests."),
@@ -1180,7 +1181,7 @@ impl Table {
             },
             Table::Users => {
                 for row in rows {
-                    let row: super::User = bincode::deserialize::<super::User>(&row).map_err(crate::api::ApiError::from)?;
+                    let row: super::NestedUser = bincode::deserialize::<super::NestedUser>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             },

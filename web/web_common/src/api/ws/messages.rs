@@ -30,7 +30,7 @@ pub enum FrontendMessage {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum BackendMessage {
     Close(Option<CloseReason>),
-    RefreshUser(User),
+    RefreshUser(NestedUser),
     Notification(NotificationMessage),
     SearchTable(uuid::Uuid, Vec<u8>),
     GetTable(uuid::Uuid, Option<String>, Vec<u8>),

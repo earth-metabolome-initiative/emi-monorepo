@@ -8,7 +8,7 @@ use web_common::database::filter_structs::*;
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
-    pub created_by: User,
+    pub created_by: NestedUser,
     pub sample: NestedSample,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -28,7 +28,7 @@ impl NestedSampleBioOttTaxonItem {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            created_by: User::get(flat_variant.created_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
             sample: NestedSample::get(flat_variant.sample_id, author_user_id, connection)?,
             taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection)?,
             inner: flat_variant,
@@ -430,7 +430,7 @@ impl From<web_common::database::nested_models::NestedSampleBioOttTaxonItem>
     fn from(item: web_common::database::nested_models::NestedSampleBioOttTaxonItem) -> Self {
         Self {
             inner: SampleBioOttTaxonItem::from(item.inner),
-            created_by: User::from(item.created_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
             sample: NestedSample::from(item.sample.as_ref().clone()),
             taxon: NestedBioOttTaxonItem::from(item.taxon.as_ref().clone()),
         }
@@ -442,7 +442,7 @@ impl From<NestedSampleBioOttTaxonItem>
     fn from(item: NestedSampleBioOttTaxonItem) -> Self {
         Self {
             inner: web_common::database::SampleBioOttTaxonItem::from(item.inner),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
             sample: Rc::from(web_common::database::NestedSample::from(item.sample)),
             taxon: Rc::from(web_common::database::NestedBioOttTaxonItem::from(
                 item.taxon,

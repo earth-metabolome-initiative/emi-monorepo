@@ -335,13 +335,20 @@ impl From<&OrganizationPageProp> for PrimaryKey {
     }
 }
 
-impl OrganizationPageProp {}
+impl OrganizationPageProp {
+    fn filter_users_by_organization_id(&self) -> UserFilter {
+        let mut filter = UserFilter::default();
+        filter.organization_id = Some(self.id);
+        filter
+    }
+}
 
 #[function_component(OrganizationPage)]
 pub fn organization_page(props: &OrganizationPageProp) -> Html {
     html! {
         <BasicPage<NestedOrganization> id={PrimaryKey::from(props)}>
-            <span>{"No content available yet."}</span>
+            // Linked with foreign key users.organization_id
+            <BasicList<NestedUser> column_name={"organization_id"} filters={props.filter_users_by_organization_id()}/>
         </BasicPage<NestedOrganization>>
     }
 }
@@ -936,49 +943,49 @@ impl From<&UserPageProp> for PrimaryKey {
 }
 
 impl UserPageProp {
-    fn filter_derived_samples_by_created_by(&self) -> DerivedSampleFilter {
-        let mut filter = DerivedSampleFilter::default();
+    fn filter_users_users_role_invitations_by_table_id(&self) -> UsersUsersRoleInvitationFilter {
+        let mut filter = UsersUsersRoleInvitationFilter::default();
+        filter.table_id = Some(self.id);
+        filter
+    }
+    fn filter_users_users_role_invitations_by_user_id(&self) -> UsersUsersRoleInvitationFilter {
+        let mut filter = UsersUsersRoleInvitationFilter::default();
+        filter.user_id = Some(self.id);
+        filter
+    }
+    fn filter_users_users_role_invitations_by_created_by(&self) -> UsersUsersRoleInvitationFilter {
+        let mut filter = UsersUsersRoleInvitationFilter::default();
         filter.created_by = Some(self.id);
         filter
     }
-    fn filter_derived_samples_by_updated_by(&self) -> DerivedSampleFilter {
-        let mut filter = DerivedSampleFilter::default();
-        filter.updated_by = Some(self.id);
+    fn filter_users_users_role_requests_by_table_id(&self) -> UsersUsersRoleRequestFilter {
+        let mut filter = UsersUsersRoleRequestFilter::default();
+        filter.table_id = Some(self.id);
         filter
     }
-    fn filter_nameplates_by_created_by(&self) -> NameplateFilter {
-        let mut filter = NameplateFilter::default();
+    fn filter_users_users_role_requests_by_user_id(&self) -> UsersUsersRoleRequestFilter {
+        let mut filter = UsersUsersRoleRequestFilter::default();
+        filter.user_id = Some(self.id);
+        filter
+    }
+    fn filter_users_users_role_requests_by_created_by(&self) -> UsersUsersRoleRequestFilter {
+        let mut filter = UsersUsersRoleRequestFilter::default();
         filter.created_by = Some(self.id);
         filter
     }
-    fn filter_nameplates_by_updated_by(&self) -> NameplateFilter {
-        let mut filter = NameplateFilter::default();
-        filter.updated_by = Some(self.id);
+    fn filter_users_users_roles_by_table_id(&self) -> UsersUsersRoleFilter {
+        let mut filter = UsersUsersRoleFilter::default();
+        filter.table_id = Some(self.id);
         filter
     }
-    fn filter_observations_by_created_by(&self) -> ObservationFilter {
-        let mut filter = ObservationFilter::default();
+    fn filter_users_users_roles_by_user_id(&self) -> UsersUsersRoleFilter {
+        let mut filter = UsersUsersRoleFilter::default();
+        filter.user_id = Some(self.id);
+        filter
+    }
+    fn filter_users_users_roles_by_created_by(&self) -> UsersUsersRoleFilter {
+        let mut filter = UsersUsersRoleFilter::default();
         filter.created_by = Some(self.id);
-        filter
-    }
-    fn filter_observations_by_updated_by(&self) -> ObservationFilter {
-        let mut filter = ObservationFilter::default();
-        filter.updated_by = Some(self.id);
-        filter
-    }
-    fn filter_organism_bio_ott_taxon_items_by_created_by(&self) -> OrganismBioOttTaxonItemFilter {
-        let mut filter = OrganismBioOttTaxonItemFilter::default();
-        filter.created_by = Some(self.id);
-        filter
-    }
-    fn filter_organisms_by_created_by(&self) -> OrganismFilter {
-        let mut filter = OrganismFilter::default();
-        filter.created_by = Some(self.id);
-        filter
-    }
-    fn filter_organisms_by_updated_by(&self) -> OrganismFilter {
-        let mut filter = OrganismFilter::default();
-        filter.updated_by = Some(self.id);
         filter
     }
     fn filter_projects_by_created_by(&self) -> ProjectFilter {
@@ -989,23 +996,6 @@ impl UserPageProp {
     fn filter_projects_by_updated_by(&self) -> ProjectFilter {
         let mut filter = ProjectFilter::default();
         filter.updated_by = Some(self.id);
-        filter
-    }
-    fn filter_projects_teams_role_invitations_by_created_by(
-        &self,
-    ) -> ProjectsTeamsRoleInvitationFilter {
-        let mut filter = ProjectsTeamsRoleInvitationFilter::default();
-        filter.created_by = Some(self.id);
-        filter
-    }
-    fn filter_projects_teams_role_requests_by_created_by(&self) -> ProjectsTeamsRoleRequestFilter {
-        let mut filter = ProjectsTeamsRoleRequestFilter::default();
-        filter.created_by = Some(self.id);
-        filter
-    }
-    fn filter_projects_teams_roles_by_created_by(&self) -> ProjectsTeamsRoleFilter {
-        let mut filter = ProjectsTeamsRoleFilter::default();
-        filter.created_by = Some(self.id);
         filter
     }
     fn filter_projects_users_role_invitations_by_user_id(
@@ -1039,11 +1029,6 @@ impl UserPageProp {
     }
     fn filter_projects_users_roles_by_created_by(&self) -> ProjectsUsersRoleFilter {
         let mut filter = ProjectsUsersRoleFilter::default();
-        filter.created_by = Some(self.id);
-        filter
-    }
-    fn filter_sample_bio_ott_taxon_items_by_created_by(&self) -> SampleBioOttTaxonItemFilter {
-        let mut filter = SampleBioOttTaxonItemFilter::default();
         filter.created_by = Some(self.id);
         filter
     }
@@ -1127,48 +1112,70 @@ impl UserPageProp {
         filter.created_by = Some(self.id);
         filter
     }
-    fn filter_users_users_role_invitations_by_table_id(&self) -> UsersUsersRoleInvitationFilter {
-        let mut filter = UsersUsersRoleInvitationFilter::default();
-        filter.table_id = Some(self.id);
-        filter
-    }
-    fn filter_users_users_role_invitations_by_user_id(&self) -> UsersUsersRoleInvitationFilter {
-        let mut filter = UsersUsersRoleInvitationFilter::default();
-        filter.user_id = Some(self.id);
-        filter
-    }
-    fn filter_users_users_role_invitations_by_created_by(&self) -> UsersUsersRoleInvitationFilter {
-        let mut filter = UsersUsersRoleInvitationFilter::default();
+    fn filter_derived_samples_by_created_by(&self) -> DerivedSampleFilter {
+        let mut filter = DerivedSampleFilter::default();
         filter.created_by = Some(self.id);
         filter
     }
-    fn filter_users_users_role_requests_by_table_id(&self) -> UsersUsersRoleRequestFilter {
-        let mut filter = UsersUsersRoleRequestFilter::default();
-        filter.table_id = Some(self.id);
+    fn filter_derived_samples_by_updated_by(&self) -> DerivedSampleFilter {
+        let mut filter = DerivedSampleFilter::default();
+        filter.updated_by = Some(self.id);
         filter
     }
-    fn filter_users_users_role_requests_by_user_id(&self) -> UsersUsersRoleRequestFilter {
-        let mut filter = UsersUsersRoleRequestFilter::default();
-        filter.user_id = Some(self.id);
-        filter
-    }
-    fn filter_users_users_role_requests_by_created_by(&self) -> UsersUsersRoleRequestFilter {
-        let mut filter = UsersUsersRoleRequestFilter::default();
+    fn filter_nameplates_by_created_by(&self) -> NameplateFilter {
+        let mut filter = NameplateFilter::default();
         filter.created_by = Some(self.id);
         filter
     }
-    fn filter_users_users_roles_by_table_id(&self) -> UsersUsersRoleFilter {
-        let mut filter = UsersUsersRoleFilter::default();
-        filter.table_id = Some(self.id);
+    fn filter_nameplates_by_updated_by(&self) -> NameplateFilter {
+        let mut filter = NameplateFilter::default();
+        filter.updated_by = Some(self.id);
         filter
     }
-    fn filter_users_users_roles_by_user_id(&self) -> UsersUsersRoleFilter {
-        let mut filter = UsersUsersRoleFilter::default();
-        filter.user_id = Some(self.id);
+    fn filter_organisms_by_created_by(&self) -> OrganismFilter {
+        let mut filter = OrganismFilter::default();
+        filter.created_by = Some(self.id);
         filter
     }
-    fn filter_users_users_roles_by_created_by(&self) -> UsersUsersRoleFilter {
-        let mut filter = UsersUsersRoleFilter::default();
+    fn filter_organisms_by_updated_by(&self) -> OrganismFilter {
+        let mut filter = OrganismFilter::default();
+        filter.updated_by = Some(self.id);
+        filter
+    }
+    fn filter_projects_teams_role_invitations_by_created_by(
+        &self,
+    ) -> ProjectsTeamsRoleInvitationFilter {
+        let mut filter = ProjectsTeamsRoleInvitationFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_projects_teams_role_requests_by_created_by(&self) -> ProjectsTeamsRoleRequestFilter {
+        let mut filter = ProjectsTeamsRoleRequestFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_projects_teams_roles_by_created_by(&self) -> ProjectsTeamsRoleFilter {
+        let mut filter = ProjectsTeamsRoleFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_sample_bio_ott_taxon_items_by_created_by(&self) -> SampleBioOttTaxonItemFilter {
+        let mut filter = SampleBioOttTaxonItemFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_observations_by_created_by(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
+        filter.created_by = Some(self.id);
+        filter
+    }
+    fn filter_observations_by_updated_by(&self) -> ObservationFilter {
+        let mut filter = ObservationFilter::default();
+        filter.updated_by = Some(self.id);
+        filter
+    }
+    fn filter_organism_bio_ott_taxon_items_by_created_by(&self) -> OrganismBioOttTaxonItemFilter {
+        let mut filter = OrganismBioOttTaxonItemFilter::default();
         filter.created_by = Some(self.id);
         filter
     }
@@ -1177,35 +1184,29 @@ impl UserPageProp {
 #[function_component(UserPage)]
 pub fn user_page(props: &UserPageProp) -> Html {
     html! {
-        <BasicPage<User> id={PrimaryKey::from(props)}>
-            // Linked with foreign key derived_samples.created_by
-            <BasicList<NestedDerivedSample> column_name={"created_by"} filters={props.filter_derived_samples_by_created_by()}/>
-            // Linked with foreign key derived_samples.updated_by
-            <BasicList<NestedDerivedSample> column_name={"updated_by"} filters={props.filter_derived_samples_by_updated_by()}/>
-            // Linked with foreign key nameplates.created_by
-            <BasicList<NestedNameplate> column_name={"created_by"} filters={props.filter_nameplates_by_created_by()}/>
-            // Linked with foreign key nameplates.updated_by
-            <BasicList<NestedNameplate> column_name={"updated_by"} filters={props.filter_nameplates_by_updated_by()}/>
-            // Linked with foreign key observations.created_by
-            <BasicList<NestedObservation> column_name={"created_by"} filters={props.filter_observations_by_created_by()}/>
-            // Linked with foreign key observations.updated_by
-            <BasicList<NestedObservation> column_name={"updated_by"} filters={props.filter_observations_by_updated_by()}/>
-            // Linked with foreign key organism_bio_ott_taxon_items.created_by
-            <BasicList<NestedOrganismBioOttTaxonItem> column_name={"created_by"} filters={props.filter_organism_bio_ott_taxon_items_by_created_by()}/>
-            // Linked with foreign key organisms.created_by
-            <BasicList<NestedOrganism> column_name={"created_by"} filters={props.filter_organisms_by_created_by()}/>
-            // Linked with foreign key organisms.updated_by
-            <BasicList<NestedOrganism> column_name={"updated_by"} filters={props.filter_organisms_by_updated_by()}/>
+        <BasicPage<NestedUser> id={PrimaryKey::from(props)}>
+            // Linked with foreign key users_users_role_invitations.table_id
+            <BasicList<NestedUsersUsersRoleInvitation> column_name={"table_id"} filters={props.filter_users_users_role_invitations_by_table_id()}/>
+            // Linked with foreign key users_users_role_invitations.user_id
+            <BasicList<NestedUsersUsersRoleInvitation> column_name={"user_id"} filters={props.filter_users_users_role_invitations_by_user_id()}/>
+            // Linked with foreign key users_users_role_invitations.created_by
+            <BasicList<NestedUsersUsersRoleInvitation> column_name={"created_by"} filters={props.filter_users_users_role_invitations_by_created_by()}/>
+            // Linked with foreign key users_users_role_requests.table_id
+            <BasicList<NestedUsersUsersRoleRequest> column_name={"table_id"} filters={props.filter_users_users_role_requests_by_table_id()}/>
+            // Linked with foreign key users_users_role_requests.user_id
+            <BasicList<NestedUsersUsersRoleRequest> column_name={"user_id"} filters={props.filter_users_users_role_requests_by_user_id()}/>
+            // Linked with foreign key users_users_role_requests.created_by
+            <BasicList<NestedUsersUsersRoleRequest> column_name={"created_by"} filters={props.filter_users_users_role_requests_by_created_by()}/>
+            // Linked with foreign key users_users_roles.table_id
+            <BasicList<NestedUsersUsersRole> column_name={"table_id"} filters={props.filter_users_users_roles_by_table_id()}/>
+            // Linked with foreign key users_users_roles.user_id
+            <BasicList<NestedUsersUsersRole> column_name={"user_id"} filters={props.filter_users_users_roles_by_user_id()}/>
+            // Linked with foreign key users_users_roles.created_by
+            <BasicList<NestedUsersUsersRole> column_name={"created_by"} filters={props.filter_users_users_roles_by_created_by()}/>
             // Linked with foreign key projects.created_by
             <BasicList<NestedProject> column_name={"created_by"} filters={props.filter_projects_by_created_by()}/>
             // Linked with foreign key projects.updated_by
             <BasicList<NestedProject> column_name={"updated_by"} filters={props.filter_projects_by_updated_by()}/>
-            // Linked with foreign key projects_teams_role_invitations.created_by
-            <BasicList<NestedProjectsTeamsRoleInvitation> column_name={"created_by"} filters={props.filter_projects_teams_role_invitations_by_created_by()}/>
-            // Linked with foreign key projects_teams_role_requests.created_by
-            <BasicList<NestedProjectsTeamsRoleRequest> column_name={"created_by"} filters={props.filter_projects_teams_role_requests_by_created_by()}/>
-            // Linked with foreign key projects_teams_roles.created_by
-            <BasicList<NestedProjectsTeamsRole> column_name={"created_by"} filters={props.filter_projects_teams_roles_by_created_by()}/>
             // Linked with foreign key projects_users_role_invitations.user_id
             <BasicList<NestedProjectsUsersRoleInvitation> column_name={"user_id"} filters={props.filter_projects_users_role_invitations_by_user_id()}/>
             // Linked with foreign key projects_users_role_invitations.created_by
@@ -1218,8 +1219,6 @@ pub fn user_page(props: &UserPageProp) -> Html {
             <BasicList<NestedProjectsUsersRole> column_name={"user_id"} filters={props.filter_projects_users_roles_by_user_id()}/>
             // Linked with foreign key projects_users_roles.created_by
             <BasicList<NestedProjectsUsersRole> column_name={"created_by"} filters={props.filter_projects_users_roles_by_created_by()}/>
-            // Linked with foreign key sample_bio_ott_taxon_items.created_by
-            <BasicList<NestedSampleBioOttTaxonItem> column_name={"created_by"} filters={props.filter_sample_bio_ott_taxon_items_by_created_by()}/>
             // Linked with foreign key sample_containers.created_by
             <BasicList<NestedSampleContainer> column_name={"created_by"} filters={props.filter_sample_containers_by_created_by()}/>
             // Linked with foreign key sample_containers.updated_by
@@ -1252,25 +1251,33 @@ pub fn user_page(props: &UserPageProp) -> Html {
             <BasicList<NestedTeamsUsersRole> column_name={"user_id"} filters={props.filter_teams_users_roles_by_user_id()}/>
             // Linked with foreign key teams_users_roles.created_by
             <BasicList<NestedTeamsUsersRole> column_name={"created_by"} filters={props.filter_teams_users_roles_by_created_by()}/>
-            // Linked with foreign key users_users_role_invitations.table_id
-            <BasicList<NestedUsersUsersRoleInvitation> column_name={"table_id"} filters={props.filter_users_users_role_invitations_by_table_id()}/>
-            // Linked with foreign key users_users_role_invitations.user_id
-            <BasicList<NestedUsersUsersRoleInvitation> column_name={"user_id"} filters={props.filter_users_users_role_invitations_by_user_id()}/>
-            // Linked with foreign key users_users_role_invitations.created_by
-            <BasicList<NestedUsersUsersRoleInvitation> column_name={"created_by"} filters={props.filter_users_users_role_invitations_by_created_by()}/>
-            // Linked with foreign key users_users_role_requests.table_id
-            <BasicList<NestedUsersUsersRoleRequest> column_name={"table_id"} filters={props.filter_users_users_role_requests_by_table_id()}/>
-            // Linked with foreign key users_users_role_requests.user_id
-            <BasicList<NestedUsersUsersRoleRequest> column_name={"user_id"} filters={props.filter_users_users_role_requests_by_user_id()}/>
-            // Linked with foreign key users_users_role_requests.created_by
-            <BasicList<NestedUsersUsersRoleRequest> column_name={"created_by"} filters={props.filter_users_users_role_requests_by_created_by()}/>
-            // Linked with foreign key users_users_roles.table_id
-            <BasicList<NestedUsersUsersRole> column_name={"table_id"} filters={props.filter_users_users_roles_by_table_id()}/>
-            // Linked with foreign key users_users_roles.user_id
-            <BasicList<NestedUsersUsersRole> column_name={"user_id"} filters={props.filter_users_users_roles_by_user_id()}/>
-            // Linked with foreign key users_users_roles.created_by
-            <BasicList<NestedUsersUsersRole> column_name={"created_by"} filters={props.filter_users_users_roles_by_created_by()}/>
-        </BasicPage<User>>
+            // Linked with foreign key derived_samples.created_by
+            <BasicList<NestedDerivedSample> column_name={"created_by"} filters={props.filter_derived_samples_by_created_by()}/>
+            // Linked with foreign key derived_samples.updated_by
+            <BasicList<NestedDerivedSample> column_name={"updated_by"} filters={props.filter_derived_samples_by_updated_by()}/>
+            // Linked with foreign key nameplates.created_by
+            <BasicList<NestedNameplate> column_name={"created_by"} filters={props.filter_nameplates_by_created_by()}/>
+            // Linked with foreign key nameplates.updated_by
+            <BasicList<NestedNameplate> column_name={"updated_by"} filters={props.filter_nameplates_by_updated_by()}/>
+            // Linked with foreign key organisms.created_by
+            <BasicList<NestedOrganism> column_name={"created_by"} filters={props.filter_organisms_by_created_by()}/>
+            // Linked with foreign key organisms.updated_by
+            <BasicList<NestedOrganism> column_name={"updated_by"} filters={props.filter_organisms_by_updated_by()}/>
+            // Linked with foreign key projects_teams_role_invitations.created_by
+            <BasicList<NestedProjectsTeamsRoleInvitation> column_name={"created_by"} filters={props.filter_projects_teams_role_invitations_by_created_by()}/>
+            // Linked with foreign key projects_teams_role_requests.created_by
+            <BasicList<NestedProjectsTeamsRoleRequest> column_name={"created_by"} filters={props.filter_projects_teams_role_requests_by_created_by()}/>
+            // Linked with foreign key projects_teams_roles.created_by
+            <BasicList<NestedProjectsTeamsRole> column_name={"created_by"} filters={props.filter_projects_teams_roles_by_created_by()}/>
+            // Linked with foreign key sample_bio_ott_taxon_items.created_by
+            <BasicList<NestedSampleBioOttTaxonItem> column_name={"created_by"} filters={props.filter_sample_bio_ott_taxon_items_by_created_by()}/>
+            // Linked with foreign key observations.created_by
+            <BasicList<NestedObservation> column_name={"created_by"} filters={props.filter_observations_by_created_by()}/>
+            // Linked with foreign key observations.updated_by
+            <BasicList<NestedObservation> column_name={"updated_by"} filters={props.filter_observations_by_updated_by()}/>
+            // Linked with foreign key organism_bio_ott_taxon_items.created_by
+            <BasicList<NestedOrganismBioOttTaxonItem> column_name={"created_by"} filters={props.filter_organism_bio_ott_taxon_items_by_created_by()}/>
+        </BasicPage<NestedUser>>
     }
 }
 

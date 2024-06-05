@@ -411,7 +411,7 @@ impl BackendTable for web_common::database::Table {
             web_common::database::Table::UserEmails => {
                 NestedUserEmail::can_view_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::Users => User::can_view_by_id()?,
+            web_common::database::Table::Users => NestedUser::can_view_by_id()?,
             web_common::database::Table::UsersUsersRoleInvitations => {
                 NestedUsersUsersRoleInvitation::can_view_by_id(
                     primary_key.into(),
@@ -917,9 +917,15 @@ impl BackendTable for web_common::database::Table {
                     connection,
                 )?)?
             }
-            web_common::database::Table::Users => {
-                bincode::serialize(&User::all_viewable(limit, offset, connection)?)?
-            }
+            web_common::database::Table::Users => bincode::serialize(&NestedUser::all_viewable(
+                filter
+                    .map(|filter| bincode::deserialize::<UserFilter>(&filter))
+                    .transpose()?
+                    .as_ref(),
+                limit,
+                offset,
+                connection,
+            )?)?,
             web_common::database::Table::UsersUsersRoleInvitations => {
                 bincode::serialize(&NestedUsersUsersRoleInvitation::all_viewable(
                     filter
@@ -1454,7 +1460,15 @@ impl BackendTable for web_common::database::Table {
                 )?)?
             }
             web_common::database::Table::Users => {
-                bincode::serialize(&User::all_viewable_sorted(limit, offset, connection)?)?
+                bincode::serialize(&NestedUser::all_viewable_sorted(
+                    filter
+                        .map(|filter| bincode::deserialize::<UserFilter>(&filter))
+                        .transpose()?
+                        .as_ref(),
+                    limit,
+                    offset,
+                    connection,
+                )?)?
             }
             web_common::database::Table::UsersUsersRoleInvitations => {
                 bincode::serialize(&NestedUsersUsersRoleInvitation::all_viewable_sorted(
@@ -1677,7 +1691,7 @@ impl BackendTable for web_common::database::Table {
                 connection,
             )?)?,
             web_common::database::Table::Users => {
-                bincode::serialize(&User::get(primary_key.into(), connection)?)?
+                bincode::serialize(&NestedUser::get(primary_key.into(), connection)?)?
             }
             web_common::database::Table::UsersUsersRoleInvitations => {
                 bincode::serialize(&NestedUsersUsersRoleInvitation::get(
@@ -2026,7 +2040,8 @@ connection)?)?
             },
             web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table user_emails."),
             web_common::database::Table::Users => {
-bincode::serialize(&User::strict_word_similarity_search_viewable(
+bincode::serialize(&NestedUser::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -2230,7 +2245,7 @@ connection)?)?
                 NestedUserEmail::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::Users => {
-                User::can_update_by_id(primary_key.into(), author_user_id, connection)?
+                NestedUser::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::UsersUsersRoleInvitations => {
                 NestedUsersUsersRoleInvitation::can_update_by_id(
@@ -2423,7 +2438,7 @@ connection)?)?
                 NestedUserEmail::can_admin_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::Users => {
-                User::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+                NestedUser::can_admin_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::UsersUsersRoleInvitations => {
                 NestedUsersUsersRoleInvitation::can_admin_by_id(
@@ -2801,7 +2816,11 @@ connection)?)?
                     connection,
                 )?)?
             }
-            web_common::database::Table::Users => bincode::serialize(&User::all_updatable(
+            web_common::database::Table::Users => bincode::serialize(&NestedUser::all_updatable(
+                filter
+                    .map(|filter| bincode::deserialize::<UserFilter>(&filter))
+                    .transpose()?
+                    .as_ref(),
                 author_user_id,
                 limit,
                 offset,
@@ -3063,7 +3082,8 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Users => {
-bincode::serialize(&User::all_updatable_sorted(
+bincode::serialize(&NestedUser::all_updatable_sorted(
+filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3327,7 +3347,8 @@ connection)?)?
             web_common::database::Table::Units => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table units."),
             web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table user_emails."),
             web_common::database::Table::Users => {
-bincode::serialize(&User::strict_word_similarity_search_updatable(
+bincode::serialize(&NestedUser::strict_word_similarity_search_updatable(
+filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3720,12 +3741,18 @@ connection)?)?
                     connection,
                 )?)?
             }
-            web_common::database::Table::Users => bincode::serialize(&User::all_administrable(
-                author_user_id,
-                limit,
-                offset,
-                connection,
-            )?)?,
+            web_common::database::Table::Users => {
+                bincode::serialize(&NestedUser::all_administrable(
+                    filter
+                        .map(|filter| bincode::deserialize::<UserFilter>(&filter))
+                        .transpose()?
+                        .as_ref(),
+                    author_user_id,
+                    limit,
+                    offset,
+                    connection,
+                )?)?
+            }
             web_common::database::Table::UsersUsersRoleInvitations => {
                 bincode::serialize(&NestedUsersUsersRoleInvitation::all_administrable(
                     filter
@@ -3982,7 +4009,8 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Users => {
-bincode::serialize(&User::all_administrable_sorted(
+bincode::serialize(&NestedUser::all_administrable_sorted(
+filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -4246,7 +4274,8 @@ connection)?)?
             web_common::database::Table::Units => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table units."),
             web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table user_emails."),
             web_common::database::Table::Users => {
-bincode::serialize(&User::strict_word_similarity_search_administrable(
+bincode::serialize(&NestedUser::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4472,7 +4501,7 @@ connection)?)?
                 NestedUserEmail::delete_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::Users => {
-                User::delete_by_id(primary_key.into(), author_user_id, connection)?
+                NestedUser::delete_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::UsersUsersRoleInvitations => {
                 NestedUsersUsersRoleInvitation::delete_by_id(
@@ -4677,7 +4706,8 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::Users => {
                 let row: web_common::database::NewUser = bincode::deserialize::<web_common::database::NewUser>(&row)?;
                 let inserted_row: crate::models::User = <web_common::database::NewUser as InsertRow>::insert(row, user_id, connection)?;
-                 bincode::serialize(&inserted_row)?
+                let nested_row = crate::nested_models::NestedUser::from_flat(inserted_row, connection)?;
+                 bincode::serialize(&nested_row)?
             },
             web_common::database::Table::UsersUsersRoleInvitations => {
                 let row: web_common::database::NewUsersUsersRoleInvitation = bincode::deserialize::<web_common::database::NewUsersUsersRoleInvitation>(&row)?;
@@ -4817,7 +4847,8 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::Users => {
                 let row: web_common::database::UpdateUser = bincode::deserialize::<web_common::database::UpdateUser>(&row)?;
                 let updated_row: crate::models::User = <web_common::database::UpdateUser as UpdateRow>::update(row, user_id, connection)?;
-                 bincode::serialize(&updated_row)?
+                let nested_row = crate::nested_models::NestedUser::from_flat(updated_row, connection)?;
+                 bincode::serialize(&nested_row)?
             },
             web_common::database::Table::UsersUsersRoleInvitations => unreachable!("Table `users_users_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::UsersUsersRoleRequests => unreachable!("Table `users_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
@@ -5156,7 +5187,11 @@ impl FromFlatStrTable for web_common::database::Table {
                 bincode::serialize(&richest_row)?
             }
             web_common::database::Table::Users => {
-                bincode::serialize(&serde_json::from_str::<crate::models::User>(row)?)?
+                let flat_row: crate::models::User =
+                    serde_json::from_str::<crate::models::User>(row)?;
+                let richest_row =
+                    crate::nested_models::NestedUser::from_flat(flat_row, connection)?;
+                bincode::serialize(&richest_row)?
             }
             web_common::database::Table::UsersUsersRoleInvitations => {
                 let flat_row: crate::models::UsersUsersRoleInvitation =

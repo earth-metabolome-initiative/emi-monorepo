@@ -1,6 +1,5 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::NestedOrganism;
-use web_common::database::{NestedNameplate, NestedProject, NestedSample, User};
+use web_common::database::*;
 use yew::prelude::*;
 
 impl RowToBadge for NestedOrganism {
@@ -19,7 +18,7 @@ impl RowToBadge for NestedOrganism {
     fn children(&self, props: &super::BadgeProps<Self>) -> Option<yew::prelude::Html> {
         Some(html! {
             <>
-                <Badge<User> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+                <Badge<NestedUser> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
                 <Badge<NestedProject> badge={self.project.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
                 <Badge<NestedNameplate> badge={self.nameplate.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
                 if let Some(sample) = self.sample.as_ref() {

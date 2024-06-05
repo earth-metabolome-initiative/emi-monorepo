@@ -647,6 +647,7 @@ diesel::table! {
         last_name -> Text,
         description -> Nullable<Text>,
         profile_picture -> Bytea,
+        organization_id -> Nullable<Int4>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -782,6 +783,7 @@ diesel::joinable!(units -> colors (color_id));
 diesel::joinable!(units -> font_awesome_icons (icon_id));
 diesel::joinable!(user_emails -> login_providers (login_provider_id));
 diesel::joinable!(user_emails -> users (created_by));
+diesel::joinable!(users -> organizations (organization_id));
 diesel::joinable!(users_users_role_invitations -> roles (role_id));
 diesel::joinable!(users_users_role_requests -> roles (role_id));
 diesel::joinable!(users_users_roles -> roles (role_id));

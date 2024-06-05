@@ -1,5 +1,5 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::{NestedDerivedSample, NestedSample, User};
+use web_common::database::*;
 use yew::prelude::*;
 
 impl RowToBadge for NestedDerivedSample {
@@ -18,7 +18,7 @@ impl RowToBadge for NestedDerivedSample {
     fn children(&self, props: &super::BadgeProps<Self>) -> Option<yew::prelude::Html> {
         Some(html! {
             <>
-                <Badge<User> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+                <Badge<NestedUser> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
                 <Badge<NestedSample> badge={self.parent_sample.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
                 <Badge<NestedSample> badge={self.child_sample.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
             </>

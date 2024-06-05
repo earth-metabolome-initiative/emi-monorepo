@@ -10589,6 +10589,7 @@ pub struct User {
     pub last_name: String,
     pub description: Option<String>,
     pub profile_picture: Vec<u8>,
+    pub organization_id: Option<i32>,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
 }
@@ -10608,7 +10609,7 @@ impl Colorable for User {
 }
 
 impl Filtrable for User {
-    type Filter = EmptyFilter;
+    type Filter = UserFilter;
 }
 #[cfg(feature = "frontend")]
 impl User {
@@ -10630,6 +10631,10 @@ impl User {
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::bytea(self.profile_picture),
+            match self.organization_id {
+                Some(organization_id) => gluesql::core::ast_builder::num(organization_id),
+                None => gluesql::core::ast_builder::null(),
+            },
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
             gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
         ]
@@ -10645,7 +10650,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         table("users")
             .insert()
-            .columns("id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at")
+            .columns("id, first_name, middle_name, last_name, description, profile_picture, organization_id, created_at, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -10671,7 +10676,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("users")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at")
+            .project("id, first_name, middle_name, last_name, description, profile_picture, organization_id, created_at, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -10751,6 +10756,9 @@ connection: &mut gluesql::prelude::Glue<C>,
         if let Some(description) = self.description {
             update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
         }
+        if let Some(organization_id) = self.organization_id {
+            update_row = update_row.set("organization_id", gluesql::core::ast_builder::num(organization_id));
+        }
             update_row.execute(connection)
             .await
              .map(|payload| match payload {
@@ -10782,11 +10790,13 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// Get all User from the database.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all<C>(
+        filter: Option<&UserFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -10796,7 +10806,8 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         let select_row = table("users")
             .select()
-           .project("id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, first_name, middle_name, last_name, description, profile_picture, organization_id, created_at, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -10809,11 +10820,13 @@ connection: &mut gluesql::prelude::Glue<C>,
     /// Get all User from the database ordered by the `updated_at` column.
     ///
     /// # Arguments
+    /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     ///
     pub async fn all_by_updated_at<C>(
+        filter: Option<&UserFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
@@ -10823,7 +10836,8 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         let select_row = table("users")
             .select()
-           .project("id, first_name, middle_name, last_name, description, profile_picture, created_at, updated_at")
+            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
+           .project("id, first_name, middle_name, last_name, description, profile_picture, organization_id, created_at, updated_at")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -10861,6 +10875,11 @@ connection: &mut gluesql::prelude::Glue<C>,
             profile_picture: match row.get("profile_picture").unwrap() {
                 gluesql::prelude::Value::Bytea(profile_picture) => profile_picture.clone(),
                 _ => unreachable!("Expected Bytea")
+            },
+            organization_id: match row.get("organization_id").unwrap() {
+                gluesql::prelude::Value::Null => None,
+                gluesql::prelude::Value::I32(organization_id) => Some(organization_id.clone()),
+                _ => unreachable!("Expected I32")
             },
             created_at: match row.get("created_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(created_at) => created_at.clone(),

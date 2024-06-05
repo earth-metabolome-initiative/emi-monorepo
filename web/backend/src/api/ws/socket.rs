@@ -3,7 +3,7 @@
 use std::mem::swap;
 
 use crate::models::Notification;
-use crate::models::User;
+use crate::nested_models::NestedUser;
 use crate::table_enumeration::*;
 use crate::DBPool;
 use crate::DieselConn;
@@ -24,7 +24,7 @@ use web_common::database::Table;
 
 pub struct WebSocket {
     notifications_handler: Option<SpawnHandle>,
-    pub(crate) user: Option<(User, AccessToken)>,
+    pub(crate) user: Option<(NestedUser, AccessToken)>,
     diesel: DBPool,
     pub(crate) diesel_connection: DieselConn,
     _redis: redis::Client,
@@ -45,7 +45,7 @@ impl WebSocket {
         }
     }
 
-    fn user(&self) -> Option<&User> {
+    fn user(&self) -> Option<&NestedUser> {
         self.user.as_ref().map(|(user, _)| user)
     }
 
@@ -53,7 +53,7 @@ impl WebSocket {
         diesel: DBPool,
         sqlx: SQLxPool<Postgres>,
         redis: redis::Client,
-        user: User,
+        user: NestedUser,
         access_token: AccessToken,
     ) -> Self {
         let diesel_connection = diesel.get().unwrap();
@@ -76,12 +76,12 @@ impl WebSocket {
         // If the handler is stopped or was never started, start it.
         if self.notifications_handler.is_none() {
             if let Some((user, _)) = &self.user {
-                log::info!("Starting notifications handler for user {}", user.id);
+                log::info!("Starting notifications handler for user {}", user.inner.id);
                 let address = ctx.address().clone();
-                let channel_name = format!("user_{}", user.id);
+                let channel_name = format!("user_{}", user.inner.id);
                 let pool = self.sqlx.clone();
                 let mut diesel_connection = self.diesel.get().unwrap();
-                let maybe_user_id = self.user().map(|user| user.id);
+                let maybe_user_id = self.user().map(|user| user.inner.id);
                 self.notifications_handler = Some(
                     ctx.spawn(
                         async move {
@@ -205,7 +205,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 match <Table as InsertableTable>::insert(
                                     &table,
                                     new_row,
-                                    self.user().map(|user| user.id).unwrap(),
+                                    self.user().map(|user| user.inner.id).unwrap(),
                                     &mut self.diesel_connection,
                                 ) {
                                     Ok(row) => {
@@ -232,7 +232,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 match <Table as UpdatableTable>::update(
                                     &table,
                                     row_to_update,
-                                    self.user().map(|user| user.id).unwrap(),
+                                    self.user().map(|user| user.inner.id).unwrap(),
                                     &mut self.diesel_connection,
                                 ) {
                                     Ok(row) => {
@@ -247,7 +247,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                             web_common::database::Operation::Select(select) => match select {
                                 web_common::database::Select::SearchAll { query, limit } => {
                                     match crate::search_all::search_all(
-                                        self.user().map(|user| user.id),
+                                        self.user().map(|user| user.inner.id),
                                         &query,
                                         Some(limit),
                                         &mut self.diesel_connection,
@@ -282,7 +282,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     match <Table as BackendTable>::can_view_by_id(
                                         &table,
                                         primary_key,
-                                        self.user().map(|user| user.id),
+                                        self.user().map(|user| user.inner.id),
                                         &mut self.diesel_connection,
                                     ) {
                                         Ok(can_view) => {
@@ -314,7 +314,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     match <Table as BackendTable>::can_update_by_id(
                                         &table,
                                         primary_key,
-                                        self.user().map(|user| user.id).unwrap(),
+                                        self.user().map(|user| user.inner.id).unwrap(),
                                         &mut self.diesel_connection,
                                     ) {
                                         Ok(can_update) => {
@@ -346,7 +346,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     match <Table as BackendTable>::can_admin_by_id(
                                         &table,
                                         primary_key,
-                                        self.user().map(|user| user.id).unwrap(),
+                                        self.user().map(|user| user.inner.id).unwrap(),
                                         &mut self.diesel_connection,
                                     ) {
                                         Ok(can_admin) => {
@@ -380,7 +380,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         };
                                     match table.strict_word_similarity_search_viewable(
                                         filter,
-                                        self.user().map(|user| user.id),
+                                        self.user().map(|user| user.inner.id),
                                         &query,
                                         Some(limit),
                                         Some(offset),
@@ -417,7 +417,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         };
                                     match table.strict_word_similarity_search_updatable(
                                         filter,
-                                        self.user().map(|user| user.id).unwrap(),
+                                        self.user().map(|user| user.inner.id).unwrap(),
                                         &query,
                                         Some(limit),
                                         Some(offset),
@@ -453,7 +453,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                     match <Table as BackendTable>::get(
                                         &table,
                                         primary_key,
-                                        self.user().map(|user| user.id),
+                                        self.user().map(|user| user.inner.id),
                                         &mut self.diesel_connection,
                                     ) {
                                         Ok(record) => {
@@ -510,7 +510,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         <Table as BackendTable>::all_viewable(
                                             &table,
                                             filter,
-                                            self.user().map(|user| user.id),
+                                            self.user().map(|user| user.inner.id),
                                             Some(limit),
                                             Some(offset),
                                             &mut self.diesel_connection,
@@ -559,7 +559,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                         <Table as BackendTable>::all_viewable_sorted(
                                             &table,
                                             filter,
-                                            self.user().map(|user| user.id),
+                                            self.user().map(|user| user.inner.id),
                                             Some(limit),
                                             Some(offset),
                                             &mut self.diesel_connection,
@@ -584,7 +584,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                                 match <Table as BackendTable>::delete_by_id(
                                     &table,
                                     primary_key,
-                                    self.user().map(|user| user.id).unwrap(),
+                                    self.user().map(|user| user.inner.id).unwrap(),
                                     &mut self.diesel_connection,
                                 ) {
                                     Ok(_) => {

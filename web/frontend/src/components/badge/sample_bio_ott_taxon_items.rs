@@ -14,7 +14,7 @@ impl RowToBadge for NestedSampleBioOttTaxonItem {
     fn children(&self, props: &super::BadgeProps<Self>) -> Option<yew::prelude::Html> {
         Some(html! {
             <>
-                <Badge<User> badge={self.created_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+                <Badge<NestedUser> badge={self.created_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
                 <Badge<NestedSample> badge={self.sample.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
                 <Badge<NestedBioOttTaxonItem> badge={self.taxon.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
             </>

@@ -9,6 +9,10 @@ def ensure_created_at_columns(
     """Ensure that all tables with a created_by column also have an created_at column."""
 
     for table_name in table_metadata.tables():
+        
+        if table_name == 'users':
+            continue
+
         columns = table_metadata.get_columns(table_name)
 
         if "created_by" in columns and "created_at" not in columns:

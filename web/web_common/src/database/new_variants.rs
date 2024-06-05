@@ -536,6 +536,7 @@ pub struct NewUser {
     pub last_name: String,
     pub description: Option<String>,
     pub profile_picture: Vec<u8>,
+    pub organization_id: Option<i32>,
 }
 
 impl Tabular for NewUser {

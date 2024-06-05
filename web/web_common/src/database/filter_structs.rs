@@ -1239,6 +1239,25 @@ impl UserEmailFilter {
     }
 }
 
+#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default, Copy, Ord)]
+pub struct UserFilter {
+    pub organization_id: Option<i32>,
+}
+
+
+#[cfg(feature = "frontend")]
+impl UserFilter {
+
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> = gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(organization_id) = &self.organization_id {
+            filter = filter.and(gluesql::core::ast_builder::col("users.organization_id").eq(organization_id.to_string()));
+        }
+
+        filter
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
 pub struct UsersUsersRoleInvitationFilter {
     pub table_id: Option<i32>,

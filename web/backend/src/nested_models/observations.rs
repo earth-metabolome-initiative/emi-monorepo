@@ -9,8 +9,8 @@ use web_common::database::filter_structs::*;
 pub struct NestedObservation {
     pub inner: Observation,
     pub parent_observation: Option<Observation>,
-    pub created_by: User,
-    pub updated_by: User,
+    pub created_by: NestedUser,
+    pub updated_by: NestedUser,
     pub project: NestedProject,
     pub organism: Option<NestedOrganism>,
     pub sample: Option<NestedSample>,
@@ -38,8 +38,8 @@ impl NestedObservation {
                     Observation::get(parent_observation_id, author_user_id, connection)
                 })
                 .transpose()?,
-            created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
             project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
             organism: flat_variant
                 .organism_id
@@ -434,8 +434,8 @@ impl From<web_common::database::nested_models::NestedObservation> for NestedObse
                 .as_deref()
                 .cloned()
                 .map(Observation::from),
-            created_by: User::from(item.created_by.as_ref().clone()),
-            updated_by: User::from(item.updated_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
             project: NestedProject::from(item.project.as_ref().clone()),
             organism: item.organism.as_deref().cloned().map(NestedOrganism::from),
             sample: item.sample.as_deref().cloned().map(NestedSample::from),
@@ -451,8 +451,8 @@ impl From<NestedObservation> for web_common::database::nested_models::NestedObse
                 .parent_observation
                 .map(web_common::database::Observation::from)
                 .map(Rc::from),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::User::from(item.updated_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
             project: Rc::from(web_common::database::NestedProject::from(item.project)),
             organism: item
                 .organism

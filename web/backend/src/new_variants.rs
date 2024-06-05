@@ -909,6 +909,7 @@ pub(super) struct IntermediateNewUser {
     last_name: String,
     description: Option<String>,
     profile_picture: Vec<u8>,
+    organization_id: Option<i32>,
 }
 
 impl InsertRow for web_common::database::NewUser {
@@ -922,6 +923,7 @@ impl InsertRow for web_common::database::NewUser {
             last_name: self.last_name,
             description: self.description,
             profile_picture: self.profile_picture,
+            organization_id: self.organization_id,
         }
     }
 

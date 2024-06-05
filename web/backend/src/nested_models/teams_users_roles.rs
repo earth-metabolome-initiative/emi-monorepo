@@ -9,9 +9,9 @@ use web_common::database::filter_structs::*;
 pub struct NestedTeamsUsersRole {
     pub inner: TeamsUsersRole,
     pub table: NestedTeam,
-    pub user: User,
+    pub user: NestedUser,
     pub role: NestedRole,
-    pub created_by: User,
+    pub created_by: NestedUser,
 }
 
 impl NestedTeamsUsersRole {
@@ -28,9 +28,9 @@ impl NestedTeamsUsersRole {
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             table: NestedTeam::get(flat_variant.table_id, connection)?,
-            user: User::get(flat_variant.user_id, connection)?,
+            user: NestedUser::get(flat_variant.user_id, connection)?,
             role: NestedRole::get(flat_variant.role_id, connection)?,
-            created_by: User::get(flat_variant.created_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
             inner: flat_variant,
         })
     }
@@ -368,9 +368,9 @@ impl From<web_common::database::nested_models::NestedTeamsUsersRole> for NestedT
         Self {
             inner: TeamsUsersRole::from(item.inner),
             table: NestedTeam::from(item.table.as_ref().clone()),
-            user: User::from(item.user.as_ref().clone()),
+            user: NestedUser::from(item.user.as_ref().clone()),
             role: NestedRole::from(item.role.as_ref().clone()),
-            created_by: User::from(item.created_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
         }
     }
 }
@@ -379,9 +379,9 @@ impl From<NestedTeamsUsersRole> for web_common::database::nested_models::NestedT
         Self {
             inner: web_common::database::TeamsUsersRole::from(item.inner),
             table: Rc::from(web_common::database::NestedTeam::from(item.table)),
-            user: Rc::from(web_common::database::User::from(item.user)),
+            user: Rc::from(web_common::database::NestedUser::from(item.user)),
             role: Rc::from(web_common::database::NestedRole::from(item.role)),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
         }
     }
 }

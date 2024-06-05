@@ -425,9 +425,9 @@ impl PageLike for NestedSample {
     }
 }
 
-impl PageLike for User {
+impl PageLike for NestedUser {
     fn id(&self) -> PrimaryKey {
-        self.id.into()
+        self.inner.id.into()
     }
 
     fn update_path(&self) -> Option<AppRoute> {

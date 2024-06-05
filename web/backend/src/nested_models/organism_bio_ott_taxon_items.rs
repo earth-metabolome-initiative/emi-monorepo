@@ -8,7 +8,7 @@ use web_common::database::filter_structs::*;
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedOrganismBioOttTaxonItem {
     pub inner: OrganismBioOttTaxonItem,
-    pub created_by: User,
+    pub created_by: NestedUser,
     pub organism: NestedOrganism,
     pub taxon: NestedBioOttTaxonItem,
 }
@@ -28,7 +28,7 @@ impl NestedOrganismBioOttTaxonItem {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            created_by: User::get(flat_variant.created_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
             organism: NestedOrganism::get(flat_variant.organism_id, author_user_id, connection)?,
             taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection)?,
             inner: flat_variant,
@@ -444,7 +444,7 @@ impl From<web_common::database::nested_models::NestedOrganismBioOttTaxonItem>
     fn from(item: web_common::database::nested_models::NestedOrganismBioOttTaxonItem) -> Self {
         Self {
             inner: OrganismBioOttTaxonItem::from(item.inner),
-            created_by: User::from(item.created_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
             organism: NestedOrganism::from(item.organism.as_ref().clone()),
             taxon: NestedBioOttTaxonItem::from(item.taxon.as_ref().clone()),
         }
@@ -456,7 +456,7 @@ impl From<NestedOrganismBioOttTaxonItem>
     fn from(item: NestedOrganismBioOttTaxonItem) -> Self {
         Self {
             inner: web_common::database::OrganismBioOttTaxonItem::from(item.inner),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
             organism: Rc::from(web_common::database::NestedOrganism::from(item.organism)),
             taxon: Rc::from(web_common::database::NestedBioOttTaxonItem::from(
                 item.taxon,

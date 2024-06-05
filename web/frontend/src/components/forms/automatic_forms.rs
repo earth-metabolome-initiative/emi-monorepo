@@ -2845,7 +2845,7 @@ pub fn create_projects_teams_role_form(props: &CreateProjectsTeamsRoleFormProp) 
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectsUsersRoleInvitationBuilder {
     pub table: Option<Rc<NestedProject>>,
-    pub user: Option<Rc<User>>,
+    pub user: Option<Rc<NestedUser>>,
     pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
@@ -2870,7 +2870,7 @@ impl Default for ProjectsUsersRoleInvitationBuilder {
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsUsersRoleInvitationActions {
     SetTable(Option<Rc<NestedProject>>),
-    SetUser(Option<Rc<User>>),
+    SetUser(Option<Rc<NestedUser>>),
     SetRole(Option<Rc<NestedRole>>),
 }
 
@@ -2982,7 +2982,7 @@ impl From<ProjectsUsersRoleInvitationBuilder> for NewProjectsUsersRoleInvitation
     fn from(builder: ProjectsUsersRoleInvitationBuilder) -> Self {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
-            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.inner.id).unwrap(),
             role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -3040,8 +3040,9 @@ pub fn create_projects_users_role_invitation_form(
     let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedProject>>| {
         ProjectsUsersRoleInvitationActions::SetTable(table)
     });
-    let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<User>>| ProjectsUsersRoleInvitationActions::SetUser(user));
+    let set_user = builder_dispatch.apply_callback(|user: Option<Rc<NestedUser>>| {
+        ProjectsUsersRoleInvitationActions::SetUser(user)
+    });
     let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
         ProjectsUsersRoleInvitationActions::SetRole(role)
     });
@@ -3051,7 +3052,7 @@ pub fn create_projects_users_role_invitation_form(
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewProjectsUsersRoleInvitation>>
     }
@@ -3059,7 +3060,7 @@ pub fn create_projects_users_role_invitation_form(
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectsUsersRoleRequestBuilder {
     pub table: Option<Rc<NestedProject>>,
-    pub user: Option<Rc<User>>,
+    pub user: Option<Rc<NestedUser>>,
     pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
@@ -3084,7 +3085,7 @@ impl Default for ProjectsUsersRoleRequestBuilder {
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsUsersRoleRequestActions {
     SetTable(Option<Rc<NestedProject>>),
-    SetUser(Option<Rc<User>>),
+    SetUser(Option<Rc<NestedUser>>),
     SetRole(Option<Rc<NestedRole>>),
 }
 
@@ -3196,7 +3197,7 @@ impl From<ProjectsUsersRoleRequestBuilder> for NewProjectsUsersRoleRequest {
     fn from(builder: ProjectsUsersRoleRequestBuilder) -> Self {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
-            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.inner.id).unwrap(),
             role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -3254,8 +3255,9 @@ pub fn create_projects_users_role_request_form(
     let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedProject>>| {
         ProjectsUsersRoleRequestActions::SetTable(table)
     });
-    let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<User>>| ProjectsUsersRoleRequestActions::SetUser(user));
+    let set_user = builder_dispatch.apply_callback(|user: Option<Rc<NestedUser>>| {
+        ProjectsUsersRoleRequestActions::SetUser(user)
+    });
     let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
         ProjectsUsersRoleRequestActions::SetRole(role)
     });
@@ -3265,7 +3267,7 @@ pub fn create_projects_users_role_request_form(
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewProjectsUsersRoleRequest>>
     }
@@ -3273,7 +3275,7 @@ pub fn create_projects_users_role_request_form(
 #[derive(Store, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectsUsersRoleBuilder {
     pub table: Option<Rc<NestedProject>>,
-    pub user: Option<Rc<User>>,
+    pub user: Option<Rc<NestedUser>>,
     pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
@@ -3298,7 +3300,7 @@ impl Default for ProjectsUsersRoleBuilder {
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum ProjectsUsersRoleActions {
     SetTable(Option<Rc<NestedProject>>),
-    SetUser(Option<Rc<User>>),
+    SetUser(Option<Rc<NestedUser>>),
     SetRole(Option<Rc<NestedRole>>),
 }
 
@@ -3406,7 +3408,7 @@ impl From<ProjectsUsersRoleBuilder> for NewProjectsUsersRole {
     fn from(builder: ProjectsUsersRoleBuilder) -> Self {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
-            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.inner.id).unwrap(),
             role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -3463,7 +3465,7 @@ pub fn create_projects_users_role_form(props: &CreateProjectsUsersRoleFormProp) 
         ProjectsUsersRoleActions::SetTable(table)
     });
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<User>>| ProjectsUsersRoleActions::SetUser(user));
+        .apply_callback(|user: Option<Rc<NestedUser>>| ProjectsUsersRoleActions::SetUser(user));
     let set_role = builder_dispatch
         .apply_callback(|role: Option<Rc<NestedRole>>| ProjectsUsersRoleActions::SetRole(role));
     html! {
@@ -3472,7 +3474,7 @@ pub fn create_projects_users_role_form(props: &CreateProjectsUsersRoleFormProp) 
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewProjectsUsersRole>>
     }
@@ -3939,7 +3941,7 @@ pub struct SampleBuilder {
     pub notes: Option<Rc<String>>,
     pub container: Option<Rc<NestedSampleContainer>>,
     pub project: Option<Rc<NestedProject>>,
-    pub sampled_by: Option<Rc<User>>,
+    pub sampled_by: Option<Rc<NestedUser>>,
     pub state: Option<Rc<NestedSampleState>>,
     pub errors_notes: Vec<ApiError>,
     pub errors_container: Vec<ApiError>,
@@ -3973,7 +3975,7 @@ pub(super) enum SampleActions {
     SetNotes(Option<String>),
     SetContainer(Option<Rc<NestedSampleContainer>>),
     SetProject(Option<Rc<NestedProject>>),
-    SetSampledBy(Option<Rc<User>>),
+    SetSampledBy(Option<Rc<NestedUser>>),
     SetState(Option<Rc<NestedSampleState>>),
 }
 
@@ -4129,7 +4131,7 @@ impl From<SampleBuilder> for NewSample {
             container_id: builder.container.as_deref().cloned().unwrap().inner.id,
             notes: builder.notes.as_deref().cloned(),
             project_id: builder.project.as_deref().cloned().unwrap().inner.id,
-            sampled_by: builder.sampled_by.as_deref().cloned().unwrap().id,
+            sampled_by: builder.sampled_by.as_deref().cloned().unwrap().inner.id,
             state_id: builder.state.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -4199,8 +4201,9 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
         });
     let set_project = builder_dispatch
         .apply_callback(|project: Option<Rc<NestedProject>>| SampleActions::SetProject(project));
-    let set_sampled_by = builder_dispatch
-        .apply_callback(|sampled_by: Option<Rc<User>>| SampleActions::SetSampledBy(sampled_by));
+    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<Rc<NestedUser>>| {
+        SampleActions::SetSampledBy(sampled_by)
+    });
     let set_state = builder_dispatch
         .apply_callback(|state: Option<Rc<NestedSampleState>>| SampleActions::SetState(state));
     html! {
@@ -4211,7 +4214,7 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Datalist<NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" scanner={false} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" scanner={false} />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
         </BasicForm<NewSample>>
     }
@@ -4236,8 +4239,9 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
         });
     let set_project = builder_dispatch
         .apply_callback(|project: Option<Rc<NestedProject>>| SampleActions::SetProject(project));
-    let set_sampled_by = builder_dispatch
-        .apply_callback(|sampled_by: Option<Rc<User>>| SampleActions::SetSampledBy(sampled_by));
+    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<Rc<NestedUser>>| {
+        SampleActions::SetSampledBy(sampled_by)
+    });
     let set_state = builder_dispatch
         .apply_callback(|state: Option<Rc<NestedSampleState>>| SampleActions::SetState(state));
     html! {
@@ -4248,7 +4252,7 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
             <Datalist<NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" scanner={false} />
             <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<User, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" scanner={false} />
             <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
         </BasicForm<NewSample>>
     }
@@ -5098,7 +5102,7 @@ pub fn create_teams_teams_role_invitation_form(
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct TeamsUsersRoleInvitationBuilder {
     pub table: Option<Rc<NestedTeam>>,
-    pub user: Option<Rc<User>>,
+    pub user: Option<Rc<NestedUser>>,
     pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
@@ -5123,7 +5127,7 @@ impl Default for TeamsUsersRoleInvitationBuilder {
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsUsersRoleInvitationActions {
     SetTable(Option<Rc<NestedTeam>>),
-    SetUser(Option<Rc<User>>),
+    SetUser(Option<Rc<NestedUser>>),
     SetRole(Option<Rc<NestedRole>>),
 }
 
@@ -5235,7 +5239,7 @@ impl From<TeamsUsersRoleInvitationBuilder> for NewTeamsUsersRoleInvitation {
     fn from(builder: TeamsUsersRoleInvitationBuilder) -> Self {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
-            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.inner.id).unwrap(),
             role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -5293,8 +5297,9 @@ pub fn create_teams_users_role_invitation_form(
     let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedTeam>>| {
         TeamsUsersRoleInvitationActions::SetTable(table)
     });
-    let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<User>>| TeamsUsersRoleInvitationActions::SetUser(user));
+    let set_user = builder_dispatch.apply_callback(|user: Option<Rc<NestedUser>>| {
+        TeamsUsersRoleInvitationActions::SetUser(user)
+    });
     let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
         TeamsUsersRoleInvitationActions::SetRole(role)
     });
@@ -5304,7 +5309,7 @@ pub fn create_teams_users_role_invitation_form(
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewTeamsUsersRoleInvitation>>
     }
@@ -5312,7 +5317,7 @@ pub fn create_teams_users_role_invitation_form(
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct TeamsUsersRoleRequestBuilder {
     pub table: Option<Rc<NestedTeam>>,
-    pub user: Option<Rc<User>>,
+    pub user: Option<Rc<NestedUser>>,
     pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
@@ -5337,7 +5342,7 @@ impl Default for TeamsUsersRoleRequestBuilder {
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsUsersRoleRequestActions {
     SetTable(Option<Rc<NestedTeam>>),
-    SetUser(Option<Rc<User>>),
+    SetUser(Option<Rc<NestedUser>>),
     SetRole(Option<Rc<NestedRole>>),
 }
 
@@ -5449,7 +5454,7 @@ impl From<TeamsUsersRoleRequestBuilder> for NewTeamsUsersRoleRequest {
     fn from(builder: TeamsUsersRoleRequestBuilder) -> Self {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
-            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.inner.id).unwrap(),
             role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -5506,7 +5511,7 @@ pub fn create_teams_users_role_request_form(props: &CreateTeamsUsersRoleRequestF
         TeamsUsersRoleRequestActions::SetTable(table)
     });
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<User>>| TeamsUsersRoleRequestActions::SetUser(user));
+        .apply_callback(|user: Option<Rc<NestedUser>>| TeamsUsersRoleRequestActions::SetUser(user));
     let set_role = builder_dispatch
         .apply_callback(|role: Option<Rc<NestedRole>>| TeamsUsersRoleRequestActions::SetRole(role));
     html! {
@@ -5515,7 +5520,7 @@ pub fn create_teams_users_role_request_form(props: &CreateTeamsUsersRoleRequestF
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewTeamsUsersRoleRequest>>
     }
@@ -5523,7 +5528,7 @@ pub fn create_teams_users_role_request_form(props: &CreateTeamsUsersRoleRequestF
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct TeamsUsersRoleBuilder {
     pub table: Option<Rc<NestedTeam>>,
-    pub user: Option<Rc<User>>,
+    pub user: Option<Rc<NestedUser>>,
     pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
@@ -5548,7 +5553,7 @@ impl Default for TeamsUsersRoleBuilder {
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum TeamsUsersRoleActions {
     SetTable(Option<Rc<NestedTeam>>),
-    SetUser(Option<Rc<User>>),
+    SetUser(Option<Rc<NestedUser>>),
     SetRole(Option<Rc<NestedRole>>),
 }
 
@@ -5654,7 +5659,7 @@ impl From<TeamsUsersRoleBuilder> for NewTeamsUsersRole {
     fn from(builder: TeamsUsersRoleBuilder) -> Self {
         Self {
             table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
-            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.inner.id).unwrap(),
             role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -5710,7 +5715,7 @@ pub fn create_teams_users_role_form(props: &CreateTeamsUsersRoleFormProp) -> Htm
     let set_table = builder_dispatch
         .apply_callback(|table: Option<Rc<NestedTeam>>| TeamsUsersRoleActions::SetTable(table));
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<User>>| TeamsUsersRoleActions::SetUser(user));
+        .apply_callback(|user: Option<Rc<NestedUser>>| TeamsUsersRoleActions::SetUser(user));
     let set_role = builder_dispatch
         .apply_callback(|role: Option<Rc<NestedRole>>| TeamsUsersRoleActions::SetRole(role));
     html! {
@@ -5719,12 +5724,12 @@ pub fn create_teams_users_role_form(props: &CreateTeamsUsersRoleFormProp) -> Htm
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <Datalist<NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewTeamsUsersRole>>
     }
 }
-#[derive(Store, Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize)]
+#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct UserBuilder {
     pub id: Option<i32>,
     pub first_name: Option<Rc<String>>,
@@ -5732,11 +5737,13 @@ pub struct UserBuilder {
     pub last_name: Option<Rc<String>>,
     pub description: Option<Rc<String>>,
     pub profile_picture: Option<Rc<Vec<u8>>>,
+    pub organization: Option<Rc<NestedOrganization>>,
     pub errors_first_name: Vec<ApiError>,
     pub errors_middle_name: Vec<ApiError>,
     pub errors_last_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_profile_picture: Vec<ApiError>,
+    pub errors_organization: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
 }
 
@@ -5749,28 +5756,38 @@ impl Default for UserBuilder {
             last_name: None,
             description: None,
             profile_picture: None,
+            organization: Default::default(),
             errors_first_name: Default::default(),
             errors_middle_name: Default::default(),
             errors_last_name: Default::default(),
             errors_description: Default::default(),
             errors_profile_picture: Default::default(),
+            errors_organization: Default::default(),
             form_updated_at: Default::default(),
         }
     }
 }
 
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UserActions {
     SetFirstName(Option<String>),
     SetMiddleName(Option<String>),
     SetLastName(Option<String>),
     SetDescription(Option<String>),
     SetProfilePicture(Option<Rc<Vec<u8>>>),
+    SetOrganization(Option<Rc<NestedOrganization>>),
 }
 
 impl FromOperation for UserActions {
-    fn from_operation<S: AsRef<str>>(_operation: S, _row: Vec<u8>) -> Self {
-        unreachable!("No operations are expected to be needed for the builder UserBuilder.")
+    fn from_operation<S: AsRef<str>>(operation: S, row: Vec<u8>) -> Self {
+        match operation.as_ref() {
+            "organization" => {
+                UserActions::SetOrganization(Some(bincode::deserialize(&row).unwrap()))
+            }
+            operation_name => {
+                unreachable!("The operation name '{}' is not supported.", operation_name)
+            }
+        }
     }
 }
 
@@ -5872,6 +5889,13 @@ impl Reducer<UserBuilder> for UserActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'profile_picture;
             }
+            UserActions::SetOrganization(organization) => 'organization: {
+                state_mut.errors_organization.clear();
+                state_mut.organization = organization.map(Rc::from);
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'organization;
+            }
         }
         state
     }
@@ -5879,7 +5903,7 @@ impl Reducer<UserBuilder> for UserActions {
 impl FormBuilder for UserBuilder {
     type Actions = UserActions;
 
-    type RichVariant = User;
+    type RichVariant = NestedUser;
 
     fn has_errors(&self) -> bool {
         !self.errors_first_name.is_empty()
@@ -5887,6 +5911,7 @@ impl FormBuilder for UserBuilder {
             || !self.errors_last_name.is_empty()
             || !self.errors_description.is_empty()
             || !self.errors_profile_picture.is_empty()
+            || !self.errors_organization.is_empty()
     }
 
     fn update(
@@ -5894,14 +5919,33 @@ impl FormBuilder for UserBuilder {
         richest_variant: Self::RichVariant,
     ) -> Vec<ComponentMessage> {
         dispatcher.reduce_mut(|state| {
-            state.id = Some(richest_variant.id);
+            state.id = Some(richest_variant.inner.id);
         });
-        dispatcher.apply(UserActions::SetFirstName(Some(richest_variant.first_name)));
-        dispatcher.apply(UserActions::SetMiddleName(richest_variant.middle_name));
-        dispatcher.apply(UserActions::SetLastName(Some(richest_variant.last_name)));
-        dispatcher.apply(UserActions::SetDescription(richest_variant.description));
+        dispatcher.apply(UserActions::SetFirstName(Some(
+            richest_variant.inner.first_name.to_string(),
+        )));
+        dispatcher.apply(UserActions::SetMiddleName(
+            richest_variant
+                .inner
+                .middle_name
+                .as_ref()
+                .map(|middle_name| middle_name.to_string()),
+        ));
+        dispatcher.apply(UserActions::SetLastName(Some(
+            richest_variant.inner.last_name.to_string(),
+        )));
+        dispatcher.apply(UserActions::SetDescription(
+            richest_variant
+                .inner
+                .description
+                .as_ref()
+                .map(|description| description.to_string()),
+        ));
         dispatcher.apply(UserActions::SetProfilePicture(
-            Some(richest_variant.profile_picture).map(Rc::from),
+            Some(richest_variant.inner.as_ref().clone().profile_picture).map(Rc::from),
+        ));
+        dispatcher.apply(UserActions::SetOrganization(
+            richest_variant.organization.map(Rc::from),
         ));
         vec![]
     }
@@ -5923,6 +5967,11 @@ impl From<UserBuilder> for UpdateUser {
             last_name: builder.last_name.as_deref().cloned().unwrap(),
             description: builder.description.as_deref().cloned(),
             profile_picture: builder.profile_picture.as_deref().cloned().unwrap(),
+            organization_id: builder
+                .organization
+                .as_deref()
+                .cloned()
+                .map(|organization| organization.inner.id),
         }
     }
 }
@@ -5965,6 +6014,10 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
     let set_profile_picture = builder_dispatch.apply_callback(|profile_picture: Option<Image>| {
         UserActions::SetProfilePicture(profile_picture.map(<Vec<u8>>::from).map(Rc::from))
     });
+    let set_organization =
+        builder_dispatch.apply_callback(|organization: Option<Rc<NestedOrganization>>| {
+            UserActions::SetOrganization(organization)
+        });
     html! {
         <BasicForm<UpdateUser>
             method={FormMethod::PUT}
@@ -5975,13 +6028,14 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
             <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
             <BasicInput<String> label="Description" optional={true} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <FileInput<Image> label="Profile picture" optional={false} errors={builder_store.errors_profile_picture.clone()} builder={set_profile_picture} allowed_formats={vec![GenericFileFormat::Image]} value={builder_store.profile_picture.as_deref().map(|profile_picture| profile_picture.into())} />
+            <Datalist<NestedOrganization, false> builder={set_organization} optional={true} errors={builder_store.errors_organization.clone()} value={builder_store.organization.clone()} label="Organization" scanner={false} />
         </BasicForm<UpdateUser>>
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct UsersUsersRoleInvitationBuilder {
-    pub table: Option<Rc<User>>,
-    pub user: Option<Rc<User>>,
+    pub table: Option<Rc<NestedUser>>,
+    pub user: Option<Rc<NestedUser>>,
     pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
@@ -6005,8 +6059,8 @@ impl Default for UsersUsersRoleInvitationBuilder {
 
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UsersUsersRoleInvitationActions {
-    SetTable(Option<Rc<User>>),
-    SetUser(Option<Rc<User>>),
+    SetTable(Option<Rc<NestedUser>>),
+    SetUser(Option<Rc<NestedUser>>),
     SetRole(Option<Rc<NestedRole>>),
 }
 
@@ -6117,8 +6171,8 @@ impl FormBuilder for UsersUsersRoleInvitationBuilder {
 impl From<UsersUsersRoleInvitationBuilder> for NewUsersUsersRoleInvitation {
     fn from(builder: UsersUsersRoleInvitationBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.id).unwrap(),
-            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.inner.id).unwrap(),
             role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -6173,10 +6227,12 @@ pub fn create_users_users_role_invitation_form(
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch
-        .apply_callback(|table: Option<Rc<User>>| UsersUsersRoleInvitationActions::SetTable(table));
-    let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<User>>| UsersUsersRoleInvitationActions::SetUser(user));
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedUser>>| {
+        UsersUsersRoleInvitationActions::SetTable(table)
+    });
+    let set_user = builder_dispatch.apply_callback(|user: Option<Rc<NestedUser>>| {
+        UsersUsersRoleInvitationActions::SetUser(user)
+    });
     let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
         UsersUsersRoleInvitationActions::SetRole(role)
     });
@@ -6185,16 +6241,16 @@ pub fn create_users_users_role_invitation_form(
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <Datalist<User, false> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewUsersUsersRoleInvitation>>
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct UsersUsersRoleRequestBuilder {
-    pub table: Option<Rc<User>>,
-    pub user: Option<Rc<User>>,
+    pub table: Option<Rc<NestedUser>>,
+    pub user: Option<Rc<NestedUser>>,
     pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
@@ -6218,8 +6274,8 @@ impl Default for UsersUsersRoleRequestBuilder {
 
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UsersUsersRoleRequestActions {
-    SetTable(Option<Rc<User>>),
-    SetUser(Option<Rc<User>>),
+    SetTable(Option<Rc<NestedUser>>),
+    SetUser(Option<Rc<NestedUser>>),
     SetRole(Option<Rc<NestedRole>>),
 }
 
@@ -6330,8 +6386,8 @@ impl FormBuilder for UsersUsersRoleRequestBuilder {
 impl From<UsersUsersRoleRequestBuilder> for NewUsersUsersRoleRequest {
     fn from(builder: UsersUsersRoleRequestBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.id).unwrap(),
-            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.inner.id).unwrap(),
             role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -6384,10 +6440,11 @@ pub fn create_users_users_role_request_form(props: &CreateUsersUsersRoleRequestF
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch
-        .apply_callback(|table: Option<Rc<User>>| UsersUsersRoleRequestActions::SetTable(table));
+    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedUser>>| {
+        UsersUsersRoleRequestActions::SetTable(table)
+    });
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<User>>| UsersUsersRoleRequestActions::SetUser(user));
+        .apply_callback(|user: Option<Rc<NestedUser>>| UsersUsersRoleRequestActions::SetUser(user));
     let set_role = builder_dispatch
         .apply_callback(|role: Option<Rc<NestedRole>>| UsersUsersRoleRequestActions::SetRole(role));
     html! {
@@ -6395,16 +6452,16 @@ pub fn create_users_users_role_request_form(props: &CreateUsersUsersRoleRequestF
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <Datalist<User, false> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewUsersUsersRoleRequest>>
     }
 }
 #[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub struct UsersUsersRoleBuilder {
-    pub table: Option<Rc<User>>,
-    pub user: Option<Rc<User>>,
+    pub table: Option<Rc<NestedUser>>,
+    pub user: Option<Rc<NestedUser>>,
     pub role: Option<Rc<NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
@@ -6428,8 +6485,8 @@ impl Default for UsersUsersRoleBuilder {
 
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize)]
 pub(super) enum UsersUsersRoleActions {
-    SetTable(Option<Rc<User>>),
-    SetUser(Option<Rc<User>>),
+    SetTable(Option<Rc<NestedUser>>),
+    SetUser(Option<Rc<NestedUser>>),
     SetRole(Option<Rc<NestedRole>>),
 }
 
@@ -6534,8 +6591,8 @@ impl FormBuilder for UsersUsersRoleBuilder {
 impl From<UsersUsersRoleBuilder> for NewUsersUsersRole {
     fn from(builder: UsersUsersRoleBuilder) -> Self {
         Self {
-            table_id: builder.table.as_ref().map(|table| table.id).unwrap(),
-            user_id: builder.user.as_ref().map(|user| user.id).unwrap(),
+            table_id: builder.table.as_ref().map(|table| table.inner.id).unwrap(),
+            user_id: builder.user.as_ref().map(|user| user.inner.id).unwrap(),
             role_id: builder.role.as_deref().cloned().unwrap().inner.id,
         }
     }
@@ -6589,9 +6646,9 @@ pub fn create_users_users_role_form(props: &CreateUsersUsersRoleFormProp) -> Htm
         ));
     }
     let set_table = builder_dispatch
-        .apply_callback(|table: Option<Rc<User>>| UsersUsersRoleActions::SetTable(table));
+        .apply_callback(|table: Option<Rc<NestedUser>>| UsersUsersRoleActions::SetTable(table));
     let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<User>>| UsersUsersRoleActions::SetUser(user));
+        .apply_callback(|user: Option<Rc<NestedUser>>| UsersUsersRoleActions::SetUser(user));
     let set_role = builder_dispatch
         .apply_callback(|role: Option<Rc<NestedRole>>| UsersUsersRoleActions::SetRole(role));
     html! {
@@ -6599,8 +6656,8 @@ pub fn create_users_users_role_form(props: &CreateUsersUsersRoleFormProp) -> Htm
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <Datalist<User, false> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<User, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
+            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
             <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewUsersUsersRole>>
     }

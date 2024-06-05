@@ -1,5 +1,5 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::{NestedSample, NestedSpectraCollection, User};
+use web_common::database::*;
 use yew::prelude::*;
 
 impl RowToBadge for NestedSpectraCollection {
@@ -19,7 +19,7 @@ impl RowToBadge for NestedSpectraCollection {
         Some(html! {
             <>
                 <Badge<NestedSample> badge={self.sample.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
-                <Badge<User> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+                <Badge<NestedUser> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
             </>
         })
     }

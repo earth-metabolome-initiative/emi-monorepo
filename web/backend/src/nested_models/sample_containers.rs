@@ -10,8 +10,8 @@ pub struct NestedSampleContainer {
     pub inner: SampleContainer,
     pub project: NestedProject,
     pub category: NestedSampleContainerCategory,
-    pub created_by: User,
-    pub updated_by: User,
+    pub created_by: NestedUser,
+    pub updated_by: NestedUser,
 }
 
 impl NestedSampleContainer {
@@ -31,8 +31,8 @@ impl NestedSampleContainer {
         Ok(Self {
             project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
             category: NestedSampleContainerCategory::get(flat_variant.category_id, connection)?,
-            created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
             inner: flat_variant,
         })
     }
@@ -435,8 +435,8 @@ impl From<web_common::database::nested_models::NestedSampleContainer> for Nested
             inner: SampleContainer::from(item.inner.as_ref().clone()),
             project: NestedProject::from(item.project.as_ref().clone()),
             category: NestedSampleContainerCategory::from(item.category.as_ref().clone()),
-            created_by: User::from(item.created_by.as_ref().clone()),
-            updated_by: User::from(item.updated_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
         }
     }
 }
@@ -448,8 +448,8 @@ impl From<NestedSampleContainer> for web_common::database::nested_models::Nested
             category: Rc::from(web_common::database::NestedSampleContainerCategory::from(
                 item.category,
             )),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::User::from(item.updated_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
         }
     }
 }

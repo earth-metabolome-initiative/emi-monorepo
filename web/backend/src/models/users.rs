@@ -16,6 +16,7 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 use serde::Deserialize;
 use serde::Serialize;
+use web_common::database::filter_structs::*;
 
 #[derive(
     Queryable,
@@ -29,11 +30,13 @@ use serde::Serialize;
     Deserialize,
     Default,
     QueryableByName,
+    Associations,
     Insertable,
     Selectable,
     AsChangeset,
 )]
 #[diesel(table_name = users)]
+#[diesel(belongs_to(crate::models::organizations::Organization, foreign_key = organization_id))]
 #[diesel(primary_key(id))]
 pub struct User {
     pub id: i32,
@@ -42,6 +45,7 @@ pub struct User {
     pub last_name: String,
     pub description: Option<String>,
     pub profile_picture: Vec<u8>,
+    pub organization_id: Option<i32>,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
 }
@@ -55,6 +59,7 @@ impl From<User> for web_common::database::tables::User {
             last_name: item.last_name,
             description: item.description,
             profile_picture: item.profile_picture,
+            organization_id: item.organization_id,
             created_at: item.created_at,
             updated_at: item.updated_at,
         }
@@ -70,6 +75,7 @@ impl From<web_common::database::tables::User> for User {
             last_name: item.last_name,
             description: item.description,
             profile_picture: item.profile_picture,
+            organization_id: item.organization_id,
             created_at: item.created_at,
             updated_at: item.updated_at,
         }
@@ -87,10 +93,12 @@ impl User {
     }
     /// Get all of the viewable structs from the database.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
+        filter: Option<&UserFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -101,6 +109,10 @@ impl User {
         let query = users::dsl::users
             .select(User::as_select())
             .order_by(users::dsl::id);
+        let mut query = query.into_boxed();
+        if let Some(organization_id) = filter.and_then(|f| f.organization_id) {
+            query = query.filter(users::dsl::organization_id.eq(organization_id));
+        }
         query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -109,10 +121,12 @@ impl User {
     }
     /// Get all of the sorted viewable structs from the database.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
+        filter: Option<&UserFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -123,6 +137,10 @@ impl User {
         let query = users::dsl::users
             .select(User::as_select())
             .order_by(users::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
+        if let Some(organization_id) = filter.and_then(|f| f.organization_id) {
+            query = query.filter(users::dsl::organization_id.eq(organization_id));
+        }
         query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -147,11 +165,13 @@ impl User {
     }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
+        filter: Option<&UserFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -163,10 +183,10 @@ impl User {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_viewable(limit, offset, connection);
+            return Self::all_viewable(filter, limit, offset, connection);
         }
         use crate::schema::users;
-        users::dsl::users
+        let mut query = users::dsl::users
             .select(User::as_select())
             .filter(
                 crate::sql_function_bindings::concat_users_name(
@@ -189,6 +209,11 @@ impl User {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(organization_id) = filter.and_then(|f| f.organization_id) {
+            query = query.filter(users::dsl::organization_id.eq(organization_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -280,11 +305,13 @@ impl User {
     }
     /// Get all of the updatable structs from the database.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
+        filter: Option<&UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -300,6 +327,10 @@ impl User {
                 users::dsl::id,
             ))
             .order_by(users::dsl::id);
+        let mut query = query.into_boxed();
+        if let Some(organization_id) = filter.and_then(|f| f.organization_id) {
+            query = query.filter(users::dsl::organization_id.eq(organization_id));
+        }
         query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -308,11 +339,13 @@ impl User {
     }
     /// Get all of the sorted updatable structs from the database.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
+        filter: Option<&UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -328,6 +361,10 @@ impl User {
                 users::dsl::id,
             ))
             .order_by(users::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
+        if let Some(organization_id) = filter.and_then(|f| f.organization_id) {
+            query = query.filter(users::dsl::organization_id.eq(organization_id));
+        }
         query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -336,12 +373,14 @@ impl User {
     }
     /// Search for the updatable structs by a given string by Postgres's `strict_word_similarity`.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
+        filter: Option<&UserFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -354,10 +393,10 @@ impl User {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_updatable(author_user_id, limit, offset, connection);
+            return Self::all_updatable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users;
-        users::dsl::users
+        let mut query = users::dsl::users
             .select(User::as_select())
             .filter(crate::sql_function_bindings::can_update_users(
                 author_user_id,
@@ -384,6 +423,11 @@ impl User {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(organization_id) = filter.and_then(|f| f.organization_id) {
+            query = query.filter(users::dsl::organization_id.eq(organization_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)
@@ -423,11 +467,13 @@ impl User {
     }
     /// Get all of the administrable structs from the database.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
+        filter: Option<&UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -443,6 +489,10 @@ impl User {
                 users::dsl::id,
             ))
             .order_by(users::dsl::id);
+        let mut query = query.into_boxed();
+        if let Some(organization_id) = filter.and_then(|f| f.organization_id) {
+            query = query.filter(users::dsl::organization_id.eq(organization_id));
+        }
         query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -451,11 +501,13 @@ impl User {
     }
     /// Get all of the sorted administrable structs from the database.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
+        filter: Option<&UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -471,6 +523,10 @@ impl User {
                 users::dsl::id,
             ))
             .order_by(users::dsl::updated_at.desc());
+        let mut query = query.into_boxed();
+        if let Some(organization_id) = filter.and_then(|f| f.organization_id) {
+            query = query.filter(users::dsl::organization_id.eq(organization_id));
+        }
         query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
@@ -479,12 +535,14 @@ impl User {
     }
     /// Search for the administrable structs by a given string by Postgres's `strict_word_similarity`.
     ///
+    /// * `filter` - The optional filter to apply to the query.
     /// * `author_user_id` - The ID of the user who is performing the search.
     /// * `query` - The string to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
+        filter: Option<&UserFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -497,10 +555,10 @@ impl User {
         // limit parameter provided instead of a more complex similarity
         // search.
         if query.is_empty() {
-            return Self::all_administrable(author_user_id, limit, offset, connection);
+            return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
         use crate::schema::users;
-        users::dsl::users
+        let mut query = users::dsl::users
             .select(User::as_select())
             .filter(crate::sql_function_bindings::can_admin_users(
                 author_user_id,
@@ -527,6 +585,11 @@ impl User {
                     query,
                 ),
             )
+            .into_boxed();
+        if let Some(organization_id) = filter.and_then(|f| f.organization_id) {
+            query = query.filter(users::dsl::organization_id.eq(organization_id));
+        }
+        query
             .limit(limit.unwrap_or(10))
             .offset(offset.unwrap_or(0))
             .load::<Self>(connection)

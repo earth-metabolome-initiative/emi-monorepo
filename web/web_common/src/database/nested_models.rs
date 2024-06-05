@@ -239,8 +239,8 @@ impl NestedBioOttTaxonItem {
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
-    pub created_by: Rc<User>,
-    pub updated_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
+    pub updated_by: Rc<NestedUser>,
     pub parent_sample: Rc<NestedSample>,
     pub child_sample: Rc<NestedSample>,
     pub unit: Rc<NestedUnit>,
@@ -274,8 +274,8 @@ impl NestedDerivedSample {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             parent_sample: Rc::from(NestedSample::get(flat_variant.parent_sample_id, connection).await?.unwrap()),
             child_sample: Rc::from(NestedSample::get(flat_variant.child_sample_id, connection).await?.unwrap()),
             unit: Rc::from(NestedUnit::get(flat_variant.unit_id, connection).await?.unwrap()),
@@ -748,8 +748,8 @@ pub struct NestedNameplate {
     pub inner: Rc<Nameplate>,
     pub project: Rc<NestedProject>,
     pub category: Rc<NestedNameplateCategory>,
-    pub created_by: Rc<User>,
-    pub updated_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
+    pub updated_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedNameplate {
@@ -782,8 +782,8 @@ impl NestedNameplate {
         Ok(Self {
             project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
             category: Rc::from(NestedNameplateCategory::get(flat_variant.category_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -868,7 +868,7 @@ impl NestedNameplate {
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedNotification {
     pub inner: Rc<Notification>,
-    pub user: Rc<User>,
+    pub user: Rc<NestedUser>,
 }
 
 impl Tabular for NestedNotification {
@@ -899,7 +899,7 @@ impl NestedNotification {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1054,8 +1054,8 @@ impl NestedObservationSubject {
 pub struct NestedObservation {
     pub inner: Rc<Observation>,
     pub parent_observation: Option<Rc<Observation>>,
-    pub created_by: Rc<User>,
-    pub updated_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
+    pub updated_by: Rc<NestedUser>,
     pub project: Rc<NestedProject>,
     pub organism: Option<Rc<NestedOrganism>>,
     pub sample: Option<Rc<NestedSample>>,
@@ -1091,8 +1091,8 @@ impl NestedObservation {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             parent_observation: if let Some(parent_observation_id) = flat_variant.parent_observation_id { Observation::get(parent_observation_id, connection).await?.map(Rc::from) } else { None },
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
             organism: if let Some(organism_id) = flat_variant.organism_id { NestedOrganism::get(organism_id, connection).await?.map(Rc::from) } else { None },
             sample: if let Some(sample_id) = flat_variant.sample_id { NestedSample::get(sample_id, connection).await?.map(Rc::from) } else { None },
@@ -1190,7 +1190,7 @@ impl NestedObservation {
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedOrganismBioOttTaxonItem {
     pub inner: OrganismBioOttTaxonItem,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
     pub organism: Rc<NestedOrganism>,
     pub taxon: Rc<NestedBioOttTaxonItem>,
 }
@@ -1223,7 +1223,7 @@ impl NestedOrganismBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             organism: Rc::from(NestedOrganism::get(flat_variant.organism_id, connection).await?.unwrap()),
             taxon: Rc::from(NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap()),
             inner: flat_variant,
@@ -1291,8 +1291,8 @@ pub struct NestedOrganism {
     pub sample: Option<Rc<NestedSample>>,
     pub nameplate: Rc<NestedNameplate>,
     pub project: Rc<NestedProject>,
-    pub created_by: Rc<User>,
-    pub updated_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
+    pub updated_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedOrganism {
@@ -1327,8 +1327,8 @@ impl NestedOrganism {
             sample: if let Some(sample_id) = flat_variant.sample_id { NestedSample::get(sample_id, connection).await?.map(Rc::from) } else { None },
             nameplate: Rc::from(NestedNameplate::get(flat_variant.nameplate_id, connection).await?.unwrap()),
             project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1702,8 +1702,8 @@ pub struct NestedProject {
     pub icon: Rc<FontAwesomeIcon>,
     pub color: Rc<Color>,
     pub parent_project: Option<Rc<Project>>,
-    pub created_by: Rc<User>,
-    pub updated_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
+    pub updated_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedProject {
@@ -1738,8 +1738,8 @@ impl NestedProject {
             icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
             color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
             parent_project: if let Some(parent_project_id) = flat_variant.parent_project_id { Project::get(parent_project_id, connection).await?.map(Rc::from) } else { None },
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1831,7 +1831,7 @@ pub struct NestedProjectsTeamsRoleInvitation {
     pub table: Rc<NestedProject>,
     pub team: Rc<NestedTeam>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedProjectsTeamsRoleInvitation {
@@ -1865,7 +1865,7 @@ impl NestedProjectsTeamsRoleInvitation {
             table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
             team: Rc::from(NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -1931,7 +1931,7 @@ pub struct NestedProjectsTeamsRoleRequest {
     pub table: Rc<NestedProject>,
     pub team: Rc<NestedTeam>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedProjectsTeamsRoleRequest {
@@ -1965,7 +1965,7 @@ impl NestedProjectsTeamsRoleRequest {
             table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
             team: Rc::from(NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2031,7 +2031,7 @@ pub struct NestedProjectsTeamsRole {
     pub table: Rc<NestedProject>,
     pub team: Rc<NestedTeam>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedProjectsTeamsRole {
@@ -2065,7 +2065,7 @@ impl NestedProjectsTeamsRole {
             table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
             team: Rc::from(NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2129,9 +2129,9 @@ impl NestedProjectsTeamsRole {
 pub struct NestedProjectsUsersRoleInvitation {
     pub inner: ProjectsUsersRoleInvitation,
     pub table: Rc<NestedProject>,
-    pub user: Rc<User>,
+    pub user: Rc<NestedUser>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedProjectsUsersRoleInvitation {
@@ -2163,9 +2163,9 @@ impl NestedProjectsUsersRoleInvitation {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2229,9 +2229,9 @@ impl NestedProjectsUsersRoleInvitation {
 pub struct NestedProjectsUsersRoleRequest {
     pub inner: ProjectsUsersRoleRequest,
     pub table: Rc<NestedProject>,
-    pub user: Rc<User>,
+    pub user: Rc<NestedUser>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedProjectsUsersRoleRequest {
@@ -2263,9 +2263,9 @@ impl NestedProjectsUsersRoleRequest {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2329,9 +2329,9 @@ impl NestedProjectsUsersRoleRequest {
 pub struct NestedProjectsUsersRole {
     pub inner: ProjectsUsersRole,
     pub table: Rc<NestedProject>,
-    pub user: Rc<User>,
+    pub user: Rc<NestedUser>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedProjectsUsersRole {
@@ -2363,9 +2363,9 @@ impl NestedProjectsUsersRole {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2522,7 +2522,7 @@ impl NestedRole {
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedSampleBioOttTaxonItem {
     pub inner: SampleBioOttTaxonItem,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
     pub sample: Rc<NestedSample>,
     pub taxon: Rc<NestedBioOttTaxonItem>,
 }
@@ -2555,7 +2555,7 @@ impl NestedSampleBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             sample: Rc::from(NestedSample::get(flat_variant.sample_id, connection).await?.unwrap()),
             taxon: Rc::from(NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap()),
             inner: flat_variant,
@@ -2718,8 +2718,8 @@ pub struct NestedSampleContainer {
     pub inner: Rc<SampleContainer>,
     pub project: Rc<NestedProject>,
     pub category: Rc<NestedSampleContainerCategory>,
-    pub created_by: Rc<User>,
-    pub updated_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
+    pub updated_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedSampleContainer {
@@ -2752,8 +2752,8 @@ impl NestedSampleContainer {
         Ok(Self {
             project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
             category: Rc::from(NestedSampleContainerCategory::get(flat_variant.category_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -2934,9 +2934,9 @@ pub struct NestedSample {
     pub inner: Rc<Sample>,
     pub container: Rc<NestedSampleContainer>,
     pub project: Rc<NestedProject>,
-    pub created_by: Rc<User>,
-    pub sampled_by: Rc<User>,
-    pub updated_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
+    pub sampled_by: Rc<NestedUser>,
+    pub updated_by: Rc<NestedUser>,
     pub state: Rc<NestedSampleState>,
 }
 
@@ -2970,9 +2970,9 @@ impl NestedSample {
         Ok(Self {
             container: Rc::from(NestedSampleContainer::get(flat_variant.container_id, connection).await?.unwrap()),
             project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            sampled_by: Rc::from(User::get(flat_variant.sampled_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            sampled_by: Rc::from(NestedUser::get(flat_variant.sampled_by, connection).await?.unwrap()),
+            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             state: Rc::from(NestedSampleState::get(flat_variant.state_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
@@ -3152,8 +3152,8 @@ impl NestedSpectra {
 pub struct NestedSpectraCollection {
     pub inner: Rc<SpectraCollection>,
     pub sample: Rc<NestedSample>,
-    pub created_by: Rc<User>,
-    pub updated_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
+    pub updated_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedSpectraCollection {
@@ -3185,8 +3185,8 @@ impl NestedSpectraCollection {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             sample: Rc::from(NestedSample::get(flat_variant.sample_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -3368,8 +3368,8 @@ pub struct NestedTeam {
     pub color: Rc<Color>,
     pub state: Rc<NestedTeamState>,
     pub parent_team: Option<Rc<Team>>,
-    pub created_by: Rc<User>,
-    pub updated_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
+    pub updated_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedTeam {
@@ -3404,8 +3404,8 @@ impl NestedTeam {
             color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
             state: Rc::from(NestedTeamState::get(flat_variant.state_id, connection).await?.unwrap()),
             parent_team: if let Some(parent_team_id) = flat_variant.parent_team_id { Team::get(parent_team_id, connection).await?.map(Rc::from) } else { None },
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(User::get(flat_variant.updated_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -3497,7 +3497,7 @@ pub struct NestedTeamsTeamsRoleInvitation {
     pub table: Rc<NestedTeam>,
     pub team: Rc<NestedTeam>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedTeamsTeamsRoleInvitation {
@@ -3531,7 +3531,7 @@ impl NestedTeamsTeamsRoleInvitation {
             table: Rc::from(NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
             team: Rc::from(NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -3595,9 +3595,9 @@ impl NestedTeamsTeamsRoleInvitation {
 pub struct NestedTeamsUsersRoleInvitation {
     pub inner: TeamsUsersRoleInvitation,
     pub table: Rc<NestedTeam>,
-    pub user: Rc<User>,
+    pub user: Rc<NestedUser>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedTeamsUsersRoleInvitation {
@@ -3629,9 +3629,9 @@ impl NestedTeamsUsersRoleInvitation {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             table: Rc::from(NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -3695,9 +3695,9 @@ impl NestedTeamsUsersRoleInvitation {
 pub struct NestedTeamsUsersRoleRequest {
     pub inner: TeamsUsersRoleRequest,
     pub table: Rc<NestedTeam>,
-    pub user: Rc<User>,
+    pub user: Rc<NestedUser>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedTeamsUsersRoleRequest {
@@ -3729,9 +3729,9 @@ impl NestedTeamsUsersRoleRequest {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             table: Rc::from(NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -3795,9 +3795,9 @@ impl NestedTeamsUsersRoleRequest {
 pub struct NestedTeamsUsersRole {
     pub inner: TeamsUsersRole,
     pub table: Rc<NestedTeam>,
-    pub user: Rc<User>,
+    pub user: Rc<NestedUser>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedTeamsUsersRole {
@@ -3829,9 +3829,9 @@ impl NestedTeamsUsersRole {
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
             table: Rc::from(NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -3988,7 +3988,7 @@ impl NestedUnit {
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUserEmail {
     pub inner: Rc<UserEmail>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
     pub login_provider: Rc<NestedLoginProvider>,
 }
 
@@ -4020,7 +4020,7 @@ impl NestedUserEmail {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             login_provider: Rc::from(NestedLoginProvider::get(flat_variant.login_provider_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
@@ -4080,12 +4080,127 @@ impl NestedUserEmail {
     }
 }
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
+pub struct NestedUser {
+    pub inner: Rc<User>,
+    pub organization: Option<Rc<NestedOrganization>>,
+}
+
+impl Tabular for NestedUser {
+    const TABLE: Table = Table::Users;
+}
+impl Filtrable for NestedUser {
+    type Filter = UserFilter;
+}
+impl Describable for NestedUser {
+    fn description(&self) -> Option<&str> {
+        self.inner.description()
+    }
+}
+impl Colorable for NestedUser {
+    fn color(&self) -> Option<&str> {
+        None
+    }
+}
+#[cfg(feature = "frontend")]
+impl NestedUser {
+    /// Convert the flat struct to the nested struct.
+    ///
+    /// # Arguments
+    /// * `flat_variant` - The flat struct.
+    /// * `connection` - The database connection.
+    pub async fn from_flat(
+        flat_variant: User,
+        connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
+    ) -> Result<Self, gluesql::prelude::Error> {
+        Ok(Self {
+            organization: if let Some(organization_id) = flat_variant.organization_id { NestedOrganization::get(organization_id, connection).await?.map(Rc::from) } else { None },
+            inner: Rc::from(flat_variant),
+        })
+    }
+    /// Get the nested struct from the provided primary key.
+    ///
+    /// # Arguments
+    /// * `id` - The primary key(s) of the row.
+    /// * `connection` - The database connection.
+    pub async fn get<C>(
+        id: i32,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Option<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+       let flat_variant = User::get(id, connection).await?;        match flat_variant {
+            Some(flat_variant) => Ok(Some(Self::from_flat(flat_variant, connection).await?)),
+            None => Ok(None),
+        }
+    }
+    /// Get all the nested structs from the database.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all<C>(
+        filter: Option<&UserFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = User::all(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Get all the nested structs from the database ordered by the `updated_at` column.
+    ///
+    /// # Arguments
+    /// * `filter` - The filter to apply to the results.
+    /// * `limit` - The maximum number of rows to return.
+    /// * `offset` - The number of rows to skip.
+    /// * `connection` - The database connection.
+    pub async fn all_by_updated_at<C>(
+        filter: Option<&UserFilter>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<Vec<Self>, gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        let flat_variants = User::all_by_updated_at(filter, limit, offset, connection).await?;
+         let mut nested_structs = Vec::with_capacity(flat_variants.len());
+         for flat_variant in flat_variants {
+             nested_structs.push(Self::from_flat(flat_variant, connection).await?);
+         }
+         Ok(nested_structs)
+    }
+    /// Update or insert the nested struct into the database.
+    ///
+    /// # Arguments
+    /// * `connection` - The database connection.
+    pub async fn update_or_insert<C>(
+        self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<(), gluesql::prelude::Error> where
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    {
+        self.inner.as_ref().clone().update_or_insert(connection).await?;
+        if let Some(organization) = self.organization {
+            organization.as_ref().clone().update_or_insert(connection).await?;
+        }
+        Ok(())
+    }
+}
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUsersUsersRoleInvitation {
     pub inner: UsersUsersRoleInvitation,
-    pub table: Rc<User>,
-    pub user: Rc<User>,
+    pub table: Rc<NestedUser>,
+    pub user: Rc<NestedUser>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedUsersUsersRoleInvitation {
@@ -4116,10 +4231,10 @@ impl NestedUsersUsersRoleInvitation {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(User::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            table: Rc::from(NestedUser::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -4182,10 +4297,10 @@ impl NestedUsersUsersRoleInvitation {
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUsersUsersRoleRequest {
     pub inner: UsersUsersRoleRequest,
-    pub table: Rc<User>,
-    pub user: Rc<User>,
+    pub table: Rc<NestedUser>,
+    pub user: Rc<NestedUser>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedUsersUsersRoleRequest {
@@ -4216,10 +4331,10 @@ impl NestedUsersUsersRoleRequest {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(User::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            table: Rc::from(NestedUser::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -4282,10 +4397,10 @@ impl NestedUsersUsersRoleRequest {
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUsersUsersRole {
     pub inner: UsersUsersRole,
-    pub table: Rc<User>,
-    pub user: Rc<User>,
+    pub table: Rc<NestedUser>,
+    pub user: Rc<NestedUser>,
     pub role: Rc<NestedRole>,
-    pub created_by: Rc<User>,
+    pub created_by: Rc<NestedUser>,
 }
 
 impl Tabular for NestedUsersUsersRole {
@@ -4316,10 +4431,10 @@ impl NestedUsersUsersRole {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(User::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(User::get(flat_variant.user_id, connection).await?.unwrap()),
+            table: Rc::from(NestedUser::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(User::get(flat_variant.created_by, connection).await?.unwrap()),
+            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }

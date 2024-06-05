@@ -1,5 +1,5 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::{NestedTeam, NestedTeamState, User};
+use web_common::database::*;
 use yew::prelude::*;
 
 impl RowToBadge for NestedTeam {
@@ -19,7 +19,7 @@ impl RowToBadge for NestedTeam {
         Some(html! {
             <>
                 <Badge<NestedTeamState> badge={self.state.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
-                <Badge<User> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+                <Badge<NestedUser> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
             </>
         })
     }

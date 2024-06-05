@@ -11,7 +11,7 @@ pub struct NestedProjectsTeamsRoleRequest {
     pub table: NestedProject,
     pub team: NestedTeam,
     pub role: NestedRole,
-    pub created_by: User,
+    pub created_by: NestedUser,
 }
 
 impl NestedProjectsTeamsRoleRequest {
@@ -32,7 +32,7 @@ impl NestedProjectsTeamsRoleRequest {
             table: NestedProject::get(flat_variant.table_id, author_user_id, connection)?,
             team: NestedTeam::get(flat_variant.team_id, connection)?,
             role: NestedRole::get(flat_variant.role_id, connection)?,
-            created_by: User::get(flat_variant.created_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
             inner: flat_variant,
         })
     }
@@ -441,7 +441,7 @@ impl From<web_common::database::nested_models::NestedProjectsTeamsRoleRequest>
             table: NestedProject::from(item.table.as_ref().clone()),
             team: NestedTeam::from(item.team.as_ref().clone()),
             role: NestedRole::from(item.role.as_ref().clone()),
-            created_by: User::from(item.created_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
         }
     }
 }
@@ -454,7 +454,7 @@ impl From<NestedProjectsTeamsRoleRequest>
             table: Rc::from(web_common::database::NestedProject::from(item.table)),
             team: Rc::from(web_common::database::NestedTeam::from(item.team)),
             role: Rc::from(web_common::database::NestedRole::from(item.role)),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
         }
     }
 }

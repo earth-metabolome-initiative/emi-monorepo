@@ -8,10 +8,10 @@ use web_common::database::filter_structs::*;
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUsersUsersRoleRequest {
     pub inner: UsersUsersRoleRequest,
-    pub table: User,
-    pub user: User,
+    pub table: NestedUser,
+    pub user: NestedUser,
     pub role: NestedRole,
-    pub created_by: User,
+    pub created_by: NestedUser,
 }
 
 impl NestedUsersUsersRoleRequest {
@@ -27,10 +27,10 @@ impl NestedUsersUsersRoleRequest {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: User::get(flat_variant.table_id, connection)?,
-            user: User::get(flat_variant.user_id, connection)?,
+            table: NestedUser::get(flat_variant.table_id, connection)?,
+            user: NestedUser::get(flat_variant.user_id, connection)?,
             role: NestedRole::get(flat_variant.role_id, connection)?,
-            created_by: User::get(flat_variant.created_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
             inner: flat_variant,
         })
     }
@@ -425,10 +425,10 @@ impl From<web_common::database::nested_models::NestedUsersUsersRoleRequest>
     fn from(item: web_common::database::nested_models::NestedUsersUsersRoleRequest) -> Self {
         Self {
             inner: UsersUsersRoleRequest::from(item.inner),
-            table: User::from(item.table.as_ref().clone()),
-            user: User::from(item.user.as_ref().clone()),
+            table: NestedUser::from(item.table.as_ref().clone()),
+            user: NestedUser::from(item.user.as_ref().clone()),
             role: NestedRole::from(item.role.as_ref().clone()),
-            created_by: User::from(item.created_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
         }
     }
 }
@@ -438,10 +438,10 @@ impl From<NestedUsersUsersRoleRequest>
     fn from(item: NestedUsersUsersRoleRequest) -> Self {
         Self {
             inner: web_common::database::UsersUsersRoleRequest::from(item.inner),
-            table: Rc::from(web_common::database::User::from(item.table)),
-            user: Rc::from(web_common::database::User::from(item.user)),
+            table: Rc::from(web_common::database::NestedUser::from(item.table)),
+            user: Rc::from(web_common::database::NestedUser::from(item.user)),
             role: Rc::from(web_common::database::NestedRole::from(item.role)),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
         }
     }
 }

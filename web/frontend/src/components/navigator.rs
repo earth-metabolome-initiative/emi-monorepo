@@ -26,7 +26,7 @@ use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 
 use crate::components::Badge;
-use web_common::database::User;
+use web_common::database::NestedUser;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;
@@ -52,7 +52,7 @@ impl Navigator {
         self.app_state.sidebar_open()
     }
 
-    fn user(&self) -> Option<Rc<User>> {
+    fn user(&self) -> Option<Rc<NestedUser>> {
         self.user_state.user()
     }
 }
@@ -156,12 +156,12 @@ impl Component for Navigator {
                             {"EMI"}
                         </Link<AppRoute>>
                     </h1>
-                    <SearchBar />
+                    // <SearchBar />
                     if let Some(user) = self.user() {
-                        if user.has_complete_profile() {
-                            <Badge<User> size={BadgeSize::Small} badge={user.clone()}/>
+                        if user.inner.has_complete_profile() {
+                            <Badge<NestedUser> size={BadgeSize::Small} badge={user.clone()}/>
                         } else {
-                            <Link<AppRoute> classes="right_nav_button" to={AppRoute::UsersUpdate { id: user.id }}>
+                            <Link<AppRoute> classes="right_nav_button" to={AppRoute::UsersUpdate { id: user.inner.id }}>
                                 <i class="fas fa-clipboard-check"></i>
                                 {'\u{00a0}'}
                                 <span>{"Complete profile"}</span>

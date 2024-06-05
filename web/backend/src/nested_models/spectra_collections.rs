@@ -9,8 +9,8 @@ use web_common::database::filter_structs::*;
 pub struct NestedSpectraCollection {
     pub inner: SpectraCollection,
     pub sample: NestedSample,
-    pub created_by: User,
-    pub updated_by: User,
+    pub created_by: NestedUser,
+    pub updated_by: NestedUser,
 }
 
 impl NestedSpectraCollection {
@@ -29,8 +29,8 @@ impl NestedSpectraCollection {
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
             sample: NestedSample::get(flat_variant.sample_id, author_user_id, connection)?,
-            created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
             inner: flat_variant,
         })
     }
@@ -419,8 +419,8 @@ impl From<web_common::database::nested_models::NestedSpectraCollection>
         Self {
             inner: SpectraCollection::from(item.inner.as_ref().clone()),
             sample: NestedSample::from(item.sample.as_ref().clone()),
-            created_by: User::from(item.created_by.as_ref().clone()),
-            updated_by: User::from(item.updated_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
         }
     }
 }
@@ -431,8 +431,8 @@ impl From<NestedSpectraCollection>
         Self {
             inner: Rc::from(web_common::database::SpectraCollection::from(item.inner)),
             sample: Rc::from(web_common::database::NestedSample::from(item.sample)),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::User::from(item.updated_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
         }
     }
 }

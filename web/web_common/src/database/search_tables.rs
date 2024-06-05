@@ -471,6 +471,28 @@ impl Searchable<false> for NestedUnit {
         )
     }
 }
+impl Searchable<false> for NestedUser {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search(
+             Table::Users,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
+impl Searchable<true> for NestedUser {
+    fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
+        super::Select::search_updatables(
+             Table::Users,
+              filter,
+              query,
+              limit,
+              offset,
+        )
+    }
+}
 impl Searchable<false> for NestedUsersUsersRoleInvitation {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select {
         super::Select::search(
@@ -1089,13 +1111,13 @@ pub enum SearchableStruct {
     NestedTeamsUsersRoleRequest(Rc<NestedTeamsUsersRoleRequest>),
     NestedTeamsUsersRole(Rc<NestedTeamsUsersRole>),
     NestedUnit(Rc<NestedUnit>),
+    NestedUser(Rc<NestedUser>),
     NestedUsersUsersRoleInvitation(Rc<NestedUsersUsersRoleInvitation>),
     NestedUsersUsersRoleRequest(Rc<NestedUsersUsersRoleRequest>),
     NestedUsersUsersRole(Rc<NestedUsersUsersRole>),
     Color(Rc<Color>),
     Country(Rc<Country>),
     FontAwesomeIcon(Rc<FontAwesomeIcon>),
-    User(Rc<User>),
 }
 
 impl Filtrable for SearchableStruct {
@@ -1274,6 +1296,11 @@ impl From<NestedUnit> for SearchableStruct {
         SearchableStruct::NestedUnit(Rc::from(value))
     }
 }
+impl From<NestedUser> for SearchableStruct {
+    fn from(value: NestedUser) -> Self {
+        SearchableStruct::NestedUser(Rc::from(value))
+    }
+}
 impl From<NestedUsersUsersRoleInvitation> for SearchableStruct {
     fn from(value: NestedUsersUsersRoleInvitation) -> Self {
         SearchableStruct::NestedUsersUsersRoleInvitation(Rc::from(value))
@@ -1302,11 +1329,6 @@ impl From<Country> for SearchableStruct {
 impl From<FontAwesomeIcon> for SearchableStruct {
     fn from(value: FontAwesomeIcon) -> Self {
         SearchableStruct::FontAwesomeIcon(Rc::from(value))
-    }
-}
-impl From<User> for SearchableStruct {
-    fn from(value: User) -> Self {
-        SearchableStruct::User(Rc::from(value))
     }
 }
 impl Describable for SearchableStruct {
@@ -1345,13 +1367,13 @@ impl Describable for SearchableStruct {
             SearchableStruct::NestedTeamsUsersRoleRequest(value) => value.description(),
             SearchableStruct::NestedTeamsUsersRole(value) => value.description(),
             SearchableStruct::NestedUnit(value) => value.description(),
+            SearchableStruct::NestedUser(value) => value.description(),
             SearchableStruct::NestedUsersUsersRoleInvitation(value) => value.description(),
             SearchableStruct::NestedUsersUsersRoleRequest(value) => value.description(),
             SearchableStruct::NestedUsersUsersRole(value) => value.description(),
             SearchableStruct::Color(value) => value.description(),
             SearchableStruct::Country(value) => value.description(),
             SearchableStruct::FontAwesomeIcon(value) => value.description(),
-            SearchableStruct::User(value) => value.description(),
         }
     }
 }
@@ -1391,13 +1413,13 @@ impl Colorable for SearchableStruct {
             SearchableStruct::NestedTeamsUsersRoleRequest(value) => value.color(),
             SearchableStruct::NestedTeamsUsersRole(value) => value.color(),
             SearchableStruct::NestedUnit(value) => value.color(),
+            SearchableStruct::NestedUser(value) => value.color(),
             SearchableStruct::NestedUsersUsersRoleInvitation(value) => value.color(),
             SearchableStruct::NestedUsersUsersRoleRequest(value) => value.color(),
             SearchableStruct::NestedUsersUsersRole(value) => value.color(),
             SearchableStruct::Color(value) => value.color(),
             SearchableStruct::Country(value) => value.color(),
             SearchableStruct::FontAwesomeIcon(value) => value.color(),
-            SearchableStruct::User(value) => value.color(),
         }
     }
 }

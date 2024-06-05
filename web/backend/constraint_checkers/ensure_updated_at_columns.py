@@ -14,6 +14,10 @@ def ensure_updated_at_columns(
         The table metadata.
     """
     for table_name in table_metadata.tables():
+
+        if table_name == 'users':
+            continue
+
         columns = table_metadata.get_columns(table_name)
 
         if "updated_by" in columns and "updated_at" not in columns:

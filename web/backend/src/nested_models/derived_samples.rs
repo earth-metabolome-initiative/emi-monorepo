@@ -8,8 +8,8 @@ use web_common::database::filter_structs::*;
 #[derive(PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedDerivedSample {
     pub inner: DerivedSample,
-    pub created_by: User,
-    pub updated_by: User,
+    pub created_by: NestedUser,
+    pub updated_by: NestedUser,
     pub parent_sample: NestedSample,
     pub child_sample: NestedSample,
     pub unit: NestedUnit,
@@ -30,8 +30,8 @@ impl NestedDerivedSample {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
             parent_sample: NestedSample::get(
                 flat_variant.parent_sample_id,
                 author_user_id,
@@ -442,8 +442,8 @@ impl From<web_common::database::nested_models::NestedDerivedSample> for NestedDe
     fn from(item: web_common::database::nested_models::NestedDerivedSample) -> Self {
         Self {
             inner: DerivedSample::from(item.inner),
-            created_by: User::from(item.created_by.as_ref().clone()),
-            updated_by: User::from(item.updated_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
             parent_sample: NestedSample::from(item.parent_sample.as_ref().clone()),
             child_sample: NestedSample::from(item.child_sample.as_ref().clone()),
             unit: NestedUnit::from(item.unit.as_ref().clone()),
@@ -454,8 +454,8 @@ impl From<NestedDerivedSample> for web_common::database::nested_models::NestedDe
     fn from(item: NestedDerivedSample) -> Self {
         Self {
             inner: web_common::database::DerivedSample::from(item.inner),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::User::from(item.updated_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
             parent_sample: Rc::from(web_common::database::NestedSample::from(item.parent_sample)),
             child_sample: Rc::from(web_common::database::NestedSample::from(item.child_sample)),
             unit: Rc::from(web_common::database::NestedUnit::from(item.unit)),

@@ -12,8 +12,8 @@ pub struct NestedTeam {
     pub color: Color,
     pub state: NestedTeamState,
     pub parent_team: Option<Team>,
-    pub created_by: User,
-    pub updated_by: User,
+    pub created_by: NestedUser,
+    pub updated_by: NestedUser,
 }
 
 impl NestedTeam {
@@ -36,8 +36,8 @@ impl NestedTeam {
                 .parent_team_id
                 .map(|parent_team_id| Team::get(parent_team_id, connection))
                 .transpose()?,
-            created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
             inner: flat_variant,
         })
     }
@@ -386,8 +386,8 @@ impl From<web_common::database::nested_models::NestedTeam> for NestedTeam {
             color: Color::from(item.color.as_ref().clone()),
             state: NestedTeamState::from(item.state.as_ref().clone()),
             parent_team: item.parent_team.as_deref().cloned().map(Team::from),
-            created_by: User::from(item.created_by.as_ref().clone()),
-            updated_by: User::from(item.updated_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
         }
     }
 }
@@ -402,8 +402,8 @@ impl From<NestedTeam> for web_common::database::nested_models::NestedTeam {
                 .parent_team
                 .map(web_common::database::Team::from)
                 .map(Rc::from),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::User::from(item.updated_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
         }
     }
 }

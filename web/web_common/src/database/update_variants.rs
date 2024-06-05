@@ -406,6 +406,7 @@ pub struct UpdateUser {
     pub last_name: String,
     pub description: Option<String>,
     pub profile_picture: Vec<u8>,
+    pub organization_id: Option<i32>,
 }
 
 impl Tabular for UpdateUser {
@@ -427,6 +428,10 @@ impl UpdateUser {
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::bytea(self.profile_picture),
+            match self.organization_id {
+                Some(organization_id) => gluesql::core::ast_builder::num(organization_id),
+                None => gluesql::core::ast_builder::null(),
+            },
         ]
     }
 
@@ -455,6 +460,9 @@ impl UpdateUser {
         }
         if let Some(description) = self.description {
             update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
+        }
+        if let Some(organization_id) = self.organization_id {
+            update_row = update_row.set("organization_id", gluesql::core::ast_builder::num(organization_id));
         }
             update_row.execute(connection)
             .await

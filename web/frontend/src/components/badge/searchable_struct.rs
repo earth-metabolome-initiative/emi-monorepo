@@ -55,6 +55,7 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedTeamsUsersRoleRequest(value) => value.similarity_score(query),
             SearchableStruct::NestedTeamsUsersRole(value) => value.similarity_score(query),
             SearchableStruct::NestedUnit(value) => value.similarity_score(query),
+            SearchableStruct::NestedUser(value) => value.similarity_score(query),
             SearchableStruct::NestedUsersUsersRoleInvitation(value) => {
                 value.similarity_score(query)
             }
@@ -63,7 +64,6 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::Color(value) => value.similarity_score(query),
             SearchableStruct::Country(value) => value.similarity_score(query),
             SearchableStruct::FontAwesomeIcon(value) => value.similarity_score(query),
-            SearchableStruct::User(value) => value.similarity_score(query),
         }
     }
 
@@ -102,13 +102,13 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedTeamsUsersRoleRequest(value) => value.badge_title(),
             SearchableStruct::NestedTeamsUsersRole(value) => value.badge_title(),
             SearchableStruct::NestedUnit(value) => value.badge_title(),
+            SearchableStruct::NestedUser(value) => value.badge_title(),
             SearchableStruct::NestedUsersUsersRoleInvitation(value) => value.badge_title(),
             SearchableStruct::NestedUsersUsersRoleRequest(value) => value.badge_title(),
             SearchableStruct::NestedUsersUsersRole(value) => value.badge_title(),
             SearchableStruct::Color(value) => value.badge_title(),
             SearchableStruct::Country(value) => value.badge_title(),
             SearchableStruct::FontAwesomeIcon(value) => value.badge_title(),
-            SearchableStruct::User(value) => value.badge_title(),
         }
     }
 
@@ -147,13 +147,13 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedTeamsUsersRoleRequest(value) => value.path(),
             SearchableStruct::NestedTeamsUsersRole(value) => value.path(),
             SearchableStruct::NestedUnit(value) => value.path(),
+            SearchableStruct::NestedUser(value) => value.path(),
             SearchableStruct::NestedUsersUsersRoleInvitation(value) => value.path(),
             SearchableStruct::NestedUsersUsersRoleRequest(value) => value.path(),
             SearchableStruct::NestedUsersUsersRole(value) => value.path(),
             SearchableStruct::Color(value) => value.path(),
             SearchableStruct::Country(value) => value.path(),
             SearchableStruct::FontAwesomeIcon(value) => value.path(),
-            SearchableStruct::User(value) => value.path(),
         }
     }
 
@@ -192,13 +192,13 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedTeamsUsersRoleRequest(value) => value.primary_image_url(),
             SearchableStruct::NestedTeamsUsersRole(value) => value.primary_image_url(),
             SearchableStruct::NestedUnit(value) => value.primary_image_url(),
+            SearchableStruct::NestedUser(value) => value.primary_image_url(),
             SearchableStruct::NestedUsersUsersRoleInvitation(value) => value.primary_image_url(),
             SearchableStruct::NestedUsersUsersRoleRequest(value) => value.primary_image_url(),
             SearchableStruct::NestedUsersUsersRole(value) => value.primary_image_url(),
             SearchableStruct::Color(value) => value.primary_image_url(),
             SearchableStruct::Country(value) => value.primary_image_url(),
             SearchableStruct::FontAwesomeIcon(value) => value.primary_image_url(),
-            SearchableStruct::User(value) => value.primary_image_url(),
         }
     }
 
@@ -237,13 +237,13 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedTeamsUsersRoleRequest(value) => value.font_awesome_icon(),
             SearchableStruct::NestedTeamsUsersRole(value) => value.font_awesome_icon(),
             SearchableStruct::NestedUnit(value) => value.font_awesome_icon(),
+            SearchableStruct::NestedUser(value) => value.font_awesome_icon(),
             SearchableStruct::NestedUsersUsersRoleInvitation(value) => value.font_awesome_icon(),
             SearchableStruct::NestedUsersUsersRoleRequest(value) => value.font_awesome_icon(),
             SearchableStruct::NestedUsersUsersRole(value) => value.font_awesome_icon(),
             SearchableStruct::Color(value) => value.font_awesome_icon(),
             SearchableStruct::Country(value) => value.font_awesome_icon(),
             SearchableStruct::FontAwesomeIcon(value) => value.font_awesome_icon(),
-            SearchableStruct::User(value) => value.font_awesome_icon(),
         }
     }
 
@@ -348,6 +348,9 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedUnit(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
+            SearchableStruct::NestedUser(value) => {
+                value.children(&props.to_child_props(value.clone()))
+            }
             SearchableStruct::NestedUsersUsersRoleInvitation(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
@@ -364,7 +367,6 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::FontAwesomeIcon(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
-            SearchableStruct::User(value) => value.children(&props.to_child_props(value.clone())),
         }
     }
 }

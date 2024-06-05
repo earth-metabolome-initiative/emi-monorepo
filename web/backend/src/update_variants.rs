@@ -286,6 +286,7 @@ pub(super) struct IntermediateUpdateUser {
     last_name: String,
     description: Option<String>,
     profile_picture: Vec<u8>,
+    organization_id: Option<i32>,
 }
 
 impl UpdateRow for web_common::database::UpdateUser {
@@ -300,6 +301,7 @@ impl UpdateRow for web_common::database::UpdateUser {
             last_name: self.last_name,
             description: self.description,
             profile_picture: self.profile_picture,
+            organization_id: self.organization_id,
         }
     }
 

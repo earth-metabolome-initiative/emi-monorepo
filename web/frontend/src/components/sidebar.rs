@@ -130,9 +130,9 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                     </li>
                     <li class={if route == AppRoute::Users { "active" } else { "" }}>
                         <Link<AppRoute> to={AppRoute::Users}>
-                            <i class={format!("fas fa-{}", User::icon())}></i>
+                            <i class={format!("fas fa-{}", NestedUser::icon())}></i>
                              {'\u{00a0}'}
-                            <span>{User::section()}</span>
+                            <span>{NestedUser::section()}</span>
                         </Link<AppRoute>>
                     </li>
                     {if user.has_user() {

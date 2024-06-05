@@ -1,3 +1,4 @@
+use super::*;
 use crate::models::*;
 use serde::Deserialize;
 use serde::Serialize;
@@ -7,7 +8,7 @@ use web_common::database::filter_structs::*;
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedNotification {
     pub inner: Notification,
-    pub user: User,
+    pub user: NestedUser,
 }
 
 impl NestedNotification {
@@ -23,7 +24,7 @@ impl NestedNotification {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            user: User::get(flat_variant.user_id, connection)?,
+            user: NestedUser::get(flat_variant.user_id, connection)?,
             inner: flat_variant,
         })
     }
@@ -107,7 +108,7 @@ impl From<web_common::database::nested_models::NestedNotification> for NestedNot
     fn from(item: web_common::database::nested_models::NestedNotification) -> Self {
         Self {
             inner: Notification::from(item.inner.as_ref().clone()),
-            user: User::from(item.user.as_ref().clone()),
+            user: NestedUser::from(item.user.as_ref().clone()),
         }
     }
 }
@@ -115,7 +116,7 @@ impl From<NestedNotification> for web_common::database::nested_models::NestedNot
     fn from(item: NestedNotification) -> Self {
         Self {
             inner: Rc::from(web_common::database::Notification::from(item.inner)),
-            user: Rc::from(web_common::database::User::from(item.user)),
+            user: Rc::from(web_common::database::NestedUser::from(item.user)),
         }
     }
 }

@@ -1,7 +1,5 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use web_common::database::{
-    NestedProject, NestedSampleContainer, NestedSampleContainerCategory, User,
-};
+use web_common::database::*;
 use yew::prelude::*;
 
 impl RowToBadge for NestedSampleContainer {
@@ -20,7 +18,7 @@ impl RowToBadge for NestedSampleContainer {
     fn children(&self, props: &super::BadgeProps<Self>) -> Option<yew::prelude::Html> {
         Some(html! {
             <>
-                <Badge<User> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
+                <Badge<NestedUser> badge={self.updated_by.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
                 <Badge<NestedProject> badge={self.project.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
                 <Badge<NestedSampleContainerCategory> badge={self.category.clone()} onclick={props.onclick.clone()} li={true} query={props.query.clone()} size={BadgeSize::Small} />
             </>

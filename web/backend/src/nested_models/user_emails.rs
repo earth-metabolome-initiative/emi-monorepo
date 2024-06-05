@@ -8,7 +8,7 @@ use web_common::database::filter_structs::*;
 #[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Serialize, Deserialize, Default)]
 pub struct NestedUserEmail {
     pub inner: UserEmail,
-    pub created_by: User,
+    pub created_by: NestedUser,
     pub login_provider: NestedLoginProvider,
 }
 
@@ -25,7 +25,7 @@ impl NestedUserEmail {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            created_by: User::get(flat_variant.created_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
             login_provider: NestedLoginProvider::get(flat_variant.login_provider_id, connection)?,
             inner: flat_variant,
         })
@@ -306,7 +306,7 @@ impl From<web_common::database::nested_models::NestedUserEmail> for NestedUserEm
     fn from(item: web_common::database::nested_models::NestedUserEmail) -> Self {
         Self {
             inner: UserEmail::from(item.inner.as_ref().clone()),
-            created_by: User::from(item.created_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
             login_provider: NestedLoginProvider::from(item.login_provider.as_ref().clone()),
         }
     }
@@ -315,7 +315,7 @@ impl From<NestedUserEmail> for web_common::database::nested_models::NestedUserEm
     fn from(item: NestedUserEmail) -> Self {
         Self {
             inner: Rc::from(web_common::database::UserEmail::from(item.inner)),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
             login_provider: Rc::from(web_common::database::NestedLoginProvider::from(
                 item.login_provider,
             )),

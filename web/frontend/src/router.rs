@@ -1295,6 +1295,21 @@ impl Updatable for User {
     }
 }
 
+impl Viewable for NestedUser {
+    fn list_route() -> AppRoute {
+        AppRoute::Users {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::UsersView { id: self.inner.id }
+    }
+}
+
+impl Updatable for NestedUser {
+    fn update_route(&self) -> AppRoute {
+        AppRoute::UsersUpdate { id: self.inner.id }
+    }
+}
+
 impl Viewable for UsersUsersRoleInvitation {
     fn list_route() -> AppRoute {
         AppRoute::UsersUsersRoleInvitations {}
@@ -2151,7 +2166,7 @@ pub fn switch(route: AppRoute) -> Html {
             html! { <CreateTeamsUsersRoleForm user_id={user_id} /> }
         }
         AppRoute::Users => {
-            html! { <BasicList<User> /> }
+            html! { <BasicList<NestedUser> /> }
         }
         AppRoute::UsersView { id } => {
             html! { <UserPage id = {id} /> }

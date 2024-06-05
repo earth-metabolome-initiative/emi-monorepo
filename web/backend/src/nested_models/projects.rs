@@ -12,8 +12,8 @@ pub struct NestedProject {
     pub icon: FontAwesomeIcon,
     pub color: Color,
     pub parent_project: Option<Project>,
-    pub created_by: User,
-    pub updated_by: User,
+    pub created_by: NestedUser,
+    pub updated_by: NestedUser,
 }
 
 impl NestedProject {
@@ -40,8 +40,8 @@ impl NestedProject {
                     Project::get(parent_project_id, author_user_id, connection)
                 })
                 .transpose()?,
-            created_by: User::get(flat_variant.created_by, connection)?,
-            updated_by: User::get(flat_variant.updated_by, connection)?,
+            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
             inner: flat_variant,
         })
     }
@@ -440,8 +440,8 @@ impl From<web_common::database::nested_models::NestedProject> for NestedProject 
             icon: FontAwesomeIcon::from(item.icon.as_ref().clone()),
             color: Color::from(item.color.as_ref().clone()),
             parent_project: item.parent_project.as_deref().cloned().map(Project::from),
-            created_by: User::from(item.created_by.as_ref().clone()),
-            updated_by: User::from(item.updated_by.as_ref().clone()),
+            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
         }
     }
 }
@@ -456,8 +456,8 @@ impl From<NestedProject> for web_common::database::nested_models::NestedProject 
                 .parent_project
                 .map(web_common::database::Project::from)
                 .map(Rc::from),
-            created_by: Rc::from(web_common::database::User::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::User::from(item.updated_by)),
+            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
         }
     }
 }
