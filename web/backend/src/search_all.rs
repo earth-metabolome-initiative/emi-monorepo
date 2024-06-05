@@ -36,13 +36,12 @@ where
 /// The threshold is stored in the `pg_trgm.strict_word_similarity_threshold` configuration
 /// parameter. By default, this is 0.5.
 fn set_threshold(
-    threshold: f64,
+    threshold: f32,
     connection: &mut diesel::r2d2::PooledConnection<
         diesel::r2d2::ConnectionManager<diesel::PgConnection>,
     >,
 ) -> Result<(), web_common::api::ApiError> {
-    diesel::sql_query("SET pg_trgm.strict_word_similarity_threshold = ?")
-        .bind::<diesel::sql_types::Float8, _>(threshold)
+    diesel::sql_query(format!("SET pg_trgm.strict_word_similarity_threshold = {}", threshold))
         .execute(connection)
         .map_err(ApiError::from)?;
     Ok(())
@@ -87,7 +86,7 @@ pub(crate) fn search_all(
         results = results.into_iter().take(limit as usize).collect();
         // And we increase the threshold to the last result, so that the subsequent queries are
         // faster and stricter.
-        set_threshold(results.last().unwrap().1 as f64, connection)?;
+        set_threshold(results.last().unwrap().1, connection)?;
     }
 
     results.extend(
@@ -110,7 +109,7 @@ pub(crate) fn search_all(
         results = results.into_iter().take(limit as usize).collect();
         // And we increase the threshold to the last result, so that the subsequent queries are
         // faster and stricter.
-        set_threshold(results.last().unwrap().1 as f64, connection)?;
+        set_threshold(results.last().unwrap().1, connection)?;
     }
 
     results.extend(convert::<
@@ -134,7 +133,7 @@ pub(crate) fn search_all(
         results = results.into_iter().take(limit as usize).collect();
         // And we increase the threshold to the last result, so that the subsequent queries are
         // faster and stricter.
-        set_threshold(results.last().unwrap().1 as f64, connection)?;
+        set_threshold(results.last().unwrap().1, connection)?;
     }
 
     results.extend(convert::<
@@ -158,7 +157,7 @@ pub(crate) fn search_all(
         results = results.into_iter().take(limit as usize).collect();
         // And we increase the threshold to the last result, so that the subsequent queries are
         // faster and stricter.
-        set_threshold(results.last().unwrap().1 as f64, connection)?;
+        set_threshold(results.last().unwrap().1, connection)?;
     }
 
     results.extend(convert::<NestedSample, web_common::database::NestedSample>(
@@ -179,7 +178,7 @@ pub(crate) fn search_all(
         results = results.into_iter().take(limit as usize).collect();
         // And we increase the threshold to the last result, so that the subsequent queries are
         // faster and stricter.
-        set_threshold(results.last().unwrap().1 as f64, connection)?;
+        set_threshold(results.last().unwrap().1, connection)?;
     }
 
     results.extend(convert::<
@@ -203,7 +202,7 @@ pub(crate) fn search_all(
         results = results.into_iter().take(limit as usize).collect();
         // And we increase the threshold to the last result, so that the subsequent queries are
         // faster and stricter.
-        set_threshold(results.last().unwrap().1 as f64, connection)?;
+        set_threshold(results.last().unwrap().1, connection)?;
     }
 
     results.extend(convert::<
@@ -227,7 +226,7 @@ pub(crate) fn search_all(
         results = results.into_iter().take(limit as usize).collect();
         // And we increase the threshold to the last result, so that the subsequent queries are
         // faster and stricter.
-        set_threshold(results.last().unwrap().1 as f64, connection)?;
+        set_threshold(results.last().unwrap().1, connection)?;
     }
 
     results.extend(convert::<NestedTeam, web_common::database::NestedTeam>(
@@ -247,7 +246,7 @@ pub(crate) fn search_all(
         results = results.into_iter().take(limit as usize).collect();
         // And we increase the threshold to the last result, so that the subsequent queries are
         // faster and stricter.
-        set_threshold(results.last().unwrap().1 as f64, connection)?;
+        set_threshold(results.last().unwrap().1, connection)?;
     }
 
     results.extend(convert::<
@@ -270,7 +269,7 @@ pub(crate) fn search_all(
         results = results.into_iter().take(limit as usize).collect();
         // And we increase the threshold to the last result, so that the subsequent queries are
         // faster and stricter.
-        set_threshold(results.last().unwrap().1 as f64, connection)?;
+        set_threshold(results.last().unwrap().1, connection)?;
     }
 
     results.extend(convert::<
