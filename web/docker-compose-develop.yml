@@ -9,13 +9,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ADMINISTRATORS_TEAM_NAME: ${ADMINISTRATORS_TEAM_NAME}
-      PGPORT: ${PGPORT}
     volumes:
       - ${POSTGRES_DATABASE_DIRECTORY}:/var/lib/postgresql/data
       - ./backend/db_data:/app
     ports:
-      - "${PGPORT}:${PGPORT}"
+      - "${PGPORT}:5432"
     networks:
       - develop_backend
     restart: on-failure
@@ -53,7 +51,7 @@ services:
       args:
         ACTIX_PORT: ${ACTIX_PORT}
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DOCKER_DATABASE_URL: ${DOCKER_DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       RUST_BACKTRACE: ${RUST_BACKTRACE}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
@@ -71,7 +69,6 @@ services:
       REFRESH_TOKEN_MINUTES: ${REFRESH_TOKEN_MINUTES}
       ACTIX_PORT: ${ACTIX_PORT}
       ACTIX_WORKER_THREADS: ${ACTIX_WORKER_THREADS}
-      ADMINISTRATORS_TEAM_NAME: ${ADMINISTRATORS_TEAM_NAME}
       DOMAIN: ${DOMAIN}
     volumes:
       - ./:/app
