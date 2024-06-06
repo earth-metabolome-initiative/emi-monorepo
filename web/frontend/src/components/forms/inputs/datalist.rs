@@ -302,7 +302,9 @@ where
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         // If this is the first time the component is rendered, we want to
         // send a message to the server to get the list of candidates.
-        if (ctx.props().always_shows_candidates || ctx.props().builder.is_some()) && first_render || self.last_filter != ctx.props().filters {
+        if (ctx.props().always_shows_candidates || ctx.props().builder.is_some()) && first_render
+            || self.last_filter != ctx.props().filters
+        {
             ctx.link().send_message(DatalistMessage::SearchCandidates);
         }
     }

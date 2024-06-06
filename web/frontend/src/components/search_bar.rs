@@ -1,5 +1,4 @@
 //! A Yew-based search bar component to be placed in the navigator component.
-//!
 use crate::components::forms::Datalist;
 use web_common::database::SearchableStruct;
 use yew::prelude::*;

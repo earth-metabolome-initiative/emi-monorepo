@@ -123,7 +123,7 @@ pub enum InternalMessage {
     Frontend(HandlerId, ComponentMessage),
     Disconnect(Option<CloseReason>),
     User(Option<Rc<NestedUser>>),
-    Reconnect(String)
+    Reconnect(String),
 }
 
 impl WebsocketWorker {
@@ -279,12 +279,8 @@ impl WebsocketWorker {
     ) -> Result<futures::channel::mpsc::Sender<FrontendMessage>, String> {
         let endpoint = web_common::api::ws::FULL_ENDPOINT;
 
-        let websocket = WebSocket::open(&format!(
-            "wss://{}{}",
-            hostname,
-            endpoint
-        ))
-        .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
+        let websocket = WebSocket::open(&format!("wss://{}{}", hostname, endpoint))
+            .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
 
         match websocket.state() {
             gloo_net::websocket::State::Open => {}

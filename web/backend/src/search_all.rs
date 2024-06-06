@@ -41,9 +41,12 @@ fn set_threshold(
         diesel::r2d2::ConnectionManager<diesel::PgConnection>,
     >,
 ) -> Result<(), web_common::api::ApiError> {
-    diesel::sql_query(format!("SET pg_trgm.strict_word_similarity_threshold = {}", threshold))
-        .execute(connection)
-        .map_err(ApiError::from)?;
+    diesel::sql_query(format!(
+        "SET pg_trgm.strict_word_similarity_threshold = {}",
+        threshold
+    ))
+    .execute(connection)
+    .map_err(ApiError::from)?;
     Ok(())
 }
 

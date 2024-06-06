@@ -47,22 +47,22 @@ impl<T: AsRef<str>> FormatMatch for T {
             matches.sort_by(|a, b| a.matched_indices().min().cmp(&b.matched_indices().min()));
 
             let start = matches
-            .first()
-            .unwrap()
-            .matched_indices()
-            .min()
-            .unwrap()
-            .clone();
+                .first()
+                .unwrap()
+                .matched_indices()
+                .min()
+                .unwrap()
+                .clone();
             let mut prev_end = matches
                 .first()
                 .unwrap()
                 .matched_indices()
                 .max()
                 .unwrap()
-                .clone() + 1;
+                .clone()
+                + 1;
 
-            let mut formatted = self.as_ref()[..start]
-                .to_string();
+            let mut formatted = self.as_ref()[..start].to_string();
 
             formatted.push_str("<strong>");
             formatted.push_str(&self.as_ref()[start..prev_end]);
@@ -86,9 +86,7 @@ impl<T: AsRef<str>> FormatMatch for T {
 
             formatted.push_str(&self.as_ref()[prev_end..]);
 
-            yew::Html::from_html_unchecked(yew::AttrValue::from(
-                formatted
-            ))
+            yew::Html::from_html_unchecked(yew::AttrValue::from(formatted))
         }
     }
 

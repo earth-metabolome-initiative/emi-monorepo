@@ -11,7 +11,6 @@ use web_common::api::ApiError;
 #[get("/providers")]
 /// Returns a list of available OAuth2 providers.
 async fn get_providers(pool: web::Data<Pool<ConnectionManager<PgConnection>>>) -> impl Responder {
-
     let mut conn = pool.get().expect("couldn't get db connection from pool");
     let providers = NestedLoginProvider::all_viewable(None, None, None, &mut conn);
 

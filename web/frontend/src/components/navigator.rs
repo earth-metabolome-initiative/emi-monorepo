@@ -90,7 +90,9 @@ impl Component for Navigator {
         }));
 
         websocket.send(ComponentMessage::UserState(user_state.user()));
-        websocket.send(ComponentMessage::Connect(window().location().hostname().unwrap()));
+        websocket.send(ComponentMessage::Connect(
+            window().location().hostname().unwrap(),
+        ));
 
         Self {
             websocket,
