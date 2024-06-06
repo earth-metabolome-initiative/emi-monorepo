@@ -36,7 +36,7 @@ LANGUAGE plpgsql;
 -- The function `can_admin_sample_bio_ott_taxon_items` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
--- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
+-- and calls the parent column's can_admin function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the sample_bio_ott_taxon_items_users_roles table or
 -- the sample_bio_ott_taxon_items_teams_users table with an appropriate role id.
 CREATE FUNCTION can_admin_sample_bio_ott_taxon_items(author_user_id INTEGER, this_sample_bio_ott_taxon_items_sample_id UUID, this_sample_bio_ott_taxon_items_taxon_id INTEGER)
@@ -60,7 +60,7 @@ BEGIN
     IF author_user_id = this_created_by THEN
         RETURN TRUE;
     END IF;
-        IF NOT can_delete_samples(author_user_id, this_sample_id) THEN
+        IF NOT can_admin_samples(author_user_id, this_sample_id) THEN
             RETURN FALSE;
         END IF;
     RETURN TRUE;

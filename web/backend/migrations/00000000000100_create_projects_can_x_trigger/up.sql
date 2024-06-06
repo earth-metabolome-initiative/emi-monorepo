@@ -73,7 +73,7 @@ EXECUTE FUNCTION can_update_projects_trigger();
 -- The function `can_admin_projects` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
--- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
+-- and calls the parent column's can_admin function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the projects_users_roles table or
 -- the projects_teams_users table with an appropriate role id.
 CREATE OR REPLACE FUNCTION can_admin_projects(author_user_id INTEGER, this_projects_id INTEGER)
@@ -106,9 +106,9 @@ BEGIN
     IF EXISTS (SELECT 1 FROM projects_users_roles WHERE projects_users_roles.user_id = author_user_id AND projects_users_roles.role_id <= 1 AND projects_users_roles.table_id = this_projects_id) THEN
         RETURN TRUE;
     END IF;
--- If the parent column is not NULL, we call the can_delete function of the parent column to determine whether the user can edit the row.
+-- If the parent column is not NULL, we call the can_admin function of the parent column to determine whether the user can edit the row.
     IF this_parent_project_id IS NOT NULL THEN
-        IF NOT can_delete_projects(author_user_id, this_parent_project_id) THEN
+        IF NOT can_admin_projects(author_user_id, this_parent_project_id) THEN
             RETURN FALSE;
         END IF;
     END IF;

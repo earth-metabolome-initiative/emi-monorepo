@@ -49,7 +49,7 @@ EXECUTE FUNCTION can_update_users_trigger();
 -- The function `can_admin_users` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
--- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
+-- and calls the parent column's can_admin function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the users_users_roles table or
 -- the users_teams_users table with an appropriate role id.
 CREATE FUNCTION can_admin_users(author_user_id INTEGER, this_users_id INTEGER)

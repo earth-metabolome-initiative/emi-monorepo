@@ -40,7 +40,7 @@ LANGUAGE plpgsql;
 -- The function `can_admin_teams_users_role_invitations` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
--- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
+-- and calls the parent column's can_admin function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the teams_users_role_invitations_users_roles table or
 -- the teams_users_role_invitations_teams_users table with an appropriate role id.
 CREATE FUNCTION can_admin_teams_users_role_invitations(author_user_id INTEGER, this_teams_users_role_invitations_table_id INTEGER, this_teams_users_role_invitations_user_id INTEGER)
@@ -65,10 +65,10 @@ BEGIN
     IF author_user_id = this_created_by THEN
         RETURN TRUE;
     END IF;
-        IF can_delete_teams(author_user_id, this_table_id) THEN
+        IF can_admin_teams(author_user_id, this_table_id) THEN
             RETURN TRUE;
         END IF;
-        IF can_delete_users(author_user_id, this_user_id) THEN
+        IF can_admin_users(author_user_id, this_user_id) THEN
             RETURN TRUE;
         END IF;
     RETURN FALSE;
