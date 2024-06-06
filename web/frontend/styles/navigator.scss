@@ -62,7 +62,7 @@ nav {
     }
 
     &.focus {
-      width: 80%;
+      width: 90%;
       .badges-container {
         display: grid;
       }
@@ -91,6 +91,8 @@ nav {
         background-color: rgba(255, 255, 255, 0.8);
         padding: 0.25em;
         margin: 0;
+        max-height: 80vh;
+        overflow-y: scroll;
         border: 1px solid $primary;
         border-top: none;
         box-sizing: border-box;
@@ -107,8 +109,7 @@ nav {
 @media (max-width: $small-screen-width) {
   nav {
     h1 {
-      display: inline-block;
-      padding-left: 0.5em;
+      display: none;
     }
     .search {
       padding: 0 0.5em;
