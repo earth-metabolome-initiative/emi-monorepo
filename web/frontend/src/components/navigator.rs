@@ -144,7 +144,7 @@ impl Component for Navigator {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         // On click, we send a message to the store to toggle the sidebar.
-        let onclick = {
+        let toggle = {
             let link = ctx.link().clone();
             Callback::from(move |_| {
                 link.send_message(NavigatorMessage::ToggleSidebar);
@@ -154,7 +154,7 @@ impl Component for Navigator {
         html! {
             <>
                 <nav>
-                    <Hamburger is_active = {self.sidebar_open()} onclick = {onclick}/>
+                    <Hamburger is_active = {self.sidebar_open()} onclick = {toggle.clone()}/>
                     <h1>
                         <Link<AppRoute> classes="logo" to={AppRoute::Home}>
                             {"EMI"}
@@ -179,7 +179,7 @@ impl Component for Navigator {
                         </Link<AppRoute>>
                     }
                 </nav>
-                <Sidebar visible={self.sidebar_open()} />
+                <Sidebar visible={self.sidebar_open()} onclose={toggle} />
             </>
         }
     }

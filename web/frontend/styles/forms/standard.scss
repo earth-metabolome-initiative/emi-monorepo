@@ -28,6 +28,14 @@
         padding-top: 0.25em;
     }
 
+    input {
+        background-color: white;
+        transition: background-color 0.2s;
+        &:disabled {
+            background-color: $light_grey;
+        }
+    }
+
     input[type="number"],
     input[type="search"],
     input[type="datetime-local"],

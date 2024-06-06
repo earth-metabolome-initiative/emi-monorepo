@@ -118,16 +118,6 @@ form, .search {
         cursor: pointer;
     }
 
-    &.small {
-        border: 1px solid;
-        width: auto;
-        box-sizing: border-box;
-        padding: 0.25rem;
-        border-color: $light_grey;
-        display : flex;
-        align-items : center;
-    }
-
     ul.badges-list {
         list-style: none;
         padding: 0;
@@ -176,6 +166,30 @@ form, .search {
                 max-width: 2em;
             }
         }
+    }
+
+    &.small {
+        border: 1px solid;
+        width: auto;
+        box-sizing: border-box;
+        padding: 0.25rem;
+        border-color: $light_grey;
+        display : flex;
+        align-items : center;
+
+        @media (max-width: $small-screen-width) {
+            &.has-image {
+                padding: 0;
+                border-radius: 100%;
+                img.badge-image {
+                    position: initial;
+                    border-radius: 100%;
+                }
+                p.badge-title {
+                    display: none;
+                }
+            }
+        }          
     }
 
     &.closable {

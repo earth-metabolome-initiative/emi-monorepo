@@ -39,6 +39,7 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "use web_common::database::*;",
         "use crate::router::AppRoute;",
         "use super::logout::Logout;",
+        "use yew_hooks::prelude::*;",
         "use crate::components::basic_page::PageLike;",
         "use crate::stores::user_state::UserState;",
     ]

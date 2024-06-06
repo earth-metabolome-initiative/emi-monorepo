@@ -26,9 +26,6 @@ nav {
     height: auto;
   }
   .hamburger {
-    position: absolute;
-    left: 0;
-    top: 0;
     display: none;
   }
   a {
@@ -110,7 +107,7 @@ nav {
   nav {
     h1 {
       display: inline-block;
-      padding-left: 50px;
+      padding-left: 0.5em;
     }
     .hamburger {
       display: inline-block;
