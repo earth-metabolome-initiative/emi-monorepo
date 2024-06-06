@@ -14,7 +14,7 @@ use yewdux::use_store;
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct SidebarProps {
     pub visible: bool,
-    pub onclose: Callback<()>,
+    pub onclose: Callback<bool>,
 }
 
 #[function_component(Sidebar)]
@@ -27,7 +27,7 @@ pub fn sidebar(props: &SidebarProps) -> Html {
     let visible = props.visible;
     use_click_away(node.clone(), move |_: Event| {
         if visible {
-            onclose.emit(());
+            onclose.emit(!visible);
         }
     });
 
