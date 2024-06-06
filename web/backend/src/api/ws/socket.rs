@@ -33,16 +33,16 @@ pub struct WebSocket {
 }
 
 impl WebSocket {
-    pub fn new(diesel: DBPool, sqlx: SQLxPool<Postgres>, redis: redis::Client) -> Self {
-        Self {
+    pub fn new(diesel: DBPool, sqlx: SQLxPool<Postgres>, redis: redis::Client) -> Result<Self, ApiError> {
+        Ok(Self {
             notifications_handler: None,
             user: None,
-            diesel_connection: diesel.get().unwrap(),
+            diesel_connection: diesel.get().map_err(ApiError::from)?,
             diesel,
             _redis: redis,
             sqlx,
             continuation_bytes: Vec::new(),
-        }
+        })
     }
 
     fn user(&self) -> Option<&NestedUser> {
@@ -72,7 +72,7 @@ impl WebSocket {
         self.user.is_some()
     }
 
-    fn listen_for_notifications(&mut self, ctx: &mut <WebSocket as Actor>::Context) {
+    fn listen_for_notifications(&mut self, ctx: &mut <WebSocket as Actor>::Context) -> Result<(), ApiError>{
         // If the handler is stopped or was never started, start it.
         if self.notifications_handler.is_none() {
             if let Some((user, _)) = &self.user {
@@ -80,7 +80,7 @@ impl WebSocket {
                 let address = ctx.address().clone();
                 let channel_name = format!("user_{}", user.inner.id);
                 let pool = self.sqlx.clone();
-                let mut diesel_connection = self.diesel.get().unwrap();
+                let mut diesel_connection = self.diesel.get().map_err(ApiError::from)?;
                 let maybe_user_id = self.user().map(|user| user.inner.id);
                 self.notifications_handler = Some(
                     ctx.spawn(
@@ -128,6 +128,7 @@ impl WebSocket {
                 );
             }
         }
+        Ok(())
     }
 }
 
@@ -135,7 +136,7 @@ impl Actor for WebSocket {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        self.listen_for_notifications(ctx);
+        let _ = self.listen_for_notifications(ctx);
         if self.is_authenticated() {
             ctx.address().do_send(BackendMessage::RefreshUser(
                 self.user().unwrap().clone().into(),
