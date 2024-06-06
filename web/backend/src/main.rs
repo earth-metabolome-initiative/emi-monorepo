@@ -36,7 +36,8 @@ async fn frontend_static_files(req: HttpRequest) -> impl Responder {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let database_url =
+        std::env::var("DOCKER_DATABASE_URL").expect("DOCKER_DATABASE_URL must be set");
 
     // create db connection pool
     let manager = ConnectionManager::<PgConnection>::new(&database_url);
