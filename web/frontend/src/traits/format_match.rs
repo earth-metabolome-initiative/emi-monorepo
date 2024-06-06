@@ -37,57 +37,12 @@ pub trait FormatMatch {
 
 impl<T: AsRef<str>> FormatMatch for T {
     fn format_match<S: AsRef<str>>(&self, query: S) -> yew::Html {
-        let mut matches = custom_best_matches(query, self);
-        if matches.is_empty() {
-            yew::Html::from(self.as_ref().to_string())
-        } else {
-            // In order to properly format the string, we need to sort the matches
-            // by their start index. If it happens that after sorting a match starts
-            // before the previous match ends, we keep the largest match.
-            matches.sort_by(|a, b| a.matched_indices().min().cmp(&b.matched_indices().min()));
-
-            let start = matches
-                .first()
-                .unwrap()
-                .matched_indices()
-                .min()
-                .unwrap()
-                .clone();
-            let mut prev_end = matches
-                .first()
-                .unwrap()
-                .matched_indices()
-                .max()
-                .unwrap()
-                .clone()
-                + 1;
-
-            let mut formatted = self.as_ref()[..start].to_string();
-
-            formatted.push_str("<strong>");
-            formatted.push_str(&self.as_ref()[start..prev_end]);
-            formatted.push_str("</strong>");
-
-            for m in matches.into_iter().skip(1) {
-                let start = m.matched_indices().min().unwrap().clone();
-                let end = m.matched_indices().max().unwrap().clone() + 1;
-
-                if start > prev_end {
-                    formatted.push_str(&self.as_ref()[prev_end..start]);
-                    formatted.push_str("<strong>");
-                    formatted.push_str(&self.as_ref()[start..end]);
-                    formatted.push_str("</strong>");
-                } else {
-                    continue;
-                }
-
-                prev_end = end;
-            }
-
-            formatted.push_str(&self.as_ref()[prev_end..]);
-
-            yew::Html::from_html_unchecked(yew::AttrValue::from(formatted))
-        }
+        yew::Html::from_html_unchecked(yew::AttrValue::from(
+            best_match(query.as_ref(), self.as_ref()).map_or_else(
+                || self.as_ref().to_owned(),
+                |match_value| format_simple(&match_value, self.as_ref(), "<strong>", "</strong>"),
+            ),
+        ))
     }
 
     fn maybe_format_match<S: AsRef<str>>(&self, query: Option<S>) -> yew::Html {
