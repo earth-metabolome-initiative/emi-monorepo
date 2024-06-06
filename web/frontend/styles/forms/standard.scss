@@ -33,6 +33,7 @@
         transition: background-color 0.2s;
         &:disabled {
             background-color: $light_grey;
+            cursor: not-allowed;
         }
     }
 
