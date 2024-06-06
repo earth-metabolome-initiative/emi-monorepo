@@ -30,3 +30,6 @@ __pycache__/
 
 # Ignore the rustc-ice dumps
 rustc-ice-*.txt
+certbot
+logs
+database_deploy

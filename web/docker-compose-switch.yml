@@ -1,0 +1,37 @@
+name: emi-nginx-switch
+services:
+  nginx:
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    build:
+      context: ./nginx
+      dockerfile: DockerfileSwitch
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+      - 9.9.9.9
+    environment:
+      DEVELOP_NGINX_HTTPS_PORT: ${DEVELOP_NGINX_HTTPS_PORT}
+      DEPLOY_NGINX_HTTPS_PORT: ${DEPLOY_NGINX_HTTPS_PORT}
+      DEPLOY_DOMAIN: ${DEPLOY_DOMAIN}
+      DEVELOP_DOMAIN: ${DEVELOP_DOMAIN}
+      NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
+    network_mode: host
+    volumes:
+      - ./nginx:/app
+      - ./logs:/logs
+    restart: unless-stopped
+
+  # certbot:
+  #   image: certbot/certbot:latest
+  #   volumes:
+  #     - ./certbot/www:/var/www/certbot/:rw
+  #     - ./certbot/conf/:/etc/letsencrypt:rw
+  #   restart: unless-stopped
+  #   entrypoint: ["/bin/sh", "-c"]
+  #   command:
+  #     - |
+  #       while true; do
+  #         certbot renew --nginx
+  #         sleep 3600
+  #       done

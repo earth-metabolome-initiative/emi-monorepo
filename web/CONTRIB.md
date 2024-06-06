@@ -59,13 +59,28 @@ Different platforms have different ways of installing Docker, so we will not cov
 To start the docker compose, you need to run the following command:
 
 ```bash
-docker-compose -f docker-compose.yml up -d --build -V
+docker compose -f docker-compose-develop.yml --env-file .env_develop up -d --build -V
 ```
 
 To start the deployment version of the platform, you need to run the following command:
 
 ```bash
-docker compose -f docker-compose-deploy.yml up -d --build -V
+docker compose -f docker-compose-deploy.yml --env-file .env_deploy up -d --build -V
+```
+
+### Starting the NGINX Switch
+
+To start the NGINX switch, you need to run the following command:
+
+```bash
+docker compose -f docker-compose-switch.yml --env-file .env_switch up -d --build -V
+```
+
+## Stopping all dockers
+The following will stop ALL dockers in the system:
+
+```bash
+docker stop $(docker ps -a -q)
 ```
 
 ### Integrity errors

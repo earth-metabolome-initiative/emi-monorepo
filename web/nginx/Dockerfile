@@ -6,5 +6,5 @@ RUN apt-get update && apt-get install -y tmux
 WORKDIR /app
 
 # Start Nginx
-CMD tmux new-session -s nginx 'bash /app/start.sh'
+CMD tmux new-session -s nginx 'bash /app/start.sh develop'
 

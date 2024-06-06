@@ -40,6 +40,8 @@ pub struct WebsocketWorker {
 pub enum ComponentMessage {
     Operation(Operation),
     UserState(Option<Rc<NestedUser>>),
+    // Connect to the provided hostname.
+    Connect(String),
 }
 
 impl ComponentMessage {
@@ -121,7 +123,7 @@ pub enum InternalMessage {
     Frontend(HandlerId, ComponentMessage),
     Disconnect(Option<CloseReason>),
     User(Option<Rc<NestedUser>>),
-    Reconnect,
+    Reconnect(String)
 }
 
 impl WebsocketWorker {
@@ -272,13 +274,14 @@ impl WebsocketWorker {
     }
 
     fn connect_to_websocket(
+        hostname: &str,
         scope: &yew_agent::prelude::WorkerScope<Self>,
     ) -> Result<futures::channel::mpsc::Sender<FrontendMessage>, String> {
         let endpoint = web_common::api::ws::FULL_ENDPOINT;
 
         let websocket = WebSocket::open(&format!(
             "wss://{}{}",
-            include_str!("../../.domain"),
+            hostname,
             endpoint
         ))
         .map_err(|err| format!("Error opening websocket connection: {:?}", err))?;
@@ -305,6 +308,8 @@ impl WebsocketWorker {
             log::debug!("Websocket sender closed");
         });
 
+        let hostname = hostname.to_owned();
+
         {
             let scope = scope.clone();
             spawn_local(async move {
@@ -324,7 +329,7 @@ impl WebsocketWorker {
                         }
                     }
                 }
-                scope.send_message(InternalMessage::Reconnect);
+                scope.send_message(InternalMessage::Reconnect(hostname));
             });
         }
 
@@ -342,7 +347,7 @@ impl Worker for WebsocketWorker {
             subscribers: HashSet::new(),
             tasks: HashMap::new(),
             user: None,
-            websocket_sender: Self::connect_to_websocket(&scope).ok(),
+            websocket_sender: None,
             database_sender: Self::connect_to_database(scope.clone()),
             reconnection_attempt: 0,
         }
@@ -433,6 +438,9 @@ impl Worker for WebsocketWorker {
             }
             InternalMessage::Frontend(subscriber_id, message) => {
                 match message {
+                    ComponentMessage::Connect(hostname) => {
+                        scope.send_message(InternalMessage::Reconnect(hostname));
+                    }
                     ComponentMessage::UserState(user) => {
                         scope.send_message(InternalMessage::User(user));
                     }
@@ -476,13 +484,13 @@ impl Worker for WebsocketWorker {
                     });
                 }
             }
-            InternalMessage::Reconnect => {
+            InternalMessage::Reconnect(hostname) => {
                 if let Some(mut sender) = self.websocket_sender.take() {
                     spawn_local(async move {
                         let _ = sender.close().await;
                     });
                 }
-                if let Ok(sender) = Self::connect_to_websocket(scope) {
+                if let Ok(sender) = Self::connect_to_websocket(&hostname, scope) {
                     log::debug!("Reconnected to websocket");
                     self.reconnection_attempt = 0;
                     self.websocket_sender = Some(sender);
@@ -495,7 +503,7 @@ impl Worker for WebsocketWorker {
                     self.reconnection_attempt += 1;
                     let scope = scope.clone();
                     Timeout::new(2_u32.pow(self.reconnection_attempt) * 1000, move || {
-                        scope.send_message(InternalMessage::Reconnect);
+                        scope.send_message(InternalMessage::Reconnect(hostname));
                     })
                     .forget();
                 }

@@ -47,7 +47,6 @@ struct JWTConfig {
 
 impl JWTConfig {
     pub fn from_env() -> Result<JWTConfig, String> {
-        dotenvy::dotenv().ok();
         Ok(JWTConfig {
             access_token_base_64_public_key: env::var("ACCESS_TOKEN_PUBLIC_KEY")
                 .map_err(|e| e.to_string())?,
@@ -307,7 +306,6 @@ mod refresh_token_tests {
 
     #[test]
     fn test_encode_decode() {
-        dotenvy::dotenv().ok();
         let user_id = 45678;
         let token = JsonRefreshToken::new(user_id).unwrap();
         let encoded = token.encode().unwrap();
@@ -388,7 +386,6 @@ mod access_token_tests {
 
     #[test]
     fn test_encode_decode() {
-        dotenvy::dotenv().ok();
         let user_id = 987654;
         let token = JsonAccessToken::new(user_id).unwrap();
         let encoded = token.encode().unwrap();

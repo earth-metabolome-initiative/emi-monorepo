@@ -32,7 +32,6 @@ impl GitHubConfig {
     pub fn from_env(
         pool: &Pool<ConnectionManager<PgConnection>>,
     ) -> Result<GitHubConfig, ApiError> {
-        dotenvy::dotenv().ok();
         let client_secret = env::var("GITHUB_CLIENT_SECRET");
 
         if client_secret.is_err() {

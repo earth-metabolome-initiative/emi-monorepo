@@ -4,7 +4,6 @@ DOMAIN='emi.local'
 ACTIX_PORT=8080
 TRUNK_PORT=3000
 NGINX_WORKER_PROCESSES=4
-NGINX_HTTP_PORT=80
 NGINX_HTTPS_PORT=443
 ACTIX_WORKER_THREADS=4
 # We set the RUST_LOG environment variable to debug
@@ -29,9 +28,6 @@ DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_DOCKE
 # It is recommended to use a large disk for this
 # as the database can grow to be very large
 POSTGRES_DATABASE_DIRECTORY='path/to/large/disk'
-# Similarly, the following is the directory where the documents will be stored.
-# It is recommended to use a large disk for this as well.
-DOCUMENTS_DIRECTORY='/app/documents_tmp'
 # In order to provide Oauth authentication for the API
 # you need to provide the client id and client secret
 # for the application that you have created in ORCID

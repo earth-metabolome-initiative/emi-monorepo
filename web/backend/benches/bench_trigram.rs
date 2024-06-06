@@ -198,7 +198,6 @@ fn ngrammatic_bitvec_trigram_par_search_lowercased(c: &mut Criterion) {
 }
 
 // fn postgres_similarity(c: &mut Criterion) {
-//     dotenvy::dotenv().ok();
 //     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
 //     // create db connection pool
@@ -239,7 +238,6 @@ fn ngrammatic_bitvec_trigram_par_search_lowercased(c: &mut Criterion) {
 // }
 
 // fn postgres_word_similarity(c: &mut Criterion) {
-//     dotenvy::dotenv().ok();
 //     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
 //     // create db connection pool
@@ -280,7 +278,6 @@ fn ngrammatic_bitvec_trigram_par_search_lowercased(c: &mut Criterion) {
 // }
 
 fn postgres_strict_word_similarity(c: &mut Criterion) {
-    dotenvy::dotenv().ok();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     // create db connection pool

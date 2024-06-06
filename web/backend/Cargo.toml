@@ -14,7 +14,6 @@ description = "Backend for the Earth Metabolome Initiative"
 
 [dependencies]
 chrono = { version = "0.4.31", features = ["serde"] }
-dotenvy = "0.15.7"
 diesel = { version = "2.2", features = ["serde_json", "postgres", "r2d2", "chrono", "uuid", "extras"] } # uuidv07
 serde = { version = "1.0.195", features = ["derive"] }
 sqlx = { version = "0.7.3", features = ["runtime-async-std-native-tls", "postgres", "chrono", "uuid"] }

@@ -26,6 +26,7 @@ use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 
 use crate::components::Badge;
+use gloo::utils::window;
 use web_common::database::NestedUser;
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
@@ -89,6 +90,7 @@ impl Component for Navigator {
         }));
 
         websocket.send(ComponentMessage::UserState(user_state.user()));
+        websocket.send(ComponentMessage::Connect(window().location().hostname().unwrap()));
 
         Self {
             websocket,

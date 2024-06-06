@@ -2,7 +2,6 @@
 FROM rust:latest
 
 ARG ACTIX_PORT
-ARG DOCUMENTS_DIRECTORY
 
 # Expose the port that the Actix server will run on
 EXPOSE $ACTIX_PORT
@@ -24,5 +23,5 @@ WORKDIR /app/backend
 
 # We run the Actix server by executing inside a TMUX session
 # the bash script called `start.sh`
-CMD tmux new-session -s actix 'bash /app/backend/start.sh'
+CMD tmux new-session -s actix-development 'bash /app/backend/start.sh'
 

@@ -1,0 +1,89 @@
+worker_processes ${NGINX_WORKER_PROCESSES};
+
+events {
+    worker_connections 1024;
+}
+
+http {
+
+    proxy_read_timeout 1800;
+    proxy_connect_timeout 1800;
+    proxy_send_timeout 1800;
+    send_timeout 1800;
+
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name ${DEVELOP_DOMAIN};
+
+        # Redirect HTTP requests to HTTPS
+        return 301 https://§server_name§request_uri;
+    }
+
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name ${DEPLOY_DOMAIN};
+
+        server_tokens off;      
+                                                                                        
+        location /.well-known/acme-challenge/ { 
+            root /var/www/certbot;
+        }
+    }
+
+    server {
+        listen 80 default_server;
+        server_name _;
+        # Redirect HTTP requests to HTTPS
+        return 301 https://§host§request_uri;
+    }
+
+    upstream develop {
+        server localhost:${DEVELOP_NGINX_HTTPS_PORT};
+    }
+
+    upstream deploy {
+        server localhost:${DEPLOY_NGINX_HTTPS_PORT};
+    }
+
+    server {
+        listen 443 ssl;
+        server_name ${DEVELOP_DOMAIN};
+
+        ssl_certificate /app/${DEVELOP_DOMAIN}.pem;
+        ssl_certificate_key /app/${DEVELOP_DOMAIN}-key.pem;
+
+        location / {
+            proxy_pass https://develop;
+            proxy_set_header Host §host;
+            proxy_set_header X-Real-IP §remote_addr;
+            proxy_set_header X-Forwarded-For §proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto §scheme;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade §http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_buffering off;
+        }
+    }
+
+    server {
+        listen 443 ssl;
+        server_name ${DEPLOY_DOMAIN};
+
+        ssl_certificate /app/${DEPLOY_DOMAIN}.pem;
+        ssl_certificate_key /app/${DEPLOY_DOMAIN}-key.pem;
+
+        location / {
+            proxy_pass https://deploy;
+            proxy_set_header Host §host;
+            proxy_set_header X-Real-IP §remote_addr;
+            proxy_set_header X-Forwarded-For §proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto §scheme;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade §http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_buffering off;
+        }
+    }
+}

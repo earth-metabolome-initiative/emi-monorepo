@@ -17,7 +17,7 @@ services:
     ports:
       - "${PGPORT}:${PGPORT}"
     networks:
-      - backend
+      - develop_backend
     restart: on-failure
 
   pgadmin:
@@ -30,22 +30,18 @@ services:
     ports:
       - "${PGADMIN_PORT}:80"
     networks:
-      - backend
+      - develop_backend
     depends_on:
       - postgres
     restart: on-failure
 
   redis:
     image: redis:latest
-    environment:
-      REDIS_PORT: ${REDIS_PORT}
     volumes:
       - ${REDIS_DATABASE_DIRECTORY}:/data
-    # ports:
-    #   - ${REDIS_PORT}:${REDIS_PORT}
     command: --port ${REDIS_PORT}
     networks:
-      - backend
+      - develop_backend
     restart: on-failure
 
   actix-server:
@@ -56,7 +52,6 @@ services:
       dockerfile: Dockerfile
       args:
         ACTIX_PORT: ${ACTIX_PORT}
-        DOCUMENTS_DIRECTORY: ${DOCUMENTS_DIRECTORY}
     environment:
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
@@ -77,17 +72,14 @@ services:
       ACTIX_PORT: ${ACTIX_PORT}
       ACTIX_WORKER_THREADS: ${ACTIX_WORKER_THREADS}
       ADMINISTRATORS_TEAM_NAME: ${ADMINISTRATORS_TEAM_NAME}
-      DOCUMENTS_DIRECTORY: ${DOCUMENTS_DIRECTORY}
       DOMAIN: ${DOMAIN}
     volumes:
       - ./:/app
-    ports:
-     - "${ACTIX_PORT}:${ACTIX_PORT}"
     depends_on:
       - postgres
       - redis
     networks:
-      - backend
+      - develop_backend
     restart: on-failure
 
   yew-frontend:
@@ -105,48 +97,37 @@ services:
       RUST_BACKTRACE: ${RUST_BACKTRACE}
     volumes:
       - ./:/app
-    ports:
-     - "${TRUNK_PORT}:${TRUNK_PORT}"
     depends_on:
       - actix-server
     networks:
-      - frontend
-      - backend
+      - develop_frontend
+      - develop_backend
 
   nginx:
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     build:
       context: ./nginx
-      args:
-        ACTIX_PORT: ${ACTIX_PORT}
-        TRUNK_PORT: ${TRUNK_PORT}
-        NGINX_HTTP_PORT: ${NGINX_HTTP_PORT}
-        NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
-        DOMAIN: ${DOMAIN}
-        NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
     volumes:
       - ./nginx:/app
     environment:
       ACTIX_PORT: ${ACTIX_PORT}
       TRUNK_PORT: ${TRUNK_PORT}
-      NGINX_HTTP_PORT: ${NGINX_HTTP_PORT}
       NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
       DOMAIN: ${DOMAIN}
       NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
     ports:
-      # - "${NGINX_HTTP_PORT}:${NGINX_HTTP_PORT}"
       - "${NGINX_HTTPS_PORT}:${NGINX_HTTPS_PORT}"
     depends_on:
       - actix-server
       - yew-frontend
     networks:
-      - frontend
-      - backend
+      - develop_frontend
+      - develop_backend
     restart: on-failure
 
 networks:
-  frontend:
+  develop_frontend:
     driver: bridge
-  backend:
+  develop_backend:
     driver: bridge

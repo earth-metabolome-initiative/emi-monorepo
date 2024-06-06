@@ -16,7 +16,7 @@ services:
     ports:
       - "${PGPORT}:${PGPORT}"
     networks:
-      - backend
+      - deploy_backend
     restart: on-failure
 
   pgadmin:
@@ -29,22 +29,18 @@ services:
     ports:
       - "${PGADMIN_PORT}:80"
     networks:
-      - backend
+      - deploy_backend
     depends_on:
       - postgres
     restart: on-failure
 
   redis:
     image: redis:latest
-    environment:
-      REDIS_PORT: ${REDIS_PORT}
     volumes:
       - ${REDIS_DATABASE_DIRECTORY}:/data
-    # ports:
-    #   - ${REDIS_PORT}:${REDIS_PORT}
     command: --port ${REDIS_PORT}
     networks:
-      - backend
+      - deploy_backend
     restart: on-failure
 
   actix-server:
@@ -55,7 +51,6 @@ services:
       dockerfile: DockerfileDeploy
       args:
         ACTIX_PORT: ${ACTIX_PORT}
-        DOCUMENTS_DIRECTORY: ${DOCUMENTS_DIRECTORY}
     environment:
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
@@ -75,45 +70,37 @@ services:
       REFRESH_TOKEN_MINUTES: ${REFRESH_TOKEN_MINUTES}
       ACTIX_PORT: ${ACTIX_PORT}
       ACTIX_WORKER_THREADS: ${ACTIX_WORKER_THREADS}
-      DOCUMENTS_DIRECTORY: ${DOCUMENTS_DIRECTORY}
       DOMAIN: ${DOMAIN}
     volumes:
       - ./:/app
-    ports:
-      - "${ACTIX_PORT}:${ACTIX_PORT}"
     depends_on:
       - postgres
       - redis
     networks:
-      - backend
+      - deploy_backend
 
   nginx:
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
     build:
       context: ./nginx
       dockerfile: DockerfileDeploy
-      args:
-        ACTIX_PORT: ${ACTIX_PORT}
-        NGINX_HTTP_PORT: ${NGINX_HTTP_PORT}
-        NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
-        DOMAIN: ${DOMAIN}
-        NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
     volumes:
       - ./nginx:/app
     environment:
       ACTIX_PORT: ${ACTIX_PORT}
-      NGINX_HTTP_PORT: ${NGINX_HTTP_PORT}
       NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT}
       DOMAIN: ${DOMAIN}
       NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES}
     ports:
-      - "${NGINX_HTTP_PORT}:${NGINX_HTTP_PORT}"
       - "${NGINX_HTTPS_PORT}:${NGINX_HTTPS_PORT}"
     restart: on-failure
     depends_on:
       - actix-server
     networks:
-      - backend
+      - deploy_backend
 
 networks:
-  backend:
+  deploy_backend:
     driver: bridge
+
