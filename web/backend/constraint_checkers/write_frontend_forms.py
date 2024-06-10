@@ -179,10 +179,7 @@ def write_frontend_builder_action_enumeration(
         if is_builder_reserved_attribute(attribute):
             continue
 
-        if (
-            attribute.data_type() in INPUT_TYPE_MAP
-            or attribute.data_type() == "NaiveDateTime"
-        ):
+        if attribute.data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
             document.write(
                 f"    Set{attribute.capitalized_normalized_name()}(Option<String>),\n"
             )
@@ -331,12 +328,12 @@ def write_frontend_builder_action_enumeration(
                 "                }\n"
             )
 
-        if attribute.data_type() == "NaiveDateTime":
+        if attribute.is_date_type():
             # We convert the dates provided from the date picker to the NaiveDateTime format.
             # The dates from a datetime-local input are in the format "YYYY-MM-DDTHH:MM".
             document.write(
                 f"                match {attribute.name} {{\n"
-                f'                    Some(value) => match NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {{\n'
+                f'                    Some(value) => match chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {{\n'
                 f"                        Ok({attribute.name}) => state_mut.{attribute.name} = Some({attribute.name}),\n"
                 f"                        Err(_) => state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
                 f'                            "The {attribute.name} field must be a valid date and time.".to_string()\n'
@@ -555,7 +552,10 @@ def write_frontend_form_builder_implementation(
 
         if struct_attribute is not None:
             rc_variant = ""
-            if not struct_attribute.implements_copy() and struct_attribute.data_type() != "String":
+            if (
+                not struct_attribute.implements_copy()
+                and struct_attribute.data_type() != "String"
+            ):
                 rc_variant = ".map(Rc::from)"
             if struct_attribute.optional:
                 document.write(
@@ -574,13 +574,10 @@ def write_frontend_form_builder_implementation(
                 rc_variant_intermediate = ""
                 if not struct_attribute.implements_copy():
                     rc_variant = ".map(Rc::from)"
-                    rc_variant_intermediate_option = ".as_deref().cloned()"                
+                    rc_variant_intermediate_option = ".as_deref().cloned()"
                     rc_variant_intermediate = ".as_ref().clone()"
 
-                if (
-                    attribute.data_type() in INPUT_TYPE_MAP
-                    or attribute.data_type() == "NaiveDateTime"
-                ):
+                if attribute.data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
                     if struct_attribute.optional:
                         document.write(
                             f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(richest_variant.inner.{attribute.name}.as_ref().map(|{attribute.name}| {attribute.name}.to_string())));\n"
@@ -694,7 +691,13 @@ def write_frontend_form_builder_implementation(
                     )
         elif variant.is_update_variant():
             for primary_key in primary_keys:
-                if variant.is_update_variant() and builder.has_attribute(primary_key) and not builder.get_attribute_by_name(primary_key.name).has_struct_data_type():
+                if (
+                    variant.is_update_variant()
+                    and builder.has_attribute(primary_key)
+                    and not builder.get_attribute_by_name(
+                        primary_key.name
+                    ).has_struct_data_type()
+                ):
                     document.write(
                         f"            {primary_key.name}: builder.{primary_key.name}.unwrap(),\n"
                     )
@@ -702,9 +705,13 @@ def write_frontend_form_builder_implementation(
                     richest_variant_attribute = richest_variant.get_attribute_by_name(
                         primary_key.normalized_name()
                     )
-                    richest_variant_attribute_struct = richest_variant_attribute.raw_data_type()
+                    richest_variant_attribute_struct = (
+                        richest_variant_attribute.raw_data_type()
+                    )
 
-                    inner_primary_keys = richest_variant_attribute_struct.get_primary_keys()
+                    inner_primary_keys = (
+                        richest_variant_attribute_struct.get_primary_keys()
+                    )
                     assert len(inner_primary_keys) == 1, (
                         f"Expected a single primary key in the struct {richest_variant_attribute_struct.name}, "
                         f"but found {len(inner_primary_keys)}."
@@ -831,7 +838,9 @@ def handle_missing_gin_index(
         f"create_{attribute.raw_data_type().table_name}_table",
     ]
 
-    print(f"I need for the {attribute.raw_data_type().table_name} table to be searchable to generate the form for the builder {builder.name}.")
+    print(
+        f"I need for the {attribute.raw_data_type().table_name} table to be searchable to generate the form for the builder {builder.name}."
+    )
 
     # We find the migration after which the index should be created.
     target_migration = None
@@ -990,6 +999,7 @@ def handle_missing_gin_index(
         f"the form for the {builder.name} builder."
     )
 
+
 def write_frontend_yew_form(
     builder: StructMetadata,
     document: "io.TextIO",
@@ -1123,7 +1133,7 @@ def write_frontend_yew_form(
                 document.write(
                     "    let user_state = yewdux::use_store_value::<crate::stores::user_state::UserState>();\n"
                 )
-                
+
             for property_attribute in properties_attributes:
                 property_struct = richest_variant.get_attribute_by_name(
                     property_attribute.normalized_name()
@@ -1161,10 +1171,7 @@ def write_frontend_yew_form(
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some({attribute.name})));\n"
                 )
-            elif (
-                attribute.data_type() in INPUT_TYPE_MAP
-                or attribute.data_type() == "NaiveDateTime"
-            ):
+            elif attribute.data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
                 )
@@ -1213,10 +1220,7 @@ def write_frontend_yew_form(
 
             optional = "true" if struct_attribute.optional else "false"
 
-            if (
-                attribute.data_type() in INPUT_TYPE_MAP
-                or attribute.data_type() == "NaiveDateTime"
-            ):
+            if attribute.data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
                 attribute_data_type = attribute.data_type()
                 if "barcode" in attribute.name:
                     attribute_data_type = "BarCode"
@@ -1282,7 +1286,8 @@ def write_frontend_yew_form(
 
                 updatables = (
                     "true"
-                    if attribute_struct.has_associated_roles() and attribute_struct.table_name != "users"
+                    if attribute_struct.has_associated_roles()
+                    and attribute_struct.table_name != "users"
                     else "false"
                 )
                 scannable = "true" if "barcode" in attribute.name else "false"
@@ -1410,10 +1415,11 @@ def write_frontend_forms(
         leave=False,
     ):
         module_document.write(
-            f"mod {builder.table_name};\n"
-            f"pub use {builder.table_name}::*;\n\n"
+            f"mod {builder.table_name};\n" f"pub use {builder.table_name}::*;\n\n"
         )
-        with open(f"{directory_path}/{builder.table_name}.rs", "w", encoding="utf8") as document:
+        with open(
+            f"{directory_path}/{builder.table_name}.rs", "w", encoding="utf8"
+        ) as document:
             document.write(
                 "//! This module contains the forms for the frontend.\n"
                 "//!\n"

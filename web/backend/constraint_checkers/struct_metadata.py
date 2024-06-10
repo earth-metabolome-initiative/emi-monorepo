@@ -229,6 +229,10 @@ class AttributeMetadata:
         """Returns whether the attribute is an image blob."""
         return self.data_type() == "JPEG"
 
+    def is_date_type(self) -> bool:
+        """Returns whether the attribute is a date type."""
+        return self.data_type() == "chrono::NaiveDateTime"
+
     def is_undefined_nested_dependencies(self) -> bool:
         """Returns whether the attribute is an undefined nested dependencies."""
         return not self.has_struct_data_type() and self.data_type().startswith("Nested")

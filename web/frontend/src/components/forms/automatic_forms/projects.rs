@@ -80,8 +80,8 @@ pub(crate) enum ProjectActions {
     SetPublic(Option<bool>),
     SetBudget(Option<String>),
     SetExpenses(Option<String>),
-    SetExpectedEndDate(Option<chrono::NaiveDateTime>),
-    SetEndDate(Option<chrono::NaiveDateTime>),
+    SetExpectedEndDate(Option<String>),
+    SetEndDate(Option<String>),
     SetState(Option<Rc<NestedProjectState>>),
     SetIcon(Option<Rc<FontAwesomeIcon>>),
     SetColor(Option<Rc<Color>>),
@@ -238,14 +238,40 @@ impl Reducer<ProjectBuilder> for ProjectActions {
             }
             ProjectActions::SetExpectedEndDate(expected_end_date) => 'expected_end_date: {
                 state_mut.errors_expected_end_date.clear();
-                state_mut.expected_end_date = expected_end_date;
+                match expected_end_date {
+                    Some(value) => {
+                        match chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {
+                            Ok(expected_end_date) => {
+                                state_mut.expected_end_date = Some(expected_end_date)
+                            }
+                            Err(_) => {
+                                state_mut
+                                    .errors_expected_end_date
+                                    .push(ApiError::BadRequest(vec![
+                            "The expected_end_date field must be a valid date and time.".to_string()
+                        ]))
+                            }
+                        }
+                    }
+                    None => state_mut.expected_end_date = None,
+                }
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'expected_end_date;
             }
             ProjectActions::SetEndDate(end_date) => 'end_date: {
                 state_mut.errors_end_date.clear();
-                state_mut.end_date = end_date;
+                match end_date {
+                    Some(value) => {
+                        match chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {
+                            Ok(end_date) => state_mut.end_date = Some(end_date),
+                            Err(_) => state_mut.errors_end_date.push(ApiError::BadRequest(vec![
+                                "The end_date field must be a valid date and time.".to_string(),
+                            ])),
+                        }
+                    }
+                    None => state_mut.end_date = None,
+                }
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'end_date;
@@ -370,9 +396,19 @@ impl FormBuilder for ProjectBuilder {
                 .map(|expenses| expenses.to_string()),
         ));
         dispatcher.apply(ProjectActions::SetExpectedEndDate(
-            richest_variant.inner.expected_end_date,
+            richest_variant
+                .inner
+                .expected_end_date
+                .as_ref()
+                .map(|expected_end_date| expected_end_date.to_string()),
         ));
-        dispatcher.apply(ProjectActions::SetEndDate(richest_variant.inner.end_date));
+        dispatcher.apply(ProjectActions::SetEndDate(
+            richest_variant
+                .inner
+                .end_date
+                .as_ref()
+                .map(|end_date| end_date.to_string()),
+        ));
         dispatcher.apply(ProjectActions::SetState(
             Some(richest_variant.state).map(Rc::from),
         ));
@@ -525,13 +561,11 @@ pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
     let set_expenses = builder_dispatch
         .apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
     let set_expected_end_date =
-        builder_dispatch.apply_callback(|expected_end_date: Option<chrono::NaiveDateTime>| {
+        builder_dispatch.apply_callback(|expected_end_date: Option<String>| {
             ProjectActions::SetExpectedEndDate(expected_end_date)
         });
-    let set_end_date =
-        builder_dispatch.apply_callback(|end_date: Option<chrono::NaiveDateTime>| {
-            ProjectActions::SetEndDate(end_date)
-        });
+    let set_end_date = builder_dispatch
+        .apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
     let set_state = builder_dispatch
         .apply_callback(|state: Option<Rc<NestedProjectState>>| ProjectActions::SetState(state));
     let set_icon = builder_dispatch
@@ -552,6 +586,8 @@ pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
             <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone().map(Rc::from)} />
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone().map(Rc::from)} />
+            <BasicInput<chrono::NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone().map(Rc::from)} />
+            <BasicInput<chrono::NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone().map(Rc::from)} />
             <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
@@ -582,13 +618,11 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
     let set_expenses = builder_dispatch
         .apply_callback(|expenses: Option<String>| ProjectActions::SetExpenses(expenses));
     let set_expected_end_date =
-        builder_dispatch.apply_callback(|expected_end_date: Option<chrono::NaiveDateTime>| {
+        builder_dispatch.apply_callback(|expected_end_date: Option<String>| {
             ProjectActions::SetExpectedEndDate(expected_end_date)
         });
-    let set_end_date =
-        builder_dispatch.apply_callback(|end_date: Option<chrono::NaiveDateTime>| {
-            ProjectActions::SetEndDate(end_date)
-        });
+    let set_end_date = builder_dispatch
+        .apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
     let set_state = builder_dispatch
         .apply_callback(|state: Option<Rc<NestedProjectState>>| ProjectActions::SetState(state));
     let set_icon = builder_dispatch
@@ -609,6 +643,8 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
             <Checkbox label="Public" errors={builder_store.errors_public.clone()} builder={set_public} value={builder_store.public.unwrap_or(false)} />
             <BasicInput<f64> label="Budget" optional={true} errors={builder_store.errors_budget.clone()} builder={set_budget} value={builder_store.budget.clone().map(Rc::from)} />
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone().map(Rc::from)} />
+            <BasicInput<chrono::NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone().map(Rc::from)} />
+            <BasicInput<chrono::NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone().map(Rc::from)} />
             <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
             <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
             <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
