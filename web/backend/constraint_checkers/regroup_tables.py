@@ -11,10 +11,12 @@ in such a way that all the migrations relative to a table are grouped together.
 import os
 from typing import Dict, List
 import shutil
+from functools import lru_cache
 from jaro import jaro_winkler_metric
 from userinput import userinput
 from userinput.utils import set_validator
 from constraint_checkers.migrations_changed import are_migrations_changed
+from constraint_checkers.is_file_changed import is_file_changed
 
 ALLOW_LISTED_MIGRATIONS = [
     "00000000000000_diesel_initial_setup",
@@ -112,6 +114,7 @@ def get_desinences(table_name: str) -> List[str]:
     """Get the possible desinences of a table."""
     return [
         f"create_{table_name}_table",
+        f"change_{table_name}_column_types",
         f"create_{table_name}_sequential_index",
         f"create_{table_name}_updated_at_trigger",
         f"create_{table_name}_parent_circularity_trigger",
@@ -120,6 +123,60 @@ def get_desinences(table_name: str) -> List[str]:
         f"create_{table_name}_gin_index",
     ]
 
+def get_type_desinences(type_name: str) -> List[str]:
+    """Get the possible desinences of a type."""
+    return [
+        f"create_{type_name}_type",
+    ]
+
+@lru_cache
+def get_types() -> List[str]:
+    """Extracts the list of types from the migrations.
+
+    Implementative details
+    ----------------------
+    The types are extracted from the migrations by searching for the string
+    "CREATE TYPE {type_name} AS" in the up migrations.
+    """
+    types = []
+
+    targets = [
+        "CREATE TYPE IF NOT EXISTS",
+        "CREATE TYPE"
+    ]
+
+    migrations = os.listdir("migrations")
+    migrations = sorted(migrations)
+
+    for migration in migrations:
+        if not os.path.isdir(f"migrations/{migration}"):
+            continue
+        with open(f"migrations/{migration}/up.sql", "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            for line in lines:
+                if "--" in line:
+                    line = line.split("--")[0]
+                for target in targets:
+                    if target in line:
+                        type_name = line.split(target)[1].split("AS")[0].strip()
+                        types.append(type_name)
+                        break
+
+    return types
+
+def is_type_migration(migration: str) -> bool:
+    """Check if a migration is a type migration.
+    
+    Parameters
+    ----------
+    migration : str
+        The name of the migration to check.
+    """
+    _number, migration_desinence = migration.split("_", 1)
+    return any(
+        migration_desinence in get_type_desinences(type_name)
+        for type_name in get_types()
+    )
 
 def get_tables() -> List[str]:
     """Extracts the table names from the migrations.
@@ -142,6 +199,9 @@ def get_tables() -> List[str]:
         with open(f"migrations/{migration}/up.sql", "r", encoding="utf-8") as f:
             lines = f.readlines()
             for line in lines:
+                if "--" in line:
+                    line = line.split("--")[0]
+
                 if target in line:
                     table_name = line.split(target)[1].split("(")[0].strip()
                     tables.append(table_name)
@@ -159,6 +219,9 @@ def table_dependencies() -> Dict[str, List[str]]:
             continue
 
         if migration in ALLOW_LISTED_MIGRATIONS:
+            continue
+
+        if is_type_migration(migration):
             continue
 
         _, migration_desinence = migration.split("_", 1)
@@ -261,7 +324,7 @@ def get_sort_tables_by_dependencies() -> List[str]:
     The tables are sorted by dependencies using a topological sort algorithm.
     """
     dependencies = table_dependencies()
-    tables = list(dependencies.keys())
+    tables = sorted(list(dependencies.keys()))
     sorted_tables = []
 
     while len(tables) > 0:
@@ -308,7 +371,7 @@ def detect_singleton_tables():
 
 def regroup_tables():
     """Regroup the tables."""
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Skipping the regrouping of tables.")
         return
 
@@ -317,6 +380,8 @@ def regroup_tables():
     associated_tables = {}
     orphan_migrations = []
     mapped_migrations = []
+
+    type_migrations = []
 
     table_names = get_sort_tables_by_dependencies()
 
@@ -327,7 +392,11 @@ def regroup_tables():
             if not os.path.isdir(f"migrations/{migration}"):
                 continue
 
-            if migration in ALLOW_LISTED_MIGRATIONS:
+            if migration in ALLOW_LISTED_MIGRATIONS or migration in type_migrations:
+                continue
+
+            if is_type_migration(migration):
+                type_migrations.append(migration)
                 continue
 
             if migration in mapped_migrations:
@@ -381,6 +450,16 @@ def regroup_tables():
         raise RuntimeError(f"Orphaned migrations found {orphan_migrations}")
 
     starting_number = len(ALLOW_LISTED_MIGRATIONS)
+
+    # First, we handle the type migrations.
+    for migration in type_migrations:
+        _number, desinence = migration.split("_", 1)
+        padded_migration_number = str(starting_number).zfill(14)
+        full_migration_name = f"{padded_migration_number}_{desinence}"
+        if migration != full_migration_name:
+            os.rename(f"migrations/{migration}", f"migrations/{full_migration_name}")
+
+        starting_number += 1
 
     for table_name in table_names:
         migrations = associated_tables[table_name]

@@ -6,6 +6,7 @@ import sys
 from dict_hash import sha256
 import compress_json
 from constraint_checkers.migrations_changed import are_migrations_changed
+from constraint_checkers.is_file_changed import is_file_changed
 
 
 def hash_migration(migration: str) -> str:
@@ -22,7 +23,7 @@ def hash_migration(migration: str) -> str:
 def handle_minimal_revertion():
     """Keeps track with hashes of changes of migrations and reverts to the last edited migration if needed
     so to avoid reverting every time all of the migrations."""
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Minimal revertion is not needed.")
         return
 

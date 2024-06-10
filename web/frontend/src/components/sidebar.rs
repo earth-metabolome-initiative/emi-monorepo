@@ -7,6 +7,7 @@ use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
 use web_common::database::*;
 use yew::prelude::*;
+use yew_hooks::prelude::*;
 use yew_hooks::use_click_away;
 use yew_router::prelude::*;
 use yewdux::use_store;
@@ -22,7 +23,6 @@ pub fn sidebar(props: &SidebarProps) -> Html {
     let (user, _) = use_store::<UserState>();
     let route: AppRoute = use_route().unwrap_or_default();
     let node = use_node_ref();
-
     let onclose = props.onclose.clone();
     let visible = props.visible;
     use_click_away(node.clone(), move |_: Event| {

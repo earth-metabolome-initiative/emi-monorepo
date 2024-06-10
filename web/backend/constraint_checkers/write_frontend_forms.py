@@ -9,6 +9,8 @@ from constraint_checkers.struct_metadata import AttributeMetadata, StructMetadat
 from insert_migration import insert_migration
 from tqdm.auto import tqdm
 from userinput import userinput
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 TEXTUAL_DATA_TYPES = ["String"]
 
@@ -167,7 +169,7 @@ def write_frontend_builder_action_enumeration(
     derives = ", ".join(
         [derive for derive in builder.derives() if derive not in ("Store", "Default")]
     )
-    document.write(f"#[derive({derives})]\npub(super) enum {action_enum_name} {{\n")
+    document.write(f"#[derive({derives})]\npub(crate) enum {action_enum_name} {{\n")
 
     for attribute in builder.attributes:
         if attribute in primary_keys:
@@ -666,7 +668,7 @@ def write_frontend_form_builder_implementation(
         if variant.is_new_variant() and variant.has_uuid_primary_key():
             primary_key = primary_keys[0]
             document.write(
-                f"            {primary_key.name}: builder.{primary_key.name}.unwrap_or_else(Uuid::new_v4),\n"
+                f"            {primary_key.name}: builder.{primary_key.name}.unwrap_or_else(uuid::Uuid::new_v4),\n"
             )
         elif variant.is_new_variant() and len(primary_keys) > 1:
             for primary_key in primary_keys:
@@ -1107,7 +1109,7 @@ def write_frontend_yew_form(
         else:
             document.write(f"pub fn {form_method_name}() -> Html {{\n")
         document.write(
-            f"    let (builder_store, builder_dispatch) = use_store::<{builder.name}>();\n"
+            f"    let (builder_store, builder_dispatch) = yewdux::use_store::<{builder.name}>();\n"
         )
 
         if method == "PUT":
@@ -1119,7 +1121,7 @@ def write_frontend_yew_form(
         elif method == "POST":
             if builder.has_sampled_by():
                 document.write(
-                    "    let user_state = use_store_value::<UserState>();\n"
+                    "    let user_state = yewdux::use_store_value::<crate::stores::user_state::UserState>();\n"
                 )
                 
             for property_attribute in properties_attributes:
@@ -1166,15 +1168,10 @@ def write_frontend_yew_form(
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
                 )
-            elif attribute.data_type() == "Vec<u8>":
-                if "picture" in attribute.name:
-                    document.write(
-                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.map(<Vec<u8>>::from).map(Rc::from)));\n"
-                    )
-                else:
-                    raise RuntimeError(
-                        f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
-                    )
+            elif attribute.is_jpeg():
+                document.write(
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Rc<web_common::types::JPEG>>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.clone()));\n"
+                )
             else:
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
@@ -1243,24 +1240,16 @@ def write_frontend_yew_form(
                 )
                 continue
 
-            if attribute.data_type() == "Vec<u8>":
-                if "picture" in attribute.name:
-                    allowed_formats = ["GenericFileFormat::Image"]
-
-                    document.write(
-                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.as_deref().map(|{attribute.name}| {attribute.name}.into())}} />\n'
-                    )
-                else:
-                    raise RuntimeError(
-                        f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
-                    )
-
+            if attribute.is_jpeg():
+                document.write(
+                    f'            <FileInput<web_common::types::JPEG> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} file={{builder_store.{attribute.name}.clone()}} />\n'
+                )
                 continue
 
             # If the attribute is a nested struct, we need to generate a Datalist
             # that will allow the user to select the nested struct.
             if attribute.has_struct_data_type():
-                struct: StructMetadata = attribute.raw_data_type()
+                attribute_struct: StructMetadata = attribute.raw_data_type()
 
                 flat_attribute = flat_variant.get_attribute_by_name(attribute.name)
                 if flat_attribute is None:
@@ -1274,15 +1263,9 @@ def write_frontend_yew_form(
 
                 # We check that the table associated to the nested struct is searchable, otherwise
                 # we cannot generate the datalist for it and we need to raise an exception.
-                if not struct.is_searchable():
+                if not attribute_struct.is_searchable():
                     if flat_attribute not in properties_attributes:
-                        if struct.table_name == "spectra_collections":
-                            document.write(
-                                f'<p>{{"{flat_attribute.human_readable_name()} has to be selected with a ScannerInput, which is not yet available."}}</p>\n'
-                            )
-                            continue
-                        else:
-                            handle_missing_gin_index(attribute, builder)
+                        handle_missing_gin_index(attribute, builder)
                     else:
                         # If the attribute does not have an index but appears in the mandatory properties,
                         # it will be loaded shortly from the backend and fed into the current builder
@@ -1299,15 +1282,20 @@ def write_frontend_yew_form(
 
                 updatables = (
                     "true"
-                    if struct.has_associated_roles() and struct.table_name != "users"
+                    if attribute_struct.has_associated_roles() and attribute_struct.table_name != "users"
                     else "false"
                 )
                 scannable = "true" if "barcode" in attribute.name else "false"
 
                 attribute_data_type = attribute.data_type()
 
+                if attribute_struct.can_implement_copy():
+                    value = f"Rc::from(builder_store.{attribute.name})"
+                else:
+                    value = f"builder_store.{attribute.name}.clone()"
+
                 document.write(
-                    f'            <Datalist<{attribute.data_type()}, {updatables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" scanner={{{scannable}}} />\n'
+                    f'            <Datalist<{attribute.data_type()}, {updatables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{{value}}} label="{attribute.human_readable_name()}" scanner={{{scannable}}} />\n'
                 )
                 continue
 
@@ -1380,43 +1368,40 @@ def write_frontend_forms(
     # In the near future, we will also implement several
     # traits for these structs.
 
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing frontend forms.")
+        return
+
     path = "../frontend/src/components/forms/automatic_forms.rs"
 
-    document = open(path, "w", encoding="utf8")
+    module_document = open(path, "w", encoding="utf8")
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
     # reader not to write anything in this file as it is
     # automatically generated.
 
-    document.write(
+    module_document.write(
         "//! This module contains the forms for the frontend.\n"
         "//!\n"
         "//! This module is automatically generated. Do not write anything here.\n\n"
     )
 
     imports = [
-        "use serde::{Deserialize, Serialize};",
         "use web_common::database::*;",
         "use yew::prelude::*;",
-        "use yewdux::{use_store, use_store_value, Reducer, Store};",
+        "use yewdux::{Reducer, Store};",
         "use crate::components::forms::*;",
         "use web_common::api::form_traits::FormMethod;",
         "use std::rc::Rc;",
-        "use uuid::Uuid;",
         "use std::ops::Deref;",
         "use yewdux::Dispatch;",
         "use web_common::api::ApiError;",
-        "use crate::stores::user_state::UserState;",
         "use crate::workers::ws_worker::ComponentMessage;",
-        "use web_common::custom_validators::Image;",
-        "use web_common::file_formats::GenericFileFormat;",
     ]
 
-    for import_statement in imports:
-        document.write(f"{import_statement}\n")
-
-    document.write("\n")
+    directory_path = path[:-3]
+    os.makedirs(directory_path, exist_ok=True)
 
     for builder in tqdm(
         builder_structs,
@@ -1424,36 +1409,28 @@ def write_frontend_forms(
         unit="struct",
         leave=False,
     ):
-        builder.write_to(document, derives_deny_list=["Default"])
-        write_frontend_builder_default_implementation(builder, document)
-        write_frontend_builder_action_enumeration(builder, document)
-        write_frontend_form_builder_implementation(builder, document)
-        write_frontend_form_buildable_implementation(builder, document)
-        write_frontend_yew_form(builder, document=document)
+        module_document.write(
+            f"mod {builder.table_name};\n"
+            f"pub use {builder.table_name}::*;\n\n"
+        )
+        with open(f"{directory_path}/{builder.table_name}.rs", "w", encoding="utf8") as document:
+            document.write(
+                "//! This module contains the forms for the frontend.\n"
+                "//!\n"
+                "//! This module is automatically generated. Do not write anything here.\n\n"
+            )
 
-    document.flush()
-    document.close()
+            document.write("\n".join(imports) + "\n")
 
-    # We verify that the forms generation has been successful by
-    # checking that all of the builder names and their relative new
-    # variants and update variants are present in the generated file.
+            if builder.has_jpeg_attribute():
+                document.write("use web_common::types::JPEG;\n")
 
-    with open(path, "r", encoding="utf8") as document:
-        content = document.read()
+            builder.write_to(document, derives_deny_list=["Default"])
+            write_frontend_builder_default_implementation(builder, document)
+            write_frontend_builder_action_enumeration(builder, document)
+            write_frontend_form_builder_implementation(builder, document)
+            write_frontend_form_buildable_implementation(builder, document)
+            write_frontend_yew_form(builder, document=document)
 
-    for builder in builder_structs:
-        assert (
-            builder.name in content
-        ), f"Builder {builder.name} not found in the generated file."
-
-        flat_variant = builder.get_flat_variant()
-
-        if flat_variant.is_insertable() and flat_variant.table_name != "users":
-            assert (
-                builder.get_new_variant().name in content
-            ), f"New variant {builder.get_new_variant().name} not found in the generated file."
-
-        if flat_variant.is_updatable():
-            assert (
-                builder.get_update_variant().name in content
-            ), f"Update variant {builder.get_update_variant().name} not found in the generated file."
+    module_document.flush()
+    module_document.close()

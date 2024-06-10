@@ -2,10 +2,11 @@
 
 import os
 from constraint_checkers.migrations_changed import are_migrations_changed
+from constraint_checkers.is_file_changed import is_file_changed
 
 def ensures_gluesql_compliance():
     """Ensures that the migrations are GlueSQL compliant."""
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Skipping the check for GlueSQL compliance.")
         return
 

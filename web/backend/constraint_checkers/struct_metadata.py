@@ -2,7 +2,6 @@
 
 from typing import List, Optional, Union, Tuple, Dict
 import re
-from functools import cache
 from constraint_checkers.find_foreign_keys import (
     TableMetadata,
     find_foreign_keys,
@@ -88,12 +87,6 @@ def data_type_to_absolute_import_path(data_type: str) -> str:
     str
         The converted absolute import path.
 
-    Examples
-    --------
-    >>> data_type_to_absolute_import_path("Uuid")
-    "crate::models::Uuid"
-    >>> data_type_to_absolute_import_path("Vec<ApiError>")
-    "crate::models::ApiError"
     """
     if data_type in TYPES_FROM_CORE_AND_STANDARD_LIBRARIES:
         return data_type
@@ -133,6 +126,11 @@ def data_type_to_absolute_import_path(data_type: str) -> str:
         "gluesql::prelude::Glue<C>"
     ]:
         return "gluesql::prelude::Glue<C>"
+
+    if data_type in [
+        "JPEG"
+    ]:
+        return "JPEG"
     
     raise ValueError(f"Unsupported data type: {data_type}")
 
@@ -227,11 +225,12 @@ class AttributeMetadata:
             lifetime=self.lifetime,
         )
 
-    def is_image_blob(self) -> bool:
+    def is_jpeg(self) -> bool:
         """Returns whether the attribute is an image blob."""
-        return "picture" in self.name and self.data_type() == "Vec<u8>"
+        return self.data_type() == "JPEG"
 
     def is_undefined_nested_dependencies(self) -> bool:
+        """Returns whether the attribute is an undefined nested dependencies."""
         return not self.has_struct_data_type() and self.data_type().startswith("Nested")
 
     def has_struct_data_type(self) -> bool:
@@ -457,6 +456,7 @@ class AttributeMetadata:
                 "String",
                 "Vec<ApiError>",
                 "Vec<u8>",
+                "JPEG",
                 "ApiError",
             ]
             or isinstance(self._data_type, StructMetadata)
@@ -504,7 +504,7 @@ class AttributeMetadata:
         return "".join(word.capitalize() for word in self.normalized_name().split("_"))
 
     def __repr__(self) -> str:
-        return f"AttributeMetadata({self.name}, {self.data_type()}, {self.optional})"
+        return f"AttributeMetadata({self.name}, {self.data_type()}, optional={self.optional})"
 
     def __hash__(self) -> int:
         return hash((self.name, self.data_type()))
@@ -844,6 +844,8 @@ class StructMetadata:
         self._primary_search_index: Optional[PGIndex] = None
         self._first_order_derived_search_indices: List[DerivedPGIndex] = []
         self._second_order_derived_search_indices: List[DerivedPGIndex] = []
+        self._foreign_keys: List[AttributeMetadata] = None
+        self._primary_keys: List[AttributeMetadata] = None
 
     def set_primary_search_index(self, index: PGIndex):
         """Sets the primary search index of the struct."""
@@ -869,6 +871,10 @@ class StructMetadata:
     def has_primary_search_index(self) -> bool:
         """Returns whether the struct has a primary search index."""
         return self._primary_search_index is not None
+
+    def has_jpeg_attribute(self) -> bool:
+        """Returns whether the struct has a JPEG attribute."""
+        return any(attribute.is_jpeg() for attribute in self.attributes)
 
     def _retro_fix_zero_alias_number(self, table_name: str, alias_number: int):
         assert isinstance(alias_number, int)
@@ -1099,7 +1105,7 @@ class StructMetadata:
                     f"{table_name}{alias_number}" for alias_number in alias_numbers
                 ]
                 schema_aliases = ", ".join(
-                    [f"crate::schema::{table_name} as {new_column_name}" for new_column_name in new_table_names]
+                    [f"crate::database::schema::{table_name} as {new_column_name}" for new_column_name in new_table_names]
                 )
                 aliases += f"let ({', '.join(new_table_names)}) = diesel::alias!({schema_aliases});\n"
         
@@ -1245,38 +1251,38 @@ class StructMetadata:
         """
         return not self.is_insertable() and not self.is_updatable()
 
-    def get_belonging_structs(self) -> List[Tuple["StructMetadata", AttributeMetadata]]:
-        """Returns the structs that the struct belongs to."""
+    # def get_belonging_structs(self) -> List[Tuple["StructMetadata", AttributeMetadata]]:
+    #     """Returns the structs that the struct belongs to."""
 
-        # Diesel for the time being only supports one single foreign key
-        # per table in the belongs_to attribute. For this reason, we skip
-        # the keys associated to duplicated foreign keys.
+    #     # Diesel for the time being only supports one single foreign key
+    #     # per table in the belongs_to attribute. For this reason, we skip
+    #     # the keys associated to duplicated foreign keys.
 
-        encountered_tables = set()
-        belonging_structs = []
+    #     encountered_tables = set()
+    #     belonging_structs = []
 
-        for attribute in self.get_foreign_keys():
-            foreign_key_table = (
-                StructMetadata.table_metadata.get_foreign_key_table_name(
-                    self.table_name, attribute.name
-                )
-            )
-            if foreign_key_table in encountered_tables:
-                continue
+    #     for attribute in self.get_foreign_keys():
+    #         foreign_key_table = (
+    #             StructMetadata.table_metadata.get_foreign_key_table_name(
+    #                 self.table_name, attribute.name
+    #             )
+    #         )
+    #         if foreign_key_table in encountered_tables:
+    #             continue
 
-            encountered_tables.add(foreign_key_table)
-            foreign_key_flat_variant = (
-                StructMetadata.table_metadata.get_flat_variant(foreign_key_table)
-            )
+    #         encountered_tables.add(foreign_key_table)
+    #         foreign_key_flat_variant = (
+    #             StructMetadata.table_metadata.get_flat_variant(foreign_key_table)
+    #         )
 
-            assert foreign_key_flat_variant is not None, (
-                f"The foreign key flat variant for the table {foreign_key_table} "
-                "is not defined."
-            )
+    #         assert foreign_key_flat_variant is not None, (
+    #             f"The foreign key flat variant for the table {foreign_key_table} "
+    #             "is not defined."
+    #         )
 
-            belonging_structs.append((foreign_key_flat_variant, attribute))
+    #         belonging_structs.append((foreign_key_flat_variant, attribute))
 
-        return belonging_structs
+    #     return belonging_structs
 
     def write_to(
         self,
@@ -1301,20 +1307,20 @@ class StructMetadata:
         )
         file.write(f"#[derive({joined_derives})]\n")
         if diesel is not None:
-            file.write(f"#[diesel(table_name = {self.table_name})]\n")
+            file.write(f"#[diesel(table_name = crate::database::schema::{self.table_name})]\n")
 
         # For each of the attribute that is a foreign key, we add the
         # #[diesel(belongs_to({foreign struct name}, foreign_key = {attribute name}))]
         # decorator.
-        if diesel is not None:
+        # if diesel is not None:
             # Diesel for the time being only supports one single foreign key
             # per table in the belongs_to attribute. For this reason, we skip
             # the keys associated to duplicated foreign keys.
 
-            for belonging_struct, attribute in self.get_belonging_structs(): 
-                file.write(
-                    f"#[diesel(belongs_to(crate::models::{belonging_struct.table_name}::{belonging_struct.name}, foreign_key = {attribute.name}))]\n"
-                )
+            # for belonging_struct, attribute in self.get_belonging_structs(): 
+            #     file.write(
+            #         f"#[diesel(belongs_to(crate::database::flat_variants::{belonging_struct.table_name}::{belonging_struct.name}, foreign_key = {attribute.name}))]\n"
+            #     )
 
         if diesel is not None:
             file.write(
@@ -1426,11 +1432,13 @@ class StructMetadata:
         return self._richest_variant
 
     def set_new_variant(self, struct: "StructMetadata"):
+        """Sets the new variant of the struct."""
         assert struct.table_name == self.table_name
         assert struct.is_new_variant()
         self._new_variant = struct
 
     def get_new_variant(self) -> "StructMetadata":
+        """Returns the new variant of the struct."""
         if self._new_variant is None:
             raise ValueError(
                 "The new variant has not been set for the struct "
@@ -1642,7 +1650,6 @@ class StructMetadata:
         """Returns whether the struct contains only optional fields."""
         return all(attribute.optional for attribute in self.attributes)
 
-    @cache
     def only_primary_key(self) -> bool:
         """Returns whether the struct contains only the primary key."""
         primary_keys = self.get_primary_keys()
@@ -1668,7 +1675,6 @@ class StructMetadata:
             f"The table name is {self.table_name}."
         )
 
-    @cache
     def get_foreign_keys(self) -> List[AttributeMetadata]:
         """Returns the foreign keys of the struct.
 
@@ -1678,6 +1684,9 @@ class StructMetadata:
         """
         if self._flat_variant is not None:
             return self._flat_variant.get_foreign_keys()
+
+        if self._foreign_keys is not None:
+            return self._foreign_keys
 
         foreign_key_names = StructMetadata.table_metadata.get_foreign_keys(
             self.table_name
@@ -1693,6 +1702,8 @@ class StructMetadata:
                     f"with the table {self.table_name}."
                 )
             foreign_keys.append(attribute)
+
+        self._foreign_keys = foreign_keys
 
         return foreign_keys
 
@@ -1727,7 +1738,6 @@ class StructMetadata:
 
         self._child_variants[key] = child_variant
 
-    @cache
     def get_child_structs(self) -> Dict[AttributeMetadata, "StructMetadata"]:
         """Returns the child foreign keys of the struct.
 
@@ -1758,7 +1768,6 @@ class StructMetadata:
         """Returns whether the struct has foreign keys."""
         return len(self.get_foreign_keys()) > 0
 
-    @cache
     def get_primary_keys(self) -> List[AttributeMetadata]:
         """Returns the primary key of the struct.
 
@@ -1768,6 +1777,9 @@ class StructMetadata:
         """
         if self._flat_variant is not None:
             return self._flat_variant.get_primary_keys()
+
+        if self._primary_keys is not None:
+            return self._primary_keys
 
         primary_keys = StructMetadata.table_metadata.get_primary_key_names_and_types(
             self.table_name
@@ -1787,9 +1799,10 @@ class StructMetadata:
                 )
             primary_key_attributes.append(attribute)
 
+        self._primary_keys = primary_key_attributes
+
         return primary_key_attributes
 
-    @cache
     def has_uuid_primary_key(self) -> bool:
         """Returns whether the struct has a UUID primary key.
 
@@ -1827,10 +1840,10 @@ class StructMetadata:
             derives.append("Copy")
         if self.can_implement_ord() and "Ord" not in self._derives:
             derives.append("Ord")
-        if self.can_implement_serialize() and "Serialize" not in self._derives:
-            derives.append("Serialize")
-        if self.can_implement_deserialize() and "Deserialize" not in self._derives:
-            derives.append("Deserialize")
+        if self.can_implement_serialize() and "Serialize" not in self._derives and "serde::Serialize" not in self._derives:
+            derives.append("serde::Serialize")
+        if self.can_implement_deserialize() and "Deserialize" not in self._derives and "serde::Deserialize" not in self._derives:
+            derives.append("serde::Deserialize")
         if self.can_implement_default() and "Default" not in self._derives:
             derives.append("Default")
 
@@ -1840,8 +1853,8 @@ class StructMetadata:
             "Queryable",
         ]
 
-        if diesel is not None and self.has_foreign_keys():
-            diesel_derives.append("Associations")
+        # if diesel is not None and self.has_foreign_keys():
+        #     diesel_derives.append("Associations")
 
         if diesel == "tables":
             diesel_derives.extend(["Insertable", "Selectable"])

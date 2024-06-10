@@ -87,7 +87,7 @@ class PGIndex:
                     for argument in self.associated_function.arguments
                 )
 
-            return f"crate::sql_function_bindings::{self.associated_function.name}({arguments})"
+            return f"crate::database::sql_function_bindings::{self.associated_function.name}({arguments})"
 
         assert " " not in self.arguments, (
             "The arguments of the index contain spaces, which is not expected. "
@@ -111,7 +111,7 @@ class PGIndex:
 
         formatted_function = self._format_function(alias_number)
         if "dist" in desinence:
-            return f"crate::sql_function_bindings::{similarity_method}_{desinence}({formatted_function}, {query})"
+            return f"crate::database::sql_function_bindings::{similarity_method}_{desinence}({formatted_function}, {query})"
         return f"{formatted_function}.{similarity_method}_{desinence}({query})"
 
 
@@ -390,10 +390,6 @@ class PGIndices:
     def __init__(self, indices: List[PGIndex]):
         assert all(isinstance(index, PGIndex) for index in indices)
         self.indices = indices
-
-    def tables(self) -> List[str]:
-        """Returns the list of table names that have an index."""
-        return list(set(index.table_name for index in self.indices))
 
     def get_table_index(self, table_name: str) -> Optional[PGIndex]:
         """Returns the indices of the table with the given name."""

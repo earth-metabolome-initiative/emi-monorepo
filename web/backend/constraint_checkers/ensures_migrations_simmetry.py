@@ -1,13 +1,13 @@
 """Ensures that migrations are symmetric."""
 import os
 from constraint_checkers.migrations_changed import are_migrations_changed
-
+from constraint_checkers.is_file_changed import is_file_changed
 
 def ensures_migrations_simmetry():
     """Ensures that migrations are symmetric."""
     # We check that, if in a migration directory up.sql contains a
     # certain string, down.sql contains the symmetric string.
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Skipping the check for the symmetry of migrations.")
         return
 

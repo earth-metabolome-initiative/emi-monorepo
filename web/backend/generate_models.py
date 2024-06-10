@@ -20,7 +20,7 @@ from constraint_checkers import (
     ensure_tables_have_creation_notification_trigger,
 )
 from constraint_checkers.regroup_tables import regroup_tables
-from constraint_checkers import generate_view_schema, generate_table_schema
+from constraint_checkers import generate_schema, execute_migrations
 from constraint_checkers import (
     check_parent_circularity_trigger,
     create_filter_structs,
@@ -30,8 +30,6 @@ from constraint_checkers import (
 from constraint_checkers import (
     check_for_common_typos_in_migrations,
     write_frontend_forms,
-    check_schema_completion,
-    generate_view_structs,
 )
 from constraint_checkers import (
     write_web_common_flat_variants,
@@ -39,7 +37,7 @@ from constraint_checkers import (
     write_web_common_new_variants,
     write_backend_new_variants,
     write_backend_update_variants,
-    write_web_common_nested_structs,
+    write_web_common_nested_variants,
     write_backend_flat_variants,
     extract_structs,
 )
@@ -52,13 +50,15 @@ from constraint_checkers import (
     derive_webcommon_update_variants,
     write_web_common_search_trait_implementations,
     write_diesel_sql_function_bindings,
-    write_diesel_sql_operator_bindings
+    write_diesel_sql_operator_bindings,
+    write_diesel_sql_types_bindings
 )
 from constraint_checkers import (
     ensure_can_x_function_existance,
     ensures_no_duplicated_migrations,
     register_derived_search_indices
 )
+from constraint_checkers import (update_migrations_hash, update_all_files_hashes)
 
 
 if __name__ == "__main__":
@@ -90,44 +90,36 @@ if __name__ == "__main__":
     print("Ensured migrations simmetry & GlueSQL compliance.")
 
     handle_minimal_revertion()
-    generate_table_schema()
-    print("Generated models.")
+    execute_migrations()
 
     ensures_all_update_at_trigger_exists(StructMetadata.table_metadata)
     ensure_created_at_columns(StructMetadata.table_metadata)
     ensure_updated_at_columns(StructMetadata.table_metadata)
     check_parent_circularity_trigger(StructMetadata.table_metadata)
 
-    generate_view_schema(StructMetadata.table_metadata)
-    print("Generated view schema.")
-    check_schema_completion()
-    print("Checked schema completion.")
-    generate_view_structs()
-    print("Generated view structs.")
+    generate_schema(StructMetadata.table_metadata)
 
-    table_structs: List[StructMetadata] = extract_structs("src/models.rs")
-    view_structs: List[StructMetadata] = extract_structs("src/views/views.rs")
-    flat_variants = table_structs + view_structs
+    flat_variants: List[StructMetadata] = extract_structs()
 
-    assert len(table_structs) > 0, (
+    assert len(flat_variants) > 0, (
         "No table structs were extracted. This is likely due some error in the "
         "generation process. Please rerun the generation script."
     )
 
     print(
-        f"Extracted {len(table_structs)} tables and {len(view_structs)} views from the backend."
+        f"Extracted {len(flat_variants)} tables from the backend."
     )
 
     StructMetadata.init_indices()
     register_derived_search_indices(flat_variants)
 
     filter_structs: List[StructMetadata] = create_filter_structs(
-        table_structs + view_structs
+        flat_variants
     )
     print(f"Generated {len(filter_structs)} filter structs.")
 
     nested_structs: List[StructMetadata] = derive_nested_structs(
-        table_structs + view_structs
+        flat_variants
     )
     print(f"Derived {len(nested_structs)} nested structs.")
     assert len(nested_structs) > 0, (
@@ -135,55 +127,40 @@ if __name__ == "__main__":
         "generation process. Please rerun the generation script."
     )
 
-    new_model_structs = derive_webcommon_new_variants(table_structs)
+    new_model_structs = derive_webcommon_new_variants(flat_variants)
     print(f"Derived {len(new_model_structs)} structs for the New versions")
 
-    update_model_structs = derive_webcommon_update_variants(table_structs)
+    update_model_structs = derive_webcommon_update_variants(flat_variants)
     print(f"Derived {len(update_model_structs)} structs for the Update versions")
 
     tables: List[TableStructMetadata] = write_web_common_table_names_enumeration(
-        table_structs + view_structs + nested_structs,
+        flat_variants + nested_structs,
         new_model_structs,
         update_model_structs,
+    )
+    assert len(tables) > 0, (
+        "No table structs were written. This is likely due some error in the "
+        "generation process. Please rerun the generation script."
     )
 
     write_diesel_sql_function_bindings(StructMetadata.table_metadata)
     write_diesel_sql_operator_bindings(StructMetadata.table_metadata)
+    write_diesel_sql_types_bindings()
     ensure_updatable_tables_have_roles_tables(tables, StructMetadata.table_metadata)
     ensure_can_x_function_existance(tables)
     ensure_tables_have_creation_notification_trigger(tables, StructMetadata.table_metadata)
     print("Generated table names enumeration for web_common.")
 
-    write_backend_flat_variants("src/models.rs", "tables", table_structs)
-    write_backend_flat_variants("src/views/views.rs", "views", view_structs)
+    write_backend_flat_variants(flat_variants)
     print(
-        f"Generated {len(table_structs)} tables and {len(view_structs)} views implementations for backend."
+        f"Generated {len(flat_variants)} tables implementations for backend."
     )
-
-    write_web_common_flat_variants(table_structs, "tables")
-    write_web_common_flat_variants(view_structs, "views")
-    print("Generated web common structs.")
 
     write_backend_nested_structs(nested_structs)
     print(f"Generated {len(nested_structs)} nested structs for backend.")
 
     write_backend_table_names_enumeration(tables)
     print("Generated table names enumeration for diesel.")
-
-    write_web_common_nested_structs("nested_models.rs", nested_structs)
-    print("Generated nested structs for web_common.")
-
-    write_web_common_search_trait_implementations(
-        nested_structs + table_structs + view_structs,
-    )
-    print("Generated search trait implementations for web_common.")
-
-    builder_structs = derive_frontend_builders(new_model_structs + update_model_structs)
-    print(f"Derived {len(builder_structs)} builders for the New & Update versions")
-
-    write_web_common_new_variants(new_model_structs)
-    write_web_common_update_variants(update_model_structs)
-    print("Generated new & update structs for web_common.")
 
     write_backend_new_variants(new_model_structs)
     write_backend_update_variants(
@@ -196,10 +173,33 @@ if __name__ == "__main__":
     )
     print("Generated new & update structs for backend.")
 
+    # We RC-ify the nested structs
+    for nested_struct in nested_structs:
+        rc_nested_struct = nested_struct.into_rc()
+
+    write_web_common_flat_variants(flat_variants)
+    print("Generated web common structs.")
+
+    write_web_common_nested_variants(nested_structs)
+    print("Generated nested structs for web_common.")
+
+    write_web_common_search_trait_implementations(
+        nested_structs + flat_variants
+    )
+    print("Generated search trait implementations for web_common.")
+    
+
+    builder_structs = derive_frontend_builders(new_model_structs + update_model_structs)
+    print(f"Derived {len(builder_structs)} builders for the New & Update versions")
+
+    write_web_common_new_variants(new_model_structs)
+    write_web_common_update_variants(update_model_structs)
+    print("Generated new & update structs for web_common.")
+
+
     write_frontend_forms(
         builder_structs,
     )
-    print("Generated frontend forms.")
 
     write_frontend_pages(
         flat_variants,
@@ -210,6 +210,12 @@ if __name__ == "__main__":
         flat_variants,
     )
     print("Generated frontend router page.")
+
+    # Since everything run appropriately since the last time we updated the
+    # migrations hash in the last generation, we update it now.
+    update_migrations_hash()
+    # And analogously for the files hashes.
+    update_all_files_hashes()
 
     # Finally, as we are currently running in the backend, we can now
     # format the generated rust code.
@@ -226,3 +232,4 @@ if __name__ == "__main__":
         print("Error running 'cargo fmt'!")
         exit(1)
     print("Formatted frontend rust code.")
+

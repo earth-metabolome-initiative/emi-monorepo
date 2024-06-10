@@ -4,6 +4,7 @@ from constraint_checkers.find_foreign_keys import TableMetadata
 from insert_migration import insert_migration
 from constraint_checkers.regroup_tables import get_best_insertion_point
 from constraint_checkers.migrations_changed import are_migrations_changed
+from constraint_checkers.is_file_changed import is_file_changed
 from userinput import userinput
 
 def handle_missing_parent_circularity_trigger(
@@ -99,12 +100,12 @@ def handle_missing_parent_circularity_trigger(
 def check_parent_circularity_trigger(tables_metadata: TableMetadata):
     """Check if the parent circularity trigger exists in tables containing parent-child relationships."""
 
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Skipping the check for the parent circularity trigger.")
         return
 
     for table_name in tqdm(
-        tables_metadata.tables(),
+        tables_metadata.all_tables(),
         desc="Checking parent circularity trigger",
         unit="table",
         leave=False,

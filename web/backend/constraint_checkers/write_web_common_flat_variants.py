@@ -12,6 +12,8 @@ from constraint_checkers.write_update_method_for_gluesql import (
     write_update_method_for_gluesql,
 )
 from constraint_checkers.rust_implementation_check import trait_implementation_exist
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def write_image_as_url_getter_method(attribute: AttributeMetadata, document: "TextIO"):
@@ -25,7 +27,7 @@ def write_image_as_url_getter_method(attribute: AttributeMetadata, document: "Te
     attribute : AttributeMetadata
         The attribute containing the image.
     """
-    assert attribute.is_image_blob()
+    assert attribute.is_jpeg()
 
     if attribute.optional:
         document.write(
@@ -43,53 +45,51 @@ def write_image_as_url_getter_method(attribute: AttributeMetadata, document: "Te
 
 def write_web_common_flat_variants(
     structs: List[StructMetadata],
-    target: str,
 ):
-    """Write the structs in the target file in the `web_common` crate.
+    """Write the flat variants of the structs in the `web_common` crate.
 
     Parameters
     ----------
     structs : List[StructMetadata]
-        The list of structs to write in the target file.
-    target : str
-        The path where to write the structs in the `web_common` crate.
-    table_metadata : TableMetadata
-        The metadata of the tables.
+        The list of structs to write in the `web_common` crate.
     """
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print(
+            "No change in migrations or file. Skipping writing frontend flat variants."
+        )
+        return
+
     # The derive statements to include in the `src/database/tables.rs` document
     imports = [
-        "use serde::Deserialize;",
-        "use serde::Serialize;",
         "use crate::database::*;",
-        "use crate::traits::GuessImageFormat;",
+        "use crate::traits::GuessImageFormat;"
     ]
 
-    document = open(f"../web_common/src/database/{target}.rs", "w", encoding="utf8")
+    document = open("../web_common/src/database/flat_variants.rs", "w", encoding="utf8")
 
     for import_statament in imports:
         document.write(f"{import_statament}\n")
 
     # First, we define the Tabular & Filtrable traits which we will implement for all of the
     # structs.
-    if target == "tables":
-        document.write(
-            "/// A struct that is associated to a table in the database.\n"
-            "\npub trait Tabular {\n"
-            "    const TABLE: Table;\n"
-            "}\n\n"
-            "/// A struct that is associated to a filter struct.\n"
-            "pub trait Filtrable: PartialEq {\n"
-            "    type Filter: Serialize + PartialEq + Clone;\n"
-            "}\n\n"
-            "/// A struct that may be associated to a textual description.\n"
-            "pub trait Describable {\n"
-            "    fn description(&self) -> Option<&str>;\n"
-            "}\n\n"
-            "/// A struct that may be associated to a color.\n"
-            "pub trait Colorable {\n"
-            "    fn color(&self) -> Option<&str>;\n"
-            "}\n\n"
-        )
+    document.write(
+        "/// A struct that is associated to a table in the database.\n"
+        "\npub trait Tabular {\n"
+        "    const TABLE: Table;\n"
+        "}\n\n"
+        "/// A struct that is associated to a filter struct.\n"
+        "pub trait Filtrable: PartialEq {\n"
+        "    type Filter: serde::Serialize + PartialEq + Clone;\n"
+        "}\n\n"
+        "/// A struct that may be associated to a textual description.\n"
+        "pub trait Describable {\n"
+        "    fn description(&self) -> Option<&str>;\n"
+        "}\n\n"
+        "/// A struct that may be associated to a color.\n"
+        "pub trait Colorable {\n"
+        "    fn color(&self) -> Option<&str>;\n"
+        "}\n\n"
+    )
 
     description = {
         "argument": AttributeMetadata(
@@ -161,7 +161,9 @@ def write_web_common_flat_variants(
                 if color_attribute.optional:
                     document.write(f"        self.{color_attribute.name}.as_deref()\n")
                 else:
-                    document.write(f"        Some(self.{color_attribute.name}.as_str())\n")
+                    document.write(
+                        f"        Some(self.{color_attribute.name}.as_str())\n"
+                    )
             else:
                 document.write("        None\n")
             document.write("    }\n}\n")
@@ -191,7 +193,7 @@ def write_web_common_flat_variants(
         document.write('#[cfg(feature = "frontend")]\n' f"impl {struct.name} {{\n")
 
         for attribute in struct.attributes:
-            if attribute.is_image_blob():
+            if attribute.is_jpeg():
                 write_image_as_url_getter_method(attribute, document)
 
         columns = ", ".join([attribute.name for attribute in struct.attributes])
@@ -523,7 +525,6 @@ def write_web_common_flat_variants(
             "f64": "F64",
             "String": "Str",
             "chrono::NaiveDateTime": "Timestamp",
-            "Vec<u8>": "Bytea",
         }
 
         for attribute in struct.attributes:
@@ -537,41 +538,34 @@ def write_web_common_flat_variants(
             elif attribute.is_uuid() and attribute.optional:
                 document.write(
                     f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
-                )
-                document.write(
                     "                gluesql::prelude::Value::Null => None,\n"
-                )
-                document.write(
                     f"                gluesql::prelude::Value::Uuid({attribute.name}) => Some(uuid::Uuid::from_u128(*{attribute.name})),\n"
+                    '                _ => unreachable!("Expected Uuid"),\n'
+                    "            },\n"
                 )
-                document.write('                _ => unreachable!("Expected Uuid"),\n')
-                document.write("            },\n")
+            elif attribute.is_jpeg():
+                document.write(
+                    f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
+                    f"                gluesql::prelude::Value::Bytea({attribute.name}) => {attribute.name}.clone().into(),\n"
+                    '                _ => unreachable!("Expected Bytea"),\n'
+                    "            },\n"
+                )
             elif attribute.implements_clone():
                 if attribute.optional:
                     document.write(
                         f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
-                    )
-                    document.write(
                         "                gluesql::prelude::Value::Null => None,\n"
-                    )
-                    document.write(
                         f"                gluesql::prelude::Value::{clonables[attribute.data_type()]}({attribute.name}) => Some({attribute.name}.clone()),\n"
-                    )
-                    document.write(
                         f'                _ => unreachable!("Expected {clonables[attribute.data_type()]}")\n'
+                        "            },\n"
                     )
-                    document.write("            },\n")
                 else:
                     document.write(
                         f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
-                    )
-                    document.write(
                         f"                gluesql::prelude::Value::{clonables[attribute.data_type()]}({attribute.name}) => {attribute.name}.clone(),\n"
-                    )
-                    document.write(
                         f'                _ => unreachable!("Expected {clonables[attribute.data_type()]}")\n'
+                        "            },\n"
                     )
-                    document.write("            },\n")
             else:
                 raise NotImplementedError(
                     f"Found an unsupported attribute type for the struct {struct.name}: {attribute.data_type()} "

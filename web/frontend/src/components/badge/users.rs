@@ -12,7 +12,7 @@ impl RowToBadge for NestedUser {
     }
 
     fn primary_image_url(&self) -> Option<String> {
-        Some(self.inner.get_profile_picture_as_url())
+        Some(self.inner.get_picture_as_url())
     }
 
     fn children(&self, props: &super::BadgeProps<Self>) -> Option<yew::prelude::Html> {

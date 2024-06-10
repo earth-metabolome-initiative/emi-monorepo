@@ -2,7 +2,7 @@
 use crate::api::oauth::jwt_cookies::{
     eliminate_cookies, JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME,
 };
-use crate::nested_models::NestedUser;
+use crate::database::*;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;

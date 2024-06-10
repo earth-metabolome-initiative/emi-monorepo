@@ -92,12 +92,7 @@ def derive_frontend_builders(
         for primary_key in primary_keys:
             if primary_key not in foreign_keys:
                 builder.add_attribute(
-                    AttributeMetadata(
-                        original_name=primary_key.original_name,
-                        name=primary_key.name,
-                        data_type=primary_key.raw_data_type(),
-                        optional=True,
-                    )
+                    primary_key.as_option()
                 )
 
         for attribute in flat_variant.attributes:
@@ -135,6 +130,12 @@ def derive_frontend_builders(
                         )
                     )
                     continue
+
+                if not attribute.implements_copy():
+                    assert attribute.rc, (
+                        f"Attribute {attribute.name} of the struct {richest_variant.name} "
+                        f"does not implement Copy and is not an Rc. "
+                    )
 
                 builder.add_attribute(attribute.as_option())
 

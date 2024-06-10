@@ -41,7 +41,7 @@ async fn main() -> std::io::Result<()> {
 
     // create db connection pool
     let manager = ConnectionManager::<PgConnection>::new(&database_url);
-    let pool: backend::DBPool = match r2d2::Pool::builder()
+    let pool: backend::database::DBPool = match r2d2::Pool::builder()
         // We set the maximum number of connections in the pool to 10
         .max_size(10)
         .build(manager)

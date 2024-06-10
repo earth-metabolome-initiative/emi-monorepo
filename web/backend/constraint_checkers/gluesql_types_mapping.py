@@ -19,4 +19,5 @@ GLUESQL_TYPES_MAPPING = {
     "chrono::NaiveDateTime": "gluesql::core::ast_builder::timestamp({}.to_string())",
     "DateTime<Utc>": "gluesql::core::ast_builder::timestamp({}.to_string())",
     "Vec<u8>": "gluesql::core::ast_builder::bytea({})",
+    "JPEG": "gluesql::core::ast_builder::bytea({})",
 }

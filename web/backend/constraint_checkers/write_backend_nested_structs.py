@@ -4,7 +4,8 @@ from typing import List
 import os
 from tqdm.auto import tqdm
 from constraint_checkers.struct_metadata import StructMetadata
-
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 def write_backend_nested_structs(nested_structs: List[StructMetadata]):
     """Write the nested structs to the backend crate."""
@@ -17,8 +18,12 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
     ), "All the nested structs must be nested. "
     assert len(nested_structs) > 0, "No nested structs to write."
 
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing backend nested variants.")
+        return
+
     # We open the file to write the nested structs
-    module_document = open("./src/nested_models.rs", "w", encoding="utf8")
+    module_document = open("./src/database/nested_variants.rs", "w", encoding="utf8")
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
@@ -34,15 +39,12 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
 
     # We start with the necessary imports.
     imports = [
-        "use serde::Deserialize;",
-        "use serde::Serialize;",
-        "use crate::models::*;",
+        "use crate::database::*;",
         "use std::rc::Rc;",
         "use web_common::database::filter_structs::*;",
-        # "use crate::views::views::*;",
     ]
 
-    os.makedirs("./src/nested_models", exist_ok=True)
+    os.makedirs("./src/database/nested_variants", exist_ok=True)
 
     for nested_struct in tqdm(
         nested_structs,
@@ -50,7 +52,7 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
         unit="nested struct",
         leave=False,
     ):
-        document = open(f"./src/nested_models/{nested_struct.table_name}.rs", "w", encoding="utf8")
+        document = open(f"./src/database/nested_variants/{nested_struct.table_name}.rs", "w", encoding="utf8")
         module_document.write(
             f"mod {nested_struct.table_name};\n"
             f"pub use {nested_struct.table_name}::*;\n"
@@ -202,8 +204,8 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
         # present in the web_common crate, which does not use Diesel or its
         # structs, but the web_common version of the structs.
         document.write(
-            f"impl From<web_common::database::nested_models::{nested_struct.name}> for {nested_struct.name} {{\n"
-            f"    fn from(item: web_common::database::nested_models::{nested_struct.name}) -> Self {{\n"
+            f"impl From<web_common::database::nested_variants::{nested_struct.name}> for {nested_struct.name} {{\n"
+            f"    fn from(item: web_common::database::nested_variants::{nested_struct.name}) -> Self {{\n"
             "        Self {\n"
         )
         for attribute in nested_struct.attributes:
@@ -228,7 +230,7 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
         document.write("        }\n    }\n}\n")
 
         document.write(
-            f"impl From<{nested_struct.name}> for web_common::database::nested_models::{nested_struct.name} {{\n"
+            f"impl From<{nested_struct.name}> for web_common::database::nested_variants::{nested_struct.name} {{\n"
             f"    fn from(item: {nested_struct.name}) -> Self {{\n"
             "        Self {\n"
         )

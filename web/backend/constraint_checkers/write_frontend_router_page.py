@@ -40,6 +40,7 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "use crate::router::AppRoute;",
         "use super::logout::Logout;",
         "use yew_hooks::prelude::*;",
+        "use yew_hooks::use_click_away;",
         "use crate::components::basic_page::PageLike;",
         "use crate::stores::user_state::UserState;",
     ]
@@ -50,6 +51,7 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "#[derive(Properties, Clone, PartialEq, Debug)]\n"
         "pub struct SidebarProps {\n"
         "    pub visible: bool,\n"
+        "    pub onclose: Callback<bool>,"
         "}\n\n"
     )
 
@@ -58,6 +60,14 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "pub fn sidebar(props: &SidebarProps) -> Html {\n"
         "    let (user, _) = use_store::<UserState>();\n"
         "    let route: AppRoute = use_route().unwrap_or_default();\n"
+        "    let node = use_node_ref();\n"
+        "    let onclose = props.onclose.clone();\n"
+        "    let visible = props.visible;\n"
+        "    use_click_away(node.clone(), move |_: Event| {\n"
+        "        if visible {\n"
+        "            onclose.emit(!visible);\n"
+        "        }\n"
+        "    });\n"
         "\n"
         "    let sidebar_class = if props.visible {\n"
         '        "sidebar"\n'
@@ -66,7 +76,7 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "    };\n"
         "\n"
         "    html! {\n"
-        "        <div class={sidebar_class}>\n"
+        "        <div ref={node} class={sidebar_class}>\n"
         '            <div class="sidebar-content">\n'
         "                <ul>\n"
     )

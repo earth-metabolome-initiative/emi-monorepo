@@ -6,8 +6,7 @@
 //! - Inserting the user's email into the user_emails table
 //! - Inserting the user's primary email into the primary_user_emails table
 
-use crate::models::*;
-use crate::new_variants::InsertRow;
+use crate::database::*;
 use crate::transactions::renormalize_user_emails::Emails;
 use diesel::connection::SimpleConnection; // Required for batch_execute
 use diesel::prelude::*;
@@ -33,24 +32,25 @@ pub(crate) fn create_user(
     pool: &Pool<ConnectionManager<PgConnection>>,
 ) -> QueryResult<User> {
     let chained_emails = user_emails.emails().join(", ");
-    let identicon = Identicon::new(&chained_emails);
+    let mut identicon = Identicon::new(&chained_emails);
+    identicon.set_size(256).unwrap();
     let dynamic_image = identicon.generate_image().unwrap();
 
-    // Write the image data into the buffer as PNG format
-    let mut png_buffer = Cursor::new(Vec::new());
+    // Write the image data into the buffer as JPEG format
+    let mut jpeg_buffer = Cursor::new(Vec::new());
 
     dynamic_image
-        .write_to(&mut png_buffer, image::ImageOutputFormat::Png)
+        .write_to(&mut jpeg_buffer, image::ImageOutputFormat::Jpeg(80))
         .unwrap();
 
-    let png_buffer = png_buffer.into_inner();
+    let jpeg_buffer = jpeg_buffer.into_inner();
 
     let new_user = NewUser {
         first_name: "".to_string(),
         middle_name: None,
         description: None,
         last_name: "".to_string(),
-        profile_picture: png_buffer,
+        picture: jpeg_buffer.into(),
         organization_id: None,
     };
 

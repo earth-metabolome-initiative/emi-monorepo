@@ -4,6 +4,8 @@ from typing import List
 from tqdm.auto import tqdm
 from constraint_checkers.struct_metadata import StructMetadata
 from constraint_checkers.regroup_tables import SUPPORT_TABLE_NAMES
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def is_deny_listed(struct: StructMetadata) -> bool:
@@ -25,6 +27,10 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
     assert all(
         isinstance(flat_variant, StructMetadata) for flat_variant in flat_variants
     ), "All elements in the flat_variants list must be of type StructMetadata."
+
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing frontend pages.")
+        return
 
     document = open("../frontend/src/pages/automatic_pages.rs", "w", encoding="utf-8")
 

@@ -1,5 +1,5 @@
 //! Submodule providing websocket services post-authentication.
-use crate::DBPool;
+use crate::database::DBPool;
 use actix_web::web;
 use actix_web::{get, Error, HttpRequest, HttpResponse};
 use sqlx::{Pool as SQLxPool, Postgres};

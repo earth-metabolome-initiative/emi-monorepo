@@ -10,3 +10,4 @@ pyarrow
 userinput
 lxml
 jaro-winkler
+inflect

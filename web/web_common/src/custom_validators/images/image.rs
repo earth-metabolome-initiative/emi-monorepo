@@ -112,46 +112,6 @@ impl Validate for Image {
     }
 }
 
-#[cfg(feature = "frontend")]
-impl crate::api::form_traits::TryFromCallback<web_sys::File> for Image {
-    fn try_from_callback<C>(file: web_sys::File, callback: C) -> Result<(), ApiError>
-    where
-        C: FnOnce(Result<Self, ApiError>) + 'static,
-    {
-        use wasm_bindgen::JsCast;
-
-        // Create a reader
-        let reader = web_sys::FileReader::new()
-            .map_err(|_| vec!["Unable to open File Reader".to_string()])?;
-
-        let on_load =
-            wasm_bindgen::closure::Closure::once_into_js(move |event: web_sys::ProgressEvent| {
-                let reader = event
-                    .target()
-                    .unwrap()
-                    .dyn_into::<web_sys::FileReader>()
-                    .unwrap();
-
-                let result = reader.result().unwrap();
-                let data = js_sys::Uint8Array::new(&result);
-                let data = data.to_vec();
-
-                match Image::try_from(data) {
-                    Ok(image) => callback(Ok(image)),
-                    Err(_) => {} // callback(Err(ApiError::BadRequest(errors))),
-                };
-            });
-
-        reader.set_onload(Some(on_load.as_ref().unchecked_ref()));
-
-        // Read file contents
-        reader
-            .read_as_array_buffer(&file)
-            .map_err(|_| vec!["Unable to read file.".to_string()])?;
-
-        Ok(())
-    }
-}
 
 // impl TryFrom<Vec<u8>> for Image {
 //     type Error = Vec<String>;

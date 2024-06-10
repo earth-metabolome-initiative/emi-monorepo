@@ -7,7 +7,7 @@ use diesel::prelude::*;
 use diesel::r2d2::{ConnectionManager, Pool};
 
 use super::jwt_cookies::build_login_response;
-use crate::models::*;
+use crate::database::*;
 use crate::transactions::renormalize_user_emails::{renormalize_user_emails, Emails};
 use redis::Client as RedisClient;
 use reqwest::Client;

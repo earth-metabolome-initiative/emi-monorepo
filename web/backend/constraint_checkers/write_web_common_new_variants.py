@@ -7,12 +7,18 @@ from constraint_checkers.gluesql_types_mapping import GLUESQL_TYPES_MAPPING
 from constraint_checkers.write_update_method_for_gluesql import (
     write_update_method_for_gluesql,
 )
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def write_web_common_new_variants(
     new_struct_metadatas: List[StructMetadata],
 ):
     """Writes the new structs to the web_common crate."""
+
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing frontend new variants.")
+        return
 
     # For the time being, we simply write out the structs.
     # In the near future, we will also implement several
@@ -34,7 +40,6 @@ def write_web_common_new_variants(
     )
 
     imports = [
-        "use serde::{Deserialize, Serialize};",
         "use super::*;",
     ]
 

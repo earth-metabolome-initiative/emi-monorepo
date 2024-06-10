@@ -1,10 +1,14 @@
 """This module contains the function that ensures that all tables that have an `updated_at` column
 have a trigger that updates the column upon each row update.
 """
+
 from constraint_checkers.find_foreign_keys import TableMetadata
 from constraint_checkers.regroup_tables import get_best_insertion_point
 from userinput import userinput
 from insert_migration import insert_migration
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
+
 
 def handle_update_at_trigger_creation(
     table_name: str,
@@ -24,7 +28,9 @@ def handle_update_at_trigger_creation(
 
     if proceed:
         trigger_migration_name = f"create_{trigger_name}"
-        migration_number = get_best_insertion_point(table_name=table_name, expected_desinence=trigger_migration_name)
+        migration_number = get_best_insertion_point(
+            table_name=table_name, expected_desinence=trigger_migration_name
+        )
 
         # We create the trigger migration.
         migration_number = int(migration_number) + 1
@@ -65,9 +71,7 @@ def handle_update_at_trigger_creation(
         )
 
 
-def ensures_all_update_at_trigger_exists(
-    tables_metadata: TableMetadata
-):
+def ensures_all_update_at_trigger_exists(tables_metadata: TableMetadata):
     """Check that for all tables that have an updated_at column, there exists an update_at trigger.
 
     Implementation details
@@ -79,12 +83,18 @@ def ensures_all_update_at_trigger_exists(
     upon each row update. If it does not, the function guides the user to create the trigger and
     afterwards raises an exception to stop the pipeline as it will need to be rerun.
     """
-    for table_name in tables_metadata.tables():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print(
+            "No change detected in the migrations or the file. Skipping the updated-at trigger check."
+        )
+        return
+
+    for table_name in tables_metadata.all_tables():
         trigger_name = f"{table_name}_updated_at_trigger"
         if tables_metadata.has_updated_at_column(table_name):
             if not tables_metadata.has_updated_at_trigger(table_name):
                 handle_update_at_trigger_creation(table_name)
-                raise Exception(
+                raise RuntimeError(
                     f"The table {table_name} has an `updated_at` column, but it does not have an `{trigger_name}` trigger. "
                     "Please create the trigger and rerun the pipeline."
                 )
@@ -93,7 +103,7 @@ def ensures_all_update_at_trigger_exists(
             # that it DOES NOT have the trigger. If it does, this is most
             # likely an error.
             if tables_metadata.has_updated_at_trigger(table_name):
-                raise Exception(
+                raise RuntimeError(
                     f"The table {table_name} does not have an `updated_at` column, but it has an `{trigger_name}` trigger. "
                     "Please remove the trigger and rerun the pipeline."
                 )

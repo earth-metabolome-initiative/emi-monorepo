@@ -3,12 +3,12 @@
 from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
 from constraint_checkers.gluesql_types_mapping import GLUESQL_TYPES_MAPPING
 
+
 def write_update_method_for_gluesql(
     struct: StructMetadata,
     writer: "io.TextIOWrapper",
 ):
     """Write the `update` method for the struct in the GlueSQL database."""
-
     if struct.is_update_variant() and struct.table_name != "users":
         updator_user_id_attribute: AttributeMetadata = (
             struct.get_updator_user_id_attribute()

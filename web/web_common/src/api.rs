@@ -182,7 +182,6 @@ impl From<r2d2::Error> for ApiError {
     }
 }
 
-#[cfg(feature = "backend")]
 impl From<image::ImageError> for ApiError {
     fn from(e: image::ImageError) -> Self {
         log::error!("Image error: {:?}", e);

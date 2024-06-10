@@ -9,6 +9,9 @@ from insert_migration import insert_migration
 from constraint_checkers.table_metadata import TableStructMetadata
 from constraint_checkers.find_foreign_keys import TableMetadata
 from constraint_checkers.regroup_tables import get_desinences
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
+
 
 
 class MissingRolesTable(Exception):
@@ -74,6 +77,8 @@ def handle_unexpected_roles_table(
     table_name: str,
     referring_table_name: str,
     desinence: str = "roles",
+    is_updatable: bool = True,
+    editability_always_depend_on_parent_column: bool = False
 ):
     """Handle the unexpected user roles table.
 
@@ -86,6 +91,10 @@ def handle_unexpected_roles_table(
     desinence : str
         The desinence to use for the table name.
         Can be either "roles" or "role_requests" or "role_invitations".
+    is_updatable : bool
+        Whether the table is updatable.
+    editability_always_depend_on_parent_column : bool
+        Whether the editability of the table always depends on the parent column.
     """
     assert isinstance(table_name, str)
     assert isinstance(referring_table_name, str)
@@ -98,6 +107,9 @@ def handle_unexpected_roles_table(
         raise ValueError(f"Desinence {desinence} is not valid.")
 
     expected_table_name = f"{table_name}_{referring_table_name}_{desinence}"
+
+    print(f"Table {table_name} updatability is {is_updatable} and editability always depends on parent column is {editability_always_depend_on_parent_column}")
+    print(f"As such, the table is not expected to have a roles table, but we found {expected_table_name}")
 
     drop_table = userinput(
         f"Table {expected_table_name} is unexpected. Do you want to drop it? (yes/no)",
@@ -310,12 +322,16 @@ def ensure_updatable_tables_have_role_invitations_tables(
         else:
             if table_metadata.is_table(f"{table.name}_users_role_invitations"):
                 handle_unexpected_roles_table(
-                    table.name, "users", "role_invitations"
+                    table.name, "users", "role_invitations",
+                    is_updatable=table.is_updatable(),
+                    editability_always_depend_on_parent_column=table.editability_always_depend_on_parent_column()
                 )
                 raise UnexpectedRoleInvitationsTable(table.name, "users")
             if table_metadata.is_table(f"{table.name}_teams_role_invitations") and table.name not in ("users", "teams"):
                 handle_unexpected_roles_table(
-                    table.name, "teams", "role_invitations"
+                    table.name, "teams", "role_invitations",
+                    is_updatable=table.is_updatable(),
+                    editability_always_depend_on_parent_column=table.editability_always_depend_on_parent_column()
                 )
                 raise UnexpectedRoleInvitationsTable(table.name, "teams")
         
@@ -341,6 +357,10 @@ def ensure_updatable_tables_have_roles_tables(
     try to handle the creation process asking the user to confirm the creation of the
     missing roles table.
     """
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change detected in the migrations or the file. Skipping the roles table check.")
+        return
+    
     ensure_updatable_tables_have_role_invitations_tables(tables, table_metadata)
     ensure_updatable_tables_have_role_requests_tables(tables, table_metadata)
 

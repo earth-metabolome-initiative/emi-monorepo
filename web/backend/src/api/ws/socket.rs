@@ -2,11 +2,7 @@
 
 use std::mem::swap;
 
-use crate::models::Notification;
-use crate::nested_models::NestedUser;
-use crate::table_enumeration::*;
-use crate::DBPool;
-use crate::DieselConn;
+use crate::database::*;
 use actix::ActorContext;
 use actix::AsyncContext;
 use actix::SpawnHandle;
@@ -33,7 +29,11 @@ pub struct WebSocket {
 }
 
 impl WebSocket {
-    pub fn new(diesel: DBPool, sqlx: SQLxPool<Postgres>, redis: redis::Client) -> Result<Self, ApiError> {
+    pub fn new(
+        diesel: DBPool,
+        sqlx: SQLxPool<Postgres>,
+        redis: redis::Client,
+    ) -> Result<Self, ApiError> {
         Ok(Self {
             notifications_handler: None,
             user: None,
@@ -72,7 +72,10 @@ impl WebSocket {
         self.user.is_some()
     }
 
-    fn listen_for_notifications(&mut self, ctx: &mut <WebSocket as Actor>::Context) -> Result<(), ApiError>{
+    fn listen_for_notifications(
+        &mut self,
+        ctx: &mut <WebSocket as Actor>::Context,
+    ) -> Result<(), ApiError> {
         // If the handler is stopped or was never started, start it.
         if self.notifications_handler.is_none() {
             if let Some((user, _)) = &self.user {

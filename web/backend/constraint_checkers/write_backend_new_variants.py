@@ -1,8 +1,10 @@
 """This module contains the function that writes the new variants of the database models to the backend."""
 
 from typing import List
-from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
 from tqdm.auto import tqdm
+from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def write_backend_new_variants(
@@ -15,9 +17,11 @@ def write_backend_new_variants(
     new_struct_metadatas : List[StructMetadata]
         The list of the StructMetadata objects.
     """
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing backend new variants.")
+        return
 
-    path = "./src/new_variants.rs"
-
+    path = "./src/database/new_variants.rs"
     document = open(path, "w", encoding="utf8")
 
     # First of all, we write a docstring that warns the reader
@@ -32,8 +36,7 @@ def write_backend_new_variants(
 
     imports = [
         "use diesel::prelude::*;",
-        "use crate::models::*;",
-        "use crate::schema::*;",
+        "use crate::database::*;",
     ]
 
     document.write("\n".join(imports) + "\n")
@@ -61,7 +64,7 @@ def write_backend_new_variants(
 
     document.write(
         "/// Trait providing the insert method for the new variants.\n"
-        "pub(super) trait InsertRow {\n"
+        "pub(crate) trait InsertRow {\n"
         "    /// The intermediate representation of the row.\n"
         "    type Intermediate;\n\n"
         "    /// The flat variant of the new variant.\n"
@@ -106,8 +109,8 @@ def write_backend_new_variants(
         document.write(
             f"/// Intermediate representation of the new variant {struct.name}.\n"
             "#[derive(Insertable)]\n"
-            f"#[diesel(table_name = {struct.table_name})]\n"
-            f"pub(super) struct {intermediate_struct_name} {{\n"
+            f"#[diesel(table_name = crate::database::schema::{struct.table_name})]\n"
+            f"pub(crate) struct {intermediate_struct_name} {{\n"
         )
 
         all_attributes: List[AttributeMetadata] = struct.attributes
@@ -140,7 +143,7 @@ def write_backend_new_variants(
         document.write(
             f"impl InsertRow for web_common::database::{struct.name} {{\n"
             f"    type Intermediate = {intermediate_struct_name};\n"
-            f"    type Flat = {struct.get_flat_variant().name};\n\n"
+            f"    type Flat = crate::database::flat_variants::{struct.get_flat_variant().name};\n\n"
             f"    fn to_intermediate(self, {underscored_user_id}user_id: i32) -> Self::Intermediate {{\n"
             f"        {intermediate_struct_name} {{\n"
         )
@@ -151,10 +154,13 @@ def write_backend_new_variants(
                 updator_user_id_attribute,
             ):
                 document.write(f"            {attribute.name}: user_id,\n")
-            else:
+                continue
+            if attribute.is_jpeg():
                 document.write(
-                    f"            {attribute.name}: self.{attribute.name},\n"
+                    f"            {attribute.name}: self.{attribute.name}.into(),\n"
                 )
+                continue
+            document.write(f"            {attribute.name}: self.{attribute.name},\n")
 
         document.write("        }\n    }\n\n")
 
@@ -172,9 +178,9 @@ def write_backend_new_variants(
             f"       user_id: i32,\n"
             "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>\n"
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
-            f"        use crate::schema::{struct.table_name};\n{assert_user_id_check}"
+            f"        use crate::database::schema::{struct.table_name};\n{assert_user_id_check}"
             f"        diesel::insert_into({struct.table_name}::dsl::{struct.table_name})\n"
-            f"            .values(self.to_intermediate({defaulted_user_id}))\n"
+            f"            .values(InsertRow::to_intermediate(self, {defaulted_user_id}))\n"
             "            .get_result(connection)\n"
             "    }\n"
             "}\n\n"
