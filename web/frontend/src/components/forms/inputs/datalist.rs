@@ -101,7 +101,7 @@ where
 
 impl<Data: Filtrable, const EDIT: bool> MultiDatalist<Data, EDIT> {
     fn disable(&self) -> bool {
-        self.total_number_of_search_queries > 0
+        self.total_number_of_search_queries == 1
             && self.number_of_search_queries == 0
             && self.candidates.is_empty()
             && self
@@ -215,7 +215,7 @@ where
                 ));
                 self.number_of_search_queries += 1;
                 self.total_number_of_search_queries += 1;
-                false
+                true
             }
             DatalistMessage::SearchCandidatesTimeout => {
                 let link = ctx.link().clone();
@@ -330,7 +330,7 @@ where
             .collect::<Vec<usize>>();
 
         let classes = format!(
-            "input-group datalist{}{}",
+            "input-group datalist{}{}{}",
             if ctx.props().show_label {
                 ""
             } else {
@@ -347,6 +347,11 @@ where
                         _ => "many",
                     }
                 )
+            },
+            if self.number_of_search_queries > 0 {
+                " loading".to_string()
+            } else {
+                "".to_string()
             }
         );
 
@@ -408,33 +413,43 @@ where
             }
         );
 
-        let input_field = html! {
-            <>
-                if props.show_label {
-                    <label for={props.normalized_label()} class={label_classes}>
-                        {props.label()}
-                    </label>
-                }
-                if self.is_focused || self.selections.is_empty(){
-                    <input
-                        type="search"
-                        class="input-control"
-                        value={input_value}
-                        placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                        oninput={on_input}
-                        onfocus={on_focus}
-                        disabled={self.disable()}
-                        autocomplete="off"
-                        spellcheck="false"
-                        id={props.normalized_label()}
-                        name={props.normalized_label()}
-                    />
-                    if ctx.props().scanner {
-                        <Scanner onscan={on_scan} onerror={on_scan_error}/>
+        let all_errors: Vec<ApiError> = if self.disable() {
+            Vec::new()
+        } else {
+            self.errors
+                .iter()
+                .chain(ctx.props().errors.iter())
+                .cloned()
+                .collect()
+        };
+
+        html! {
+            <div class={classes}>
+                <div class="input-container">
+                    if props.show_label {
+                        <label for={props.normalized_label()} class={label_classes}>
+                            {props.label()}
+                        </label>
                     }
-                }
-                {if !self.selections.is_empty() {
-                    html! {
+                    if self.is_focused || self.selections.is_empty(){
+                        <input
+                            type="search"
+                            class="input-control"
+                            value={input_value}
+                            placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                            oninput={on_input}
+                            onfocus={on_focus}
+                            disabled={self.disable()}
+                            autocomplete="off"
+                            spellcheck="false"
+                            id={props.normalized_label()}
+                            name={props.normalized_label()}
+                        />
+                        if ctx.props().scanner {
+                            <Scanner onscan={on_scan} onerror={on_scan_error}/>
+                        }
+                    }
+                    if !self.selections.is_empty() {
                         <ul class="selected-datalist-badges">
                         {for self.selections.iter().enumerate().map(|(i, selection)| {
                             let onclick = {
@@ -475,26 +490,6 @@ where
                         }
                         </ul>
                     }
-                } else {
-                    html!{}
-                }}
-            </>
-        };
-
-        let all_errors: Vec<ApiError> = if self.disable() {
-            Vec::new()
-        } else {
-            self.errors
-                .iter()
-                .chain(ctx.props().errors.iter())
-                .cloned()
-                .collect()
-        };
-
-        html! {
-            <div class={classes}>
-                <div class="input-container">
-                    {input_field}
                 </div>
                 {if !ctx.props().always_shows_candidates && (!self.is_focused || self.candidates.is_empty() || self.selections.len() == ctx.props().maximum_number_of_choices){
                     html! {}

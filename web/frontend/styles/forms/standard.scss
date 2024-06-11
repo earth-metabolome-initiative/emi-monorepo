@@ -62,8 +62,50 @@
             animation: pop-in 0.2s;
         }
 
+        /* clears the ‘X’ from Internet Explorer */
+        input[type=search]::-ms-clear { display: none; width : 0; height: 0; }
+        input[type=search]::-ms-reveal { display: none; width : 0; height: 0; }
+        /* clears the ‘X’ from Chrome */
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration { display: none; }
+
         .input-container {
             grid-template-columns: auto 1fr auto;
+            position: relative;
+            // We show by default a search icon
+            // on the right side of the search input
+            &::after {
+                content: "\f002";
+                display: block;
+                font-family: "Font Awesome 5 Free";
+                font-style: normal;
+                font-variant: normal;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+                font-weight: 900;
+                font-size: 1.2em;
+                color: $grey;
+                position: absolute;
+                right: 0.5em;
+                transition: color 0.2s;
+            }
+        }
+        &:focus-within {
+            .input-container {
+                &::after {
+                    color: $primary;
+                }
+            }
+        }
+        &.loading {
+            .input-container {
+                &::after {
+                    content: "\f110";
+                    animation: fa-spin 1s infinite linear;
+                }
+            }
         }
     }
 
