@@ -150,18 +150,18 @@
         }
 
         .start-scanner {
-            border: none;
             animation: fade-in-right 0.2s;
+            padding: 0.25em 0.35em;
 
             i {
-                font-size: 1.5em;
-                color: $light_grey;
+                font-size: 1.75em;
+                color: inherit;
                 transition: color 0.2s;
             }
 
             &:hover {
                 i {
-                    color: inherit;
+                   color: white; 
                 }
             }
         }
@@ -682,6 +682,10 @@ form.standard-form {
         .input-group.scanner {
             .start-scanner {
                 color: $red;
+                &:hover {
+                    color: white;
+                    background-color: $red;
+                }
             }
         }
 
@@ -723,6 +727,10 @@ form.standard-form {
         .input-group.scanner {
             .start-scanner {
                 color: $green;
+                &:hover {
+                    color: white;
+                    background-color: $green;
+                }
             }
         }
 
@@ -764,6 +772,10 @@ form.standard-form {
         .input-group.scanner {
             .start-scanner {
                 color: $blue;
+                &:hover {
+                    color: white;
+                    background-color: $blue;
+                }
             }
         }
 

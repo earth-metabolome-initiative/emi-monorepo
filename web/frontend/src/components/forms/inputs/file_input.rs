@@ -66,7 +66,7 @@ pub fn multi_file_input<Data: FileLike>(props: &MultiFileInputProp<Data>) -> Htm
     let container_node = use_node_ref();
     let input_node = use_node_ref();
     let inner_errors = use_state(|| Vec::new());
-    let is_dragging = use_state(|| true);
+    let is_dragging = use_state(|| false);
 
     // First, we handle that on click on the container node, it should trigger a click on the input node.
     let container_on_click = {
@@ -92,6 +92,8 @@ pub fn multi_file_input<Data: FileLike>(props: &MultiFileInputProp<Data>) -> Htm
                 .unwrap()
                 .files()
                 .unwrap();
+
+            
         })
     };
 
