@@ -9,10 +9,9 @@
 
     label.input-label {
         display: block;
-        font-size: 0.8em;
-        margin-bottom: 0.2em;
+        font-size: 0.9em;
 
-        color: $grey;
+        color: $near_black;
         font-weight: 100;
         padding-right: 0.5em;
         display: inline-block;
@@ -31,6 +30,7 @@
     input {
         background-color: white;
         transition: background-color 0.2s;
+        font-size: 0.9em;
         &:disabled {
             background-color: $light_grey;
             cursor: not-allowed;
@@ -128,7 +128,7 @@
     input[type="datetime-local"],
     textarea,
     input[type="number"] {
-        padding: 0.5em;
+        padding: 0.4em;
         box-sizing: border-box;
         max-width: 100%;
         transition: border-color 0.2s, border-radius 0.2s;
