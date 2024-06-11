@@ -330,7 +330,7 @@ where
             .collect::<Vec<usize>>();
 
         let classes = format!(
-            "input-group datalist{}{}{}",
+            "input-group datalist{}{}{}{}",
             if ctx.props().show_label {
                 ""
             } else {
@@ -350,6 +350,11 @@ where
             },
             if self.number_of_search_queries > 0 {
                 " loading".to_string()
+            } else {
+                "".to_string()
+            },
+            if self.selections.len() > 0 {
+                " has-selections".to_string()
             } else {
                 "".to_string()
             }
@@ -431,7 +436,7 @@ where
                             {props.label()}
                         </label>
                     }
-                    if self.is_focused || self.selections.is_empty(){
+                    if self.is_focused || self.selections.is_empty() {
                         <input
                             type="search"
                             class="input-control"
