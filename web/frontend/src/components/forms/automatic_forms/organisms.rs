@@ -12,14 +12,14 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct OrganismBuilder {
     pub id: Option<uuid::Uuid>,
     pub notes: Option<Rc<String>>,
-    pub host_organism: Option<Rc<NestedOrganism>>,
-    pub sample: Option<Rc<NestedSample>>,
-    pub nameplate: Option<Rc<NestedNameplate>>,
-    pub project: Option<Rc<NestedProject>>,
+    pub host_organism: Option<Rc<web_common::database::nested_variants::NestedOrganism>>,
+    pub sample: Option<Rc<web_common::database::nested_variants::NestedSample>>,
+    pub nameplate: Option<Rc<web_common::database::nested_variants::NestedNameplate>>,
+    pub project: Option<Rc<web_common::database::nested_variants::NestedProject>>,
     pub errors_notes: Vec<ApiError>,
     pub errors_host_organism: Vec<ApiError>,
     pub errors_sample: Vec<ApiError>,
@@ -49,13 +49,13 @@ impl Default for OrganismBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum OrganismActions {
     SetNotes(Option<String>),
-    SetHostOrganism(Option<Rc<NestedOrganism>>),
-    SetSample(Option<Rc<NestedSample>>),
-    SetNameplate(Option<Rc<NestedNameplate>>),
-    SetProject(Option<Rc<NestedProject>>),
+    SetHostOrganism(Option<Rc<web_common::database::nested_variants::NestedOrganism>>),
+    SetSample(Option<Rc<web_common::database::nested_variants::NestedSample>>),
+    SetNameplate(Option<Rc<web_common::database::nested_variants::NestedNameplate>>),
+    SetProject(Option<Rc<web_common::database::nested_variants::NestedProject>>),
 }
 
 impl FromOperation for OrganismActions {
@@ -288,28 +288,36 @@ pub fn create_organism_form(props: &CreateOrganismFormProp) -> Html {
     }
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| OrganismActions::SetNotes(notes));
-    let set_host_organism =
-        builder_dispatch.apply_callback(|host_organism: Option<Rc<NestedOrganism>>| {
+    let set_host_organism = builder_dispatch.apply_callback(
+        |host_organism: Option<Rc<web_common::database::nested_variants::NestedOrganism>>| {
             OrganismActions::SetHostOrganism(host_organism)
-        });
-    let set_sample = builder_dispatch
-        .apply_callback(|sample: Option<Rc<NestedSample>>| OrganismActions::SetSample(sample));
-    let set_nameplate =
-        builder_dispatch.apply_callback(|nameplate: Option<Rc<NestedNameplate>>| {
+        },
+    );
+    let set_sample = builder_dispatch.apply_callback(
+        |sample: Option<Rc<web_common::database::nested_variants::NestedSample>>| {
+            OrganismActions::SetSample(sample)
+        },
+    );
+    let set_nameplate = builder_dispatch.apply_callback(
+        |nameplate: Option<Rc<web_common::database::nested_variants::NestedNameplate>>| {
             OrganismActions::SetNameplate(nameplate)
-        });
-    let set_project = builder_dispatch
-        .apply_callback(|project: Option<Rc<NestedProject>>| OrganismActions::SetProject(project));
+        },
+    );
+    let set_project = builder_dispatch.apply_callback(
+        |project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
+            OrganismActions::SetProject(project)
+        },
+    );
     html! {
         <BasicForm<NewOrganism>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <Datalist<NestedOrganism, false> builder={set_host_organism} optional={true} errors={builder_store.errors_host_organism.clone()} value={builder_store.host_organism.clone()} label="Host organism" scanner={false} />
-            <Datalist<NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
-            <Datalist<NestedNameplate, false> builder={set_nameplate} optional={false} errors={builder_store.errors_nameplate.clone()} value={builder_store.nameplate.clone()} label="Nameplate" scanner={false} />
-            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedOrganism, false> builder={set_host_organism} optional={true} errors={builder_store.errors_host_organism.clone()} value={builder_store.host_organism.clone()} label="Host organism" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedNameplate, false> builder={set_nameplate} optional={false} errors={builder_store.errors_nameplate.clone()} value={builder_store.nameplate.clone()} label="Nameplate" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
         </BasicForm<NewOrganism>>
     }
 }
@@ -327,28 +335,36 @@ pub fn update_organism_form(props: &UpdateOrganismFormProp) -> Html {
     named_requests.push(ComponentMessage::get::<NewOrganism>(props.id.into()));
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| OrganismActions::SetNotes(notes));
-    let set_host_organism =
-        builder_dispatch.apply_callback(|host_organism: Option<Rc<NestedOrganism>>| {
+    let set_host_organism = builder_dispatch.apply_callback(
+        |host_organism: Option<Rc<web_common::database::nested_variants::NestedOrganism>>| {
             OrganismActions::SetHostOrganism(host_organism)
-        });
-    let set_sample = builder_dispatch
-        .apply_callback(|sample: Option<Rc<NestedSample>>| OrganismActions::SetSample(sample));
-    let set_nameplate =
-        builder_dispatch.apply_callback(|nameplate: Option<Rc<NestedNameplate>>| {
+        },
+    );
+    let set_sample = builder_dispatch.apply_callback(
+        |sample: Option<Rc<web_common::database::nested_variants::NestedSample>>| {
+            OrganismActions::SetSample(sample)
+        },
+    );
+    let set_nameplate = builder_dispatch.apply_callback(
+        |nameplate: Option<Rc<web_common::database::nested_variants::NestedNameplate>>| {
             OrganismActions::SetNameplate(nameplate)
-        });
-    let set_project = builder_dispatch
-        .apply_callback(|project: Option<Rc<NestedProject>>| OrganismActions::SetProject(project));
+        },
+    );
+    let set_project = builder_dispatch.apply_callback(
+        |project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
+            OrganismActions::SetProject(project)
+        },
+    );
     html! {
         <BasicForm<NewOrganism>
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <Datalist<NestedOrganism, false> builder={set_host_organism} optional={true} errors={builder_store.errors_host_organism.clone()} value={builder_store.host_organism.clone()} label="Host organism" scanner={false} />
-            <Datalist<NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
-            <Datalist<NestedNameplate, false> builder={set_nameplate} optional={false} errors={builder_store.errors_nameplate.clone()} value={builder_store.nameplate.clone()} label="Nameplate" scanner={false} />
-            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedOrganism, false> builder={set_host_organism} optional={true} errors={builder_store.errors_host_organism.clone()} value={builder_store.host_organism.clone()} label="Host organism" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedNameplate, false> builder={set_nameplate} optional={false} errors={builder_store.errors_nameplate.clone()} value={builder_store.nameplate.clone()} label="Nameplate" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
         </BasicForm<NewOrganism>>
     }
 }

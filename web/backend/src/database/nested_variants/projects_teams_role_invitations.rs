@@ -1,15 +1,13 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedProjectsTeamsRoleInvitation {
-    pub inner: ProjectsTeamsRoleInvitation,
-    pub table: NestedProject,
-    pub team: NestedTeam,
-    pub role: NestedRole,
-    pub created_by: NestedUser,
+    pub inner: crate::database::flat_variants::ProjectsTeamsRoleInvitation,
+    pub table: crate::database::nested_variants::NestedProject,
+    pub team: crate::database::nested_variants::NestedTeam,
+    pub role: crate::database::nested_variants::NestedRole,
+    pub created_by: crate::database::nested_variants::NestedUser,
 }
 
 unsafe impl Send for NestedProjectsTeamsRoleInvitation {}
@@ -29,10 +27,23 @@ impl NestedProjectsTeamsRoleInvitation {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: NestedProject::get(flat_variant.table_id, author_user_id, connection)?,
-            team: NestedTeam::get(flat_variant.team_id, connection)?,
-            role: NestedRole::get(flat_variant.role_id, connection)?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            table: crate::database::nested_variants::NestedProject::get(
+                flat_variant.table_id,
+                author_user_id,
+                connection,
+            )?,
+            team: crate::database::nested_variants::NestedTeam::get(
+                flat_variant.team_id,
+                connection,
+            )?,
+            role: crate::database::nested_variants::NestedRole::get(
+                flat_variant.role_id,
+                connection,
+            )?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -71,7 +82,7 @@ impl NestedProjectsTeamsRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -98,7 +109,7 @@ impl NestedProjectsTeamsRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -141,7 +152,7 @@ impl NestedProjectsTeamsRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -233,7 +244,7 @@ impl NestedProjectsTeamsRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -260,7 +271,7 @@ impl NestedProjectsTeamsRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -288,7 +299,7 @@ impl NestedProjectsTeamsRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -348,7 +359,7 @@ impl NestedProjectsTeamsRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -375,7 +386,7 @@ impl NestedProjectsTeamsRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -403,7 +414,7 @@ impl NestedProjectsTeamsRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&ProjectsTeamsRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -453,30 +464,44 @@ impl NestedProjectsTeamsRoleInvitation {
     }
 }
 impl From<web_common::database::nested_variants::NestedProjectsTeamsRoleInvitation>
-    for NestedProjectsTeamsRoleInvitation
+    for crate::database::nested_variants::NestedProjectsTeamsRoleInvitation
 {
     fn from(
         item: web_common::database::nested_variants::NestedProjectsTeamsRoleInvitation,
     ) -> Self {
         Self {
-            inner: ProjectsTeamsRoleInvitation::from(item.inner),
-            table: NestedProject::from(item.table.as_ref().clone()),
-            team: NestedTeam::from(item.team.as_ref().clone()),
-            role: NestedRole::from(item.role.as_ref().clone()),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            inner: crate::database::flat_variants::ProjectsTeamsRoleInvitation::from(item.inner),
+            table: crate::database::nested_variants::NestedProject::from(
+                item.table.as_ref().clone(),
+            ),
+            team: crate::database::nested_variants::NestedTeam::from(item.team.as_ref().clone()),
+            role: crate::database::nested_variants::NestedRole::from(item.role.as_ref().clone()),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedProjectsTeamsRoleInvitation>
+impl From<crate::database::nested_variants::NestedProjectsTeamsRoleInvitation>
     for web_common::database::nested_variants::NestedProjectsTeamsRoleInvitation
 {
-    fn from(item: NestedProjectsTeamsRoleInvitation) -> Self {
+    fn from(item: crate::database::nested_variants::NestedProjectsTeamsRoleInvitation) -> Self {
         Self {
-            inner: web_common::database::ProjectsTeamsRoleInvitation::from(item.inner),
-            table: Rc::from(web_common::database::NestedProject::from(item.table)),
-            team: Rc::from(web_common::database::NestedTeam::from(item.team)),
-            role: Rc::from(web_common::database::NestedRole::from(item.role)),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            inner: web_common::database::flat_variants::ProjectsTeamsRoleInvitation::from(
+                item.inner,
+            ),
+            table: Rc::from(web_common::database::nested_variants::NestedProject::from(
+                item.table,
+            )),
+            team: Rc::from(web_common::database::nested_variants::NestedTeam::from(
+                item.team,
+            )),
+            role: Rc::from(web_common::database::nested_variants::NestedRole::from(
+                item.role,
+            )),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
         }
     }
 }

@@ -12,12 +12,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -45,8 +42,10 @@ pub struct LoginProvider {
 
 unsafe impl Send for LoginProvider {}
 unsafe impl Sync for LoginProvider {}
-impl From<LoginProvider> for web_common::database::flat_variants::LoginProvider {
-    fn from(item: LoginProvider) -> Self {
+impl From<web_common::database::flat_variants::LoginProvider>
+    for crate::database::flat_variants::LoginProvider
+{
+    fn from(item: web_common::database::flat_variants::LoginProvider) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -60,8 +59,10 @@ impl From<LoginProvider> for web_common::database::flat_variants::LoginProvider 
     }
 }
 
-impl From<web_common::database::flat_variants::LoginProvider> for LoginProvider {
-    fn from(item: web_common::database::flat_variants::LoginProvider) -> Self {
+impl From<crate::database::flat_variants::LoginProvider>
+    for web_common::database::flat_variants::LoginProvider
+{
+    fn from(item: crate::database::flat_variants::LoginProvider) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -91,7 +92,7 @@ impl LoginProvider {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&LoginProviderFilter>,
+        filter: Option<&web_common::database::filter_variants::LoginProviderFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -122,7 +123,7 @@ impl LoginProvider {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&LoginProviderFilter>,
+        filter: Option<&web_common::database::filter_variants::LoginProviderFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<

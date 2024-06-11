@@ -13,7 +13,6 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
     Eq,
@@ -45,8 +44,10 @@ pub struct UsersUsersRole {
 
 unsafe impl Send for UsersUsersRole {}
 unsafe impl Sync for UsersUsersRole {}
-impl From<UsersUsersRole> for web_common::database::flat_variants::UsersUsersRole {
-    fn from(item: UsersUsersRole) -> Self {
+impl From<web_common::database::flat_variants::UsersUsersRole>
+    for crate::database::flat_variants::UsersUsersRole
+{
+    fn from(item: web_common::database::flat_variants::UsersUsersRole) -> Self {
         Self {
             table_id: item.table_id,
             user_id: item.user_id,
@@ -57,8 +58,10 @@ impl From<UsersUsersRole> for web_common::database::flat_variants::UsersUsersRol
     }
 }
 
-impl From<web_common::database::flat_variants::UsersUsersRole> for UsersUsersRole {
-    fn from(item: web_common::database::flat_variants::UsersUsersRole) -> Self {
+impl From<crate::database::flat_variants::UsersUsersRole>
+    for web_common::database::flat_variants::UsersUsersRole
+{
+    fn from(item: crate::database::flat_variants::UsersUsersRole) -> Self {
         Self {
             table_id: item.table_id,
             user_id: item.user_id,
@@ -85,7 +88,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&UsersUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -122,7 +125,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&UsersUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -177,7 +180,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&UsersUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -333,7 +336,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&UsersUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -379,7 +382,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&UsersUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -426,7 +429,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&UsersUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -536,7 +539,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&UsersUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -582,7 +585,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&UsersUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -629,7 +632,7 @@ impl UsersUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&UsersUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

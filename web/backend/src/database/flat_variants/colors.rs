@@ -15,9 +15,7 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -41,8 +39,8 @@ pub struct Color {
 
 unsafe impl Send for Color {}
 unsafe impl Sync for Color {}
-impl From<Color> for web_common::database::flat_variants::Color {
-    fn from(item: Color) -> Self {
+impl From<web_common::database::flat_variants::Color> for crate::database::flat_variants::Color {
+    fn from(item: web_common::database::flat_variants::Color) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -52,8 +50,8 @@ impl From<Color> for web_common::database::flat_variants::Color {
     }
 }
 
-impl From<web_common::database::flat_variants::Color> for Color {
-    fn from(item: web_common::database::flat_variants::Color) -> Self {
+impl From<crate::database::flat_variants::Color> for web_common::database::flat_variants::Color {
+    fn from(item: crate::database::flat_variants::Color) -> Self {
         Self {
             id: item.id,
             name: item.name,

@@ -209,25 +209,25 @@ def write_web_common_flat_variants(
         for attribute in struct.attributes:
 
             if attribute.optional:
-                if attribute.data_type() in GLUESQL_TYPES_MAPPING:
+                if attribute.raw_data_type() in GLUESQL_TYPES_MAPPING:
                     document.write(
                         f"            match self.{attribute.name} {{\n"
-                        f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(attribute.name)},\n"
+                        f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.raw_data_type()].format(value=attribute.name)},\n"
                         "                None => gluesql::core::ast_builder::null(),\n"
                         "            },\n"
                     )
                 else:
                     raise NotImplementedError(
-                        f"The type {attribute.data_type()} is not supported. "
-                        f"The struct {struct.name} contains an {attribute.data_type()}. "
+                        f"The type {attribute.raw_data_type()} is not supported. "
+                        f"The struct {struct.name} contains an {attribute.raw_data_type()}. "
                     )
-            elif attribute.data_type() in GLUESQL_TYPES_MAPPING:
+            elif attribute.raw_data_type() in GLUESQL_TYPES_MAPPING:
                 document.write(
-                    f"            {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(f'self.{attribute.name}')},\n"
+                    f"            {GLUESQL_TYPES_MAPPING[attribute.raw_data_type()].format(value=f'self.{attribute.name}')},\n"
                 )
             else:
                 raise NotImplementedError(
-                    f"The type {attribute.data_type()} is not supported."
+                    f"The type {attribute.raw_data_type()} is not supported."
                 )
 
         document.write("        ]\n    }\n\n")
@@ -524,6 +524,8 @@ def write_web_common_flat_variants(
             "f32": "F32",
             "f64": "F64",
             "String": "Str",
+            "Point": "Point",
+            "JPEG": "Bytea",
             "chrono::NaiveDateTime": "Timestamp",
         }
 
@@ -543,10 +545,10 @@ def write_web_common_flat_variants(
                     '                _ => unreachable!("Expected Uuid"),\n'
                     "            },\n"
                 )
-            elif attribute.is_jpeg():
+            elif attribute.has_backend_type():
                 document.write(
                     f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
-                    f"                gluesql::prelude::Value::Bytea({attribute.name}) => {attribute.name}.clone().into(),\n"
+                    f"                gluesql::prelude::Value::{clonables[attribute.raw_data_type()]}({attribute.name}) => {attribute.name}.clone().into(),\n"
                     '                _ => unreachable!("Expected Bytea"),\n'
                     "            },\n"
                 )
@@ -555,20 +557,20 @@ def write_web_common_flat_variants(
                     document.write(
                         f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
                         "                gluesql::prelude::Value::Null => None,\n"
-                        f"                gluesql::prelude::Value::{clonables[attribute.data_type()]}({attribute.name}) => Some({attribute.name}.clone()),\n"
-                        f'                _ => unreachable!("Expected {clonables[attribute.data_type()]}")\n'
+                        f"                gluesql::prelude::Value::{clonables[attribute.raw_data_type()]}({attribute.name}) => Some({attribute.name}.clone()),\n"
+                        f'                _ => unreachable!("Expected {clonables[attribute.raw_data_type()]}")\n'
                         "            },\n"
                     )
                 else:
                     document.write(
                         f'            {attribute.name}: match row.get("{attribute.name}").unwrap() {{\n'
-                        f"                gluesql::prelude::Value::{clonables[attribute.data_type()]}({attribute.name}) => {attribute.name}.clone(),\n"
-                        f'                _ => unreachable!("Expected {clonables[attribute.data_type()]}")\n'
+                        f"                gluesql::prelude::Value::{clonables[attribute.raw_data_type()]}({attribute.name}) => {attribute.name}.clone(),\n"
+                        f'                _ => unreachable!("Expected {clonables[attribute.raw_data_type()]}")\n'
                         "            },\n"
                     )
             else:
                 raise NotImplementedError(
-                    f"Found an unsupported attribute type for the struct {struct.name}: {attribute.data_type()} "
+                    f"Found an unsupported attribute type for the struct {struct.name}: {attribute.raw_data_type()} "
                     f"for the attribute {attribute.name}."
                 )
         document.write("        }\n    }\n}\n")

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 pub struct EmptyFilter;
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct BioOttRankFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -29,7 +29,7 @@ impl BioOttRankFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct BioOttTaxonItemFilter {
     pub ott_rank_id: Option<i32>,
     pub domain_id: Option<i32>,
@@ -100,7 +100,7 @@ impl BioOttTaxonItemFilter {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default, Eq)]
+#[derive(PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default, Eq)]
 pub struct DerivedSampleFilter {
     pub created_by: Option<i32>,
     pub updated_by: Option<i32>,
@@ -141,7 +141,7 @@ impl DerivedSampleFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct DocumentFormatFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -167,7 +167,7 @@ impl DocumentFormatFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct LoginProviderFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -193,7 +193,7 @@ impl LoginProviderFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct MaterialFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -219,7 +219,7 @@ impl MaterialFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct NameplateCategoryFilter {
     pub permanence_id: Option<i32>,
     pub material_id: Option<i32>,
@@ -255,7 +255,7 @@ impl NameplateCategoryFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Eq, PartialOrd, Copy, Ord, Default)]
 pub struct NameplateFilter {
     pub project_id: Option<i32>,
     pub category_id: Option<i32>,
@@ -291,7 +291,7 @@ impl NameplateFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct NotificationFilter {
     pub user_id: Option<i32>,
 }
@@ -312,7 +312,7 @@ impl NotificationFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct ObservationSubjectFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -338,7 +338,7 @@ impl ObservationSubjectFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, Copy)]
 pub struct ObservationFilter {
     pub parent_observation_id: Option<uuid::Uuid>,
     pub created_by: Option<i32>,
@@ -389,7 +389,7 @@ impl ObservationFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct OrganismBioOttTaxonItemFilter {
     pub created_by: Option<i32>,
     pub organism_id: Option<uuid::Uuid>,
@@ -420,7 +420,7 @@ impl OrganismBioOttTaxonItemFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, Copy)]
 pub struct OrganismFilter {
     pub host_organism_id: Option<uuid::Uuid>,
     pub sample_id: Option<uuid::Uuid>,
@@ -466,7 +466,7 @@ impl OrganismFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct OrganizationFilter {
     pub country_id: Option<i32>,
 }
@@ -487,7 +487,7 @@ impl OrganizationFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct PermanenceCategoryFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -513,7 +513,7 @@ impl PermanenceCategoryFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct ProjectStateFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -539,7 +539,7 @@ impl ProjectStateFilter {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct ProjectFilter {
     pub state_id: Option<i32>,
     pub icon_id: Option<i32>,
@@ -801,7 +801,7 @@ impl ProjectsUsersRoleFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct RoleFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -827,7 +827,7 @@ impl RoleFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct SampleBioOttTaxonItemFilter {
     pub created_by: Option<i32>,
     pub sample_id: Option<uuid::Uuid>,
@@ -858,7 +858,7 @@ impl SampleBioOttTaxonItemFilter {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct SampleContainerCategoryFilter {
     pub material_id: Option<i32>,
     pub icon_id: Option<i32>,
@@ -889,7 +889,7 @@ impl SampleContainerCategoryFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct SampleContainerFilter {
     pub project_id: Option<i32>,
     pub category_id: Option<i32>,
@@ -925,7 +925,7 @@ impl SampleContainerFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct SampleStateFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -951,7 +951,7 @@ impl SampleStateFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct SampleFilter {
     pub container_id: Option<i32>,
     pub project_id: Option<i32>,
@@ -1018,7 +1018,7 @@ impl SpectraFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, Copy)]
 pub struct SpectraCollectionFilter {
     pub sample_id: Option<uuid::Uuid>,
     pub created_by: Option<i32>,
@@ -1049,7 +1049,7 @@ impl SpectraCollectionFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct TeamStateFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -1075,7 +1075,7 @@ impl TeamStateFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct TeamFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -1265,7 +1265,7 @@ impl TeamsUsersRoleFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct UnitFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -1291,7 +1291,7 @@ impl UnitFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct UserEmailFilter {
     pub created_by: Option<i32>,
     pub login_provider_id: Option<i32>,
@@ -1317,7 +1317,7 @@ impl UserEmailFilter {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Copy, Ord)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default, Eq, PartialOrd, Copy, Ord)]
 pub struct UserFilter {
     pub organization_id: Option<i32>,
 }

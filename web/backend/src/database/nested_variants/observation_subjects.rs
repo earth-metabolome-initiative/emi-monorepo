@@ -1,14 +1,11 @@
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedObservationSubject {
-    pub inner: ObservationSubject,
-    pub icon: FontAwesomeIcon,
-    pub color: Color,
+    pub inner: crate::database::flat_variants::ObservationSubject,
+    pub icon: crate::database::flat_variants::FontAwesomeIcon,
+    pub color: crate::database::flat_variants::Color,
 }
 
 unsafe impl Send for NestedObservationSubject {}
@@ -26,8 +23,11 @@ impl NestedObservationSubject {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
-            color: Color::get(flat_variant.color_id, connection)?,
+            icon: crate::database::flat_variants::FontAwesomeIcon::get(
+                flat_variant.icon_id,
+                connection,
+            )?,
+            color: crate::database::flat_variants::Color::get(flat_variant.color_id, connection)?,
             inner: flat_variant,
         })
     }
@@ -46,7 +46,7 @@ impl NestedObservationSubject {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&ObservationSubjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationSubjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -65,7 +65,7 @@ impl NestedObservationSubject {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&ObservationSubjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationSubjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -98,7 +98,7 @@ impl NestedObservationSubject {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&ObservationSubjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationSubjectFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -152,24 +152,30 @@ impl NestedObservationSubject {
     }
 }
 impl From<web_common::database::nested_variants::NestedObservationSubject>
-    for NestedObservationSubject
+    for crate::database::nested_variants::NestedObservationSubject
 {
     fn from(item: web_common::database::nested_variants::NestedObservationSubject) -> Self {
         Self {
-            inner: ObservationSubject::from(item.inner.as_ref().clone()),
-            icon: FontAwesomeIcon::from(item.icon.as_ref().clone()),
-            color: Color::from(item.color.as_ref().clone()),
+            inner: crate::database::flat_variants::ObservationSubject::from(
+                item.inner.as_ref().clone(),
+            ),
+            icon: crate::database::flat_variants::FontAwesomeIcon::from(item.icon.as_ref().clone()),
+            color: crate::database::flat_variants::Color::from(item.color.as_ref().clone()),
         }
     }
 }
-impl From<NestedObservationSubject>
+impl From<crate::database::nested_variants::NestedObservationSubject>
     for web_common::database::nested_variants::NestedObservationSubject
 {
-    fn from(item: NestedObservationSubject) -> Self {
+    fn from(item: crate::database::nested_variants::NestedObservationSubject) -> Self {
         Self {
-            inner: Rc::from(web_common::database::ObservationSubject::from(item.inner)),
-            icon: Rc::from(web_common::database::FontAwesomeIcon::from(item.icon)),
-            color: Rc::from(web_common::database::Color::from(item.color)),
+            inner: Rc::from(
+                web_common::database::flat_variants::ObservationSubject::from(item.inner),
+            ),
+            icon: Rc::from(web_common::database::flat_variants::FontAwesomeIcon::from(
+                item.icon,
+            )),
+            color: Rc::from(web_common::database::flat_variants::Color::from(item.color)),
         }
     }
 }

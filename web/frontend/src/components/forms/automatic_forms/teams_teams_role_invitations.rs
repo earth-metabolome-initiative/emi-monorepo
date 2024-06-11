@@ -12,11 +12,11 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TeamsTeamsRoleInvitationBuilder {
-    pub table: Option<Rc<NestedTeam>>,
-    pub team: Option<Rc<NestedTeam>>,
-    pub role: Option<Rc<NestedRole>>,
+    pub table: Option<Rc<web_common::database::nested_variants::NestedTeam>>,
+    pub team: Option<Rc<web_common::database::nested_variants::NestedTeam>>,
+    pub role: Option<Rc<web_common::database::nested_variants::NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_team: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -39,11 +39,11 @@ impl Default for TeamsTeamsRoleInvitationBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum TeamsTeamsRoleInvitationActions {
-    SetTable(Option<Rc<NestedTeam>>),
-    SetTeam(Option<Rc<NestedTeam>>),
-    SetRole(Option<Rc<NestedRole>>),
+    SetTable(Option<Rc<web_common::database::nested_variants::NestedTeam>>),
+    SetTeam(Option<Rc<web_common::database::nested_variants::NestedTeam>>),
+    SetRole(Option<Rc<web_common::database::nested_variants::NestedRole>>),
 }
 
 impl FromOperation for TeamsTeamsRoleInvitationActions {
@@ -209,23 +209,29 @@ pub fn create_teams_teams_role_invitation_form(
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedTeam>>| {
-        TeamsTeamsRoleInvitationActions::SetTable(table)
-    });
-    let set_team = builder_dispatch.apply_callback(|team: Option<Rc<NestedTeam>>| {
-        TeamsTeamsRoleInvitationActions::SetTeam(team)
-    });
-    let set_role = builder_dispatch.apply_callback(|role: Option<Rc<NestedRole>>| {
-        TeamsTeamsRoleInvitationActions::SetRole(role)
-    });
+    let set_table = builder_dispatch.apply_callback(
+        |table: Option<Rc<web_common::database::nested_variants::NestedTeam>>| {
+            TeamsTeamsRoleInvitationActions::SetTable(table)
+        },
+    );
+    let set_team = builder_dispatch.apply_callback(
+        |team: Option<Rc<web_common::database::nested_variants::NestedTeam>>| {
+            TeamsTeamsRoleInvitationActions::SetTeam(team)
+        },
+    );
+    let set_role = builder_dispatch.apply_callback(
+        |role: Option<Rc<web_common::database::nested_variants::NestedRole>>| {
+            TeamsTeamsRoleInvitationActions::SetRole(role)
+        },
+    );
     html! {
         <BasicForm<NewTeamsTeamsRoleInvitation>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <Datalist<NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" scanner={false} />
-            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedTeam, true> builder={set_team} optional={false} errors={builder_store.errors_team.clone()} value={builder_store.team.clone()} label="Team" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewTeamsTeamsRoleInvitation>>
     }
 }

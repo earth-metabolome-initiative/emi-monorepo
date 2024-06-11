@@ -12,7 +12,7 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ProjectBuilder {
     pub id: Option<i32>,
     pub name: Option<Rc<String>>,
@@ -22,10 +22,10 @@ pub struct ProjectBuilder {
     pub expenses: Option<f64>,
     pub expected_end_date: Option<chrono::NaiveDateTime>,
     pub end_date: Option<chrono::NaiveDateTime>,
-    pub state: Option<Rc<NestedProjectState>>,
-    pub icon: Option<Rc<FontAwesomeIcon>>,
-    pub color: Option<Rc<Color>>,
-    pub parent_project: Option<Rc<NestedProject>>,
+    pub state: Option<Rc<web_common::database::nested_variants::NestedProjectState>>,
+    pub icon: Option<Rc<web_common::database::flat_variants::FontAwesomeIcon>>,
+    pub color: Option<Rc<web_common::database::flat_variants::Color>>,
+    pub parent_project: Option<Rc<web_common::database::nested_variants::NestedProject>>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_public: Vec<ApiError>,
@@ -73,7 +73,7 @@ impl Default for ProjectBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum ProjectActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
@@ -82,10 +82,10 @@ pub(crate) enum ProjectActions {
     SetExpenses(Option<String>),
     SetExpectedEndDate(Option<String>),
     SetEndDate(Option<String>),
-    SetState(Option<Rc<NestedProjectState>>),
-    SetIcon(Option<Rc<FontAwesomeIcon>>),
-    SetColor(Option<Rc<Color>>),
-    SetParentProject(Option<Rc<NestedProject>>),
+    SetState(Option<Rc<web_common::database::nested_variants::NestedProjectState>>),
+    SetIcon(Option<Rc<web_common::database::flat_variants::FontAwesomeIcon>>),
+    SetColor(Option<Rc<web_common::database::flat_variants::Color>>),
+    SetParentProject(Option<Rc<web_common::database::nested_variants::NestedProject>>),
 }
 
 impl FromOperation for ProjectActions {
@@ -566,16 +566,26 @@ pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
         });
     let set_end_date = builder_dispatch
         .apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<Rc<NestedProjectState>>| ProjectActions::SetState(state));
-    let set_icon = builder_dispatch
-        .apply_callback(|icon: Option<Rc<FontAwesomeIcon>>| ProjectActions::SetIcon(icon));
-    let set_color =
-        builder_dispatch.apply_callback(|color: Option<Rc<Color>>| ProjectActions::SetColor(color));
-    let set_parent_project =
-        builder_dispatch.apply_callback(|parent_project: Option<Rc<NestedProject>>| {
+    let set_state = builder_dispatch.apply_callback(
+        |state: Option<Rc<web_common::database::nested_variants::NestedProjectState>>| {
+            ProjectActions::SetState(state)
+        },
+    );
+    let set_icon = builder_dispatch.apply_callback(
+        |icon: Option<Rc<web_common::database::flat_variants::FontAwesomeIcon>>| {
+            ProjectActions::SetIcon(icon)
+        },
+    );
+    let set_color = builder_dispatch.apply_callback(
+        |color: Option<Rc<web_common::database::flat_variants::Color>>| {
+            ProjectActions::SetColor(color)
+        },
+    );
+    let set_parent_project = builder_dispatch.apply_callback(
+        |parent_project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
             ProjectActions::SetParentProject(parent_project)
-        });
+        },
+    );
     html! {
         <BasicForm<NewProject>
             method={FormMethod::POST}
@@ -588,10 +598,10 @@ pub fn create_project_form(props: &CreateProjectFormProp) -> Html {
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone().map(Rc::from)} />
             <BasicInput<chrono::NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone().map(Rc::from)} />
             <BasicInput<chrono::NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone().map(Rc::from)} />
-            <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
-            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
-            <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
-            <Datalist<NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
+            <Datalist<web_common::database::flat_variants::FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
+            <Datalist<web_common::database::flat_variants::Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" scanner={false} />
         </BasicForm<NewProject>>
     }
 }
@@ -623,16 +633,26 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
         });
     let set_end_date = builder_dispatch
         .apply_callback(|end_date: Option<String>| ProjectActions::SetEndDate(end_date));
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<Rc<NestedProjectState>>| ProjectActions::SetState(state));
-    let set_icon = builder_dispatch
-        .apply_callback(|icon: Option<Rc<FontAwesomeIcon>>| ProjectActions::SetIcon(icon));
-    let set_color =
-        builder_dispatch.apply_callback(|color: Option<Rc<Color>>| ProjectActions::SetColor(color));
-    let set_parent_project =
-        builder_dispatch.apply_callback(|parent_project: Option<Rc<NestedProject>>| {
+    let set_state = builder_dispatch.apply_callback(
+        |state: Option<Rc<web_common::database::nested_variants::NestedProjectState>>| {
+            ProjectActions::SetState(state)
+        },
+    );
+    let set_icon = builder_dispatch.apply_callback(
+        |icon: Option<Rc<web_common::database::flat_variants::FontAwesomeIcon>>| {
+            ProjectActions::SetIcon(icon)
+        },
+    );
+    let set_color = builder_dispatch.apply_callback(
+        |color: Option<Rc<web_common::database::flat_variants::Color>>| {
+            ProjectActions::SetColor(color)
+        },
+    );
+    let set_parent_project = builder_dispatch.apply_callback(
+        |parent_project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
             ProjectActions::SetParentProject(parent_project)
-        });
+        },
+    );
     html! {
         <BasicForm<UpdateProject>
             method={FormMethod::PUT}
@@ -645,10 +665,10 @@ pub fn update_project_form(props: &UpdateProjectFormProp) -> Html {
             <BasicInput<f64> label="Expenses" optional={true} errors={builder_store.errors_expenses.clone()} builder={set_expenses} value={builder_store.expenses.clone().map(Rc::from)} />
             <BasicInput<chrono::NaiveDateTime> label="Expected end date" optional={true} errors={builder_store.errors_expected_end_date.clone()} builder={set_expected_end_date} value={builder_store.expected_end_date.clone().map(Rc::from)} />
             <BasicInput<chrono::NaiveDateTime> label="End date" optional={true} errors={builder_store.errors_end_date.clone()} builder={set_end_date} value={builder_store.end_date.clone().map(Rc::from)} />
-            <Datalist<NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
-            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
-            <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
-            <Datalist<NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProjectState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
+            <Datalist<web_common::database::flat_variants::FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
+            <Datalist<web_common::database::flat_variants::Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_parent_project} optional={true} errors={builder_store.errors_parent_project.clone()} value={builder_store.parent_project.clone()} label="Parent project" scanner={false} />
         </BasicForm<UpdateProject>>
     }
 }

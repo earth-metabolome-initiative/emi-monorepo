@@ -1,16 +1,14 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedDerivedSample {
-    pub inner: DerivedSample,
-    pub created_by: NestedUser,
-    pub updated_by: NestedUser,
-    pub parent_sample: NestedSample,
-    pub child_sample: NestedSample,
-    pub unit: NestedUnit,
+    pub inner: crate::database::flat_variants::DerivedSample,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub updated_by: crate::database::nested_variants::NestedUser,
+    pub parent_sample: crate::database::nested_variants::NestedSample,
+    pub child_sample: crate::database::nested_variants::NestedSample,
+    pub unit: crate::database::nested_variants::NestedUnit,
 }
 
 unsafe impl Send for NestedDerivedSample {}
@@ -30,19 +28,28 @@ impl NestedDerivedSample {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
-            parent_sample: NestedSample::get(
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            updated_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.updated_by,
+                connection,
+            )?,
+            parent_sample: crate::database::nested_variants::NestedSample::get(
                 flat_variant.parent_sample_id,
                 author_user_id,
                 connection,
             )?,
-            child_sample: NestedSample::get(
+            child_sample: crate::database::nested_variants::NestedSample::get(
                 flat_variant.child_sample_id,
                 author_user_id,
                 connection,
             )?,
-            unit: NestedUnit::get(flat_variant.unit_id, connection)?,
+            unit: crate::database::nested_variants::NestedUnit::get(
+                flat_variant.unit_id,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -85,7 +92,7 @@ impl NestedDerivedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&DerivedSampleFilter>,
+        filter: Option<&web_common::database::filter_variants::DerivedSampleFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -106,7 +113,7 @@ impl NestedDerivedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&DerivedSampleFilter>,
+        filter: Option<&web_common::database::filter_variants::DerivedSampleFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -147,7 +154,7 @@ impl NestedDerivedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&DerivedSampleFilter>,
+        filter: Option<&web_common::database::filter_variants::DerivedSampleFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -239,7 +246,7 @@ impl NestedDerivedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&DerivedSampleFilter>,
+        filter: Option<&web_common::database::filter_variants::DerivedSampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -260,7 +267,7 @@ impl NestedDerivedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&DerivedSampleFilter>,
+        filter: Option<&web_common::database::filter_variants::DerivedSampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -282,7 +289,7 @@ impl NestedDerivedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&DerivedSampleFilter>,
+        filter: Option<&web_common::database::filter_variants::DerivedSampleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -342,7 +349,7 @@ impl NestedDerivedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&DerivedSampleFilter>,
+        filter: Option<&web_common::database::filter_variants::DerivedSampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -363,7 +370,7 @@ impl NestedDerivedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&DerivedSampleFilter>,
+        filter: Option<&web_common::database::filter_variants::DerivedSampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -385,7 +392,7 @@ impl NestedDerivedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&DerivedSampleFilter>,
+        filter: Option<&web_common::database::filter_variants::DerivedSampleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -438,27 +445,49 @@ impl NestedDerivedSample {
         )
     }
 }
-impl From<web_common::database::nested_variants::NestedDerivedSample> for NestedDerivedSample {
+impl From<web_common::database::nested_variants::NestedDerivedSample>
+    for crate::database::nested_variants::NestedDerivedSample
+{
     fn from(item: web_common::database::nested_variants::NestedDerivedSample) -> Self {
         Self {
-            inner: DerivedSample::from(item.inner),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
-            parent_sample: NestedSample::from(item.parent_sample.as_ref().clone()),
-            child_sample: NestedSample::from(item.child_sample.as_ref().clone()),
-            unit: NestedUnit::from(item.unit.as_ref().clone()),
+            inner: crate::database::flat_variants::DerivedSample::from(item.inner),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            updated_by: crate::database::nested_variants::NestedUser::from(
+                item.updated_by.as_ref().clone(),
+            ),
+            parent_sample: crate::database::nested_variants::NestedSample::from(
+                item.parent_sample.as_ref().clone(),
+            ),
+            child_sample: crate::database::nested_variants::NestedSample::from(
+                item.child_sample.as_ref().clone(),
+            ),
+            unit: crate::database::nested_variants::NestedUnit::from(item.unit.as_ref().clone()),
         }
     }
 }
-impl From<NestedDerivedSample> for web_common::database::nested_variants::NestedDerivedSample {
-    fn from(item: NestedDerivedSample) -> Self {
+impl From<crate::database::nested_variants::NestedDerivedSample>
+    for web_common::database::nested_variants::NestedDerivedSample
+{
+    fn from(item: crate::database::nested_variants::NestedDerivedSample) -> Self {
         Self {
-            inner: web_common::database::DerivedSample::from(item.inner),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
-            parent_sample: Rc::from(web_common::database::NestedSample::from(item.parent_sample)),
-            child_sample: Rc::from(web_common::database::NestedSample::from(item.child_sample)),
-            unit: Rc::from(web_common::database::NestedUnit::from(item.unit)),
+            inner: web_common::database::flat_variants::DerivedSample::from(item.inner),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
+            updated_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.updated_by,
+            )),
+            parent_sample: Rc::from(web_common::database::nested_variants::NestedSample::from(
+                item.parent_sample,
+            )),
+            child_sample: Rc::from(web_common::database::nested_variants::NestedSample::from(
+                item.child_sample,
+            )),
+            unit: Rc::from(web_common::database::nested_variants::NestedUnit::from(
+                item.unit,
+            )),
         }
     }
 }

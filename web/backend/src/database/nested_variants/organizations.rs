@@ -1,13 +1,10 @@
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedOrganization {
-    pub inner: Organization,
-    pub country: Country,
+    pub inner: crate::database::flat_variants::Organization,
+    pub country: crate::database::flat_variants::Country,
 }
 
 unsafe impl Send for NestedOrganization {}
@@ -25,7 +22,10 @@ impl NestedOrganization {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            country: Country::get(flat_variant.country_id, connection)?,
+            country: crate::database::flat_variants::Country::get(
+                flat_variant.country_id,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -44,7 +44,7 @@ impl NestedOrganization {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&OrganizationFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -63,7 +63,7 @@ impl NestedOrganization {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&OrganizationFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -144,7 +144,7 @@ impl NestedOrganization {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&OrganizationFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganizationFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -197,19 +197,27 @@ impl NestedOrganization {
         Organization::can_admin_by_id()
     }
 }
-impl From<web_common::database::nested_variants::NestedOrganization> for NestedOrganization {
+impl From<web_common::database::nested_variants::NestedOrganization>
+    for crate::database::nested_variants::NestedOrganization
+{
     fn from(item: web_common::database::nested_variants::NestedOrganization) -> Self {
         Self {
-            inner: Organization::from(item.inner.as_ref().clone()),
-            country: Country::from(item.country.as_ref().clone()),
+            inner: crate::database::flat_variants::Organization::from(item.inner.as_ref().clone()),
+            country: crate::database::flat_variants::Country::from(item.country.as_ref().clone()),
         }
     }
 }
-impl From<NestedOrganization> for web_common::database::nested_variants::NestedOrganization {
-    fn from(item: NestedOrganization) -> Self {
+impl From<crate::database::nested_variants::NestedOrganization>
+    for web_common::database::nested_variants::NestedOrganization
+{
+    fn from(item: crate::database::nested_variants::NestedOrganization) -> Self {
         Self {
-            inner: Rc::from(web_common::database::Organization::from(item.inner)),
-            country: Rc::from(web_common::database::Country::from(item.country)),
+            inner: Rc::from(web_common::database::flat_variants::Organization::from(
+                item.inner,
+            )),
+            country: Rc::from(web_common::database::flat_variants::Country::from(
+                item.country,
+            )),
         }
     }
 }

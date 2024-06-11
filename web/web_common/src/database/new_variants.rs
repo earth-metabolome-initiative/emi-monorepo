@@ -4,7 +4,7 @@
 
 use super::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewDerivedSample {
     pub parent_sample_id: uuid::Uuid,
     pub child_sample_id: uuid::Uuid,
@@ -17,11 +17,12 @@ unsafe impl Sync for NewDerivedSample {}
 impl Tabular for NewDerivedSample {
     const TABLE: Table = Table::DerivedSamples;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NewNameplate {
     pub barcode: String,
     pub project_id: i32,
     pub category_id: i32,
+    pub geolocation: crate::types::Point,
 }
 
 unsafe impl Send for NewNameplate {}
@@ -29,7 +30,7 @@ unsafe impl Sync for NewNameplate {}
 impl Tabular for NewNameplate {
     const TABLE: Table = Table::Nameplates;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewObservation {
     pub id: uuid::Uuid,
     pub parent_observation_id: Option<uuid::Uuid>,
@@ -38,7 +39,7 @@ pub struct NewObservation {
     pub sample_id: Option<uuid::Uuid>,
     pub subject_id: i32,
     pub notes: Option<String>,
-    pub picture: JPEG,
+    pub picture: crate::types::JPEG,
 }
 
 unsafe impl Send for NewObservation {}
@@ -149,7 +150,7 @@ impl NewObservation {
     }
 
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewOrganismBioOttTaxonItem {
     pub organism_id: uuid::Uuid,
     pub taxon_id: i32,
@@ -160,7 +161,7 @@ unsafe impl Sync for NewOrganismBioOttTaxonItem {}
 impl Tabular for NewOrganismBioOttTaxonItem {
     const TABLE: Table = Table::OrganismBioOttTaxonItems;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewOrganism {
     pub id: uuid::Uuid,
     pub host_organism_id: Option<uuid::Uuid>,
@@ -269,7 +270,7 @@ impl NewOrganism {
     }
 
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewProject {
     pub name: String,
     pub description: String,
@@ -361,7 +362,7 @@ unsafe impl Sync for NewProjectsUsersRole {}
 impl Tabular for NewProjectsUsersRole {
     const TABLE: Table = Table::ProjectsUsersRoles;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSampleBioOttTaxonItem {
     pub sample_id: uuid::Uuid,
     pub taxon_id: i32,
@@ -372,7 +373,7 @@ unsafe impl Sync for NewSampleBioOttTaxonItem {}
 impl Tabular for NewSampleBioOttTaxonItem {
     const TABLE: Table = Table::SampleBioOttTaxonItems;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSampleContainer {
     pub barcode: String,
     pub project_id: i32,
@@ -384,7 +385,7 @@ unsafe impl Sync for NewSampleContainer {}
 impl Tabular for NewSampleContainer {
     const TABLE: Table = Table::SampleContainers;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSample {
     pub id: uuid::Uuid,
     pub container_id: i32,
@@ -483,7 +484,7 @@ impl NewSample {
     }
 
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSpectraCollection {
     pub notes: Option<String>,
     pub sample_id: uuid::Uuid,
@@ -494,7 +495,7 @@ unsafe impl Sync for NewSpectraCollection {}
 impl Tabular for NewSpectraCollection {
     const TABLE: Table = Table::SpectraCollections;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewTeam {
     pub name: String,
     pub description: String,
@@ -557,7 +558,7 @@ unsafe impl Sync for NewTeamsUsersRole {}
 impl Tabular for NewTeamsUsersRole {
     const TABLE: Table = Table::TeamsUsersRoles;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewUserEmail {
     pub email: String,
     pub login_provider_id: i32,
@@ -569,14 +570,14 @@ unsafe impl Sync for NewUserEmail {}
 impl Tabular for NewUserEmail {
     const TABLE: Table = Table::UserEmails;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewUser {
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
     pub description: Option<String>,
     pub organization_id: Option<i32>,
-    pub picture: JPEG,
+    pub picture: crate::types::JPEG,
 }
 
 unsafe impl Send for NewUser {}

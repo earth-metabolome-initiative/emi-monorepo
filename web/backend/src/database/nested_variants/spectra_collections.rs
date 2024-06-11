@@ -1,14 +1,12 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSpectraCollection {
-    pub inner: SpectraCollection,
-    pub sample: NestedSample,
-    pub created_by: NestedUser,
-    pub updated_by: NestedUser,
+    pub inner: crate::database::flat_variants::SpectraCollection,
+    pub sample: crate::database::nested_variants::NestedSample,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub updated_by: crate::database::nested_variants::NestedUser,
 }
 
 unsafe impl Send for NestedSpectraCollection {}
@@ -28,9 +26,19 @@ impl NestedSpectraCollection {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            sample: NestedSample::get(flat_variant.sample_id, author_user_id, connection)?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
+            sample: crate::database::nested_variants::NestedSample::get(
+                flat_variant.sample_id,
+                author_user_id,
+                connection,
+            )?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            updated_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.updated_by,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -69,7 +77,7 @@ impl NestedSpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -90,7 +98,7 @@ impl NestedSpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -127,7 +135,7 @@ impl NestedSpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -215,7 +223,7 @@ impl NestedSpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -236,7 +244,7 @@ impl NestedSpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -258,7 +266,7 @@ impl NestedSpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -314,7 +322,7 @@ impl NestedSpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -335,7 +343,7 @@ impl NestedSpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -363,7 +371,7 @@ impl NestedSpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -413,26 +421,42 @@ impl NestedSpectraCollection {
     }
 }
 impl From<web_common::database::nested_variants::NestedSpectraCollection>
-    for NestedSpectraCollection
+    for crate::database::nested_variants::NestedSpectraCollection
 {
     fn from(item: web_common::database::nested_variants::NestedSpectraCollection) -> Self {
         Self {
-            inner: SpectraCollection::from(item.inner.as_ref().clone()),
-            sample: NestedSample::from(item.sample.as_ref().clone()),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
+            inner: crate::database::flat_variants::SpectraCollection::from(
+                item.inner.as_ref().clone(),
+            ),
+            sample: crate::database::nested_variants::NestedSample::from(
+                item.sample.as_ref().clone(),
+            ),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            updated_by: crate::database::nested_variants::NestedUser::from(
+                item.updated_by.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedSpectraCollection>
+impl From<crate::database::nested_variants::NestedSpectraCollection>
     for web_common::database::nested_variants::NestedSpectraCollection
 {
-    fn from(item: NestedSpectraCollection) -> Self {
+    fn from(item: crate::database::nested_variants::NestedSpectraCollection) -> Self {
         Self {
-            inner: Rc::from(web_common::database::SpectraCollection::from(item.inner)),
-            sample: Rc::from(web_common::database::NestedSample::from(item.sample)),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
+            inner: Rc::from(
+                web_common::database::flat_variants::SpectraCollection::from(item.inner),
+            ),
+            sample: Rc::from(web_common::database::nested_variants::NestedSample::from(
+                item.sample,
+            )),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
+            updated_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.updated_by,
+            )),
         }
     }
 }

@@ -144,7 +144,7 @@ impl WebsocketWorker {
                     Operation::Delete(table_name, primary_key) => {
                         let table: Table = table_name.try_into().unwrap();
                         match table.delete(primary_key, &mut database).await {
-                            Ok(row) => {
+                            Ok(_row) => {
                                 todo!()
                             }
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
@@ -156,7 +156,7 @@ impl WebsocketWorker {
                             .insert(serialized_row, user_id.unwrap(), &mut database)
                             .await
                         {
-                            Ok(row) => {
+                            Ok(_row) => {
                                 todo!()
                             }
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
@@ -183,73 +183,28 @@ impl WebsocketWorker {
                                 Err(err) => BackendMessage::Error(task_id, err),
                             }
                         }
-                        Select::All {
-                            table_name,
-                            filter,
-                            limit,
-                            offset,
-                        } => {
-                            let table: Table = table_name.try_into().unwrap();
-
+                        Select::All { .. } => {
                             todo!()
                         }
-                        Select::AllByUpdatedAt {
-                            table_name,
-                            filter,
-                            limit,
-                            offset,
-                        } => {
-                            let table: Table = table_name.try_into().unwrap();
-
+                        Select::AllByUpdatedAt { .. } => {
                             todo!()
                         }
-                        Select::SearchTable {
-                            filter,
-                            table_name,
-                            query,
-                            limit,
-                            offset,
-                        } => {
-                            let table: Table = table_name.try_into().unwrap();
-
+                        Select::SearchTable { .. } => {
                             todo!()
                         }
-                        Select::SearchEditableTable {
-                            filter,
-                            table_name,
-                            query,
-                            limit,
-                            offset,
-                        } => {
-                            let table: Table = table_name.try_into().unwrap();
-
+                        Select::SearchEditableTable { .. } => {
                             todo!()
                         }
-                        Select::SearchAll { query, limit } => {
+                        Select::SearchAll { .. } => {
                             todo!()
                         }
-                        Select::CanView {
-                            table_name,
-                            primary_key,
-                        } => {
-                            let table: Table = table_name.try_into().unwrap();
-
+                        Select::CanView { .. } => {
                             todo!()
                         }
-                        Select::CanUpdate {
-                            table_name,
-                            primary_key,
-                        } => {
-                            let table: Table = table_name.try_into().unwrap();
-
+                        Select::CanUpdate { .. } => {
                             todo!()
                         }
-                        Select::CanDelete {
-                            table_name,
-                            primary_key,
-                        } => {
-                            let table: Table = table_name.try_into().unwrap();
-
+                        Select::CanDelete { .. } => {
                             todo!()
                         }
                     },
@@ -259,7 +214,7 @@ impl WebsocketWorker {
                             .update(serialized_row, user_id.unwrap(), &mut database)
                             .await
                         {
-                            Ok(row) => {
+                            Ok(_row) => {
                                 todo!()
                             }
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),

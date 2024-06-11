@@ -1,15 +1,13 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSampleContainer {
-    pub inner: SampleContainer,
-    pub project: NestedProject,
-    pub category: NestedSampleContainerCategory,
-    pub created_by: NestedUser,
-    pub updated_by: NestedUser,
+    pub inner: crate::database::flat_variants::SampleContainer,
+    pub project: crate::database::nested_variants::NestedProject,
+    pub category: crate::database::nested_variants::NestedSampleContainerCategory,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub updated_by: crate::database::nested_variants::NestedUser,
 }
 
 unsafe impl Send for NestedSampleContainer {}
@@ -29,10 +27,23 @@ impl NestedSampleContainer {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
-            category: NestedSampleContainerCategory::get(flat_variant.category_id, connection)?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
+            project: crate::database::nested_variants::NestedProject::get(
+                flat_variant.project_id,
+                author_user_id,
+                connection,
+            )?,
+            category: crate::database::nested_variants::NestedSampleContainerCategory::get(
+                flat_variant.category_id,
+                connection,
+            )?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            updated_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.updated_by,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -71,7 +82,7 @@ impl NestedSampleContainer {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SampleContainerFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -92,7 +103,7 @@ impl NestedSampleContainer {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SampleContainerFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -144,7 +155,7 @@ impl NestedSampleContainer {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&SampleContainerFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -232,7 +243,7 @@ impl NestedSampleContainer {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&SampleContainerFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -253,7 +264,7 @@ impl NestedSampleContainer {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&SampleContainerFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -275,7 +286,7 @@ impl NestedSampleContainer {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&SampleContainerFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -331,7 +342,7 @@ impl NestedSampleContainer {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&SampleContainerFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -352,7 +363,7 @@ impl NestedSampleContainer {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&SampleContainerFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -380,7 +391,7 @@ impl NestedSampleContainer {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&SampleContainerFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -429,27 +440,51 @@ impl NestedSampleContainer {
         SampleContainer::delete_by_id(id, author_user_id, connection)
     }
 }
-impl From<web_common::database::nested_variants::NestedSampleContainer> for NestedSampleContainer {
+impl From<web_common::database::nested_variants::NestedSampleContainer>
+    for crate::database::nested_variants::NestedSampleContainer
+{
     fn from(item: web_common::database::nested_variants::NestedSampleContainer) -> Self {
         Self {
-            inner: SampleContainer::from(item.inner.as_ref().clone()),
-            project: NestedProject::from(item.project.as_ref().clone()),
-            category: NestedSampleContainerCategory::from(item.category.as_ref().clone()),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
+            inner: crate::database::flat_variants::SampleContainer::from(
+                item.inner.as_ref().clone(),
+            ),
+            project: crate::database::nested_variants::NestedProject::from(
+                item.project.as_ref().clone(),
+            ),
+            category: crate::database::nested_variants::NestedSampleContainerCategory::from(
+                item.category.as_ref().clone(),
+            ),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            updated_by: crate::database::nested_variants::NestedUser::from(
+                item.updated_by.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedSampleContainer> for web_common::database::nested_variants::NestedSampleContainer {
-    fn from(item: NestedSampleContainer) -> Self {
+impl From<crate::database::nested_variants::NestedSampleContainer>
+    for web_common::database::nested_variants::NestedSampleContainer
+{
+    fn from(item: crate::database::nested_variants::NestedSampleContainer) -> Self {
         Self {
-            inner: Rc::from(web_common::database::SampleContainer::from(item.inner)),
-            project: Rc::from(web_common::database::NestedProject::from(item.project)),
-            category: Rc::from(web_common::database::NestedSampleContainerCategory::from(
-                item.category,
+            inner: Rc::from(web_common::database::flat_variants::SampleContainer::from(
+                item.inner,
             )),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
+            project: Rc::from(web_common::database::nested_variants::NestedProject::from(
+                item.project,
+            )),
+            category: Rc::from(
+                web_common::database::nested_variants::NestedSampleContainerCategory::from(
+                    item.category,
+                ),
+            ),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
+            updated_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.updated_by,
+            )),
         }
     }
 }

@@ -23,7 +23,7 @@ from constraint_checkers.regroup_tables import regroup_tables
 from constraint_checkers import generate_schema, execute_migrations
 from constraint_checkers import (
     check_parent_circularity_trigger,
-    create_filter_structs,
+    create_filter_variants,
     ensures_migrations_simmetry,
     ensures_gluesql_compliance,
 )
@@ -113,10 +113,10 @@ if __name__ == "__main__":
     StructMetadata.init_indices()
     register_derived_search_indices(flat_variants)
 
-    filter_structs: List[StructMetadata] = create_filter_structs(
+    filter_variants: List[StructMetadata] = create_filter_variants(
         flat_variants
     )
-    print(f"Generated {len(filter_structs)} filter structs.")
+    print(f"Generated {len(filter_variants)} filter structs.")
 
     nested_structs: List[StructMetadata] = derive_nested_structs(
         flat_variants

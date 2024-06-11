@@ -74,6 +74,7 @@ pub(crate) struct IntermediateNewNameplate {
     barcode: String,
     project_id: i32,
     category_id: i32,
+    geolocation: postgis_diesel::types::Point,
     updated_by: i32,
 }
 
@@ -87,6 +88,7 @@ impl InsertRow for web_common::database::NewNameplate {
             barcode: self.barcode,
             project_id: self.project_id,
             category_id: self.category_id,
+            geolocation: self.geolocation.convert(),
             updated_by: user_id,
         }
     }
@@ -117,7 +119,7 @@ pub(crate) struct IntermediateNewObservation {
     sample_id: Option<uuid::Uuid>,
     subject_id: i32,
     notes: Option<String>,
-    picture: JPEG,
+    picture: crate::database::diesel_types::JPEG,
     updated_by: i32,
 }
 
@@ -135,7 +137,7 @@ impl InsertRow for web_common::database::NewObservation {
             sample_id: self.sample_id,
             subject_id: self.subject_id,
             notes: self.notes,
-            picture: self.picture.into(),
+            picture: self.picture.convert(),
             updated_by: user_id,
         }
     }
@@ -906,7 +908,7 @@ pub(crate) struct IntermediateNewUser {
     last_name: String,
     description: Option<String>,
     organization_id: Option<i32>,
-    picture: JPEG,
+    picture: crate::database::diesel_types::JPEG,
 }
 
 impl InsertRow for web_common::database::NewUser {
@@ -920,7 +922,7 @@ impl InsertRow for web_common::database::NewUser {
             last_name: self.last_name,
             description: self.description,
             organization_id: self.organization_id,
-            picture: self.picture.into(),
+            picture: self.picture.convert(),
         }
     }
 

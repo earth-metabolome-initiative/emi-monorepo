@@ -68,6 +68,7 @@ class TableStructMetadata:
         self.new_flat_variant = struct
 
     def get_new_flat_variant(self) -> StructMetadata:
+        """Returns the new flat struct of the table."""
         if self.new_flat_variant is None:
             raise ValueError(
                 f"The new flat struct has not been set for the table {self.name}."

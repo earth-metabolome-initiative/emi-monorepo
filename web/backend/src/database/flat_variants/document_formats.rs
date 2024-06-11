@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -44,8 +41,10 @@ pub struct DocumentFormat {
 
 unsafe impl Send for DocumentFormat {}
 unsafe impl Sync for DocumentFormat {}
-impl From<DocumentFormat> for web_common::database::flat_variants::DocumentFormat {
-    fn from(item: DocumentFormat) -> Self {
+impl From<web_common::database::flat_variants::DocumentFormat>
+    for crate::database::flat_variants::DocumentFormat
+{
+    fn from(item: web_common::database::flat_variants::DocumentFormat) -> Self {
         Self {
             id: item.id,
             extension: item.extension,
@@ -57,8 +56,10 @@ impl From<DocumentFormat> for web_common::database::flat_variants::DocumentForma
     }
 }
 
-impl From<web_common::database::flat_variants::DocumentFormat> for DocumentFormat {
-    fn from(item: web_common::database::flat_variants::DocumentFormat) -> Self {
+impl From<crate::database::flat_variants::DocumentFormat>
+    for web_common::database::flat_variants::DocumentFormat
+{
+    fn from(item: crate::database::flat_variants::DocumentFormat) -> Self {
         Self {
             id: item.id,
             extension: item.extension,
@@ -86,7 +87,7 @@ impl DocumentFormat {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&DocumentFormatFilter>,
+        filter: Option<&web_common::database::filter_variants::DocumentFormatFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -117,7 +118,7 @@ impl DocumentFormat {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&DocumentFormatFilter>,
+        filter: Option<&web_common::database::filter_variants::DocumentFormatFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -166,7 +167,7 @@ impl DocumentFormat {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&DocumentFormatFilter>,
+        filter: Option<&web_common::database::filter_variants::DocumentFormatFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,

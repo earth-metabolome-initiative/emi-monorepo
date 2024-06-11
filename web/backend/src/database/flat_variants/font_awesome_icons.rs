@@ -15,9 +15,7 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -40,8 +38,10 @@ pub struct FontAwesomeIcon {
 
 unsafe impl Send for FontAwesomeIcon {}
 unsafe impl Sync for FontAwesomeIcon {}
-impl From<FontAwesomeIcon> for web_common::database::flat_variants::FontAwesomeIcon {
-    fn from(item: FontAwesomeIcon) -> Self {
+impl From<web_common::database::flat_variants::FontAwesomeIcon>
+    for crate::database::flat_variants::FontAwesomeIcon
+{
+    fn from(item: web_common::database::flat_variants::FontAwesomeIcon) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -50,8 +50,10 @@ impl From<FontAwesomeIcon> for web_common::database::flat_variants::FontAwesomeI
     }
 }
 
-impl From<web_common::database::flat_variants::FontAwesomeIcon> for FontAwesomeIcon {
-    fn from(item: web_common::database::flat_variants::FontAwesomeIcon) -> Self {
+impl From<crate::database::flat_variants::FontAwesomeIcon>
+    for web_common::database::flat_variants::FontAwesomeIcon
+{
+    fn from(item: crate::database::flat_variants::FontAwesomeIcon) -> Self {
         Self {
             id: item.id,
             name: item.name,

@@ -15,9 +15,7 @@ use diesel::QueryableByName;
 use diesel::Selectable;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -42,8 +40,10 @@ pub struct Country {
 
 unsafe impl Send for Country {}
 unsafe impl Sync for Country {}
-impl From<Country> for web_common::database::flat_variants::Country {
-    fn from(item: Country) -> Self {
+impl From<web_common::database::flat_variants::Country>
+    for crate::database::flat_variants::Country
+{
+    fn from(item: web_common::database::flat_variants::Country) -> Self {
         Self {
             id: item.id,
             iso: item.iso,
@@ -54,8 +54,10 @@ impl From<Country> for web_common::database::flat_variants::Country {
     }
 }
 
-impl From<web_common::database::flat_variants::Country> for Country {
-    fn from(item: web_common::database::flat_variants::Country) -> Self {
+impl From<crate::database::flat_variants::Country>
+    for web_common::database::flat_variants::Country
+{
+    fn from(item: crate::database::flat_variants::Country) -> Self {
         Self {
             id: item.id,
             iso: item.iso,

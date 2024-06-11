@@ -126,7 +126,7 @@ def write_web_common_nested_variants(nested_structs: List[StructMetadata]):
             if attribute.name == "inner":
                 continue
             if (
-                attribute.data_type() == nested_struct.name
+                attribute.raw_data_type() == nested_struct
                 or flat_variant.has_attribute(attribute)
             ):
                 if attribute.rc:
@@ -141,12 +141,12 @@ def write_web_common_nested_variants(nested_structs: List[StructMetadata]):
             if attribute.optional:
                 assert attribute.rc
                 document.write(
-                    f"            {attribute.name}: if let Some({attribute.original_name}) = flat_variant.{attribute.original_name} {{ {attribute.data_type()}::get({attribute.original_name}, connection).await?.map(Rc::from) }} else {{ None }},\n"
+                    f"            {attribute.name}: if let Some({attribute.original_name}) = flat_variant.{attribute.original_name} {{ {attribute.data_type(route='web_common')}::get({attribute.original_name}, connection).await?.map(Rc::from) }} else {{ None }},\n"
                 )
             else:
                 assert attribute.rc
                 document.write(
-                    f"            {attribute.name}: Rc::from({attribute.data_type()}::get(flat_variant.{attribute.original_name}, connection).await?.unwrap()),\n"
+                    f"            {attribute.name}: Rc::from({attribute.data_type(route='web_common')}::get(flat_variant.{attribute.original_name}, connection).await?.unwrap()),\n"
                 )
 
         inner_attribute = nested_struct.get_inner_attribute()

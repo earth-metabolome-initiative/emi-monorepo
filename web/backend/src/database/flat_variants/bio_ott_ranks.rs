@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -43,8 +40,10 @@ pub struct BioOttRank {
 
 unsafe impl Send for BioOttRank {}
 unsafe impl Sync for BioOttRank {}
-impl From<BioOttRank> for web_common::database::flat_variants::BioOttRank {
-    fn from(item: BioOttRank) -> Self {
+impl From<web_common::database::flat_variants::BioOttRank>
+    for crate::database::flat_variants::BioOttRank
+{
+    fn from(item: web_common::database::flat_variants::BioOttRank) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -55,8 +54,10 @@ impl From<BioOttRank> for web_common::database::flat_variants::BioOttRank {
     }
 }
 
-impl From<web_common::database::flat_variants::BioOttRank> for BioOttRank {
-    fn from(item: web_common::database::flat_variants::BioOttRank) -> Self {
+impl From<crate::database::flat_variants::BioOttRank>
+    for web_common::database::flat_variants::BioOttRank
+{
+    fn from(item: crate::database::flat_variants::BioOttRank) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -83,7 +84,7 @@ impl BioOttRank {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&BioOttRankFilter>,
+        filter: Option<&web_common::database::filter_variants::BioOttRankFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -114,7 +115,7 @@ impl BioOttRank {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&BioOttRankFilter>,
+        filter: Option<&web_common::database::filter_variants::BioOttRankFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -163,7 +164,7 @@ impl BioOttRank {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&BioOttRankFilter>,
+        filter: Option<&web_common::database::filter_variants::BioOttRankFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,

@@ -1,19 +1,15 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedTeam {
-    pub inner: Team,
-    pub icon: FontAwesomeIcon,
-    pub color: Color,
-    pub state: NestedTeamState,
-    pub parent_team: Option<Team>,
-    pub created_by: NestedUser,
-    pub updated_by: NestedUser,
+    pub inner: crate::database::flat_variants::Team,
+    pub icon: crate::database::flat_variants::FontAwesomeIcon,
+    pub color: crate::database::flat_variants::Color,
+    pub state: crate::database::nested_variants::NestedTeamState,
+    pub parent_team: Option<crate::database::flat_variants::Team>,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub updated_by: crate::database::nested_variants::NestedUser,
 }
 
 unsafe impl Send for NestedTeam {}
@@ -31,15 +27,29 @@ impl NestedTeam {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
-            color: Color::get(flat_variant.color_id, connection)?,
-            state: NestedTeamState::get(flat_variant.state_id, connection)?,
+            icon: crate::database::flat_variants::FontAwesomeIcon::get(
+                flat_variant.icon_id,
+                connection,
+            )?,
+            color: crate::database::flat_variants::Color::get(flat_variant.color_id, connection)?,
+            state: crate::database::nested_variants::NestedTeamState::get(
+                flat_variant.state_id,
+                connection,
+            )?,
             parent_team: flat_variant
                 .parent_team_id
-                .map(|parent_team_id| Team::get(parent_team_id, connection))
+                .map(|parent_team_id| {
+                    crate::database::flat_variants::Team::get(parent_team_id, connection)
+                })
                 .transpose()?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            updated_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.updated_by,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -58,7 +68,7 @@ impl NestedTeam {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -77,7 +87,7 @@ impl NestedTeam {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -122,7 +132,7 @@ impl NestedTeam {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -189,7 +199,7 @@ impl NestedTeam {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -210,7 +220,7 @@ impl NestedTeam {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -232,7 +242,7 @@ impl NestedTeam {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -288,7 +298,7 @@ impl NestedTeam {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -309,7 +319,7 @@ impl NestedTeam {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -331,7 +341,7 @@ impl NestedTeam {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -380,32 +390,54 @@ impl NestedTeam {
         Team::delete_by_id(id, author_user_id, connection)
     }
 }
-impl From<web_common::database::nested_variants::NestedTeam> for NestedTeam {
+impl From<web_common::database::nested_variants::NestedTeam>
+    for crate::database::nested_variants::NestedTeam
+{
     fn from(item: web_common::database::nested_variants::NestedTeam) -> Self {
         Self {
-            inner: Team::from(item.inner.as_ref().clone()),
-            icon: FontAwesomeIcon::from(item.icon.as_ref().clone()),
-            color: Color::from(item.color.as_ref().clone()),
-            state: NestedTeamState::from(item.state.as_ref().clone()),
-            parent_team: item.parent_team.as_deref().cloned().map(Team::from),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
+            inner: crate::database::flat_variants::Team::from(item.inner.as_ref().clone()),
+            icon: crate::database::flat_variants::FontAwesomeIcon::from(item.icon.as_ref().clone()),
+            color: crate::database::flat_variants::Color::from(item.color.as_ref().clone()),
+            state: crate::database::nested_variants::NestedTeamState::from(
+                item.state.as_ref().clone(),
+            ),
+            parent_team: item
+                .parent_team
+                .as_deref()
+                .cloned()
+                .map(crate::database::flat_variants::Team::from),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            updated_by: crate::database::nested_variants::NestedUser::from(
+                item.updated_by.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedTeam> for web_common::database::nested_variants::NestedTeam {
-    fn from(item: NestedTeam) -> Self {
+impl From<crate::database::nested_variants::NestedTeam>
+    for web_common::database::nested_variants::NestedTeam
+{
+    fn from(item: crate::database::nested_variants::NestedTeam) -> Self {
         Self {
-            inner: Rc::from(web_common::database::Team::from(item.inner)),
-            icon: Rc::from(web_common::database::FontAwesomeIcon::from(item.icon)),
-            color: Rc::from(web_common::database::Color::from(item.color)),
-            state: Rc::from(web_common::database::NestedTeamState::from(item.state)),
+            inner: Rc::from(web_common::database::flat_variants::Team::from(item.inner)),
+            icon: Rc::from(web_common::database::flat_variants::FontAwesomeIcon::from(
+                item.icon,
+            )),
+            color: Rc::from(web_common::database::flat_variants::Color::from(item.color)),
+            state: Rc::from(
+                web_common::database::nested_variants::NestedTeamState::from(item.state),
+            ),
             parent_team: item
                 .parent_team
-                .map(web_common::database::Team::from)
+                .map(web_common::database::flat_variants::Team::from)
                 .map(Rc::from),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
+            updated_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.updated_by,
+            )),
         }
     }
 }

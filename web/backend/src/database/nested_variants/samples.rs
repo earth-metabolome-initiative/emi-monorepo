@@ -1,17 +1,15 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSample {
-    pub inner: Sample,
-    pub container: NestedSampleContainer,
-    pub project: NestedProject,
-    pub created_by: NestedUser,
-    pub sampled_by: NestedUser,
-    pub updated_by: NestedUser,
-    pub state: NestedSampleState,
+    pub inner: crate::database::flat_variants::Sample,
+    pub container: crate::database::nested_variants::NestedSampleContainer,
+    pub project: crate::database::nested_variants::NestedProject,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub sampled_by: crate::database::nested_variants::NestedUser,
+    pub updated_by: crate::database::nested_variants::NestedUser,
+    pub state: crate::database::nested_variants::NestedSampleState,
 }
 
 unsafe impl Send for NestedSample {}
@@ -31,16 +29,32 @@ impl NestedSample {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            container: NestedSampleContainer::get(
+            container: crate::database::nested_variants::NestedSampleContainer::get(
                 flat_variant.container_id,
                 author_user_id,
                 connection,
             )?,
-            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            sampled_by: NestedUser::get(flat_variant.sampled_by, connection)?,
-            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
-            state: NestedSampleState::get(flat_variant.state_id, connection)?,
+            project: crate::database::nested_variants::NestedProject::get(
+                flat_variant.project_id,
+                author_user_id,
+                connection,
+            )?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            sampled_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.sampled_by,
+                connection,
+            )?,
+            updated_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.updated_by,
+                connection,
+            )?,
+            state: crate::database::nested_variants::NestedSampleState::get(
+                flat_variant.state_id,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -79,7 +93,7 @@ impl NestedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -100,7 +114,7 @@ impl NestedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -152,7 +166,7 @@ impl NestedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -240,7 +254,7 @@ impl NestedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -261,7 +275,7 @@ impl NestedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -283,7 +297,7 @@ impl NestedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -339,7 +353,7 @@ impl NestedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -360,7 +374,7 @@ impl NestedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -382,7 +396,7 @@ impl NestedSample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -431,31 +445,59 @@ impl NestedSample {
         Sample::delete_by_id(id, author_user_id, connection)
     }
 }
-impl From<web_common::database::nested_variants::NestedSample> for NestedSample {
+impl From<web_common::database::nested_variants::NestedSample>
+    for crate::database::nested_variants::NestedSample
+{
     fn from(item: web_common::database::nested_variants::NestedSample) -> Self {
         Self {
-            inner: Sample::from(item.inner.as_ref().clone()),
-            container: NestedSampleContainer::from(item.container.as_ref().clone()),
-            project: NestedProject::from(item.project.as_ref().clone()),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            sampled_by: NestedUser::from(item.sampled_by.as_ref().clone()),
-            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
-            state: NestedSampleState::from(item.state.as_ref().clone()),
+            inner: crate::database::flat_variants::Sample::from(item.inner.as_ref().clone()),
+            container: crate::database::nested_variants::NestedSampleContainer::from(
+                item.container.as_ref().clone(),
+            ),
+            project: crate::database::nested_variants::NestedProject::from(
+                item.project.as_ref().clone(),
+            ),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            sampled_by: crate::database::nested_variants::NestedUser::from(
+                item.sampled_by.as_ref().clone(),
+            ),
+            updated_by: crate::database::nested_variants::NestedUser::from(
+                item.updated_by.as_ref().clone(),
+            ),
+            state: crate::database::nested_variants::NestedSampleState::from(
+                item.state.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedSample> for web_common::database::nested_variants::NestedSample {
-    fn from(item: NestedSample) -> Self {
+impl From<crate::database::nested_variants::NestedSample>
+    for web_common::database::nested_variants::NestedSample
+{
+    fn from(item: crate::database::nested_variants::NestedSample) -> Self {
         Self {
-            inner: Rc::from(web_common::database::Sample::from(item.inner)),
-            container: Rc::from(web_common::database::NestedSampleContainer::from(
-                item.container,
+            inner: Rc::from(web_common::database::flat_variants::Sample::from(
+                item.inner,
             )),
-            project: Rc::from(web_common::database::NestedProject::from(item.project)),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            sampled_by: Rc::from(web_common::database::NestedUser::from(item.sampled_by)),
-            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
-            state: Rc::from(web_common::database::NestedSampleState::from(item.state)),
+            container: Rc::from(
+                web_common::database::nested_variants::NestedSampleContainer::from(item.container),
+            ),
+            project: Rc::from(web_common::database::nested_variants::NestedProject::from(
+                item.project,
+            )),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
+            sampled_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.sampled_by,
+            )),
+            updated_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.updated_by,
+            )),
+            state: Rc::from(
+                web_common::database::nested_variants::NestedSampleState::from(item.state),
+            ),
         }
     }
 }

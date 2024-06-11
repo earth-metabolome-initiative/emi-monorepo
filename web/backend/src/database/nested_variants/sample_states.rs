@@ -1,14 +1,11 @@
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSampleState {
-    pub inner: SampleState,
-    pub icon: FontAwesomeIcon,
-    pub color: Color,
+    pub inner: crate::database::flat_variants::SampleState,
+    pub icon: crate::database::flat_variants::FontAwesomeIcon,
+    pub color: crate::database::flat_variants::Color,
 }
 
 unsafe impl Send for NestedSampleState {}
@@ -26,8 +23,11 @@ impl NestedSampleState {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
-            color: Color::get(flat_variant.color_id, connection)?,
+            icon: crate::database::flat_variants::FontAwesomeIcon::get(
+                flat_variant.icon_id,
+                connection,
+            )?,
+            color: crate::database::flat_variants::Color::get(flat_variant.color_id, connection)?,
             inner: flat_variant,
         })
     }
@@ -46,7 +46,7 @@ impl NestedSampleState {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SampleStateFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -65,7 +65,7 @@ impl NestedSampleState {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SampleStateFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -124,7 +124,7 @@ impl NestedSampleState {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&SampleStateFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleStateFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -177,21 +177,29 @@ impl NestedSampleState {
         SampleState::can_admin_by_id()
     }
 }
-impl From<web_common::database::nested_variants::NestedSampleState> for NestedSampleState {
+impl From<web_common::database::nested_variants::NestedSampleState>
+    for crate::database::nested_variants::NestedSampleState
+{
     fn from(item: web_common::database::nested_variants::NestedSampleState) -> Self {
         Self {
-            inner: SampleState::from(item.inner.as_ref().clone()),
-            icon: FontAwesomeIcon::from(item.icon.as_ref().clone()),
-            color: Color::from(item.color.as_ref().clone()),
+            inner: crate::database::flat_variants::SampleState::from(item.inner.as_ref().clone()),
+            icon: crate::database::flat_variants::FontAwesomeIcon::from(item.icon.as_ref().clone()),
+            color: crate::database::flat_variants::Color::from(item.color.as_ref().clone()),
         }
     }
 }
-impl From<NestedSampleState> for web_common::database::nested_variants::NestedSampleState {
-    fn from(item: NestedSampleState) -> Self {
+impl From<crate::database::nested_variants::NestedSampleState>
+    for web_common::database::nested_variants::NestedSampleState
+{
+    fn from(item: crate::database::nested_variants::NestedSampleState) -> Self {
         Self {
-            inner: Rc::from(web_common::database::SampleState::from(item.inner)),
-            icon: Rc::from(web_common::database::FontAwesomeIcon::from(item.icon)),
-            color: Rc::from(web_common::database::Color::from(item.color)),
+            inner: Rc::from(web_common::database::flat_variants::SampleState::from(
+                item.inner,
+            )),
+            icon: Rc::from(web_common::database::flat_variants::FontAwesomeIcon::from(
+                item.icon,
+            )),
+            color: Rc::from(web_common::database::flat_variants::Color::from(item.color)),
         }
     }
 }

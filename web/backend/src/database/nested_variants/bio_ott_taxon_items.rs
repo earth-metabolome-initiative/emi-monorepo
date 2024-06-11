@@ -1,24 +1,20 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedBioOttTaxonItem {
-    pub inner: BioOttTaxonItem,
-    pub ott_rank: NestedBioOttRank,
-    pub domain: Option<BioOttTaxonItem>,
-    pub kingdom: Option<BioOttTaxonItem>,
-    pub phylum: Option<BioOttTaxonItem>,
-    pub class: Option<BioOttTaxonItem>,
-    pub order: Option<BioOttTaxonItem>,
-    pub family: Option<BioOttTaxonItem>,
-    pub genus: Option<BioOttTaxonItem>,
-    pub parent: BioOttTaxonItem,
-    pub icon: FontAwesomeIcon,
-    pub color: Color,
+    pub inner: crate::database::flat_variants::BioOttTaxonItem,
+    pub ott_rank: crate::database::nested_variants::NestedBioOttRank,
+    pub domain: Option<crate::database::flat_variants::BioOttTaxonItem>,
+    pub kingdom: Option<crate::database::flat_variants::BioOttTaxonItem>,
+    pub phylum: Option<crate::database::flat_variants::BioOttTaxonItem>,
+    pub class: Option<crate::database::flat_variants::BioOttTaxonItem>,
+    pub order: Option<crate::database::flat_variants::BioOttTaxonItem>,
+    pub family: Option<crate::database::flat_variants::BioOttTaxonItem>,
+    pub genus: Option<crate::database::flat_variants::BioOttTaxonItem>,
+    pub parent: crate::database::flat_variants::BioOttTaxonItem,
+    pub icon: crate::database::flat_variants::FontAwesomeIcon,
+    pub color: crate::database::flat_variants::Color,
 }
 
 unsafe impl Send for NestedBioOttTaxonItem {}
@@ -36,38 +32,61 @@ impl NestedBioOttTaxonItem {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            ott_rank: NestedBioOttRank::get(flat_variant.ott_rank_id, connection)?,
+            ott_rank: crate::database::nested_variants::NestedBioOttRank::get(
+                flat_variant.ott_rank_id,
+                connection,
+            )?,
             domain: flat_variant
                 .domain_id
-                .map(|domain_id| BioOttTaxonItem::get(domain_id, connection))
+                .map(|domain_id| {
+                    crate::database::flat_variants::BioOttTaxonItem::get(domain_id, connection)
+                })
                 .transpose()?,
             kingdom: flat_variant
                 .kingdom_id
-                .map(|kingdom_id| BioOttTaxonItem::get(kingdom_id, connection))
+                .map(|kingdom_id| {
+                    crate::database::flat_variants::BioOttTaxonItem::get(kingdom_id, connection)
+                })
                 .transpose()?,
             phylum: flat_variant
                 .phylum_id
-                .map(|phylum_id| BioOttTaxonItem::get(phylum_id, connection))
+                .map(|phylum_id| {
+                    crate::database::flat_variants::BioOttTaxonItem::get(phylum_id, connection)
+                })
                 .transpose()?,
             class: flat_variant
                 .class_id
-                .map(|class_id| BioOttTaxonItem::get(class_id, connection))
+                .map(|class_id| {
+                    crate::database::flat_variants::BioOttTaxonItem::get(class_id, connection)
+                })
                 .transpose()?,
             order: flat_variant
                 .order_id
-                .map(|order_id| BioOttTaxonItem::get(order_id, connection))
+                .map(|order_id| {
+                    crate::database::flat_variants::BioOttTaxonItem::get(order_id, connection)
+                })
                 .transpose()?,
             family: flat_variant
                 .family_id
-                .map(|family_id| BioOttTaxonItem::get(family_id, connection))
+                .map(|family_id| {
+                    crate::database::flat_variants::BioOttTaxonItem::get(family_id, connection)
+                })
                 .transpose()?,
             genus: flat_variant
                 .genus_id
-                .map(|genus_id| BioOttTaxonItem::get(genus_id, connection))
+                .map(|genus_id| {
+                    crate::database::flat_variants::BioOttTaxonItem::get(genus_id, connection)
+                })
                 .transpose()?,
-            parent: BioOttTaxonItem::get(flat_variant.parent_id, connection)?,
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
-            color: Color::get(flat_variant.color_id, connection)?,
+            parent: crate::database::flat_variants::BioOttTaxonItem::get(
+                flat_variant.parent_id,
+                connection,
+            )?,
+            icon: crate::database::flat_variants::FontAwesomeIcon::get(
+                flat_variant.icon_id,
+                connection,
+            )?,
+            color: crate::database::flat_variants::Color::get(flat_variant.color_id, connection)?,
             inner: flat_variant,
         })
     }
@@ -86,7 +105,7 @@ impl NestedBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&BioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -105,7 +124,7 @@ impl NestedBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&BioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -151,7 +170,7 @@ impl NestedBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&BioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::BioOttTaxonItemFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -204,60 +223,106 @@ impl NestedBioOttTaxonItem {
         BioOttTaxonItem::can_admin_by_id()
     }
 }
-impl From<web_common::database::nested_variants::NestedBioOttTaxonItem> for NestedBioOttTaxonItem {
+impl From<web_common::database::nested_variants::NestedBioOttTaxonItem>
+    for crate::database::nested_variants::NestedBioOttTaxonItem
+{
     fn from(item: web_common::database::nested_variants::NestedBioOttTaxonItem) -> Self {
         Self {
-            inner: BioOttTaxonItem::from(item.inner.as_ref().clone()),
-            ott_rank: NestedBioOttRank::from(item.ott_rank.as_ref().clone()),
-            domain: item.domain.as_deref().cloned().map(BioOttTaxonItem::from),
-            kingdom: item.kingdom.as_deref().cloned().map(BioOttTaxonItem::from),
-            phylum: item.phylum.as_deref().cloned().map(BioOttTaxonItem::from),
-            class: item.class.as_deref().cloned().map(BioOttTaxonItem::from),
-            order: item.order.as_deref().cloned().map(BioOttTaxonItem::from),
-            family: item.family.as_deref().cloned().map(BioOttTaxonItem::from),
-            genus: item.genus.as_deref().cloned().map(BioOttTaxonItem::from),
-            parent: BioOttTaxonItem::from(item.parent.as_ref().clone()),
-            icon: FontAwesomeIcon::from(item.icon.as_ref().clone()),
-            color: Color::from(item.color.as_ref().clone()),
+            inner: crate::database::flat_variants::BioOttTaxonItem::from(
+                item.inner.as_ref().clone(),
+            ),
+            ott_rank: crate::database::nested_variants::NestedBioOttRank::from(
+                item.ott_rank.as_ref().clone(),
+            ),
+            domain: item
+                .domain
+                .as_deref()
+                .cloned()
+                .map(crate::database::flat_variants::BioOttTaxonItem::from),
+            kingdom: item
+                .kingdom
+                .as_deref()
+                .cloned()
+                .map(crate::database::flat_variants::BioOttTaxonItem::from),
+            phylum: item
+                .phylum
+                .as_deref()
+                .cloned()
+                .map(crate::database::flat_variants::BioOttTaxonItem::from),
+            class: item
+                .class
+                .as_deref()
+                .cloned()
+                .map(crate::database::flat_variants::BioOttTaxonItem::from),
+            order: item
+                .order
+                .as_deref()
+                .cloned()
+                .map(crate::database::flat_variants::BioOttTaxonItem::from),
+            family: item
+                .family
+                .as_deref()
+                .cloned()
+                .map(crate::database::flat_variants::BioOttTaxonItem::from),
+            genus: item
+                .genus
+                .as_deref()
+                .cloned()
+                .map(crate::database::flat_variants::BioOttTaxonItem::from),
+            parent: crate::database::flat_variants::BioOttTaxonItem::from(
+                item.parent.as_ref().clone(),
+            ),
+            icon: crate::database::flat_variants::FontAwesomeIcon::from(item.icon.as_ref().clone()),
+            color: crate::database::flat_variants::Color::from(item.color.as_ref().clone()),
         }
     }
 }
-impl From<NestedBioOttTaxonItem> for web_common::database::nested_variants::NestedBioOttTaxonItem {
-    fn from(item: NestedBioOttTaxonItem) -> Self {
+impl From<crate::database::nested_variants::NestedBioOttTaxonItem>
+    for web_common::database::nested_variants::NestedBioOttTaxonItem
+{
+    fn from(item: crate::database::nested_variants::NestedBioOttTaxonItem) -> Self {
         Self {
-            inner: Rc::from(web_common::database::BioOttTaxonItem::from(item.inner)),
-            ott_rank: Rc::from(web_common::database::NestedBioOttRank::from(item.ott_rank)),
+            inner: Rc::from(web_common::database::flat_variants::BioOttTaxonItem::from(
+                item.inner,
+            )),
+            ott_rank: Rc::from(
+                web_common::database::nested_variants::NestedBioOttRank::from(item.ott_rank),
+            ),
             domain: item
                 .domain
-                .map(web_common::database::BioOttTaxonItem::from)
+                .map(web_common::database::flat_variants::BioOttTaxonItem::from)
                 .map(Rc::from),
             kingdom: item
                 .kingdom
-                .map(web_common::database::BioOttTaxonItem::from)
+                .map(web_common::database::flat_variants::BioOttTaxonItem::from)
                 .map(Rc::from),
             phylum: item
                 .phylum
-                .map(web_common::database::BioOttTaxonItem::from)
+                .map(web_common::database::flat_variants::BioOttTaxonItem::from)
                 .map(Rc::from),
             class: item
                 .class
-                .map(web_common::database::BioOttTaxonItem::from)
+                .map(web_common::database::flat_variants::BioOttTaxonItem::from)
                 .map(Rc::from),
             order: item
                 .order
-                .map(web_common::database::BioOttTaxonItem::from)
+                .map(web_common::database::flat_variants::BioOttTaxonItem::from)
                 .map(Rc::from),
             family: item
                 .family
-                .map(web_common::database::BioOttTaxonItem::from)
+                .map(web_common::database::flat_variants::BioOttTaxonItem::from)
                 .map(Rc::from),
             genus: item
                 .genus
-                .map(web_common::database::BioOttTaxonItem::from)
+                .map(web_common::database::flat_variants::BioOttTaxonItem::from)
                 .map(Rc::from),
-            parent: Rc::from(web_common::database::BioOttTaxonItem::from(item.parent)),
-            icon: Rc::from(web_common::database::FontAwesomeIcon::from(item.icon)),
-            color: Rc::from(web_common::database::Color::from(item.color)),
+            parent: Rc::from(web_common::database::flat_variants::BioOttTaxonItem::from(
+                item.parent,
+            )),
+            icon: Rc::from(web_common::database::flat_variants::FontAwesomeIcon::from(
+                item.icon,
+            )),
+            color: Rc::from(web_common::database::flat_variants::Color::from(item.color)),
         }
     }
 }

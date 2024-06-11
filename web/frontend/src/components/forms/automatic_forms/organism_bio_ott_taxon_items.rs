@@ -12,10 +12,10 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct OrganismBioOttTaxonItemBuilder {
-    pub organism: Option<Rc<NestedOrganism>>,
-    pub taxon: Option<Rc<NestedBioOttTaxonItem>>,
+    pub organism: Option<Rc<web_common::database::nested_variants::NestedOrganism>>,
+    pub taxon: Option<Rc<web_common::database::nested_variants::NestedBioOttTaxonItem>>,
     pub errors_organism: Vec<ApiError>,
     pub errors_taxon: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
@@ -35,10 +35,10 @@ impl Default for OrganismBioOttTaxonItemBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum OrganismBioOttTaxonItemActions {
-    SetOrganism(Option<Rc<NestedOrganism>>),
-    SetTaxon(Option<Rc<NestedBioOttTaxonItem>>),
+    SetOrganism(Option<Rc<web_common::database::nested_variants::NestedOrganism>>),
+    SetTaxon(Option<Rc<web_common::database::nested_variants::NestedBioOttTaxonItem>>),
 }
 
 impl FromOperation for OrganismBioOttTaxonItemActions {
@@ -177,19 +177,23 @@ pub fn create_organism_bio_ott_taxon_item_form(
             taxon_id.into(),
         ));
     }
-    let set_organism = builder_dispatch.apply_callback(|organism: Option<Rc<NestedOrganism>>| {
-        OrganismBioOttTaxonItemActions::SetOrganism(organism)
-    });
-    let set_taxon = builder_dispatch.apply_callback(|taxon: Option<Rc<NestedBioOttTaxonItem>>| {
-        OrganismBioOttTaxonItemActions::SetTaxon(taxon)
-    });
+    let set_organism = builder_dispatch.apply_callback(
+        |organism: Option<Rc<web_common::database::nested_variants::NestedOrganism>>| {
+            OrganismBioOttTaxonItemActions::SetOrganism(organism)
+        },
+    );
+    let set_taxon = builder_dispatch.apply_callback(
+        |taxon: Option<Rc<web_common::database::nested_variants::NestedBioOttTaxonItem>>| {
+            OrganismBioOttTaxonItemActions::SetTaxon(taxon)
+        },
+    );
     html! {
         <BasicForm<NewOrganismBioOttTaxonItem>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <Datalist<NestedOrganism, false> builder={set_organism} optional={false} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
-            <Datalist<NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedOrganism, false> builder={set_organism} optional={false} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" scanner={false} />
         </BasicForm<NewOrganismBioOttTaxonItem>>
     }
 }

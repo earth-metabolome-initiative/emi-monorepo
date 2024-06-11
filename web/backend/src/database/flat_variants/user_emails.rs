@@ -12,12 +12,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -43,8 +40,10 @@ pub struct UserEmail {
 
 unsafe impl Send for UserEmail {}
 unsafe impl Sync for UserEmail {}
-impl From<UserEmail> for web_common::database::flat_variants::UserEmail {
-    fn from(item: UserEmail) -> Self {
+impl From<web_common::database::flat_variants::UserEmail>
+    for crate::database::flat_variants::UserEmail
+{
+    fn from(item: web_common::database::flat_variants::UserEmail) -> Self {
         Self {
             id: item.id,
             email: item.email,
@@ -56,8 +55,10 @@ impl From<UserEmail> for web_common::database::flat_variants::UserEmail {
     }
 }
 
-impl From<web_common::database::flat_variants::UserEmail> for UserEmail {
-    fn from(item: web_common::database::flat_variants::UserEmail) -> Self {
+impl From<crate::database::flat_variants::UserEmail>
+    for web_common::database::flat_variants::UserEmail
+{
+    fn from(item: crate::database::flat_variants::UserEmail) -> Self {
         Self {
             id: item.id,
             email: item.email,
@@ -109,7 +110,7 @@ impl UserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -148,7 +149,7 @@ impl UserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -263,7 +264,7 @@ impl UserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -302,7 +303,7 @@ impl UserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -372,7 +373,7 @@ impl UserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -411,7 +412,7 @@ impl UserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,

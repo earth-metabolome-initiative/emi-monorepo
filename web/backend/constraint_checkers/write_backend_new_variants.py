@@ -131,7 +131,7 @@ def write_backend_new_variants(
             updator_user_id_attribute = creator_user_id_attribute
 
         for attribute in all_attributes:
-            document.write(f"    {attribute.name}: {attribute.format_data_type()},\n")
+            document.write(f"    {attribute.name}: {attribute.format_data_type(route='backend')},\n")
 
         document.write("}\n\n")
 
@@ -155,9 +155,9 @@ def write_backend_new_variants(
             ):
                 document.write(f"            {attribute.name}: user_id,\n")
                 continue
-            if attribute.is_jpeg():
+            if attribute.has_backend_type():
                 document.write(
-                    f"            {attribute.name}: self.{attribute.name}.into(),\n"
+                    f"            {attribute.name}: self.{attribute.name}.convert(),\n"
                 )
                 continue
             document.write(f"            {attribute.name}: self.{attribute.name},\n")

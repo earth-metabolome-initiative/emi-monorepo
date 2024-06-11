@@ -124,6 +124,7 @@ diesel::table! {
         barcode -> diesel::sql_types::Text,
         project_id -> diesel::sql_types::Integer,
         category_id -> diesel::sql_types::Integer,
+        geolocation -> postgis_diesel::sql_types::Geometry,
         created_by -> diesel::sql_types::Integer,
         created_at -> diesel::sql_types::Timestamp,
         updated_by -> diesel::sql_types::Integer,

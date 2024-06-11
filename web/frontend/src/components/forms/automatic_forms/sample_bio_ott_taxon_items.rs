@@ -12,10 +12,10 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SampleBioOttTaxonItemBuilder {
-    pub sample: Option<Rc<NestedSample>>,
-    pub taxon: Option<Rc<NestedBioOttTaxonItem>>,
+    pub sample: Option<Rc<web_common::database::nested_variants::NestedSample>>,
+    pub taxon: Option<Rc<web_common::database::nested_variants::NestedBioOttTaxonItem>>,
     pub errors_sample: Vec<ApiError>,
     pub errors_taxon: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
@@ -35,10 +35,10 @@ impl Default for SampleBioOttTaxonItemBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum SampleBioOttTaxonItemActions {
-    SetSample(Option<Rc<NestedSample>>),
-    SetTaxon(Option<Rc<NestedBioOttTaxonItem>>),
+    SetSample(Option<Rc<web_common::database::nested_variants::NestedSample>>),
+    SetTaxon(Option<Rc<web_common::database::nested_variants::NestedBioOttTaxonItem>>),
 }
 
 impl FromOperation for SampleBioOttTaxonItemActions {
@@ -175,19 +175,23 @@ pub fn create_sample_bio_ott_taxon_item_form(props: &CreateSampleBioOttTaxonItem
             taxon_id.into(),
         ));
     }
-    let set_sample = builder_dispatch.apply_callback(|sample: Option<Rc<NestedSample>>| {
-        SampleBioOttTaxonItemActions::SetSample(sample)
-    });
-    let set_taxon = builder_dispatch.apply_callback(|taxon: Option<Rc<NestedBioOttTaxonItem>>| {
-        SampleBioOttTaxonItemActions::SetTaxon(taxon)
-    });
+    let set_sample = builder_dispatch.apply_callback(
+        |sample: Option<Rc<web_common::database::nested_variants::NestedSample>>| {
+            SampleBioOttTaxonItemActions::SetSample(sample)
+        },
+    );
+    let set_taxon = builder_dispatch.apply_callback(
+        |taxon: Option<Rc<web_common::database::nested_variants::NestedBioOttTaxonItem>>| {
+            SampleBioOttTaxonItemActions::SetTaxon(taxon)
+        },
+    );
     html! {
         <BasicForm<NewSampleBioOttTaxonItem>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <Datalist<NestedSample, false> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
-            <Datalist<NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedBioOttTaxonItem, false> builder={set_taxon} optional={false} errors={builder_store.errors_taxon.clone()} value={builder_store.taxon.clone()} label="Taxon" scanner={false} />
         </BasicForm<NewSampleBioOttTaxonItem>>
     }
 }

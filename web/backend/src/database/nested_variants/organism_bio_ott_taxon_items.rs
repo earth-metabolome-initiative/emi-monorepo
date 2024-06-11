@@ -1,14 +1,12 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedOrganismBioOttTaxonItem {
-    pub inner: OrganismBioOttTaxonItem,
-    pub created_by: NestedUser,
-    pub organism: NestedOrganism,
-    pub taxon: NestedBioOttTaxonItem,
+    pub inner: crate::database::flat_variants::OrganismBioOttTaxonItem,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub organism: crate::database::nested_variants::NestedOrganism,
+    pub taxon: crate::database::nested_variants::NestedBioOttTaxonItem,
 }
 
 unsafe impl Send for NestedOrganismBioOttTaxonItem {}
@@ -28,9 +26,19 @@ impl NestedOrganismBioOttTaxonItem {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            organism: NestedOrganism::get(flat_variant.organism_id, author_user_id, connection)?,
-            taxon: NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection)?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            organism: crate::database::nested_variants::NestedOrganism::get(
+                flat_variant.organism_id,
+                author_user_id,
+                connection,
+            )?,
+            taxon: crate::database::nested_variants::NestedBioOttTaxonItem::get(
+                flat_variant.taxon_id,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -69,7 +77,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -90,7 +98,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -133,7 +141,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -225,7 +233,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -246,7 +254,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -274,7 +282,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -334,7 +342,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -361,7 +369,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -389,7 +397,7 @@ impl NestedOrganismBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&OrganismBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -439,28 +447,38 @@ impl NestedOrganismBioOttTaxonItem {
     }
 }
 impl From<web_common::database::nested_variants::NestedOrganismBioOttTaxonItem>
-    for NestedOrganismBioOttTaxonItem
+    for crate::database::nested_variants::NestedOrganismBioOttTaxonItem
 {
     fn from(item: web_common::database::nested_variants::NestedOrganismBioOttTaxonItem) -> Self {
         Self {
-            inner: OrganismBioOttTaxonItem::from(item.inner),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            organism: NestedOrganism::from(item.organism.as_ref().clone()),
-            taxon: NestedBioOttTaxonItem::from(item.taxon.as_ref().clone()),
+            inner: crate::database::flat_variants::OrganismBioOttTaxonItem::from(item.inner),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            organism: crate::database::nested_variants::NestedOrganism::from(
+                item.organism.as_ref().clone(),
+            ),
+            taxon: crate::database::nested_variants::NestedBioOttTaxonItem::from(
+                item.taxon.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedOrganismBioOttTaxonItem>
+impl From<crate::database::nested_variants::NestedOrganismBioOttTaxonItem>
     for web_common::database::nested_variants::NestedOrganismBioOttTaxonItem
 {
-    fn from(item: NestedOrganismBioOttTaxonItem) -> Self {
+    fn from(item: crate::database::nested_variants::NestedOrganismBioOttTaxonItem) -> Self {
         Self {
-            inner: web_common::database::OrganismBioOttTaxonItem::from(item.inner),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            organism: Rc::from(web_common::database::NestedOrganism::from(item.organism)),
-            taxon: Rc::from(web_common::database::NestedBioOttTaxonItem::from(
-                item.taxon,
+            inner: web_common::database::flat_variants::OrganismBioOttTaxonItem::from(item.inner),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
             )),
+            organism: Rc::from(web_common::database::nested_variants::NestedOrganism::from(
+                item.organism,
+            )),
+            taxon: Rc::from(
+                web_common::database::nested_variants::NestedBioOttTaxonItem::from(item.taxon),
+            ),
         }
     }
 }

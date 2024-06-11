@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -57,8 +54,10 @@ pub struct BioOttTaxonItem {
 
 unsafe impl Send for BioOttTaxonItem {}
 unsafe impl Sync for BioOttTaxonItem {}
-impl From<BioOttTaxonItem> for web_common::database::flat_variants::BioOttTaxonItem {
-    fn from(item: BioOttTaxonItem) -> Self {
+impl From<web_common::database::flat_variants::BioOttTaxonItem>
+    for crate::database::flat_variants::BioOttTaxonItem
+{
+    fn from(item: web_common::database::flat_variants::BioOttTaxonItem) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -83,8 +82,10 @@ impl From<BioOttTaxonItem> for web_common::database::flat_variants::BioOttTaxonI
     }
 }
 
-impl From<web_common::database::flat_variants::BioOttTaxonItem> for BioOttTaxonItem {
-    fn from(item: web_common::database::flat_variants::BioOttTaxonItem) -> Self {
+impl From<crate::database::flat_variants::BioOttTaxonItem>
+    for web_common::database::flat_variants::BioOttTaxonItem
+{
+    fn from(item: crate::database::flat_variants::BioOttTaxonItem) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -125,7 +126,7 @@ impl BioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&BioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -183,7 +184,7 @@ impl BioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&BioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::BioOttTaxonItemFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -232,7 +233,7 @@ impl BioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&BioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::BioOttTaxonItemFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,

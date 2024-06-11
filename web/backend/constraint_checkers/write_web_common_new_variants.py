@@ -96,7 +96,7 @@ def write_web_common_new_variants(
         document.write(f'#[cfg(feature = "frontend")]\n' f"impl {struct.name} {{\n")
 
         document.write(
-            f"    pub fn into_row(self, {creator_user_id_attribute.name}: {creator_user_id_attribute.format_data_type()}) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {{\n"
+            f"    pub fn into_row(self, {creator_user_id_attribute.name}: {creator_user_id_attribute.format_data_type(route='web_common')}) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {{\n"
         )
 
         document.write("        vec![\n")
@@ -112,25 +112,25 @@ def write_web_common_new_variants(
                 self_attribute_name = f"self.{attribute.name}"
 
             if attribute.optional:
-                if attribute.data_type() in GLUESQL_TYPES_MAPPING:
+                if attribute.raw_data_type() in GLUESQL_TYPES_MAPPING:
                     document.write(
                         f"            match {self_attribute_name} {{\n"
-                        f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(attribute.name)},\n"
+                        f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.raw_data_type()].format(value=attribute.name)},\n"
                         "                None => gluesql::core::ast_builder::null(),\n"
                         "            },\n"
                     )
                 else:
                     raise NotImplementedError(
-                        f"The type {attribute.data_type()} is not supported. "
-                        f"The struct {struct.name} contains an {attribute.data_type()}. "
+                        f"The type {attribute.raw_data_type()} is not supported. "
+                        f"The struct {struct.name} contains an {attribute.raw_data_type()}. "
                     )
-            elif attribute.data_type() in GLUESQL_TYPES_MAPPING:
+            elif attribute.raw_data_type() in GLUESQL_TYPES_MAPPING:
                 document.write(
-                    f"            {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(self_attribute_name)},\n"
+                    f"            {GLUESQL_TYPES_MAPPING[attribute.raw_data_type()].format(value=self_attribute_name)},\n"
                 )
             else:
                 raise NotImplementedError(
-                    f"The type {attribute.data_type()} is not supported."
+                    f"The type {attribute.raw_data_type()} is not supported."
                 )
 
         document.write("        ]\n    }\n\n")
@@ -149,7 +149,7 @@ def write_web_common_new_variants(
             f"    /// The number of rows inserted in table {struct.name}\n"
             "    pub async fn insert<C>(\n"
             "        self,\n"
-            f"        {creator_user_id_attribute.name}: {creator_user_id_attribute.format_data_type()},\n"
+            f"        {creator_user_id_attribute.name}: {creator_user_id_attribute.format_data_type(route='web_common')},\n"
             "        connection: &mut gluesql::prelude::Glue<C>,\n"
             f"    ) -> Result<super::{struct.get_flat_variant().name}, gluesql::prelude::Error> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"

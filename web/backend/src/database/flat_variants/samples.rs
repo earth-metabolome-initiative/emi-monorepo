@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -48,8 +45,8 @@ pub struct Sample {
 
 unsafe impl Send for Sample {}
 unsafe impl Sync for Sample {}
-impl From<Sample> for web_common::database::flat_variants::Sample {
-    fn from(item: Sample) -> Self {
+impl From<web_common::database::flat_variants::Sample> for crate::database::flat_variants::Sample {
+    fn from(item: web_common::database::flat_variants::Sample) -> Self {
         Self {
             id: item.id,
             container_id: item.container_id,
@@ -65,8 +62,8 @@ impl From<Sample> for web_common::database::flat_variants::Sample {
     }
 }
 
-impl From<web_common::database::flat_variants::Sample> for Sample {
-    fn from(item: web_common::database::flat_variants::Sample) -> Self {
+impl From<crate::database::flat_variants::Sample> for web_common::database::flat_variants::Sample {
+    fn from(item: crate::database::flat_variants::Sample) -> Self {
         Self {
             id: item.id,
             container_id: item.container_id,
@@ -123,7 +120,7 @@ impl Sample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -172,7 +169,7 @@ impl Sample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -264,7 +261,7 @@ impl Sample {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -475,7 +472,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -524,7 +521,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -574,7 +571,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -703,7 +700,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -752,7 +749,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -802,7 +799,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&SampleFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

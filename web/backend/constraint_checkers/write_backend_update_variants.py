@@ -124,7 +124,7 @@ def write_backend_update_variants(
             all_attributes = [updator_user_id_attribute] + all_attributes
 
         for attribute in all_attributes:
-            document.write(f"    {attribute.name}: {attribute.format_data_type()},\n")
+            document.write(f"    {attribute.name}: {attribute.format_data_type(route='backend')},\n")
 
         document.write("}\n\n")
 
@@ -132,7 +132,7 @@ def write_backend_update_variants(
         document.write(
             f"impl UpdateRow for web_common::database::{struct.name} {{\n"
             f"    type Intermediate = {intermediate_struct_name};\n"
-            f"    type Flat = crate::database::flat_variants::{struct.get_flat_variant().name};\n\n"
+            f"    type Flat = {struct.get_flat_variant().full_path(route='backend')};\n\n"
         )
         if struct.table_name != "users":
             document.write(
@@ -145,9 +145,9 @@ def write_backend_update_variants(
         document.write(f"        {intermediate_struct_name} {{\n")
 
         for attribute in all_attributes:
-            if attribute.is_jpeg():
+            if attribute.has_backend_type():
                 document.write(
-                    f"            {attribute.name}: self.{attribute.name}.into(),\n"
+                    f"            {attribute.name}: self.{attribute.name}.convert(),\n"
                 )
                 continue
             if struct.get_attribute_by_name(attribute.name) is not None:

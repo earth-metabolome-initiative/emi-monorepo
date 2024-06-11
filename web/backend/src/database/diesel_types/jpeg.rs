@@ -57,14 +57,14 @@ impl From<JPEG> for Vec<u8> {
     }
 }
 
-impl From<web_common::types::JPEG> for JPEG {
-    fn from(data: web_common::types::JPEG) -> Self {
-        JPEG(data.into())
+impl super::Convert<JPEG> for web_common::types::JPEG {
+    fn convert(self) -> JPEG {
+        JPEG(self.into())
     }
 }
 
-impl From<JPEG> for web_common::types::JPEG {
-    fn from(data: JPEG) -> web_common::types::JPEG {
-        data.0.into()
+impl super::Convert<web_common::types::JPEG> for JPEG {
+    fn convert(self) -> web_common::types::JPEG {
+        web_common::types::JPEG::from(self.0)
     }
 }

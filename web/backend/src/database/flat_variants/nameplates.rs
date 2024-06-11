@@ -13,17 +13,13 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
     serde::Deserialize,
-    Default,
     Identifiable,
     QueryableByName,
     Queryable,
@@ -38,6 +34,7 @@ pub struct Nameplate {
     pub barcode: String,
     pub project_id: i32,
     pub category_id: i32,
+    pub geolocation: postgis_diesel::types::Point,
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
@@ -46,13 +43,16 @@ pub struct Nameplate {
 
 unsafe impl Send for Nameplate {}
 unsafe impl Sync for Nameplate {}
-impl From<Nameplate> for web_common::database::flat_variants::Nameplate {
-    fn from(item: Nameplate) -> Self {
+impl From<web_common::database::flat_variants::Nameplate>
+    for crate::database::flat_variants::Nameplate
+{
+    fn from(item: web_common::database::flat_variants::Nameplate) -> Self {
         Self {
             id: item.id,
             barcode: item.barcode,
             project_id: item.project_id,
             category_id: item.category_id,
+            geolocation: item.geolocation.convert(),
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -61,13 +61,16 @@ impl From<Nameplate> for web_common::database::flat_variants::Nameplate {
     }
 }
 
-impl From<web_common::database::flat_variants::Nameplate> for Nameplate {
-    fn from(item: web_common::database::flat_variants::Nameplate) -> Self {
+impl From<crate::database::flat_variants::Nameplate>
+    for web_common::database::flat_variants::Nameplate
+{
+    fn from(item: crate::database::flat_variants::Nameplate) -> Self {
         Self {
             id: item.id,
             barcode: item.barcode,
             project_id: item.project_id,
             category_id: item.category_id,
+            geolocation: item.geolocation.convert(),
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
@@ -117,7 +120,7 @@ impl Nameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -160,7 +163,7 @@ impl Nameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -246,7 +249,7 @@ impl Nameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -382,7 +385,7 @@ impl Nameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -427,7 +430,7 @@ impl Nameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -473,7 +476,7 @@ impl Nameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -566,7 +569,7 @@ impl Nameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -611,7 +614,7 @@ impl Nameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -657,7 +660,7 @@ impl Nameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

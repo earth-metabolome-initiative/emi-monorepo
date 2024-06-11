@@ -12,13 +12,15 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NameplateBuilder {
     pub id: Option<i32>,
     pub barcode: Option<Rc<String>>,
-    pub project: Option<Rc<NestedProject>>,
-    pub category: Option<Rc<NestedNameplateCategory>>,
+    pub geolocation: Option<web_common::types::Point>,
+    pub project: Option<Rc<web_common::database::nested_variants::NestedProject>>,
+    pub category: Option<Rc<web_common::database::nested_variants::NestedNameplateCategory>>,
     pub errors_barcode: Vec<ApiError>,
+    pub errors_geolocation: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
     pub errors_category: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
@@ -31,9 +33,11 @@ impl Default for NameplateBuilder {
         Self {
             id: None,
             barcode: None,
+            geolocation: None,
             project: Default::default(),
             category: Default::default(),
             errors_barcode: Default::default(),
+            errors_geolocation: Default::default(),
             errors_project: Default::default(),
             errors_category: Default::default(),
             form_updated_at: Default::default(),
@@ -41,11 +45,12 @@ impl Default for NameplateBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum NameplateActions {
     SetBarcode(Option<String>),
-    SetProject(Option<Rc<NestedProject>>),
-    SetCategory(Option<Rc<NestedNameplateCategory>>),
+    SetGeolocation(Option<web_common::types::Point>),
+    SetProject(Option<Rc<web_common::database::nested_variants::NestedProject>>),
+    SetCategory(Option<Rc<web_common::database::nested_variants::NestedNameplateCategory>>),
 }
 
 impl FromOperation for NameplateActions {
@@ -87,6 +92,20 @@ impl Reducer<NameplateBuilder> for NameplateActions {
                 // yet handling more corner cases, we always use the break here.
                 break 'barcode;
             }
+            NameplateActions::SetGeolocation(geolocation) => 'geolocation: {
+                state_mut.errors_geolocation.clear();
+                if geolocation.is_none() {
+                    state_mut.errors_geolocation.push(ApiError::BadRequest(vec![
+                        "The Geolocation field is required.".to_string(),
+                    ]));
+                    state_mut.geolocation = None;
+                    break 'geolocation;
+                }
+                state_mut.geolocation = geolocation;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'geolocation;
+            }
             NameplateActions::SetProject(project) => 'project: {
                 state_mut.errors_project.clear();
                 if project.is_none() {
@@ -126,6 +145,7 @@ impl FormBuilder for NameplateBuilder {
 
     fn has_errors(&self) -> bool {
         !self.errors_barcode.is_empty()
+            || !self.errors_geolocation.is_empty()
             || !self.errors_project.is_empty()
             || !self.errors_category.is_empty()
     }
@@ -140,6 +160,9 @@ impl FormBuilder for NameplateBuilder {
         dispatcher.apply(NameplateActions::SetBarcode(Some(
             richest_variant.inner.barcode.to_string(),
         )));
+        dispatcher.apply(NameplateActions::SetGeolocation(Some(
+            richest_variant.inner.geolocation,
+        )));
         dispatcher.apply(NameplateActions::SetProject(
             Some(richest_variant.project).map(Rc::from),
         ));
@@ -152,6 +175,7 @@ impl FormBuilder for NameplateBuilder {
     fn can_submit(&self) -> bool {
         !self.has_errors()
             && self.barcode.is_some()
+            && self.geolocation.is_some()
             && self.project.is_some()
             && self.category.is_some()
     }
@@ -163,6 +187,7 @@ impl From<NameplateBuilder> for NewNameplate {
             barcode: builder.barcode.as_deref().cloned().unwrap(),
             project_id: builder.project.as_deref().cloned().unwrap().inner.id,
             category_id: builder.category.as_deref().cloned().unwrap().inner.id,
+            geolocation: builder.geolocation.unwrap(),
         }
     }
 }
@@ -173,6 +198,7 @@ impl From<NameplateBuilder> for UpdateNameplate {
             barcode: builder.barcode.as_deref().cloned().unwrap(),
             project_id: builder.project.as_deref().cloned().unwrap().inner.id,
             category_id: builder.category.as_deref().cloned().unwrap().inner.id,
+            geolocation: builder.geolocation.unwrap(),
         }
     }
 }
@@ -232,20 +258,29 @@ pub fn create_nameplate_form(props: &CreateNameplateFormProp) -> Html {
     ));
     let set_barcode = builder_dispatch
         .apply_callback(|barcode: Option<String>| NameplateActions::SetBarcode(barcode));
-    let set_project = builder_dispatch
-        .apply_callback(|project: Option<Rc<NestedProject>>| NameplateActions::SetProject(project));
-    let set_category =
-        builder_dispatch.apply_callback(|category: Option<Rc<NestedNameplateCategory>>| {
-            NameplateActions::SetCategory(category)
+    let set_geolocation =
+        builder_dispatch.apply_callback(|geolocation: Option<web_common::types::Point>| {
+            NameplateActions::SetGeolocation(geolocation)
         });
+    let set_project = builder_dispatch.apply_callback(
+        |project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
+            NameplateActions::SetProject(project)
+        },
+    );
+    let set_category = builder_dispatch.apply_callback(
+        |category: Option<Rc<web_common::database::nested_variants::NestedNameplateCategory>>| {
+            NameplateActions::SetCategory(category)
+        },
+    );
     html! {
         <BasicForm<NewNameplate>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.as_deref().cloned().map(BarCode::from).map(Rc::from)} />
-            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<NestedNameplateCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
+            <GPSInput label="Geolocation" optional={false} errors={builder_store.errors_geolocation.clone()} builder={set_geolocation} coordinates={builder_store.geolocation.clone()} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedNameplateCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<NewNameplate>>
     }
 }
@@ -263,20 +298,29 @@ pub fn update_nameplate_form(props: &UpdateNameplateFormProp) -> Html {
     named_requests.push(ComponentMessage::get::<UpdateNameplate>(props.id.into()));
     let set_barcode = builder_dispatch
         .apply_callback(|barcode: Option<String>| NameplateActions::SetBarcode(barcode));
-    let set_project = builder_dispatch
-        .apply_callback(|project: Option<Rc<NestedProject>>| NameplateActions::SetProject(project));
-    let set_category =
-        builder_dispatch.apply_callback(|category: Option<Rc<NestedNameplateCategory>>| {
-            NameplateActions::SetCategory(category)
+    let set_geolocation =
+        builder_dispatch.apply_callback(|geolocation: Option<web_common::types::Point>| {
+            NameplateActions::SetGeolocation(geolocation)
         });
+    let set_project = builder_dispatch.apply_callback(
+        |project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
+            NameplateActions::SetProject(project)
+        },
+    );
+    let set_category = builder_dispatch.apply_callback(
+        |category: Option<Rc<web_common::database::nested_variants::NestedNameplateCategory>>| {
+            NameplateActions::SetCategory(category)
+        },
+    );
     html! {
         <BasicForm<UpdateNameplate>
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.as_deref().cloned().map(BarCode::from).map(Rc::from)} />
-            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<NestedNameplateCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
+            <GPSInput label="Geolocation" optional={false} errors={builder_store.errors_geolocation.clone()} builder={set_geolocation} coordinates={builder_store.geolocation.clone()} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedNameplateCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<UpdateNameplate>>
     }
 }

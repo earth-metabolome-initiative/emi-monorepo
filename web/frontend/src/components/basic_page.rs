@@ -18,7 +18,7 @@ use yewdux::Dispatch;
 
 use super::RowToBadge;
 
-pub(crate) trait PageLike:
+pub trait PageLike:
     RowToBadge + DeserializeOwned + Filtrable + Viewable + PartialEq + Clone + Tabular + 'static
 {
     fn section() -> String {

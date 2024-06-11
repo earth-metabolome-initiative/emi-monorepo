@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -42,28 +39,12 @@ pub struct User {
     pub organization_id: Option<i32>,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
-    pub picture: JPEG,
+    pub picture: crate::database::diesel_types::JPEG,
 }
 
 unsafe impl Send for User {}
 unsafe impl Sync for User {}
-impl From<User> for web_common::database::flat_variants::User {
-    fn from(item: User) -> Self {
-        Self {
-            id: item.id,
-            first_name: item.first_name,
-            middle_name: item.middle_name,
-            last_name: item.last_name,
-            description: item.description,
-            organization_id: item.organization_id,
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-            picture: item.picture.into(),
-        }
-    }
-}
-
-impl From<web_common::database::flat_variants::User> for User {
+impl From<web_common::database::flat_variants::User> for crate::database::flat_variants::User {
     fn from(item: web_common::database::flat_variants::User) -> Self {
         Self {
             id: item.id,
@@ -74,7 +55,23 @@ impl From<web_common::database::flat_variants::User> for User {
             organization_id: item.organization_id,
             created_at: item.created_at,
             updated_at: item.updated_at,
-            picture: item.picture.into(),
+            picture: item.picture.convert(),
+        }
+    }
+}
+
+impl From<crate::database::flat_variants::User> for web_common::database::flat_variants::User {
+    fn from(item: crate::database::flat_variants::User) -> Self {
+        Self {
+            id: item.id,
+            first_name: item.first_name,
+            middle_name: item.middle_name,
+            last_name: item.last_name,
+            description: item.description,
+            organization_id: item.organization_id,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            picture: item.picture.convert(),
         }
     }
 }
@@ -95,7 +92,7 @@ impl User {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -123,7 +120,7 @@ impl User {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -168,7 +165,7 @@ impl User {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -308,7 +305,7 @@ impl User {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -342,7 +339,7 @@ impl User {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -377,7 +374,7 @@ impl User {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -470,7 +467,7 @@ impl User {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -504,7 +501,7 @@ impl User {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -539,7 +536,7 @@ impl User {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

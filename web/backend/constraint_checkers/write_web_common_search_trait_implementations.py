@@ -32,7 +32,6 @@ def write_web_common_search_trait_implementations(
     imports = [
         "use crate::database::*;",
         "use std::rc::Rc;",
-        "use serde::{Serialize, Deserialize};",
     ]
 
     # Preliminarly, we write a docstring at the very head
@@ -93,7 +92,7 @@ def write_web_common_search_trait_implementations(
     # This boxed variant of the Searchable trait is used to call the search_task method
     # on all structs at once.
     document.write(
-        "#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]\n"
+        "#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]\n"
         "pub enum SearchableStruct {\n"
     )
 

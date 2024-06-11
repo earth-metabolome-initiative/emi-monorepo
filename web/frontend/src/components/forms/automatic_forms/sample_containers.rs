@@ -12,12 +12,12 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SampleContainerBuilder {
     pub id: Option<i32>,
     pub barcode: Option<Rc<String>>,
-    pub project: Option<Rc<NestedProject>>,
-    pub category: Option<Rc<NestedSampleContainerCategory>>,
+    pub project: Option<Rc<web_common::database::nested_variants::NestedProject>>,
+    pub category: Option<Rc<web_common::database::nested_variants::NestedSampleContainerCategory>>,
     pub errors_barcode: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
     pub errors_category: Vec<ApiError>,
@@ -41,11 +41,11 @@ impl Default for SampleContainerBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum SampleContainerActions {
     SetBarcode(Option<String>),
-    SetProject(Option<Rc<NestedProject>>),
-    SetCategory(Option<Rc<NestedSampleContainerCategory>>),
+    SetProject(Option<Rc<web_common::database::nested_variants::NestedProject>>),
+    SetCategory(Option<Rc<web_common::database::nested_variants::NestedSampleContainerCategory>>),
 }
 
 impl FromOperation for SampleContainerActions {
@@ -241,21 +241,24 @@ pub fn create_sample_container_form(props: &CreateSampleContainerFormProp) -> Ht
     );
     let set_barcode = builder_dispatch
         .apply_callback(|barcode: Option<String>| SampleContainerActions::SetBarcode(barcode));
-    let set_project = builder_dispatch.apply_callback(|project: Option<Rc<NestedProject>>| {
-        SampleContainerActions::SetProject(project)
-    });
-    let set_category =
-        builder_dispatch.apply_callback(|category: Option<Rc<NestedSampleContainerCategory>>| {
-            SampleContainerActions::SetCategory(category)
-        });
+    let set_project = builder_dispatch.apply_callback(
+        |project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
+            SampleContainerActions::SetProject(project)
+        },
+    );
+    let set_category = builder_dispatch.apply_callback(
+        |category: Option<
+            Rc<web_common::database::nested_variants::NestedSampleContainerCategory>,
+        >| SampleContainerActions::SetCategory(category),
+    );
     html! {
         <BasicForm<NewSampleContainer>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.as_deref().cloned().map(BarCode::from).map(Rc::from)} />
-            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<NewSampleContainer>>
     }
 }
@@ -275,21 +278,24 @@ pub fn update_sample_container_form(props: &UpdateSampleContainerFormProp) -> Ht
     ));
     let set_barcode = builder_dispatch
         .apply_callback(|barcode: Option<String>| SampleContainerActions::SetBarcode(barcode));
-    let set_project = builder_dispatch.apply_callback(|project: Option<Rc<NestedProject>>| {
-        SampleContainerActions::SetProject(project)
-    });
-    let set_category =
-        builder_dispatch.apply_callback(|category: Option<Rc<NestedSampleContainerCategory>>| {
-            SampleContainerActions::SetCategory(category)
-        });
+    let set_project = builder_dispatch.apply_callback(
+        |project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
+            SampleContainerActions::SetProject(project)
+        },
+    );
+    let set_category = builder_dispatch.apply_callback(
+        |category: Option<
+            Rc<web_common::database::nested_variants::NestedSampleContainerCategory>,
+        >| SampleContainerActions::SetCategory(category),
+    );
     html! {
         <BasicForm<UpdateSampleContainer>
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<BarCode> label="Barcode" optional={false} errors={builder_store.errors_barcode.clone()} builder={set_barcode} value={builder_store.barcode.as_deref().cloned().map(BarCode::from).map(Rc::from)} />
-            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSampleContainerCategory, false> builder={set_category} optional={false} errors={builder_store.errors_category.clone()} value={builder_store.category.clone()} label="Category" scanner={false} />
         </BasicForm<UpdateSampleContainer>>
     }
 }

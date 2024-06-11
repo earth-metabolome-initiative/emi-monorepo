@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -48,8 +45,10 @@ pub struct Organism {
 
 unsafe impl Send for Organism {}
 unsafe impl Sync for Organism {}
-impl From<Organism> for web_common::database::flat_variants::Organism {
-    fn from(item: Organism) -> Self {
+impl From<web_common::database::flat_variants::Organism>
+    for crate::database::flat_variants::Organism
+{
+    fn from(item: web_common::database::flat_variants::Organism) -> Self {
         Self {
             id: item.id,
             host_organism_id: item.host_organism_id,
@@ -65,8 +64,10 @@ impl From<Organism> for web_common::database::flat_variants::Organism {
     }
 }
 
-impl From<web_common::database::flat_variants::Organism> for Organism {
-    fn from(item: web_common::database::flat_variants::Organism) -> Self {
+impl From<crate::database::flat_variants::Organism>
+    for web_common::database::flat_variants::Organism
+{
+    fn from(item: crate::database::flat_variants::Organism) -> Self {
         Self {
             id: item.id,
             host_organism_id: item.host_organism_id,
@@ -123,7 +124,7 @@ impl Organism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -172,7 +173,7 @@ impl Organism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -264,7 +265,7 @@ impl Organism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -309,7 +310,7 @@ impl Organism {
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.container_id to sample_containers.
-.left_join(
+.inner_join(
    samples0.on(
        organisms::dsl::sample_id.eq(
            samples0.field(samples::dsl::id).nullable()
@@ -326,7 +327,7 @@ impl Organism {
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.project_id to projects.
-.left_join(
+.inner_join(
    samples1.on(
        organisms::dsl::sample_id.eq(
            samples1.field(samples::dsl::id).nullable()
@@ -343,7 +344,7 @@ impl Organism {
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.state_id to sample_states.
-.left_join(
+.inner_join(
    samples2.on(
        organisms::dsl::sample_id.eq(
            samples2.field(samples::dsl::id).nullable()
@@ -462,7 +463,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.container_id to sample_containers.
-.left_join(
+.inner_join(
    samples0.on(
        organisms::dsl::sample_id.eq(
            samples0.field(samples::dsl::id).nullable()
@@ -479,7 +480,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.project_id to projects.
-.left_join(
+.inner_join(
    samples1.on(
        organisms::dsl::sample_id.eq(
            samples1.field(samples::dsl::id).nullable()
@@ -496,7 +497,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.state_id to sample_states.
-.left_join(
+.inner_join(
    samples2.on(
        organisms::dsl::sample_id.eq(
            samples2.field(samples::dsl::id).nullable()
@@ -602,7 +603,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -653,7 +654,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -705,7 +706,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -750,7 +751,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.container_id to sample_containers.
-.left_join(
+.inner_join(
    samples0.on(
        organisms::dsl::sample_id.eq(
            samples0.field(samples::dsl::id).nullable()
@@ -767,7 +768,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.project_id to projects.
-.left_join(
+.inner_join(
    samples1.on(
        organisms::dsl::sample_id.eq(
            samples1.field(samples::dsl::id).nullable()
@@ -784,7 +785,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.state_id to sample_states.
-.left_join(
+.inner_join(
    samples2.on(
        organisms::dsl::sample_id.eq(
            samples2.field(samples::dsl::id).nullable()
@@ -897,7 +898,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -946,7 +947,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -996,7 +997,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -1041,7 +1042,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.container_id to sample_containers.
-.left_join(
+.inner_join(
    samples0.on(
        organisms::dsl::sample_id.eq(
            samples0.field(samples::dsl::id).nullable()
@@ -1058,7 +1059,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.project_id to projects.
-.left_join(
+.inner_join(
    samples1.on(
        organisms::dsl::sample_id.eq(
            samples1.field(samples::dsl::id).nullable()
@@ -1075,7 +1076,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
 // This operation is defined by a second order index linking organisms.sample_id to samples and samples.state_id to sample_states.
-.left_join(
+.inner_join(
    samples2.on(
        organisms::dsl::sample_id.eq(
            samples2.field(samples::dsl::id).nullable()

@@ -30,7 +30,7 @@ from constraint_checkers.parent_circularity_trigger import (
     check_parent_circularity_trigger,
 )
 from constraint_checkers.is_file_changed import (is_file_changed, update_all_files_hashes)
-from constraint_checkers.create_filter_structs import create_filter_structs
+from constraint_checkers.create_filter_variants import create_filter_variants
 from constraint_checkers.ensures_migrations_simmetry import ensures_migrations_simmetry
 from constraint_checkers.ensures_gluesql_compliance import ensures_gluesql_compliance
 from constraint_checkers.check_for_common_typos_in_migrations import (
@@ -98,6 +98,8 @@ from constraint_checkers.rust_implementation_check import trait_implementation_e
 from constraint_checkers.write_diesel_sql_types_bindings import (
     write_diesel_sql_types_bindings
 )
+from constraint_checkers.utils import infer_route_from_document
+
 
 __all__ = [
     "ensures_all_update_at_trigger_exists",
@@ -111,7 +113,7 @@ __all__ = [
     "handle_minimal_revertion",
     "write_frontend_pages",
     "regroup_tables",
-    "create_filter_structs",
+    "create_filter_variants",
     "StructMetadata",
     "AttributeMetadata",
     "replace_serial_indices",

@@ -13,12 +13,10 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
     Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     Copy,
@@ -43,8 +41,10 @@ pub struct SampleBioOttTaxonItem {
 
 unsafe impl Send for SampleBioOttTaxonItem {}
 unsafe impl Sync for SampleBioOttTaxonItem {}
-impl From<SampleBioOttTaxonItem> for web_common::database::flat_variants::SampleBioOttTaxonItem {
-    fn from(item: SampleBioOttTaxonItem) -> Self {
+impl From<web_common::database::flat_variants::SampleBioOttTaxonItem>
+    for crate::database::flat_variants::SampleBioOttTaxonItem
+{
+    fn from(item: web_common::database::flat_variants::SampleBioOttTaxonItem) -> Self {
         Self {
             created_by: item.created_by,
             created_at: item.created_at,
@@ -54,8 +54,10 @@ impl From<SampleBioOttTaxonItem> for web_common::database::flat_variants::Sample
     }
 }
 
-impl From<web_common::database::flat_variants::SampleBioOttTaxonItem> for SampleBioOttTaxonItem {
-    fn from(item: web_common::database::flat_variants::SampleBioOttTaxonItem) -> Self {
+impl From<crate::database::flat_variants::SampleBioOttTaxonItem>
+    for web_common::database::flat_variants::SampleBioOttTaxonItem
+{
+    fn from(item: crate::database::flat_variants::SampleBioOttTaxonItem) -> Self {
         Self {
             created_by: item.created_by,
             created_at: item.created_at,
@@ -109,7 +111,7 @@ impl SampleBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleBioOttTaxonItemFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -152,7 +154,7 @@ impl SampleBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleBioOttTaxonItemFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -218,7 +220,7 @@ impl SampleBioOttTaxonItem {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleBioOttTaxonItemFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -512,7 +514,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleBioOttTaxonItemFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -555,7 +557,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleBioOttTaxonItemFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -599,7 +601,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleBioOttTaxonItemFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -766,7 +768,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleBioOttTaxonItemFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -809,7 +811,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleBioOttTaxonItemFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -853,7 +855,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&SampleBioOttTaxonItemFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleBioOttTaxonItemFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

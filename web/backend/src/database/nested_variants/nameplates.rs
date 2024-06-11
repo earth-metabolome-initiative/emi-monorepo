@@ -1,15 +1,13 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedNameplate {
-    pub inner: Nameplate,
-    pub project: NestedProject,
-    pub category: NestedNameplateCategory,
-    pub created_by: NestedUser,
-    pub updated_by: NestedUser,
+    pub inner: crate::database::flat_variants::Nameplate,
+    pub project: crate::database::nested_variants::NestedProject,
+    pub category: crate::database::nested_variants::NestedNameplateCategory,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub updated_by: crate::database::nested_variants::NestedUser,
 }
 
 unsafe impl Send for NestedNameplate {}
@@ -29,10 +27,23 @@ impl NestedNameplate {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
-            category: NestedNameplateCategory::get(flat_variant.category_id, connection)?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
+            project: crate::database::nested_variants::NestedProject::get(
+                flat_variant.project_id,
+                author_user_id,
+                connection,
+            )?,
+            category: crate::database::nested_variants::NestedNameplateCategory::get(
+                flat_variant.category_id,
+                connection,
+            )?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            updated_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.updated_by,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -71,7 +82,7 @@ impl NestedNameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -92,7 +103,7 @@ impl NestedNameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -144,7 +155,7 @@ impl NestedNameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -232,7 +243,7 @@ impl NestedNameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -253,7 +264,7 @@ impl NestedNameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -275,7 +286,7 @@ impl NestedNameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -331,7 +342,7 @@ impl NestedNameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -352,7 +363,7 @@ impl NestedNameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -374,7 +385,7 @@ impl NestedNameplate {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&NameplateFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -423,27 +434,47 @@ impl NestedNameplate {
         Nameplate::delete_by_id(id, author_user_id, connection)
     }
 }
-impl From<web_common::database::nested_variants::NestedNameplate> for NestedNameplate {
+impl From<web_common::database::nested_variants::NestedNameplate>
+    for crate::database::nested_variants::NestedNameplate
+{
     fn from(item: web_common::database::nested_variants::NestedNameplate) -> Self {
         Self {
-            inner: Nameplate::from(item.inner.as_ref().clone()),
-            project: NestedProject::from(item.project.as_ref().clone()),
-            category: NestedNameplateCategory::from(item.category.as_ref().clone()),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
+            inner: crate::database::flat_variants::Nameplate::from(item.inner.as_ref().clone()),
+            project: crate::database::nested_variants::NestedProject::from(
+                item.project.as_ref().clone(),
+            ),
+            category: crate::database::nested_variants::NestedNameplateCategory::from(
+                item.category.as_ref().clone(),
+            ),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            updated_by: crate::database::nested_variants::NestedUser::from(
+                item.updated_by.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedNameplate> for web_common::database::nested_variants::NestedNameplate {
-    fn from(item: NestedNameplate) -> Self {
+impl From<crate::database::nested_variants::NestedNameplate>
+    for web_common::database::nested_variants::NestedNameplate
+{
+    fn from(item: crate::database::nested_variants::NestedNameplate) -> Self {
         Self {
-            inner: Rc::from(web_common::database::Nameplate::from(item.inner)),
-            project: Rc::from(web_common::database::NestedProject::from(item.project)),
-            category: Rc::from(web_common::database::NestedNameplateCategory::from(
-                item.category,
+            inner: Rc::from(web_common::database::flat_variants::Nameplate::from(
+                item.inner,
             )),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
+            project: Rc::from(web_common::database::nested_variants::NestedProject::from(
+                item.project,
+            )),
+            category: Rc::from(
+                web_common::database::nested_variants::NestedNameplateCategory::from(item.category),
+            ),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
+            updated_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.updated_by,
+            )),
         }
     }
 }

@@ -12,11 +12,11 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ProjectsUsersRoleBuilder {
-    pub table: Option<Rc<NestedProject>>,
-    pub user: Option<Rc<NestedUser>>,
-    pub role: Option<Rc<NestedRole>>,
+    pub table: Option<Rc<web_common::database::nested_variants::NestedProject>>,
+    pub user: Option<Rc<web_common::database::nested_variants::NestedUser>>,
+    pub role: Option<Rc<web_common::database::nested_variants::NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -39,11 +39,11 @@ impl Default for ProjectsUsersRoleBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum ProjectsUsersRoleActions {
-    SetTable(Option<Rc<NestedProject>>),
-    SetUser(Option<Rc<NestedUser>>),
-    SetRole(Option<Rc<NestedRole>>),
+    SetTable(Option<Rc<web_common::database::nested_variants::NestedProject>>),
+    SetUser(Option<Rc<web_common::database::nested_variants::NestedUser>>),
+    SetRole(Option<Rc<web_common::database::nested_variants::NestedRole>>),
 }
 
 impl FromOperation for ProjectsUsersRoleActions {
@@ -203,21 +203,29 @@ pub fn create_projects_users_role_form(props: &CreateProjectsUsersRoleFormProp) 
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch.apply_callback(|table: Option<Rc<NestedProject>>| {
-        ProjectsUsersRoleActions::SetTable(table)
-    });
-    let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<NestedUser>>| ProjectsUsersRoleActions::SetUser(user));
-    let set_role = builder_dispatch
-        .apply_callback(|role: Option<Rc<NestedRole>>| ProjectsUsersRoleActions::SetRole(role));
+    let set_table = builder_dispatch.apply_callback(
+        |table: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
+            ProjectsUsersRoleActions::SetTable(table)
+        },
+    );
+    let set_user = builder_dispatch.apply_callback(
+        |user: Option<Rc<web_common::database::nested_variants::NestedUser>>| {
+            ProjectsUsersRoleActions::SetUser(user)
+        },
+    );
+    let set_role = builder_dispatch.apply_callback(
+        |role: Option<Rc<web_common::database::nested_variants::NestedRole>>| {
+            ProjectsUsersRoleActions::SetRole(role)
+        },
+    );
     html! {
         <BasicForm<NewProjectsUsersRole>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <Datalist<NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
-            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewProjectsUsersRole>>
     }
 }

@@ -13,7 +13,6 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
     Eq,
@@ -45,8 +44,10 @@ pub struct ProjectsTeamsRole {
 
 unsafe impl Send for ProjectsTeamsRole {}
 unsafe impl Sync for ProjectsTeamsRole {}
-impl From<ProjectsTeamsRole> for web_common::database::flat_variants::ProjectsTeamsRole {
-    fn from(item: ProjectsTeamsRole) -> Self {
+impl From<web_common::database::flat_variants::ProjectsTeamsRole>
+    for crate::database::flat_variants::ProjectsTeamsRole
+{
+    fn from(item: web_common::database::flat_variants::ProjectsTeamsRole) -> Self {
         Self {
             table_id: item.table_id,
             team_id: item.team_id,
@@ -57,8 +58,10 @@ impl From<ProjectsTeamsRole> for web_common::database::flat_variants::ProjectsTe
     }
 }
 
-impl From<web_common::database::flat_variants::ProjectsTeamsRole> for ProjectsTeamsRole {
-    fn from(item: web_common::database::flat_variants::ProjectsTeamsRole) -> Self {
+impl From<crate::database::flat_variants::ProjectsTeamsRole>
+    for web_common::database::flat_variants::ProjectsTeamsRole
+{
+    fn from(item: crate::database::flat_variants::ProjectsTeamsRole) -> Self {
         Self {
             table_id: item.table_id,
             team_id: item.team_id,
@@ -113,7 +116,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&ProjectsTeamsRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -159,7 +162,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&ProjectsTeamsRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -228,7 +231,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&ProjectsTeamsRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -509,7 +512,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&ProjectsTeamsRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -555,7 +558,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&ProjectsTeamsRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -602,7 +605,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&ProjectsTeamsRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -757,7 +760,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&ProjectsTeamsRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -803,7 +806,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&ProjectsTeamsRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -850,7 +853,7 @@ impl ProjectsTeamsRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&ProjectsTeamsRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsTeamsRoleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

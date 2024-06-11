@@ -1,14 +1,10 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedUser {
-    pub inner: User,
-    pub organization: Option<NestedOrganization>,
+    pub inner: crate::database::flat_variants::User,
+    pub organization: Option<crate::database::nested_variants::NestedOrganization>,
 }
 
 unsafe impl Send for NestedUser {}
@@ -28,7 +24,12 @@ impl NestedUser {
         Ok(Self {
             organization: flat_variant
                 .organization_id
-                .map(|organization_id| NestedOrganization::get(organization_id, connection))
+                .map(|organization_id| {
+                    crate::database::nested_variants::NestedOrganization::get(
+                        organization_id,
+                        connection,
+                    )
+                })
                 .transpose()?,
             inner: flat_variant,
         })
@@ -48,7 +49,7 @@ impl NestedUser {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -67,7 +68,7 @@ impl NestedUser {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -99,7 +100,7 @@ impl NestedUser {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -166,7 +167,7 @@ impl NestedUser {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -187,7 +188,7 @@ impl NestedUser {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -209,7 +210,7 @@ impl NestedUser {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -265,7 +266,7 @@ impl NestedUser {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -286,7 +287,7 @@ impl NestedUser {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -308,7 +309,7 @@ impl NestedUser {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&UserFilter>,
+        filter: Option<&web_common::database::filter_variants::UserFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -357,25 +358,29 @@ impl NestedUser {
         User::delete_by_id(id, author_user_id, connection)
     }
 }
-impl From<web_common::database::nested_variants::NestedUser> for NestedUser {
+impl From<web_common::database::nested_variants::NestedUser>
+    for crate::database::nested_variants::NestedUser
+{
     fn from(item: web_common::database::nested_variants::NestedUser) -> Self {
         Self {
-            inner: User::from(item.inner.as_ref().clone()),
+            inner: crate::database::flat_variants::User::from(item.inner.as_ref().clone()),
             organization: item
                 .organization
                 .as_deref()
                 .cloned()
-                .map(NestedOrganization::from),
+                .map(crate::database::nested_variants::NestedOrganization::from),
         }
     }
 }
-impl From<NestedUser> for web_common::database::nested_variants::NestedUser {
-    fn from(item: NestedUser) -> Self {
+impl From<crate::database::nested_variants::NestedUser>
+    for web_common::database::nested_variants::NestedUser
+{
+    fn from(item: crate::database::nested_variants::NestedUser) -> Self {
         Self {
-            inner: Rc::from(web_common::database::User::from(item.inner)),
+            inner: Rc::from(web_common::database::flat_variants::User::from(item.inner)),
             organization: item
                 .organization
-                .map(web_common::database::NestedOrganization::from)
+                .map(web_common::database::nested_variants::NestedOrganization::from)
                 .map(Rc::from),
         }
     }

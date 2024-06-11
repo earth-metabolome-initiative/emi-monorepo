@@ -57,32 +57,28 @@ class SQLType:
 @lru_cache
 def get_all_postgres_types() -> List[SQLType]:
     """Retrieve all PostgreSQL types from the database."""
-    # _connection, cursor = get_cursor()
-    # # We exclude all types that start with "_" as they are internal types
-    # # and similarly we exclude all types that start with "pg_" as they are
-    # # system types. Furthermore, we exclude all types that are placeholders.
-    # cursor.execute(
-    #     "SELECT typname, oid FROM pg_type WHERE "
-    #     r"typname NOT LIKE '\_%' AND typname NOT LIKE 'pg_%' "
-    #     "AND typname NOT LIKE 'any%'"
-    # )
-    # types = [SQLType(name, oid) for name, oid in cursor.fetchall()]
-    # cursor.close()
+    _connection, cursor = get_cursor()
+    # We exclude all types that start with "_" as they are internal types
+    # and similarly we exclude all types that start with "pg_" as they are
+    # system types. Furthermore, we exclude all types that are placeholders.
+    cursor.execute(
+        "SELECT typname, oid FROM pg_type WHERE "
+        r"typname NOT LIKE '\_%' AND typname NOT LIKE 'pg_%' "
+        "AND typname NOT LIKE 'any%'"
+    )
+    types = [SQLType(name) for name, oid in cursor.fetchall()]
+    cursor.close()
 
-    # # We sort the types by name to ensure consistent output
-    # types = sorted(types, key=lambda x: x.name)
+    # We sort the types by name to ensure consistent output
+    types = sorted(types, key=lambda x: x.name)
 
     # As a self-consistency check, we ensure that all of the types that we are
     # defining in the migrations are actually being retrieved by the aforementioned
     # query.
-    # for defined_type in get_types():
-    #     assert any(
-    #         defined_type == sql_type.name for sql_type in types
-    #     ), f"Type {defined_type} is not being retrieved from the database."
-
-    types = [SQLType(defined_type) for defined_type in get_types()]
-
-    types = sorted(types, key=lambda x: x.name)
+    for defined_type in get_types():
+        assert any(
+            defined_type == sql_type.name for sql_type in types
+        ), f"Type {defined_type} is not being retrieved from the database."
 
     return types
 
@@ -123,10 +119,9 @@ def write_diesel_sql_types_bindings():
             )
 
             with open(
-                f"src/database/sql_type_bindings/{sql_type.sanitized_name()}.rs", "w", encoding="utf8"
+                f"src/database/sql_type_bindings/{sql_type.name}.rs", "w", encoding="utf8"
             ) as f:
                 f.write(warning)
-
                 try:
                     sql_type.write_diesel_binding_to_file(f)
                 except NotImplementedError as e:

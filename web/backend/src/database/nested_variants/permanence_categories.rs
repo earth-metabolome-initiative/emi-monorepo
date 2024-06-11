@@ -1,14 +1,11 @@
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedPermanenceCategory {
-    pub inner: PermanenceCategory,
-    pub icon: FontAwesomeIcon,
-    pub color: Color,
+    pub inner: crate::database::flat_variants::PermanenceCategory,
+    pub icon: crate::database::flat_variants::FontAwesomeIcon,
+    pub color: crate::database::flat_variants::Color,
 }
 
 unsafe impl Send for NestedPermanenceCategory {}
@@ -26,8 +23,11 @@ impl NestedPermanenceCategory {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
-            color: Color::get(flat_variant.color_id, connection)?,
+            icon: crate::database::flat_variants::FontAwesomeIcon::get(
+                flat_variant.icon_id,
+                connection,
+            )?,
+            color: crate::database::flat_variants::Color::get(flat_variant.color_id, connection)?,
             inner: flat_variant,
         })
     }
@@ -46,7 +46,7 @@ impl NestedPermanenceCategory {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&PermanenceCategoryFilter>,
+        filter: Option<&web_common::database::filter_variants::PermanenceCategoryFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -65,7 +65,7 @@ impl NestedPermanenceCategory {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&PermanenceCategoryFilter>,
+        filter: Option<&web_common::database::filter_variants::PermanenceCategoryFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -121,24 +121,30 @@ impl NestedPermanenceCategory {
     }
 }
 impl From<web_common::database::nested_variants::NestedPermanenceCategory>
-    for NestedPermanenceCategory
+    for crate::database::nested_variants::NestedPermanenceCategory
 {
     fn from(item: web_common::database::nested_variants::NestedPermanenceCategory) -> Self {
         Self {
-            inner: PermanenceCategory::from(item.inner.as_ref().clone()),
-            icon: FontAwesomeIcon::from(item.icon.as_ref().clone()),
-            color: Color::from(item.color.as_ref().clone()),
+            inner: crate::database::flat_variants::PermanenceCategory::from(
+                item.inner.as_ref().clone(),
+            ),
+            icon: crate::database::flat_variants::FontAwesomeIcon::from(item.icon.as_ref().clone()),
+            color: crate::database::flat_variants::Color::from(item.color.as_ref().clone()),
         }
     }
 }
-impl From<NestedPermanenceCategory>
+impl From<crate::database::nested_variants::NestedPermanenceCategory>
     for web_common::database::nested_variants::NestedPermanenceCategory
 {
-    fn from(item: NestedPermanenceCategory) -> Self {
+    fn from(item: crate::database::nested_variants::NestedPermanenceCategory) -> Self {
         Self {
-            inner: Rc::from(web_common::database::PermanenceCategory::from(item.inner)),
-            icon: Rc::from(web_common::database::FontAwesomeIcon::from(item.icon)),
-            color: Rc::from(web_common::database::Color::from(item.color)),
+            inner: Rc::from(
+                web_common::database::flat_variants::PermanenceCategory::from(item.inner),
+            ),
+            icon: Rc::from(web_common::database::flat_variants::FontAwesomeIcon::from(
+                item.icon,
+            )),
+            color: Rc::from(web_common::database::flat_variants::Color::from(item.color)),
         }
     }
 }

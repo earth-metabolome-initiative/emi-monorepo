@@ -13,7 +13,6 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
     Eq,
@@ -45,10 +44,10 @@ pub struct ProjectsUsersRoleInvitation {
 
 unsafe impl Send for ProjectsUsersRoleInvitation {}
 unsafe impl Sync for ProjectsUsersRoleInvitation {}
-impl From<ProjectsUsersRoleInvitation>
-    for web_common::database::flat_variants::ProjectsUsersRoleInvitation
+impl From<web_common::database::flat_variants::ProjectsUsersRoleInvitation>
+    for crate::database::flat_variants::ProjectsUsersRoleInvitation
 {
-    fn from(item: ProjectsUsersRoleInvitation) -> Self {
+    fn from(item: web_common::database::flat_variants::ProjectsUsersRoleInvitation) -> Self {
         Self {
             table_id: item.table_id,
             user_id: item.user_id,
@@ -59,10 +58,10 @@ impl From<ProjectsUsersRoleInvitation>
     }
 }
 
-impl From<web_common::database::flat_variants::ProjectsUsersRoleInvitation>
-    for ProjectsUsersRoleInvitation
+impl From<crate::database::flat_variants::ProjectsUsersRoleInvitation>
+    for web_common::database::flat_variants::ProjectsUsersRoleInvitation
 {
-    fn from(item: web_common::database::flat_variants::ProjectsUsersRoleInvitation) -> Self {
+    fn from(item: crate::database::flat_variants::ProjectsUsersRoleInvitation) -> Self {
         Self {
             table_id: item.table_id,
             user_id: item.user_id,
@@ -117,7 +116,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&ProjectsUsersRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -163,7 +162,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&ProjectsUsersRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -232,7 +231,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&ProjectsUsersRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -469,7 +468,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&ProjectsUsersRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -515,7 +514,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&ProjectsUsersRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -562,7 +561,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&ProjectsUsersRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -698,7 +697,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&ProjectsUsersRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -744,7 +743,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&ProjectsUsersRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -791,7 +790,7 @@ impl ProjectsUsersRoleInvitation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&ProjectsUsersRoleInvitationFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

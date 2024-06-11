@@ -1,14 +1,10 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedNotification {
-    pub inner: Notification,
-    pub user: NestedUser,
+    pub inner: crate::database::flat_variants::Notification,
+    pub user: crate::database::nested_variants::NestedUser,
 }
 
 unsafe impl Send for NestedNotification {}
@@ -26,7 +22,10 @@ impl NestedNotification {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            user: NestedUser::get(flat_variant.user_id, connection)?,
+            user: crate::database::nested_variants::NestedUser::get(
+                flat_variant.user_id,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -45,7 +44,7 @@ impl NestedNotification {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&NotificationFilter>,
+        filter: Option<&web_common::database::filter_variants::NotificationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -64,7 +63,7 @@ impl NestedNotification {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&NotificationFilter>,
+        filter: Option<&web_common::database::filter_variants::NotificationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -106,19 +105,27 @@ impl NestedNotification {
         Notification::can_admin_by_id()
     }
 }
-impl From<web_common::database::nested_variants::NestedNotification> for NestedNotification {
+impl From<web_common::database::nested_variants::NestedNotification>
+    for crate::database::nested_variants::NestedNotification
+{
     fn from(item: web_common::database::nested_variants::NestedNotification) -> Self {
         Self {
-            inner: Notification::from(item.inner.as_ref().clone()),
-            user: NestedUser::from(item.user.as_ref().clone()),
+            inner: crate::database::flat_variants::Notification::from(item.inner.as_ref().clone()),
+            user: crate::database::nested_variants::NestedUser::from(item.user.as_ref().clone()),
         }
     }
 }
-impl From<NestedNotification> for web_common::database::nested_variants::NestedNotification {
-    fn from(item: NestedNotification) -> Self {
+impl From<crate::database::nested_variants::NestedNotification>
+    for web_common::database::nested_variants::NestedNotification
+{
+    fn from(item: crate::database::nested_variants::NestedNotification) -> Self {
         Self {
-            inner: Rc::from(web_common::database::Notification::from(item.inner)),
-            user: Rc::from(web_common::database::NestedUser::from(item.user)),
+            inner: Rc::from(web_common::database::flat_variants::Notification::from(
+                item.inner,
+            )),
+            user: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.user,
+            )),
         }
     }
 }

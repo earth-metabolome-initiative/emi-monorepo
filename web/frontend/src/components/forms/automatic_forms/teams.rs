@@ -12,15 +12,15 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TeamBuilder {
     pub id: Option<i32>,
     pub name: Option<Rc<String>>,
     pub description: Option<Rc<String>>,
-    pub icon: Option<Rc<FontAwesomeIcon>>,
-    pub color: Option<Rc<Color>>,
-    pub state: Option<Rc<NestedTeamState>>,
-    pub parent_team: Option<Rc<NestedTeam>>,
+    pub icon: Option<Rc<web_common::database::flat_variants::FontAwesomeIcon>>,
+    pub color: Option<Rc<web_common::database::flat_variants::Color>>,
+    pub state: Option<Rc<web_common::database::nested_variants::NestedTeamState>>,
+    pub parent_team: Option<Rc<web_common::database::nested_variants::NestedTeam>>,
     pub errors_name: Vec<ApiError>,
     pub errors_description: Vec<ApiError>,
     pub errors_icon: Vec<ApiError>,
@@ -53,14 +53,14 @@ impl Default for TeamBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum TeamActions {
     SetName(Option<String>),
     SetDescription(Option<String>),
-    SetIcon(Option<Rc<FontAwesomeIcon>>),
-    SetColor(Option<Rc<Color>>),
-    SetState(Option<Rc<NestedTeamState>>),
-    SetParentTeam(Option<Rc<NestedTeam>>),
+    SetIcon(Option<Rc<web_common::database::flat_variants::FontAwesomeIcon>>),
+    SetColor(Option<Rc<web_common::database::flat_variants::Color>>),
+    SetState(Option<Rc<web_common::database::nested_variants::NestedTeamState>>),
+    SetParentTeam(Option<Rc<web_common::database::nested_variants::NestedTeam>>),
 }
 
 impl FromOperation for TeamActions {
@@ -353,15 +353,26 @@ pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
         builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch
         .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_icon = builder_dispatch
-        .apply_callback(|icon: Option<Rc<FontAwesomeIcon>>| TeamActions::SetIcon(icon));
-    let set_color =
-        builder_dispatch.apply_callback(|color: Option<Rc<Color>>| TeamActions::SetColor(color));
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<Rc<NestedTeamState>>| TeamActions::SetState(state));
-    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<Rc<NestedTeam>>| {
-        TeamActions::SetParentTeam(parent_team)
-    });
+    let set_icon = builder_dispatch.apply_callback(
+        |icon: Option<Rc<web_common::database::flat_variants::FontAwesomeIcon>>| {
+            TeamActions::SetIcon(icon)
+        },
+    );
+    let set_color = builder_dispatch.apply_callback(
+        |color: Option<Rc<web_common::database::flat_variants::Color>>| {
+            TeamActions::SetColor(color)
+        },
+    );
+    let set_state = builder_dispatch.apply_callback(
+        |state: Option<Rc<web_common::database::nested_variants::NestedTeamState>>| {
+            TeamActions::SetState(state)
+        },
+    );
+    let set_parent_team = builder_dispatch.apply_callback(
+        |parent_team: Option<Rc<web_common::database::nested_variants::NestedTeam>>| {
+            TeamActions::SetParentTeam(parent_team)
+        },
+    );
     html! {
         <BasicForm<NewTeam>
             method={FormMethod::POST}
@@ -369,10 +380,10 @@ pub fn create_team_form(props: &CreateTeamFormProp) -> Html {
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
-            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
-            <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
-            <Datalist<NestedTeamState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
-            <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" scanner={false} />
+            <Datalist<web_common::database::flat_variants::FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
+            <Datalist<web_common::database::flat_variants::Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedTeamState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" scanner={false} />
         </BasicForm<NewTeam>>
     }
 }
@@ -392,15 +403,26 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
         builder_dispatch.apply_callback(|name: Option<String>| TeamActions::SetName(name));
     let set_description = builder_dispatch
         .apply_callback(|description: Option<String>| TeamActions::SetDescription(description));
-    let set_icon = builder_dispatch
-        .apply_callback(|icon: Option<Rc<FontAwesomeIcon>>| TeamActions::SetIcon(icon));
-    let set_color =
-        builder_dispatch.apply_callback(|color: Option<Rc<Color>>| TeamActions::SetColor(color));
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<Rc<NestedTeamState>>| TeamActions::SetState(state));
-    let set_parent_team = builder_dispatch.apply_callback(|parent_team: Option<Rc<NestedTeam>>| {
-        TeamActions::SetParentTeam(parent_team)
-    });
+    let set_icon = builder_dispatch.apply_callback(
+        |icon: Option<Rc<web_common::database::flat_variants::FontAwesomeIcon>>| {
+            TeamActions::SetIcon(icon)
+        },
+    );
+    let set_color = builder_dispatch.apply_callback(
+        |color: Option<Rc<web_common::database::flat_variants::Color>>| {
+            TeamActions::SetColor(color)
+        },
+    );
+    let set_state = builder_dispatch.apply_callback(
+        |state: Option<Rc<web_common::database::nested_variants::NestedTeamState>>| {
+            TeamActions::SetState(state)
+        },
+    );
+    let set_parent_team = builder_dispatch.apply_callback(
+        |parent_team: Option<Rc<web_common::database::nested_variants::NestedTeam>>| {
+            TeamActions::SetParentTeam(parent_team)
+        },
+    );
     html! {
         <BasicForm<UpdateTeam>
             method={FormMethod::PUT}
@@ -408,10 +430,10 @@ pub fn update_team_form(props: &UpdateTeamFormProp) -> Html {
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Name" optional={false} errors={builder_store.errors_name.clone()} builder={set_name} value={builder_store.name.clone()} />
             <BasicInput<String> label="Description" optional={false} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
-            <Datalist<FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
-            <Datalist<Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
-            <Datalist<NestedTeamState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
-            <Datalist<NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" scanner={false} />
+            <Datalist<web_common::database::flat_variants::FontAwesomeIcon, false> builder={set_icon} optional={false} errors={builder_store.errors_icon.clone()} value={builder_store.icon.clone()} label="Icon" scanner={false} />
+            <Datalist<web_common::database::flat_variants::Color, false> builder={set_color} optional={false} errors={builder_store.errors_color.clone()} value={builder_store.color.clone()} label="Color" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedTeamState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedTeam, true> builder={set_parent_team} optional={true} errors={builder_store.errors_parent_team.clone()} value={builder_store.parent_team.clone()} label="Parent team" scanner={false} />
         </BasicForm<UpdateTeam>>
     }
 }

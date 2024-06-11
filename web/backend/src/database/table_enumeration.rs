@@ -5,7 +5,6 @@
 use crate::database::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
-use web_common::database::filter_structs::*;
 use web_common::database::PrimaryKey;
 
 /// Trait providing the backend implementations for the Table enumeration
@@ -446,520 +445,347 @@ impl BackendTable for web_common::database::Table {
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
-                bincode::serialize(&NestedBioOttRank::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<BioOttRankFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedBioOttRank::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttRankFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::BioOttTaxonItems => {
-                bincode::serialize(&NestedBioOttTaxonItem::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<BioOttTaxonItemFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedBioOttTaxonItem::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Colors => {
-                bincode::serialize(&Color::all_viewable(limit, offset, connection)?)?
-            }
+bincode::serialize(&Color::all_viewable(
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Countries => {
-                bincode::serialize(&Country::all_viewable(limit, offset, connection)?)?
-            }
+bincode::serialize(&Country::all_viewable(
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::DerivedSamples => {
-                bincode::serialize(&NestedDerivedSample::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedDerivedSample::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::DocumentFormats => {
-                bincode::serialize(&NestedDocumentFormat::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<DocumentFormatFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedDocumentFormat::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DocumentFormatFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::FontAwesomeIcons => {
-                bincode::serialize(&FontAwesomeIcon::all_viewable(limit, offset, connection)?)?
-            }
+bincode::serialize(&FontAwesomeIcon::all_viewable(
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::LoginProviders => {
-                bincode::serialize(&NestedLoginProvider::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedLoginProvider::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::LoginProviderFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Materials => {
-                bincode::serialize(&NestedMaterial::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<MaterialFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedMaterial::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::MaterialFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::NameplateCategories => {
-                bincode::serialize(&NestedNameplateCategory::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<NameplateCategoryFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedNameplateCategory::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateCategoryFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Nameplates => {
-                bincode::serialize(&NestedNameplate::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<NameplateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedNameplate::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => {
-                bincode::serialize(&NestedNotification::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<NotificationFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedNotification::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NotificationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ObservationSubjects => {
-                bincode::serialize(&NestedObservationSubject::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ObservationSubjectFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedObservationSubject::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationSubjectFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Observations => {
-                bincode::serialize(&NestedObservation::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ObservationFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedObservation::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::OrganismBioOttTaxonItems => {
-                bincode::serialize(&NestedOrganismBioOttTaxonItem::all_viewable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedOrganismBioOttTaxonItem::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Organisms => {
-                bincode::serialize(&NestedOrganism::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<OrganismFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedOrganism::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Organizations => {
-                bincode::serialize(&NestedOrganization::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<OrganizationFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedOrganization::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganizationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::PermanenceCategories => {
-                bincode::serialize(&NestedPermanenceCategory::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<PermanenceCategoryFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedPermanenceCategory::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::PermanenceCategoryFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectStates => {
-                bincode::serialize(&NestedProjectState::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectStateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectState::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectStateFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Projects => {
-                bincode::serialize(&NestedProject::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProject::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
-                bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_viewable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
-                bincode::serialize(&NestedProjectsTeamsRoleRequest::all_viewable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRoleRequest::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoles => {
-                bincode::serialize(&NestedProjectsTeamsRole::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRole::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
-                bincode::serialize(&NestedProjectsUsersRoleInvitation::all_viewable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsUsersRoleInvitation::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoleRequests => {
-                bincode::serialize(&NestedProjectsUsersRoleRequest::all_viewable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsUsersRoleRequest::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoles => {
-                bincode::serialize(&NestedProjectsUsersRole::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Roles => bincode::serialize(&NestedRole::all_viewable(
-                filter
-                    .map(|filter| bincode::deserialize::<RoleFilter>(&filter))
-                    .transpose()?
-                    .as_ref(),
-                limit,
-                offset,
-                connection,
-            )?)?,
+bincode::serialize(&NestedProjectsUsersRole::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => {
+bincode::serialize(&NestedRole::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RoleFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleBioOttTaxonItems => {
-                bincode::serialize(&NestedSampleBioOttTaxonItem::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSampleBioOttTaxonItem::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleContainerCategories => {
-                bincode::serialize(&NestedSampleContainerCategory::all_viewable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<SampleContainerCategoryFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSampleContainerCategory::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerCategoryFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleContainers => {
-                bincode::serialize(&NestedSampleContainer::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSampleContainer::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleStates => {
-                bincode::serialize(&NestedSampleState::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleStateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSampleState::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleStateFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Samples => {
-                bincode::serialize(&NestedSample::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSample::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => {
-                bincode::serialize(&NestedSpectra::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SpectraFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSpectra::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SpectraCollections => {
-                bincode::serialize(&NestedSpectraCollection::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSpectraCollection::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamStates => {
-                bincode::serialize(&NestedTeamState::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamStateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Teams => bincode::serialize(&NestedTeam::all_viewable(
-                filter
-                    .map(|filter| bincode::deserialize::<TeamFilter>(&filter))
-                    .transpose()?
-                    .as_ref(),
-                limit,
-                offset,
-                connection,
-            )?)?,
+bincode::serialize(&NestedTeamState::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamStateFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
-                bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_viewable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoleInvitations => {
-                bincode::serialize(&NestedTeamsUsersRoleInvitation::all_viewable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsUsersRoleInvitation::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoleRequests => {
-                bincode::serialize(&NestedTeamsUsersRoleRequest::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsUsersRoleRequest::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoles => {
-                bincode::serialize(&NestedTeamsUsersRole::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Units => bincode::serialize(&NestedUnit::all_viewable(
-                filter
-                    .map(|filter| bincode::deserialize::<UnitFilter>(&filter))
-                    .transpose()?
-                    .as_ref(),
-                limit,
-                offset,
-                connection,
-            )?)?,
+bincode::serialize(&NestedTeamsUsersRole::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => {
+bincode::serialize(&NestedUnit::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UnitFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UserEmails => {
-                bincode::serialize(&NestedUserEmail::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UserEmailFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Users => bincode::serialize(&NestedUser::all_viewable(
-                filter
-                    .map(|filter| bincode::deserialize::<UserFilter>(&filter))
-                    .transpose()?
-                    .as_ref(),
-                limit,
-                offset,
-                connection,
-            )?)?,
+bincode::serialize(&NestedUserEmail::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserEmailFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Users => {
+bincode::serialize(&NestedUser::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoleInvitations => {
-                bincode::serialize(&NestedUsersUsersRoleInvitation::all_viewable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRoleInvitation::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoleRequests => {
-                bincode::serialize(&NestedUsersUsersRoleRequest::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRoleRequest::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoles => {
-                bincode::serialize(&NestedUsersUsersRole::all_viewable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRole::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
         })
     }
 
@@ -982,528 +808,347 @@ impl BackendTable for web_common::database::Table {
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
-                bincode::serialize(&NestedBioOttRank::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<BioOttRankFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedBioOttRank::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttRankFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::BioOttTaxonItems => {
-                bincode::serialize(&NestedBioOttTaxonItem::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<BioOttTaxonItemFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedBioOttTaxonItem::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Colors => {
-                bincode::serialize(&Color::all_viewable_sorted(limit, offset, connection)?)?
-            }
+bincode::serialize(&Color::all_viewable_sorted(
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Countries => {
-                bincode::serialize(&Country::all_viewable_sorted(limit, offset, connection)?)?
-            }
+bincode::serialize(&Country::all_viewable_sorted(
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::DerivedSamples => {
-                bincode::serialize(&NestedDerivedSample::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedDerivedSample::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::DocumentFormats => {
-                bincode::serialize(&NestedDocumentFormat::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<DocumentFormatFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::FontAwesomeIcons => bincode::serialize(
-                &FontAwesomeIcon::all_viewable_sorted(limit, offset, connection)?,
-            )?,
+bincode::serialize(&NestedDocumentFormat::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DocumentFormatFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::FontAwesomeIcons => {
+bincode::serialize(&FontAwesomeIcon::all_viewable_sorted(
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::LoginProviders => {
-                bincode::serialize(&NestedLoginProvider::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<LoginProviderFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedLoginProvider::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::LoginProviderFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Materials => {
-                bincode::serialize(&NestedMaterial::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<MaterialFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedMaterial::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::MaterialFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::NameplateCategories => {
-                bincode::serialize(&NestedNameplateCategory::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<NameplateCategoryFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedNameplateCategory::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateCategoryFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Nameplates => {
-                bincode::serialize(&NestedNameplate::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<NameplateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedNameplate::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Notifications => {
-                bincode::serialize(&NestedNotification::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<NotificationFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedNotification::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NotificationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ObservationSubjects => {
-                bincode::serialize(&NestedObservationSubject::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<ObservationSubjectFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedObservationSubject::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationSubjectFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Observations => {
-                bincode::serialize(&NestedObservation::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<ObservationFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedObservation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::OrganismBioOttTaxonItems => {
-                bincode::serialize(&NestedOrganismBioOttTaxonItem::all_viewable_sorted(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedOrganismBioOttTaxonItem::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Organisms => {
-                bincode::serialize(&NestedOrganism::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<OrganismFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedOrganism::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Organizations => {
-                bincode::serialize(&NestedOrganization::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<OrganizationFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedOrganization::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganizationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::PermanenceCategories => {
-                bincode::serialize(&NestedPermanenceCategory::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<PermanenceCategoryFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedPermanenceCategory::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::PermanenceCategoryFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectStates => {
-                bincode::serialize(&NestedProjectState::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectStateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectState::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectStateFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Projects => {
-                bincode::serialize(&NestedProject::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProject::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
-                bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_viewable_sorted(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
-                bincode::serialize(&NestedProjectsTeamsRoleRequest::all_viewable_sorted(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRoleRequest::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoles => {
-                bincode::serialize(&NestedProjectsTeamsRole::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
-                bincode::serialize(&NestedProjectsUsersRoleInvitation::all_viewable_sorted(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsUsersRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoleRequests => {
-                bincode::serialize(&NestedProjectsUsersRoleRequest::all_viewable_sorted(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsUsersRoleRequest::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoles => {
-                bincode::serialize(&NestedProjectsUsersRole::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsUsersRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Roles => {
-                bincode::serialize(&NestedRole::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<RoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RoleFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleBioOttTaxonItems => {
-                bincode::serialize(&NestedSampleBioOttTaxonItem::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSampleBioOttTaxonItem::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleContainerCategories => {
-                bincode::serialize(&NestedSampleContainerCategory::all_viewable_sorted(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<SampleContainerCategoryFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSampleContainerCategory::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerCategoryFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleContainers => {
-                bincode::serialize(&NestedSampleContainer::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSampleContainer::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SampleStates => {
-                bincode::serialize(&NestedSampleState::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleStateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSampleState::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleStateFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Samples => {
-                bincode::serialize(&NestedSample::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSample::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Spectra => {
-                bincode::serialize(&NestedSpectra::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<SpectraFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSpectra::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::SpectraCollections => {
-                bincode::serialize(&NestedSpectraCollection::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedSpectraCollection::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamStates => {
-                bincode::serialize(&NestedTeamState::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamStateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamState::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamStateFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Teams => {
-                bincode::serialize(&NestedTeam::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeam::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
-                bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_viewable_sorted(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoleInvitations => {
-                bincode::serialize(&NestedTeamsUsersRoleInvitation::all_viewable_sorted(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsUsersRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoleRequests => {
-                bincode::serialize(&NestedTeamsUsersRoleRequest::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsUsersRoleRequest::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoles => {
-                bincode::serialize(&NestedTeamsUsersRole::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsUsersRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Units => {
-                bincode::serialize(&NestedUnit::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<UnitFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUnit::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UnitFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UserEmails => {
-                bincode::serialize(&NestedUserEmail::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<UserEmailFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUserEmail::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserEmailFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Users => {
-                bincode::serialize(&NestedUser::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<UserFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUser::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoleInvitations => {
-                bincode::serialize(&NestedUsersUsersRoleInvitation::all_viewable_sorted(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRoleInvitation::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoleRequests => {
-                bincode::serialize(&NestedUsersUsersRoleRequest::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRoleRequest::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoles => {
-                bincode::serialize(&NestedUsersUsersRole::all_viewable_sorted(
-                    filter
-                        .map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection)?)?
+            },
         })
     }
 
@@ -1728,7 +1373,7 @@ impl BackendTable for web_common::database::Table {
         Ok(match self {
             web_common::database::Table::BioOttRanks => {
 bincode::serialize(&NestedBioOttRank::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<BioOttRankFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttRankFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1736,7 +1381,7 @@ connection)?)?
             },
             web_common::database::Table::BioOttTaxonItems => {
 bincode::serialize(&NestedBioOttTaxonItem::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<BioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1758,7 +1403,7 @@ connection)?)?
             },
             web_common::database::Table::DerivedSamples => {
 bincode::serialize(&NestedDerivedSample::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1767,7 +1412,7 @@ connection)?)?
             },
             web_common::database::Table::DocumentFormats => {
 bincode::serialize(&NestedDocumentFormat::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<DocumentFormatFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DocumentFormatFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1784,7 +1429,7 @@ connection)?)?
             web_common::database::Table::Materials => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table materials."),
             web_common::database::Table::NameplateCategories => {
 bincode::serialize(&NestedNameplateCategory::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<NameplateCategoryFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateCategoryFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1792,7 +1437,7 @@ connection)?)?
             },
             web_common::database::Table::Nameplates => {
 bincode::serialize(&NestedNameplate::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1802,7 +1447,7 @@ connection)?)?
             web_common::database::Table::Notifications => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table notifications."),
             web_common::database::Table::ObservationSubjects => {
 bincode::serialize(&NestedObservationSubject::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ObservationSubjectFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationSubjectFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1810,7 +1455,7 @@ connection)?)?
             },
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1819,7 +1464,7 @@ connection)?)?
             },
             web_common::database::Table::OrganismBioOttTaxonItems => {
 bincode::serialize(&NestedOrganismBioOttTaxonItem::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1828,7 +1473,7 @@ connection)?)?
             },
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1837,7 +1482,7 @@ connection)?)?
             },
             web_common::database::Table::Organizations => {
 bincode::serialize(&NestedOrganization::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<OrganizationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganizationFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1846,7 +1491,7 @@ connection)?)?
             web_common::database::Table::PermanenceCategories => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table permanence_categories."),
             web_common::database::Table::ProjectStates => {
 bincode::serialize(&NestedProjectState::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ProjectStateFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectStateFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1854,7 +1499,7 @@ connection)?)?
             },
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1863,7 +1508,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
 bincode::serialize(&NestedProjectsTeamsRoleInvitation::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1872,7 +1517,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
 bincode::serialize(&NestedProjectsTeamsRoleRequest::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1881,7 +1526,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoles => {
 bincode::serialize(&NestedProjectsTeamsRole::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1890,7 +1535,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
 bincode::serialize(&NestedProjectsUsersRoleInvitation::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1899,7 +1544,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleRequests => {
 bincode::serialize(&NestedProjectsUsersRoleRequest::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1908,7 +1553,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoles => {
 bincode::serialize(&NestedProjectsUsersRole::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1917,7 +1562,7 @@ connection)?)?
             },
             web_common::database::Table::Roles => {
 bincode::serialize(&NestedRole::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<RoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RoleFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1925,7 +1570,7 @@ connection)?)?
             },
             web_common::database::Table::SampleBioOttTaxonItems => {
 bincode::serialize(&NestedSampleBioOttTaxonItem::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1934,7 +1579,7 @@ connection)?)?
             },
             web_common::database::Table::SampleContainerCategories => {
 bincode::serialize(&NestedSampleContainerCategory::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<SampleContainerCategoryFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerCategoryFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1942,7 +1587,7 @@ connection)?)?
             },
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1951,7 +1596,7 @@ connection)?)?
             },
             web_common::database::Table::SampleStates => {
 bincode::serialize(&NestedSampleState::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<SampleStateFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleStateFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1959,7 +1604,7 @@ connection)?)?
             },
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1969,7 +1614,7 @@ connection)?)?
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => {
 bincode::serialize(&NestedSpectraCollection::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1978,7 +1623,7 @@ connection)?)?
             },
             web_common::database::Table::TeamStates => {
 bincode::serialize(&NestedTeamState::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<TeamStateFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamStateFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1986,7 +1631,7 @@ connection)?)?
             },
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1994,7 +1639,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
 bincode::serialize(&NestedTeamsTeamsRoleInvitation::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -2003,7 +1648,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleInvitations => {
 bincode::serialize(&NestedTeamsUsersRoleInvitation::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -2012,7 +1657,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleRequests => {
 bincode::serialize(&NestedTeamsUsersRoleRequest::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -2021,7 +1666,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoles => {
 bincode::serialize(&NestedTeamsUsersRole::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -2029,7 +1674,7 @@ connection)?)?
             },
             web_common::database::Table::Units => {
 bincode::serialize(&NestedUnit::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<UnitFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UnitFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -2038,7 +1683,7 @@ connection)?)?
             web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_viewable not implemented for table user_emails."),
             web_common::database::Table::Users => {
 bincode::serialize(&NestedUser::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -2046,7 +1691,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleInvitations => {
 bincode::serialize(&NestedUsersUsersRoleInvitation::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -2055,7 +1700,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleRequests => {
 bincode::serialize(&NestedUsersUsersRoleRequest::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -2064,7 +1709,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoles => {
 bincode::serialize(&NestedUsersUsersRole::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -2477,390 +2122,234 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-                unimplemented!("Method all_updatable not implemented for table bio_ott_ranks.")
-            }
-            web_common::database::Table::BioOttTaxonItems => unimplemented!(
-                "Method all_updatable not implemented for table bio_ott_taxon_items."
-            ),
-            web_common::database::Table::Colors => {
-                unimplemented!("Method all_updatable not implemented for table colors.")
-            }
-            web_common::database::Table::Countries => {
-                unimplemented!("Method all_updatable not implemented for table countries.")
-            }
+            web_common::database::Table::BioOttRanks => unimplemented!("Method all_updatable not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_updatable not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method all_updatable not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method all_updatable not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
-                bincode::serialize(&NestedDerivedSample::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::DocumentFormats => {
-                unimplemented!("Method all_updatable not implemented for table document_formats.")
-            }
-            web_common::database::Table::FontAwesomeIcons => {
-                unimplemented!("Method all_updatable not implemented for table font_awesome_icons.")
-            }
-            web_common::database::Table::LoginProviders => {
-                unimplemented!("Method all_updatable not implemented for table login_providers.")
-            }
-            web_common::database::Table::Materials => {
-                unimplemented!("Method all_updatable not implemented for table materials.")
-            }
-            web_common::database::Table::NameplateCategories => unimplemented!(
-                "Method all_updatable not implemented for table nameplate_categories."
-            ),
+bincode::serialize(&NestedDerivedSample::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method all_updatable not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_updatable not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method all_updatable not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method all_updatable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method all_updatable not implemented for table nameplate_categories."),
             web_common::database::Table::Nameplates => {
-                bincode::serialize(&NestedNameplate::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<NameplateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Notifications => {
-                unimplemented!("Method all_updatable not implemented for table notifications.")
-            }
-            web_common::database::Table::ObservationSubjects => unimplemented!(
-                "Method all_updatable not implemented for table observation_subjects."
-            ),
+bincode::serialize(&NestedNameplate::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Notifications => unimplemented!("Method all_updatable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method all_updatable not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
-                bincode::serialize(&NestedObservation::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ObservationFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedObservation::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::OrganismBioOttTaxonItems => {
-                bincode::serialize(&NestedOrganismBioOttTaxonItem::all_updatable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedOrganismBioOttTaxonItem::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Organisms => {
-                bincode::serialize(&NestedOrganism::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<OrganismFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Organizations => {
-                unimplemented!("Method all_updatable not implemented for table organizations.")
-            }
-            web_common::database::Table::PermanenceCategories => unimplemented!(
-                "Method all_updatable not implemented for table permanence_categories."
-            ),
-            web_common::database::Table::ProjectStates => {
-                unimplemented!("Method all_updatable not implemented for table project_states.")
-            }
+bincode::serialize(&NestedOrganism::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method all_updatable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method all_updatable not implemented for table permanence_categories."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method all_updatable not implemented for table project_states."),
             web_common::database::Table::Projects => {
-                bincode::serialize(&NestedProject::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProject::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
-                bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_updatable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
-                bincode::serialize(&NestedProjectsTeamsRoleRequest::all_updatable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRoleRequest::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoles => {
-                bincode::serialize(&NestedProjectsTeamsRole::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRole::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
-                bincode::serialize(&NestedProjectsUsersRoleInvitation::all_updatable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsUsersRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoleRequests => {
-                bincode::serialize(&NestedProjectsUsersRoleRequest::all_updatable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsUsersRoleRequest::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoles => {
-                bincode::serialize(&NestedProjectsUsersRole::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Roles => {
-                unimplemented!("Method all_updatable not implemented for table roles.")
-            }
+bincode::serialize(&NestedProjectsUsersRole::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method all_updatable not implemented for table roles."),
             web_common::database::Table::SampleBioOttTaxonItems => {
-                bincode::serialize(&NestedSampleBioOttTaxonItem::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::SampleContainerCategories => unimplemented!(
-                "Method all_updatable not implemented for table sample_container_categories."
-            ),
+bincode::serialize(&NestedSampleBioOttTaxonItem::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_updatable not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
-                bincode::serialize(&NestedSampleContainer::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::SampleStates => {
-                unimplemented!("Method all_updatable not implemented for table sample_states.")
-            }
+bincode::serialize(&NestedSampleContainer::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method all_updatable not implemented for table sample_states."),
             web_common::database::Table::Samples => {
-                bincode::serialize(&NestedSample::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Spectra => {
-                unimplemented!("Method all_updatable not implemented for table spectra.")
-            }
+bincode::serialize(&NestedSample::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method all_updatable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => {
-                bincode::serialize(&NestedSpectraCollection::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::TeamStates => {
-                unimplemented!("Method all_updatable not implemented for table team_states.")
-            }
-            web_common::database::Table::Teams => bincode::serialize(&NestedTeam::all_updatable(
-                filter
-                    .map(|filter| bincode::deserialize::<TeamFilter>(&filter))
-                    .transpose()?
-                    .as_ref(),
-                author_user_id,
-                limit,
-                offset,
-                connection,
-            )?)?,
+bincode::serialize(&NestedSpectraCollection::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method all_updatable not implemented for table team_states."),
+            web_common::database::Table::Teams => {
+bincode::serialize(&NestedTeam::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
-                bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_updatable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoleInvitations => {
-                bincode::serialize(&NestedTeamsUsersRoleInvitation::all_updatable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsUsersRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoleRequests => {
-                bincode::serialize(&NestedTeamsUsersRoleRequest::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsUsersRoleRequest::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoles => {
-                bincode::serialize(&NestedTeamsUsersRole::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Units => {
-                unimplemented!("Method all_updatable not implemented for table units.")
-            }
+bincode::serialize(&NestedTeamsUsersRole::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method all_updatable not implemented for table units."),
             web_common::database::Table::UserEmails => {
-                bincode::serialize(&NestedUserEmail::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UserEmailFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Users => bincode::serialize(&NestedUser::all_updatable(
-                filter
-                    .map(|filter| bincode::deserialize::<UserFilter>(&filter))
-                    .transpose()?
-                    .as_ref(),
-                author_user_id,
-                limit,
-                offset,
-                connection,
-            )?)?,
+bincode::serialize(&NestedUserEmail::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserEmailFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Users => {
+bincode::serialize(&NestedUser::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoleInvitations => {
-                bincode::serialize(&NestedUsersUsersRoleInvitation::all_updatable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRoleInvitation::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoleRequests => {
-                bincode::serialize(&NestedUsersUsersRoleRequest::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRoleRequest::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoles => {
-                bincode::serialize(&NestedUsersUsersRole::all_updatable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRole::all_updatable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
         })
     }
 
@@ -2888,7 +2377,7 @@ connection)?)?
             web_common::database::Table::Countries => unimplemented!("Method all_updatable_sorted not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
 bincode::serialize(&NestedDerivedSample::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2901,7 +2390,7 @@ connection)?)?
             web_common::database::Table::NameplateCategories => unimplemented!("Method all_updatable_sorted not implemented for table nameplate_categories."),
             web_common::database::Table::Nameplates => {
 bincode::serialize(&NestedNameplate::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2911,7 +2400,7 @@ connection)?)?
             web_common::database::Table::ObservationSubjects => unimplemented!("Method all_updatable_sorted not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2919,7 +2408,7 @@ connection)?)?
             },
             web_common::database::Table::OrganismBioOttTaxonItems => {
 bincode::serialize(&NestedOrganismBioOttTaxonItem::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2927,7 +2416,7 @@ connection)?)?
             },
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2938,7 +2427,7 @@ connection)?)?
             web_common::database::Table::ProjectStates => unimplemented!("Method all_updatable_sorted not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2946,7 +2435,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
 bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2954,7 +2443,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
 bincode::serialize(&NestedProjectsTeamsRoleRequest::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2962,7 +2451,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoles => {
 bincode::serialize(&NestedProjectsTeamsRole::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2970,7 +2459,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
 bincode::serialize(&NestedProjectsUsersRoleInvitation::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2978,7 +2467,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleRequests => {
 bincode::serialize(&NestedProjectsUsersRoleRequest::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2986,7 +2475,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoles => {
 bincode::serialize(&NestedProjectsUsersRole::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2995,7 +2484,7 @@ connection)?)?
             web_common::database::Table::Roles => unimplemented!("Method all_updatable_sorted not implemented for table roles."),
             web_common::database::Table::SampleBioOttTaxonItems => {
 bincode::serialize(&NestedSampleBioOttTaxonItem::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3004,7 +2493,7 @@ connection)?)?
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_updatable_sorted not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3013,7 +2502,7 @@ connection)?)?
             web_common::database::Table::SampleStates => unimplemented!("Method all_updatable_sorted not implemented for table sample_states."),
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3022,7 +2511,7 @@ connection)?)?
             web_common::database::Table::Spectra => unimplemented!("Method all_updatable_sorted not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => {
 bincode::serialize(&NestedSpectraCollection::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3031,7 +2520,7 @@ connection)?)?
             web_common::database::Table::TeamStates => unimplemented!("Method all_updatable_sorted not implemented for table team_states."),
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3039,7 +2528,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
 bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3047,7 +2536,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleInvitations => {
 bincode::serialize(&NestedTeamsUsersRoleInvitation::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3055,7 +2544,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleRequests => {
 bincode::serialize(&NestedTeamsUsersRoleRequest::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3063,7 +2552,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoles => {
 bincode::serialize(&NestedTeamsUsersRole::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3072,7 +2561,7 @@ connection)?)?
             web_common::database::Table::Units => unimplemented!("Method all_updatable_sorted not implemented for table units."),
             web_common::database::Table::UserEmails => {
 bincode::serialize(&NestedUserEmail::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<UserEmailFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserEmailFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3080,7 +2569,7 @@ connection)?)?
             },
             web_common::database::Table::Users => {
 bincode::serialize(&NestedUser::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3088,7 +2577,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleInvitations => {
 bincode::serialize(&NestedUsersUsersRoleInvitation::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3096,7 +2585,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleRequests => {
 bincode::serialize(&NestedUsersUsersRoleRequest::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3104,7 +2593,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoles => {
 bincode::serialize(&NestedUsersUsersRole::all_updatable_sorted(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3139,7 +2628,7 @@ connection)?)?
             web_common::database::Table::Countries => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
 bincode::serialize(&NestedDerivedSample::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3153,7 +2642,7 @@ connection)?)?
             web_common::database::Table::NameplateCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table nameplate_categories."),
             web_common::database::Table::Nameplates => {
 bincode::serialize(&NestedNameplate::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3164,7 +2653,7 @@ connection)?)?
             web_common::database::Table::ObservationSubjects => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3173,7 +2662,7 @@ connection)?)?
             },
             web_common::database::Table::OrganismBioOttTaxonItems => {
 bincode::serialize(&NestedOrganismBioOttTaxonItem::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3182,7 +2671,7 @@ connection)?)?
             },
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3194,7 +2683,7 @@ connection)?)?
             web_common::database::Table::ProjectStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3203,7 +2692,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
 bincode::serialize(&NestedProjectsTeamsRoleInvitation::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3212,7 +2701,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
 bincode::serialize(&NestedProjectsTeamsRoleRequest::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3221,7 +2710,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoles => {
 bincode::serialize(&NestedProjectsTeamsRole::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3230,7 +2719,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
 bincode::serialize(&NestedProjectsUsersRoleInvitation::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3239,7 +2728,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleRequests => {
 bincode::serialize(&NestedProjectsUsersRoleRequest::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3248,7 +2737,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoles => {
 bincode::serialize(&NestedProjectsUsersRole::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3258,7 +2747,7 @@ connection)?)?
             web_common::database::Table::Roles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table roles."),
             web_common::database::Table::SampleBioOttTaxonItems => {
 bincode::serialize(&NestedSampleBioOttTaxonItem::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3268,7 +2757,7 @@ connection)?)?
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3278,7 +2767,7 @@ connection)?)?
             web_common::database::Table::SampleStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_states."),
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3288,7 +2777,7 @@ connection)?)?
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => {
 bincode::serialize(&NestedSpectraCollection::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3298,7 +2787,7 @@ connection)?)?
             web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table team_states."),
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3307,7 +2796,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
 bincode::serialize(&NestedTeamsTeamsRoleInvitation::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3316,7 +2805,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleInvitations => {
 bincode::serialize(&NestedTeamsUsersRoleInvitation::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3325,7 +2814,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleRequests => {
 bincode::serialize(&NestedTeamsUsersRoleRequest::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3334,7 +2823,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoles => {
 bincode::serialize(&NestedTeamsUsersRole::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3345,7 +2834,7 @@ connection)?)?
             web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table user_emails."),
             web_common::database::Table::Users => {
 bincode::serialize(&NestedUser::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3354,7 +2843,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleInvitations => {
 bincode::serialize(&NestedUsersUsersRoleInvitation::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3363,7 +2852,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleRequests => {
 bincode::serialize(&NestedUsersUsersRoleRequest::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3372,7 +2861,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoles => {
 bincode::serialize(&NestedUsersUsersRole::strict_word_similarity_search_updatable(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3400,394 +2889,234 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-                unimplemented!("Method all_administrable not implemented for table bio_ott_ranks.")
-            }
-            web_common::database::Table::BioOttTaxonItems => unimplemented!(
-                "Method all_administrable not implemented for table bio_ott_taxon_items."
-            ),
-            web_common::database::Table::Colors => {
-                unimplemented!("Method all_administrable not implemented for table colors.")
-            }
-            web_common::database::Table::Countries => {
-                unimplemented!("Method all_administrable not implemented for table countries.")
-            }
+            web_common::database::Table::BioOttRanks => unimplemented!("Method all_administrable not implemented for table bio_ott_ranks."),
+            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_administrable not implemented for table bio_ott_taxon_items."),
+            web_common::database::Table::Colors => unimplemented!("Method all_administrable not implemented for table colors."),
+            web_common::database::Table::Countries => unimplemented!("Method all_administrable not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
-                bincode::serialize(&NestedDerivedSample::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::DocumentFormats => unimplemented!(
-                "Method all_administrable not implemented for table document_formats."
-            ),
-            web_common::database::Table::FontAwesomeIcons => unimplemented!(
-                "Method all_administrable not implemented for table font_awesome_icons."
-            ),
-            web_common::database::Table::LoginProviders => unimplemented!(
-                "Method all_administrable not implemented for table login_providers."
-            ),
-            web_common::database::Table::Materials => {
-                unimplemented!("Method all_administrable not implemented for table materials.")
-            }
-            web_common::database::Table::NameplateCategories => unimplemented!(
-                "Method all_administrable not implemented for table nameplate_categories."
-            ),
+bincode::serialize(&NestedDerivedSample::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::DocumentFormats => unimplemented!("Method all_administrable not implemented for table document_formats."),
+            web_common::database::Table::FontAwesomeIcons => unimplemented!("Method all_administrable not implemented for table font_awesome_icons."),
+            web_common::database::Table::LoginProviders => unimplemented!("Method all_administrable not implemented for table login_providers."),
+            web_common::database::Table::Materials => unimplemented!("Method all_administrable not implemented for table materials."),
+            web_common::database::Table::NameplateCategories => unimplemented!("Method all_administrable not implemented for table nameplate_categories."),
             web_common::database::Table::Nameplates => {
-                bincode::serialize(&NestedNameplate::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<NameplateFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Notifications => {
-                unimplemented!("Method all_administrable not implemented for table notifications.")
-            }
-            web_common::database::Table::ObservationSubjects => unimplemented!(
-                "Method all_administrable not implemented for table observation_subjects."
-            ),
+bincode::serialize(&NestedNameplate::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Notifications => unimplemented!("Method all_administrable not implemented for table notifications."),
+            web_common::database::Table::ObservationSubjects => unimplemented!("Method all_administrable not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
-                bincode::serialize(&NestedObservation::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ObservationFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedObservation::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::OrganismBioOttTaxonItems => {
-                bincode::serialize(&NestedOrganismBioOttTaxonItem::all_administrable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedOrganismBioOttTaxonItem::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Organisms => {
-                bincode::serialize(&NestedOrganism::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<OrganismFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Organizations => {
-                unimplemented!("Method all_administrable not implemented for table organizations.")
-            }
-            web_common::database::Table::PermanenceCategories => unimplemented!(
-                "Method all_administrable not implemented for table permanence_categories."
-            ),
-            web_common::database::Table::ProjectStates => {
-                unimplemented!("Method all_administrable not implemented for table project_states.")
-            }
+bincode::serialize(&NestedOrganism::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Organizations => unimplemented!("Method all_administrable not implemented for table organizations."),
+            web_common::database::Table::PermanenceCategories => unimplemented!("Method all_administrable not implemented for table permanence_categories."),
+            web_common::database::Table::ProjectStates => unimplemented!("Method all_administrable not implemented for table project_states."),
             web_common::database::Table::Projects => {
-                bincode::serialize(&NestedProject::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProject::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
-                bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_administrable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
-                bincode::serialize(&NestedProjectsTeamsRoleRequest::all_administrable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRoleRequest::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsTeamsRoles => {
-                bincode::serialize(&NestedProjectsTeamsRole::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsTeamsRole::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
-                bincode::serialize(&NestedProjectsUsersRoleInvitation::all_administrable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsUsersRoleInvitation::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoleRequests => {
-                bincode::serialize(&NestedProjectsUsersRoleRequest::all_administrable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedProjectsUsersRoleRequest::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::ProjectsUsersRoles => {
-                bincode::serialize(&NestedProjectsUsersRole::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Roles => {
-                unimplemented!("Method all_administrable not implemented for table roles.")
-            }
+bincode::serialize(&NestedProjectsUsersRole::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Roles => unimplemented!("Method all_administrable not implemented for table roles."),
             web_common::database::Table::SampleBioOttTaxonItems => {
-                bincode::serialize(&NestedSampleBioOttTaxonItem::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::SampleContainerCategories => unimplemented!(
-                "Method all_administrable not implemented for table sample_container_categories."
-            ),
+bincode::serialize(&NestedSampleBioOttTaxonItem::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_administrable not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
-                bincode::serialize(&NestedSampleContainer::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::SampleStates => {
-                unimplemented!("Method all_administrable not implemented for table sample_states.")
-            }
+bincode::serialize(&NestedSampleContainer::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::SampleStates => unimplemented!("Method all_administrable not implemented for table sample_states."),
             web_common::database::Table::Samples => {
-                bincode::serialize(&NestedSample::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SampleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Spectra => {
-                unimplemented!("Method all_administrable not implemented for table spectra.")
-            }
+bincode::serialize(&NestedSample::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Spectra => unimplemented!("Method all_administrable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => {
-                bincode::serialize(&NestedSpectraCollection::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::TeamStates => {
-                unimplemented!("Method all_administrable not implemented for table team_states.")
-            }
+bincode::serialize(&NestedSpectraCollection::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::TeamStates => unimplemented!("Method all_administrable not implemented for table team_states."),
             web_common::database::Table::Teams => {
-                bincode::serialize(&NestedTeam::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeam::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
-                bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_administrable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoleInvitations => {
-                bincode::serialize(&NestedTeamsUsersRoleInvitation::all_administrable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsUsersRoleInvitation::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoleRequests => {
-                bincode::serialize(&NestedTeamsUsersRoleRequest::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedTeamsUsersRoleRequest::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::TeamsUsersRoles => {
-                bincode::serialize(&NestedTeamsUsersRole::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
-            web_common::database::Table::Units => {
-                unimplemented!("Method all_administrable not implemented for table units.")
-            }
+bincode::serialize(&NestedTeamsUsersRole::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Units => unimplemented!("Method all_administrable not implemented for table units."),
             web_common::database::Table::UserEmails => {
-                bincode::serialize(&NestedUserEmail::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UserEmailFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUserEmail::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserEmailFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Users => {
-                bincode::serialize(&NestedUser::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UserFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUser::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoleInvitations => {
-                bincode::serialize(&NestedUsersUsersRoleInvitation::all_administrable(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRoleInvitation::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoleRequests => {
-                bincode::serialize(&NestedUsersUsersRoleRequest::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRoleRequest::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::UsersUsersRoles => {
-                bincode::serialize(&NestedUsersUsersRole::all_administrable(
-                    filter
-                        .map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter))
-                        .transpose()?
-                        .as_ref(),
-                    author_user_id,
-                    limit,
-                    offset,
-                    connection,
-                )?)?
-            }
+bincode::serialize(&NestedUsersUsersRole::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
         })
     }
 
@@ -3815,7 +3144,7 @@ connection)?)?
             web_common::database::Table::Countries => unimplemented!("Method all_administrable_sorted not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
 bincode::serialize(&NestedDerivedSample::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3828,7 +3157,7 @@ connection)?)?
             web_common::database::Table::NameplateCategories => unimplemented!("Method all_administrable_sorted not implemented for table nameplate_categories."),
             web_common::database::Table::Nameplates => {
 bincode::serialize(&NestedNameplate::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3838,7 +3167,7 @@ connection)?)?
             web_common::database::Table::ObservationSubjects => unimplemented!("Method all_administrable_sorted not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3846,7 +3175,7 @@ connection)?)?
             },
             web_common::database::Table::OrganismBioOttTaxonItems => {
 bincode::serialize(&NestedOrganismBioOttTaxonItem::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3854,7 +3183,7 @@ connection)?)?
             },
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3865,7 +3194,7 @@ connection)?)?
             web_common::database::Table::ProjectStates => unimplemented!("Method all_administrable_sorted not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3873,7 +3202,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
 bincode::serialize(&NestedProjectsTeamsRoleInvitation::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3881,7 +3210,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
 bincode::serialize(&NestedProjectsTeamsRoleRequest::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3889,7 +3218,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoles => {
 bincode::serialize(&NestedProjectsTeamsRole::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3897,7 +3226,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
 bincode::serialize(&NestedProjectsUsersRoleInvitation::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3905,7 +3234,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleRequests => {
 bincode::serialize(&NestedProjectsUsersRoleRequest::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3913,7 +3242,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoles => {
 bincode::serialize(&NestedProjectsUsersRole::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3922,7 +3251,7 @@ connection)?)?
             web_common::database::Table::Roles => unimplemented!("Method all_administrable_sorted not implemented for table roles."),
             web_common::database::Table::SampleBioOttTaxonItems => {
 bincode::serialize(&NestedSampleBioOttTaxonItem::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3931,7 +3260,7 @@ connection)?)?
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_administrable_sorted not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3940,7 +3269,7 @@ connection)?)?
             web_common::database::Table::SampleStates => unimplemented!("Method all_administrable_sorted not implemented for table sample_states."),
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3949,7 +3278,7 @@ connection)?)?
             web_common::database::Table::Spectra => unimplemented!("Method all_administrable_sorted not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => {
 bincode::serialize(&NestedSpectraCollection::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3958,7 +3287,7 @@ connection)?)?
             web_common::database::Table::TeamStates => unimplemented!("Method all_administrable_sorted not implemented for table team_states."),
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3966,7 +3295,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
 bincode::serialize(&NestedTeamsTeamsRoleInvitation::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3974,7 +3303,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleInvitations => {
 bincode::serialize(&NestedTeamsUsersRoleInvitation::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3982,7 +3311,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleRequests => {
 bincode::serialize(&NestedTeamsUsersRoleRequest::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3990,7 +3319,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoles => {
 bincode::serialize(&NestedTeamsUsersRole::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -3999,7 +3328,7 @@ connection)?)?
             web_common::database::Table::Units => unimplemented!("Method all_administrable_sorted not implemented for table units."),
             web_common::database::Table::UserEmails => {
 bincode::serialize(&NestedUserEmail::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<UserEmailFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserEmailFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -4007,7 +3336,7 @@ connection)?)?
             },
             web_common::database::Table::Users => {
 bincode::serialize(&NestedUser::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -4015,7 +3344,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleInvitations => {
 bincode::serialize(&NestedUsersUsersRoleInvitation::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -4023,7 +3352,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleRequests => {
 bincode::serialize(&NestedUsersUsersRoleRequest::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -4031,7 +3360,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoles => {
 bincode::serialize(&NestedUsersUsersRole::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -4066,7 +3395,7 @@ connection)?)?
             web_common::database::Table::Countries => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
 bincode::serialize(&NestedDerivedSample::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::DerivedSampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4080,7 +3409,7 @@ connection)?)?
             web_common::database::Table::NameplateCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table nameplate_categories."),
             web_common::database::Table::Nameplates => {
 bincode::serialize(&NestedNameplate::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<NameplateFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::NameplateFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4091,7 +3420,7 @@ connection)?)?
             web_common::database::Table::ObservationSubjects => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table observation_subjects."),
             web_common::database::Table::Observations => {
 bincode::serialize(&NestedObservation::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ObservationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ObservationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4100,7 +3429,7 @@ connection)?)?
             },
             web_common::database::Table::OrganismBioOttTaxonItems => {
 bincode::serialize(&NestedOrganismBioOttTaxonItem::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4109,7 +3438,7 @@ connection)?)?
             },
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<OrganismFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4121,7 +3450,7 @@ connection)?)?
             web_common::database::Table::ProjectStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table project_states."),
             web_common::database::Table::Projects => {
 bincode::serialize(&NestedProject::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4130,7 +3459,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
 bincode::serialize(&NestedProjectsTeamsRoleInvitation::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4139,7 +3468,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
 bincode::serialize(&NestedProjectsTeamsRoleRequest::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4148,7 +3477,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsTeamsRoles => {
 bincode::serialize(&NestedProjectsTeamsRole::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsTeamsRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4157,7 +3486,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
 bincode::serialize(&NestedProjectsUsersRoleInvitation::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4166,7 +3495,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoleRequests => {
 bincode::serialize(&NestedProjectsUsersRoleRequest::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4175,7 +3504,7 @@ connection)?)?
             },
             web_common::database::Table::ProjectsUsersRoles => {
 bincode::serialize(&NestedProjectsUsersRole::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::ProjectsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4185,7 +3514,7 @@ connection)?)?
             web_common::database::Table::Roles => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table roles."),
             web_common::database::Table::SampleBioOttTaxonItems => {
 bincode::serialize(&NestedSampleBioOttTaxonItem::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4195,7 +3524,7 @@ connection)?)?
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SampleContainerFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleContainerFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4205,7 +3534,7 @@ connection)?)?
             web_common::database::Table::SampleStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table sample_states."),
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SampleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4215,7 +3544,7 @@ connection)?)?
             web_common::database::Table::Spectra => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table spectra."),
             web_common::database::Table::SpectraCollections => {
 bincode::serialize(&NestedSpectraCollection::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4225,7 +3554,7 @@ connection)?)?
             web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table team_states."),
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<TeamFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4234,7 +3563,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
 bincode::serialize(&NestedTeamsTeamsRoleInvitation::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4243,7 +3572,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleInvitations => {
 bincode::serialize(&NestedTeamsUsersRoleInvitation::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4252,7 +3581,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoleRequests => {
 bincode::serialize(&NestedTeamsUsersRoleRequest::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4261,7 +3590,7 @@ connection)?)?
             },
             web_common::database::Table::TeamsUsersRoles => {
 bincode::serialize(&NestedTeamsUsersRole::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TeamsUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4272,7 +3601,7 @@ connection)?)?
             web_common::database::Table::UserEmails => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table user_emails."),
             web_common::database::Table::Users => {
 bincode::serialize(&NestedUser::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<UserFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UserFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4281,7 +3610,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleInvitations => {
 bincode::serialize(&NestedUsersUsersRoleInvitation::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4290,7 +3619,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoleRequests => {
 bincode::serialize(&NestedUsersUsersRoleRequest::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleRequestFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4299,7 +3628,7 @@ connection)?)?
             },
             web_common::database::Table::UsersUsersRoles => {
 bincode::serialize(&NestedUsersUsersRole::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::UsersUsersRoleFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -4553,8 +3882,8 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::Colors => unreachable!("Table `colors` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Countries => unreachable!("Table `countries` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::DerivedSamples => {
-                let row: web_common::database::NewDerivedSample = bincode::deserialize::<web_common::database::NewDerivedSample>(&row)?;
-                let inserted_row: crate::database::flat_variants::DerivedSample = <web_common::database::NewDerivedSample as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewDerivedSample = bincode::deserialize::<web_common::database::new_variants::NewDerivedSample>(&row)?;
+                let inserted_row: crate::database::flat_variants::DerivedSample = <web_common::database::new_variants::NewDerivedSample as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedDerivedSample::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
@@ -4564,28 +3893,28 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::Materials => unreachable!("Table `materials` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::NameplateCategories => unreachable!("Table `nameplate_categories` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Nameplates => {
-                let row: web_common::database::NewNameplate = bincode::deserialize::<web_common::database::NewNameplate>(&row)?;
-                let inserted_row: crate::database::flat_variants::Nameplate = <web_common::database::NewNameplate as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewNameplate = bincode::deserialize::<web_common::database::new_variants::NewNameplate>(&row)?;
+                let inserted_row: crate::database::flat_variants::Nameplate = <web_common::database::new_variants::NewNameplate as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedNameplate::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Notifications => unreachable!("Table `notifications` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::ObservationSubjects => unreachable!("Table `observation_subjects` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Observations => {
-                let row: web_common::database::NewObservation = bincode::deserialize::<web_common::database::NewObservation>(&row)?;
-                let inserted_row: crate::database::flat_variants::Observation = <web_common::database::NewObservation as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewObservation = bincode::deserialize::<web_common::database::new_variants::NewObservation>(&row)?;
+                let inserted_row: crate::database::flat_variants::Observation = <web_common::database::new_variants::NewObservation as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedObservation::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::OrganismBioOttTaxonItems => {
-                let row: web_common::database::NewOrganismBioOttTaxonItem = bincode::deserialize::<web_common::database::NewOrganismBioOttTaxonItem>(&row)?;
-                let inserted_row: crate::database::flat_variants::OrganismBioOttTaxonItem = <web_common::database::NewOrganismBioOttTaxonItem as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewOrganismBioOttTaxonItem = bincode::deserialize::<web_common::database::new_variants::NewOrganismBioOttTaxonItem>(&row)?;
+                let inserted_row: crate::database::flat_variants::OrganismBioOttTaxonItem = <web_common::database::new_variants::NewOrganismBioOttTaxonItem as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedOrganismBioOttTaxonItem::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Organisms => {
-                let row: web_common::database::NewOrganism = bincode::deserialize::<web_common::database::NewOrganism>(&row)?;
-                let inserted_row: crate::database::flat_variants::Organism = <web_common::database::NewOrganism as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewOrganism = bincode::deserialize::<web_common::database::new_variants::NewOrganism>(&row)?;
+                let inserted_row: crate::database::flat_variants::Organism = <web_common::database::new_variants::NewOrganism as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedOrganism::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
@@ -4593,134 +3922,134 @@ impl InsertableTable for web_common::database::Table {
             web_common::database::Table::PermanenceCategories => unreachable!("Table `permanence_categories` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::ProjectStates => unreachable!("Table `project_states` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Projects => {
-                let row: web_common::database::NewProject = bincode::deserialize::<web_common::database::NewProject>(&row)?;
-                let inserted_row: crate::database::flat_variants::Project = <web_common::database::NewProject as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewProject = bincode::deserialize::<web_common::database::new_variants::NewProject>(&row)?;
+                let inserted_row: crate::database::flat_variants::Project = <web_common::database::new_variants::NewProject as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedProject::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
-                let row: web_common::database::NewProjectsTeamsRoleInvitation = bincode::deserialize::<web_common::database::NewProjectsTeamsRoleInvitation>(&row)?;
-                let inserted_row: crate::database::flat_variants::ProjectsTeamsRoleInvitation = <web_common::database::NewProjectsTeamsRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewProjectsTeamsRoleInvitation = bincode::deserialize::<web_common::database::new_variants::NewProjectsTeamsRoleInvitation>(&row)?;
+                let inserted_row: crate::database::flat_variants::ProjectsTeamsRoleInvitation = <web_common::database::new_variants::NewProjectsTeamsRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedProjectsTeamsRoleInvitation::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::ProjectsTeamsRoleRequests => {
-                let row: web_common::database::NewProjectsTeamsRoleRequest = bincode::deserialize::<web_common::database::NewProjectsTeamsRoleRequest>(&row)?;
-                let inserted_row: crate::database::flat_variants::ProjectsTeamsRoleRequest = <web_common::database::NewProjectsTeamsRoleRequest as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewProjectsTeamsRoleRequest = bincode::deserialize::<web_common::database::new_variants::NewProjectsTeamsRoleRequest>(&row)?;
+                let inserted_row: crate::database::flat_variants::ProjectsTeamsRoleRequest = <web_common::database::new_variants::NewProjectsTeamsRoleRequest as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedProjectsTeamsRoleRequest::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::ProjectsTeamsRoles => {
-                let row: web_common::database::NewProjectsTeamsRole = bincode::deserialize::<web_common::database::NewProjectsTeamsRole>(&row)?;
-                let inserted_row: crate::database::flat_variants::ProjectsTeamsRole = <web_common::database::NewProjectsTeamsRole as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewProjectsTeamsRole = bincode::deserialize::<web_common::database::new_variants::NewProjectsTeamsRole>(&row)?;
+                let inserted_row: crate::database::flat_variants::ProjectsTeamsRole = <web_common::database::new_variants::NewProjectsTeamsRole as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedProjectsTeamsRole::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::ProjectsUsersRoleInvitations => {
-                let row: web_common::database::NewProjectsUsersRoleInvitation = bincode::deserialize::<web_common::database::NewProjectsUsersRoleInvitation>(&row)?;
-                let inserted_row: crate::database::flat_variants::ProjectsUsersRoleInvitation = <web_common::database::NewProjectsUsersRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewProjectsUsersRoleInvitation = bincode::deserialize::<web_common::database::new_variants::NewProjectsUsersRoleInvitation>(&row)?;
+                let inserted_row: crate::database::flat_variants::ProjectsUsersRoleInvitation = <web_common::database::new_variants::NewProjectsUsersRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedProjectsUsersRoleInvitation::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::ProjectsUsersRoleRequests => {
-                let row: web_common::database::NewProjectsUsersRoleRequest = bincode::deserialize::<web_common::database::NewProjectsUsersRoleRequest>(&row)?;
-                let inserted_row: crate::database::flat_variants::ProjectsUsersRoleRequest = <web_common::database::NewProjectsUsersRoleRequest as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewProjectsUsersRoleRequest = bincode::deserialize::<web_common::database::new_variants::NewProjectsUsersRoleRequest>(&row)?;
+                let inserted_row: crate::database::flat_variants::ProjectsUsersRoleRequest = <web_common::database::new_variants::NewProjectsUsersRoleRequest as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedProjectsUsersRoleRequest::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::ProjectsUsersRoles => {
-                let row: web_common::database::NewProjectsUsersRole = bincode::deserialize::<web_common::database::NewProjectsUsersRole>(&row)?;
-                let inserted_row: crate::database::flat_variants::ProjectsUsersRole = <web_common::database::NewProjectsUsersRole as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewProjectsUsersRole = bincode::deserialize::<web_common::database::new_variants::NewProjectsUsersRole>(&row)?;
+                let inserted_row: crate::database::flat_variants::ProjectsUsersRole = <web_common::database::new_variants::NewProjectsUsersRole as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedProjectsUsersRole::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Roles => unreachable!("Table `roles` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampleBioOttTaxonItems => {
-                let row: web_common::database::NewSampleBioOttTaxonItem = bincode::deserialize::<web_common::database::NewSampleBioOttTaxonItem>(&row)?;
-                let inserted_row: crate::database::flat_variants::SampleBioOttTaxonItem = <web_common::database::NewSampleBioOttTaxonItem as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewSampleBioOttTaxonItem = bincode::deserialize::<web_common::database::new_variants::NewSampleBioOttTaxonItem>(&row)?;
+                let inserted_row: crate::database::flat_variants::SampleBioOttTaxonItem = <web_common::database::new_variants::NewSampleBioOttTaxonItem as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedSampleBioOttTaxonItem::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::SampleContainerCategories => unreachable!("Table `sample_container_categories` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampleContainers => {
-                let row: web_common::database::NewSampleContainer = bincode::deserialize::<web_common::database::NewSampleContainer>(&row)?;
-                let inserted_row: crate::database::flat_variants::SampleContainer = <web_common::database::NewSampleContainer as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewSampleContainer = bincode::deserialize::<web_common::database::new_variants::NewSampleContainer>(&row)?;
+                let inserted_row: crate::database::flat_variants::SampleContainer = <web_common::database::new_variants::NewSampleContainer as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedSampleContainer::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Samples => {
-                let row: web_common::database::NewSample = bincode::deserialize::<web_common::database::NewSample>(&row)?;
-                let inserted_row: crate::database::flat_variants::Sample = <web_common::database::NewSample as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewSample = bincode::deserialize::<web_common::database::new_variants::NewSample>(&row)?;
+                let inserted_row: crate::database::flat_variants::Sample = <web_common::database::new_variants::NewSample as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedSample::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Spectra => unreachable!("Table `spectra` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SpectraCollections => {
-                let row: web_common::database::NewSpectraCollection = bincode::deserialize::<web_common::database::NewSpectraCollection>(&row)?;
-                let inserted_row: crate::database::flat_variants::SpectraCollection = <web_common::database::NewSpectraCollection as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewSpectraCollection = bincode::deserialize::<web_common::database::new_variants::NewSpectraCollection>(&row)?;
+                let inserted_row: crate::database::flat_variants::SpectraCollection = <web_common::database::new_variants::NewSpectraCollection as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedSpectraCollection::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::TeamStates => unreachable!("Table `team_states` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Teams => {
-                let row: web_common::database::NewTeam = bincode::deserialize::<web_common::database::NewTeam>(&row)?;
-                let inserted_row: crate::database::flat_variants::Team = <web_common::database::NewTeam as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewTeam = bincode::deserialize::<web_common::database::new_variants::NewTeam>(&row)?;
+                let inserted_row: crate::database::flat_variants::Team = <web_common::database::new_variants::NewTeam as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedTeam::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::TeamsTeamsRoleInvitations => {
-                let row: web_common::database::NewTeamsTeamsRoleInvitation = bincode::deserialize::<web_common::database::NewTeamsTeamsRoleInvitation>(&row)?;
-                let inserted_row: crate::database::flat_variants::TeamsTeamsRoleInvitation = <web_common::database::NewTeamsTeamsRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewTeamsTeamsRoleInvitation = bincode::deserialize::<web_common::database::new_variants::NewTeamsTeamsRoleInvitation>(&row)?;
+                let inserted_row: crate::database::flat_variants::TeamsTeamsRoleInvitation = <web_common::database::new_variants::NewTeamsTeamsRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedTeamsTeamsRoleInvitation::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::TeamsUsersRoleInvitations => {
-                let row: web_common::database::NewTeamsUsersRoleInvitation = bincode::deserialize::<web_common::database::NewTeamsUsersRoleInvitation>(&row)?;
-                let inserted_row: crate::database::flat_variants::TeamsUsersRoleInvitation = <web_common::database::NewTeamsUsersRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewTeamsUsersRoleInvitation = bincode::deserialize::<web_common::database::new_variants::NewTeamsUsersRoleInvitation>(&row)?;
+                let inserted_row: crate::database::flat_variants::TeamsUsersRoleInvitation = <web_common::database::new_variants::NewTeamsUsersRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedTeamsUsersRoleInvitation::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::TeamsUsersRoleRequests => {
-                let row: web_common::database::NewTeamsUsersRoleRequest = bincode::deserialize::<web_common::database::NewTeamsUsersRoleRequest>(&row)?;
-                let inserted_row: crate::database::flat_variants::TeamsUsersRoleRequest = <web_common::database::NewTeamsUsersRoleRequest as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewTeamsUsersRoleRequest = bincode::deserialize::<web_common::database::new_variants::NewTeamsUsersRoleRequest>(&row)?;
+                let inserted_row: crate::database::flat_variants::TeamsUsersRoleRequest = <web_common::database::new_variants::NewTeamsUsersRoleRequest as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedTeamsUsersRoleRequest::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::TeamsUsersRoles => {
-                let row: web_common::database::NewTeamsUsersRole = bincode::deserialize::<web_common::database::NewTeamsUsersRole>(&row)?;
-                let inserted_row: crate::database::flat_variants::TeamsUsersRole = <web_common::database::NewTeamsUsersRole as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewTeamsUsersRole = bincode::deserialize::<web_common::database::new_variants::NewTeamsUsersRole>(&row)?;
+                let inserted_row: crate::database::flat_variants::TeamsUsersRole = <web_common::database::new_variants::NewTeamsUsersRole as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedTeamsUsersRole::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Units => unreachable!("Table `units` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::UserEmails => {
-                let row: web_common::database::NewUserEmail = bincode::deserialize::<web_common::database::NewUserEmail>(&row)?;
-                let inserted_row: crate::database::flat_variants::UserEmail = <web_common::database::NewUserEmail as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewUserEmail = bincode::deserialize::<web_common::database::new_variants::NewUserEmail>(&row)?;
+                let inserted_row: crate::database::flat_variants::UserEmail = <web_common::database::new_variants::NewUserEmail as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedUserEmail::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Users => {
-                let row: web_common::database::NewUser = bincode::deserialize::<web_common::database::NewUser>(&row)?;
-                let inserted_row: crate::database::flat_variants::User = <web_common::database::NewUser as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewUser = bincode::deserialize::<web_common::database::new_variants::NewUser>(&row)?;
+                let inserted_row: crate::database::flat_variants::User = <web_common::database::new_variants::NewUser as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedUser::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::UsersUsersRoleInvitations => {
-                let row: web_common::database::NewUsersUsersRoleInvitation = bincode::deserialize::<web_common::database::NewUsersUsersRoleInvitation>(&row)?;
-                let inserted_row: crate::database::flat_variants::UsersUsersRoleInvitation = <web_common::database::NewUsersUsersRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewUsersUsersRoleInvitation = bincode::deserialize::<web_common::database::new_variants::NewUsersUsersRoleInvitation>(&row)?;
+                let inserted_row: crate::database::flat_variants::UsersUsersRoleInvitation = <web_common::database::new_variants::NewUsersUsersRoleInvitation as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedUsersUsersRoleInvitation::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::UsersUsersRoleRequests => {
-                let row: web_common::database::NewUsersUsersRoleRequest = bincode::deserialize::<web_common::database::NewUsersUsersRoleRequest>(&row)?;
-                let inserted_row: crate::database::flat_variants::UsersUsersRoleRequest = <web_common::database::NewUsersUsersRoleRequest as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewUsersUsersRoleRequest = bincode::deserialize::<web_common::database::new_variants::NewUsersUsersRoleRequest>(&row)?;
+                let inserted_row: crate::database::flat_variants::UsersUsersRoleRequest = <web_common::database::new_variants::NewUsersUsersRoleRequest as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedUsersUsersRoleRequest::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::UsersUsersRoles => {
-                let row: web_common::database::NewUsersUsersRole = bincode::deserialize::<web_common::database::NewUsersUsersRole>(&row)?;
-                let inserted_row: crate::database::flat_variants::UsersUsersRole = <web_common::database::NewUsersUsersRole as InsertRow>::insert(row, user_id, connection)?;
+                let row: web_common::database::new_variants::NewUsersUsersRole = bincode::deserialize::<web_common::database::new_variants::NewUsersUsersRole>(&row)?;
+                let inserted_row: crate::database::flat_variants::UsersUsersRole = <web_common::database::new_variants::NewUsersUsersRole as InsertRow>::insert(row, user_id, connection)?;
                 let nested_row = crate::database::nested_variants::NestedUsersUsersRole::from_flat(inserted_row, connection)?;
                  bincode::serialize(&nested_row)?
             },

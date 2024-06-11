@@ -9,19 +9,18 @@ use std::rc::Rc;
 use web_common::api::form_traits::FormMethod;
 use web_common::api::ApiError;
 use web_common::database::*;
-use web_common::types::JPEG;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UserBuilder {
     pub id: Option<i32>,
     pub first_name: Option<Rc<String>>,
     pub middle_name: Option<Rc<String>>,
     pub last_name: Option<Rc<String>>,
     pub description: Option<Rc<String>>,
-    pub picture: Option<Rc<JPEG>>,
-    pub organization: Option<Rc<NestedOrganization>>,
+    pub picture: Option<Rc<web_common::types::JPEG>>,
+    pub organization: Option<Rc<web_common::database::nested_variants::NestedOrganization>>,
     pub errors_first_name: Vec<ApiError>,
     pub errors_middle_name: Vec<ApiError>,
     pub errors_last_name: Vec<ApiError>,
@@ -54,14 +53,14 @@ impl Default for UserBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum UserActions {
     SetFirstName(Option<String>),
     SetMiddleName(Option<String>),
     SetLastName(Option<String>),
     SetDescription(Option<String>),
-    SetPicture(Option<Rc<JPEG>>),
-    SetOrganization(Option<Rc<NestedOrganization>>),
+    SetPicture(Option<Rc<web_common::types::JPEG>>),
+    SetOrganization(Option<Rc<web_common::database::nested_variants::NestedOrganization>>),
 }
 
 impl FromOperation for UserActions {
@@ -299,10 +298,11 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
         builder_dispatch.apply_callback(|picture: Option<Rc<web_common::types::JPEG>>| {
             UserActions::SetPicture(picture.clone())
         });
-    let set_organization =
-        builder_dispatch.apply_callback(|organization: Option<Rc<NestedOrganization>>| {
+    let set_organization = builder_dispatch.apply_callback(
+        |organization: Option<Rc<web_common::database::nested_variants::NestedOrganization>>| {
             UserActions::SetOrganization(organization)
-        });
+        },
+    );
     html! {
         <BasicForm<UpdateUser>
             method={FormMethod::PUT}
@@ -313,7 +313,7 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
             <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
             <BasicInput<String> label="Description" optional={true} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
             <FileInput<web_common::types::JPEG> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} file={builder_store.picture.clone()} />
-            <Datalist<NestedOrganization, false> builder={set_organization} optional={true} errors={builder_store.errors_organization.clone()} value={builder_store.organization.clone()} label="Organization" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedOrganization, false> builder={set_organization} optional={true} errors={builder_store.errors_organization.clone()} value={builder_store.organization.clone()} label="Organization" scanner={false} />
         </BasicForm<UpdateUser>>
     }
 }

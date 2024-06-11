@@ -13,11 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -45,10 +43,10 @@ pub struct SampleContainerCategory {
 
 unsafe impl Send for SampleContainerCategory {}
 unsafe impl Sync for SampleContainerCategory {}
-impl From<SampleContainerCategory>
-    for web_common::database::flat_variants::SampleContainerCategory
+impl From<web_common::database::flat_variants::SampleContainerCategory>
+    for crate::database::flat_variants::SampleContainerCategory
 {
-    fn from(item: SampleContainerCategory) -> Self {
+    fn from(item: web_common::database::flat_variants::SampleContainerCategory) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -62,10 +60,10 @@ impl From<SampleContainerCategory>
     }
 }
 
-impl From<web_common::database::flat_variants::SampleContainerCategory>
-    for SampleContainerCategory
+impl From<crate::database::flat_variants::SampleContainerCategory>
+    for web_common::database::flat_variants::SampleContainerCategory
 {
-    fn from(item: web_common::database::flat_variants::SampleContainerCategory) -> Self {
+    fn from(item: crate::database::flat_variants::SampleContainerCategory) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -95,7 +93,7 @@ impl SampleContainerCategory {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SampleContainerCategoryFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerCategoryFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -129,7 +127,7 @@ impl SampleContainerCategory {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SampleContainerCategoryFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerCategoryFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -162,7 +160,7 @@ impl SampleContainerCategory {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&SampleContainerCategoryFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleContainerCategoryFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,

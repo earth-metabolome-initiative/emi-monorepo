@@ -1,18 +1,16 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedObservation {
-    pub inner: Observation,
-    pub parent_observation: Option<Observation>,
-    pub created_by: NestedUser,
-    pub updated_by: NestedUser,
-    pub project: NestedProject,
-    pub organism: Option<NestedOrganism>,
-    pub sample: Option<NestedSample>,
-    pub subject: NestedObservationSubject,
+    pub inner: crate::database::flat_variants::Observation,
+    pub parent_observation: Option<crate::database::flat_variants::Observation>,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub updated_by: crate::database::nested_variants::NestedUser,
+    pub project: crate::database::nested_variants::NestedProject,
+    pub organism: Option<crate::database::nested_variants::NestedOrganism>,
+    pub sample: Option<crate::database::nested_variants::NestedSample>,
+    pub subject: crate::database::nested_variants::NestedObservationSubject,
 }
 
 unsafe impl Send for NestedObservation {}
@@ -35,21 +33,50 @@ impl NestedObservation {
             parent_observation: flat_variant
                 .parent_observation_id
                 .map(|parent_observation_id| {
-                    Observation::get(parent_observation_id, author_user_id, connection)
+                    crate::database::flat_variants::Observation::get(
+                        parent_observation_id,
+                        author_user_id,
+                        connection,
+                    )
                 })
                 .transpose()?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
-            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            updated_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.updated_by,
+                connection,
+            )?,
+            project: crate::database::nested_variants::NestedProject::get(
+                flat_variant.project_id,
+                author_user_id,
+                connection,
+            )?,
             organism: flat_variant
                 .organism_id
-                .map(|organism_id| NestedOrganism::get(organism_id, author_user_id, connection))
+                .map(|organism_id| {
+                    crate::database::nested_variants::NestedOrganism::get(
+                        organism_id,
+                        author_user_id,
+                        connection,
+                    )
+                })
                 .transpose()?,
             sample: flat_variant
                 .sample_id
-                .map(|sample_id| NestedSample::get(sample_id, author_user_id, connection))
+                .map(|sample_id| {
+                    crate::database::nested_variants::NestedSample::get(
+                        sample_id,
+                        author_user_id,
+                        connection,
+                    )
+                })
                 .transpose()?,
-            subject: NestedObservationSubject::get(flat_variant.subject_id, connection)?,
+            subject: crate::database::nested_variants::NestedObservationSubject::get(
+                flat_variant.subject_id,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -88,7 +115,7 @@ impl NestedObservation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&ObservationFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -109,7 +136,7 @@ impl NestedObservation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&ObservationFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -161,7 +188,7 @@ impl NestedObservation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&ObservationFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -249,7 +276,7 @@ impl NestedObservation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&ObservationFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -270,7 +297,7 @@ impl NestedObservation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&ObservationFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -292,7 +319,7 @@ impl NestedObservation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&ObservationFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -348,7 +375,7 @@ impl NestedObservation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&ObservationFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -369,7 +396,7 @@ impl NestedObservation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&ObservationFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -391,7 +418,7 @@ impl NestedObservation {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&ObservationFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -440,46 +467,74 @@ impl NestedObservation {
         Observation::delete_by_id(id, author_user_id, connection)
     }
 }
-impl From<web_common::database::nested_variants::NestedObservation> for NestedObservation {
+impl From<web_common::database::nested_variants::NestedObservation>
+    for crate::database::nested_variants::NestedObservation
+{
     fn from(item: web_common::database::nested_variants::NestedObservation) -> Self {
         Self {
-            inner: Observation::from(item.inner.as_ref().clone()),
+            inner: crate::database::flat_variants::Observation::from(item.inner.as_ref().clone()),
             parent_observation: item
                 .parent_observation
                 .as_deref()
                 .cloned()
-                .map(Observation::from),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
-            project: NestedProject::from(item.project.as_ref().clone()),
-            organism: item.organism.as_deref().cloned().map(NestedOrganism::from),
-            sample: item.sample.as_deref().cloned().map(NestedSample::from),
-            subject: NestedObservationSubject::from(item.subject.as_ref().clone()),
+                .map(crate::database::flat_variants::Observation::from),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            updated_by: crate::database::nested_variants::NestedUser::from(
+                item.updated_by.as_ref().clone(),
+            ),
+            project: crate::database::nested_variants::NestedProject::from(
+                item.project.as_ref().clone(),
+            ),
+            organism: item
+                .organism
+                .as_deref()
+                .cloned()
+                .map(crate::database::nested_variants::NestedOrganism::from),
+            sample: item
+                .sample
+                .as_deref()
+                .cloned()
+                .map(crate::database::nested_variants::NestedSample::from),
+            subject: crate::database::nested_variants::NestedObservationSubject::from(
+                item.subject.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedObservation> for web_common::database::nested_variants::NestedObservation {
-    fn from(item: NestedObservation) -> Self {
+impl From<crate::database::nested_variants::NestedObservation>
+    for web_common::database::nested_variants::NestedObservation
+{
+    fn from(item: crate::database::nested_variants::NestedObservation) -> Self {
         Self {
-            inner: Rc::from(web_common::database::Observation::from(item.inner)),
+            inner: Rc::from(web_common::database::flat_variants::Observation::from(
+                item.inner,
+            )),
             parent_observation: item
                 .parent_observation
-                .map(web_common::database::Observation::from)
+                .map(web_common::database::flat_variants::Observation::from)
                 .map(Rc::from),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
-            project: Rc::from(web_common::database::NestedProject::from(item.project)),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
+            updated_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.updated_by,
+            )),
+            project: Rc::from(web_common::database::nested_variants::NestedProject::from(
+                item.project,
+            )),
             organism: item
                 .organism
-                .map(web_common::database::NestedOrganism::from)
+                .map(web_common::database::nested_variants::NestedOrganism::from)
                 .map(Rc::from),
             sample: item
                 .sample
-                .map(web_common::database::NestedSample::from)
+                .map(web_common::database::nested_variants::NestedSample::from)
                 .map(Rc::from),
-            subject: Rc::from(web_common::database::NestedObservationSubject::from(
-                item.subject,
-            )),
+            subject: Rc::from(
+                web_common::database::nested_variants::NestedObservationSubject::from(item.subject),
+            ),
         }
     }
 }

@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -43,8 +40,10 @@ pub struct TeamState {
 
 unsafe impl Send for TeamState {}
 unsafe impl Sync for TeamState {}
-impl From<TeamState> for web_common::database::flat_variants::TeamState {
-    fn from(item: TeamState) -> Self {
+impl From<web_common::database::flat_variants::TeamState>
+    for crate::database::flat_variants::TeamState
+{
+    fn from(item: web_common::database::flat_variants::TeamState) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -55,8 +54,10 @@ impl From<TeamState> for web_common::database::flat_variants::TeamState {
     }
 }
 
-impl From<web_common::database::flat_variants::TeamState> for TeamState {
-    fn from(item: web_common::database::flat_variants::TeamState) -> Self {
+impl From<crate::database::flat_variants::TeamState>
+    for web_common::database::flat_variants::TeamState
+{
+    fn from(item: crate::database::flat_variants::TeamState) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -83,7 +84,7 @@ impl TeamState {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&TeamStateFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -114,7 +115,7 @@ impl TeamState {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&TeamStateFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -195,7 +196,7 @@ impl TeamState {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&TeamStateFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamStateFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,

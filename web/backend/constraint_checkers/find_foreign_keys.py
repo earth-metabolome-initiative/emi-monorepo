@@ -195,7 +195,7 @@ def postgres_type_to_rust_type(postgres_type: str) -> str:
     if postgres_type == "geography":
         return "postgis::ewkb::Geometry"
     if postgres_type == "point":
-        return "postgis::ewkb::Point"
+        return "Point"
     if postgres_type == "line":
         return "postgis::ewkb::LineString"
     if postgres_type == "jpeg":

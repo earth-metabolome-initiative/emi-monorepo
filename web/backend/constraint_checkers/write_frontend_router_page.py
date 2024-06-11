@@ -313,7 +313,7 @@ def write_frontend_router_page(
         ids_url = "".join([f"/:{primary_key.name}" for primary_key in primary_keys])
         ids_struct = ", ".join(
             [
-                f"{primary_key.name}: {primary_key.format_data_type()}"
+                f"{primary_key.name}: {primary_key.format_data_type(route='frontend')}"
                 for primary_key in primary_keys
             ]
         )
@@ -362,7 +362,7 @@ def write_frontend_router_page(
 
                 document.write(
                     f'    #[at("/{flat_variant.table_name}/new/{normalized_foreign_key_name}/:{foreign_key.name}")]\n'
-                    f"    {enum_variant_name}{{{foreign_key.name}: {foreign_key.data_type()}}},\n"
+                    f"    {enum_variant_name}{{{foreign_key.name}: {foreign_key.data_type(route='frontend')}}},\n"
                 )
 
                 enum_variants.append(enum_variant_name)

@@ -14,6 +14,7 @@ from constraint_checkers.indices import (
     PGIndex,
     DerivedPGIndex,
 )
+from constraint_checkers.utils import infer_route_from_document
 
 TYPES_FROM_CORE_AND_STANDARD_LIBRARIES = [
     "bool",
@@ -31,8 +32,9 @@ TYPES_FROM_CORE_AND_STANDARD_LIBRARIES = [
     "f64",
     "Vec<u8>",
     "String",
-    "str"
+    "str",
 ]
+
 
 def rust_type_to_diesel_type(rust_type: str) -> str:
     """Converts a Rust type to a diesel type, including full crate path.
@@ -74,43 +76,52 @@ def rust_type_to_diesel_type(rust_type: str) -> str:
     raise ValueError(f"Unsupported Rust type: {rust_type}")
 
 
-def data_type_to_absolute_import_path(data_type: str) -> str:
+def data_type_to_absolute_import_path(
+    data_type: Union[str, "StructMetadata"], route: str
+) -> str:
     """Converts a data type to an absolute import path.
 
     Parameters
     ----------
     data_type : str
         The data type to convert.
+    route : str
+        The route of the file.
 
     Returns
     -------
     str
         The converted absolute import path.
-
     """
+    assert isinstance(route, str), (
+        "The route must be a string. " f"The provided route is a {type(route)}."
+    )
+    assert route in ("backend", "web_common", "frontend"), (
+        "The route must be either 'backend', 'web_common', or 'frontend'. "
+        f"The provided route is {route}."
+    )
+
     if data_type in TYPES_FROM_CORE_AND_STANDARD_LIBRARIES:
         return data_type
 
-    if data_type.startswith("Nested"):
-        return data_type
+    if isinstance(data_type, StructMetadata):
+        return data_type.full_path(route)
+
     if "ApiError" in data_type:
         return data_type
 
-    if data_type == "Uuid" or data_type == "uuid::Uuid":
+    if data_type in ("Uuid", "uuid::Uuid"):
         return "uuid::Uuid"
 
     if "uuid::Uuid" in data_type:
         return data_type
 
-    if data_type in [
-        "( i32, i32 )",
-        "PrimaryKey"
-    ]:
+    if data_type in ["( i32, i32 )", "PrimaryKey"]:
         return data_type
 
     if data_type == "NaiveDateTime" or data_type == "chrono::NaiveDateTime":
         return "chrono::NaiveDateTime"
-    
+
     if data_type in [
         "PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>",
         "diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>",
@@ -122,16 +133,25 @@ def data_type_to_absolute_import_path(data_type: str) -> str:
     ]:
         return "Result<usize, gluesql::prelude::Error>"
 
-    if data_type in [
-        "gluesql::prelude::Glue<C>"
-    ]:
+    if data_type in ["gluesql::prelude::Glue<C>"]:
         return "gluesql::prelude::Glue<C>"
 
-    if data_type in [
-        "JPEG"
-    ]:
-        return "JPEG"
-    
+    if data_type == "JPEG":
+        if route == "backend":
+            return "crate::database::diesel_types::JPEG"
+        if route == "web_common":
+            return "crate::types::JPEG"
+        if route == "frontend":
+            return "web_common::types::JPEG"
+
+    if data_type == "Point":
+        if route == "backend":
+            return "postgis_diesel::types::Point"
+        if route == "web_common":
+            return "crate::types::Point"
+        if route == "frontend":
+            return "web_common::types::Point"
+
     raise ValueError(f"Unsupported data type: {data_type}")
 
 
@@ -150,9 +170,44 @@ class AttributeMetadata:
         rc: bool = False,
         lifetime: Optional[str] = None,
     ):
+        assert isinstance(original_name, str), (
+            "The original name must be a string. "
+            f"The provided original name is a {type(original_name)}."
+        )
+        assert isinstance(name, str), (
+            "The name must be a string. " f"The provided name is a {type(name)}."
+        )
+        assert len(name) > 0, "The name must not be empty."
+        assert isinstance(data_type, (str, StructMetadata)), (
+            "The data type must be a string or a StructMetadata. "
+            f"The provided data type is a {type(data_type)}."
+        )
+        assert isinstance(optional, bool), (
+            "The optional flag must be a boolean. "
+            f"The provided optional flag is a {type(optional)}."
+        )
+        assert isinstance(unique, bool), (
+            "The unique flag must be a boolean. "
+            f"The provided unique flag is a {type(unique)}."
+        )
+        assert isinstance(reference, bool), (
+            "The reference flag must be a boolean. "
+            f"The provided reference flag is a {type(reference)}."
+        )
+        assert isinstance(mutable, bool), (
+            "The mutable flag must be a boolean. "
+            f"The provided mutable flag is a {type(mutable)}."
+        )
+        assert isinstance(rc, bool), (
+            "The Rc flag must be a boolean. " f"The provided Rc flag is a {type(rc)}."
+        )
+        assert lifetime is None or isinstance(lifetime, str), (
+            "The lifetime must be a string or None. "
+            f"The provided lifetime is a {type(lifetime)}."
+        )
         self.original_name = original_name
         self.name = name
-        self._data_type = data_type_to_absolute_import_path(data_type) if isinstance(data_type, str) else data_type
+        self._data_type = data_type
         self.optional = optional
         self.unique = unique
         self.reference = reference
@@ -210,7 +265,7 @@ class AttributeMetadata:
             rc=self.rc,
             mutable=self.mutable,
         )
-    
+
     def as_rc(self) -> "AttributeMetadata":
         """Returns the attribute as an Rc."""
         return AttributeMetadata(
@@ -225,34 +280,47 @@ class AttributeMetadata:
             lifetime=self.lifetime,
         )
 
+    def has_backend_type(self) -> bool:
+        """Returns whether the attribute has a backend data type."""
+        return data_type_to_absolute_import_path(
+            self._data_type, route="backend"
+        ) != data_type_to_absolute_import_path(self._data_type, route="frontend")
+
     def is_jpeg(self) -> bool:
         """Returns whether the attribute is an image blob."""
-        return self.data_type() == "JPEG"
+        return self.data_type(route="frontend") == "web_common::types::JPEG"
+
+    def is_point(self) -> bool:
+        """Returns whether the attribute is a point."""
+        return self.data_type(route="frontend") == "web_common::types::Point"
 
     def is_date_type(self) -> bool:
         """Returns whether the attribute is a date type."""
-        return self.data_type() == "chrono::NaiveDateTime"
+        return self.data_type(route="frontend") == "chrono::NaiveDateTime"
 
     def is_undefined_nested_dependencies(self) -> bool:
         """Returns whether the attribute is an undefined nested dependencies."""
-        return not self.has_struct_data_type() and self.data_type().startswith("Nested")
+        return not self.has_struct_data_type() and self._data_type.startswith("Nested")
 
     def has_struct_data_type(self) -> bool:
         """Returns whether the attribute has a struct data type."""
         return isinstance(self._data_type, StructMetadata)
 
-    def format_data_type(self, diesel: bool = False) -> str:
+    def format_data_type(self, route: str, diesel: bool = False) -> str:
         """Returns the formatted data type of the attribute.
 
         Parameters
         ----------
+        route : str
+            The route of the file.
+            Can either be 'backend', 'web_common', or 'frontend'.
         diesel : bool
             Whether to format the data type for the diesel crate.
         """
         if diesel:
             assert not self.has_struct_data_type()
 
-        data_type = self.data_type()
+        data_type = self.data_type(route=route)
 
         if diesel:
             data_type = rust_type_to_diesel_type(data_type)
@@ -278,13 +346,22 @@ class AttributeMetadata:
         return data_type
 
     def raw_data_type(self) -> Union[str, "StructMetadata"]:
+        """Returns the raw data type of the attribute."""
         return self._data_type
 
-    def data_type(self) -> str:
+    def data_type(self, route: str) -> str:
+        """Returns the data type of the attribute.
+
+        Parameters
+        ----------
+        route : str
+            The route of the file.
+            Can either be 'backend', 'web_common', or 'frontend'.
+        """
         if isinstance(self._data_type, StructMetadata):
-            return self._data_type.name
+            return data_type_to_absolute_import_path(self._data_type, route)
         elif isinstance(self._data_type, str):
-            return self._data_type
+            return data_type_to_absolute_import_path(self._data_type, route)
 
         raise ValueError("The data type must be either a string or a StructMetadata.")
 
@@ -305,6 +382,7 @@ class AttributeMetadata:
         )
 
     def human_readable_name(self) -> str:
+        """Returns the human-readable name of the attribute."""
         return " ".join(self.name.split("_")).lower().capitalize()
 
     def implements_serialize(self) -> bool:
@@ -324,8 +402,29 @@ class AttributeMetadata:
     def implements_default(self) -> bool:
         """Returns whether the attribute implements the Default trait."""
         return (
-            not isinstance(self._data_type, StructMetadata)
-            or self._data_type.can_implement_default()
+            isinstance(self._data_type, str)
+            and self._data_type in [
+                "bool",
+                "i8",
+                "i16",
+                "i32",
+                "i64",
+                "i128",
+                "u8",
+                "u16",
+                "u32",
+                "u64",
+                "u128",
+                "f32",
+                "f64",
+                "String",
+                "Vec<u8>",
+                "uuid::Uuid",
+                "chrono::NaiveDateTime",
+                "JPEG",
+            ]
+            or isinstance(self._data_type, StructMetadata)
+            and self._data_type.can_implement_default()
         )
 
     def implements_eq(self) -> bool:
@@ -334,7 +433,22 @@ class AttributeMetadata:
             isinstance(self._data_type, StructMetadata)
             and self._data_type.can_implement_eq()
             or isinstance(self._data_type, str)
-            and self._data_type not in ["f32", "f64"]
+            and self._data_type
+            in [
+                "bool",
+                "i8",
+                "i16",
+                "i32",
+                "i64",
+                "i128",
+                "u8",
+                "u16",
+                "u32",
+                "u64",
+                "u128",
+                "uuid::Uuid",
+                "chrono::NaiveDateTime",
+            ]
         )
 
     def is_creator_user_id(self) -> bool:
@@ -357,7 +471,7 @@ class AttributeMetadata:
         """Returns whether the attribute is the sampled by."""
         return self.name in ("sampled_by",) and (
             (self.has_struct_data_type() and self.raw_data_type().table_name == "users")
-            or self.data_type() == "i32"
+            or self.data_type(route="frontend") == "i32"
         )
 
     def is_inner(self) -> bool:
@@ -378,13 +492,15 @@ class AttributeMetadata:
             The new owner of the attribute.
         """
         new_attribute = AttributeMetadata(
-            self.original_name,
-            self.name,
-            self._data_type,
-            self.optional,
-            self.reference,
-            self.mutable,
-            self.lifetime,
+            original_name=self.original_name,
+            name=self.name,
+            data_type=self._data_type,
+            optional=self.optional,
+            unique=self.unique,
+            reference=self.reference,
+            mutable=self.mutable,
+            rc=self.rc,
+            lifetime=self.lifetime,
         )
         new_attribute.set_owner(owner)
         return new_attribute
@@ -413,6 +529,7 @@ class AttributeMetadata:
         )
 
     def requires_authentication(self) -> bool:
+        """Returns whether the attribute requires authentication."""
         return (
             isinstance(self._data_type, StructMetadata)
             and self._data_type.requires_authentication()
@@ -444,8 +561,9 @@ class AttributeMetadata:
                 "u128",
                 "f32",
                 "f64",
+                "Point",
                 "uuid::Uuid",
-                "chrono::NaiveDateTime"
+                "chrono::NaiveDateTime",
             ]
             or isinstance(self._data_type, StructMetadata)
             and self._data_type.can_implement_copy()
@@ -454,8 +572,8 @@ class AttributeMetadata:
     def implements_clone(self) -> bool:
         """Returns whether the attribute implements the Clone trait."""
         return (
-            self.implements_copy() or 
-            self._data_type
+            self.implements_copy()
+            or self._data_type
             in [
                 "String",
                 "Vec<ApiError>",
@@ -472,30 +590,52 @@ class AttributeMetadata:
         return (
             self._data_type
             in [
+                "u8",
+                "u16",
+                "u32",
+                "u64",
+                "u128",
+                "i8",
+                "i16",
                 "i32",
                 "i64",
-                "f32",
-                "f64",
+                "i128",
                 "chrono::NaiveDateTime",
             ]
             or isinstance(self._data_type, StructMetadata)
             and self._data_type.can_implement_ord()
         )
 
+    def implements_partial_ord(self) -> bool:
+        """Returns whether the attribute implements the PartialOrd trait."""
+        return (
+            self.implements_ord()
+            or self._data_type in ["f32", "f64"]
+            or isinstance(self._data_type, StructMetadata)
+            and self._data_type.can_implement_partial_ord()
+        )
+
     def is_uuid(self) -> bool:
         """Returns whether the attribute is a UUID."""
-        return self.data_type() == "uuid::Uuid"
+        return self.data_type(route="frontend") == "uuid::Uuid"
 
     def is_description(self) -> bool:
         """Returns whether the attribute is a description."""
         # An attribute may be considered a description when its
         # name is either 'notes' or 'description' and has a string
         # data type.
-        return self.name in ("notes", "description") and self.data_type() == "String"
+        return (
+            self.name in ("notes", "description")
+            and self.data_type(route="frontend") == "String"
+        )
 
     def is_color(self) -> bool:
         """Returns whether the attribute is a color."""
-        return self.name in ("color",) and self.data_type() == "Color" and self.has_struct_data_type()
+        return (
+            self.name in ("color",)
+            and self.data_type(route="frontend") == "Color"
+            and self.has_struct_data_type()
+        )
 
     def normalized_name(self) -> str:
         """Returns the name of the attribute eventually without the _id suffix."""
@@ -508,10 +648,10 @@ class AttributeMetadata:
         return "".join(word.capitalize() for word in self.normalized_name().split("_"))
 
     def __repr__(self) -> str:
-        return f"AttributeMetadata({self.name}, {self.data_type()}, optional={self.optional})"
+        return f"AttributeMetadata({self.name}, {self.data_type(route='frontend')}, optional={self.optional})"
 
     def __hash__(self) -> int:
-        return hash((self.name, self.data_type()))
+        return hash((self.name, self.data_type(route="frontend")))
 
     def get_attribute_path(self, attribute: "AttributeMetadata") -> str:
         """Returns the path to the attribute.
@@ -648,8 +788,18 @@ class MethodDefinition:
     def include_self_ref(self):
         """Whether to include the self argument in the method."""
         assert len(self.arguments) == 0
+        assert self.owner is not None, (
+            "The owner of the method must be set before including the self argument. "
+            f"The method is {self.name}."
+        )
         self.arguments.append(
-            AttributeMetadata("self", "self", self.owner, False, reference=True)
+            AttributeMetadata(
+                original_name="self",
+                name="self",
+                data_type=self.owner,
+                optional=False,
+                reference=True,
+            )
         )
 
     def include_self(self):
@@ -746,7 +896,8 @@ class MethodDefinition:
         result = any(
             argument.name == "self"
             and argument.reference
-            and argument.data_type() == self.owner.name
+            and argument.has_struct_data_type()
+            and argument.raw_data_type().name == self.owner.name
             for argument in self.arguments
         )
         if not result:
@@ -754,7 +905,7 @@ class MethodDefinition:
                 if argument.name == "self" and argument.reference:
                     raise RuntimeError(
                         f"The method has a reference to self, but the owner is {self.owner.name} "
-                        f"while the argument data type is {argument.data_type()}."
+                        f"while the argument data type is {argument.data_type(route='frontend')}. "
                         f"The method is {self.name}."
                     )
 
@@ -780,6 +931,8 @@ class MethodDefinition:
         document : File
             The document to write the method header to.
         """
+        route = infer_route_from_document(document)
+
         document.write(f"    /// {self.summary}\n")
 
         if self.argument_descriptions:
@@ -803,10 +956,12 @@ class MethodDefinition:
             if argument.name == "self" and argument.reference:
                 document.write("        &self,\n")
                 continue
-            document.write(f"{argument.name}: {argument.format_data_type()},\n")
+            document.write(
+                f"{argument.name}: {argument.format_data_type(route=route)},\n"
+            )
         document.write(")")
         if self.return_type is not None:
-            document.write(f" -> {self.return_type.format_data_type()}")
+            document.write(f" -> {self.return_type.format_data_type(route=route)}")
 
 
 class StructMetadata:
@@ -829,7 +984,6 @@ class StructMetadata:
         """Initializes the table metadata."""
         assert StructMetadata.table_metadata is None
         StructMetadata.table_metadata = find_foreign_keys()
-
 
     def __init__(self, struct_name: str, table_name: str):
         self.name = struct_name
@@ -863,7 +1017,7 @@ class StructMetadata:
             f"The provided table name is {index.table_name}, and the table name of the struct is {self.table_name}."
         )
         self._primary_search_index = index
-    
+
     def into_rc(self) -> "StructMetadata":
         """Returns the struct as an Rc."""
         for attribute in self.attributes:
@@ -876,9 +1030,33 @@ class StructMetadata:
         """Returns whether the struct has a primary search index."""
         return self._primary_search_index is not None
 
-    def has_jpeg_attribute(self) -> bool:
-        """Returns whether the struct has a JPEG attribute."""
-        return any(attribute.is_jpeg() for attribute in self.attributes)
+    def full_path(self, route: str) -> str:
+        """Returns the full path of the struct.
+
+        Parameters
+        ----------
+        route : str
+            The route of the file.
+            Can either be 'backend', 'web_common', or 'frontend'.
+        """
+        if (
+            self.is_filter_variant()
+            or self.is_new_variant()
+            or self.is_update_variant()
+        ):
+            crate = "crate" if route == "web_common" else "web_common"
+            if self.is_filter_variant():
+                submodule = "filter_variants"
+            elif self.is_new_variant():
+                submodule = "new_variants"
+            elif self.is_update_variant():
+                submodule = "update_variants"
+            return f"{crate}::database::{submodule}::{self.name}"
+
+        crate = "crate" if route in ("backend", "web_common") else "web_common"
+        if self.is_nested():
+            return f"{crate}::database::nested_variants::{self.name}"
+        return f"{crate}::database::flat_variants::{self.name}"
 
     def _retro_fix_zero_alias_number(self, table_name: str, alias_number: int):
         assert isinstance(alias_number, int)
@@ -893,7 +1071,10 @@ class StructMetadata:
                 assert not other_index.has_alias_number()
                 other_index.set_alias_number(0)
                 matches_found += 1
-            if isinstance(other_index, DerivedPGIndex) and other_index.is_second_order():
+            if (
+                isinstance(other_index, DerivedPGIndex)
+                and other_index.is_second_order()
+            ):
                 if other_index.index.index_table_name() == table_name:
                     assert not other_index.has_inner_alias_number()
                     other_index.set_inner_alias_number(0)
@@ -937,7 +1118,7 @@ class StructMetadata:
             for other_index in self.get_all_search_indices()
         )
 
-        if alias_number> 0:
+        if alias_number > 0:
             index.set_alias_number(alias_number)
         self._retro_fix_zero_alias_number(index.index_table_name(), alias_number)
 
@@ -989,7 +1170,10 @@ class StructMetadata:
 
         # We check that no other second-order derived search index searches over the same foreign key.
         for other_index in self._second_order_derived_search_indices:
-            assert other_index.index != index.index or other_index.foreign_key_id != index.foreign_key_id, (
+            assert (
+                other_index.index != index.index
+                or other_index.foreign_key_id != index.foreign_key_id
+            ), (
                 "The index searches over a table that is already covered by another "
                 "second-order derived search index. The current struct is "
                 f"{self.name}, and the provided index searches over the table {index.table_name}'s "
@@ -1013,7 +1197,8 @@ class StructMetadata:
             other_index.index_table_name() == index.index.index_table_name()
             for other_index in self.get_all_search_indices()
         ) + sum(
-            second_other_index.index.index_table_name() == index.index.index_table_name()
+            second_other_index.index.index_table_name()
+            == index.index.index_table_name()
             for second_other_index in self._second_order_derived_search_indices
         )
 
@@ -1022,7 +1207,9 @@ class StructMetadata:
         self._retro_fix_zero_alias_number(index.index_table_name(), alias_number)
         if inner_alias_number > 0:
             index.set_inner_alias_number(inner_alias_number)
-        self._retro_fix_zero_alias_number(index.index.index_table_name(), inner_alias_number)
+        self._retro_fix_zero_alias_number(
+            index.index.index_table_name(), inner_alias_number
+        )
 
         self._second_order_derived_search_indices.append(index)
 
@@ -1066,7 +1253,7 @@ class StructMetadata:
 
     def format_diesel_search_aliases(self) -> str:
         """Returns the diesel search aliases for the struct.
-        
+
         Implementative details
         ----------------------
         In settings such as the multi-index search queries, we execute several
@@ -1087,12 +1274,16 @@ class StructMetadata:
                     table_name = index.index.index_table_name()
                     if table_name not in table_alias_numbers:
                         table_alias_numbers[table_name] = []
-                    table_alias_numbers[table_name].append(index.get_inner_alias_number())
-        
+                    table_alias_numbers[table_name].append(
+                        index.get_inner_alias_number()
+                    )
+
         if len(table_alias_numbers) == 0:
             return ""
-        
-        assert all(len(alias_numbers) > 1 for alias_numbers in table_alias_numbers.values())
+
+        assert all(
+            len(alias_numbers) > 1 for alias_numbers in table_alias_numbers.values()
+        )
 
         # We then create the aliases for the tables associated to the foreign keys
         # that are used in the search indices that refer to the same table.
@@ -1109,12 +1300,14 @@ class StructMetadata:
                     f"{table_name}{alias_number}" for alias_number in alias_numbers
                 ]
                 schema_aliases = ", ".join(
-                    [f"crate::database::schema::{table_name} as {new_column_name}" for new_column_name in new_table_names]
+                    [
+                        f"crate::database::schema::{table_name} as {new_column_name}"
+                        for new_column_name in new_table_names
+                    ]
                 )
                 aliases += f"let ({', '.join(new_table_names)}) = diesel::alias!({schema_aliases});\n"
-        
-        return aliases
 
+        return aliases
 
     def format_diesel_search_filter(self, query: str, similarity_method: str) -> str:
         """Returns the index in Diesel format.
@@ -1159,10 +1352,12 @@ class StructMetadata:
         for i, index in enumerate(self.get_all_search_indices()):
             if i > 0:
                 search_order += "    +\n"
-            search_order += index.format_distance_operator_diesel(query, similarity_method)
+            search_order += index.format_distance_operator_diesel(
+                query, similarity_method
+            )
 
         return search_order
-    
+
     def format_diesel_search_order(self, query: str, similarity_method: str) -> str:
         """Returns the index in Diesel format.
 
@@ -1178,7 +1373,6 @@ class StructMetadata:
         ), "The struct must have derived search indices or a primary search index to format the diesel search order."
 
         return f".order({self.format_diesel_search_score(query, similarity_method)})"
-        
 
     def backend_methods(self) -> List[MethodDefinition]:
         """Returns the methods of the struct."""
@@ -1295,9 +1489,7 @@ class StructMetadata:
         derives_deny_list: Optional[List[str]] = None,
     ):
         """Writes the struct to the file."""
-        if diesel is not None:
-            if diesel not in ["tables", "views"]:
-                raise ValueError("The table type must be either 'tables' or 'views'.")
+        route = infer_route_from_document(file)
 
         if derives_deny_list is None:
             derives_deny_list = []
@@ -1311,20 +1503,22 @@ class StructMetadata:
         )
         file.write(f"#[derive({joined_derives})]\n")
         if diesel is not None:
-            file.write(f"#[diesel(table_name = crate::database::schema::{self.table_name})]\n")
+            file.write(
+                f"#[diesel(table_name = crate::database::schema::{self.table_name})]\n"
+            )
 
         # For each of the attribute that is a foreign key, we add the
         # #[diesel(belongs_to({foreign struct name}, foreign_key = {attribute name}))]
         # decorator.
         # if diesel is not None:
-            # Diesel for the time being only supports one single foreign key
-            # per table in the belongs_to attribute. For this reason, we skip
-            # the keys associated to duplicated foreign keys.
+        # Diesel for the time being only supports one single foreign key
+        # per table in the belongs_to attribute. For this reason, we skip
+        # the keys associated to duplicated foreign keys.
 
-            # for belonging_struct, attribute in self.get_belonging_structs(): 
-            #     file.write(
-            #         f"#[diesel(belongs_to(crate::database::flat_variants::{belonging_struct.table_name}::{belonging_struct.name}, foreign_key = {attribute.name}))]\n"
-            #     )
+        # for belonging_struct, attribute in self.get_belonging_structs():
+        #     file.write(
+        #         f"#[diesel(belongs_to(crate::database::flat_variants::{belonging_struct.table_name}::{belonging_struct.name}, foreign_key = {attribute.name}))]\n"
+        #     )
 
         if diesel is not None:
             file.write(
@@ -1335,15 +1529,23 @@ class StructMetadata:
             file.write(f"#[{decorator}]\n")
         file.write(f"pub struct {self.name} {{\n")
         for attribute in self.attributes:
-            file.write(f"    pub {attribute.name}: {attribute.format_data_type()},\n")
+            file.write(
+                f"    pub {attribute.name}: {attribute.format_data_type(route=route)},\n"
+            )
         file.write("}\n\n")
 
         # Next, we always implement the Send and Sync traits for the struct.
         file.write(f"unsafe impl Send for {self.name} {{}}\n")
         file.write(f"unsafe impl Sync for {self.name} {{}}\n")
-        
+
+    def is_filter_variant(self) -> bool:
+        """Returns whether the struct is a filter variant."""
+        return self.name.endswith("Filter") and all(
+            attribute.optional for attribute in self.attributes
+        )
 
     def is_new_variant(self) -> bool:
+        """Returns whether the struct is a new variant."""
         return (
             self.is_insertable()
             and self._flat_variant is not None
@@ -1351,6 +1553,7 @@ class StructMetadata:
         )
 
     def is_update_variant(self) -> bool:
+        """Returns whether the struct is an update variant."""
         return self.is_updatable() and (
             (not self.has_uuid_primary_key())
             and self._flat_variant is not None
@@ -1519,7 +1722,7 @@ class StructMetadata:
         """Returns the description attribute if it exists."""
         if self._flat_variant is not None:
             return self._flat_variant.get_description_attribute()
-        
+
         for attribute in self.attributes:
             if attribute.is_description():
                 return attribute
@@ -1538,10 +1741,6 @@ class StructMetadata:
     def is_nested(self) -> bool:
         """Returns whether the struct is nested."""
         return any(attribute.has_struct_data_type() for attribute in self.attributes)
-
-    def contains_nested_structs(self) -> bool:
-        """Returns whether the struct contains nested structs."""
-        return any(attribute.has_struct_data_type() and attribute.raw_data_type().is_nested() for attribute in self.attributes)
 
     def add_attribute(self, attribute_metadata: AttributeMetadata):
         """Adds an attribute to the struct.
@@ -1645,7 +1844,7 @@ class StructMetadata:
             The derive to add to the struct.
         """
         self._derives.append(derive)
-    
+
     def contains_optional_fields(self) -> bool:
         """Returns whether the struct contains optional fields."""
         return any(attribute.optional for attribute in self.attributes)
@@ -1832,9 +2031,11 @@ class StructMetadata:
         derives = self._derives.copy()
         if self.can_implement_eq() and "Eq" not in self._derives:
             derives.append("Eq")
+
         if "PartialEq" not in self._derives:
             derives.append("PartialEq")
-        if "PartialOrd" not in self._derives:
+
+        if self.can_implement_partial_ord() and "PartialOrd" not in self._derives:
             derives.append("PartialOrd")
         if "Debug" not in self._derives:
             derives.append("Debug")
@@ -1844,9 +2045,17 @@ class StructMetadata:
             derives.append("Copy")
         if self.can_implement_ord() and "Ord" not in self._derives:
             derives.append("Ord")
-        if self.can_implement_serialize() and "Serialize" not in self._derives and "serde::Serialize" not in self._derives:
+        if (
+            self.can_implement_serialize()
+            and "Serialize" not in self._derives
+            and "serde::Serialize" not in self._derives
+        ):
             derives.append("serde::Serialize")
-        if self.can_implement_deserialize() and "Deserialize" not in self._derives and "serde::Deserialize" not in self._derives:
+        if (
+            self.can_implement_deserialize()
+            and "Deserialize" not in self._derives
+            and "serde::Deserialize" not in self._derives
+        ):
             derives.append("serde::Deserialize")
         if self.can_implement_default() and "Default" not in self._derives:
             derives.append("Default")
@@ -1888,6 +2097,10 @@ class StructMetadata:
     def can_implement_ord(self) -> bool:
         """Returns whether the struct can implement the Ord trait."""
         return all(attribute.implements_ord() for attribute in self.attributes)
+
+    def can_implement_partial_ord(self) -> bool:
+        """Returns whether the struct can implement the PartialOrd trait."""
+        return all(attribute.implements_partial_ord() for attribute in self.attributes)
 
     def can_implement_eq(self) -> bool:
         """Returns whether the struct can implement the Eq trait."""
@@ -2045,7 +2258,9 @@ class StructMetadata:
         """Returns the formatted primary key data types."""
         keys = self.get_primary_keys()
 
-        formatted_keys = ", ".join(attribute.format_data_type() for attribute in keys)
+        formatted_keys = ", ".join(
+            attribute.format_data_type(route="frontend") for attribute in keys
+        )
 
         if len(keys) > 1:
             return f"( {formatted_keys} )"
@@ -2075,7 +2290,10 @@ class StructMetadata:
             return self._flat_variant.get_public_column()
 
         for attribute in self.attributes:
-            if attribute.data_type() == "bool" and attribute.name == "public":
+            if (
+                attribute.data_type(route="frontend") == "bool"
+                and attribute.name == "public"
+            ):
                 return attribute
 
         return None
@@ -2150,11 +2368,10 @@ class StructMetadata:
                 return attribute.get_attribute_path(needle)
             except ValueError:
                 continue
-        
+
         raise ValueError(
             f"The attribute {needle.name} is not in the struct {self.name}."
         )
-
 
     def get_foreign_key_flat_variant(
         self, foreign_key: AttributeMetadata
@@ -2197,6 +2414,9 @@ class StructMetadata:
         """Returns whether the struct has a filter variant."""
         if self._flat_variant is not None:
             return self._flat_variant.has_filter_variant()
+
+        if self.is_filter_variant():
+            assert self._filter_variant is None
 
         return self._filter_variant is not None
 

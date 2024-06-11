@@ -59,11 +59,11 @@ def extract_structs() -> List[StructMetadata]:
                     name=column.column_name,
                     data_type=postgres_type_to_rust_type(column.data_type),
                     optional=column.nullable,
-                    unique=[
+                    unique=any([
                         unique_constraint[0] == column.column_name
                         for unique_constraint in unique_constraints
                         if len(unique_constraints) == 1
-                    ]
+                    ])
                 )
             )
         

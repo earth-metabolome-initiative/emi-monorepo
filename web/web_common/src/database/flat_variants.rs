@@ -21,7 +21,7 @@ pub trait Colorable {
     fn color(&self) -> Option<&str>;
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct BioOttRank {
     pub id: i32,
     pub name: String,
@@ -65,7 +65,7 @@ impl BioOttRank {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: BioOttRank,
+self: crate::database::flat_variants::BioOttRank,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -252,7 +252,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct BioOttTaxonItem {
     pub id: i32,
     pub name: String,
@@ -360,7 +360,7 @@ impl BioOttTaxonItem {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: BioOttTaxonItem,
+self: crate::database::flat_variants::BioOttTaxonItem,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -654,7 +654,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Color {
     pub id: i32,
     pub name: String,
@@ -696,7 +696,7 @@ impl Color {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Color,
+self: crate::database::flat_variants::Color,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -875,7 +875,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Country {
     pub id: i32,
     pub iso: String,
@@ -919,7 +919,7 @@ impl Country {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Country,
+self: crate::database::flat_variants::Country,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -1103,7 +1103,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct DerivedSample {
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
@@ -1153,7 +1153,7 @@ impl DerivedSample {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: DerivedSample,
+self: crate::database::flat_variants::DerivedSample,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -1388,7 +1388,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct DocumentFormat {
     pub id: i32,
     pub extension: String,
@@ -1434,7 +1434,7 @@ impl DocumentFormat {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: DocumentFormat,
+self: crate::database::flat_variants::DocumentFormat,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -1626,7 +1626,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct FontAwesomeIcon {
     pub id: i32,
     pub name: String,
@@ -1666,7 +1666,7 @@ impl FontAwesomeIcon {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: FontAwesomeIcon,
+self: crate::database::flat_variants::FontAwesomeIcon,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -1840,7 +1840,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct LoginProvider {
     pub id: i32,
     pub name: String,
@@ -1890,7 +1890,7 @@ impl LoginProvider {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: LoginProvider,
+self: crate::database::flat_variants::LoginProvider,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -2092,7 +2092,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Material {
     pub id: i32,
     pub name: String,
@@ -2136,7 +2136,7 @@ impl Material {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Material,
+self: crate::database::flat_variants::Material,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -2323,7 +2323,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NameplateCategory {
     pub id: i32,
     pub name: String,
@@ -2371,7 +2371,7 @@ impl NameplateCategory {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: NameplateCategory,
+self: crate::database::flat_variants::NameplateCategory,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -2568,12 +2568,13 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Nameplate {
     pub id: i32,
     pub barcode: String,
     pub project_id: i32,
     pub category_id: i32,
+    pub geolocation: crate::types::Point,
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
@@ -2607,6 +2608,7 @@ impl Nameplate {
             gluesql::core::ast_builder::text(self.barcode),
             gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.category_id),
+            gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
             gluesql::core::ast_builder::num(self.updated_by),
@@ -2618,13 +2620,13 @@ impl Nameplate {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Nameplate,
+self: crate::database::flat_variants::Nameplate,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
         table("nameplates")
             .insert()
-            .columns("id, barcode, project_id, category_id, created_by, created_at, updated_by, updated_at")
+            .columns("id, barcode, project_id, category_id, geolocation, created_by, created_at, updated_by, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -2650,7 +2652,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("nameplates")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, barcode, project_id, category_id, created_by, created_at, updated_by, updated_at")
+            .project("id, barcode, project_id, category_id, geolocation, created_by, created_at, updated_by, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -2722,6 +2724,7 @@ connection: &mut gluesql::prelude::Glue<C>,
 .set("barcode", gluesql::core::ast_builder::text(self.barcode))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("category_id", gluesql::core::ast_builder::num(self.category_id))        
+.set("geolocation", gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
 .set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
@@ -2773,7 +2776,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("nameplates")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, barcode, project_id, category_id, created_by, created_at, updated_by, updated_at")
+           .project("id, barcode, project_id, category_id, geolocation, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2803,7 +2806,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("nameplates")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, barcode, project_id, category_id, created_by, created_at, updated_by, updated_at")
+           .project("id, barcode, project_id, category_id, geolocation, created_by, created_at, updated_by, updated_at")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -2832,6 +2835,10 @@ connection: &mut gluesql::prelude::Glue<C>,
                 gluesql::prelude::Value::I32(category_id) => category_id.clone(),
                 _ => unreachable!("Expected I32")
             },
+            geolocation: match row.get("geolocation").unwrap() {
+                gluesql::prelude::Value::Point(geolocation) => geolocation.clone().into(),
+                _ => unreachable!("Expected Bytea"),
+            },
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
@@ -2851,7 +2858,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Notification {
     pub id: i32,
     pub user_id: i32,
@@ -2897,7 +2904,7 @@ impl Notification {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Notification,
+self: crate::database::flat_variants::Notification,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -3089,7 +3096,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct ObservationSubject {
     pub id: i32,
     pub name: String,
@@ -3133,7 +3140,7 @@ impl ObservationSubject {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: ObservationSubject,
+self: crate::database::flat_variants::ObservationSubject,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -3320,7 +3327,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Observation {
     pub id: uuid::Uuid,
     pub parent_observation_id: Option<uuid::Uuid>,
@@ -3333,7 +3340,7 @@ pub struct Observation {
     pub sample_id: Option<uuid::Uuid>,
     pub subject_id: i32,
     pub notes: Option<String>,
-    pub picture: JPEG,
+    pub picture: crate::types::JPEG,
 }
 
 unsafe impl Send for Observation {}
@@ -3400,7 +3407,7 @@ impl Observation {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Observation,
+self: crate::database::flat_variants::Observation,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -3672,7 +3679,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct OrganismBioOttTaxonItem {
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
@@ -3714,7 +3721,7 @@ impl OrganismBioOttTaxonItem {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: OrganismBioOttTaxonItem,
+self: crate::database::flat_variants::OrganismBioOttTaxonItem,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -3898,7 +3905,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Organism {
     pub id: uuid::Uuid,
     pub host_organism_id: Option<uuid::Uuid>,
@@ -3961,7 +3968,7 @@ impl Organism {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Organism,
+self: crate::database::flat_variants::Organism,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -4214,7 +4221,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Organization {
     pub id: i32,
     pub name: String,
@@ -4263,7 +4270,7 @@ impl Organization {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Organization,
+self: crate::database::flat_variants::Organization,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -4459,7 +4466,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct PermanenceCategory {
     pub id: i32,
     pub name: String,
@@ -4503,7 +4510,7 @@ impl PermanenceCategory {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: PermanenceCategory,
+self: crate::database::flat_variants::PermanenceCategory,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -4690,7 +4697,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct ProjectState {
     pub id: i32,
     pub name: String,
@@ -4734,7 +4741,7 @@ impl ProjectState {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: ProjectState,
+self: crate::database::flat_variants::ProjectState,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -4921,7 +4928,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Project {
     pub id: i32,
     pub name: String,
@@ -5002,7 +5009,7 @@ impl Project {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Project,
+self: crate::database::flat_variants::Project,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -5335,7 +5342,7 @@ impl ProjectsTeamsRoleInvitation {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: ProjectsTeamsRoleInvitation,
+self: crate::database::flat_variants::ProjectsTeamsRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -5568,7 +5575,7 @@ impl ProjectsTeamsRoleRequest {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: ProjectsTeamsRoleRequest,
+self: crate::database::flat_variants::ProjectsTeamsRoleRequest,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -5801,7 +5808,7 @@ impl ProjectsTeamsRole {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: ProjectsTeamsRole,
+self: crate::database::flat_variants::ProjectsTeamsRole,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -6034,7 +6041,7 @@ impl ProjectsUsersRoleInvitation {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: ProjectsUsersRoleInvitation,
+self: crate::database::flat_variants::ProjectsUsersRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -6267,7 +6274,7 @@ impl ProjectsUsersRoleRequest {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: ProjectsUsersRoleRequest,
+self: crate::database::flat_variants::ProjectsUsersRoleRequest,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -6500,7 +6507,7 @@ impl ProjectsUsersRole {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: ProjectsUsersRole,
+self: crate::database::flat_variants::ProjectsUsersRole,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -6689,7 +6696,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Role {
     pub id: i32,
     pub name: String,
@@ -6733,7 +6740,7 @@ impl Role {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Role,
+self: crate::database::flat_variants::Role,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -6920,7 +6927,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct SampleBioOttTaxonItem {
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
@@ -6962,7 +6969,7 @@ impl SampleBioOttTaxonItem {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: SampleBioOttTaxonItem,
+self: crate::database::flat_variants::SampleBioOttTaxonItem,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -7146,7 +7153,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct SampleContainerCategory {
     pub id: i32,
     pub name: String,
@@ -7196,7 +7203,7 @@ impl SampleContainerCategory {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: SampleContainerCategory,
+self: crate::database::flat_variants::SampleContainerCategory,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -7398,7 +7405,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct SampleContainer {
     pub id: i32,
     pub barcode: String,
@@ -7448,7 +7455,7 @@ impl SampleContainer {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: SampleContainer,
+self: crate::database::flat_variants::SampleContainer,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -7681,7 +7688,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct SampleState {
     pub id: i32,
     pub name: String,
@@ -7725,7 +7732,7 @@ impl SampleState {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: SampleState,
+self: crate::database::flat_variants::SampleState,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -7912,7 +7919,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Sample {
     pub id: uuid::Uuid,
     pub container_id: i32,
@@ -7969,7 +7976,7 @@ impl Sample {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Sample,
+self: crate::database::flat_variants::Sample,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -8254,7 +8261,7 @@ impl Spectra {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Spectra,
+self: crate::database::flat_variants::Spectra,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -8426,7 +8433,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct SpectraCollection {
     pub id: i32,
     pub notes: Option<String>,
@@ -8477,7 +8484,7 @@ impl SpectraCollection {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: SpectraCollection,
+self: crate::database::flat_variants::SpectraCollection,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -8709,7 +8716,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct TeamState {
     pub id: i32,
     pub name: String,
@@ -8753,7 +8760,7 @@ impl TeamState {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: TeamState,
+self: crate::database::flat_variants::TeamState,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -8940,7 +8947,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Team {
     pub id: i32,
     pub name: String,
@@ -8999,7 +9006,7 @@ impl Team {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Team,
+self: crate::database::flat_variants::Team,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -9295,7 +9302,7 @@ impl TeamsTeamsRoleInvitation {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: TeamsTeamsRoleInvitation,
+self: crate::database::flat_variants::TeamsTeamsRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -9528,7 +9535,7 @@ impl TeamsUsersRoleInvitation {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: TeamsUsersRoleInvitation,
+self: crate::database::flat_variants::TeamsUsersRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -9761,7 +9768,7 @@ impl TeamsUsersRoleRequest {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: TeamsUsersRoleRequest,
+self: crate::database::flat_variants::TeamsUsersRoleRequest,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -9994,7 +10001,7 @@ impl TeamsUsersRole {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: TeamsUsersRole,
+self: crate::database::flat_variants::TeamsUsersRole,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -10183,7 +10190,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct Unit {
     pub id: i32,
     pub name: String,
@@ -10227,7 +10234,7 @@ impl Unit {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: Unit,
+self: crate::database::flat_variants::Unit,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -10414,7 +10421,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UserEmail {
     pub id: i32,
     pub email: String,
@@ -10460,7 +10467,7 @@ impl UserEmail {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: UserEmail,
+self: crate::database::flat_variants::UserEmail,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -10652,7 +10659,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         }
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct User {
     pub id: i32,
     pub first_name: String,
@@ -10662,7 +10669,7 @@ pub struct User {
     pub organization_id: Option<i32>,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
-    pub picture: JPEG,
+    pub picture: crate::types::JPEG,
 }
 
 unsafe impl Send for User {}
@@ -10717,7 +10724,7 @@ impl User {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: User,
+self: crate::database::flat_variants::User,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -11009,7 +11016,7 @@ impl UsersUsersRoleInvitation {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: UsersUsersRoleInvitation,
+self: crate::database::flat_variants::UsersUsersRoleInvitation,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -11242,7 +11249,7 @@ impl UsersUsersRoleRequest {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: UsersUsersRoleRequest,
+self: crate::database::flat_variants::UsersUsersRoleRequest,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;
@@ -11475,7 +11482,7 @@ impl UsersUsersRole {
     ///
     /// * `connection` - The connection to the database.
     pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut> (
-self: UsersUsersRole,
+self: crate::database::flat_variants::UsersUsersRole,
 connection: &mut gluesql::prelude::Glue<C>,
 ) -> Result<usize, gluesql::prelude::Error>    {
         use gluesql::core::ast_builder::*;

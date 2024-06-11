@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -49,8 +46,8 @@ pub struct Team {
 
 unsafe impl Send for Team {}
 unsafe impl Sync for Team {}
-impl From<Team> for web_common::database::flat_variants::Team {
-    fn from(item: Team) -> Self {
+impl From<web_common::database::flat_variants::Team> for crate::database::flat_variants::Team {
+    fn from(item: web_common::database::flat_variants::Team) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -67,8 +64,8 @@ impl From<Team> for web_common::database::flat_variants::Team {
     }
 }
 
-impl From<web_common::database::flat_variants::Team> for Team {
-    fn from(item: web_common::database::flat_variants::Team) -> Self {
+impl From<crate::database::flat_variants::Team> for web_common::database::flat_variants::Team {
+    fn from(item: crate::database::flat_variants::Team) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -101,7 +98,7 @@ impl Team {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -144,7 +141,7 @@ impl Team {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -220,7 +217,7 @@ impl Team {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -379,7 +376,7 @@ impl Team {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -428,7 +425,7 @@ impl Team {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -478,7 +475,7 @@ impl Team {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -588,7 +585,7 @@ impl Team {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -637,7 +634,7 @@ impl Team {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -687,7 +684,7 @@ impl Team {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&TeamFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

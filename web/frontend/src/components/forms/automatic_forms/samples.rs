@@ -12,14 +12,14 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SampleBuilder {
     pub id: Option<uuid::Uuid>,
     pub notes: Option<Rc<String>>,
-    pub container: Option<Rc<NestedSampleContainer>>,
-    pub project: Option<Rc<NestedProject>>,
-    pub sampled_by: Option<Rc<NestedUser>>,
-    pub state: Option<Rc<NestedSampleState>>,
+    pub container: Option<Rc<web_common::database::nested_variants::NestedSampleContainer>>,
+    pub project: Option<Rc<web_common::database::nested_variants::NestedProject>>,
+    pub sampled_by: Option<Rc<web_common::database::nested_variants::NestedUser>>,
+    pub state: Option<Rc<web_common::database::nested_variants::NestedSampleState>>,
     pub errors_notes: Vec<ApiError>,
     pub errors_container: Vec<ApiError>,
     pub errors_project: Vec<ApiError>,
@@ -49,13 +49,13 @@ impl Default for SampleBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum SampleActions {
     SetNotes(Option<String>),
-    SetContainer(Option<Rc<NestedSampleContainer>>),
-    SetProject(Option<Rc<NestedProject>>),
-    SetSampledBy(Option<Rc<NestedUser>>),
-    SetState(Option<Rc<NestedSampleState>>),
+    SetContainer(Option<Rc<web_common::database::nested_variants::NestedSampleContainer>>),
+    SetProject(Option<Rc<web_common::database::nested_variants::NestedProject>>),
+    SetSampledBy(Option<Rc<web_common::database::nested_variants::NestedUser>>),
+    SetState(Option<Rc<web_common::database::nested_variants::NestedSampleState>>),
 }
 
 impl FromOperation for SampleActions {
@@ -274,27 +274,36 @@ pub fn create_sample_form(props: &CreateSampleFormProp) -> Html {
     ));
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
-    let set_container =
-        builder_dispatch.apply_callback(|container: Option<Rc<NestedSampleContainer>>| {
+    let set_container = builder_dispatch.apply_callback(
+        |container: Option<Rc<web_common::database::nested_variants::NestedSampleContainer>>| {
             SampleActions::SetContainer(container)
-        });
-    let set_project = builder_dispatch
-        .apply_callback(|project: Option<Rc<NestedProject>>| SampleActions::SetProject(project));
-    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<Rc<NestedUser>>| {
-        SampleActions::SetSampledBy(sampled_by)
-    });
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<Rc<NestedSampleState>>| SampleActions::SetState(state));
+        },
+    );
+    let set_project = builder_dispatch.apply_callback(
+        |project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
+            SampleActions::SetProject(project)
+        },
+    );
+    let set_sampled_by = builder_dispatch.apply_callback(
+        |sampled_by: Option<Rc<web_common::database::nested_variants::NestedUser>>| {
+            SampleActions::SetSampledBy(sampled_by)
+        },
+    );
+    let set_state = builder_dispatch.apply_callback(
+        |state: Option<Rc<web_common::database::nested_variants::NestedSampleState>>| {
+            SampleActions::SetState(state)
+        },
+    );
     html! {
         <BasicForm<NewSample>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <Datalist<NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" scanner={false} />
-            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<NestedUser, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" scanner={false} />
-            <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedUser, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
         </BasicForm<NewSample>>
     }
 }
@@ -312,27 +321,36 @@ pub fn update_sample_form(props: &UpdateSampleFormProp) -> Html {
     named_requests.push(ComponentMessage::get::<NewSample>(props.id.into()));
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| SampleActions::SetNotes(notes));
-    let set_container =
-        builder_dispatch.apply_callback(|container: Option<Rc<NestedSampleContainer>>| {
+    let set_container = builder_dispatch.apply_callback(
+        |container: Option<Rc<web_common::database::nested_variants::NestedSampleContainer>>| {
             SampleActions::SetContainer(container)
-        });
-    let set_project = builder_dispatch
-        .apply_callback(|project: Option<Rc<NestedProject>>| SampleActions::SetProject(project));
-    let set_sampled_by = builder_dispatch.apply_callback(|sampled_by: Option<Rc<NestedUser>>| {
-        SampleActions::SetSampledBy(sampled_by)
-    });
-    let set_state = builder_dispatch
-        .apply_callback(|state: Option<Rc<NestedSampleState>>| SampleActions::SetState(state));
+        },
+    );
+    let set_project = builder_dispatch.apply_callback(
+        |project: Option<Rc<web_common::database::nested_variants::NestedProject>>| {
+            SampleActions::SetProject(project)
+        },
+    );
+    let set_sampled_by = builder_dispatch.apply_callback(
+        |sampled_by: Option<Rc<web_common::database::nested_variants::NestedUser>>| {
+            SampleActions::SetSampledBy(sampled_by)
+        },
+    );
+    let set_state = builder_dispatch.apply_callback(
+        |state: Option<Rc<web_common::database::nested_variants::NestedSampleState>>| {
+            SampleActions::SetState(state)
+        },
+    );
     html! {
         <BasicForm<NewSample>
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <Datalist<NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" scanner={false} />
-            <Datalist<NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<NestedUser, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" scanner={false} />
-            <Datalist<NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSampleContainer, false> builder={set_container} optional={false} errors={builder_store.errors_container.clone()} value={builder_store.container.clone()} label="Container" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedUser, false> builder={set_sampled_by} optional={false} errors={builder_store.errors_sampled_by.clone()} value={builder_store.sampled_by.clone()} label="Sampled by" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSampleState, false> builder={set_state} optional={false} errors={builder_store.errors_state.clone()} value={builder_store.state.clone()} label="State" scanner={false} />
         </BasicForm<NewSample>>
     }
 }

@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -43,8 +40,10 @@ pub struct ObservationSubject {
 
 unsafe impl Send for ObservationSubject {}
 unsafe impl Sync for ObservationSubject {}
-impl From<ObservationSubject> for web_common::database::flat_variants::ObservationSubject {
-    fn from(item: ObservationSubject) -> Self {
+impl From<web_common::database::flat_variants::ObservationSubject>
+    for crate::database::flat_variants::ObservationSubject
+{
+    fn from(item: web_common::database::flat_variants::ObservationSubject) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -55,8 +54,10 @@ impl From<ObservationSubject> for web_common::database::flat_variants::Observati
     }
 }
 
-impl From<web_common::database::flat_variants::ObservationSubject> for ObservationSubject {
-    fn from(item: web_common::database::flat_variants::ObservationSubject) -> Self {
+impl From<crate::database::flat_variants::ObservationSubject>
+    for web_common::database::flat_variants::ObservationSubject
+{
+    fn from(item: crate::database::flat_variants::ObservationSubject) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -83,7 +84,7 @@ impl ObservationSubject {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&ObservationSubjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationSubjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -114,7 +115,7 @@ impl ObservationSubject {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&ObservationSubjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationSubjectFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -147,7 +148,7 @@ impl ObservationSubject {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&ObservationSubjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ObservationSubjectFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,

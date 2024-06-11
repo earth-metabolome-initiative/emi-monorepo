@@ -12,11 +12,11 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SpectraCollectionBuilder {
     pub id: Option<i32>,
     pub notes: Option<Rc<String>>,
-    pub sample: Option<Rc<NestedSample>>,
+    pub sample: Option<Rc<web_common::database::nested_variants::NestedSample>>,
     pub errors_notes: Vec<ApiError>,
     pub errors_sample: Vec<ApiError>,
     pub form_updated_at: chrono::NaiveDateTime,
@@ -37,10 +37,10 @@ impl Default for SpectraCollectionBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum SpectraCollectionActions {
     SetNotes(Option<String>),
-    SetSample(Option<Rc<NestedSample>>),
+    SetSample(Option<Rc<web_common::database::nested_variants::NestedSample>>),
 }
 
 impl FromOperation for SpectraCollectionActions {
@@ -198,16 +198,18 @@ pub fn create_spectra_collection_form(props: &CreateSpectraCollectionFormProp) -
     }
     let set_notes = builder_dispatch
         .apply_callback(|notes: Option<String>| SpectraCollectionActions::SetNotes(notes));
-    let set_sample = builder_dispatch.apply_callback(|sample: Option<Rc<NestedSample>>| {
-        SpectraCollectionActions::SetSample(sample)
-    });
+    let set_sample = builder_dispatch.apply_callback(
+        |sample: Option<Rc<web_common::database::nested_variants::NestedSample>>| {
+            SpectraCollectionActions::SetSample(sample)
+        },
+    );
     html! {
         <BasicForm<NewSpectraCollection>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <Datalist<NestedSample, false> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
         </BasicForm<NewSpectraCollection>>
     }
 }
@@ -227,16 +229,18 @@ pub fn update_spectra_collection_form(props: &UpdateSpectraCollectionFormProp) -
     ));
     let set_notes = builder_dispatch
         .apply_callback(|notes: Option<String>| SpectraCollectionActions::SetNotes(notes));
-    let set_sample = builder_dispatch.apply_callback(|sample: Option<Rc<NestedSample>>| {
-        SpectraCollectionActions::SetSample(sample)
-    });
+    let set_sample = builder_dispatch.apply_callback(
+        |sample: Option<Rc<web_common::database::nested_variants::NestedSample>>| {
+            SpectraCollectionActions::SetSample(sample)
+        },
+    );
     html! {
         <BasicForm<UpdateSpectraCollection>
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <Datalist<NestedSample, false> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={false} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
         </BasicForm<UpdateSpectraCollection>>
     }
 }

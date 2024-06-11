@@ -4,7 +4,7 @@ from typing import List
 from constraint_checkers.struct_metadata import StructMetadata
 
 
-def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMetadata]:
+def create_filter_variants(flat_variants: List[StructMetadata]) -> List[StructMetadata]:
     """Create structs for filter queries.
     
     Parameters
@@ -13,7 +13,7 @@ def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMet
         List of flat variants to create filter structs for.
     """
     assert len(flat_variants) > 0
-    filter_structs = []
+    filter_variants = []
     for flat_variant in flat_variants:
         assert not flat_variant.is_nested()
         if not flat_variant.has_foreign_keys():
@@ -39,12 +39,12 @@ def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMet
         filter_struct.set_flat_variant(flat_variant)
         flat_variant.set_filter_variant(filter_struct)
 
-        filter_structs.append(filter_struct)
+        filter_variants.append(filter_struct)
 
     # We write out the filter structs into the webcommon crate
-    # in the src/filter_structs.rs file.
+    # in the src/filter_variants.rs file.
 
-    document = open("../web_common/src/database/filter_structs.rs", "w", encoding="utf-8")
+    document = open("../web_common/src/database/filter_variants.rs", "w", encoding="utf-8")
 
     imports = [
         "use serde::{Deserialize, Serialize};",
@@ -61,7 +61,7 @@ def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMet
         "pub struct EmptyFilter;\n\n"
     )
 
-    for filter_struct in filter_structs:
+    for filter_struct in filter_variants:
         filter_struct.write_to(document)
 
         # For when the frontend feature is enabled, we implement the
@@ -88,4 +88,4 @@ def create_filter_structs(flat_variants: List[StructMetadata]) -> List[StructMet
             "}\n\n"
         )
 
-    return filter_structs
+    return filter_variants

@@ -4,7 +4,6 @@
 
 use crate::database::*;
 use std::rc::Rc;
-use serde::{Serialize, Deserialize};
 
 pub trait Searchable<const EDIT: bool>: Filtrable {
     fn search_task(filter: Option<&Self::Filter>, query: String, limit: i64, offset: i64) -> super::Select;
@@ -1076,7 +1075,7 @@ impl Searchable<false> for UsersUsersRole {
         )
     }
 }
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum SearchableStruct {
     NestedBioOttRank(Rc<NestedBioOttRank>),
     NestedBioOttTaxonItem(Rc<NestedBioOttTaxonItem>),

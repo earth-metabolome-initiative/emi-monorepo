@@ -119,7 +119,7 @@ def derive_frontend_builders(
                 if attribute.is_automatically_determined_column():
                     continue
 
-                if attribute.data_type() == flat_variant.name:
+                if attribute.raw_data_type() == flat_variant:
                     builder.add_attribute(
                         AttributeMetadata(
                             original_name=attribute.original_name,

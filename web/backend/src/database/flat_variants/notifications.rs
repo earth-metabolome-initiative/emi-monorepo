@@ -12,12 +12,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -43,8 +40,10 @@ pub struct Notification {
 
 unsafe impl Send for Notification {}
 unsafe impl Sync for Notification {}
-impl From<Notification> for web_common::database::flat_variants::Notification {
-    fn from(item: Notification) -> Self {
+impl From<web_common::database::flat_variants::Notification>
+    for crate::database::flat_variants::Notification
+{
+    fn from(item: web_common::database::flat_variants::Notification) -> Self {
         Self {
             id: item.id,
             user_id: item.user_id,
@@ -56,8 +55,10 @@ impl From<Notification> for web_common::database::flat_variants::Notification {
     }
 }
 
-impl From<web_common::database::flat_variants::Notification> for Notification {
-    fn from(item: web_common::database::flat_variants::Notification) -> Self {
+impl From<crate::database::flat_variants::Notification>
+    for web_common::database::flat_variants::Notification
+{
+    fn from(item: crate::database::flat_variants::Notification) -> Self {
         Self {
             id: item.id,
             user_id: item.user_id,
@@ -85,7 +86,7 @@ impl Notification {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&NotificationFilter>,
+        filter: Option<&web_common::database::filter_variants::NotificationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -113,7 +114,7 @@ impl Notification {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&NotificationFilter>,
+        filter: Option<&web_common::database::filter_variants::NotificationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<

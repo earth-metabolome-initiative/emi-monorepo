@@ -13,11 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -53,8 +51,10 @@ pub struct Project {
 
 unsafe impl Send for Project {}
 unsafe impl Sync for Project {}
-impl From<Project> for web_common::database::flat_variants::Project {
-    fn from(item: Project) -> Self {
+impl From<web_common::database::flat_variants::Project>
+    for crate::database::flat_variants::Project
+{
+    fn from(item: web_common::database::flat_variants::Project) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -76,8 +76,10 @@ impl From<Project> for web_common::database::flat_variants::Project {
     }
 }
 
-impl From<web_common::database::flat_variants::Project> for Project {
-    fn from(item: web_common::database::flat_variants::Project) -> Self {
+impl From<crate::database::flat_variants::Project>
+    for web_common::database::flat_variants::Project
+{
+    fn from(item: crate::database::flat_variants::Project) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -140,7 +142,7 @@ impl Project {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&ProjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -189,7 +191,7 @@ impl Project {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&ProjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -281,7 +283,7 @@ impl Project {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&ProjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -451,7 +453,7 @@ impl Project {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&ProjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -500,7 +502,7 @@ impl Project {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&ProjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -550,7 +552,7 @@ impl Project {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&ProjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -660,7 +662,7 @@ impl Project {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&ProjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -709,7 +711,7 @@ impl Project {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&ProjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -759,7 +761,7 @@ impl Project {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&ProjectFilter>,
+        filter: Option<&web_common::database::filter_variants::ProjectFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

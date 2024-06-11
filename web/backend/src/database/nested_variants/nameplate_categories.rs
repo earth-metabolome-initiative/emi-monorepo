@@ -1,17 +1,13 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedNameplateCategory {
-    pub inner: NameplateCategory,
-    pub permanence: NestedPermanenceCategory,
-    pub material: NestedMaterial,
-    pub icon: FontAwesomeIcon,
-    pub color: Color,
+    pub inner: crate::database::flat_variants::NameplateCategory,
+    pub permanence: crate::database::nested_variants::NestedPermanenceCategory,
+    pub material: crate::database::nested_variants::NestedMaterial,
+    pub icon: crate::database::flat_variants::FontAwesomeIcon,
+    pub color: crate::database::flat_variants::Color,
 }
 
 unsafe impl Send for NestedNameplateCategory {}
@@ -29,10 +25,19 @@ impl NestedNameplateCategory {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            permanence: NestedPermanenceCategory::get(flat_variant.permanence_id, connection)?,
-            material: NestedMaterial::get(flat_variant.material_id, connection)?,
-            icon: FontAwesomeIcon::get(flat_variant.icon_id, connection)?,
-            color: Color::get(flat_variant.color_id, connection)?,
+            permanence: crate::database::nested_variants::NestedPermanenceCategory::get(
+                flat_variant.permanence_id,
+                connection,
+            )?,
+            material: crate::database::nested_variants::NestedMaterial::get(
+                flat_variant.material_id,
+                connection,
+            )?,
+            icon: crate::database::flat_variants::FontAwesomeIcon::get(
+                flat_variant.icon_id,
+                connection,
+            )?,
+            color: crate::database::flat_variants::Color::get(flat_variant.color_id, connection)?,
             inner: flat_variant,
         })
     }
@@ -51,7 +56,7 @@ impl NestedNameplateCategory {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&NameplateCategoryFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateCategoryFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -70,7 +75,7 @@ impl NestedNameplateCategory {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&NameplateCategoryFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateCategoryFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -103,7 +108,7 @@ impl NestedNameplateCategory {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&NameplateCategoryFilter>,
+        filter: Option<&web_common::database::filter_variants::NameplateCategoryFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -157,30 +162,44 @@ impl NestedNameplateCategory {
     }
 }
 impl From<web_common::database::nested_variants::NestedNameplateCategory>
-    for NestedNameplateCategory
+    for crate::database::nested_variants::NestedNameplateCategory
 {
     fn from(item: web_common::database::nested_variants::NestedNameplateCategory) -> Self {
         Self {
-            inner: NameplateCategory::from(item.inner.as_ref().clone()),
-            permanence: NestedPermanenceCategory::from(item.permanence.as_ref().clone()),
-            material: NestedMaterial::from(item.material.as_ref().clone()),
-            icon: FontAwesomeIcon::from(item.icon.as_ref().clone()),
-            color: Color::from(item.color.as_ref().clone()),
+            inner: crate::database::flat_variants::NameplateCategory::from(
+                item.inner.as_ref().clone(),
+            ),
+            permanence: crate::database::nested_variants::NestedPermanenceCategory::from(
+                item.permanence.as_ref().clone(),
+            ),
+            material: crate::database::nested_variants::NestedMaterial::from(
+                item.material.as_ref().clone(),
+            ),
+            icon: crate::database::flat_variants::FontAwesomeIcon::from(item.icon.as_ref().clone()),
+            color: crate::database::flat_variants::Color::from(item.color.as_ref().clone()),
         }
     }
 }
-impl From<NestedNameplateCategory>
+impl From<crate::database::nested_variants::NestedNameplateCategory>
     for web_common::database::nested_variants::NestedNameplateCategory
 {
-    fn from(item: NestedNameplateCategory) -> Self {
+    fn from(item: crate::database::nested_variants::NestedNameplateCategory) -> Self {
         Self {
-            inner: Rc::from(web_common::database::NameplateCategory::from(item.inner)),
-            permanence: Rc::from(web_common::database::NestedPermanenceCategory::from(
-                item.permanence,
+            inner: Rc::from(
+                web_common::database::flat_variants::NameplateCategory::from(item.inner),
+            ),
+            permanence: Rc::from(
+                web_common::database::nested_variants::NestedPermanenceCategory::from(
+                    item.permanence,
+                ),
+            ),
+            material: Rc::from(web_common::database::nested_variants::NestedMaterial::from(
+                item.material,
             )),
-            material: Rc::from(web_common::database::NestedMaterial::from(item.material)),
-            icon: Rc::from(web_common::database::FontAwesomeIcon::from(item.icon)),
-            color: Rc::from(web_common::database::Color::from(item.color)),
+            icon: Rc::from(web_common::database::flat_variants::FontAwesomeIcon::from(
+                item.icon,
+            )),
+            color: Rc::from(web_common::database::flat_variants::Color::from(item.color)),
         }
     }
 }

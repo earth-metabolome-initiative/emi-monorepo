@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -44,8 +41,10 @@ pub struct Organization {
 
 unsafe impl Send for Organization {}
 unsafe impl Sync for Organization {}
-impl From<Organization> for web_common::database::flat_variants::Organization {
-    fn from(item: Organization) -> Self {
+impl From<web_common::database::flat_variants::Organization>
+    for crate::database::flat_variants::Organization
+{
+    fn from(item: web_common::database::flat_variants::Organization) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -57,8 +56,10 @@ impl From<Organization> for web_common::database::flat_variants::Organization {
     }
 }
 
-impl From<web_common::database::flat_variants::Organization> for Organization {
-    fn from(item: web_common::database::flat_variants::Organization) -> Self {
+impl From<crate::database::flat_variants::Organization>
+    for web_common::database::flat_variants::Organization
+{
+    fn from(item: crate::database::flat_variants::Organization) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -86,7 +87,7 @@ impl Organization {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&OrganizationFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -114,7 +115,7 @@ impl Organization {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&OrganizationFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganizationFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -201,7 +202,7 @@ impl Organization {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&OrganizationFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganizationFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,

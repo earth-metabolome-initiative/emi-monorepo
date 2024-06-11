@@ -12,12 +12,12 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DerivedSampleBuilder {
     pub quantity: Option<f64>,
-    pub parent_sample: Option<Rc<NestedSample>>,
-    pub child_sample: Option<Rc<NestedSample>>,
-    pub unit: Option<Rc<NestedUnit>>,
+    pub parent_sample: Option<Rc<web_common::database::nested_variants::NestedSample>>,
+    pub child_sample: Option<Rc<web_common::database::nested_variants::NestedSample>>,
+    pub unit: Option<Rc<web_common::database::nested_variants::NestedUnit>>,
     pub errors_quantity: Vec<ApiError>,
     pub errors_parent_sample: Vec<ApiError>,
     pub errors_child_sample: Vec<ApiError>,
@@ -43,12 +43,12 @@ impl Default for DerivedSampleBuilder {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum DerivedSampleActions {
     SetQuantity(Option<String>),
-    SetParentSample(Option<Rc<NestedSample>>),
-    SetChildSample(Option<Rc<NestedSample>>),
-    SetUnit(Option<Rc<NestedUnit>>),
+    SetParentSample(Option<Rc<web_common::database::nested_variants::NestedSample>>),
+    SetChildSample(Option<Rc<web_common::database::nested_variants::NestedSample>>),
+    SetUnit(Option<Rc<web_common::database::nested_variants::NestedUnit>>),
 }
 
 impl FromOperation for DerivedSampleActions {
@@ -308,25 +308,30 @@ pub fn create_derived_sample_form(props: &CreateDerivedSampleFormProp) -> Html {
     }
     let set_quantity = builder_dispatch
         .apply_callback(|quantity: Option<String>| DerivedSampleActions::SetQuantity(quantity));
-    let set_parent_sample =
-        builder_dispatch.apply_callback(|parent_sample: Option<Rc<NestedSample>>| {
+    let set_parent_sample = builder_dispatch.apply_callback(
+        |parent_sample: Option<Rc<web_common::database::nested_variants::NestedSample>>| {
             DerivedSampleActions::SetParentSample(parent_sample)
-        });
-    let set_child_sample =
-        builder_dispatch.apply_callback(|child_sample: Option<Rc<NestedSample>>| {
+        },
+    );
+    let set_child_sample = builder_dispatch.apply_callback(
+        |child_sample: Option<Rc<web_common::database::nested_variants::NestedSample>>| {
             DerivedSampleActions::SetChildSample(child_sample)
-        });
-    let set_unit = builder_dispatch
-        .apply_callback(|unit: Option<Rc<NestedUnit>>| DerivedSampleActions::SetUnit(unit));
+        },
+    );
+    let set_unit = builder_dispatch.apply_callback(
+        |unit: Option<Rc<web_common::database::nested_variants::NestedUnit>>| {
+            DerivedSampleActions::SetUnit(unit)
+        },
+    );
     html! {
         <BasicForm<NewDerivedSample>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<f64> label="Quantity" optional={false} errors={builder_store.errors_quantity.clone()} builder={set_quantity} value={builder_store.quantity.clone().map(Rc::from)} />
-            <Datalist<NestedSample, false> builder={set_parent_sample} optional={false} errors={builder_store.errors_parent_sample.clone()} value={builder_store.parent_sample.clone()} label="Parent sample" scanner={false} />
-            <Datalist<NestedSample, false> builder={set_child_sample} optional={false} errors={builder_store.errors_child_sample.clone()} value={builder_store.child_sample.clone()} label="Child sample" scanner={false} />
-            <Datalist<NestedUnit, false> builder={set_unit} optional={false} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_parent_sample} optional={false} errors={builder_store.errors_parent_sample.clone()} value={builder_store.parent_sample.clone()} label="Parent sample" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_child_sample} optional={false} errors={builder_store.errors_child_sample.clone()} value={builder_store.child_sample.clone()} label="Child sample" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedUnit, false> builder={set_unit} optional={false} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" scanner={false} />
         </BasicForm<NewDerivedSample>>
     }
 }
@@ -347,25 +352,30 @@ pub fn update_derived_sample_form(props: &UpdateDerivedSampleFormProp) -> Html {
     ));
     let set_quantity = builder_dispatch
         .apply_callback(|quantity: Option<String>| DerivedSampleActions::SetQuantity(quantity));
-    let set_parent_sample =
-        builder_dispatch.apply_callback(|parent_sample: Option<Rc<NestedSample>>| {
+    let set_parent_sample = builder_dispatch.apply_callback(
+        |parent_sample: Option<Rc<web_common::database::nested_variants::NestedSample>>| {
             DerivedSampleActions::SetParentSample(parent_sample)
-        });
-    let set_child_sample =
-        builder_dispatch.apply_callback(|child_sample: Option<Rc<NestedSample>>| {
+        },
+    );
+    let set_child_sample = builder_dispatch.apply_callback(
+        |child_sample: Option<Rc<web_common::database::nested_variants::NestedSample>>| {
             DerivedSampleActions::SetChildSample(child_sample)
-        });
-    let set_unit = builder_dispatch
-        .apply_callback(|unit: Option<Rc<NestedUnit>>| DerivedSampleActions::SetUnit(unit));
+        },
+    );
+    let set_unit = builder_dispatch.apply_callback(
+        |unit: Option<Rc<web_common::database::nested_variants::NestedUnit>>| {
+            DerivedSampleActions::SetUnit(unit)
+        },
+    );
     html! {
         <BasicForm<UpdateDerivedSample>
             method={FormMethod::PUT}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<f64> label="Quantity" optional={false} errors={builder_store.errors_quantity.clone()} builder={set_quantity} value={builder_store.quantity.clone().map(Rc::from)} />
-            <Datalist<NestedSample, false> builder={set_parent_sample} optional={false} errors={builder_store.errors_parent_sample.clone()} value={builder_store.parent_sample.clone()} label="Parent sample" scanner={false} />
-            <Datalist<NestedSample, false> builder={set_child_sample} optional={false} errors={builder_store.errors_child_sample.clone()} value={builder_store.child_sample.clone()} label="Child sample" scanner={false} />
-            <Datalist<NestedUnit, false> builder={set_unit} optional={false} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_parent_sample} optional={false} errors={builder_store.errors_parent_sample.clone()} value={builder_store.parent_sample.clone()} label="Parent sample" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_child_sample} optional={false} errors={builder_store.errors_child_sample.clone()} value={builder_store.child_sample.clone()} label="Child sample" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedUnit, false> builder={set_unit} optional={false} errors={builder_store.errors_unit.clone()} value={builder_store.unit.clone()} label="Unit" scanner={false} />
         </BasicForm<UpdateDerivedSample>>
     }
 }

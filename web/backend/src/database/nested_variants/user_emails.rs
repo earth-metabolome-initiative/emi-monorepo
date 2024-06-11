@@ -1,15 +1,11 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedUserEmail {
-    pub inner: UserEmail,
-    pub created_by: NestedUser,
-    pub login_provider: NestedLoginProvider,
+    pub inner: crate::database::flat_variants::UserEmail,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub login_provider: crate::database::nested_variants::NestedLoginProvider,
 }
 
 unsafe impl Send for NestedUserEmail {}
@@ -27,8 +23,14 @@ impl NestedUserEmail {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            login_provider: NestedLoginProvider::get(flat_variant.login_provider_id, connection)?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            login_provider: crate::database::nested_variants::NestedLoginProvider::get(
+                flat_variant.login_provider_id,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -67,7 +69,7 @@ impl NestedUserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -88,7 +90,7 @@ impl NestedUserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -173,7 +175,7 @@ impl NestedUserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -194,7 +196,7 @@ impl NestedUserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -242,7 +244,7 @@ impl NestedUserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -263,7 +265,7 @@ impl NestedUserEmail {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&UserEmailFilter>,
+        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -304,23 +306,37 @@ impl NestedUserEmail {
         UserEmail::delete_by_id(id, author_user_id, connection)
     }
 }
-impl From<web_common::database::nested_variants::NestedUserEmail> for NestedUserEmail {
+impl From<web_common::database::nested_variants::NestedUserEmail>
+    for crate::database::nested_variants::NestedUserEmail
+{
     fn from(item: web_common::database::nested_variants::NestedUserEmail) -> Self {
         Self {
-            inner: UserEmail::from(item.inner.as_ref().clone()),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            login_provider: NestedLoginProvider::from(item.login_provider.as_ref().clone()),
+            inner: crate::database::flat_variants::UserEmail::from(item.inner.as_ref().clone()),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            login_provider: crate::database::nested_variants::NestedLoginProvider::from(
+                item.login_provider.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedUserEmail> for web_common::database::nested_variants::NestedUserEmail {
-    fn from(item: NestedUserEmail) -> Self {
+impl From<crate::database::nested_variants::NestedUserEmail>
+    for web_common::database::nested_variants::NestedUserEmail
+{
+    fn from(item: crate::database::nested_variants::NestedUserEmail) -> Self {
         Self {
-            inner: Rc::from(web_common::database::UserEmail::from(item.inner)),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            login_provider: Rc::from(web_common::database::NestedLoginProvider::from(
-                item.login_provider,
+            inner: Rc::from(web_common::database::flat_variants::UserEmail::from(
+                item.inner,
             )),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
+            login_provider: Rc::from(
+                web_common::database::nested_variants::NestedLoginProvider::from(
+                    item.login_provider,
+                ),
+            ),
         }
     }
 }

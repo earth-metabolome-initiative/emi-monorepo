@@ -12,11 +12,11 @@ use web_common::database::*;
 use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
-#[derive(Store, Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TeamsUsersRoleBuilder {
-    pub table: Option<Rc<NestedTeam>>,
-    pub user: Option<Rc<NestedUser>>,
-    pub role: Option<Rc<NestedRole>>,
+    pub table: Option<Rc<web_common::database::nested_variants::NestedTeam>>,
+    pub user: Option<Rc<web_common::database::nested_variants::NestedUser>>,
+    pub role: Option<Rc<web_common::database::nested_variants::NestedRole>>,
     pub errors_table: Vec<ApiError>,
     pub errors_user: Vec<ApiError>,
     pub errors_role: Vec<ApiError>,
@@ -39,11 +39,11 @@ impl Default for TeamsUsersRoleBuilder {
     }
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum TeamsUsersRoleActions {
-    SetTable(Option<Rc<NestedTeam>>),
-    SetUser(Option<Rc<NestedUser>>),
-    SetRole(Option<Rc<NestedRole>>),
+    SetTable(Option<Rc<web_common::database::nested_variants::NestedTeam>>),
+    SetUser(Option<Rc<web_common::database::nested_variants::NestedUser>>),
+    SetRole(Option<Rc<web_common::database::nested_variants::NestedRole>>),
 }
 
 impl FromOperation for TeamsUsersRoleActions {
@@ -201,20 +201,29 @@ pub fn create_teams_users_role_form(props: &CreateTeamsUsersRoleFormProp) -> Htm
             role_id.into(),
         ));
     }
-    let set_table = builder_dispatch
-        .apply_callback(|table: Option<Rc<NestedTeam>>| TeamsUsersRoleActions::SetTable(table));
-    let set_user = builder_dispatch
-        .apply_callback(|user: Option<Rc<NestedUser>>| TeamsUsersRoleActions::SetUser(user));
-    let set_role = builder_dispatch
-        .apply_callback(|role: Option<Rc<NestedRole>>| TeamsUsersRoleActions::SetRole(role));
+    let set_table = builder_dispatch.apply_callback(
+        |table: Option<Rc<web_common::database::nested_variants::NestedTeam>>| {
+            TeamsUsersRoleActions::SetTable(table)
+        },
+    );
+    let set_user = builder_dispatch.apply_callback(
+        |user: Option<Rc<web_common::database::nested_variants::NestedUser>>| {
+            TeamsUsersRoleActions::SetUser(user)
+        },
+    );
+    let set_role = builder_dispatch.apply_callback(
+        |role: Option<Rc<web_common::database::nested_variants::NestedRole>>| {
+            TeamsUsersRoleActions::SetRole(role)
+        },
+    );
     html! {
         <BasicForm<NewTeamsUsersRole>
             method={FormMethod::POST}
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <Datalist<NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
-            <Datalist<NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
-            <Datalist<NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedTeam, true> builder={set_table} optional={false} errors={builder_store.errors_table.clone()} value={builder_store.table.clone()} label="Table" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedUser, false> builder={set_user} optional={false} errors={builder_store.errors_user.clone()} value={builder_store.user.clone()} label="User" scanner={false} />
+            <Datalist<web_common::database::nested_variants::NestedRole, false> builder={set_role} optional={false} errors={builder_store.errors_role.clone()} value={builder_store.role.clone()} label="Role" scanner={false} />
         </BasicForm<NewTeamsUsersRole>>
     }
 }

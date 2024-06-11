@@ -41,7 +41,6 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
     imports = [
         "use crate::database::*;",
         "use std::rc::Rc;",
-        "use web_common::database::filter_structs::*;",
     ]
 
     os.makedirs("./src/database/nested_variants", exist_ok=True)
@@ -59,9 +58,6 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
         )
 
         default_imports = list(imports)
-
-        if nested_struct.contains_nested_structs():
-            default_imports.append("use super::*;")
 
         document.write("\n".join(default_imports) + "\n\n")
         nested_struct.write_to(document)
@@ -102,9 +98,6 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
             "        Ok(Self {\n"
         )
         for attribute in nested_struct.attributes:
-            assert (
-                not attribute.data_type() == nested_struct.name
-            ), "The data type of the attribute cannot be the same as the nested struct."
             if attribute.is_inner():
                 continue
             if flat_variant.has_attribute(attribute):
@@ -121,14 +114,19 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
 
             if attribute.optional:
                 document.write(
-                    f"            {attribute.name}: flat_variant.{attribute.original_name}.map(|{attribute.original_name}| {attribute.data_type()}::get({attribute.original_name}, {author_user_id_argument}connection)).transpose()?,\n"
+                    f"            {attribute.name}: flat_variant.{attribute.original_name}.map(|{attribute.original_name}| {attribute.data_type(route='backend')}::get({attribute.original_name}, {author_user_id_argument}connection)).transpose()?,\n"
                 )
             else:
                 document.write(
-                    f"            {attribute.name}: {attribute.data_type()}::get(flat_variant.{attribute.original_name}, {author_user_id_argument}connection)?,\n"
+                    f"            {attribute.name}: {attribute.data_type(route='backend')}::get(flat_variant.{attribute.original_name}, {author_user_id_argument}connection)?,\n"
                 )
 
         document.write("                inner: flat_variant,\n        })\n    }\n")
+
+        assert len(flat_variant.backend_methods()) > 0, (
+            "The flat variant must have at least one method. "
+            f"The struct {flat_variant.name} does not have any method."
+        )
 
         for method in flat_variant.backend_methods():
             return_type = method.get_return_type()
@@ -151,31 +149,31 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
                 else:
                     this_author_user_id_argument = f"Some({author_user_id.name}), "
 
-            if return_type.format_data_type() == "Result<Vec<Self>, web_common::api::ApiError>":
+            if return_type.format_data_type(route='backend') == "Result<Vec<Self>, web_common::api::ApiError>":
                 method.write_header_to(document)
                 document.write(
                     "{\n"
                     f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)})?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, {this_author_user_id_argument}connection)).collect()\n"
                     "}\n"
                 )
-            elif return_type.format_data_type() == "Result<Self, web_common::api::ApiError>":
+            elif return_type.format_data_type(route='backend') == "Result<Self, web_common::api::ApiError>":
                 method.write_header_to(document)
                 document.write(
                     "{\n"
                     f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)}).and_then(|flat_variant| Self::from_flat(flat_variant, {this_author_user_id_argument}connection))\n"
                     "}\n"
                 )
-            elif return_type.format_data_type() == "Result<Vec<(Self, f32)>, web_common::api::ApiError>":
+            elif return_type.format_data_type(route='backend') == "Result<Vec<(Self, f32)>, web_common::api::ApiError>":
                 method.write_header_to(document)
                 document.write(
                     "{\n"
                     f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)})?.into_iter().map(|(flat_variant, score)| Ok((Self::from_flat(flat_variant, {this_author_user_id_argument}connection)?, score))).collect()\n"
                     "}\n"
                 )
-            elif "Self" in return_type.format_data_type():
+            elif "Self" in return_type.format_data_type(route='backend'):
                 raise NotImplementedError(
                     "All cases returning a Self must be handled. "
-                    f"The method {method.name} returns {return_type.format_data_type()}. "
+                    f"The method {method.name} returns {return_type.format_data_type(route='backend')}. "
                     f"The method {method.name} is in the struct {nested_struct.name}."
                 )
             elif method.has_self_reference():
@@ -204,34 +202,34 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
         # present in the web_common crate, which does not use Diesel or its
         # structs, but the web_common version of the structs.
         document.write(
-            f"impl From<web_common::database::nested_variants::{nested_struct.name}> for {nested_struct.name} {{\n"
-            f"    fn from(item: web_common::database::nested_variants::{nested_struct.name}) -> Self {{\n"
+            f"impl From<{nested_struct.full_path(route='frontend')}> for {nested_struct.full_path(route='backend')} {{\n"
+            f"    fn from(item: {nested_struct.full_path(route='frontend')}) -> Self {{\n"
             "        Self {\n"
         )
         for attribute in nested_struct.attributes:
             if attribute.optional:
                 if attribute.implements_copy():
                     document.write(
-                        f"            {attribute.name}: item.{attribute.name}.map({attribute.data_type()}::from),\n"
+                        f"            {attribute.name}: item.{attribute.name}.map({attribute.data_type(route='backend')}::from),\n"
                     )
                 else:
                     document.write(
-                        f"            {attribute.name}: item.{attribute.name}.as_deref().cloned().map({attribute.data_type()}::from),\n"
+                        f"            {attribute.name}: item.{attribute.name}.as_deref().cloned().map({attribute.data_type(route='backend')}::from),\n"
                     )
             else:
                 if attribute.implements_copy():
                     document.write(
-                        f"            {attribute.name}: {attribute.data_type()}::from(item.{attribute.name}),\n"
+                        f"            {attribute.name}: {attribute.data_type(route='backend')}::from(item.{attribute.name}),\n"
                     )
                 else:
                     document.write(
-                        f"            {attribute.name}: {attribute.data_type()}::from(item.{attribute.name}.as_ref().clone()),\n"
+                        f"            {attribute.name}: {attribute.data_type(route='backend')}::from(item.{attribute.name}.as_ref().clone()),\n"
                     )
         document.write("        }\n    }\n}\n")
 
         document.write(
-            f"impl From<{nested_struct.name}> for web_common::database::nested_variants::{nested_struct.name} {{\n"
-            f"    fn from(item: {nested_struct.name}) -> Self {{\n"
+            f"impl From<{nested_struct.full_path(route='backend')}> for {nested_struct.full_path(route='frontend')} {{\n"
+            f"    fn from(item: {nested_struct.full_path(route='backend')}) -> Self {{\n"
             "        Self {\n"
         )
         for attribute in nested_struct.attributes:
@@ -241,16 +239,16 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
                     rc_variant = ".map(Rc::from)"
                     
                 document.write(
-                    f"            {attribute.name}: item.{attribute.name}.map(web_common::database::{attribute.data_type()}::from){rc_variant},\n"
+                    f"            {attribute.name}: item.{attribute.name}.map({attribute.data_type(route='frontend')}::from){rc_variant},\n"
                 )
             else:
                 if attribute.implements_copy():
                     document.write(
-                        f"            {attribute.name}: web_common::database::{attribute.data_type()}::from(item.{attribute.name}),\n"
+                        f"            {attribute.name}: {attribute.data_type(route='frontend')}::from(item.{attribute.name}),\n"
                     )
                 else:
                     document.write(
-                        f"            {attribute.name}: Rc::from(web_common::database::{attribute.data_type()}::from(item.{attribute.name})),\n"
+                        f"            {attribute.name}: Rc::from({attribute.data_type(route='frontend')}::from(item.{attribute.name})),\n"
                     )
         document.write("        }\n    }\n}\n")
         document.close()

@@ -12,7 +12,6 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
     Eq,
@@ -41,8 +40,10 @@ pub struct Spectra {
 
 unsafe impl Send for Spectra {}
 unsafe impl Sync for Spectra {}
-impl From<Spectra> for web_common::database::flat_variants::Spectra {
-    fn from(item: Spectra) -> Self {
+impl From<web_common::database::flat_variants::Spectra>
+    for crate::database::flat_variants::Spectra
+{
+    fn from(item: web_common::database::flat_variants::Spectra) -> Self {
         Self {
             id: item.id,
             spectra_collection_id: item.spectra_collection_id,
@@ -50,8 +51,10 @@ impl From<Spectra> for web_common::database::flat_variants::Spectra {
     }
 }
 
-impl From<web_common::database::flat_variants::Spectra> for Spectra {
-    fn from(item: web_common::database::flat_variants::Spectra) -> Self {
+impl From<crate::database::flat_variants::Spectra>
+    for web_common::database::flat_variants::Spectra
+{
+    fn from(item: crate::database::flat_variants::Spectra) -> Self {
         Self {
             id: item.id,
             spectra_collection_id: item.spectra_collection_id,
@@ -100,7 +103,7 @@ impl Spectra {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SpectraFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -134,7 +137,7 @@ impl Spectra {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SpectraFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,

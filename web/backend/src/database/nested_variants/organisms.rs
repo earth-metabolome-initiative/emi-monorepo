@@ -1,17 +1,15 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedOrganism {
-    pub inner: Organism,
-    pub host_organism: Option<Organism>,
-    pub sample: Option<NestedSample>,
-    pub nameplate: NestedNameplate,
-    pub project: NestedProject,
-    pub created_by: NestedUser,
-    pub updated_by: NestedUser,
+    pub inner: crate::database::flat_variants::Organism,
+    pub host_organism: Option<crate::database::flat_variants::Organism>,
+    pub sample: Option<crate::database::nested_variants::NestedSample>,
+    pub nameplate: crate::database::nested_variants::NestedNameplate,
+    pub project: crate::database::nested_variants::NestedProject,
+    pub created_by: crate::database::nested_variants::NestedUser,
+    pub updated_by: crate::database::nested_variants::NestedUser,
 }
 
 unsafe impl Send for NestedOrganism {}
@@ -33,16 +31,42 @@ impl NestedOrganism {
         Ok(Self {
             host_organism: flat_variant
                 .host_organism_id
-                .map(|host_organism_id| Organism::get(host_organism_id, author_user_id, connection))
+                .map(|host_organism_id| {
+                    crate::database::flat_variants::Organism::get(
+                        host_organism_id,
+                        author_user_id,
+                        connection,
+                    )
+                })
                 .transpose()?,
             sample: flat_variant
                 .sample_id
-                .map(|sample_id| NestedSample::get(sample_id, author_user_id, connection))
+                .map(|sample_id| {
+                    crate::database::nested_variants::NestedSample::get(
+                        sample_id,
+                        author_user_id,
+                        connection,
+                    )
+                })
                 .transpose()?,
-            nameplate: NestedNameplate::get(flat_variant.nameplate_id, author_user_id, connection)?,
-            project: NestedProject::get(flat_variant.project_id, author_user_id, connection)?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
-            updated_by: NestedUser::get(flat_variant.updated_by, connection)?,
+            nameplate: crate::database::nested_variants::NestedNameplate::get(
+                flat_variant.nameplate_id,
+                author_user_id,
+                connection,
+            )?,
+            project: crate::database::nested_variants::NestedProject::get(
+                flat_variant.project_id,
+                author_user_id,
+                connection,
+            )?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
+            updated_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.updated_by,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -81,7 +105,7 @@ impl NestedOrganism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -102,7 +126,7 @@ impl NestedOrganism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -154,7 +178,7 @@ impl NestedOrganism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -242,7 +266,7 @@ impl NestedOrganism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -263,7 +287,7 @@ impl NestedOrganism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -285,7 +309,7 @@ impl NestedOrganism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -341,7 +365,7 @@ impl NestedOrganism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -362,7 +386,7 @@ impl NestedOrganism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -384,7 +408,7 @@ impl NestedOrganism {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&OrganismFilter>,
+        filter: Option<&web_common::database::filter_variants::OrganismFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -433,35 +457,65 @@ impl NestedOrganism {
         Organism::delete_by_id(id, author_user_id, connection)
     }
 }
-impl From<web_common::database::nested_variants::NestedOrganism> for NestedOrganism {
+impl From<web_common::database::nested_variants::NestedOrganism>
+    for crate::database::nested_variants::NestedOrganism
+{
     fn from(item: web_common::database::nested_variants::NestedOrganism) -> Self {
         Self {
-            inner: Organism::from(item.inner.as_ref().clone()),
-            host_organism: item.host_organism.as_deref().cloned().map(Organism::from),
-            sample: item.sample.as_deref().cloned().map(NestedSample::from),
-            nameplate: NestedNameplate::from(item.nameplate.as_ref().clone()),
-            project: NestedProject::from(item.project.as_ref().clone()),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
-            updated_by: NestedUser::from(item.updated_by.as_ref().clone()),
+            inner: crate::database::flat_variants::Organism::from(item.inner.as_ref().clone()),
+            host_organism: item
+                .host_organism
+                .as_deref()
+                .cloned()
+                .map(crate::database::flat_variants::Organism::from),
+            sample: item
+                .sample
+                .as_deref()
+                .cloned()
+                .map(crate::database::nested_variants::NestedSample::from),
+            nameplate: crate::database::nested_variants::NestedNameplate::from(
+                item.nameplate.as_ref().clone(),
+            ),
+            project: crate::database::nested_variants::NestedProject::from(
+                item.project.as_ref().clone(),
+            ),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
+            updated_by: crate::database::nested_variants::NestedUser::from(
+                item.updated_by.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedOrganism> for web_common::database::nested_variants::NestedOrganism {
-    fn from(item: NestedOrganism) -> Self {
+impl From<crate::database::nested_variants::NestedOrganism>
+    for web_common::database::nested_variants::NestedOrganism
+{
+    fn from(item: crate::database::nested_variants::NestedOrganism) -> Self {
         Self {
-            inner: Rc::from(web_common::database::Organism::from(item.inner)),
+            inner: Rc::from(web_common::database::flat_variants::Organism::from(
+                item.inner,
+            )),
             host_organism: item
                 .host_organism
-                .map(web_common::database::Organism::from)
+                .map(web_common::database::flat_variants::Organism::from)
                 .map(Rc::from),
             sample: item
                 .sample
-                .map(web_common::database::NestedSample::from)
+                .map(web_common::database::nested_variants::NestedSample::from)
                 .map(Rc::from),
-            nameplate: Rc::from(web_common::database::NestedNameplate::from(item.nameplate)),
-            project: Rc::from(web_common::database::NestedProject::from(item.project)),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
-            updated_by: Rc::from(web_common::database::NestedUser::from(item.updated_by)),
+            nameplate: Rc::from(
+                web_common::database::nested_variants::NestedNameplate::from(item.nameplate),
+            ),
+            project: Rc::from(web_common::database::nested_variants::NestedProject::from(
+                item.project,
+            )),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
+            updated_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.updated_by,
+            )),
         }
     }
 }

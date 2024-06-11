@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -45,8 +42,10 @@ pub struct SpectraCollection {
 
 unsafe impl Send for SpectraCollection {}
 unsafe impl Sync for SpectraCollection {}
-impl From<SpectraCollection> for web_common::database::flat_variants::SpectraCollection {
-    fn from(item: SpectraCollection) -> Self {
+impl From<web_common::database::flat_variants::SpectraCollection>
+    for crate::database::flat_variants::SpectraCollection
+{
+    fn from(item: web_common::database::flat_variants::SpectraCollection) -> Self {
         Self {
             id: item.id,
             notes: item.notes,
@@ -59,8 +58,10 @@ impl From<SpectraCollection> for web_common::database::flat_variants::SpectraCol
     }
 }
 
-impl From<web_common::database::flat_variants::SpectraCollection> for SpectraCollection {
-    fn from(item: web_common::database::flat_variants::SpectraCollection) -> Self {
+impl From<crate::database::flat_variants::SpectraCollection>
+    for web_common::database::flat_variants::SpectraCollection
+{
+    fn from(item: crate::database::flat_variants::SpectraCollection) -> Self {
         Self {
             id: item.id,
             notes: item.notes,
@@ -116,7 +117,7 @@ impl SpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -158,7 +159,7 @@ impl SpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -222,7 +223,7 @@ impl SpectraCollection {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -484,7 +485,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -526,7 +527,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -569,7 +570,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -720,7 +721,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -762,7 +763,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -805,7 +806,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&SpectraCollectionFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectraCollectionFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,

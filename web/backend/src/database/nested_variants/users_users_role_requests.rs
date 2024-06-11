@@ -1,17 +1,13 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedUsersUsersRoleRequest {
-    pub inner: UsersUsersRoleRequest,
-    pub table: NestedUser,
-    pub user: NestedUser,
-    pub role: NestedRole,
-    pub created_by: NestedUser,
+    pub inner: crate::database::flat_variants::UsersUsersRoleRequest,
+    pub table: crate::database::nested_variants::NestedUser,
+    pub user: crate::database::nested_variants::NestedUser,
+    pub role: crate::database::nested_variants::NestedRole,
+    pub created_by: crate::database::nested_variants::NestedUser,
 }
 
 unsafe impl Send for NestedUsersUsersRoleRequest {}
@@ -29,10 +25,22 @@ impl NestedUsersUsersRoleRequest {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: NestedUser::get(flat_variant.table_id, connection)?,
-            user: NestedUser::get(flat_variant.user_id, connection)?,
-            role: NestedRole::get(flat_variant.role_id, connection)?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            table: crate::database::nested_variants::NestedUser::get(
+                flat_variant.table_id,
+                connection,
+            )?,
+            user: crate::database::nested_variants::NestedUser::get(
+                flat_variant.user_id,
+                connection,
+            )?,
+            role: crate::database::nested_variants::NestedRole::get(
+                flat_variant.role_id,
+                connection,
+            )?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -71,7 +79,7 @@ impl NestedUsersUsersRoleRequest {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&UsersUsersRoleRequestFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleRequestFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -92,7 +100,7 @@ impl NestedUsersUsersRoleRequest {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&UsersUsersRoleRequestFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleRequestFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -135,7 +143,7 @@ impl NestedUsersUsersRoleRequest {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&UsersUsersRoleRequestFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleRequestFilter>,
         author_user_id: Option<i32>,
         query: &str,
         limit: Option<i64>,
@@ -218,7 +226,7 @@ impl NestedUsersUsersRoleRequest {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&UsersUsersRoleRequestFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleRequestFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -239,7 +247,7 @@ impl NestedUsersUsersRoleRequest {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&UsersUsersRoleRequestFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleRequestFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -267,7 +275,7 @@ impl NestedUsersUsersRoleRequest {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&UsersUsersRoleRequestFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleRequestFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -323,7 +331,7 @@ impl NestedUsersUsersRoleRequest {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&UsersUsersRoleRequestFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleRequestFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -344,7 +352,7 @@ impl NestedUsersUsersRoleRequest {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&UsersUsersRoleRequestFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleRequestFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -372,7 +380,7 @@ impl NestedUsersUsersRoleRequest {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&UsersUsersRoleRequestFilter>,
+        filter: Option<&web_common::database::filter_variants::UsersUsersRoleRequestFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -422,28 +430,38 @@ impl NestedUsersUsersRoleRequest {
     }
 }
 impl From<web_common::database::nested_variants::NestedUsersUsersRoleRequest>
-    for NestedUsersUsersRoleRequest
+    for crate::database::nested_variants::NestedUsersUsersRoleRequest
 {
     fn from(item: web_common::database::nested_variants::NestedUsersUsersRoleRequest) -> Self {
         Self {
-            inner: UsersUsersRoleRequest::from(item.inner),
-            table: NestedUser::from(item.table.as_ref().clone()),
-            user: NestedUser::from(item.user.as_ref().clone()),
-            role: NestedRole::from(item.role.as_ref().clone()),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            inner: crate::database::flat_variants::UsersUsersRoleRequest::from(item.inner),
+            table: crate::database::nested_variants::NestedUser::from(item.table.as_ref().clone()),
+            user: crate::database::nested_variants::NestedUser::from(item.user.as_ref().clone()),
+            role: crate::database::nested_variants::NestedRole::from(item.role.as_ref().clone()),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedUsersUsersRoleRequest>
+impl From<crate::database::nested_variants::NestedUsersUsersRoleRequest>
     for web_common::database::nested_variants::NestedUsersUsersRoleRequest
 {
-    fn from(item: NestedUsersUsersRoleRequest) -> Self {
+    fn from(item: crate::database::nested_variants::NestedUsersUsersRoleRequest) -> Self {
         Self {
-            inner: web_common::database::UsersUsersRoleRequest::from(item.inner),
-            table: Rc::from(web_common::database::NestedUser::from(item.table)),
-            user: Rc::from(web_common::database::NestedUser::from(item.user)),
-            role: Rc::from(web_common::database::NestedRole::from(item.role)),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            inner: web_common::database::flat_variants::UsersUsersRoleRequest::from(item.inner),
+            table: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.table,
+            )),
+            user: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.user,
+            )),
+            role: Rc::from(web_common::database::nested_variants::NestedRole::from(
+                item.role,
+            )),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
         }
     }
 }

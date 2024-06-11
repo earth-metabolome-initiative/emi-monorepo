@@ -13,12 +13,9 @@ use diesel::Insertable;
 use diesel::Queryable;
 use diesel::QueryableByName;
 use diesel::Selectable;
-use web_common::database::filter_structs::*;
 
 #[derive(
-    Eq,
     PartialEq,
-    PartialOrd,
     Debug,
     Clone,
     serde::Serialize,
@@ -43,8 +40,10 @@ pub struct SampleState {
 
 unsafe impl Send for SampleState {}
 unsafe impl Sync for SampleState {}
-impl From<SampleState> for web_common::database::flat_variants::SampleState {
-    fn from(item: SampleState) -> Self {
+impl From<web_common::database::flat_variants::SampleState>
+    for crate::database::flat_variants::SampleState
+{
+    fn from(item: web_common::database::flat_variants::SampleState) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -55,8 +54,10 @@ impl From<SampleState> for web_common::database::flat_variants::SampleState {
     }
 }
 
-impl From<web_common::database::flat_variants::SampleState> for SampleState {
-    fn from(item: web_common::database::flat_variants::SampleState) -> Self {
+impl From<crate::database::flat_variants::SampleState>
+    for web_common::database::flat_variants::SampleState
+{
+    fn from(item: crate::database::flat_variants::SampleState) -> Self {
         Self {
             id: item.id,
             name: item.name,
@@ -83,7 +84,7 @@ impl SampleState {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&SampleStateFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -114,7 +115,7 @@ impl SampleState {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&SampleStateFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleStateFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -179,7 +180,7 @@ impl SampleState {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&SampleStateFilter>,
+        filter: Option<&web_common::database::filter_variants::SampleStateFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,

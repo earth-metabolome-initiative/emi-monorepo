@@ -5,11 +5,11 @@
 use std::rc::Rc;
 use super::*;
 
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedBioOttRank {
-    pub inner: Rc<BioOttRank>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::BioOttRank>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedBioOttRank {}
@@ -27,7 +27,7 @@ impl Describable for NestedBioOttRank {
 }
 impl Colorable for NestedBioOttRank {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -42,8 +42,8 @@ impl NestedBioOttRank {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -101,20 +101,20 @@ impl NestedBioOttRank {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedBioOttTaxonItem {
-    pub inner: Rc<BioOttTaxonItem>,
-    pub ott_rank: Rc<NestedBioOttRank>,
-    pub domain: Option<Rc<BioOttTaxonItem>>,
-    pub kingdom: Option<Rc<BioOttTaxonItem>>,
-    pub phylum: Option<Rc<BioOttTaxonItem>>,
-    pub class: Option<Rc<BioOttTaxonItem>>,
-    pub order: Option<Rc<BioOttTaxonItem>>,
-    pub family: Option<Rc<BioOttTaxonItem>>,
-    pub genus: Option<Rc<BioOttTaxonItem>>,
-    pub parent: Rc<BioOttTaxonItem>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::BioOttTaxonItem>,
+    pub ott_rank: Rc<crate::database::nested_variants::NestedBioOttRank>,
+    pub domain: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
+    pub kingdom: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
+    pub phylum: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
+    pub class: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
+    pub order: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
+    pub family: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
+    pub genus: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
+    pub parent: Rc<crate::database::flat_variants::BioOttTaxonItem>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedBioOttTaxonItem {}
@@ -132,7 +132,7 @@ impl Describable for NestedBioOttTaxonItem {
 }
 impl Colorable for NestedBioOttTaxonItem {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -147,17 +147,17 @@ impl NestedBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            ott_rank: Rc::from(NestedBioOttRank::get(flat_variant.ott_rank_id, connection).await?.unwrap()),
-            domain: if let Some(domain_id) = flat_variant.domain_id { BioOttTaxonItem::get(domain_id, connection).await?.map(Rc::from) } else { None },
-            kingdom: if let Some(kingdom_id) = flat_variant.kingdom_id { BioOttTaxonItem::get(kingdom_id, connection).await?.map(Rc::from) } else { None },
-            phylum: if let Some(phylum_id) = flat_variant.phylum_id { BioOttTaxonItem::get(phylum_id, connection).await?.map(Rc::from) } else { None },
-            class: if let Some(class_id) = flat_variant.class_id { BioOttTaxonItem::get(class_id, connection).await?.map(Rc::from) } else { None },
-            order: if let Some(order_id) = flat_variant.order_id { BioOttTaxonItem::get(order_id, connection).await?.map(Rc::from) } else { None },
-            family: if let Some(family_id) = flat_variant.family_id { BioOttTaxonItem::get(family_id, connection).await?.map(Rc::from) } else { None },
-            genus: if let Some(genus_id) = flat_variant.genus_id { BioOttTaxonItem::get(genus_id, connection).await?.map(Rc::from) } else { None },
-            parent: Rc::from(BioOttTaxonItem::get(flat_variant.parent_id, connection).await?.unwrap()),
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            ott_rank: Rc::from(crate::database::nested_variants::NestedBioOttRank::get(flat_variant.ott_rank_id, connection).await?.unwrap()),
+            domain: if let Some(domain_id) = flat_variant.domain_id { crate::database::flat_variants::BioOttTaxonItem::get(domain_id, connection).await?.map(Rc::from) } else { None },
+            kingdom: if let Some(kingdom_id) = flat_variant.kingdom_id { crate::database::flat_variants::BioOttTaxonItem::get(kingdom_id, connection).await?.map(Rc::from) } else { None },
+            phylum: if let Some(phylum_id) = flat_variant.phylum_id { crate::database::flat_variants::BioOttTaxonItem::get(phylum_id, connection).await?.map(Rc::from) } else { None },
+            class: if let Some(class_id) = flat_variant.class_id { crate::database::flat_variants::BioOttTaxonItem::get(class_id, connection).await?.map(Rc::from) } else { None },
+            order: if let Some(order_id) = flat_variant.order_id { crate::database::flat_variants::BioOttTaxonItem::get(order_id, connection).await?.map(Rc::from) } else { None },
+            family: if let Some(family_id) = flat_variant.family_id { crate::database::flat_variants::BioOttTaxonItem::get(family_id, connection).await?.map(Rc::from) } else { None },
+            genus: if let Some(genus_id) = flat_variant.genus_id { crate::database::flat_variants::BioOttTaxonItem::get(genus_id, connection).await?.map(Rc::from) } else { None },
+            parent: Rc::from(crate::database::flat_variants::BioOttTaxonItem::get(flat_variant.parent_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -238,14 +238,14 @@ impl NestedBioOttTaxonItem {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedDerivedSample {
-    pub inner: DerivedSample,
-    pub created_by: Rc<NestedUser>,
-    pub updated_by: Rc<NestedUser>,
-    pub parent_sample: Rc<NestedSample>,
-    pub child_sample: Rc<NestedSample>,
-    pub unit: Rc<NestedUnit>,
+    pub inner: crate::database::flat_variants::DerivedSample,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub updated_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub parent_sample: Rc<crate::database::nested_variants::NestedSample>,
+    pub child_sample: Rc<crate::database::nested_variants::NestedSample>,
+    pub unit: Rc<crate::database::nested_variants::NestedUnit>,
 }
 
 unsafe impl Send for NestedDerivedSample {}
@@ -278,11 +278,11 @@ impl NestedDerivedSample {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
-            parent_sample: Rc::from(NestedSample::get(flat_variant.parent_sample_id, connection).await?.unwrap()),
-            child_sample: Rc::from(NestedSample::get(flat_variant.child_sample_id, connection).await?.unwrap()),
-            unit: Rc::from(NestedUnit::get(flat_variant.unit_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
+            parent_sample: Rc::from(crate::database::nested_variants::NestedSample::get(flat_variant.parent_sample_id, connection).await?.unwrap()),
+            child_sample: Rc::from(crate::database::nested_variants::NestedSample::get(flat_variant.child_sample_id, connection).await?.unwrap()),
+            unit: Rc::from(crate::database::nested_variants::NestedUnit::get(flat_variant.unit_id, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -365,11 +365,11 @@ impl NestedDerivedSample {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedDocumentFormat {
-    pub inner: Rc<DocumentFormat>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::DocumentFormat>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedDocumentFormat {}
@@ -387,7 +387,7 @@ impl Describable for NestedDocumentFormat {
 }
 impl Colorable for NestedDocumentFormat {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -402,8 +402,8 @@ impl NestedDocumentFormat {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -461,11 +461,11 @@ impl NestedDocumentFormat {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedLoginProvider {
-    pub inner: Rc<LoginProvider>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::LoginProvider>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedLoginProvider {}
@@ -483,7 +483,7 @@ impl Describable for NestedLoginProvider {
 }
 impl Colorable for NestedLoginProvider {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -498,8 +498,8 @@ impl NestedLoginProvider {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -557,11 +557,11 @@ impl NestedLoginProvider {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedMaterial {
-    pub inner: Rc<Material>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::Material>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedMaterial {}
@@ -579,7 +579,7 @@ impl Describable for NestedMaterial {
 }
 impl Colorable for NestedMaterial {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -594,8 +594,8 @@ impl NestedMaterial {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -653,13 +653,13 @@ impl NestedMaterial {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedNameplateCategory {
-    pub inner: Rc<NameplateCategory>,
-    pub permanence: Rc<NestedPermanenceCategory>,
-    pub material: Rc<NestedMaterial>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::NameplateCategory>,
+    pub permanence: Rc<crate::database::nested_variants::NestedPermanenceCategory>,
+    pub material: Rc<crate::database::nested_variants::NestedMaterial>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedNameplateCategory {}
@@ -677,7 +677,7 @@ impl Describable for NestedNameplateCategory {
 }
 impl Colorable for NestedNameplateCategory {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -692,10 +692,10 @@ impl NestedNameplateCategory {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            permanence: Rc::from(NestedPermanenceCategory::get(flat_variant.permanence_id, connection).await?.unwrap()),
-            material: Rc::from(NestedMaterial::get(flat_variant.material_id, connection).await?.unwrap()),
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            permanence: Rc::from(crate::database::nested_variants::NestedPermanenceCategory::get(flat_variant.permanence_id, connection).await?.unwrap()),
+            material: Rc::from(crate::database::nested_variants::NestedMaterial::get(flat_variant.material_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -755,13 +755,13 @@ impl NestedNameplateCategory {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedNameplate {
-    pub inner: Rc<Nameplate>,
-    pub project: Rc<NestedProject>,
-    pub category: Rc<NestedNameplateCategory>,
-    pub created_by: Rc<NestedUser>,
-    pub updated_by: Rc<NestedUser>,
+    pub inner: Rc<crate::database::flat_variants::Nameplate>,
+    pub project: Rc<crate::database::nested_variants::NestedProject>,
+    pub category: Rc<crate::database::nested_variants::NestedNameplateCategory>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub updated_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedNameplate {}
@@ -794,10 +794,10 @@ impl NestedNameplate {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
-            category: Rc::from(NestedNameplateCategory::get(flat_variant.category_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
+            project: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
+            category: Rc::from(crate::database::nested_variants::NestedNameplateCategory::get(flat_variant.category_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -879,10 +879,10 @@ impl NestedNameplate {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedNotification {
-    pub inner: Rc<Notification>,
-    pub user: Rc<NestedUser>,
+    pub inner: Rc<crate::database::flat_variants::Notification>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedNotification {}
@@ -915,7 +915,7 @@ impl NestedNotification {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -972,11 +972,11 @@ impl NestedNotification {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedObservationSubject {
-    pub inner: Rc<ObservationSubject>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::ObservationSubject>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedObservationSubject {}
@@ -994,7 +994,7 @@ impl Describable for NestedObservationSubject {
 }
 impl Colorable for NestedObservationSubject {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -1009,8 +1009,8 @@ impl NestedObservationSubject {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1068,16 +1068,16 @@ impl NestedObservationSubject {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedObservation {
-    pub inner: Rc<Observation>,
-    pub parent_observation: Option<Rc<Observation>>,
-    pub created_by: Rc<NestedUser>,
-    pub updated_by: Rc<NestedUser>,
-    pub project: Rc<NestedProject>,
-    pub organism: Option<Rc<NestedOrganism>>,
-    pub sample: Option<Rc<NestedSample>>,
-    pub subject: Rc<NestedObservationSubject>,
+    pub inner: Rc<crate::database::flat_variants::Observation>,
+    pub parent_observation: Option<Rc<crate::database::flat_variants::Observation>>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub updated_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub project: Rc<crate::database::nested_variants::NestedProject>,
+    pub organism: Option<Rc<crate::database::nested_variants::NestedOrganism>>,
+    pub sample: Option<Rc<crate::database::nested_variants::NestedSample>>,
+    pub subject: Rc<crate::database::nested_variants::NestedObservationSubject>,
 }
 
 unsafe impl Send for NestedObservation {}
@@ -1110,13 +1110,13 @@ impl NestedObservation {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            parent_observation: if let Some(parent_observation_id) = flat_variant.parent_observation_id { Observation::get(parent_observation_id, connection).await?.map(Rc::from) } else { None },
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
-            project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
-            organism: if let Some(organism_id) = flat_variant.organism_id { NestedOrganism::get(organism_id, connection).await?.map(Rc::from) } else { None },
-            sample: if let Some(sample_id) = flat_variant.sample_id { NestedSample::get(sample_id, connection).await?.map(Rc::from) } else { None },
-            subject: Rc::from(NestedObservationSubject::get(flat_variant.subject_id, connection).await?.unwrap()),
+            parent_observation: if let Some(parent_observation_id) = flat_variant.parent_observation_id { crate::database::flat_variants::Observation::get(parent_observation_id, connection).await?.map(Rc::from) } else { None },
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
+            project: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
+            organism: if let Some(organism_id) = flat_variant.organism_id { crate::database::nested_variants::NestedOrganism::get(organism_id, connection).await?.map(Rc::from) } else { None },
+            sample: if let Some(sample_id) = flat_variant.sample_id { crate::database::nested_variants::NestedSample::get(sample_id, connection).await?.map(Rc::from) } else { None },
+            subject: Rc::from(crate::database::nested_variants::NestedObservationSubject::get(flat_variant.subject_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1207,12 +1207,12 @@ impl NestedObservation {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedOrganismBioOttTaxonItem {
-    pub inner: OrganismBioOttTaxonItem,
-    pub created_by: Rc<NestedUser>,
-    pub organism: Rc<NestedOrganism>,
-    pub taxon: Rc<NestedBioOttTaxonItem>,
+    pub inner: crate::database::flat_variants::OrganismBioOttTaxonItem,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub organism: Rc<crate::database::nested_variants::NestedOrganism>,
+    pub taxon: Rc<crate::database::nested_variants::NestedBioOttTaxonItem>,
 }
 
 unsafe impl Send for NestedOrganismBioOttTaxonItem {}
@@ -1245,9 +1245,9 @@ impl NestedOrganismBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            organism: Rc::from(NestedOrganism::get(flat_variant.organism_id, connection).await?.unwrap()),
-            taxon: Rc::from(NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            organism: Rc::from(crate::database::nested_variants::NestedOrganism::get(flat_variant.organism_id, connection).await?.unwrap()),
+            taxon: Rc::from(crate::database::nested_variants::NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -1306,15 +1306,15 @@ impl NestedOrganismBioOttTaxonItem {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NestedOrganism {
-    pub inner: Rc<Organism>,
-    pub host_organism: Option<Rc<Organism>>,
-    pub sample: Option<Rc<NestedSample>>,
-    pub nameplate: Rc<NestedNameplate>,
-    pub project: Rc<NestedProject>,
-    pub created_by: Rc<NestedUser>,
-    pub updated_by: Rc<NestedUser>,
+    pub inner: Rc<crate::database::flat_variants::Organism>,
+    pub host_organism: Option<Rc<crate::database::flat_variants::Organism>>,
+    pub sample: Option<Rc<crate::database::nested_variants::NestedSample>>,
+    pub nameplate: Rc<crate::database::nested_variants::NestedNameplate>,
+    pub project: Rc<crate::database::nested_variants::NestedProject>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub updated_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedOrganism {}
@@ -1347,12 +1347,12 @@ impl NestedOrganism {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            host_organism: if let Some(host_organism_id) = flat_variant.host_organism_id { Organism::get(host_organism_id, connection).await?.map(Rc::from) } else { None },
-            sample: if let Some(sample_id) = flat_variant.sample_id { NestedSample::get(sample_id, connection).await?.map(Rc::from) } else { None },
-            nameplate: Rc::from(NestedNameplate::get(flat_variant.nameplate_id, connection).await?.unwrap()),
-            project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
+            host_organism: if let Some(host_organism_id) = flat_variant.host_organism_id { crate::database::flat_variants::Organism::get(host_organism_id, connection).await?.map(Rc::from) } else { None },
+            sample: if let Some(sample_id) = flat_variant.sample_id { crate::database::nested_variants::NestedSample::get(sample_id, connection).await?.map(Rc::from) } else { None },
+            nameplate: Rc::from(crate::database::nested_variants::NestedNameplate::get(flat_variant.nameplate_id, connection).await?.unwrap()),
+            project: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1440,10 +1440,10 @@ impl NestedOrganism {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedOrganization {
-    pub inner: Rc<Organization>,
-    pub country: Rc<Country>,
+    pub inner: Rc<crate::database::flat_variants::Organization>,
+    pub country: Rc<crate::database::flat_variants::Country>,
 }
 
 unsafe impl Send for NestedOrganization {}
@@ -1476,7 +1476,7 @@ impl NestedOrganization {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            country: Rc::from(Country::get(flat_variant.country_id, connection).await?.unwrap()),
+            country: Rc::from(crate::database::flat_variants::Country::get(flat_variant.country_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1533,11 +1533,11 @@ impl NestedOrganization {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedPermanenceCategory {
-    pub inner: Rc<PermanenceCategory>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::PermanenceCategory>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedPermanenceCategory {}
@@ -1555,7 +1555,7 @@ impl Describable for NestedPermanenceCategory {
 }
 impl Colorable for NestedPermanenceCategory {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -1570,8 +1570,8 @@ impl NestedPermanenceCategory {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1629,11 +1629,11 @@ impl NestedPermanenceCategory {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedProjectState {
-    pub inner: Rc<ProjectState>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::ProjectState>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedProjectState {}
@@ -1651,7 +1651,7 @@ impl Describable for NestedProjectState {
 }
 impl Colorable for NestedProjectState {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -1666,8 +1666,8 @@ impl NestedProjectState {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1725,15 +1725,15 @@ impl NestedProjectState {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedProject {
-    pub inner: Rc<Project>,
-    pub state: Rc<NestedProjectState>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
-    pub parent_project: Option<Rc<Project>>,
-    pub created_by: Rc<NestedUser>,
-    pub updated_by: Rc<NestedUser>,
+    pub inner: Rc<crate::database::flat_variants::Project>,
+    pub state: Rc<crate::database::nested_variants::NestedProjectState>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
+    pub parent_project: Option<Rc<crate::database::flat_variants::Project>>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub updated_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedProject {}
@@ -1751,7 +1751,7 @@ impl Describable for NestedProject {
 }
 impl Colorable for NestedProject {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -1766,12 +1766,12 @@ impl NestedProject {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            state: Rc::from(NestedProjectState::get(flat_variant.state_id, connection).await?.unwrap()),
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
-            parent_project: if let Some(parent_project_id) = flat_variant.parent_project_id { Project::get(parent_project_id, connection).await?.map(Rc::from) } else { None },
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
+            state: Rc::from(crate::database::nested_variants::NestedProjectState::get(flat_variant.state_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            parent_project: if let Some(parent_project_id) = flat_variant.parent_project_id { crate::database::flat_variants::Project::get(parent_project_id, connection).await?.map(Rc::from) } else { None },
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -1857,13 +1857,13 @@ impl NestedProject {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedProjectsTeamsRoleInvitation {
-    pub inner: ProjectsTeamsRoleInvitation,
-    pub table: Rc<NestedProject>,
-    pub team: Rc<NestedTeam>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::ProjectsTeamsRoleInvitation,
+    pub table: Rc<crate::database::nested_variants::NestedProject>,
+    pub team: Rc<crate::database::nested_variants::NestedTeam>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedProjectsTeamsRoleInvitation {}
@@ -1896,10 +1896,10 @@ impl NestedProjectsTeamsRoleInvitation {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
-            team: Rc::from(NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
+            team: Rc::from(crate::database::nested_variants::NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -1959,13 +1959,13 @@ impl NestedProjectsTeamsRoleInvitation {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedProjectsTeamsRoleRequest {
-    pub inner: ProjectsTeamsRoleRequest,
-    pub table: Rc<NestedProject>,
-    pub team: Rc<NestedTeam>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::ProjectsTeamsRoleRequest,
+    pub table: Rc<crate::database::nested_variants::NestedProject>,
+    pub team: Rc<crate::database::nested_variants::NestedTeam>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedProjectsTeamsRoleRequest {}
@@ -1998,10 +1998,10 @@ impl NestedProjectsTeamsRoleRequest {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
-            team: Rc::from(NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
+            team: Rc::from(crate::database::nested_variants::NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2061,13 +2061,13 @@ impl NestedProjectsTeamsRoleRequest {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedProjectsTeamsRole {
-    pub inner: ProjectsTeamsRole,
-    pub table: Rc<NestedProject>,
-    pub team: Rc<NestedTeam>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::ProjectsTeamsRole,
+    pub table: Rc<crate::database::nested_variants::NestedProject>,
+    pub team: Rc<crate::database::nested_variants::NestedTeam>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedProjectsTeamsRole {}
@@ -2100,10 +2100,10 @@ impl NestedProjectsTeamsRole {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
-            team: Rc::from(NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
+            team: Rc::from(crate::database::nested_variants::NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2163,13 +2163,13 @@ impl NestedProjectsTeamsRole {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedProjectsUsersRoleInvitation {
-    pub inner: ProjectsUsersRoleInvitation,
-    pub table: Rc<NestedProject>,
-    pub user: Rc<NestedUser>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::ProjectsUsersRoleInvitation,
+    pub table: Rc<crate::database::nested_variants::NestedProject>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedProjectsUsersRoleInvitation {}
@@ -2202,10 +2202,10 @@ impl NestedProjectsUsersRoleInvitation {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2265,13 +2265,13 @@ impl NestedProjectsUsersRoleInvitation {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedProjectsUsersRoleRequest {
-    pub inner: ProjectsUsersRoleRequest,
-    pub table: Rc<NestedProject>,
-    pub user: Rc<NestedUser>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::ProjectsUsersRoleRequest,
+    pub table: Rc<crate::database::nested_variants::NestedProject>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedProjectsUsersRoleRequest {}
@@ -2304,10 +2304,10 @@ impl NestedProjectsUsersRoleRequest {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2367,13 +2367,13 @@ impl NestedProjectsUsersRoleRequest {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedProjectsUsersRole {
-    pub inner: ProjectsUsersRole,
-    pub table: Rc<NestedProject>,
-    pub user: Rc<NestedUser>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::ProjectsUsersRole,
+    pub table: Rc<crate::database::nested_variants::NestedProject>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedProjectsUsersRole {}
@@ -2406,10 +2406,10 @@ impl NestedProjectsUsersRole {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2469,11 +2469,11 @@ impl NestedProjectsUsersRole {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedRole {
-    pub inner: Rc<Role>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::Role>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedRole {}
@@ -2491,7 +2491,7 @@ impl Describable for NestedRole {
 }
 impl Colorable for NestedRole {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -2506,8 +2506,8 @@ impl NestedRole {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -2565,12 +2565,12 @@ impl NestedRole {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSampleBioOttTaxonItem {
-    pub inner: SampleBioOttTaxonItem,
-    pub created_by: Rc<NestedUser>,
-    pub sample: Rc<NestedSample>,
-    pub taxon: Rc<NestedBioOttTaxonItem>,
+    pub inner: crate::database::flat_variants::SampleBioOttTaxonItem,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub sample: Rc<crate::database::nested_variants::NestedSample>,
+    pub taxon: Rc<crate::database::nested_variants::NestedBioOttTaxonItem>,
 }
 
 unsafe impl Send for NestedSampleBioOttTaxonItem {}
@@ -2603,9 +2603,9 @@ impl NestedSampleBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            sample: Rc::from(NestedSample::get(flat_variant.sample_id, connection).await?.unwrap()),
-            taxon: Rc::from(NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            sample: Rc::from(crate::database::nested_variants::NestedSample::get(flat_variant.sample_id, connection).await?.unwrap()),
+            taxon: Rc::from(crate::database::nested_variants::NestedBioOttTaxonItem::get(flat_variant.taxon_id, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -2664,12 +2664,12 @@ impl NestedSampleBioOttTaxonItem {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSampleContainerCategory {
-    pub inner: Rc<SampleContainerCategory>,
-    pub material: Rc<NestedMaterial>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::SampleContainerCategory>,
+    pub material: Rc<crate::database::nested_variants::NestedMaterial>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedSampleContainerCategory {}
@@ -2687,7 +2687,7 @@ impl Describable for NestedSampleContainerCategory {
 }
 impl Colorable for NestedSampleContainerCategory {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -2702,9 +2702,9 @@ impl NestedSampleContainerCategory {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            material: Rc::from(NestedMaterial::get(flat_variant.material_id, connection).await?.unwrap()),
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            material: Rc::from(crate::database::nested_variants::NestedMaterial::get(flat_variant.material_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -2763,13 +2763,13 @@ impl NestedSampleContainerCategory {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSampleContainer {
-    pub inner: Rc<SampleContainer>,
-    pub project: Rc<NestedProject>,
-    pub category: Rc<NestedSampleContainerCategory>,
-    pub created_by: Rc<NestedUser>,
-    pub updated_by: Rc<NestedUser>,
+    pub inner: Rc<crate::database::flat_variants::SampleContainer>,
+    pub project: Rc<crate::database::nested_variants::NestedProject>,
+    pub category: Rc<crate::database::nested_variants::NestedSampleContainerCategory>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub updated_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedSampleContainer {}
@@ -2802,10 +2802,10 @@ impl NestedSampleContainer {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
-            category: Rc::from(NestedSampleContainerCategory::get(flat_variant.category_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
+            project: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
+            category: Rc::from(crate::database::nested_variants::NestedSampleContainerCategory::get(flat_variant.category_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -2887,11 +2887,11 @@ impl NestedSampleContainer {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSampleState {
-    pub inner: Rc<SampleState>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::SampleState>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedSampleState {}
@@ -2909,7 +2909,7 @@ impl Describable for NestedSampleState {
 }
 impl Colorable for NestedSampleState {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -2924,8 +2924,8 @@ impl NestedSampleState {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -2983,15 +2983,15 @@ impl NestedSampleState {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSample {
-    pub inner: Rc<Sample>,
-    pub container: Rc<NestedSampleContainer>,
-    pub project: Rc<NestedProject>,
-    pub created_by: Rc<NestedUser>,
-    pub sampled_by: Rc<NestedUser>,
-    pub updated_by: Rc<NestedUser>,
-    pub state: Rc<NestedSampleState>,
+    pub inner: Rc<crate::database::flat_variants::Sample>,
+    pub container: Rc<crate::database::nested_variants::NestedSampleContainer>,
+    pub project: Rc<crate::database::nested_variants::NestedProject>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub sampled_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub updated_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub state: Rc<crate::database::nested_variants::NestedSampleState>,
 }
 
 unsafe impl Send for NestedSample {}
@@ -3024,12 +3024,12 @@ impl NestedSample {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            container: Rc::from(NestedSampleContainer::get(flat_variant.container_id, connection).await?.unwrap()),
-            project: Rc::from(NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            sampled_by: Rc::from(NestedUser::get(flat_variant.sampled_by, connection).await?.unwrap()),
-            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
-            state: Rc::from(NestedSampleState::get(flat_variant.state_id, connection).await?.unwrap()),
+            container: Rc::from(crate::database::nested_variants::NestedSampleContainer::get(flat_variant.container_id, connection).await?.unwrap()),
+            project: Rc::from(crate::database::nested_variants::NestedProject::get(flat_variant.project_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            sampled_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.sampled_by, connection).await?.unwrap()),
+            updated_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
+            state: Rc::from(crate::database::nested_variants::NestedSampleState::get(flat_variant.state_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -3113,10 +3113,10 @@ impl NestedSample {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSpectra {
-    pub inner: Spectra,
-    pub spectra_collection: Rc<NestedSpectraCollection>,
+    pub inner: crate::database::flat_variants::Spectra,
+    pub spectra_collection: Rc<crate::database::nested_variants::NestedSpectraCollection>,
 }
 
 unsafe impl Send for NestedSpectra {}
@@ -3149,7 +3149,7 @@ impl NestedSpectra {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            spectra_collection: Rc::from(NestedSpectraCollection::get(flat_variant.spectra_collection_id, connection).await?.unwrap()),
+            spectra_collection: Rc::from(crate::database::nested_variants::NestedSpectraCollection::get(flat_variant.spectra_collection_id, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -3206,12 +3206,12 @@ impl NestedSpectra {
         Ok(())
     }
 }
-#[derive(PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedSpectraCollection {
-    pub inner: Rc<SpectraCollection>,
-    pub sample: Rc<NestedSample>,
-    pub created_by: Rc<NestedUser>,
-    pub updated_by: Rc<NestedUser>,
+    pub inner: Rc<crate::database::flat_variants::SpectraCollection>,
+    pub sample: Rc<crate::database::nested_variants::NestedSample>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub updated_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedSpectraCollection {}
@@ -3244,9 +3244,9 @@ impl NestedSpectraCollection {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            sample: Rc::from(NestedSample::get(flat_variant.sample_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
+            sample: Rc::from(crate::database::nested_variants::NestedSample::get(flat_variant.sample_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -3327,11 +3327,11 @@ impl NestedSpectraCollection {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedTeamState {
-    pub inner: Rc<TeamState>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::TeamState>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedTeamState {}
@@ -3349,7 +3349,7 @@ impl Describable for NestedTeamState {
 }
 impl Colorable for NestedTeamState {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -3364,8 +3364,8 @@ impl NestedTeamState {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -3423,15 +3423,15 @@ impl NestedTeamState {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedTeam {
-    pub inner: Rc<Team>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
-    pub state: Rc<NestedTeamState>,
-    pub parent_team: Option<Rc<Team>>,
-    pub created_by: Rc<NestedUser>,
-    pub updated_by: Rc<NestedUser>,
+    pub inner: Rc<crate::database::flat_variants::Team>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
+    pub state: Rc<crate::database::nested_variants::NestedTeamState>,
+    pub parent_team: Option<Rc<crate::database::flat_variants::Team>>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub updated_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedTeam {}
@@ -3449,7 +3449,7 @@ impl Describable for NestedTeam {
 }
 impl Colorable for NestedTeam {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -3464,12 +3464,12 @@ impl NestedTeam {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
-            state: Rc::from(NestedTeamState::get(flat_variant.state_id, connection).await?.unwrap()),
-            parent_team: if let Some(parent_team_id) = flat_variant.parent_team_id { Team::get(parent_team_id, connection).await?.map(Rc::from) } else { None },
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            updated_by: Rc::from(NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            state: Rc::from(crate::database::nested_variants::NestedTeamState::get(flat_variant.state_id, connection).await?.unwrap()),
+            parent_team: if let Some(parent_team_id) = flat_variant.parent_team_id { crate::database::flat_variants::Team::get(parent_team_id, connection).await?.map(Rc::from) } else { None },
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            updated_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.updated_by, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -3555,13 +3555,13 @@ impl NestedTeam {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedTeamsTeamsRoleInvitation {
-    pub inner: TeamsTeamsRoleInvitation,
-    pub table: Rc<NestedTeam>,
-    pub team: Rc<NestedTeam>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::TeamsTeamsRoleInvitation,
+    pub table: Rc<crate::database::nested_variants::NestedTeam>,
+    pub team: Rc<crate::database::nested_variants::NestedTeam>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedTeamsTeamsRoleInvitation {}
@@ -3594,10 +3594,10 @@ impl NestedTeamsTeamsRoleInvitation {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
-            team: Rc::from(NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
+            team: Rc::from(crate::database::nested_variants::NestedTeam::get(flat_variant.team_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -3657,13 +3657,13 @@ impl NestedTeamsTeamsRoleInvitation {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedTeamsUsersRoleInvitation {
-    pub inner: TeamsUsersRoleInvitation,
-    pub table: Rc<NestedTeam>,
-    pub user: Rc<NestedUser>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::TeamsUsersRoleInvitation,
+    pub table: Rc<crate::database::nested_variants::NestedTeam>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedTeamsUsersRoleInvitation {}
@@ -3696,10 +3696,10 @@ impl NestedTeamsUsersRoleInvitation {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -3759,13 +3759,13 @@ impl NestedTeamsUsersRoleInvitation {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedTeamsUsersRoleRequest {
-    pub inner: TeamsUsersRoleRequest,
-    pub table: Rc<NestedTeam>,
-    pub user: Rc<NestedUser>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::TeamsUsersRoleRequest,
+    pub table: Rc<crate::database::nested_variants::NestedTeam>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedTeamsUsersRoleRequest {}
@@ -3798,10 +3798,10 @@ impl NestedTeamsUsersRoleRequest {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -3861,13 +3861,13 @@ impl NestedTeamsUsersRoleRequest {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedTeamsUsersRole {
-    pub inner: TeamsUsersRole,
-    pub table: Rc<NestedTeam>,
-    pub user: Rc<NestedUser>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::TeamsUsersRole,
+    pub table: Rc<crate::database::nested_variants::NestedTeam>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedTeamsUsersRole {}
@@ -3900,10 +3900,10 @@ impl NestedTeamsUsersRole {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedTeam::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -3963,11 +3963,11 @@ impl NestedTeamsUsersRole {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedUnit {
-    pub inner: Rc<Unit>,
-    pub icon: Rc<FontAwesomeIcon>,
-    pub color: Rc<Color>,
+    pub inner: Rc<crate::database::flat_variants::Unit>,
+    pub icon: Rc<crate::database::flat_variants::FontAwesomeIcon>,
+    pub color: Rc<crate::database::flat_variants::Color>,
 }
 
 unsafe impl Send for NestedUnit {}
@@ -3985,7 +3985,7 @@ impl Describable for NestedUnit {
 }
 impl Colorable for NestedUnit {
     fn color(&self) -> Option<&str> {
-        Some(self.color.name.as_str())
+        None
     }
 }
 #[cfg(feature = "frontend")]
@@ -4000,8 +4000,8 @@ impl NestedUnit {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            icon: Rc::from(FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
-            color: Rc::from(Color::get(flat_variant.color_id, connection).await?.unwrap()),
+            icon: Rc::from(crate::database::flat_variants::FontAwesomeIcon::get(flat_variant.icon_id, connection).await?.unwrap()),
+            color: Rc::from(crate::database::flat_variants::Color::get(flat_variant.color_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -4059,11 +4059,11 @@ impl NestedUnit {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedUserEmail {
-    pub inner: Rc<UserEmail>,
-    pub created_by: Rc<NestedUser>,
-    pub login_provider: Rc<NestedLoginProvider>,
+    pub inner: Rc<crate::database::flat_variants::UserEmail>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
+    pub login_provider: Rc<crate::database::nested_variants::NestedLoginProvider>,
 }
 
 unsafe impl Send for NestedUserEmail {}
@@ -4096,8 +4096,8 @@ impl NestedUserEmail {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
-            login_provider: Rc::from(NestedLoginProvider::get(flat_variant.login_provider_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            login_provider: Rc::from(crate::database::nested_variants::NestedLoginProvider::get(flat_variant.login_provider_id, connection).await?.unwrap()),
             inner: Rc::from(flat_variant),
         })
     }
@@ -4155,10 +4155,10 @@ impl NestedUserEmail {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedUser {
-    pub inner: Rc<User>,
-    pub organization: Option<Rc<NestedOrganization>>,
+    pub inner: Rc<crate::database::flat_variants::User>,
+    pub organization: Option<Rc<crate::database::nested_variants::NestedOrganization>>,
 }
 
 unsafe impl Send for NestedUser {}
@@ -4191,7 +4191,7 @@ impl NestedUser {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            organization: if let Some(organization_id) = flat_variant.organization_id { NestedOrganization::get(organization_id, connection).await?.map(Rc::from) } else { None },
+            organization: if let Some(organization_id) = flat_variant.organization_id { crate::database::nested_variants::NestedOrganization::get(organization_id, connection).await?.map(Rc::from) } else { None },
             inner: Rc::from(flat_variant),
         })
     }
@@ -4272,13 +4272,13 @@ impl NestedUser {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedUsersUsersRoleInvitation {
-    pub inner: UsersUsersRoleInvitation,
-    pub table: Rc<NestedUser>,
-    pub user: Rc<NestedUser>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::UsersUsersRoleInvitation,
+    pub table: Rc<crate::database::nested_variants::NestedUser>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedUsersUsersRoleInvitation {}
@@ -4311,10 +4311,10 @@ impl NestedUsersUsersRoleInvitation {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedUser::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -4374,13 +4374,13 @@ impl NestedUsersUsersRoleInvitation {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedUsersUsersRoleRequest {
-    pub inner: UsersUsersRoleRequest,
-    pub table: Rc<NestedUser>,
-    pub user: Rc<NestedUser>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::UsersUsersRoleRequest,
+    pub table: Rc<crate::database::nested_variants::NestedUser>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedUsersUsersRoleRequest {}
@@ -4413,10 +4413,10 @@ impl NestedUsersUsersRoleRequest {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedUser::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }
@@ -4476,13 +4476,13 @@ impl NestedUsersUsersRoleRequest {
         Ok(())
     }
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedUsersUsersRole {
-    pub inner: UsersUsersRole,
-    pub table: Rc<NestedUser>,
-    pub user: Rc<NestedUser>,
-    pub role: Rc<NestedRole>,
-    pub created_by: Rc<NestedUser>,
+    pub inner: crate::database::flat_variants::UsersUsersRole,
+    pub table: Rc<crate::database::nested_variants::NestedUser>,
+    pub user: Rc<crate::database::nested_variants::NestedUser>,
+    pub role: Rc<crate::database::nested_variants::NestedRole>,
+    pub created_by: Rc<crate::database::nested_variants::NestedUser>,
 }
 
 unsafe impl Send for NestedUsersUsersRole {}
@@ -4515,10 +4515,10 @@ impl NestedUsersUsersRole {
         connection: &mut gluesql::prelude::Glue<impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut>,
     ) -> Result<Self, gluesql::prelude::Error> {
         Ok(Self {
-            table: Rc::from(NestedUser::get(flat_variant.table_id, connection).await?.unwrap()),
-            user: Rc::from(NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
-            role: Rc::from(NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
-            created_by: Rc::from(NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
+            table: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.table_id, connection).await?.unwrap()),
+            user: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.user_id, connection).await?.unwrap()),
+            role: Rc::from(crate::database::nested_variants::NestedRole::get(flat_variant.role_id, connection).await?.unwrap()),
+            created_by: Rc::from(crate::database::nested_variants::NestedUser::get(flat_variant.created_by, connection).await?.unwrap()),
             inner: flat_variant,
         })
     }

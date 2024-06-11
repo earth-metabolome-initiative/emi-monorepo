@@ -1,17 +1,13 @@
-use super::*;
 use crate::database::*;
 use std::rc::Rc;
-use web_common::database::filter_structs::*;
 
-#[derive(
-    Eq, PartialEq, PartialOrd, Debug, Clone, serde::Serialize, serde::Deserialize, Default,
-)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NestedTeamsUsersRole {
-    pub inner: TeamsUsersRole,
-    pub table: NestedTeam,
-    pub user: NestedUser,
-    pub role: NestedRole,
-    pub created_by: NestedUser,
+    pub inner: crate::database::flat_variants::TeamsUsersRole,
+    pub table: crate::database::nested_variants::NestedTeam,
+    pub user: crate::database::nested_variants::NestedUser,
+    pub role: crate::database::nested_variants::NestedRole,
+    pub created_by: crate::database::nested_variants::NestedUser,
 }
 
 unsafe impl Send for NestedTeamsUsersRole {}
@@ -29,10 +25,22 @@ impl NestedTeamsUsersRole {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            table: NestedTeam::get(flat_variant.table_id, connection)?,
-            user: NestedUser::get(flat_variant.user_id, connection)?,
-            role: NestedRole::get(flat_variant.role_id, connection)?,
-            created_by: NestedUser::get(flat_variant.created_by, connection)?,
+            table: crate::database::nested_variants::NestedTeam::get(
+                flat_variant.table_id,
+                connection,
+            )?,
+            user: crate::database::nested_variants::NestedUser::get(
+                flat_variant.user_id,
+                connection,
+            )?,
+            role: crate::database::nested_variants::NestedRole::get(
+                flat_variant.role_id,
+                connection,
+            )?,
+            created_by: crate::database::nested_variants::NestedUser::get(
+                flat_variant.created_by,
+                connection,
+            )?,
             inner: flat_variant,
         })
     }
@@ -51,7 +59,7 @@ impl NestedTeamsUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&TeamsUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -70,7 +78,7 @@ impl NestedTeamsUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&TeamsUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamsUsersRoleFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
@@ -103,7 +111,7 @@ impl NestedTeamsUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&TeamsUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamsUsersRoleFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -174,7 +182,7 @@ impl NestedTeamsUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable(
-        filter: Option<&TeamsUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamsUsersRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -195,7 +203,7 @@ impl NestedTeamsUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_updatable_sorted(
-        filter: Option<&TeamsUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamsUsersRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -217,7 +225,7 @@ impl NestedTeamsUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_updatable(
-        filter: Option<&TeamsUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamsUsersRoleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -273,7 +281,7 @@ impl NestedTeamsUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable(
-        filter: Option<&TeamsUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamsUsersRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -294,7 +302,7 @@ impl NestedTeamsUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_administrable_sorted(
-        filter: Option<&TeamsUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamsUsersRoleFilter>,
         author_user_id: i32,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -316,7 +324,7 @@ impl NestedTeamsUsersRole {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_administrable(
-        filter: Option<&TeamsUsersRoleFilter>,
+        filter: Option<&web_common::database::filter_variants::TeamsUsersRoleFilter>,
         author_user_id: i32,
         query: &str,
         limit: Option<i64>,
@@ -365,25 +373,39 @@ impl NestedTeamsUsersRole {
         TeamsUsersRole::delete_by_id((table_id, user_id), author_user_id, connection)
     }
 }
-impl From<web_common::database::nested_variants::NestedTeamsUsersRole> for NestedTeamsUsersRole {
+impl From<web_common::database::nested_variants::NestedTeamsUsersRole>
+    for crate::database::nested_variants::NestedTeamsUsersRole
+{
     fn from(item: web_common::database::nested_variants::NestedTeamsUsersRole) -> Self {
         Self {
-            inner: TeamsUsersRole::from(item.inner),
-            table: NestedTeam::from(item.table.as_ref().clone()),
-            user: NestedUser::from(item.user.as_ref().clone()),
-            role: NestedRole::from(item.role.as_ref().clone()),
-            created_by: NestedUser::from(item.created_by.as_ref().clone()),
+            inner: crate::database::flat_variants::TeamsUsersRole::from(item.inner),
+            table: crate::database::nested_variants::NestedTeam::from(item.table.as_ref().clone()),
+            user: crate::database::nested_variants::NestedUser::from(item.user.as_ref().clone()),
+            role: crate::database::nested_variants::NestedRole::from(item.role.as_ref().clone()),
+            created_by: crate::database::nested_variants::NestedUser::from(
+                item.created_by.as_ref().clone(),
+            ),
         }
     }
 }
-impl From<NestedTeamsUsersRole> for web_common::database::nested_variants::NestedTeamsUsersRole {
-    fn from(item: NestedTeamsUsersRole) -> Self {
+impl From<crate::database::nested_variants::NestedTeamsUsersRole>
+    for web_common::database::nested_variants::NestedTeamsUsersRole
+{
+    fn from(item: crate::database::nested_variants::NestedTeamsUsersRole) -> Self {
         Self {
-            inner: web_common::database::TeamsUsersRole::from(item.inner),
-            table: Rc::from(web_common::database::NestedTeam::from(item.table)),
-            user: Rc::from(web_common::database::NestedUser::from(item.user)),
-            role: Rc::from(web_common::database::NestedRole::from(item.role)),
-            created_by: Rc::from(web_common::database::NestedUser::from(item.created_by)),
+            inner: web_common::database::flat_variants::TeamsUsersRole::from(item.inner),
+            table: Rc::from(web_common::database::nested_variants::NestedTeam::from(
+                item.table,
+            )),
+            user: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.user,
+            )),
+            role: Rc::from(web_common::database::nested_variants::NestedRole::from(
+                item.role,
+            )),
+            created_by: Rc::from(web_common::database::nested_variants::NestedUser::from(
+                item.created_by,
+            )),
         }
     }
 }

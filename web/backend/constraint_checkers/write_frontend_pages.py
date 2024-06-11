@@ -73,7 +73,7 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
             f"pub struct {component_name}Prop {{\n"
         )
         for primary_key in flat_variant.get_primary_keys():
-            document.write(f"    pub {primary_key.name}: {primary_key.data_type()},\n")
+            document.write(f"    pub {primary_key.name}: {primary_key.data_type(route='frontend')},\n")
 
         document.write("}\n\n")
 
