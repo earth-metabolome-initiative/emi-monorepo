@@ -33,7 +33,7 @@ pub(crate) fn create_user(
 ) -> QueryResult<User> {
     let chained_emails = user_emails.emails().join(", ");
     let mut identicon = Identicon::new(&chained_emails);
-    identicon.set_size(256).unwrap();
+    identicon.set_scale(256).unwrap();
     let dynamic_image = identicon.generate_image().unwrap();
 
     // Write the image data into the buffer as JPEG format
