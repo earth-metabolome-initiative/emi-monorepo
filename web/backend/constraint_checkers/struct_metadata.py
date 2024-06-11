@@ -632,8 +632,7 @@ class AttributeMetadata:
     def is_color(self) -> bool:
         """Returns whether the attribute is a color."""
         return (
-            self.name in ("color",)
-            and self.data_type(route="frontend") == "Color"
+            self.data_type(route="frontend") == "web_common::database::flat_variants::Color"
             and self.has_struct_data_type()
         )
 

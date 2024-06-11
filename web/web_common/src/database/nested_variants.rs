@@ -27,7 +27,7 @@ impl Describable for NestedBioOttRank {
 }
 impl Colorable for NestedBioOttRank {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -132,7 +132,7 @@ impl Describable for NestedBioOttTaxonItem {
 }
 impl Colorable for NestedBioOttTaxonItem {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -387,7 +387,7 @@ impl Describable for NestedDocumentFormat {
 }
 impl Colorable for NestedDocumentFormat {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -483,7 +483,7 @@ impl Describable for NestedLoginProvider {
 }
 impl Colorable for NestedLoginProvider {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -579,7 +579,7 @@ impl Describable for NestedMaterial {
 }
 impl Colorable for NestedMaterial {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -677,7 +677,7 @@ impl Describable for NestedNameplateCategory {
 }
 impl Colorable for NestedNameplateCategory {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -994,7 +994,7 @@ impl Describable for NestedObservationSubject {
 }
 impl Colorable for NestedObservationSubject {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -1555,7 +1555,7 @@ impl Describable for NestedPermanenceCategory {
 }
 impl Colorable for NestedPermanenceCategory {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -1651,7 +1651,7 @@ impl Describable for NestedProjectState {
 }
 impl Colorable for NestedProjectState {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -1751,7 +1751,7 @@ impl Describable for NestedProject {
 }
 impl Colorable for NestedProject {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -2491,7 +2491,7 @@ impl Describable for NestedRole {
 }
 impl Colorable for NestedRole {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -2687,7 +2687,7 @@ impl Describable for NestedSampleContainerCategory {
 }
 impl Colorable for NestedSampleContainerCategory {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -2909,7 +2909,7 @@ impl Describable for NestedSampleState {
 }
 impl Colorable for NestedSampleState {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -3349,7 +3349,7 @@ impl Describable for NestedTeamState {
 }
 impl Colorable for NestedTeamState {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -3449,7 +3449,7 @@ impl Describable for NestedTeam {
 }
 impl Colorable for NestedTeam {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
@@ -3985,7 +3985,7 @@ impl Describable for NestedUnit {
 }
 impl Colorable for NestedUnit {
     fn color(&self) -> Option<&str> {
-        None
+        Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
