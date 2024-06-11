@@ -29,6 +29,7 @@
 
     input {
         background-color: white;
+        color: $near_black;
         transition: background-color 0.2s;
         font-size: 0.9em;
         &:disabled {
@@ -176,11 +177,39 @@
     }
 }
 
-.map {
-    height: 400px;
-    width: 100%;
-    margin-bottom: 0.5em;
-    border-radius: 0.5em;
+.gps-input {
+    .map {
+        height: 400px;
+        width: 100%;
+        margin-bottom: 0.5em;
+        border-radius: 0.5em;
+    }
+
+    div.input-container {
+        position: relative;
+        &:after {
+            content: "\f041";
+            display: block;
+            font-family: "Font Awesome 5 Free";
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 900;
+            font-size: 1.2em;
+            color: $grey;
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: color 0.2s;
+        }
+        &:focus-within {
+            &:after {
+                color: $primary;
+            }
+        }
+    }
 }
 
 ul.input-errors {
@@ -301,6 +330,9 @@ form.standard-form {
     ul.coords-wrapper {
         &:before {
             content: "Coords:";
+            min-width: 100px;
+            padding-right: 0.5em;
+            color: $near_black;
         }
 
         >li {
@@ -308,6 +340,10 @@ form.standard-form {
 
             &:not(:last-child) {
                 margin-right: 0.5em;
+            }
+
+            .input-group {
+                padding: 0;
             }
         }
     }
