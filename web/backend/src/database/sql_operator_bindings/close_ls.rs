@@ -3,7 +3,7 @@
 //!
 //! This file contains the bindings for the SQL operators in the database.
 
-diesel::infix_operator!(CloseLs, " ## ", postgis_diesel::sql_types::Geometry, backend: diesel::pg::Pg);
+diesel::infix_operator!(CloseLs, " ## ", crate::database::sql_type_bindings::Point, backend: diesel::pg::Pg);
 /// Trait for the `##` operator.
 pub trait HasCloseLs:
     Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>

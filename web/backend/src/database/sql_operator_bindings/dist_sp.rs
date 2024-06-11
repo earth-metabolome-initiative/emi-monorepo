@@ -11,7 +11,7 @@ pub trait HasDistSp:
     /// The function to create the `DistSp` struct representing the `<->` operator.
     fn dist_sp<Rhs>(self, rhs: Rhs) -> DistSp<Self, Rhs::Expression>
     where
-        Rhs: diesel::expression::AsExpression<postgis_diesel::sql_types::Geometry>,
+        Rhs: diesel::expression::AsExpression<crate::database::sql_type_bindings::Point>,
     {
         DistSp::new(self, rhs.as_expression())
     }

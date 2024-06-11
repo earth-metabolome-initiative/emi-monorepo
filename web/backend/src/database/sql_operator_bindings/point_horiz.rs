@@ -6,18 +6,18 @@
 diesel::infix_operator!(PointHoriz, " ?- ", diesel::sql_types::Bool, backend: diesel::pg::Pg);
 /// Trait for the `?-` operator.
 pub trait HasPointHoriz:
-    Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
     /// The function to create the `PointHoriz` struct representing the `?-` operator.
     fn point_horiz<Rhs>(self, rhs: Rhs) -> PointHoriz<Self, Rhs::Expression>
     where
-        Rhs: diesel::expression::AsExpression<postgis_diesel::sql_types::Geometry>,
+        Rhs: diesel::expression::AsExpression<crate::database::sql_type_bindings::Point>,
     {
         PointHoriz::new(self, rhs.as_expression())
     }
 }
 
 impl<T> HasPointHoriz for T where
-    T: Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    T: Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
 }

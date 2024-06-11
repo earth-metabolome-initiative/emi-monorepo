@@ -194,7 +194,7 @@ def postgres_type_to_rust_type(postgres_type: str) -> str:
         return "postgis::ewkb::Geometry"
     if postgres_type == "geography":
         return "postgis::ewkb::Geometry"
-    if postgres_type == "point":
+    if postgres_type == "geometry(Point,4326)":
         return "Point"
     if postgres_type == "line":
         return "postgis::ewkb::LineString"
@@ -261,7 +261,7 @@ def postgres_type_to_diesel_type(postgres_type: str) -> str:
         return "postgis_diesel::sql_types::Geometry"
     if postgres_type == "geography":
         return "postgis_diesel::sql_types::Geography"
-    if postgres_type == "point":
+    if postgres_type == "geometry(Point,4326)":
         return "postgis_diesel::sql_types::Geometry"
         # return "postgis_diesel::types::Point"
     if postgres_type == "line":

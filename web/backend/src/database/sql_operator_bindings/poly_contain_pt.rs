@@ -11,7 +11,7 @@ pub trait HasPolyContainPt:
     /// The function to create the `PolyContainPt` struct representing the `@>` operator.
     fn poly_contain_pt<Rhs>(self, rhs: Rhs) -> PolyContainPt<Self, Rhs::Expression>
     where
-        Rhs: diesel::expression::AsExpression<postgis_diesel::sql_types::Geometry>,
+        Rhs: diesel::expression::AsExpression<crate::database::sql_type_bindings::Point>,
     {
         PolyContainPt::new(self, rhs.as_expression())
     }

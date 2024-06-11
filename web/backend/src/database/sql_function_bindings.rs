@@ -1094,7 +1094,7 @@ diesel::define_sql_function! {
 diesel::define_sql_function! {
    fn point(
         arg_0: postgis_diesel::sql_types::Geometry,
-    ) -> postgis_diesel::sql_types::Geometry;
+    ) -> crate::database::sql_type_bindings::Point;
 }
 
 diesel::define_sql_function! {

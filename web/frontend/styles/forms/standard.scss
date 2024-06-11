@@ -126,6 +126,12 @@
     }
 }
 
+.map {
+    height: 400px;
+    width: 100%;
+    border-radius: 0.5em;
+}
+
 ul.input-errors {
     padding: 0;
     margin: 0;
@@ -546,12 +552,6 @@ form.standard-form {
                     margin: 0;
                 }
             }
-        }
-
-        .map-input {
-            height: 400px;
-            width: 100%;
-            border-radius: 0.5em;
         }
 
         // We style inputs of type checkbox in such

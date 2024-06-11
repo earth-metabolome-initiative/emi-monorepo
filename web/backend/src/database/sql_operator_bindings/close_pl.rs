@@ -3,10 +3,10 @@
 //!
 //! This file contains the bindings for the SQL operators in the database.
 
-diesel::infix_operator!(ClosePl, " ## ", postgis_diesel::sql_types::Geometry, backend: diesel::pg::Pg);
+diesel::infix_operator!(ClosePl, " ## ", crate::database::sql_type_bindings::Point, backend: diesel::pg::Pg);
 /// Trait for the `##` operator.
 pub trait HasClosePl:
-    Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
     /// The function to create the `ClosePl` struct representing the `##` operator.
     fn close_pl<Rhs>(self, rhs: Rhs) -> ClosePl<Self, Rhs::Expression>
@@ -18,6 +18,6 @@ pub trait HasClosePl:
 }
 
 impl<T> HasClosePl for T where
-    T: Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    T: Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
 }

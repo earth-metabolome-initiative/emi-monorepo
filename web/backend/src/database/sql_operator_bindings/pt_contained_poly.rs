@@ -6,7 +6,7 @@
 diesel::infix_operator!(PtContainedPoly, " <@ ", diesel::sql_types::Bool, backend: diesel::pg::Pg);
 /// Trait for the `<@` operator.
 pub trait HasPtContainedPoly:
-    Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
     /// The function to create the `PtContainedPoly` struct representing the `<@` operator.
     fn pt_contained_poly<Rhs>(self, rhs: Rhs) -> PtContainedPoly<Self, Rhs::Expression>
@@ -18,6 +18,6 @@ pub trait HasPtContainedPoly:
 }
 
 impl<T> HasPtContainedPoly for T where
-    T: Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    T: Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
 }

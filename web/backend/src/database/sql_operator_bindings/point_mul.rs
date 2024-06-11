@@ -3,21 +3,21 @@
 //!
 //! This file contains the bindings for the SQL operators in the database.
 
-diesel::infix_operator!(PointMul, " * ", postgis_diesel::sql_types::Geometry, backend: diesel::pg::Pg);
+diesel::infix_operator!(PointMul, " * ", crate::database::sql_type_bindings::Point, backend: diesel::pg::Pg);
 /// Trait for the `*` operator.
 pub trait HasPointMul:
-    Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
     /// The function to create the `PointMul` struct representing the `*` operator.
     fn point_mul<Rhs>(self, rhs: Rhs) -> PointMul<Self, Rhs::Expression>
     where
-        Rhs: diesel::expression::AsExpression<postgis_diesel::sql_types::Geometry>,
+        Rhs: diesel::expression::AsExpression<crate::database::sql_type_bindings::Point>,
     {
         PointMul::new(self, rhs.as_expression())
     }
 }
 
 impl<T> HasPointMul for T where
-    T: Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    T: Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
 }

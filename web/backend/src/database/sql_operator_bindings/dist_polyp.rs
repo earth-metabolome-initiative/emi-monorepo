@@ -11,7 +11,7 @@ pub trait HasDistPolyp:
     /// The function to create the `DistPolyp` struct representing the `<->` operator.
     fn dist_polyp<Rhs>(self, rhs: Rhs) -> DistPolyp<Self, Rhs::Expression>
     where
-        Rhs: diesel::expression::AsExpression<postgis_diesel::sql_types::Geometry>,
+        Rhs: diesel::expression::AsExpression<crate::database::sql_type_bindings::Point>,
     {
         DistPolyp::new(self, rhs.as_expression())
     }

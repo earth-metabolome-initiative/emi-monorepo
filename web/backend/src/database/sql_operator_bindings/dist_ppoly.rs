@@ -6,7 +6,7 @@
 diesel::infix_operator!(DistPpoly, " <-> ", diesel::sql_types::Double, backend: diesel::pg::Pg);
 /// Trait for the `<->` operator.
 pub trait HasDistPpoly:
-    Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
     /// The function to create the `DistPpoly` struct representing the `<->` operator.
     fn dist_ppoly<Rhs>(self, rhs: Rhs) -> DistPpoly<Self, Rhs::Expression>
@@ -18,6 +18,6 @@ pub trait HasDistPpoly:
 }
 
 impl<T> HasDistPpoly for T where
-    T: Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    T: Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
 }

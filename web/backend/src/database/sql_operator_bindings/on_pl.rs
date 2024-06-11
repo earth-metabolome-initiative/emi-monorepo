@@ -6,7 +6,7 @@
 diesel::infix_operator!(OnPl, " <@ ", diesel::sql_types::Bool, backend: diesel::pg::Pg);
 /// Trait for the `<@` operator.
 pub trait HasOnPl:
-    Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
     /// The function to create the `OnPl` struct representing the `<@` operator.
     fn on_pl<Rhs>(self, rhs: Rhs) -> OnPl<Self, Rhs::Expression>
@@ -18,6 +18,6 @@ pub trait HasOnPl:
 }
 
 impl<T> HasOnPl for T where
-    T: Sized + diesel::expression::Expression<SqlType = postgis_diesel::sql_types::Geometry>
+    T: Sized + diesel::expression::Expression<SqlType = crate::database::sql_type_bindings::Point>
 {
 }
