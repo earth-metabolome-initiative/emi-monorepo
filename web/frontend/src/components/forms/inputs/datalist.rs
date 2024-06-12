@@ -330,7 +330,7 @@ where
             .collect::<Vec<usize>>();
 
         let classes = format!(
-            "input-group datalist{}{}{}{}",
+            "input-group datalist{}{}{}{}{}",
             if ctx.props().show_label {
                 ""
             } else {
@@ -355,6 +355,11 @@ where
             },
             if self.selections.len() > 0 {
                 " has-selections".to_string()
+            } else {
+                "".to_string()
+            },
+            if self.disable() {
+                " disabled".to_string()
             } else {
                 "".to_string()
             }

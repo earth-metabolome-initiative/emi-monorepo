@@ -108,6 +108,15 @@
                 }
             }
         }
+        &.disabled {
+            .input-container {
+                &::after {
+                    // We apply a disable symbol for the content
+                    // to illustrate this form is disabled
+                    content: "\f05e";
+                }
+            }
+        }
 
         &.has-selections {
             .input-container {
