@@ -186,7 +186,7 @@ impl Component for Navigator {
                             </Link<AppRoute>>
                         }
                     } else {
-                        <Link<AppRoute> classes="right_nav_button" to={AppRoute::Login}>
+                        <Link<AppRoute> classes="right_nav_button login" to={AppRoute::Login}>
                             <i class="fas fa-right-to-bracket"></i>
                             {'\u{00a0}'}
                             <span>{"Login"}</span>
