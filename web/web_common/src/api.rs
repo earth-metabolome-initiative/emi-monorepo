@@ -15,7 +15,7 @@ use crate::custom_validators::validation_errors::ValidationErrorToString;
 pub const ENDPOINT: &str = "/api";
 pub const FULL_ENDPOINT: &str = ENDPOINT;
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
 pub enum ApiError {
     Unauthorized,
     BadGateway,

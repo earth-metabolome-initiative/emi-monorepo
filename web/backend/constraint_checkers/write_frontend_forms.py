@@ -1180,9 +1180,9 @@ def write_frontend_yew_form(
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
                 )
-            elif attribute.is_jpeg():
+            elif attribute.is_file():
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Rc<web_common::types::JPEG>>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.clone()));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Rc<{attribute.data_type('frontend')}>>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.clone()));\n"
                 )
             else:
                 document.write(
@@ -1249,9 +1249,12 @@ def write_frontend_yew_form(
                 )
                 continue
 
-            if attribute.is_jpeg():
+            if attribute.is_file():
+                # TODO! CHECK THAT THE APPROPRIATE FILE PROCESSOR EXISTS!
                 document.write(
-                    f'            <FileInput<web_common::types::JPEG> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} file={{builder_store.{attribute.name}.clone()}} />\n'
+                    f'  <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<{attribute.data_type("frontend")}>> path=\"/{attribute.raw_data_type().lower()}_file_processor.js\">'
+                    f'        <FileInput<{attribute.data_type("frontend")}> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} file={{builder_store.{attribute.name}.clone()}} />\n'
+                    f"    </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<{attribute.data_type('frontend')}>>>\n"
                 )
                 continue
 

@@ -15,6 +15,9 @@ from constraint_checkers.indices import (
     DerivedPGIndex,
 )
 from constraint_checkers.utils import infer_route_from_document
+from constraint_checkers.gluesql_types_mapping import (
+    GLUESQL_TYPES_MAPPING,
+)
 
 TYPES_FROM_CORE_AND_STANDARD_LIBRARIES = [
     "bool",
@@ -286,6 +289,14 @@ class AttributeMetadata:
             self._data_type, route="backend"
         ) != data_type_to_absolute_import_path(self._data_type, route="frontend")
 
+    def is_file(self) -> bool:
+        """Returns whether the attribute is an image blob."""
+        return (
+            not self.has_struct_data_type()
+            and GLUESQL_TYPES_MAPPING[self.raw_data_type()]
+            == "gluesql::core::ast_builder::bytea({value})"
+        )
+
     def is_jpeg(self) -> bool:
         """Returns whether the attribute is an image blob."""
         return self.data_type(route="frontend") == "web_common::types::JPEG"
@@ -403,7 +414,8 @@ class AttributeMetadata:
         """Returns whether the attribute implements the Default trait."""
         return (
             isinstance(self._data_type, str)
-            and self._data_type in [
+            and self._data_type
+            in [
                 "bool",
                 "i8",
                 "i16",
@@ -632,7 +644,8 @@ class AttributeMetadata:
     def is_color(self) -> bool:
         """Returns whether the attribute is a color."""
         return (
-            self.data_type(route="frontend") == "web_common::database::flat_variants::Color"
+            self.data_type(route="frontend")
+            == "web_common::database::flat_variants::Color"
             and self.has_struct_data_type()
         )
 

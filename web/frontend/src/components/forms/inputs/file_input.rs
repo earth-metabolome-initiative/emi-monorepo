@@ -2,13 +2,16 @@
 
 use super::file_like::*;
 use super::InputErrors;
+use crate::workers::FileProcessor;
+use gloo::timers::callback::Timeout;
+use std::collections::HashSet;
 use std::rc::Rc;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 use web_common::api::ApiError;
 use web_common::file_formats::GenericFileFormat;
 use yew::prelude::*;
-use yew_hooks::use_throttle;
+use yew_agent::scope_ext::AgentScopeExt;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct MultiFileInputProp<Data>
@@ -26,8 +29,10 @@ where
     pub maximum_number_of_expected_files: usize,
     #[prop_or(1)]
     pub minimum_number_of_expected_files: usize,
+    #[prop_or(16_777_216)] // 16 MB
+    pub maximal_raw_size: u64,
     #[prop_or(1_048_576)] // 1 MB
-    pub maximal_size: u64,
+    pub maximal_processed_size: u64,
 }
 
 impl<Data> MultiFileInputProp<Data>
@@ -61,187 +66,284 @@ where
     }
 }
 
-#[function_component(MultiFileInput)]
-pub fn multi_file_input<Data: FileLike>(props: &MultiFileInputProp<Data>) -> Html {
-    let container_node = use_node_ref();
-    let input_node = use_node_ref();
-    let inner_errors = use_state(|| Vec::new());
-    let is_dragging = use_state(|| false);
+pub struct MultiFileInput<Data> {
+    input_ref: NodeRef,
+    errors: HashSet<ApiError>,
+    hide_box_timeout: Option<Timeout>,
+    box_visible: bool,
+    _phantom: std::marker::PhantomData<Data>,
+}
 
-    // First, we handle that on click on the container node, it should trigger a click on the input node.
-    let container_on_click = {
-        let input_node = input_node.clone();
-        Callback::from(move |_| {
-            input_node
-                .cast::<web_sys::HtmlInputElement>()
-                .unwrap()
-                .click();
-        })
-    };
+pub enum MultiFileInputMessage {
+    DragStart,
+    HideDropBox,
+    NoFiles,
+    LoadedFile(Vec<u8>),
+    Files(web_sys::FileList),
+    AddError(ApiError),
+}
 
-    // We define the callback that handles the file input messages.
-    let on_files = {
-        let props = props.clone();
-        let inner_errors = inner_errors.clone();
-        let container_node = container_node.clone();
-        let input_node = input_node.clone();
-        Callback::from(move |_| {
-            // TODO! Handle here the file being provided.
-            let file_list: web_sys::FileList = input_node
-                .cast::<web_sys::HtmlInputElement>()
-                .unwrap()
-                .files()
-                .unwrap();
-        })
-    };
+impl<Data> Component for MultiFileInput<Data>
+where
+    Data: FileLike,
+{
+    type Message = MultiFileInputMessage;
+    type Properties = MultiFileInputProp<Data>;
 
-    // Then, we handle the input event, which is triggered when the user selects files.
-    let on_input = {
-        let on_files = on_files.clone();
-        Callback::from(move |input_event: InputEvent| {
-            input_event.prevent_default();
-            on_files.emit(());
-        })
-    };
+    fn create(ctx: &Context<Self>) -> Self {
+        // We setup an event listener for the dragstart event, which is triggered when the user starts dragging a file
+        // on the document. When this event is triggered, we send the DragStart message to the component.
+        let document = web_sys::window().unwrap().document().unwrap();
+        let link = ctx.link().clone();
+        let drag_over_closure = Closure::wrap(Box::new(move |e: DragEvent| {
+            e.prevent_default();
+            e.stop_propagation();
+            link.send_message(MultiFileInputMessage::DragStart);
+        }) as Box<dyn FnMut(_)>);
+        document
+            .add_event_listener_with_callback(
+                "dragover",
+                drag_over_closure.as_ref().unchecked_ref(),
+            )
+            .unwrap();
+        drag_over_closure.forget();
 
-    let on_drop = {
-        let on_files = on_files.clone();
-        Callback::from(move |drop_event: DragEvent| {
-            drop_event.prevent_default();
-            on_files.emit(());
-        })
-    };
+        let link = ctx.link().clone();
+        let drop_closure = Closure::wrap(Box::new(move |e: DragEvent| {
+            e.prevent_default();
+            e.stop_propagation();
+            link.send_message(MultiFileInputMessage::HideDropBox);
+        }) as Box<dyn FnMut(_)>);
+        document
+            .add_event_listener_with_callback("drop", drop_closure.as_ref().unchecked_ref())
+            .unwrap();
+        drop_closure.forget();
 
-    let throttle_drag_start = {
-        let is_dragging = is_dragging.clone();
-        use_throttle(
-            move || {
-                is_dragging.set(true);
-            },
-            300,
-        )
-    };
-    let throttle_drag_end = {
-        let is_dragging = is_dragging.clone();
-        use_throttle(
-            move || {
-                is_dragging.set(false);
-            },
-            300,
-        )
-    };
+        Self {
+            input_ref: NodeRef::default(),
+            errors: HashSet::new(),
+            hide_box_timeout: None,
+            box_visible: ctx.props().files.is_empty(),
+            _phantom: std::marker::PhantomData,
+        }
+    }
 
-    // We set a callback event listening for when any file is dragged over the document.
-    // We need to throttle how often this event is called to avoid performance issues.
-    // When the dragging is ongoing, we set the currently_dragging state to true, and
-    // when the dragging ends, we set it to false.
-    use_effect({
-        move || {
-            let document = web_sys::window().unwrap().document().unwrap();
-
-            let drag_over_closure = Closure::wrap(Box::new(move |e: Event| {
-                e.prevent_default();
-            }) as Box<dyn FnMut(_)>);
-
-            let drag_enter_closure = Closure::wrap(Box::new(move |e: Event| {
-                e.prevent_default();
-                throttle_drag_start.run();
-            }) as Box<dyn FnMut(_)>);
-
-            let drag_leave_closure = Closure::wrap(Box::new(move |_: Event| {
-                throttle_drag_end.run();
-            }) as Box<dyn FnMut(_)>);
-
-            document
-                .add_event_listener_with_callback(
-                    "dragover",
-                    drag_over_closure.as_ref().unchecked_ref(),
-                )
-                .unwrap();
-            document
-                .add_event_listener_with_callback(
-                    "dragenter",
-                    drag_enter_closure.as_ref().unchecked_ref(),
-                )
-                .unwrap();
-            document
-                .add_event_listener_with_callback(
-                    "dragleave",
-                    drag_leave_closure.as_ref().unchecked_ref(),
-                )
-                .unwrap();
-
-            drag_over_closure.forget();
-            drag_enter_closure.forget();
-            drag_leave_closure.forget();
-
-            move || {
-                // Clean up code here if necessary
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            MultiFileInputMessage::DragStart => {
+                log::info!("Performing drag start");
+                let box_was_invisible = !self.box_visible;
+                self.box_visible = true;
+                if let Some(timeout) = self.hide_box_timeout.take() {
+                    timeout.cancel();
+                }
+                let link = ctx.link().clone();
+                self.hide_box_timeout = Some(Timeout::new(1000, move || {
+                    link.send_message(MultiFileInputMessage::HideDropBox)
+                }));
+                box_was_invisible
             }
-        }
-    });
+            MultiFileInputMessage::HideDropBox => {
+                let box_was_visible = self.box_visible;
+                self.box_visible = false;
+                box_was_visible
+            }
+            MultiFileInputMessage::NoFiles => {
+                log::info!("No files");
+                self.errors.clear();
+                true
+            }
+            MultiFileInputMessage::AddError(error) => self.errors.insert(error),
+            MultiFileInputMessage::LoadedFile(data) => {
+                let append_file: Callback<Rc<Data>> = ctx.props().append_file.clone();
+                let link = ctx.link().clone();
+                ctx.link().run_oneshot::<FileProcessor<Data>>(
+                    data,
+                    Callback::from(move |data: Result<Data, ApiError>| match data {
+                        Ok(data) => {
+                            log::info!("File processed");
+                            append_file.emit(Rc::new(data));
+                        }
+                        Err(error) => {
+                            link.send_message(MultiFileInputMessage::AddError(error));
+                        }
+                    }),
+                );
+                false
+            }
+            MultiFileInputMessage::Files(files) => {
+                log::info!("Performing file upload");
+                if files.length() == 0 {
+                    ctx.link().send_message(MultiFileInputMessage::NoFiles);
+                    return false;
+                }
 
-    let droparea_classes = format!("droparea{}", if *is_dragging { " dragging" } else { "" },);
+                self.errors.clear();
 
-    let label_classes = format!(
-        "input-label{}",
-        if props.optional {
-            ""
-        } else {
-            " input-label-mandatory"
-        }
-    );
-
-    let all_errors = props
-        .errors
-        .iter()
-        .chain(inner_errors.iter())
-        .cloned()
-        .collect::<Vec<ApiError>>();
-
-    let classes = if !all_errors.is_empty() {
-        "input-group file input-group-valid"
-    } else {
-        "input-group file input-group-invalid"
-    };
-
-    let object_unique_identifier = uuid::Uuid::new_v4();
-
-    html! {
-        <div ref={container_node} class={classes} onclick={container_on_click} ondrop={on_drop}>
-            <label class={label_classes} for={object_unique_identifier.to_string()}>{format!("{}:", props.label)}</label>
-            <input
-                type="file"
-                ref={input_node}
-                class="input-control"
-                name={object_unique_identifier.to_string()}
-                multiple={props.maximum_number_of_expected_files > 1}
-                oninput={on_input}
-            />
-            if *is_dragging || props.files.is_empty() {
-                <div class={droparea_classes}>
-                    <div class="droparea-icon"><i class="fas fa-file-upload"></i></div>
-                    <p>{"Drag & Drop files here or click to select"}</p>
-                </div>
-            } else {
-                {props.files.iter().cloned().enumerate().map(|(index, file)| {
-                    let delete = {
-                        let remove_file = props.remove_file.clone();
-                        Callback::from(move |_| {
-                            remove_file.emit(index);
-                        })
-                    };
-
-                    html!{
-                        <FilePreview<Data>
-                            file={file}
-                            delete={delete}
-                        />
+                // Before anything else, we check the file sizes.
+                for i in 0..files.length() {
+                    let file = files.get(i).unwrap();
+                    if file.size() as u64 > ctx.props().maximal_raw_size {
+                        ctx.link().send_message(MultiFileInputMessage::AddError(
+                            ApiError::BadRequest(vec![format!(
+                                "File {} is too large ({}). Maximum size is {}.",
+                                file.name(),
+                                human_readable_file_size(file.size() as usize),
+                                human_readable_file_size(ctx.props().maximal_raw_size as usize)
+                            )]),
+                        ));
+                        break;
                     }
-                }).collect::<Html>()}
+                    // We check that the file mime type is allowed.
+                    let mime_type = file.type_();
+
+                    if !Data::FORMATS
+                        .iter()
+                        .any(|format| format.mime_types().contains(&mime_type.as_str()))
+                    {
+                        ctx.link().send_message(MultiFileInputMessage::AddError(
+                            ApiError::InvalidFileFormat(format!(
+                                "File {} has an invalid format. Only {} files are allowed.",
+                                file.name(),
+                                ctx.props().human_readable_allowed_formats()
+                            )),
+                        ));
+                        break;
+                    }
+
+                    // We read the file and convert it to the appropriate type.
+                    let file_name = file.name();
+
+                    // First, we read the file as an array buffer using a send_future call.
+                    ctx.link().send_future(async move {
+                        match wasm_bindgen_futures::JsFuture::from(file.array_buffer()).await {
+                            Ok(buffer) => {
+                                log::info!("File loaded");
+                                let data = js_sys::Uint8Array::new(&buffer).to_vec();
+                                MultiFileInputMessage::LoadedFile(data)
+                            }
+                            Err(_) => MultiFileInputMessage::AddError(ApiError::BadRequest(vec![
+                                format!("Unable to read file {}", file_name),
+                            ])),
+                        }
+                    });
+                }
+                false
             }
-            <InputErrors errors={all_errors} />
-        </div>
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let container_on_click = {
+            let input_node = self.input_ref.clone();
+            Callback::from(move |_| {
+                input_node
+                    .cast::<web_sys::HtmlInputElement>()
+                    .unwrap()
+                    .click();
+            })
+        };
+
+        let on_input = {
+            let link = ctx.link().clone();
+            let input_node = self.input_ref.clone();
+            Callback::from(move |input_event: InputEvent| {
+                input_event.prevent_default();
+                input_event.stop_propagation();
+                match input_node.cast::<web_sys::HtmlInputElement>() {
+                    Some(input) => match input.files() {
+                        Some(files) => {
+                            link.send_message(MultiFileInputMessage::Files(files));
+                        }
+                        None => {
+                            link.send_message(MultiFileInputMessage::NoFiles);
+                        }
+                    },
+                    None => {
+                        link.send_message(MultiFileInputMessage::AddError(ApiError::BadRequest(
+                            vec!["Unable to get files from input".to_string()],
+                        )));
+                    }
+                };
+            })
+        };
+
+        let on_drop = {
+            let link = ctx.link().clone();
+            Callback::from(move |drop_event: DragEvent| {
+                drop_event.stop_propagation();
+                drop_event.prevent_default();
+                let files = drop_event.data_transfer().unwrap().files().unwrap();
+                link.send_message(MultiFileInputMessage::Files(files));
+            })
+        };
+
+        let droparea_classes = format!(
+            "droparea{}",
+            if self.box_visible { " dragging" } else { "" },
+        );
+
+        let label_classes = format!(
+            "input-label{}",
+            if ctx.props().optional {
+                ""
+            } else {
+                " input-label-mandatory"
+            }
+        );
+
+        let all_errors = ctx
+            .props()
+            .errors
+            .iter()
+            .chain(self.errors.iter())
+            .cloned()
+            .collect::<Vec<ApiError>>();
+
+        let classes = if !all_errors.is_empty() {
+            "input-group file input-group-valid"
+        } else {
+            "input-group file input-group-invalid"
+        };
+
+        let object_unique_identifier = uuid::Uuid::new_v4();
+
+        html! {
+                <div class={classes} onclick={container_on_click} ondrop={on_drop}>
+                    <label class={label_classes} for={object_unique_identifier.to_string()}>{format!("{}:", ctx.props().label)}</label>
+                    <input
+                        type="file"
+                        ref={&self.input_ref}
+                        class="input-control"
+                        name={object_unique_identifier.to_string()}
+                        multiple={ctx.props().maximum_number_of_expected_files > 1}
+                        oninput={on_input}
+                    />
+                    if self.box_visible || ctx.props().files.is_empty() {
+                        <div class={droparea_classes}>
+                            <div class="droparea-icon"><i class="fas fa-file-upload"></i></div>
+                            <p>{"Drag & Drop files here or click to select"}</p>
+                        </div>
+                    } else {
+                        {ctx.props().files.iter().cloned().enumerate().map(|(index, file)| {
+                            let delete = {
+                                let remove_file = ctx.props().remove_file.clone();
+                                Callback::from(move |_| {
+                                    remove_file.emit(index);
+                                })
+                            };
+
+                            html!{
+                                <FilePreview<Data>
+                                    file={file}
+                                    delete={delete}
+                                />
+                            }
+                        }).collect::<Html>()}
+                    }
+                    <InputErrors errors={all_errors} />
+                </div>
+        }
     }
 }
 
@@ -258,8 +360,10 @@ where
     pub optional: bool,
     #[prop_or_default]
     pub allowed_formats: Vec<GenericFileFormat>,
+    #[prop_or(16_777_216)] // 16 MB
+    pub maximal_raw_size: u64,
     #[prop_or(1_048_576)] // 1 MB
-    pub maximal_size: u64,
+    pub maximal_processed_size: u64,
 }
 
 #[function_component(FileInput)]
@@ -291,7 +395,8 @@ where
             minimum_number_of_expected_files={1}
             maximum_number_of_expected_files={1}
             files={props.file.clone().map_or_else(|| Rc::from(Vec::new()), |file| Rc::from(vec![file]))}
-            maximal_size={props.maximal_size}
+            maximal_raw_size={props.maximal_raw_size}
+            maximal_processed_size={props.maximal_processed_size}
         />
     }
 }

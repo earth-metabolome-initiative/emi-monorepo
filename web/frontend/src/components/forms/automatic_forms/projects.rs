@@ -254,10 +254,8 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                                     }
                                     Err(_) => state_mut.errors_expected_end_date.push(
                                         ApiError::BadRequest(vec![
-                                            format!(
-                                                "The Expected end date field must be a valid date but received {}",
-                                                value
-                                            ),
+                                            "The Expected end date field must be a valid date."
+                                                .to_string(),
                                         ]),
                                     ),
                                 }
@@ -278,7 +276,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                             Ok(end_date) => state_mut.end_date = Some(end_date),
                             Err(_) => match chrono::NaiveDateTime::parse_from_str(
                                 &value,
-                                "%Y-%m-%dT%H:%M:%S",
+                                "%Y-%m-%d %H:%M:%S",
                             ) {
                                 Ok(end_date) => state_mut.end_date = Some(end_date),
                                 Err(_) => {
