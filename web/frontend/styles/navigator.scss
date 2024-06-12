@@ -13,24 +13,30 @@ nav {
   align-items: center;
   height: $navigator-height;
   padding: 1em 0.5em;
+
   h1 {
     display: inline-block;
     color: $primary;
     font-size: 1.5em;
+
     a {
       color: inherit;
     }
   }
+
   .badge {
     width: auto;
     height: auto;
   }
+
   .hamburger {
     display: none;
   }
+
   a {
     text-decoration: none;
   }
+
   a.right_nav_button {
     color: $primary;
     font-size: 1.25rem;
@@ -40,11 +46,13 @@ nav {
     transition:
       background-color 0.2s,
       color 0.2s;
+
     &:hover {
       background-color: $primary;
       color: white;
     }
   }
+
   .search {
     margin-left: auto;
     margin-right: auto;
@@ -54,18 +62,23 @@ nav {
     padding: 0 1em;
     transition: width 0.5s;
     position: relative;
+
     input {
       width: 100%;
     }
-    .badges-container, .input-errors {
+
+    .badges-container,
+    .input-errors {
       display: none;
     }
 
     &.focus {
       width: 90%;
+
       .badges-container {
         display: grid;
       }
+
       .input-errors {
         display: block;
       }
@@ -80,12 +93,16 @@ nav {
 
     .input-group.datalist {
       padding: 0;
-      ul.input-errors, ul.badges-container {
+
+      ul.input-errors,
+      ul.badges-container {
         position: absolute;
+
         &:empty {
           display: none;
         }
       }
+
       ul.badges-container {
         backdrop-filter: blur(5px);
         background-color: rgba(255, 255, 255, 0.9);
@@ -99,6 +116,7 @@ nav {
         border-bottom-left-radius: 0.5em;
         border-bottom-right-radius: 0.5em;
       }
+
       ul.input-errors {
         margin-top: 1em;
       }
@@ -111,9 +129,11 @@ nav {
     h1 {
       display: none;
     }
+
     .search {
       padding: 0 0.5em;
     }
+
     .hamburger {
       display: inline-block;
     }

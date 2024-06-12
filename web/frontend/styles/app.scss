@@ -1,18 +1,27 @@
 .app {
     padding-top: $navigator-height;
-    padding-left: $sidebar-width + 1;
-    padding-bottom: 2.25em;
-    padding-right: 1em;
+    padding-left: $sidebar-width;
+    padding-bottom: 2rem;
+    padding-right: 0;
     min-width: 100%;
     min-height: 100%;
     box-sizing: border-box;
     position: relative;
+    transition: padding-left 0.5s;
+
+    .page-container {
+        position: relative;
+        min-width: 100%;
+        min-height: 100%;
+        box-sizing: border-box;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
 }
 
 // Media query for smaller screens
 @media screen and (max-width: $small-screen-width) {
     .app {
-        padding-left: 1em;
-        padding-right: 1em;
+        padding-left: 0;
     }
 }

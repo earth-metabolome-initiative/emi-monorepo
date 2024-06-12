@@ -1,5 +1,5 @@
 // Define variables for easy customization
-$sidebar-width: 18em;
+$sidebar-width: 16rem;
 $sidebar-hover-color: #f76a00;
 
 .sidebar {
@@ -7,8 +7,8 @@ $sidebar-hover-color: #f76a00;
     left: 0;
     top: $navigator-height;
     height: 100%;
-    width: $sidebar-width;
     max-width: 80%;
+    width: $sidebar-width;
     color: $near_black;
     transition: transform 0.3s ease;
     background-color: white;
