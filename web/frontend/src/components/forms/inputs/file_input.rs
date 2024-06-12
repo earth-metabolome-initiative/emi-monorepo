@@ -92,8 +92,6 @@ pub fn multi_file_input<Data: FileLike>(props: &MultiFileInputProp<Data>) -> Htm
                 .unwrap()
                 .files()
                 .unwrap();
-
-            
         })
     };
 

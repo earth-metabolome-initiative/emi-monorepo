@@ -176,13 +176,13 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                         Ok(value) => {
                             if value.is_nan() || value.is_infinite() {
                                 state_mut.errors_budget.push(ApiError::BadRequest(vec![
-                                    "The budget field must be a valid f64.".to_string(),
+                                    "The Budget field must be a valid f64.".to_string(),
                                 ]));
                             } else if value < f64::MIN as f64 || value > f64::MAX as f64 {
                                 state_mut
                                     .errors_budget
                                     .push(ApiError::BadRequest(vec![format!(
-                                        "The budget field must be between {} and {}.",
+                                        "The Budget field must be between {} and {}.",
                                         f64::MIN,
                                         f64::MAX
                                     )]));
@@ -192,7 +192,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                         }
                         Err(_) => {
                             state_mut.errors_budget.push(ApiError::BadRequest(vec![
-                                "The budget field must be a valid f64.".to_string(),
+                                "The Budget field must be a valid f64.".to_string(),
                             ]));
                         }
                     },
@@ -210,12 +210,12 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                         Ok(value) => {
                             if value.is_nan() || value.is_infinite() {
                                 state_mut.errors_expenses.push(ApiError::BadRequest(vec![
-                                    "The expenses field must be a valid f64.".to_string(),
+                                    "The Expenses field must be a valid f64.".to_string(),
                                 ]));
                             } else if value < f64::MIN as f64 || value > f64::MAX as f64 {
                                 state_mut.errors_expenses.push(ApiError::BadRequest(vec![
                                     format!(
-                                        "The expenses field must be between {} and {}.",
+                                        "The Expenses field must be between {} and {}.",
                                         f64::MIN,
                                         f64::MAX
                                     ),
@@ -226,7 +226,7 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                         }
                         Err(_) => {
                             state_mut.errors_expenses.push(ApiError::BadRequest(vec![
-                                "The expenses field must be a valid f64.".to_string(),
+                                "The Expenses field must be a valid f64.".to_string(),
                             ]));
                         }
                     },
@@ -245,11 +245,22 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                                 state_mut.expected_end_date = Some(expected_end_date)
                             }
                             Err(_) => {
-                                state_mut
-                                    .errors_expected_end_date
-                                    .push(ApiError::BadRequest(vec![
-                            "The expected_end_date field must be a valid date and time.".to_string()
-                        ]))
+                                match chrono::NaiveDateTime::parse_from_str(
+                                    &value,
+                                    "%Y-%m-%d %H:%M:%S",
+                                ) {
+                                    Ok(expected_end_date) => {
+                                        state_mut.expected_end_date = Some(expected_end_date)
+                                    }
+                                    Err(_) => state_mut.errors_expected_end_date.push(
+                                        ApiError::BadRequest(vec![
+                                            format!(
+                                                "The Expected end date field must be a valid date but received {}",
+                                                value
+                                            ),
+                                        ]),
+                                    ),
+                                }
                             }
                         }
                     }
@@ -265,9 +276,17 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                     Some(value) => {
                         match chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {
                             Ok(end_date) => state_mut.end_date = Some(end_date),
-                            Err(_) => state_mut.errors_end_date.push(ApiError::BadRequest(vec![
-                                "The end_date field must be a valid date and time.".to_string(),
-                            ])),
+                            Err(_) => match chrono::NaiveDateTime::parse_from_str(
+                                &value,
+                                "%Y-%m-%dT%H:%M:%S",
+                            ) {
+                                Ok(end_date) => state_mut.end_date = Some(end_date),
+                                Err(_) => {
+                                    state_mut.errors_end_date.push(ApiError::BadRequest(vec![
+                                        "The End date field must be a valid date.".to_string(),
+                                    ]))
+                                }
+                            },
                         }
                     }
                     None => state_mut.end_date = None,

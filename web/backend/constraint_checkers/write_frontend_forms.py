@@ -331,13 +331,18 @@ def write_frontend_builder_action_enumeration(
         if attribute.is_date_type():
             # We convert the dates provided from the date picker to the NaiveDateTime format.
             # The dates from a datetime-local input are in the format "YYYY-MM-DDTHH:MM".
+            # Some of the dates will be in the more extensive format "YYYY-MM-DD HH:MM:SS",
+            # and we will need to handle these cases as well.
             document.write(
                 f"                match {attribute.name} {{\n"
                 f'                    Some(value) => match chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {{\n'
                 f"                        Ok({attribute.name}) => state_mut.{attribute.name} = Some({attribute.name}),\n"
-                f"                        Err(_) => state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
-                f'                            "The {attribute.name} field must be a valid date and time.".to_string()\n'
-                "                        ])),\n"
+                f"                        Err(_) => match chrono::NaiveDateTime::parse_from_str(&value, \"%Y-%m-%d %H:%M:%S\") {{\n"
+                f"                            Ok({attribute.name}) => state_mut.{attribute.name} = Some({attribute.name}),\n"
+                f"                            Err(_) => state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f'                                "The {attribute.human_readable_name()} field must be a valid date.".to_string()\n'
+                "                            ])),\n"
+                "                        },\n"
                 "                    },\n"
                 f"                    None => state_mut.{attribute.name} = None,\n"
                 "                }\n"
@@ -364,7 +369,7 @@ def write_frontend_builder_action_enumeration(
                 document.write(
                     f"                            if value.is_nan() || value.is_infinite() {{\n"
                     f"                                state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
-                    f'                                    "The {attribute.name} field must be a valid {attribute.raw_data_type()}.".to_string()\n'
+                    f'                                    "The {attribute.human_readable_name()} field must be a valid {attribute.raw_data_type()}.".to_string()\n'
                     "                                ]));\n"
                     "                            } else "
                 )
@@ -373,7 +378,7 @@ def write_frontend_builder_action_enumeration(
                 f"                            if value < {attribute.raw_data_type()}::MIN as {largest_type_variant} || value > {attribute.raw_data_type()}::MAX as {largest_type_variant} {{\n"
                 f"                                state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
                 f"                                    format!("
-                f'                                            "The {attribute.name} field must be between {{}} and {{}}.",\n'
+                f'                                            "The {attribute.human_readable_name()} field must be between {{}} and {{}}.",\n'
                 f"                                            {attribute.raw_data_type()}::MIN,\n"
                 f"                                            {attribute.raw_data_type()}::MAX\n"
                 "                                    )\n"
@@ -384,7 +389,7 @@ def write_frontend_builder_action_enumeration(
                 "                        }\n"
                 "                        Err(_) => {\n"
                 f"                            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
-                f'                                "The {attribute.name} field must be a valid {attribute.raw_data_type()}.".to_string()\n'
+                f'                                "The {attribute.human_readable_name()} field must be a valid {attribute.raw_data_type()}.".to_string()\n'
                 "                            ]));\n"
                 "                        }\n"
                 "                    },\n"

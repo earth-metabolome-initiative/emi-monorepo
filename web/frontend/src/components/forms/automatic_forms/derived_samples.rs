@@ -90,12 +90,12 @@ impl Reducer<DerivedSampleBuilder> for DerivedSampleActions {
                         Ok(value) => {
                             if value.is_nan() || value.is_infinite() {
                                 state_mut.errors_quantity.push(ApiError::BadRequest(vec![
-                                    "The quantity field must be a valid f64.".to_string(),
+                                    "The Quantity field must be a valid f64.".to_string(),
                                 ]));
                             } else if value < f64::MIN as f64 || value > f64::MAX as f64 {
                                 state_mut.errors_quantity.push(ApiError::BadRequest(vec![
                                     format!(
-                                        "The quantity field must be between {} and {}.",
+                                        "The Quantity field must be between {} and {}.",
                                         f64::MIN,
                                         f64::MAX
                                     ),
@@ -106,7 +106,7 @@ impl Reducer<DerivedSampleBuilder> for DerivedSampleActions {
                         }
                         Err(_) => {
                             state_mut.errors_quantity.push(ApiError::BadRequest(vec![
-                                "The quantity field must be a valid f64.".to_string(),
+                                "The Quantity field must be a valid f64.".to_string(),
                             ]));
                         }
                     },
