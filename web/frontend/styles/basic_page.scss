@@ -1,7 +1,9 @@
 .page {
     width: 1200px;
     max-width: 100%;
-    margin: 1em auto;
+    margin: 0 auto;
+    padding-top: 1em;
+    padding-bottom: 1em;
     animation: slide-in-from-bottom 0.3s;
 
     h2 {
