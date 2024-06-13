@@ -2,8 +2,6 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::api::ApiError;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum GenericFileFormat {
     JPEG,

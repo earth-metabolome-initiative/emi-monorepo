@@ -53,6 +53,8 @@ yew-hooks = "0.3.2"
 postcard = "1.0.8"
 serde-wasm-bindgen = "0.6.5"
 yew-agent = "0.3.0"
+rustfft = "6.2.0"
+imageproc = "0.25.0"
 # syntect = "5.2.0"
 
 [dependencies.web-sys]
