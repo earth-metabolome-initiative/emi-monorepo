@@ -1,5 +1,5 @@
 # Use a lightweight image as a base
-FROM rust:latest
+FROM rust:1.78
 
 ARG ACTIX_PORT
 
@@ -15,13 +15,9 @@ RUN cargo install cargo-watch
 # We need to compile diesel-cli to run the migrations
 RUN cargo install diesel_cli --no-default-features --features postgres
 
-# We run a rustup update and a cargo update to make sure we have the latest versions
-RUN rustup update
-
 # Set the working directory inside the container
 WORKDIR /app/backend
 
 # We run the Actix server by executing inside a TMUX session
 # the bash script called `start.sh`
 CMD tmux new-session -s actix-development 'bash /app/backend/start.sh'
-

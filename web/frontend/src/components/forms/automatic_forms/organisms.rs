@@ -16,11 +16,13 @@ use yewdux::{Reducer, Store};
 pub struct OrganismBuilder {
     pub id: Option<uuid::Uuid>,
     pub notes: Option<Rc<String>>,
+    pub wild: Option<bool>,
     pub host_organism: Option<Rc<web_common::database::nested_variants::NestedOrganism>>,
     pub sample: Option<Rc<web_common::database::nested_variants::NestedSample>>,
     pub nameplate: Option<Rc<web_common::database::nested_variants::NestedNameplate>>,
     pub project: Option<Rc<web_common::database::nested_variants::NestedProject>>,
     pub errors_notes: Vec<ApiError>,
+    pub errors_wild: Vec<ApiError>,
     pub errors_host_organism: Vec<ApiError>,
     pub errors_sample: Vec<ApiError>,
     pub errors_nameplate: Vec<ApiError>,
@@ -35,11 +37,13 @@ impl Default for OrganismBuilder {
         Self {
             id: None,
             notes: None,
+            wild: Some(true),
             host_organism: Default::default(),
             sample: Default::default(),
             nameplate: Default::default(),
             project: Default::default(),
             errors_notes: Default::default(),
+            errors_wild: Default::default(),
             errors_host_organism: Default::default(),
             errors_sample: Default::default(),
             errors_nameplate: Default::default(),
@@ -52,6 +56,7 @@ impl Default for OrganismBuilder {
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) enum OrganismActions {
     SetNotes(Option<String>),
+    SetWild(Option<bool>),
     SetHostOrganism(Option<Rc<web_common::database::nested_variants::NestedOrganism>>),
     SetSample(Option<Rc<web_common::database::nested_variants::NestedSample>>),
     SetNameplate(Option<Rc<web_common::database::nested_variants::NestedNameplate>>),
@@ -93,6 +98,20 @@ impl Reducer<OrganismBuilder> for OrganismActions {
                 // To avoid having a codesmell relative to the cases where we are not
                 // yet handling more corner cases, we always use the break here.
                 break 'notes;
+            }
+            OrganismActions::SetWild(wild) => 'wild: {
+                state_mut.errors_wild.clear();
+                if wild.is_none() {
+                    state_mut.errors_wild.push(ApiError::BadRequest(vec![
+                        "The Wild field is required.".to_string(),
+                    ]));
+                    state_mut.wild = None;
+                    break 'wild;
+                }
+                state_mut.wild = wild;
+                // To avoid having a codesmell relative to the cases where we are not
+                // yet handling more corner cases, we always use the break here.
+                break 'wild;
             }
             OrganismActions::SetHostOrganism(host_organism) => 'host_organism: {
                 state_mut.errors_host_organism.clear();
@@ -164,6 +183,7 @@ impl FormBuilder for OrganismBuilder {
 
     fn has_errors(&self) -> bool {
         !self.errors_notes.is_empty()
+            || !self.errors_wild.is_empty()
             || !self.errors_host_organism.is_empty()
             || !self.errors_sample.is_empty()
             || !self.errors_nameplate.is_empty()
@@ -184,6 +204,7 @@ impl FormBuilder for OrganismBuilder {
                 .as_ref()
                 .map(|notes| notes.to_string()),
         ));
+        dispatcher.apply(OrganismActions::SetWild(Some(richest_variant.inner.wild)));
         dispatcher.apply(OrganismActions::SetSample(
             richest_variant.sample.map(Rc::from),
         ));
@@ -206,7 +227,10 @@ impl FormBuilder for OrganismBuilder {
     }
 
     fn can_submit(&self) -> bool {
-        !self.has_errors() && self.nameplate.is_some() && self.project.is_some()
+        !self.has_errors()
+            && self.wild.is_some()
+            && self.nameplate.is_some()
+            && self.project.is_some()
     }
 }
 
@@ -225,6 +249,7 @@ impl From<OrganismBuilder> for NewOrganism {
                 .cloned()
                 .map(|sample| sample.inner.id),
             notes: builder.notes.as_deref().cloned(),
+            wild: builder.wild.unwrap(),
             nameplate_id: builder.nameplate.as_deref().cloned().unwrap().inner.id,
             project_id: builder.project.as_deref().cloned().unwrap().inner.id,
         }
@@ -288,6 +313,8 @@ pub fn create_organism_form(props: &CreateOrganismFormProp) -> Html {
     }
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| OrganismActions::SetNotes(notes));
+    let set_wild =
+        builder_dispatch.apply_callback(|wild: bool| OrganismActions::SetWild(Some(wild)));
     let set_host_organism = builder_dispatch.apply_callback(
         |host_organism: Option<Rc<web_common::database::nested_variants::NestedOrganism>>| {
             OrganismActions::SetHostOrganism(host_organism)
@@ -314,6 +341,7 @@ pub fn create_organism_form(props: &CreateOrganismFormProp) -> Html {
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
+            <Checkbox label="Wild" errors={builder_store.errors_wild.clone()} builder={set_wild} value={builder_store.wild.unwrap_or(false)} />
             <Datalist<web_common::database::nested_variants::NestedOrganism, false> builder={set_host_organism} optional={true} errors={builder_store.errors_host_organism.clone()} value={builder_store.host_organism.clone()} label="Host organism" scanner={false} />
             <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
             <Datalist<web_common::database::nested_variants::NestedNameplate, false> builder={set_nameplate} optional={false} errors={builder_store.errors_nameplate.clone()} value={builder_store.nameplate.clone()} label="Nameplate" scanner={false} />
@@ -335,6 +363,8 @@ pub fn update_organism_form(props: &UpdateOrganismFormProp) -> Html {
     named_requests.push(ComponentMessage::get::<NewOrganism>(props.id.into()));
     let set_notes =
         builder_dispatch.apply_callback(|notes: Option<String>| OrganismActions::SetNotes(notes));
+    let set_wild =
+        builder_dispatch.apply_callback(|wild: bool| OrganismActions::SetWild(Some(wild)));
     let set_host_organism = builder_dispatch.apply_callback(
         |host_organism: Option<Rc<web_common::database::nested_variants::NestedOrganism>>| {
             OrganismActions::SetHostOrganism(host_organism)
@@ -361,6 +391,7 @@ pub fn update_organism_form(props: &UpdateOrganismFormProp) -> Html {
             named_requests={named_requests}
             builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
             <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
+            <Checkbox label="Wild" errors={builder_store.errors_wild.clone()} builder={set_wild} value={builder_store.wild.unwrap_or(false)} />
             <Datalist<web_common::database::nested_variants::NestedOrganism, false> builder={set_host_organism} optional={true} errors={builder_store.errors_host_organism.clone()} value={builder_store.host_organism.clone()} label="Host organism" scanner={false} />
             <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
             <Datalist<web_common::database::nested_variants::NestedNameplate, false> builder={set_nameplate} optional={false} errors={builder_store.errors_nameplate.clone()} value={builder_store.nameplate.clone()} label="Nameplate" scanner={false} />

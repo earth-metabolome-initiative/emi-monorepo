@@ -7,14 +7,13 @@ CREATE TABLE IF NOT EXISTS organisms (
   -- This is the optional where this organisms was found in
   sample_id UUID,
   notes TEXT,
+  wild BOOLEAN NOT NULL DEFAULT TRUE,
   nameplate_id INTEGER NOT NULL UNIQUE,
   project_id INTEGER NOT NULL,
   created_by INTEGER NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_by INTEGER NOT NULL,
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    -- Geographic coordinates of the organism.
-    -- geolocation COORDINATES NOT NULL : TODO!
   FOREIGN KEY (host_organism_id) REFERENCES organisms(id),
   FOREIGN KEY (sample_id) REFERENCES samples(id),
   FOREIGN KEY (nameplate_id) REFERENCES nameplates(id),

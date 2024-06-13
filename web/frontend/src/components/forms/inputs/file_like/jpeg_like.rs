@@ -1,9 +1,9 @@
 use super::*;
 use base64::engine::general_purpose;
 use base64::Engine;
-use web_common::types::JPEG;
-use web_common::traits::*;
 use image::GenericImageView;
+use web_common::traits::*;
+use web_common::types::JPEG;
 
 impl FileLike for JPEG {
     const FORMATS: &'static [GenericFileFormat] =

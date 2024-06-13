@@ -374,6 +374,7 @@ pub(crate) struct IntermediateNewOrganism {
     host_organism_id: Option<uuid::Uuid>,
     sample_id: Option<uuid::Uuid>,
     notes: Option<String>,
+    wild: bool,
     nameplate_id: i32,
     project_id: i32,
 }
@@ -389,6 +390,7 @@ impl UpdateRow for web_common::database::NewOrganism {
             host_organism_id: self.host_organism_id,
             sample_id: self.sample_id,
             notes: self.notes,
+            wild: self.wild,
             nameplate_id: self.nameplate_id,
             project_id: self.project_id,
         }

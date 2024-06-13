@@ -185,6 +185,7 @@ diesel::table! {
         host_organism_id -> diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
         sample_id -> diesel::sql_types::Nullable<diesel::sql_types::Uuid>,
         notes -> diesel::sql_types::Nullable<diesel::sql_types::Text>,
+        wild -> diesel::sql_types::Bool,
         nameplate_id -> diesel::sql_types::Integer,
         project_id -> diesel::sql_types::Integer,
         created_by -> diesel::sql_types::Integer,

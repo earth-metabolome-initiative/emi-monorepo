@@ -167,6 +167,7 @@ pub struct NewOrganism {
     pub host_organism_id: Option<uuid::Uuid>,
     pub sample_id: Option<uuid::Uuid>,
     pub notes: Option<String>,
+    pub wild: bool,
     pub nameplate_id: i32,
     pub project_id: i32,
 }
@@ -194,6 +195,7 @@ impl NewOrganism {
                 Some(notes) => gluesql::core::ast_builder::text(notes),
                 None => gluesql::core::ast_builder::null(),
             },
+            (self.wild.into()),
             gluesql::core::ast_builder::num(self.nameplate_id),
             gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(created_by),
@@ -219,7 +221,7 @@ impl NewOrganism {
         let id = self.id;
         table("organisms")
             .insert()
-            .columns("created_by,id,host_organism_id,sample_id,notes,nameplate_id,project_id,updated_by")
+            .columns("created_by,id,host_organism_id,sample_id,notes,wild,nameplate_id,project_id,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -249,6 +251,7 @@ impl NewOrganism {
         let mut update_row = table("organisms")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("wild", self.wild)        
 .set("nameplate_id", gluesql::core::ast_builder::num(self.nameplate_id))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));

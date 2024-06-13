@@ -3911,6 +3911,7 @@ pub struct Organism {
     pub host_organism_id: Option<uuid::Uuid>,
     pub sample_id: Option<uuid::Uuid>,
     pub notes: Option<String>,
+    pub wild: bool,
     pub nameplate_id: i32,
     pub project_id: i32,
     pub created_by: i32,
@@ -3955,6 +3956,7 @@ impl Organism {
                 Some(notes) => gluesql::core::ast_builder::text(notes),
                 None => gluesql::core::ast_builder::null(),
             },
+            (self.wild.into()),
             gluesql::core::ast_builder::num(self.nameplate_id),
             gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.created_by),
@@ -3974,7 +3976,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         table("organisms")
             .insert()
-            .columns("id, host_organism_id, sample_id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at")
+            .columns("id, host_organism_id, sample_id, notes, wild, nameplate_id, project_id, created_by, created_at, updated_by, updated_at")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -4000,7 +4002,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("organisms")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, host_organism_id, sample_id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at")
+            .project("id, host_organism_id, sample_id, notes, wild, nameplate_id, project_id, created_by, created_at, updated_by, updated_at")
             .limit(1)
             .execute(connection)
             .await?;
@@ -4069,6 +4071,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let mut update_row = table("organisms")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("wild", self.wild)        
 .set("nameplate_id", gluesql::core::ast_builder::num(self.nameplate_id))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
@@ -4132,7 +4135,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("organisms")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, host_organism_id, sample_id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at")
+           .project("id, host_organism_id, sample_id, notes, wild, nameplate_id, project_id, created_by, created_at, updated_by, updated_at")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -4162,7 +4165,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("organisms")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, host_organism_id, sample_id, notes, nameplate_id, project_id, created_by, created_at, updated_by, updated_at")
+           .project("id, host_organism_id, sample_id, notes, wild, nameplate_id, project_id, created_by, created_at, updated_by, updated_at")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -4193,6 +4196,10 @@ connection: &mut gluesql::prelude::Glue<C>,
                 gluesql::prelude::Value::Null => None,
                 gluesql::prelude::Value::Str(notes) => Some(notes.clone()),
                 _ => unreachable!("Expected Str")
+            },
+            wild: match row.get("wild").unwrap() {
+                gluesql::prelude::Value::Bool(wild) => wild.clone(),
+                _ => unreachable!("Expected Bool")
             },
             nameplate_id: match row.get("nameplate_id").unwrap() {
                 gluesql::prelude::Value::I32(nameplate_id) => nameplate_id.clone(),

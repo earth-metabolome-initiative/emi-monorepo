@@ -7,5 +7,4 @@ members = [
     "web/frontend",
     "web/web_common",
     "web/web_common/web_common_derive",
-    "web/frontend/qr_code",
 ]
