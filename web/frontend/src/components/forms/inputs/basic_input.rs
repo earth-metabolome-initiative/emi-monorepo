@@ -5,7 +5,6 @@ use std::fmt::Display;
 use super::InputErrors;
 use super::Scanner;
 use chrono::NaiveDateTime;
-use gloo::utils::errors::JsError;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
 use web_common::api::ApiError;
@@ -123,6 +122,8 @@ impl<Data: Inputtable> InputProp<Data> {
 
 #[function_component(BasicInput)]
 pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
+    let input_errors: UseStateHandle<Option<ApiError>> = use_state(|| None);
+
     let extra_classes: Option<&str> = if props.errors.is_empty() {
         if props.value.is_some() {
             Some("input-group-valid")
@@ -144,6 +145,7 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
 
     let on_input: Callback<InputEvent> = {
         let props = props.clone();
+        let input_errors = input_errors.clone();
         Callback::from(move |input_event: InputEvent| {
             input_event.prevent_default();
 
@@ -163,6 +165,8 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
                     .value(),
             };
 
+            input_errors.set(None);
+
             // We update the current value of the input field
             props
                 .builder
@@ -172,17 +176,19 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
 
     let on_scan: Callback<rxing::RXingResult> = {
         let props = props.clone();
+        let input_errors = input_errors.clone();
         Callback::from(move |result: rxing::RXingResult| {
             let value = result.getText().to_string();
+            input_errors.set(None);
             props
                 .builder
                 .emit(if value.is_empty() { None } else { Some(value) });
         })
     };
-    let on_scan_error: Callback<JsError> = {
-        Callback::from(move |error: JsError| {
-            let value = error.to_string();
-            log::error!("Error scanning barcode: {}", value);
+    let on_scan_error: Callback<ApiError> = {
+        let input_errors = input_errors.clone();
+        Callback::from(move |error: ApiError| {
+            input_errors.set(Some(error));
         })
     };
     let value = props
@@ -198,8 +204,11 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
         }
     );
 
-    let input_field = html! {
-        <>
+    let errors = props.errors.clone().into_iter().chain((*input_errors).clone().into_iter()).collect::<Vec<ApiError>>();
+
+    html! {
+        <div class={classes}>
+            <div class="input-container">
             <label for={props.normalized_label()} class={label_classes}>
                 {props.label()}
             </label>
@@ -244,15 +253,8 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
                     />
                 }
             }}
-        </>
-    };
-
-    html! {
-        <div class={classes}>
-            <div class="input-container">
-                {input_field}
             </div>
-            <InputErrors errors={props.errors.clone()} />
+            <InputErrors errors={errors} />
         </div>
     }
 }

@@ -9,7 +9,6 @@ use crate::workers::ws_worker::ComponentMessage;
 use crate::workers::ws_worker::WebsocketMessage;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
-use gloo::utils::errors::JsError;
 use serde::de::DeserializeOwned;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
@@ -391,13 +390,10 @@ where
                 link.send_message(DatalistMessage::UpdateCurrentValue(value));
             })
         };
-        let on_scan_error: Callback<JsError> = {
+        let on_scan_error: Callback<ApiError> = {
             let link = ctx.link().clone();
-            Callback::from(move |error: JsError| {
-                let value = error.to_string();
-                link.send_message(DatalistMessage::ScannerError(ApiError::BadRequest(vec![
-                    value,
-                ])));
+            Callback::from(move |error: ApiError| {
+                link.send_message(DatalistMessage::ScannerError(error));
             })
         };
 

@@ -12,7 +12,7 @@ $sidebar-hover-color: #f76a00;
     color: $near_black;
     transition: transform 0.3s ease;
     background-color: white;
-    z-index: 100;
+    z-index: 10;
     box-sizing: border-box;
     border-right: 1px solid $primary;
     padding-bottom: $navigator-height;

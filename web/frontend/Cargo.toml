@@ -87,6 +87,7 @@ features = [
   'HtmlAnchorElement',
   "CanvasRenderingContext2d",
   "MediaDevices",
+  "MediaDeviceInfo",
   "MediaStream",
   "HtmlCanvasElement",
   "HtmlVideoElement",

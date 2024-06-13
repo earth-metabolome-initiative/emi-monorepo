@@ -189,6 +189,14 @@ impl From<image::ImageError> for ApiError {
     }
 }
 
+#[cfg(feature = "frontend")]
+impl From<wasm_bindgen::JsValue> for ApiError {
+    fn from(e: wasm_bindgen::JsValue) -> Self {
+        log::error!("JsValue error: {:?}", e);
+        Self::InternalServerError
+    }
+}
+
 #[cfg(feature = "backend")]
 impl From<ApiError> for actix_web::HttpResponse {
     fn from(e: ApiError) -> Self {
