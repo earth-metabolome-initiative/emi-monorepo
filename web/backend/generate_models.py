@@ -3,63 +3,60 @@
 import os
 import shutil
 from typing import List
-from dotenv import load_dotenv
-from retrieve_taxons import retrieve_taxons
+
 from constraint_checkers import (
-    ensure_no_dead_python_code,
-    ensures_all_update_at_trigger_exists,
-)
-from constraint_checkers import ensure_created_at_columns, ensure_updated_at_columns
-from constraint_checkers import handle_minimal_revertion
-from constraint_checkers import replace_serial_indices
-from constraint_checkers import TableStructMetadata, StructMetadata
-from constraint_checkers import write_frontend_pages, write_frontend_router_page
-from constraint_checkers import (
-    enforce_migration_naming_convention,
-    ensure_updatable_tables_have_roles_tables,
-    ensure_tables_have_creation_notification_trigger,
-)
-from constraint_checkers.regroup_tables import regroup_tables
-from constraint_checkers import generate_schema, execute_migrations
-from constraint_checkers import (
+    StructMetadata,
+    TableStructMetadata,
+    check_for_common_typos_in_migrations,
     check_parent_circularity_trigger,
     create_filter_variants,
-    ensures_migrations_simmetry,
-    ensures_gluesql_compliance,
-)
-from constraint_checkers import (
-    check_for_common_typos_in_migrations,
-    write_frontend_forms,
-)
-from constraint_checkers import (
-    write_web_common_flat_variants,
-    write_web_common_update_variants,
-    write_web_common_new_variants,
-    write_backend_new_variants,
-    write_backend_update_variants,
-    write_web_common_nested_variants,
-    write_backend_flat_variants,
-    extract_structs,
-)
-from constraint_checkers import derive_nested_structs, write_backend_nested_structs
-from constraint_checkers import (
-    write_web_common_table_names_enumeration,
-    write_backend_table_names_enumeration,
     derive_frontend_builders,
+    derive_nested_structs,
     derive_webcommon_new_variants,
     derive_webcommon_update_variants,
-    write_web_common_search_trait_implementations,
+    enforce_migration_naming_convention,
+    ensure_can_x_function_existance,
+    ensure_created_at_columns,
+    ensure_no_dead_python_code,
+    ensure_tables_have_creation_notification_trigger,
+    ensure_updatable_tables_have_roles_tables,
+    ensure_updated_at_columns,
+    ensures_all_update_at_trigger_exists,
+    ensures_gluesql_compliance,
+    ensures_migrations_simmetry,
+    ensures_no_duplicated_migrations,
+    execute_migrations,
+    extract_structs,
+    generate_schema,
+    handle_minimal_revertion,
+    register_derived_search_indices,
+    replace_serial_indices,
+    update_all_files_hashes,
+    update_migrations_hash,
+    write_backend_flat_variants,
+    write_backend_nested_structs,
+    write_backend_new_variants,
+    write_backend_table_names_enumeration,
+    write_backend_update_variants,
     write_diesel_sql_function_bindings,
     write_diesel_sql_operator_bindings,
-    write_diesel_sql_types_bindings
+    write_diesel_sql_types_bindings,
+    write_frontend_forms,
+    write_frontend_pages,
+    write_frontend_router_page,
+    write_web_common_flat_variants,
+    write_web_common_nested_variants,
+    write_web_common_new_variants,
+    write_web_common_search_trait_implementations,
+    write_web_common_table_names_enumeration,
+    write_web_common_update_variants,
 )
-from constraint_checkers import (
-    ensure_can_x_function_existance,
-    ensures_no_duplicated_migrations,
-    register_derived_search_indices
+from constraint_checkers.regroup_tables import regroup_tables
+from constraint_checkers.write_frontend_database_schema import (
+    write_frontend_database_schema,
 )
-from constraint_checkers import (update_migrations_hash, update_all_files_hashes)
-
+from dotenv import load_dotenv
+from retrieve_taxons import retrieve_taxons
 
 if __name__ == "__main__":
     # Load dotenv file
@@ -106,21 +103,15 @@ if __name__ == "__main__":
         "generation process. Please rerun the generation script."
     )
 
-    print(
-        f"Extracted {len(flat_variants)} tables from the backend."
-    )
+    print(f"Extracted {len(flat_variants)} tables from the backend.")
 
     StructMetadata.init_indices()
     register_derived_search_indices(flat_variants)
 
-    filter_variants: List[StructMetadata] = create_filter_variants(
-        flat_variants
-    )
+    filter_variants: List[StructMetadata] = create_filter_variants(flat_variants)
     print(f"Generated {len(filter_variants)} filter structs.")
 
-    nested_structs: List[StructMetadata] = derive_nested_structs(
-        flat_variants
-    )
+    nested_structs: List[StructMetadata] = derive_nested_structs(flat_variants)
     print(f"Derived {len(nested_structs)} nested structs.")
     assert len(nested_structs) > 0, (
         "No nested structs were derived. This is likely due some error in the "
@@ -148,13 +139,13 @@ if __name__ == "__main__":
     write_diesel_sql_types_bindings()
     ensure_updatable_tables_have_roles_tables(tables, StructMetadata.table_metadata)
     ensure_can_x_function_existance(tables)
-    ensure_tables_have_creation_notification_trigger(tables, StructMetadata.table_metadata)
+    ensure_tables_have_creation_notification_trigger(
+        tables, StructMetadata.table_metadata
+    )
     print("Generated table names enumeration for web_common.")
 
     write_backend_flat_variants(flat_variants)
-    print(
-        f"Generated {len(flat_variants)} tables implementations for backend."
-    )
+    print(f"Generated {len(flat_variants)} tables implementations for backend.")
 
     write_backend_nested_structs(nested_structs)
     print(f"Generated {len(nested_structs)} nested structs for backend.")
@@ -183,11 +174,8 @@ if __name__ == "__main__":
     write_web_common_nested_variants(nested_structs)
     print("Generated nested structs for web_common.")
 
-    write_web_common_search_trait_implementations(
-        nested_structs + flat_variants
-    )
+    write_web_common_search_trait_implementations(nested_structs + flat_variants)
     print("Generated search trait implementations for web_common.")
-    
 
     builder_structs = derive_frontend_builders(new_model_structs + update_model_structs)
     print(f"Derived {len(builder_structs)} builders for the New & Update versions")
@@ -195,7 +183,6 @@ if __name__ == "__main__":
     write_web_common_new_variants(new_model_structs)
     write_web_common_update_variants(update_model_structs)
     print("Generated new & update structs for web_common.")
-
 
     write_frontend_forms(
         builder_structs,
@@ -211,6 +198,7 @@ if __name__ == "__main__":
     )
     print("Generated frontend router page.")
 
+    write_frontend_database_schema()
     # Since everything run appropriately since the last time we updated the
     # migrations hash in the last generation, we update it now.
     update_migrations_hash()
@@ -232,4 +220,3 @@ if __name__ == "__main__":
         print("Error running 'cargo fmt'!")
         exit(1)
     print("Formatted frontend rust code.")
-
