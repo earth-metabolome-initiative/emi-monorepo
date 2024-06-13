@@ -131,9 +131,9 @@ impl Component for Scanner {
             if self.is_scanning {
                 <div class="active-scanner-ui">
                     <div class="active-scanner-ui-content">
-                    <button class="toggle-flashlight" onclick={&toggle_flashlight} title="Turn on/off flashlight">
-                        <i class="fas fa-lightbulb"></i>
-                    </button>
+                        <button class="toggle-flashlight" onclick={&toggle_flashlight} title="Turn on/off flashlight">
+                            <i class="fas fa-lightbulb"></i>
+                        </button> // Add this line
                         <button class="close" onclick={&close_scanner}>{ "×" }</button>
                         <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update} style="display: none;"/>
                         if let Some(image_url) = image_url {

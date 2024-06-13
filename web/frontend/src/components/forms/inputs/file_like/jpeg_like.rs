@@ -44,7 +44,7 @@ impl FileLike for JPEG {
         };
 
         // If the image has only a few colors that are repeated a lot, we reject it
-        if image.get_repeated_colors_rate(10) > 30.0 {
+        if image.get_repeated_colors_rate(10) > 20.0 {
             return Err(ApiError::from(vec![concat!(
                 "The provided image contains a very limited number of colors. ",
                 "Therefore, it is likely to be a logo or icon and not a photograph. ",
@@ -54,15 +54,6 @@ impl FileLike for JPEG {
         }
 
         let grayscale = image.to_luma8();
-
-        // If the image is too sharp, we reject it
-        if grayscale.has_sharp_edges(None, None) {
-            return Err(ApiError::from(vec![concat!(
-                "The provided image is too sharp and likely to be a logo or icon. ",
-                "Please provide a photograph instead of a logo or icon."
-            )
-            .to_string()]));
-        }
 
         // If the image is blurry, we reject it
         if grayscale.is_blurry(None) {
