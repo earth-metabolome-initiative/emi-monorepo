@@ -3,6 +3,14 @@
 use base64::engine::general_purpose;
 use base64::Engine;
 use image::ImageFormat;
+mod is_blurry;
+pub use is_blurry::IsBlurry;
+mod is_transparent;
+pub use is_transparent::IsTransparent;
+mod repeated_colors;
+pub use repeated_colors::RepeatedColors;
+mod sharp_edges;
+pub use sharp_edges::SharpEdges;
 
 pub trait CapitalizeString {
     /// Returns the provided string with the first letter capitalized.

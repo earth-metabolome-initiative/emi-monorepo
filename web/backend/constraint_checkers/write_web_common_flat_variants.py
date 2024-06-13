@@ -27,8 +27,6 @@ def write_image_as_url_getter_method(attribute: AttributeMetadata, document: "Te
     attribute : AttributeMetadata
         The attribute containing the image.
     """
-    assert attribute.is_jpeg()
-
     if attribute.optional:
         document.write(
             f"    pub fn get_{attribute.name}_as_url(&self) -> Option<String> {{\n"
@@ -190,7 +188,7 @@ def write_web_common_flat_variants(
         # feature. It provides several methods including the use
         # of GlueSQL. Fortunately, it does not force us like Diesel
         # to create yet again another duplicate of the struct.
-        document.write('#[cfg(feature = "frontend")]\n' f"impl {struct.name} {{\n")
+        document.write(f"#[cfg(feature = \"frontend\")]\nimpl {struct.name} {{\n")
 
         for attribute in struct.attributes:
             if attribute.is_jpeg():

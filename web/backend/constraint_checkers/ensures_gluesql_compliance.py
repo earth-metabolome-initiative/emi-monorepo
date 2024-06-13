@@ -81,6 +81,24 @@ def check_absence_of_current_timestamp(migration: str, up_content: str):
         )
 
 
+def check_geometry_keyword_absence(migration: str, up_content: str):
+    """Check the absence of a `geometry` keyword in a migration.
+
+    Parameters
+    ----------
+    migration : str
+        The name of the migration.
+    up_content : str
+        The content of the `up.sql` file of the migration.
+    """
+
+    up_content = up_content.lower()
+    if "geometry" in up_content:
+        raise RuntimeError(
+            f"Migration `{migration}` contains a `geometry` keyword, which is not supported by GlueSQL. Please change it to `POINT`."
+        )
+
+
 def ensures_gluesql_compliance():
     """Ensures that the migrations are GlueSQL compliant."""
     if not (are_migrations_changed() or is_file_changed(__file__)):
@@ -105,3 +123,4 @@ def ensures_gluesql_compliance():
         check_absence_of_serial_primary_key_constraint(migration, up_content)
         check_foreign_key_constraints(migration, up_content)
         check_absence_of_current_timestamp(migration, up_content)
+        check_geometry_keyword_absence(migration, up_content)

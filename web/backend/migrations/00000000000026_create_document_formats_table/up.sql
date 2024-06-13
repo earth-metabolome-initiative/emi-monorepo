@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS document_formats (
   extension text NOT NULL UNIQUE,
   mime_type text NOT NULL,
   description TEXT NOT NULL,
-  icon_id INTEGER REFERENCES font_awesome_icons(id) NOT NULL,
-  color_id INTEGER REFERENCES colors(id) NOT NULL
+  icon_id INTEGER NOT NULL,
+  color_id INTEGER NOT NULL,
+  FOREIGN KEY (icon_id) REFERENCES font_awesome_icons(id),
+  FOREIGN KEY (color_id) REFERENCES colors(id)
 );

@@ -1,10 +1,15 @@
 use gloo::timers::callback::Interval;
 use gloo::utils::errors::JsError;
 use gloo::utils::window;
-use rxing::{self, Exceptions};
+use image::codecs::jpeg::JpegEncoder;
+use image::Luma;
+use rxing::qrcode::encoder::QRCode;
+use rxing::{self, BarcodeFormat, Exceptions};
+use std::collections::hash_set::HashSet;
 use std::collections::HashMap;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::JsValue;
+use web_common::traits::GuessImageFormat;
 use web_sys::{
     CanvasRenderingContext2d, HtmlCanvasElement, HtmlVideoElement, MediaStream,
     MediaStreamConstraints, MediaStreamTrack, MediaTrackConstraints, VideoFacingModeEnum,
@@ -14,10 +19,12 @@ use yew::prelude::*;
 pub struct Scanner {
     video_ref: NodeRef,
     canvas_ref: NodeRef,
+    canvas_to_display: NodeRef,
     stream: Option<MediaStream>,
     is_scanning: bool,
     is_flashlight_on: bool,
     interval: Option<Interval>,
+    image: Option<Vec<u8>>,
 }
 
 pub enum ScannerMessage {
@@ -38,8 +45,12 @@ pub struct ScannerProps {
     pub onerror: Callback<JsError>,
     #[prop_or_default]
     pub onclose: Callback<()>,
-    #[prop_or(500)]
+    #[prop_or(100)]
     pub refresh_milliseconds: u32,
+    #[prop_or(0.3)]
+    crop_percentage: f64,
+    #[prop_or(300)]
+    crop_dimension: u32,
 }
 
 impl Scanner {
@@ -75,10 +86,12 @@ impl Component for Scanner {
         Self {
             video_ref: NodeRef::default(),
             canvas_ref: NodeRef::default(),
+            canvas_to_display: NodeRef::default(),
             stream: None,
             is_scanning: false,
             is_flashlight_on: false,
             interval: None,
+            image: None,
         }
     }
 
@@ -100,6 +113,12 @@ impl Component for Scanner {
             ScannerMessage::ToggleFlashlight
         });
         let (video_width, video_height) = self.get_resolution();
+
+        let image_url = self
+            .image
+            .as_ref()
+            .and_then(|image| image.guess_image_url());
+
         html! {
             <>
                 // Button to start or stop the scanner
@@ -114,10 +133,14 @@ impl Component for Scanner {
                     <div class="active-scanner-ui-content">
                     <button class="toggle-flashlight" onclick={&toggle_flashlight} title="Turn on/off flashlight">
                         <i class="fas fa-lightbulb"></i>
-                    </button> // Add this line
+                    </button>
                         <button class="close" onclick={&close_scanner}>{ "×" }</button>
-                        <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update}/>
+                        <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update} style="display: none;"/>
+                        if let Some(image_url) = image_url {
+                            <img src={image_url} alt="Captured Image" class="captured-image"/>
+                        }
                         <canvas ref={&self.canvas_ref} width={video_width.to_string()} height={video_height.to_string()} style="display: none;"></canvas>
+                        <canvas ref={&self.canvas_to_display} width={video_width.to_string()} height={video_height.to_string()} style="display: block;"></canvas>
                     </div>
                 </div>
                 }
@@ -178,6 +201,23 @@ impl Component for Scanner {
                     }
                 }
 
+                let canvas_to_display = self
+                    .canvas_to_display
+                    .cast::<HtmlCanvasElement>()
+                    .expect("canvas should be an HtmlCanvasElement");
+
+                let context_to_display = canvas_to_display
+                    .get_context("2d")
+                    .expect("context should be available")
+                    .unwrap()
+                    .unchecked_into::<CanvasRenderingContext2d>();
+                match context_to_display.draw_image_with_html_video_element(&video, 0.0, 0.0) {
+                    Ok(_) => {}
+                    Err(e) => {
+                        log::error!("{:?}", e);
+                        return true;
+                    }
+                }
                 let image_data =
                     match context.get_image_data(0.0, 0.0, video_width as f64, video_height as f64)
                     {
@@ -188,11 +228,58 @@ impl Component for Scanner {
                         }
                     };
 
+                let image_data = convert_js_image_to_luma(&image_data.data());
+
+                // We crop the image down to the central 80% square of the image.
+                let square_side = (video_width as f64 * ctx.props().crop_percentage)
+                    .min(video_height as f64 * ctx.props().crop_percentage);
+                let x = (video_width as f64 - square_side) / 2.0;
+                let y = (video_height as f64 - square_side) / 2.0;
+                let image_data: Vec<u8> = image_data
+                    .chunks_exact(video_width as usize)
+                    .skip(y as usize)
+                    .take(square_side as usize)
+                    .map(|row| {
+                        row.iter()
+                            .skip(x as usize)
+                            .take(square_side as usize)
+                            .cloned()
+                    })
+                    .flatten()
+                    .collect();
+
+                // Next, we resize the image to 300x300 pixels.
+                let resized_image: image::ImageBuffer<image::Luma<u8>, Vec<u8>> =
+                    image::imageops::resize(
+                        &image::ImageBuffer::from_raw(
+                            square_side as u32,
+                            square_side as u32,
+                            image_data,
+                        )
+                        .unwrap(),
+                        ctx.props().crop_dimension,
+                        ctx.props().crop_dimension,
+                        image::imageops::FilterType::Nearest,
+                    );
+
+                // we convert the image into a jpeg and serialize it into a Vec<u8>
+                let mut jpeg_image = Vec::new();
+                let mut encoder = JpegEncoder::new_with_quality(&mut jpeg_image, 100);
+                encoder
+                    .encode(
+                        resized_image.as_raw(),
+                        resized_image.width(),
+                        resized_image.height(),
+                        image::ExtendedColorType::L8,
+                    )
+                    .unwrap();
+                self.image = Some(jpeg_image);
+
                 let decode_result = decode_barcode(
-                    convert_js_image_to_luma(image_data.data().as_ref()),
-                    image_data.width(),
-                    image_data.height(),
-                    Some(true),
+                    resized_image.into_vec(),
+                    ctx.props().crop_dimension,
+                    ctx.props().crop_dimension,
+                    Some(false),
                     Some(false),
                 );
                 match decode_result {
@@ -311,6 +398,10 @@ pub(crate) fn decode_barcode(
     filter_image: Option<bool>,
 ) -> Result<rxing::RXingResult, Exceptions> {
     let mut hints: rxing::DecodingHintDictionary = HashMap::new();
+    hints.insert(
+        rxing::DecodeHintType::POSSIBLE_FORMATS,
+        rxing::DecodeHintValue::PossibleFormats([BarcodeFormat::QR_CODE].iter().cloned().collect()),
+    );
     if let Some(true) = try_harder {
         hints.insert(
             rxing::DecodeHintType::TRY_HARDER,
@@ -324,7 +415,13 @@ pub(crate) fn decode_barcode(
         rxing::helpers::detect_in_luma_with_hints
     };
 
-    detection_function(data, width, height, None, &mut hints)
+    detection_function(
+        data,
+        width,
+        height,
+        Some(BarcodeFormat::QR_CODE),
+        &mut hints,
+    )
 }
 
 /// Convert a javascript image context's data into luma 8.

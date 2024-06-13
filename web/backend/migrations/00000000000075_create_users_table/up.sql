@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     last_name TEXT NOT NULL,
     description TEXT,
     picture BYTEA NOT NULL,
-    organization_id INTEGER REFERENCES organizations(id),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    organization_id INTEGER,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (organization_id) REFERENCES organizations(id)
 );

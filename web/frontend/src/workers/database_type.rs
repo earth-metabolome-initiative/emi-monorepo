@@ -9,11 +9,14 @@
 use gluesql::prelude::*;
 
 pub type Database = Glue<IdbStorage>;
+use super::database_schema::create_schema;
 
 pub(super) async fn create_database() -> Database {
-    Glue::new(
+    let mut database = Glue::new(
         IdbStorage::new(Some("Earth Metabolome Initiative".to_string()))
             .await
             .unwrap(),
-    )
+    );
+    create_schema(&mut database).await;
+    database
 }

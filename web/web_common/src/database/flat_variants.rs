@@ -2574,11 +2574,11 @@ pub struct Nameplate {
     pub barcode: String,
     pub project_id: i32,
     pub category_id: i32,
-    pub geolocation: crate::types::Point,
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: chrono::NaiveDateTime,
+    pub geolocation: crate::types::Point,
 }
 
 unsafe impl Send for Nameplate {}
@@ -2608,11 +2608,11 @@ impl Nameplate {
             gluesql::core::ast_builder::text(self.barcode),
             gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.category_id),
-            gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)),
             gluesql::core::ast_builder::num(self.created_by),
             gluesql::core::ast_builder::timestamp(self.created_at.to_string()),
             gluesql::core::ast_builder::num(self.updated_by),
             gluesql::core::ast_builder::timestamp(self.updated_at.to_string()),
+            gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)),
         ]
     }
 
@@ -2626,7 +2626,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         use gluesql::core::ast_builder::*;
         table("nameplates")
             .insert()
-            .columns("id, barcode, project_id, category_id, geolocation, created_by, created_at, updated_by, updated_at")
+            .columns("id, barcode, project_id, category_id, created_by, created_at, updated_by, updated_at, geolocation")
             .values(vec![self.into_row()])
             .execute(connection)
             .await
@@ -2652,7 +2652,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("nameplates")
             .select()
             .filter(col("id").eq(id.to_string()))
-            .project("id, barcode, project_id, category_id, geolocation, created_by, created_at, updated_by, updated_at")
+            .project("id, barcode, project_id, category_id, created_by, created_at, updated_by, updated_at, geolocation")
             .limit(1)
             .execute(connection)
             .await?;
@@ -2724,11 +2724,11 @@ connection: &mut gluesql::prelude::Glue<C>,
 .set("barcode", gluesql::core::ast_builder::text(self.barcode))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("category_id", gluesql::core::ast_builder::num(self.category_id))        
-.set("geolocation", gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)))        
 .set("created_by", gluesql::core::ast_builder::num(self.created_by))        
 .set("created_at", gluesql::core::ast_builder::timestamp(self.created_at.to_string()))        
 .set("updated_by", gluesql::core::ast_builder::num(self.updated_by))        
-.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))            .execute(connection)
+.set("updated_at", gluesql::core::ast_builder::timestamp(self.updated_at.to_string()))        
+.set("geolocation", gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)))            .execute(connection)
             .await
              .map(|payload| match payload {
                  gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
@@ -2776,7 +2776,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("nameplates")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, barcode, project_id, category_id, geolocation, created_by, created_at, updated_by, updated_at")
+           .project("id, barcode, project_id, category_id, created_by, created_at, updated_by, updated_at, geolocation")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
             .execute(connection)
@@ -2806,7 +2806,7 @@ connection: &mut gluesql::prelude::Glue<C>,
         let select_row = table("nameplates")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
-           .project("id, barcode, project_id, category_id, geolocation, created_by, created_at, updated_by, updated_at")
+           .project("id, barcode, project_id, category_id, created_by, created_at, updated_by, updated_at, geolocation")
             .order_by("updated_at desc")
             .offset(offset.unwrap_or(0))
             .limit(limit.unwrap_or(10))
@@ -2835,10 +2835,6 @@ connection: &mut gluesql::prelude::Glue<C>,
                 gluesql::prelude::Value::I32(category_id) => category_id.clone(),
                 _ => unreachable!("Expected I32")
             },
-            geolocation: match row.get("geolocation").unwrap() {
-                gluesql::prelude::Value::Point(geolocation) => geolocation.clone().into(),
-                _ => unreachable!("Expected Bytea"),
-            },
             created_by: match row.get("created_by").unwrap() {
                 gluesql::prelude::Value::I32(created_by) => created_by.clone(),
                 _ => unreachable!("Expected I32")
@@ -2854,6 +2850,10 @@ connection: &mut gluesql::prelude::Glue<C>,
             updated_at: match row.get("updated_at").unwrap() {
                 gluesql::prelude::Value::Timestamp(updated_at) => updated_at.clone(),
                 _ => unreachable!("Expected Timestamp")
+            },
+            geolocation: match row.get("geolocation").unwrap() {
+                gluesql::prelude::Value::Point(geolocation) => geolocation.clone().into(),
+                _ => unreachable!("Expected Bytea"),
             },
         }
     }

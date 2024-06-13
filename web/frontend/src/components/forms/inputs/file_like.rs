@@ -1,17 +1,27 @@
+use web_common::api::ApiError;
 use yew::prelude::*;
 mod jpeg_like;
 use std::fmt::Debug;
 use std::rc::Rc;
 use web_common::file_formats::GenericFileFormat;
 
-pub trait TryFromCallback<T>: Sized {
-    fn try_from_callback<C>(value: T, callback: C) -> Result<(), web_common::api::ApiError>
-    where
-        C: FnOnce(Result<Self, web_common::api::ApiError>) + 'static;
+/// Returns a human-readable string representing the size of a file.
+pub fn human_readable_file_size(size: usize) -> String {
+    if size < 1024 {
+        format!("{} B", size)
+    } else if size < 1024 * 1024 {
+        format!("{:.0} KB", size as f64 / 1024.0)
+    } else if size < 1024 * 1024 * 1024 {
+        format!("{:.0} MB", size as f64 / (1024.0 * 1024.0))
+    } else {
+        format!("{:.2} GB", size as f64 / (1024.0 * 1024.0 * 1024.0))
+    }
 }
 
 /// Trait defining an object which is File-like
-pub trait FileLike: Clone + Debug + PartialEq + 'static {
+pub trait FileLike:
+    Clone + Debug + PartialEq + Unpin + for<'de> serde::Deserialize<'de> + 'static
+{
     const FORMATS: &'static [GenericFileFormat];
 
     /// Returns the file size in bytes.
@@ -19,18 +29,13 @@ pub trait FileLike: Clone + Debug + PartialEq + 'static {
 
     fn preview(&self) -> Html;
 
+    fn try_from_bytes(
+        bytes: Vec<u8>,
+    ) -> impl std::future::Future<Output = Result<Self, ApiError>> + Send;
+
     /// Returns the file size in a human readable format.
     fn human_readable_file_size(&self) -> String {
-        let size = self.file_size();
-        if size < 1024 {
-            format!("{} B", size)
-        } else if size < 1024 * 1024 {
-            format!("{:.0} KB", size as f64 / 1024.0)
-        } else if size < 1024 * 1024 * 1024 {
-            format!("{:.0} MB", size as f64 / (1024.0 * 1024.0))
-        } else {
-            format!("{:.2} GB", size as f64 / (1024.0 * 1024.0 * 1024.0))
-        }
+        human_readable_file_size(self.file_size() as usize)
     }
 }
 

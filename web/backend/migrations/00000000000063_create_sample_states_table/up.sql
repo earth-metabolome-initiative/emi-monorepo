@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS sample_states (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT NOT NULL,
-    icon_id INTEGER NOT NULL UNIQUE REFERENCES font_awesome_icons(id),
-    color_id INTEGER NOT NULL UNIQUE REFERENCES colors(id)
+    icon_id INTEGER NOT NULL UNIQUE,
+    color_id INTEGER NOT NULL UNIQUE,
+    FOREIGN KEY (icon_id) REFERENCES font_awesome_icons(id),
+    FOREIGN KEY (color_id) REFERENCES colors(id)
 );

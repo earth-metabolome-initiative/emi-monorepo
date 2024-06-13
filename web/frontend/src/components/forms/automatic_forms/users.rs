@@ -304,16 +304,17 @@ pub fn update_user_form(props: &UpdateUserFormProp) -> Html {
         },
     );
     html! {
-        <BasicForm<UpdateUser>
-            method={FormMethod::PUT}
-            named_requests={named_requests}
-            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<String> label="First name" optional={false} errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
-            <BasicInput<String> label="Middle name" optional={true} errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
-            <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
-            <BasicInput<String> label="Description" optional={true} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
-            <FileInput<web_common::types::JPEG> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} file={builder_store.picture.clone()} />
-            <Datalist<web_common::database::nested_variants::NestedOrganization, false> builder={set_organization} optional={true} errors={builder_store.errors_organization.clone()} value={builder_store.organization.clone()} label="Organization" scanner={false} />
-        </BasicForm<UpdateUser>>
-    }
+          <BasicForm<UpdateUser>
+              method={FormMethod::PUT}
+              named_requests={named_requests}
+              builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+              <BasicInput<String> label="First name" optional={false} errors={builder_store.errors_first_name.clone()} builder={set_first_name} value={builder_store.first_name.clone()} />
+              <BasicInput<String> label="Middle name" optional={true} errors={builder_store.errors_middle_name.clone()} builder={set_middle_name} value={builder_store.middle_name.clone()} />
+              <BasicInput<String> label="Last name" optional={false} errors={builder_store.errors_last_name.clone()} builder={set_last_name} value={builder_store.last_name.clone()} />
+              <BasicInput<String> label="Description" optional={true} errors={builder_store.errors_description.clone()} builder={set_description} value={builder_store.description.clone()} />
+    <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>> path="/jpeg_file_processor.js">        <FileInput<web_common::types::JPEG> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} file={builder_store.picture.clone()} />
+      </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>>>
+              <Datalist<web_common::database::nested_variants::NestedOrganization, false> builder={set_organization} optional={true} errors={builder_store.errors_organization.clone()} value={builder_store.organization.clone()} label="Organization" scanner={false} />
+          </BasicForm<UpdateUser>>
+      }
 }

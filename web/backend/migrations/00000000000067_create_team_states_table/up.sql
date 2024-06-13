@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS team_states (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
-    icon_id INTEGER NOT NULL UNIQUE REFERENCES font_awesome_icons(id) ON DELETE CASCADE,
-    color_id INTEGER NOT NULL UNIQUE REFERENCES colors(id) ON DELETE CASCADE
+    icon_id INTEGER NOT NULL UNIQUE,
+    color_id INTEGER NOT NULL UNIQUE,
+    FOREIGN KEY (icon_id) REFERENCES font_awesome_icons(id),
+    FOREIGN KEY (color_id) REFERENCES colors(id)
 );

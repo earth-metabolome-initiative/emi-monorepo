@@ -14,4 +14,4 @@ pub mod checkbox;
 pub use checkbox::*;
 pub mod barcode_scanner;
 pub use barcode_scanner::*;
-mod file_like;
+pub mod file_like;

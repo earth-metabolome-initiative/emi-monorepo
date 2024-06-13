@@ -1180,9 +1180,9 @@ def write_frontend_yew_form(
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
                 )
-            elif attribute.is_jpeg():
+            elif attribute.is_file():
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Rc<web_common::types::JPEG>>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.clone()));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Rc<{attribute.data_type('frontend')}>>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.clone()));\n"
                 )
             else:
                 document.write(
@@ -1249,9 +1249,27 @@ def write_frontend_yew_form(
                 )
                 continue
 
-            if attribute.is_jpeg():
+            if attribute.is_file():
+                # TODO! CHECK THAT THE APPROPRIATE FILE PROCESSOR EXISTS!
+                worker_name = f"{attribute.raw_data_type().lower()}_file_processor"
+                expected_path = f"../frontend/src/bin/{worker_name}.rs"
+                if not os.path.exists(expected_path):
+                    raise NotImplementedError(
+                        f"File processor for {attribute.raw_data_type()} not found. Expected to find the file {expected_path}. "
+                        "Perhaps you still have to write that file."
+                    )
+                needle = f'data-bin="{worker_name}"'
+                if not needle in open("../frontend/index.html", "r", encoding="utf8").read():
+                    expected_metadata = f'<link data-trunk rel="rust" href="Cargo.toml" data-bin="{worker_name}" data-type="worker" data-weak-refs data-wasm-opt="z" />'
+                    raise NotImplementedError(
+                        f"File processor for {attribute.raw_data_type()} not found in the frontend index.html file. Expected to find the following metadata tag: {expected_metadata}. "
+                        "Perhaps you still have to add that tag."
+                    )
+
                 document.write(
-                    f'            <FileInput<web_common::types::JPEG> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} file={{builder_store.{attribute.name}.clone()}} />\n'
+                    f'  <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<{attribute.data_type("frontend")}>> path=\"/{worker_name}.js\">'
+                    f'        <FileInput<{attribute.data_type("frontend")}> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} file={{builder_store.{attribute.name}.clone()}} />\n'
+                    f"    </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<{attribute.data_type('frontend')}>>>\n"
                 )
                 continue
 

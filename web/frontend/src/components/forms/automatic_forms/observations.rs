@@ -374,19 +374,20 @@ pub fn create_observation_form(props: &CreateObservationFormProp) -> Html {
         },
     );
     html! {
-        <BasicForm<NewObservation>
-            method={FormMethod::POST}
-            named_requests={named_requests}
-            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <FileInput<web_common::types::JPEG> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} file={builder_store.picture.clone()} />
-            <Datalist<web_common::database::nested_variants::NestedObservation, false> builder={set_parent_observation} optional={true} errors={builder_store.errors_parent_observation.clone()} value={builder_store.parent_observation.clone()} label="Parent observation" scanner={false} />
-            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<web_common::database::nested_variants::NestedOrganism, false> builder={set_organism} optional={true} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
-            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
-            <Datalist<web_common::database::nested_variants::NestedObservationSubject, false> builder={set_subject} optional={false} errors={builder_store.errors_subject.clone()} value={builder_store.subject.clone()} label="Subject" scanner={false} />
-        </BasicForm<NewObservation>>
-    }
+          <BasicForm<NewObservation>
+              method={FormMethod::POST}
+              named_requests={named_requests}
+              builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+              <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
+    <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>> path="/jpeg_file_processor.js">        <FileInput<web_common::types::JPEG> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} file={builder_store.picture.clone()} />
+      </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>>>
+              <Datalist<web_common::database::nested_variants::NestedObservation, false> builder={set_parent_observation} optional={true} errors={builder_store.errors_parent_observation.clone()} value={builder_store.parent_observation.clone()} label="Parent observation" scanner={false} />
+              <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+              <Datalist<web_common::database::nested_variants::NestedOrganism, false> builder={set_organism} optional={true} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
+              <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
+              <Datalist<web_common::database::nested_variants::NestedObservationSubject, false> builder={set_subject} optional={false} errors={builder_store.errors_subject.clone()} value={builder_store.subject.clone()} label="Subject" scanner={false} />
+          </BasicForm<NewObservation>>
+      }
 }
 #[derive(Clone, PartialEq, Properties)]
 pub struct UpdateObservationFormProp {
@@ -432,17 +433,18 @@ pub fn update_observation_form(props: &UpdateObservationFormProp) -> Html {
         },
     );
     html! {
-        <BasicForm<NewObservation>
-            method={FormMethod::PUT}
-            named_requests={named_requests}
-            builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
-            <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
-            <FileInput<web_common::types::JPEG> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} file={builder_store.picture.clone()} />
-            <Datalist<web_common::database::nested_variants::NestedObservation, false> builder={set_parent_observation} optional={true} errors={builder_store.errors_parent_observation.clone()} value={builder_store.parent_observation.clone()} label="Parent observation" scanner={false} />
-            <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
-            <Datalist<web_common::database::nested_variants::NestedOrganism, false> builder={set_organism} optional={true} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
-            <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
-            <Datalist<web_common::database::nested_variants::NestedObservationSubject, false> builder={set_subject} optional={false} errors={builder_store.errors_subject.clone()} value={builder_store.subject.clone()} label="Subject" scanner={false} />
-        </BasicForm<NewObservation>>
-    }
+          <BasicForm<NewObservation>
+              method={FormMethod::PUT}
+              named_requests={named_requests}
+              builder={builder_store.deref().clone()} builder_dispatch={builder_dispatch}>
+              <BasicInput<String> label="Notes" optional={true} errors={builder_store.errors_notes.clone()} builder={set_notes} value={builder_store.notes.clone()} />
+    <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>> path="/jpeg_file_processor.js">        <FileInput<web_common::types::JPEG> label="Picture" optional={false} errors={builder_store.errors_picture.clone()} builder={set_picture} file={builder_store.picture.clone()} />
+      </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>>>
+              <Datalist<web_common::database::nested_variants::NestedObservation, false> builder={set_parent_observation} optional={true} errors={builder_store.errors_parent_observation.clone()} value={builder_store.parent_observation.clone()} label="Parent observation" scanner={false} />
+              <Datalist<web_common::database::nested_variants::NestedProject, true> builder={set_project} optional={false} errors={builder_store.errors_project.clone()} value={builder_store.project.clone()} label="Project" scanner={false} />
+              <Datalist<web_common::database::nested_variants::NestedOrganism, false> builder={set_organism} optional={true} errors={builder_store.errors_organism.clone()} value={builder_store.organism.clone()} label="Organism" scanner={false} />
+              <Datalist<web_common::database::nested_variants::NestedSample, false> builder={set_sample} optional={true} errors={builder_store.errors_sample.clone()} value={builder_store.sample.clone()} label="Sample" scanner={false} />
+              <Datalist<web_common::database::nested_variants::NestedObservationSubject, false> builder={set_subject} optional={false} errors={builder_store.errors_subject.clone()} value={builder_store.subject.clone()} label="Subject" scanner={false} />
+          </BasicForm<NewObservation>>
+      }
 }

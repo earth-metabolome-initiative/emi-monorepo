@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS notifications (
     id INTEGER PRIMARY KEY,
     -- The user to whom the notification is addressed
-    user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL,
     -- An operation such as "INSERT", "UPDATE", or "DELETE"
     operation text NOT NULL,
     -- The table on which the operation was performed
@@ -11,32 +11,33 @@ CREATE TABLE IF NOT EXISTS notifications (
     record TEXT NOT NULL,
     -- Whether the notification has been read
     read BOOLEAN NOT NULL DEFAULT FALSE,
-    CHECK (operation IN ('INSERT', 'UPDATE', 'DELETE'))
+    CHECK (operation IN ('INSERT', 'UPDATE', 'DELETE')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Function to be called when a notification is inserted or updated
 -- in the notifications table to call a pg_notify function to notify the user
 -- with the serialized notification record.
-CREATE FUNCTION custom_notification_change()
-RETURNS TRIGGER AS $$
-BEGIN
-    PERFORM pg_notify(
-        'user' || '_' || NEW.user_id,
-        row_to_json(NEW)::TEXT
-    );
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- CREATE FUNCTION custom_notification_change()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     PERFORM pg_notify(
+--         'user' || '_' || NEW.user_id,
+--         row_to_json(NEW)::TEXT
+--     );
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
 -- We define a trigger that calls the pg_notify function
 -- every time a notification is inserted or updated into the notifications
 -- table to notify the user of the new notification.
-DROP TRIGGER IF EXISTS notifications_notify_trigger ON notifications;
-CREATE TRIGGER notifications_notify_trigger
-AFTER INSERT OR UPDATE
-ON notifications
-FOR EACH ROW
-EXECUTE FUNCTION custom_notification_change();
+-- DROP TRIGGER IF EXISTS notifications_notify_trigger ON notifications;
+-- CREATE TRIGGER notifications_notify_trigger
+-- AFTER INSERT OR UPDATE
+-- ON notifications
+-- FOR EACH ROW
+-- EXECUTE FUNCTION custom_notification_change();
 
 -- -- We create a function that notifies the user when a row is
 -- -- inserted, edited or deleted in the notifications table.

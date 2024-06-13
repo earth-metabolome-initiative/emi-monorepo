@@ -34,11 +34,11 @@ pub struct Nameplate {
     pub barcode: String,
     pub project_id: i32,
     pub category_id: i32,
-    pub geolocation: postgis_diesel::types::Point,
     pub created_by: i32,
     pub created_at: chrono::NaiveDateTime,
     pub updated_by: i32,
     pub updated_at: chrono::NaiveDateTime,
+    pub geolocation: postgis_diesel::types::Point,
 }
 
 unsafe impl Send for Nameplate {}
@@ -52,11 +52,11 @@ impl From<web_common::database::flat_variants::Nameplate>
             barcode: item.barcode,
             project_id: item.project_id,
             category_id: item.category_id,
-            geolocation: item.geolocation.convert(),
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
+            geolocation: item.geolocation.convert(),
         }
     }
 }
@@ -70,11 +70,11 @@ impl From<crate::database::flat_variants::Nameplate>
             barcode: item.barcode,
             project_id: item.project_id,
             category_id: item.category_id,
-            geolocation: item.geolocation.convert(),
             created_by: item.created_by,
             created_at: item.created_at,
             updated_by: item.updated_by,
             updated_at: item.updated_at,
+            geolocation: item.geolocation.convert(),
         }
     }
 }

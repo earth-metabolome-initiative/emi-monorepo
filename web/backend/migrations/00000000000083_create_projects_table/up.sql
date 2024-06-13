@@ -4,21 +4,22 @@ CREATE TABLE IF NOT EXISTS projects (
     name TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
     public BOOLEAN NOT NULL DEFAULT TRUE,
-    state_id INTEGER NOT NULL REFERENCES project_states(id) DEFAULT 1,
-    icon_id INTEGER NOT NULL DEFAULT 415 REFERENCES font_awesome_icons(id) ON
-    DELETE
-    SET
-        DEFAULT,
-        color_id INTEGER NOT NULL DEFAULT 1 REFERENCES colors(id),
-        parent_project_id INTEGER REFERENCES projects(id) ON
-    DELETE
-        CASCADE,
-        budget FLOAT DEFAULT NULL,
-        expenses FLOAT DEFAULT NULL,
-        created_by INTEGER NOT NULL REFERENCES users(id),
-        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_by INTEGER NOT NULL REFERENCES users(id),
-        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        expected_end_date TIMESTAMP DEFAULT NULL,
-        end_date TIMESTAMP DEFAULT NULL
+    state_id INTEGER NOT NULL DEFAULT 1,
+    icon_id INTEGER NOT NULL DEFAULT 415,
+    color_id INTEGER NOT NULL DEFAULT 1,
+    parent_project_id INTEGER,
+    budget FLOAT DEFAULT NULL,
+    expenses FLOAT DEFAULT NULL,
+    created_by INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_by INTEGER NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    expected_end_date TIMESTAMP DEFAULT NULL,
+    end_date TIMESTAMP DEFAULT NULL,
+    FOREIGN KEY (state_id) REFERENCES project_states(id),
+    FOREIGN KEY (icon_id) REFERENCES font_awesome_icons(id),
+    FOREIGN KEY (color_id) REFERENCES colors(id),
+    FOREIGN KEY (parent_project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (updated_by) REFERENCES users(id)
 );
