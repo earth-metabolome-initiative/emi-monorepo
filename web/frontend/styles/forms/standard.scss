@@ -58,6 +58,29 @@
         }
     }
 
+    .input-wrapper {
+        width: 100%;
+        position: relative;
+        // We show by default a search icon
+        // on the right side of the search input
+        &::after {
+            display: block;
+            font-family: "Font Awesome 5 Free";
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 900;
+            font-size: 1.2em;
+            color: $grey;
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            margin-top: -0.5em;
+            transition: color 0.2s;
+        }
+    }
+
     &.datalist {
         input[type="search"] {
             animation: pop-in 0.2s;
@@ -74,34 +97,23 @@
 
         .input-container {
             grid-template-columns: auto 1fr auto;
-            position: relative;
             // We show by default a search icon
             // on the right side of the search input
-            &::after {
-                content: "\f002";
-                display: block;
-                font-family: "Font Awesome 5 Free";
-                font-style: normal;
-                font-variant: normal;
-                text-rendering: auto;
-                -webkit-font-smoothing: antialiased;
-                font-weight: 900;
-                font-size: 1.2em;
-                color: $grey;
-                position: absolute;
-                right: 0.5em;
-                transition: color 0.2s;
+            .input-wrapper {
+                &::after {
+                    content: "\f002";
+                }
             }
         }
         &:focus-within {
-            .input-container {
+            .input-wrapper {
                 &::after {
                     color: $primary;
                 }
             }
         }
         &.loading {
-            .input-container {
+            .input-wrapper {
                 &::after {
                     content: "\f110";
                     animation: fa-spin 1s infinite linear;
@@ -109,7 +121,7 @@
             }
         }
         &.disabled {
-            .input-container {
+            .input-wrapper {
                 &::after {
                     // We apply a disable symbol for the content
                     // to illustrate this form is disabled
@@ -119,7 +131,7 @@
         }
 
         &.has-selections {
-            .input-container {
+            .input-wrapper {
                 &::after {
                     display: none;
                 }
@@ -165,6 +177,17 @@
     &.scanner {
         .input-container {
             grid-template-columns: auto 1fr auto;
+            .input-wrapper {
+                &::after {
+                    content: "\f029";
+                }
+
+                &:focus-within {
+                    &::after {
+                        color: $primary;
+                    }
+                }
+            }
         }
 
         .start-scanner {
@@ -188,7 +211,7 @@
 
 .gps-input {
     .map {
-        height: 400px;
+        height: 300px;
         width: 100%;
         margin-bottom: 0.5em;
         border-radius: 0.5em;

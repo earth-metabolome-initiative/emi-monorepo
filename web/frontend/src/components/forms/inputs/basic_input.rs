@@ -216,15 +216,17 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
                 },
                 InputType::Number | InputType::Text | InputType::Scanner => html! {
                     <>
-                    <input
-                        type={InputType::Text}
-                        class={format!("input-control {}", Data::INPUT_TYPE)}
-                        name={props.normalized_label()}
-                        id={props.normalized_label()}
-                        value={value}
-                        placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                        oninput={on_input}
-                    />
+                    <div class="input-wrapper">
+                        <input
+                            type={InputType::Text}
+                            class={format!("input-control {}", Data::INPUT_TYPE)}
+                            name={props.normalized_label()}
+                            id={props.normalized_label()}
+                            value={value}
+                            placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                            oninput={on_input}
+                        />
+                    </div>
                     if Data::INPUT_TYPE == InputType::Scanner {
                         <Scanner onscan={on_scan} onerror={on_scan_error}/>
                     }

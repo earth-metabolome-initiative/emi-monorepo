@@ -442,19 +442,21 @@ where
                         </label>
                     }
                     if self.is_focused || self.selections.is_empty() {
-                        <input
-                            type="search"
-                            class="input-control"
-                            value={input_value}
-                            placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                            oninput={on_input}
-                            onfocus={on_focus}
-                            disabled={self.disable()}
-                            autocomplete="off"
-                            spellcheck="false"
-                            id={props.normalized_label()}
-                            name={props.normalized_label()}
-                        />
+                        <div class="input-wrapper">
+                            <input
+                                type="search"
+                                class="input-control"
+                                value={input_value}
+                                placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                                oninput={on_input}
+                                onfocus={on_focus}
+                                disabled={self.disable()}
+                                autocomplete="off"
+                                spellcheck="false"
+                                id={props.normalized_label()}
+                                name={props.normalized_label()}
+                            />
+                        </div>
                         if ctx.props().scanner {
                             <Scanner onscan={on_scan} onerror={on_scan_error}/>
                         }
