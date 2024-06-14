@@ -4,14 +4,14 @@
     padding-bottom: 2rem;
     padding-right: 0;
     min-width: 100%;
-    min-height: 100vh;
+    min-height: 100dvh;
     box-sizing: border-box;
     position: relative;
     transition: padding-left 0.5s;
 
     .page-container {
         position: relative;
-        min-height: calc(100vh - $navigator-height - 2rem);
+        min-height: calc(100dvh - $navigator-height - 2rem);
         box-sizing: border-box;
         padding-left: 1rem;
         padding-right: 1rem;
