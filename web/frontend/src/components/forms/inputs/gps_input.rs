@@ -57,7 +57,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
 
             let error_callback = Closure::wrap(Box::new(move |_: PositionError| {
                 errors1.set(vec![ApiError::BadRequest(vec![
-                    "Unable to get the current position".to_owned(),
+                    "Unable to get the updated position".to_owned(),
                 ])]);
             }) as Box<dyn Fn(PositionError)>);
 
@@ -67,7 +67,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                 &position_options,
             ) {
                 errors2.set(vec![ApiError::BadRequest(vec![
-                    "Unable to get the current position".to_owned(),
+                    "Unable to watch the current position".to_owned(),
                 ])]);
             }
 

@@ -21,6 +21,7 @@ pub struct Scanner {
     has_loaded: bool,
     mirrored: bool,
     current_camera: Option<(usize, CameraInfo)>,
+    number_of_identical_frames: u32,
     cameras: Vec<CameraInfo>,
     closing: Option<Timeout>,
     interval: Option<Interval>,
@@ -112,6 +113,7 @@ impl Component for Scanner {
             interval: None,
             closing: None,
             image: None,
+            number_of_identical_frames: 0
         }
     }
 
@@ -240,8 +242,11 @@ impl Component for Scanner {
                 // If the two image data are exactly the same, something went wrong
                 // and we assume that the video has stopped.
                 if previous_image_data.data() == image_data.data() {
-                    ctx.link().send_message(ScannerMessage::VideoEnded);
-                    return false;
+                    self.number_of_identical_frames += 1;
+                    if self.number_of_identical_frames > 10 {
+                        ctx.link().send_message(ScannerMessage::VideoEnded);
+                        return false;
+                    }
                 }
 
                 match decode_barcode(
@@ -429,10 +434,6 @@ impl Component for Scanner {
             event.stop_propagation();
             ScannerMessage::Mirrored
         });
-        let video_end = ctx.link().callback(|_| {
-            log::info!("Video ended");
-            ScannerMessage::VideoEnded
-        });
 
         let classes = format!(
             "active-scanner-ui{}{}{}",
@@ -464,7 +465,7 @@ impl Component for Scanner {
             // Modal for the scanner
             if self.is_scanning {
                 <div class={classes} onclick={&close_scanner}>
-                    <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update} onplaying={onloaded} onended={&video_end} onerror={&video_end} onabort={&video_end} onemptied={&video_end}></video>
+                    <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update} onplaying={onloaded}></video>
                     if let Some(video) = self.video_ref.cast::<HtmlVideoElement>() {
                         <canvas ref={&self.canvas_ref} width={video.video_width().to_string()} height={video.video_height().to_string()}></canvas>
                     }
