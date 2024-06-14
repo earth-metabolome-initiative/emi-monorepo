@@ -50,7 +50,6 @@ r2d2 = {version="0.8.10", optional = true}
 reqwest = "0.12.4"
 base64 = "0.22.1"
 rustfft = "6.2.0"
-imageproc = "0.25.0"
 
 [dependencies.web-sys]
 version = "0.3.69"

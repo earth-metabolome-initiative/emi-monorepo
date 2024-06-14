@@ -9,8 +9,6 @@ mod is_transparent;
 pub use is_transparent::IsTransparent;
 mod repeated_colors;
 pub use repeated_colors::RepeatedColors;
-mod sharp_edges;
-pub use sharp_edges::SharpEdges;
 mod is_dark;
 pub use is_dark::IsDark;
 mod is_light;
