@@ -10,12 +10,7 @@ pub struct CameraInfo {
     pub device_id: String,
     pub group_id: String,
     pub label: String,
-}
-
-impl CameraInfo {
-    pub fn is_front_camera(&self) -> bool {
-        self.label.contains("iPhone")
-    }
+    pub environment: bool,
 }
 
 /// Checks available cameras and their torch capabilities.
@@ -65,10 +60,24 @@ pub async fn get_available_cameras() -> Result<Vec<CameraInfo>, web_common::api:
             continue;
         }
 
+        let environment: bool = match get_device_stream(&device.device_id(), false, true).await {
+            Ok(stream) => {
+                // Closing the stream.
+                for track in stream.get_tracks().iter() {
+                    if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
+                        track.stop();
+                    }
+                }
+                true
+            },
+            Err(_) => false,
+        };
+
         cameras.push(CameraInfo {
             device_id: device.device_id(),
             label: device.label(),
             group_id: device.group_id(),
+            environment
         });
     }
 
@@ -84,12 +93,14 @@ pub async fn get_available_cameras() -> Result<Vec<CameraInfo>, web_common::api:
 /// # Arguments
 /// * `device_id` - A string slice that holds the device ID of the camera.
 /// * `torch` - A boolean that indicates if the torch should be enabled.
+/// * `environment` - A boolean that indicates if the camera should be set to environment mode.
 ///
 /// # Returns
 /// A `Result` containing a `MediaStream` if successful, or a `JsValue` error if failed.
 pub async fn get_device_stream(
     device_id: &str,
     torch: bool,
+    environment: bool,
 ) -> Result<web_sys::MediaStream, JsValue> {
     // Access the window's navigator object to get media devices.
     let media_devices = window().unwrap().navigator().media_devices().unwrap();
@@ -112,9 +123,11 @@ pub async fn get_device_stream(
     .unwrap();
     advanced_constraints.push(&torch_constraint);
     video_constraints
-        .advanced(&advanced_constraints)
-        .facing_mode(&VideoFacingModeEnum::Environment.into())
-        .frame_rate(&20.into());
+        .advanced(&advanced_constraints);
+    if environment {
+        video_constraints
+        .facing_mode(&VideoFacingModeEnum::Environment.into());
+    }
     constraints.video(&video_constraints);
 
     // Request media stream using the specified constraints.

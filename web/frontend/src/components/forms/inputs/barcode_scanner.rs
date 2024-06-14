@@ -122,11 +122,7 @@ impl Component for Scanner {
         match msg {
             ScannerMessage::RequireUserMedia => {
                 let mut constraints = web_sys::MediaStreamConstraints::new();
-                let mut video_constraints = web_sys::MediaTrackConstraints::new();
-                video_constraints
-                    .facing_mode(&web_sys::VideoFacingModeEnum::Environment.into())
-                    .frame_rate(&20.into());
-                constraints.video(&video_constraints);
+                constraints.video(&web_sys::MediaTrackConstraints::default());
                 let promise = match web_sys::window()
                     .unwrap()
                     .navigator()
@@ -143,7 +139,16 @@ impl Component for Scanner {
                 };
                 ctx.link().send_future(async {
                     match wasm_bindgen_futures::JsFuture::from(promise).await {
-                        Ok(stream) => ScannerMessage::FindCameras,
+                        Ok(stream) => {
+                            let stream: MediaStream = stream.dyn_into().unwrap();
+                            // We immediately stop the stream because we only need it to get the list of cameras.
+                            for track in stream.get_tracks().iter() {
+                                if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
+                                    track.stop();
+                                }
+                            }
+                            ScannerMessage::FindCameras
+                        }
                         Err(error) => ScannerMessage::Error(ApiError::from(error)),
                     }
                 });
@@ -167,11 +172,6 @@ impl Component for Scanner {
                 if self.has_loaded {
                     return false;
                 }
-                // let link = ctx.link().clone();
-                // let timeout = Timeout::new(1000, move || {
-                //     link.send_message(ScannerMessage::SetLoaded);
-                // });
-                // timeout.forget();
                 self.has_loaded = true;
                 true
             }
@@ -330,7 +330,7 @@ impl Component for Scanner {
                 };
                 let torch = self.is_flashlight_on;
                 ctx.link().send_future(async move {
-                    match get_device_stream(&current_device.device_id, torch).await {
+                    match get_device_stream(&current_device.device_id, torch, false).await {
                         Ok(stream) => ScannerMessage::ReceivedStream(stream),
                         Err(error) => ScannerMessage::Error(ApiError::from(error)),
                     }
@@ -412,12 +412,30 @@ impl Component for Scanner {
                         .iter()
                         .any(|camera| camera.device_id == current_device.device_id)
                     {
-                        // If the current camera is not available, we need to select the first one.
-                        self.current_camera = Some((0, cameras[0].clone()));
+                        // If the current camera is not available, we need to select the first
+                        // that has support for environment mode. If there is no camera with
+                        // support for environment mode, we select the first camera.
+                        let next_camera = cameras
+                            .iter()
+                            .enumerate()
+                            .find(|(_, camera)| camera.environment);
+                        if let Some(next_camera) = next_camera {
+                            self.current_camera = Some((next_camera.0, next_camera.1.clone()));
+                        } else {
+                            self.current_camera = Some((0, cameras[0].clone()));
+                        }
                     }
                 } else {
                     // If there is no current camera, we need to select the first one.
-                    self.current_camera = Some((0, cameras[0].clone()));
+                    let next_camera = cameras
+                        .iter()
+                        .enumerate()
+                        .find(|(_, camera)| camera.environment);
+                    if let Some(next_camera) = next_camera {
+                        self.current_camera = Some((next_camera.0, next_camera.1.clone()));
+                    } else {
+                        self.current_camera = Some((0, cameras[0].clone()));
+                    }
                 }
                 self.cameras = cameras;
                 true
