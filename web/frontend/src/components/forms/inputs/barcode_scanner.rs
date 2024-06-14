@@ -121,10 +121,23 @@ impl Component for Scanner {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             ScannerMessage::RequireUserMedia => {
-                let promise = match web_sys::window().unwrap().navigator().media_devices().unwrap().get_user_media() {
+                let mut constraints = web_sys::MediaStreamConstraints::new();
+                let mut video_constraints = web_sys::MediaTrackConstraints::new();
+                video_constraints
+                    .facing_mode(&web_sys::VideoFacingModeEnum::Environment.into())
+                    .frame_rate(&20.into());
+                constraints.video(&video_constraints);
+                let promise = match web_sys::window()
+                    .unwrap()
+                    .navigator()
+                    .media_devices()
+                    .unwrap()
+                    .get_user_media_with_constraints(&constraints)
+                {
                     Ok(promise) => promise,
                     Err(error) => {
-                        ctx.link().send_message(ScannerMessage::Error(ApiError::from(error)));
+                        ctx.link()
+                            .send_message(ScannerMessage::Error(ApiError::from(error)));
                         return false;
                     }
                 };
@@ -431,7 +444,6 @@ impl Component for Scanner {
         if self.cameras.is_empty() {
             return html! {};
         }
-
 
         let time_update = ctx.link().callback(|_| ScannerMessage::VideoTimeUpdate);
         let toggle_scanner = ctx.link().callback(|event: MouseEvent| {
