@@ -2,6 +2,7 @@
     position: fixed;
     z-index: 100;
     transform: translate3d(0px, 0px, 0px);
+    background-color: rgba(0, 0, 0, 0.5);
     // We blur the background to make the scanner more visible
     backdrop-filter: blur(5px);
     left: 0;
@@ -123,9 +124,9 @@
             height: 100%;
             width: 100%;
             border-radius: min(8vh, 8vw);
-            border: min(2.5vh, 2.5vw) solid white;
-            top: max(-2.5vh, -2.5vw);
-            left: max(-2.5vh, -2.5vw);
+            border: min(3vh, 3vw) solid white;
+            top: max(-2.95vh, -2.95vw);
+            left: max(-2.95vh, -2.95vw);
             &::before {
                 content: "";
                 font-family: "Font Awesome 5 Free";
