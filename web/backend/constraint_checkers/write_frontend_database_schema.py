@@ -47,8 +47,6 @@ def write_frontend_database_schema():
 
     imports = [
         "use sql_minifier::macros::load_sql;",
-        "use gluesql::prelude::Glue;",
-        "use gluesql::prelude::IdbStorage;",
     ]
 
     document.write("\n".join(imports) + "\n\n")
@@ -59,7 +57,7 @@ def write_frontend_database_schema():
     # and all the table names
 
     document.write(
-        "pub(super) async fn create_schema(database: &mut Glue<IdbStorage>) {\n"
+        "pub(super) async fn create_schema(database: &mut super::database_type::Database) {\n"
     )
     files_to_load = [
         f'if let Err(error) = database.execute(load_sql!("../backend/{table_creation}")).await {{\n'

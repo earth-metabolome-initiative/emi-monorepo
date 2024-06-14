@@ -71,13 +71,16 @@ pub struct MultiFileInput<Data> {
     errors: HashSet<ApiError>,
     hide_box_timeout: Option<Timeout>,
     box_visible: bool,
+    number_of_files_currently_processing: usize,
     _phantom: std::marker::PhantomData<Data>,
 }
 
-pub enum MultiFileInputMessage {
+pub enum MultiFileInputMessage<Data> {
     DragStart,
     HideDropBox,
     NoFiles,
+    FileProcessed(Data),
+    FileProcessingFailed(ApiError),
     LoadedFile(Vec<u8>),
     Files(web_sys::FileList),
     AddError(ApiError),
@@ -87,7 +90,7 @@ impl<Data> Component for MultiFileInput<Data>
 where
     Data: FileLike,
 {
-    type Message = MultiFileInputMessage;
+    type Message = MultiFileInputMessage<Data>;
     type Properties = MultiFileInputProp<Data>;
 
     fn create(ctx: &Context<Self>) -> Self {
@@ -124,6 +127,7 @@ where
             errors: HashSet::new(),
             hide_box_timeout: None,
             box_visible: ctx.props().files.is_empty(),
+            number_of_files_currently_processing: 0,
             _phantom: std::marker::PhantomData,
         }
     }
@@ -153,22 +157,30 @@ where
                 self.errors.clear();
                 true
             }
+            MultiFileInputMessage::FileProcessingFailed(error) => {
+                self.number_of_files_currently_processing -= 1;
+                ctx.link().send_message(MultiFileInputMessage::AddError(error));
+                false
+            }
             MultiFileInputMessage::AddError(error) => self.errors.insert(error),
             MultiFileInputMessage::LoadedFile(data) => {
-                let append_file: Callback<Rc<Data>> = ctx.props().append_file.clone();
                 let link = ctx.link().clone();
                 ctx.link().run_oneshot::<FileProcessor<Data>>(
                     data,
                     Callback::from(move |data: Result<Data, ApiError>| match data {
                         Ok(data) => {
-                            log::info!("File processed");
-                            append_file.emit(Rc::new(data));
+                            link.send_message(MultiFileInputMessage::FileProcessed(data))
                         }
                         Err(error) => {
-                            link.send_message(MultiFileInputMessage::AddError(error));
+                            link.send_message(MultiFileInputMessage::FileProcessingFailed(error));
                         }
                     }),
                 );
+                false
+            }
+            MultiFileInputMessage::FileProcessed(data) => {
+                self.number_of_files_currently_processing -= 1;
+                ctx.props().append_file.emit(Rc::new(data));
                 false
             }
             MultiFileInputMessage::Files(files) => {
@@ -214,6 +226,8 @@ where
                     // We read the file and convert it to the appropriate type.
                     let file_name = file.name();
 
+                    self.number_of_files_currently_processing += 1;
+
                     // First, we read the file as an array buffer using a send_future call.
                     ctx.link().send_future(async move {
                         match wasm_bindgen_futures::JsFuture::from(file.array_buffer()).await {
@@ -228,7 +242,7 @@ where
                         }
                     });
                 }
-                false
+                true
             }
         }
     }
@@ -300,11 +314,19 @@ where
             .cloned()
             .collect::<Vec<ApiError>>();
 
-        let classes = if !all_errors.is_empty() {
-            "input-group file input-group-valid"
-        } else {
-            "input-group file input-group-invalid"
-        };
+        let classes = format!(
+            "input-group file {}{}",
+            if !all_errors.is_empty() {
+                "input-group-valid"
+            } else {
+                "input-group-invalid"
+            },
+            if self.number_of_files_currently_processing > 0 {
+                " processing"
+            } else {
+                ""
+            }
+        );
 
         let object_unique_identifier = uuid::Uuid::new_v4();
 

@@ -11,6 +11,11 @@ mod repeated_colors;
 pub use repeated_colors::RepeatedColors;
 mod sharp_edges;
 pub use sharp_edges::SharpEdges;
+mod is_dark;
+pub use is_dark::IsDark;
+mod is_light;
+pub use is_light::IsLight;
+
 
 pub trait CapitalizeString {
     /// Returns the provided string with the first letter capitalized.

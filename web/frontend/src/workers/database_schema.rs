@@ -2,11 +2,9 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
-use gluesql::prelude::Glue;
-use gluesql::prelude::IdbStorage;
 use sql_minifier::macros::load_sql;
 
-pub(super) async fn create_schema(database: &mut Glue<IdbStorage>) {
+pub(super) async fn create_schema(database: &mut super::database_type::Database) {
     if let Err(error) = database
         .execute(load_sql!(
             "../backend/migrations/00000000000005_create_colors_table/up.sql"

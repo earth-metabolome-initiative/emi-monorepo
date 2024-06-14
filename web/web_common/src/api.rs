@@ -23,6 +23,38 @@ pub enum ApiError {
     BadRequest(Vec<String>),
     InternalServerError,
     InvalidFileFormat(String),
+    JPEGError(JPEGError),
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
+pub enum JPEGError {
+    InvalidImage,
+    ImageTooSmall,
+    ImageHasTransparency,
+    ImageTooDark,
+    ImageTooLight,
+    ImageIsBlurry,
+    ImageHasFewColors,
+    UnableToEncode,
+}
+
+impl ToString for JPEGError {
+    fn to_string(&self) -> String {
+        match self {
+            JPEGError::InvalidImage => "Invalid JPEG file.".to_string(),
+            JPEGError::ImageTooSmall => "Image is too small. Minimum size is 64x64.".to_string(),
+            JPEGError::ImageHasTransparency => "Image has transparency.".to_string(),
+            JPEGError::ImageTooDark => "The provided image is too dark.".to_string(),
+            JPEGError::ImageTooLight => "The provided image is too light.".to_string(),
+            JPEGError::ImageIsBlurry => "The provided image is blurry.".to_string(),
+            JPEGError::ImageHasFewColors => concat!(
+                "The image contains a very limited number of colors. ",
+                "Therefore, it is unlikely to be a photograph."
+            )
+            .to_string(),
+            JPEGError::UnableToEncode => "Unable to encode image.".to_string(),
+        }
+    }
 }
 
 impl ApiError {
@@ -34,6 +66,16 @@ impl ApiError {
             Self::InternalServerError => "bomb",
             Self::NoResults => "search",
             Self::InvalidFileFormat(_) => "file-circle-exclamation",
+            Self::JPEGError(e) => match e {
+                JPEGError::InvalidImage => "file-image",
+                JPEGError::ImageTooSmall => "expand-arrows-alt",
+                JPEGError::ImageHasTransparency => "file-image",
+                JPEGError::ImageTooDark => "moon",
+                JPEGError::ImageTooLight => "sun",
+                JPEGError::ImageIsBlurry => "eye-slash",
+                JPEGError::ImageHasFewColors => "palette",
+                JPEGError::UnableToEncode => "file-image",
+            },
         }
     }
 
@@ -111,6 +153,7 @@ impl Into<Vec<String>> for ApiError {
             ApiError::BadGateway => vec!["Bad Gateway".to_string()],
             ApiError::InternalServerError => vec!["Internal Server Error".to_string()],
             ApiError::InvalidFileFormat(format) => vec![format!("Invalid file format: {}", format)],
+            ApiError::JPEGError(e) => vec![e.to_string()],
         }
     }
 }
@@ -132,6 +175,12 @@ impl From<reqwest::Error> for ApiError {
     fn from(e: reqwest::Error) -> Self {
         log::error!("Reqwest error: {:?}", e);
         Self::BadGateway
+    }
+}
+
+impl From<JPEGError> for ApiError {
+    fn from(e: JPEGError) -> Self {
+        Self::JPEGError(e)
     }
 }
 
@@ -210,6 +259,7 @@ impl From<ApiError> for actix_web::HttpResponse {
             }
             ApiError::InvalidFileFormat(format) => actix_web::HttpResponse::BadRequest()
                 .json(format!("Invalid file format: {}", format)),
+            ApiError::JPEGError(e) => actix_web::HttpResponse::BadRequest().json(e.to_string()),
         }
     }
 }
