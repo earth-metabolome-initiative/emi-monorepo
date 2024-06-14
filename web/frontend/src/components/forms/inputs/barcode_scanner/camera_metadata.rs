@@ -64,7 +64,7 @@ pub async fn get_available_cameras() -> Result<Vec<CameraInfo>, web_common::api:
             Ok(stream) => {
                 // Closing the stream.
                 for track in stream.get_tracks().iter() {
-                    if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
+                    if let Ok(track) = track.dyn_into::<web_sys::MediaStreamTrack>() {
                         track.stop();
                     }
                 }
