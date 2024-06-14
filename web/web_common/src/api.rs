@@ -269,6 +269,26 @@ impl From<wasm_bindgen::JsValue> for ApiError {
     }
 }
 
+#[cfg(feature = "frontend")]
+impl From<web_sys::PositionError> for ApiError {
+    fn from(e: web_sys::PositionError) -> Self {
+        match e.code() {
+            web_sys::PositionError::PERMISSION_DENIED => Self::BadRequest(vec![
+                "Location permission denied. Please enable location services.".to_string(),
+            ]),
+            web_sys::PositionError::POSITION_UNAVAILABLE => Self::BadRequest(vec![
+                "Location unavailable. Please enable location services.".to_string(),
+            ]),
+            web_sys::PositionError::TIMEOUT => Self::BadRequest(vec![
+                "Location request timed out. Please enable location services.".to_string(),
+            ]),
+            _ => Self::BadRequest(vec![
+                "Location request failed. Please enable location services.".to_string(),
+            ]),
+        }
+    }
+}
+
 #[cfg(feature = "backend")]
 impl From<ApiError> for actix_web::HttpResponse {
     fn from(e: ApiError) -> Self {

@@ -40,7 +40,7 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
         .maximum_age(10_000);
 
     // We create a state to store the errors that might happen
-    let errors = use_state(|| Vec::new());
+    let errors: UseStateHandle<Option<ApiError>> = use_state(|| None);
 
     if props.coordinates.is_none() {
         if let Some(geolocation) =
@@ -55,20 +55,16 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
             let errors1 = errors.clone();
             let errors2 = errors.clone();
 
-            let error_callback = Closure::wrap(Box::new(move |_: PositionError| {
-                errors1.set(vec![ApiError::BadRequest(vec![
-                    "Unable to get the updated position".to_owned(),
-                ])]);
+            let error_callback = Closure::wrap(Box::new(move |error: PositionError| {
+                errors1.set(Some(error.into()));
             }) as Box<dyn Fn(PositionError)>);
 
-            if let Err(_) = geolocation.watch_position_with_error_callback_and_options(
+            if let Err(error) = geolocation.watch_position_with_error_callback_and_options(
                 &callback.as_ref().unchecked_ref(),
                 Some(&error_callback.as_ref().unchecked_ref()),
                 &position_options,
             ) {
-                errors2.set(vec![ApiError::BadRequest(vec![
-                    "Unable to watch the current position".to_owned(),
-                ])]);
+                errors2.set(Some(error.into()));
             }
 
             callback.forget();
@@ -93,9 +89,9 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                 if let Ok(latitude) = latitude {
                     builder.emit(Some((latitude, longitude).into()));
                 } else {
-                    errors.set(vec![ApiError::BadRequest(vec![
+                    errors.set(Some(ApiError::BadRequest(vec![
                         "Latitude must be a number".to_string(),
-                    ])]);
+                    ])));
                 }
             } else {
                 builder.emit(None);
@@ -115,9 +111,9 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                 if let Ok(longitude) = longitude {
                     builder.emit(Some((latitude, longitude).into()));
                 } else {
-                    errors.set(vec![ApiError::BadRequest(vec![
+                    errors.set(Some(ApiError::BadRequest(vec![
                         "Longitude must be a number".to_string(),
-                    ])]);
+                    ])));
                 }
             } else {
                 builder.emit(None);

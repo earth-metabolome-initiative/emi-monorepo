@@ -113,7 +113,7 @@ impl Component for Scanner {
             interval: None,
             closing: None,
             image: None,
-            number_of_identical_frames: 0
+            number_of_identical_frames: 0,
         }
     }
 

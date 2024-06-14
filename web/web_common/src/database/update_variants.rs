@@ -42,31 +42,24 @@ impl UpdateDerivedSample {
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error>
-    where
+    ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         table("derived_samples")
-            .update()
-            .set(
-                "parent_sample_id",
-                gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()),
-            )
-            .set(
-                "child_sample_id",
-                gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()),
-            )
-            .set("quantity", gluesql::core::ast_builder::num(self.quantity))
-            .set("unit_id", gluesql::core::ast_builder::num(self.unit_id))
-            .set("updated_by", gluesql::core::ast_builder::num(user_id))
-            .execute(connection)
+            .update()        
+.set("parent_sample_id", gluesql::core::ast_builder::uuid(self.parent_sample_id.to_string()))        
+.set("child_sample_id", gluesql::core::ast_builder::uuid(self.child_sample_id.to_string()))        
+.set("quantity", gluesql::core::ast_builder::num(self.quantity))        
+.set("unit_id", gluesql::core::ast_builder::num(self.unit_id))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
             .await
-            .map(|payload| match payload {
-                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                _ => unreachable!("Expected Payload::Update"),
-            })
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
     }
+
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UpdateNameplate {
@@ -91,10 +84,7 @@ impl UpdateNameplate {
             gluesql::core::ast_builder::text(self.barcode),
             gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.category_id),
-            gluesql::core::ast_builder::function::point(
-                gluesql::core::ast_builder::num(self.geolocation.x),
-                gluesql::core::ast_builder::num(self.geolocation.y),
-            ),
+            gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)),
         ]
     }
 
@@ -110,38 +100,25 @@ impl UpdateNameplate {
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error>
-    where
+    ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         table("nameplates")
-            .update()
-            .set("id", gluesql::core::ast_builder::num(self.id))
-            .set("barcode", gluesql::core::ast_builder::text(self.barcode))
-            .set(
-                "project_id",
-                gluesql::core::ast_builder::num(self.project_id),
-            )
-            .set(
-                "category_id",
-                gluesql::core::ast_builder::num(self.category_id),
-            )
-            .set(
-                "geolocation",
-                gluesql::core::ast_builder::function::point(
-                    gluesql::core::ast_builder::num(self.geolocation.x),
-                    gluesql::core::ast_builder::num(self.geolocation.y),
-                ),
-            )
-            .set("updated_by", gluesql::core::ast_builder::num(user_id))
-            .execute(connection)
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("barcode", gluesql::core::ast_builder::text(self.barcode))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
+.set("category_id", gluesql::core::ast_builder::num(self.category_id))        
+.set("geolocation", gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
             .await
-            .map(|payload| match payload {
-                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                _ => unreachable!("Expected Payload::Update"),
-            })
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
     }
+
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateProject {
@@ -189,9 +166,7 @@ impl UpdateProject {
                 None => gluesql::core::ast_builder::null(),
             },
             match self.expected_end_date {
-                Some(expected_end_date) => {
-                    gluesql::core::ast_builder::timestamp(expected_end_date.to_string())
-                }
+                Some(expected_end_date) => gluesql::core::ast_builder::timestamp(expected_end_date.to_string()),
                 None => gluesql::core::ast_builder::null(),
             },
             match self.end_date {
@@ -213,29 +188,22 @@ impl UpdateProject {
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error>
-    where
+    ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("projects")
-            .update()
-            .set("id", gluesql::core::ast_builder::num(self.id))
-            .set("name", gluesql::core::ast_builder::text(self.name))
-            .set(
-                "description",
-                gluesql::core::ast_builder::text(self.description),
-            )
-            .set("public", self.public)
-            .set("state_id", gluesql::core::ast_builder::num(self.state_id))
-            .set("icon_id", gluesql::core::ast_builder::num(self.icon_id))
-            .set("color_id", gluesql::core::ast_builder::num(self.color_id))
-            .set("updated_by", gluesql::core::ast_builder::num(user_id));
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("description", gluesql::core::ast_builder::text(self.description))        
+.set("public", self.public)        
+.set("state_id", gluesql::core::ast_builder::num(self.state_id))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(parent_project_id) = self.parent_project_id {
-            update_row = update_row.set(
-                "parent_project_id",
-                gluesql::core::ast_builder::num(parent_project_id),
-            );
+            update_row = update_row.set("parent_project_id", gluesql::core::ast_builder::num(parent_project_id));
         }
         if let Some(budget) = self.budget {
             update_row = update_row.set("budget", gluesql::core::ast_builder::num(budget));
@@ -244,25 +212,19 @@ impl UpdateProject {
             update_row = update_row.set("expenses", gluesql::core::ast_builder::num(expenses));
         }
         if let Some(expected_end_date) = self.expected_end_date {
-            update_row = update_row.set(
-                "expected_end_date",
-                gluesql::core::ast_builder::timestamp(expected_end_date.to_string()),
-            );
+            update_row = update_row.set("expected_end_date", gluesql::core::ast_builder::timestamp(expected_end_date.to_string()));
         }
         if let Some(end_date) = self.end_date {
-            update_row = update_row.set(
-                "end_date",
-                gluesql::core::ast_builder::timestamp(end_date.to_string()),
-            );
+            update_row = update_row.set("end_date", gluesql::core::ast_builder::timestamp(end_date.to_string()));
         }
-        update_row
-            .execute(connection)
+            update_row.execute(connection)
             .await
-            .map(|payload| match payload {
-                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                _ => unreachable!("Expected Payload::Update"),
-            })
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
     }
+
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateSampleContainer {
@@ -301,31 +263,24 @@ impl UpdateSampleContainer {
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error>
-    where
+    ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         table("sample_containers")
-            .update()
-            .set("id", gluesql::core::ast_builder::num(self.id))
-            .set("barcode", gluesql::core::ast_builder::text(self.barcode))
-            .set(
-                "project_id",
-                gluesql::core::ast_builder::num(self.project_id),
-            )
-            .set(
-                "category_id",
-                gluesql::core::ast_builder::num(self.category_id),
-            )
-            .set("updated_by", gluesql::core::ast_builder::num(user_id))
-            .execute(connection)
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("barcode", gluesql::core::ast_builder::text(self.barcode))        
+.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
+.set("category_id", gluesql::core::ast_builder::num(self.category_id))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
             .await
-            .map(|payload| match payload {
-                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                _ => unreachable!("Expected Payload::Update"),
-            })
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
     }
+
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateSpectraCollection {
@@ -365,30 +320,26 @@ impl UpdateSpectraCollection {
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error>
-    where
+    ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("spectra_collections")
-            .update()
-            .set("id", gluesql::core::ast_builder::num(self.id))
-            .set(
-                "sample_id",
-                gluesql::core::ast_builder::uuid(self.sample_id.to_string()),
-            )
-            .set("updated_by", gluesql::core::ast_builder::num(user_id));
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("sample_id", gluesql::core::ast_builder::uuid(self.sample_id.to_string()))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(notes) = self.notes {
             update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
         }
-        update_row
-            .execute(connection)
+            update_row.execute(connection)
             .await
-            .map(|payload| match payload {
-                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                _ => unreachable!("Expected Payload::Update"),
-            })
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
     }
+
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateTeam {
@@ -436,37 +387,30 @@ impl UpdateTeam {
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error>
-    where
+    ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("teams")
-            .update()
-            .set("id", gluesql::core::ast_builder::num(self.id))
-            .set("name", gluesql::core::ast_builder::text(self.name))
-            .set(
-                "description",
-                gluesql::core::ast_builder::text(self.description),
-            )
-            .set("icon_id", gluesql::core::ast_builder::num(self.icon_id))
-            .set("color_id", gluesql::core::ast_builder::num(self.color_id))
-            .set("state_id", gluesql::core::ast_builder::num(self.state_id))
-            .set("updated_by", gluesql::core::ast_builder::num(user_id));
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("name", gluesql::core::ast_builder::text(self.name))        
+.set("description", gluesql::core::ast_builder::text(self.description))        
+.set("icon_id", gluesql::core::ast_builder::num(self.icon_id))        
+.set("color_id", gluesql::core::ast_builder::num(self.color_id))        
+.set("state_id", gluesql::core::ast_builder::num(self.state_id))        
+.set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(parent_team_id) = self.parent_team_id {
-            update_row = update_row.set(
-                "parent_team_id",
-                gluesql::core::ast_builder::num(parent_team_id),
-            );
+            update_row = update_row.set("parent_team_id", gluesql::core::ast_builder::num(parent_team_id));
         }
-        update_row
-            .execute(connection)
+            update_row.execute(connection)
             .await
-            .map(|payload| match payload {
-                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                _ => unreachable!("Expected Payload::Update"),
-            })
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
     }
+
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateUser {
@@ -517,43 +461,31 @@ impl UpdateUser {
     pub async fn update<C>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error>
-    where
+    ) -> Result<usize, gluesql::prelude::Error> where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("users")
-            .update()
-            .set("id", gluesql::core::ast_builder::num(self.id))
-            .set(
-                "first_name",
-                gluesql::core::ast_builder::text(self.first_name),
-            )
-            .set(
-                "last_name",
-                gluesql::core::ast_builder::text(self.last_name),
-            )
-            .set("picture", gluesql::core::ast_builder::bytea(self.picture));
+            .update()        
+.set("id", gluesql::core::ast_builder::num(self.id))        
+.set("first_name", gluesql::core::ast_builder::text(self.first_name))        
+.set("last_name", gluesql::core::ast_builder::text(self.last_name))        
+.set("picture", gluesql::core::ast_builder::bytea(self.picture));
         if let Some(middle_name) = self.middle_name {
-            update_row =
-                update_row.set("middle_name", gluesql::core::ast_builder::text(middle_name));
+            update_row = update_row.set("middle_name", gluesql::core::ast_builder::text(middle_name));
         }
         if let Some(description) = self.description {
-            update_row =
-                update_row.set("description", gluesql::core::ast_builder::text(description));
+            update_row = update_row.set("description", gluesql::core::ast_builder::text(description));
         }
         if let Some(organization_id) = self.organization_id {
-            update_row = update_row.set(
-                "organization_id",
-                gluesql::core::ast_builder::num(organization_id),
-            );
+            update_row = update_row.set("organization_id", gluesql::core::ast_builder::num(organization_id));
         }
-        update_row
-            .execute(connection)
+            update_row.execute(connection)
             .await
-            .map(|payload| match payload {
-                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                _ => unreachable!("Expected Payload::Update"),
-            })
+             .map(|payload| match payload {
+                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                 _ => unreachable!("Expected Payload::Update")
+})
     }
+
 }
