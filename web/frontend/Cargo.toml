@@ -44,7 +44,7 @@ chrono = "0.4.35"
 sublime_fuzzy = "0.7.0"
 implicit-clone = "0.4.9"
 v = "0.1.0"
-image = "0.25.1"
+image = "0.24.0"
 base64 = "0.22.1"
 rxing = { version = "0.5.9", features = [
   "wasm_support",
