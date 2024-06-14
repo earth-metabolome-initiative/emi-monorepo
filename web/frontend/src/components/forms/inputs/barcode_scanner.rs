@@ -46,7 +46,7 @@ pub struct ScannerProps {
     pub onerror: Callback<ApiError>,
     #[prop_or_default]
     pub onclose: Callback<()>,
-    #[prop_or(1000)]
+    #[prop_or(100)]
     pub refresh_milliseconds: u32,
     #[prop_or(0.3)]
     crop_percentage: f64,

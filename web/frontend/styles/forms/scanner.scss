@@ -2,7 +2,6 @@
     position: fixed;
     z-index: 100;
     transform: translate3d(0px, 0px, 0px);
-    background-color: rgba(0, 0, 0, 0.5);
     // We blur the background to make the scanner more visible
     backdrop-filter: blur(5px);
     left: 0;
@@ -12,15 +11,27 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: opacity 0.3s;
+    opacity: 0;
+
+    video {
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .scanner-focus-container {
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
 
     &.opening {
-        animation: fade-in 0.3s;
+        opacity: 1;
         video {
-            animation: fade-in 0.3s;
+            opacity: 1;
         }
 
         .scanner-focus-container {
-            animation: fade-in 0.3s;
+            opacity: 1;
             &::after {
                 animation: fade-in-up 0.3s;
             }
@@ -38,13 +49,13 @@
     }
 
     &.closing {
-        animation: fade-out 0.3s;
+        opacity: 0;
         video {
-            animation: fade-out 0.3s;
+            opacity: 0;
         }
 
         .scanner-focus-container {
-            animation: fade-out 0.3s;
+            opacity: 0;
             &::after {
                 animation: fade-out-up 0.3s;
             }
@@ -88,7 +99,7 @@
         border-top: 50vh;
         border-bottom: 50vh;
         border-style: solid;
-        border-color: rgba(255, 255, 255, 0.5);
+        border-color: rgba(0, 0, 0, 0.5);
         height:0;
         width: min(30vw, 30vh);
         padding-bottom: min(30vw, 30vh);
@@ -116,7 +127,7 @@
             top: max(-2.5vh, -2.5vw);
             left: max(-2.5vh, -2.5vw);
             &::before {
-                content: "\f029";
+                content: "";
                 font-family: "Font Awesome 5 Free";
                 position: absolute;
                 font-weight: 900;
@@ -136,7 +147,7 @@
                 font-size: 100;
                 color: white;
                 text-align: center;
-                bottom: min(0.5vh, 0.5vw);
+                bottom: min(1vh, 1vw);
             }
         }
     }
@@ -146,6 +157,7 @@
             .scanner-focus {
                 &::before {
                     content: "\f110";
+                    display: block;
                     animation: fa-spin 1s linear infinite;
                 }
                 &::after {
