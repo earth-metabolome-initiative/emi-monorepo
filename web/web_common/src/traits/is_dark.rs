@@ -5,14 +5,14 @@ pub trait IsDark {
     /// Returns whether the image is too underexposed.
     ///
     /// # Arguments
-    /// * `threshold` - The threshold for the luma value of a pixel to be considered dark. If not provided, the default value is 0.3.
+    /// * `threshold` - The threshold for the luma value of a pixel to be considered dark. If not provided, the default value is 0.1.
     ///
     fn is_dark(&self, threshold: Option<f32>) -> bool;
 }
 
 impl IsDark for image::GrayImage {
     fn is_dark(&self, threshold: Option<f32>) -> bool {
-        let threshold = threshold.unwrap_or(0.3);
+        let threshold = threshold.unwrap_or(0.1);
         let threshold_u8 = (threshold * 255.0) as u8;
         let mut dark_pixels = 0;
         for pixel in self.pixels() {
