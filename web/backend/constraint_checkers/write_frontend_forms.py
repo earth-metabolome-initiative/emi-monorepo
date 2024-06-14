@@ -9,6 +9,8 @@ from constraint_checkers.struct_metadata import AttributeMetadata, StructMetadat
 from insert_migration import insert_migration
 from tqdm.auto import tqdm
 from userinput import userinput
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 TEXTUAL_DATA_TYPES = ["String"]
 
@@ -45,7 +47,7 @@ def is_error_vector(attribute: AttributeMetadata) -> bool:
     assert isinstance(attribute, AttributeMetadata)
     return (
         attribute.name.startswith("errors_")
-        and attribute.data_type() == "Vec<ApiError>"
+        and attribute.raw_data_type() == "Vec<ApiError>"
     )
 
 
@@ -167,7 +169,7 @@ def write_frontend_builder_action_enumeration(
     derives = ", ".join(
         [derive for derive in builder.derives() if derive not in ("Store", "Default")]
     )
-    document.write(f"#[derive({derives})]\npub(super) enum {action_enum_name} {{\n")
+    document.write(f"#[derive({derives})]\npub(crate) enum {action_enum_name} {{\n")
 
     for attribute in builder.attributes:
         if attribute in primary_keys:
@@ -177,16 +179,13 @@ def write_frontend_builder_action_enumeration(
         if is_builder_reserved_attribute(attribute):
             continue
 
-        if (
-            attribute.data_type() in INPUT_TYPE_MAP
-            or attribute.data_type() == "NaiveDateTime"
-        ):
+        if attribute.raw_data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
             document.write(
                 f"    Set{attribute.capitalized_normalized_name()}(Option<String>),\n"
             )
         else:
             document.write(
-                f"    Set{attribute.capitalized_normalized_name()}({attribute.format_data_type()}),\n"
+                f"    Set{attribute.capitalized_normalized_name()}({attribute.format_data_type(route='frontend')}),\n"
             )
 
     document.write("}\n\n")
@@ -290,7 +289,7 @@ def write_frontend_builder_action_enumeration(
         # If the provided value is a StructMetadata, and it is of the same type as the richest variant,
         # we check that all of the primary keys are distinct from the primary keys of the richest variant.
         # We do not want to find an entry equal to the one we are trying to insert.
-        if attribute.data_type() == richest_variant.name:
+        if attribute.raw_data_type() == richest_variant:
             document.write(
                 f"                match {attribute.name}.as_ref() {{\n"
                 f"                    Some({attribute.name}) => {{\n"
@@ -316,7 +315,7 @@ def write_frontend_builder_action_enumeration(
 
         # If the provided value is a String, we need to check whether it is empty.
         # If it is, we add an error to the errors vector.
-        if attribute.data_type() == "String":
+        if attribute.raw_data_type() == "String":
             document.write(
                 f"                if let Some(value) = {attribute.name}.as_ref() {{\n"
                 "                    if value.is_empty() {\n"
@@ -329,29 +328,34 @@ def write_frontend_builder_action_enumeration(
                 "                }\n"
             )
 
-        if attribute.data_type() == "NaiveDateTime":
+        if attribute.is_date_type():
             # We convert the dates provided from the date picker to the NaiveDateTime format.
             # The dates from a datetime-local input are in the format "YYYY-MM-DDTHH:MM".
+            # Some of the dates will be in the more extensive format "YYYY-MM-DD HH:MM:SS",
+            # and we will need to handle these cases as well.
             document.write(
                 f"                match {attribute.name} {{\n"
-                f'                    Some(value) => match NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {{\n'
+                f'                    Some(value) => match chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {{\n'
                 f"                        Ok({attribute.name}) => state_mut.{attribute.name} = Some({attribute.name}),\n"
-                f"                        Err(_) => state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
-                f'                            "The {attribute.name} field must be a valid date and time.".to_string()\n'
-                "                        ])),\n"
+                f"                        Err(_) => match chrono::NaiveDateTime::parse_from_str(&value, \"%Y-%m-%d %H:%M:%S\") {{\n"
+                f"                            Ok({attribute.name}) => state_mut.{attribute.name} = Some({attribute.name}),\n"
+                f"                            Err(_) => state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
+                f'                                "The {attribute.human_readable_name()} field must be a valid date.".to_string()\n'
+                "                            ])),\n"
+                "                        },\n"
                 "                    },\n"
                 f"                    None => state_mut.{attribute.name} = None,\n"
                 "                }\n"
             )
         elif (
-            attribute.data_type() in INPUT_TYPE_MAP
-            and attribute.data_type() != "String"
+            attribute.raw_data_type() in INPUT_TYPE_MAP
+            and attribute.raw_data_type() != "String"
         ):
             # We try to convert the values to the largest possible type.
             # If the conversion fails, we add an error to the errors vector. Subsequently, we
             # verify whether the value is within the expected range. If it is not, we add an error to the
             # errors vector. Finally, we set the attribute to the provided value.
-            largest_type_variant = largest_type_variants[attribute.data_type()]
+            largest_type_variant = largest_type_variants[attribute.raw_data_type()]
 
             document.write(
                 f"                state_mut.form_updated_at = chrono::Utc::now().naive_utc();\n"
@@ -361,31 +365,31 @@ def write_frontend_builder_action_enumeration(
             )
 
             # In the case of floats, we also check for NaN and Infinity.
-            if attribute.data_type() in ("f32", "f64"):
+            if attribute.raw_data_type() in ("f32", "f64"):
                 document.write(
                     f"                            if value.is_nan() || value.is_infinite() {{\n"
                     f"                                state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
-                    f'                                    "The {attribute.name} field must be a valid {attribute.data_type()}.".to_string()\n'
+                    f'                                    "The {attribute.human_readable_name()} field must be a valid {attribute.raw_data_type()}.".to_string()\n'
                     "                                ]));\n"
                     "                            } else "
                 )
 
             document.write(
-                f"                            if value < {attribute.data_type()}::MIN as {largest_type_variant} || value > {attribute.data_type()}::MAX as {largest_type_variant} {{\n"
+                f"                            if value < {attribute.raw_data_type()}::MIN as {largest_type_variant} || value > {attribute.raw_data_type()}::MAX as {largest_type_variant} {{\n"
                 f"                                state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
                 f"                                    format!("
-                f'                                            "The {attribute.name} field must be between {{}} and {{}}.",\n'
-                f"                                            {attribute.data_type()}::MIN,\n"
-                f"                                            {attribute.data_type()}::MAX\n"
+                f'                                            "The {attribute.human_readable_name()} field must be between {{}} and {{}}.",\n'
+                f"                                            {attribute.raw_data_type()}::MIN,\n"
+                f"                                            {attribute.raw_data_type()}::MAX\n"
                 "                                    )\n"
                 "                                ]));\n"
                 "                            } else {\n"
-                f"                                state_mut.{attribute.name} = Some(value as {attribute.data_type()});\n"
+                f"                                state_mut.{attribute.name} = Some(value as {attribute.raw_data_type()});\n"
                 "                            }\n"
                 "                        }\n"
                 "                        Err(_) => {\n"
                 f"                            state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
-                f'                                "The {attribute.name} field must be a valid {attribute.data_type()}.".to_string()\n'
+                f'                                "The {attribute.human_readable_name()} field must be a valid {attribute.raw_data_type()}.".to_string()\n'
                 "                            ]));\n"
                 "                        }\n"
                 "                    },\n"
@@ -517,7 +521,7 @@ def write_frontend_form_builder_implementation(
         # We need to check whether is will be necessary to make a request to the backend
         # to obtain the nested version of the attribute. The request name is always equal
         # to the name of the attribute.
-        if attribute.data_type() == richest_variant.name:
+        if attribute.raw_data_type() == richest_variant:
             assert richest_variant.is_nested()
 
             flat_struct = attribute.raw_data_type().get_flat_variant()
@@ -553,7 +557,10 @@ def write_frontend_form_builder_implementation(
 
         if struct_attribute is not None:
             rc_variant = ""
-            if not struct_attribute.implements_copy() and struct_attribute.data_type() != "String":
+            if (
+                not struct_attribute.implements_copy()
+                and struct_attribute.raw_data_type() != "String"
+            ):
                 rc_variant = ".map(Rc::from)"
             if struct_attribute.optional:
                 document.write(
@@ -572,13 +579,10 @@ def write_frontend_form_builder_implementation(
                 rc_variant_intermediate = ""
                 if not struct_attribute.implements_copy():
                     rc_variant = ".map(Rc::from)"
-                    rc_variant_intermediate_option = ".as_deref().cloned()"                
+                    rc_variant_intermediate_option = ".as_deref().cloned()"
                     rc_variant_intermediate = ".as_ref().clone()"
 
-                if (
-                    attribute.data_type() in INPUT_TYPE_MAP
-                    or attribute.data_type() == "NaiveDateTime"
-                ):
+                if attribute.raw_data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
                     if struct_attribute.optional:
                         document.write(
                             f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(richest_variant.inner.{attribute.name}.as_ref().map(|{attribute.name}| {attribute.name}.to_string())));\n"
@@ -666,7 +670,7 @@ def write_frontend_form_builder_implementation(
         if variant.is_new_variant() and variant.has_uuid_primary_key():
             primary_key = primary_keys[0]
             document.write(
-                f"            {primary_key.name}: builder.{primary_key.name}.unwrap_or_else(Uuid::new_v4),\n"
+                f"            {primary_key.name}: builder.{primary_key.name}.unwrap_or_else(uuid::Uuid::new_v4),\n"
             )
         elif variant.is_new_variant() and len(primary_keys) > 1:
             for primary_key in primary_keys:
@@ -692,7 +696,13 @@ def write_frontend_form_builder_implementation(
                     )
         elif variant.is_update_variant():
             for primary_key in primary_keys:
-                if variant.is_update_variant() and builder.has_attribute(primary_key) and not builder.get_attribute_by_name(primary_key.name).has_struct_data_type():
+                if (
+                    variant.is_update_variant()
+                    and builder.has_attribute(primary_key)
+                    and not builder.get_attribute_by_name(
+                        primary_key.name
+                    ).has_struct_data_type()
+                ):
                     document.write(
                         f"            {primary_key.name}: builder.{primary_key.name}.unwrap(),\n"
                     )
@@ -700,9 +710,13 @@ def write_frontend_form_builder_implementation(
                     richest_variant_attribute = richest_variant.get_attribute_by_name(
                         primary_key.normalized_name()
                     )
-                    richest_variant_attribute_struct = richest_variant_attribute.raw_data_type()
+                    richest_variant_attribute_struct = (
+                        richest_variant_attribute.raw_data_type()
+                    )
 
-                    inner_primary_keys = richest_variant_attribute_struct.get_primary_keys()
+                    inner_primary_keys = (
+                        richest_variant_attribute_struct.get_primary_keys()
+                    )
                     assert len(inner_primary_keys) == 1, (
                         f"Expected a single primary key in the struct {richest_variant_attribute_struct.name}, "
                         f"but found {len(inner_primary_keys)}."
@@ -829,7 +843,9 @@ def handle_missing_gin_index(
         f"create_{attribute.raw_data_type().table_name}_table",
     ]
 
-    print(f"I need for the {attribute.raw_data_type().table_name} table to be searchable to generate the form for the builder {builder.name}.")
+    print(
+        f"I need for the {attribute.raw_data_type().table_name} table to be searchable to generate the form for the builder {builder.name}."
+    )
 
     # We find the migration after which the index should be created.
     target_migration = None
@@ -871,7 +887,7 @@ def handle_missing_gin_index(
         flat_variant = attribute.raw_data_type()
 
     for inner_attribute in flat_variant.attributes:
-        if inner_attribute.data_type() in TEXTUAL_DATA_TYPES:
+        if inner_attribute.raw_data_type() in TEXTUAL_DATA_TYPES:
             textual_columns.append(inner_attribute)
 
     if len(textual_columns) == 0:
@@ -883,7 +899,7 @@ def handle_missing_gin_index(
             "that particular migration. Furthermore, we have not even found any textual "
             "columns in the table, so we cannot help you creating the index. "
             f"The builder struct is {builder.name}. "
-            f"The attribute name is {attribute.name} and is of type {attribute.data_type()}."
+            f"The attribute name is {attribute.name} and is of type {attribute.raw_data_type()}."
         )
 
     if len(textual_columns) > 0:
@@ -988,6 +1004,7 @@ def handle_missing_gin_index(
         f"the form for the {builder.name} builder."
     )
 
+
 def write_frontend_yew_form(
     builder: StructMetadata,
     document: "io.TextIO",
@@ -1046,7 +1063,7 @@ def write_frontend_yew_form(
             )
             for primary_key in primary_keys:
                 document.write(
-                    f"    pub {primary_key.name}: {primary_key.format_data_type()},\n"
+                    f"    pub {primary_key.name}: {primary_key.format_data_type(route='frontend')},\n"
                 )
                 properties_attributes.append(primary_key)
             document.write("}\n\n")
@@ -1070,7 +1087,7 @@ def write_frontend_yew_form(
                 if default_value is not None:
                     document.write(
                         f"     #[prop_or({default_value})]\n"
-                        f"     pub {foreign_key.name}: {foreign_key.data_type()},\n"
+                        f"     pub {foreign_key.name}: {foreign_key.data_type(route='frontend')},\n"
                     )
                     properties_attributes.append(foreign_key)
                 else:
@@ -1080,7 +1097,7 @@ def write_frontend_yew_form(
                     if foreign_key_struct.is_searchable():
                         document.write(
                             "     #[prop_or_default]\n"
-                            f"    pub {foreign_key.name}: Option<{foreign_key.data_type()}>,\n"
+                            f"    pub {foreign_key.name}: Option<{foreign_key.data_type(route='frontend')}>,\n"
                         )
                         properties_attributes.append(foreign_key.as_option())
                     else:
@@ -1093,7 +1110,7 @@ def write_frontend_yew_form(
                             )
 
                         document.write(
-                            f"    pub {foreign_key.name}: {foreign_key.data_type()},\n"
+                            f"    pub {foreign_key.name}: {foreign_key.data_type(route='frontend')},\n"
                         )
                         properties_attributes.append(foreign_key)
             document.write("}\n\n")
@@ -1107,7 +1124,7 @@ def write_frontend_yew_form(
         else:
             document.write(f"pub fn {form_method_name}() -> Html {{\n")
         document.write(
-            f"    let (builder_store, builder_dispatch) = use_store::<{builder.name}>();\n"
+            f"    let (builder_store, builder_dispatch) = yewdux::use_store::<{builder.name}>();\n"
         )
 
         if method == "PUT":
@@ -1119,9 +1136,9 @@ def write_frontend_yew_form(
         elif method == "POST":
             if builder.has_sampled_by():
                 document.write(
-                    "    let user_state = use_store_value::<UserState>();\n"
+                    "    let user_state = yewdux::use_store_value::<crate::stores::user_state::UserState>();\n"
                 )
-                
+
             for property_attribute in properties_attributes:
                 property_struct = richest_variant.get_attribute_by_name(
                     property_attribute.normalized_name()
@@ -1155,29 +1172,21 @@ def write_frontend_yew_form(
             if attribute in primary_keys:
                 continue
 
-            if attribute.data_type() == "bool":
+            if attribute.raw_data_type() == "bool":
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some({attribute.name})));\n"
                 )
-            elif (
-                attribute.data_type() in INPUT_TYPE_MAP
-                or attribute.data_type() == "NaiveDateTime"
-            ):
+            elif attribute.raw_data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
                 )
-            elif attribute.data_type() == "Vec<u8>":
-                if "picture" in attribute.name:
-                    document.write(
-                        f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Image>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.map(<Vec<u8>>::from).map(Rc::from)));\n"
-                    )
-                else:
-                    raise RuntimeError(
-                        f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
-                    )
+            elif attribute.is_file():
+                document.write(
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<Rc<{attribute.data_type('frontend')}>>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}.clone()));\n"
+                )
             else:
                 document.write(
-                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type()}| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
+                    f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: {attribute.format_data_type(route='frontend')}| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
                 )
 
         document.write(
@@ -1216,11 +1225,8 @@ def write_frontend_yew_form(
 
             optional = "true" if struct_attribute.optional else "false"
 
-            if (
-                attribute.data_type() in INPUT_TYPE_MAP
-                or attribute.data_type() == "NaiveDateTime"
-            ):
-                attribute_data_type = attribute.data_type()
+            if attribute.raw_data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
+                attribute_data_type = attribute.raw_data_type()
                 if "barcode" in attribute.name:
                     attribute_data_type = "BarCode"
 
@@ -1237,30 +1243,46 @@ def write_frontend_yew_form(
                 )
                 continue
 
-            if attribute.data_type() == "bool":
+            if attribute.raw_data_type() == "bool":
                 document.write(
                     f'            <Checkbox label="{attribute.human_readable_name()}" errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} value={{builder_store.{attribute.name}.unwrap_or(false)}} />\n'
                 )
                 continue
 
-            if attribute.data_type() == "Vec<u8>":
-                if "picture" in attribute.name:
-                    allowed_formats = ["GenericFileFormat::Image"]
-
-                    document.write(
-                        f'            <FileInput<Image> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} allowed_formats={{vec![{", ".join(allowed_formats)}]}} value={{builder_store.{attribute.name}.as_deref().map(|{attribute.name}| {attribute.name}.into())}} />\n'
+            if attribute.is_file():
+                # TODO! CHECK THAT THE APPROPRIATE FILE PROCESSOR EXISTS!
+                worker_name = f"{attribute.raw_data_type().lower()}_file_processor"
+                expected_path = f"../frontend/src/bin/{worker_name}.rs"
+                if not os.path.exists(expected_path):
+                    raise NotImplementedError(
+                        f"File processor for {attribute.raw_data_type()} not found. Expected to find the file {expected_path}. "
+                        "Perhaps you still have to write that file."
                     )
-                else:
-                    raise RuntimeError(
-                        f"Attribute {attribute.name} of type {attribute.data_type()} not supported in the frontend form generation."
+                needle = f'data-bin="{worker_name}"'
+                if not needle in open("../frontend/index.html", "r", encoding="utf8").read():
+                    expected_metadata = f'<link data-trunk rel="rust" href="Cargo.toml" data-bin="{worker_name}" data-type="worker" data-weak-refs data-wasm-opt="z" />'
+                    raise NotImplementedError(
+                        f"File processor for {attribute.raw_data_type()} not found in the frontend index.html file. Expected to find the following metadata tag: {expected_metadata}. "
+                        "Perhaps you still have to add that tag."
                     )
 
+                document.write(
+                    f'  <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<{attribute.data_type("frontend")}>> path=\"/{worker_name}.js\">'
+                    f'        <FileInput<{attribute.data_type("frontend")}> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} file={{builder_store.{attribute.name}.clone()}} />\n'
+                    f"    </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<{attribute.data_type('frontend')}>>>\n"
+                )
+                continue
+
+            if attribute.is_point():
+                document.write(
+                    f'            <GPSInput label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} coordinates={{builder_store.{attribute.name}.clone()}} />\n'
+                )
                 continue
 
             # If the attribute is a nested struct, we need to generate a Datalist
             # that will allow the user to select the nested struct.
             if attribute.has_struct_data_type():
-                struct: StructMetadata = attribute.raw_data_type()
+                attribute_struct: StructMetadata = attribute.raw_data_type()
 
                 flat_attribute = flat_variant.get_attribute_by_name(attribute.name)
                 if flat_attribute is None:
@@ -1274,15 +1296,9 @@ def write_frontend_yew_form(
 
                 # We check that the table associated to the nested struct is searchable, otherwise
                 # we cannot generate the datalist for it and we need to raise an exception.
-                if not struct.is_searchable():
+                if not attribute_struct.is_searchable():
                     if flat_attribute not in properties_attributes:
-                        if struct.table_name == "spectra_collections":
-                            document.write(
-                                f'<p>{{"{flat_attribute.human_readable_name()} has to be selected with a ScannerInput, which is not yet available."}}</p>\n'
-                            )
-                            continue
-                        else:
-                            handle_missing_gin_index(attribute, builder)
+                        handle_missing_gin_index(attribute, builder)
                     else:
                         # If the attribute does not have an index but appears in the mandatory properties,
                         # it will be loaded shortly from the backend and fed into the current builder
@@ -1299,15 +1315,21 @@ def write_frontend_yew_form(
 
                 updatables = (
                     "true"
-                    if struct.has_associated_roles() and struct.table_name != "users"
+                    if attribute_struct.has_associated_roles()
+                    and attribute_struct.table_name != "users"
                     else "false"
                 )
                 scannable = "true" if "barcode" in attribute.name else "false"
 
-                attribute_data_type = attribute.data_type()
+                attribute_data_type = attribute.data_type(route='frontend')
+
+                if attribute_struct.can_implement_copy():
+                    value = f"Rc::from(builder_store.{attribute.name})"
+                else:
+                    value = f"builder_store.{attribute.name}.clone()"
 
                 document.write(
-                    f'            <Datalist<{attribute.data_type()}, {updatables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{builder_store.{attribute.name}.clone()}} label="{attribute.human_readable_name()}" scanner={{{scannable}}} />\n'
+                    f'            <Datalist<{attribute_data_type}, {updatables}> builder={{set_{attribute.name}}} optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} value={{{value}}} label="{attribute.human_readable_name()}" scanner={{{scannable}}} />\n'
                 )
                 continue
 
@@ -1380,43 +1402,40 @@ def write_frontend_forms(
     # In the near future, we will also implement several
     # traits for these structs.
 
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing frontend forms.")
+        return
+
     path = "../frontend/src/components/forms/automatic_forms.rs"
 
-    document = open(path, "w", encoding="utf8")
+    module_document = open(path, "w", encoding="utf8")
 
     # Preliminarly, we write a docstring at the very head
     # of this submodule to explain what it does and warn the
     # reader not to write anything in this file as it is
     # automatically generated.
 
-    document.write(
+    module_document.write(
         "//! This module contains the forms for the frontend.\n"
         "//!\n"
         "//! This module is automatically generated. Do not write anything here.\n\n"
     )
 
     imports = [
-        "use serde::{Deserialize, Serialize};",
         "use web_common::database::*;",
         "use yew::prelude::*;",
-        "use yewdux::{use_store, use_store_value, Reducer, Store};",
+        "use yewdux::{Reducer, Store};",
         "use crate::components::forms::*;",
         "use web_common::api::form_traits::FormMethod;",
         "use std::rc::Rc;",
-        "use uuid::Uuid;",
         "use std::ops::Deref;",
         "use yewdux::Dispatch;",
         "use web_common::api::ApiError;",
-        "use crate::stores::user_state::UserState;",
         "use crate::workers::ws_worker::ComponentMessage;",
-        "use web_common::custom_validators::Image;",
-        "use web_common::file_formats::GenericFileFormat;",
     ]
 
-    for import_statement in imports:
-        document.write(f"{import_statement}\n")
-
-    document.write("\n")
+    directory_path = path[:-3]
+    os.makedirs(directory_path, exist_ok=True)
 
     for builder in tqdm(
         builder_structs,
@@ -1424,36 +1443,26 @@ def write_frontend_forms(
         unit="struct",
         leave=False,
     ):
-        builder.write_to(document, derives_deny_list=["Default"])
-        write_frontend_builder_default_implementation(builder, document)
-        write_frontend_builder_action_enumeration(builder, document)
-        write_frontend_form_builder_implementation(builder, document)
-        write_frontend_form_buildable_implementation(builder, document)
-        write_frontend_yew_form(builder, document=document)
+        module_document.write(
+            f"mod {builder.table_name};\n" f"pub use {builder.table_name}::*;\n\n"
+        )
+        with open(
+            f"{directory_path}/{builder.table_name}.rs", "w", encoding="utf8"
+        ) as document:
+            document.write(
+                "//! This module contains the forms for the frontend.\n"
+                "//!\n"
+                "//! This module is automatically generated. Do not write anything here.\n\n"
+            )
 
-    document.flush()
-    document.close()
+            document.write("\n".join(imports) + "\n")
 
-    # We verify that the forms generation has been successful by
-    # checking that all of the builder names and their relative new
-    # variants and update variants are present in the generated file.
+            builder.write_to(document, derives_deny_list=["Default"])
+            write_frontend_builder_default_implementation(builder, document)
+            write_frontend_builder_action_enumeration(builder, document)
+            write_frontend_form_builder_implementation(builder, document)
+            write_frontend_form_buildable_implementation(builder, document)
+            write_frontend_yew_form(builder, document=document)
 
-    with open(path, "r", encoding="utf8") as document:
-        content = document.read()
-
-    for builder in builder_structs:
-        assert (
-            builder.name in content
-        ), f"Builder {builder.name} not found in the generated file."
-
-        flat_variant = builder.get_flat_variant()
-
-        if flat_variant.is_insertable() and flat_variant.table_name != "users":
-            assert (
-                builder.get_new_variant().name in content
-            ), f"New variant {builder.get_new_variant().name} not found in the generated file."
-
-        if flat_variant.is_updatable():
-            assert (
-                builder.get_update_variant().name in content
-            ), f"Update variant {builder.get_update_variant().name} not found in the generated file."
+    module_document.flush()
+    module_document.close()

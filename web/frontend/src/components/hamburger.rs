@@ -7,7 +7,7 @@ use yew::prelude::*;
 #[derive(Properties, Clone, PartialEq)]
 pub struct HamburgerProperties {
     pub is_active: bool,
-    pub onclick: Callback<MouseEvent>,
+    pub onclick: Callback<bool>,
 }
 
 #[function_component(Hamburger)]
@@ -18,7 +18,12 @@ pub fn hamburger(props: &HamburgerProperties) -> Html {
         "hamburger hamburger--elastic"
     };
 
-    let onclick = props.onclick.reform(|mouse_event| mouse_event);
+    let visible = props.is_active;
+    let onclick = props.onclick.reform(move |e: MouseEvent| {
+        e.prevent_default();
+        e.stop_immediate_propagation();
+        !visible
+    });
 
     html! {
         <button class={classes} type="button" aria-label="Menu" aria-controls="navigation" onclick={onclick}>

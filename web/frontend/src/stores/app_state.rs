@@ -13,7 +13,8 @@ impl AppState {
         self.sidebar_open
     }
 
-    pub fn toggle_sidebar(&mut self) {
-        self.sidebar_open = !self.sidebar_open;
+    /// Set the sidebar visibility.
+    pub fn set_sidebar_visibility(&mut self, visibility: bool) {
+        self.sidebar_open = visibility;
     }
 }

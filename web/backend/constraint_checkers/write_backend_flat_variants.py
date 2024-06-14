@@ -10,39 +10,43 @@ from constraint_checkers.struct_metadata import (
 )
 from constraint_checkers.indices import PGIndices
 from constraint_checkers.regroup_tables import SUPPORT_TABLE_NAMES
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def write_backend_flat_variants(
-    path: str,
-    table_type: str,
     flat_variants: List[StructMetadata],
 ):
     """Write the `From` implementations for the structs in the `src/models.rs` struct_document."""
+    if not (
+        are_migrations_changed()
+        or is_file_changed(__file__)
+        or is_file_changed(
+            os.path.abspath("./constraint_checkers/write_backend_nested_structs.py")
+        )
+    ):
+        print(
+            "No change in migrations or file. Skipping writing backend flat variants."
+        )
+        return
+
+    path = "./src/database/flat_variants.rs"
 
     # After each struct ends, as defined by the `}` character, after
     # we have found a `struct` keyword, we write the `From` implementation
     # for the struct where we implement the conversion to the struct in the
     # `web_common` crate.
 
-    impl_from_line = "impl From<{struct_name}> for web_common::database::{table_type}::{struct_name} {{\n"
-    reverse_from = "impl From<web_common::database::{table_type}::{struct_name}> for {struct_name} {{\n"
-
     default_imports = [
         "use diesel::Queryable;",
         "use diesel::QueryableByName;",
         "use diesel::Identifiable;",
         "use diesel::Insertable;",
-        "use crate::schema::*;",
         "use diesel::Selectable;",
-        "use serde::Deserialize;",
-        "use serde::Serialize;",
         "use diesel::prelude::*;",
     ]
 
-    if table_type == "views":
-        default_imports.append("use crate::views::schema::*;")
-
-    path_directory = path.split(".")[0]
+    path_directory = path.rsplit(".", 1)[0]
     os.makedirs(path_directory, exist_ok=True)
 
     main_document = open(path, "w", encoding="utf8")
@@ -99,51 +103,61 @@ def write_backend_flat_variants(
 
     for struct in tqdm(
         flat_variants,
-        desc=f"Writing {table_type} to backend",
+        desc="Writing flat variants to backend",
         unit="struct",
         leave=False,
     ):
 
         this_imports = list(default_imports)
         
-        if struct.has_filter_variant():
-            this_imports.append("use web_common::database::filter_structs::*;")
-
         if struct.is_searchable():
-            this_imports.append(
-                "use crate::sql_operator_bindings::HasStrictWordSimilarityCommutatorOp;"
-            )
+            this_imports.append("use crate::database::*;")
 
-        struct_document = open(f"{path_directory}/{struct.table_name}.rs", "w", encoding="utf8")
+        struct_document = open(
+            f"{path_directory}/{struct.table_name}.rs", "w", encoding="utf8"
+        )
         struct_document.write(warning_header)
         # Then, we write the import statements.
         struct_document.write("\n".join(this_imports) + "\n\n")
 
         main_document.write(
-            f"mod {struct.table_name};\n"
-            f"pub use {struct.table_name}::*;\n"
+            f"mod {struct.table_name};\n" f"pub use {struct.table_name}::*;\n"
         )
 
         primary_keys = struct.get_primary_keys()
 
         # First of all, we write out the struct.
-        struct.write_to(struct_document, diesel=table_type)
+        struct.write_to(struct_document, diesel="tables")
 
         struct_document.write(
-            impl_from_line.format(struct_name=struct.name, table_type=table_type)
+            f"impl From<{struct.full_path('frontend')}> for {struct.full_path('backend')} {{\n"
+            f"    fn from(item: {struct.full_path('frontend')}) -> Self {{\n        Self {{\n"
         )
-        struct_document.write(f"    fn from(item: {struct.name}) -> Self {{\n        Self {{\n")
         for attribute in struct.attributes:
-            struct_document.write(f"            {attribute.name}: item.{attribute.name},\n")
+            if attribute.has_backend_type():
+                struct_document.write(
+                    f"            {attribute.name}: item.{attribute.name}.convert(),\n"
+                )
+                continue
+            struct_document.write(
+                f"            {attribute.name}: item.{attribute.name},\n"
+            )
         struct_document.write("        }\n    }\n}\n\n")
 
-        struct_document.write(reverse_from.format(struct_name=struct.name, table_type=table_type))
         struct_document.write(
-            f"    fn from(item: web_common::database::{table_type}::{struct.name}) -> Self {{\n"
+            f"impl From<{struct.full_path('backend')}> for {struct.full_path('frontend')} {{\n"
+            f"    fn from(item: {struct.full_path('backend')}) -> Self {{\n"
             "        Self {\n"
         )
         for attribute in struct.attributes:
-            struct_document.write(f"            {attribute.name}: item.{attribute.name},\n")
+            if attribute.has_backend_type():
+                struct_document.write(
+                    f"            {attribute.name}: item.{attribute.name}.convert(),\n"
+                )
+                continue
+            struct_document.write(
+                f"            {attribute.name}: item.{attribute.name},\n"
+            )
         struct_document.write("        }\n    }\n}\n\n")
 
         # We now generate the `get` method for the diesel struct.
@@ -281,7 +295,7 @@ def write_backend_flat_variants(
             if struct.table_metadata.has_postgres_function(can_x_function_name):
                 struct_document.write(
                     "{\n"
-                    f"       diesel::select(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))\n"
+                    f"       diesel::select(crate::database::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))\n"
                     "            .get_result(connection).map_err(web_common::api::ApiError::from)\n"
                     "}\n"
                 )
@@ -306,11 +320,16 @@ def write_backend_flat_variants(
                 )
 
                 if struct.has_filter_variant():
+                    filter_variant = struct.get_filter_variant()
+                    assert filter_variant.is_filter_variant(), (
+                        f"The {struct.name} struct has a filter variant, but it is not a filter variant. "
+                        f"The child struct is called {filter_variant.name} and has the attributes {filter_variant.attributes}."
+                    )
                     method.add_argument(
                         AttributeMetadata(
                             original_name="filter",
                             name="filter",
-                            data_type=struct.get_filter_variant(),
+                            data_type=filter_variant,
                             optional=True,
                             reference=True,
                         ),
@@ -342,10 +361,12 @@ def write_backend_flat_variants(
                 # If the current struct does not have neither an updated_at nor a created_at
                 # field, and the sorted variant is requested, we dispatch the call to the
                 # all_{operation_able} method without the sorted variant.
-                if sorted_variant and not struct.has_updated_at() and not struct.has_created_at():
-                    struct_document.write(
-                        f"{{\n        Self::all_{operation_able}("
-                    )
+                if (
+                    sorted_variant
+                    and not struct.has_updated_at()
+                    and not struct.has_created_at()
+                ):
+                    struct_document.write(f"{{\n        Self::all_{operation_able}(")
                     if struct.has_filter_variant():
                         struct_document.write("filter, ")
 
@@ -356,12 +377,9 @@ def write_backend_flat_variants(
                     continue
 
                 struct_document.write("{\n")
-                if table_type == "tables":
-                    struct_document.write(f"        use crate::schema::{struct.table_name};\n")
-                else:
-                    struct_document.write(
-                        f"        use crate::views::schema::{struct.table_name};\n"
-                    )
+                struct_document.write(
+                    f"        use crate::database::schema::{struct.table_name};\n"
+                )
                 # If the limit is None, we do not apply any limit to the query.
 
                 struct_document.write(
@@ -375,7 +393,7 @@ def write_backend_flat_variants(
                         for primary_key in struct.get_primary_keys()
                     )
                     struct_document.write(
-                        f"            .filter(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {diesel_primary_keys}))\n"
+                        f"            .filter(crate::database::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {diesel_primary_keys}))\n"
                     )
 
                 if sorted_variant:
@@ -394,7 +412,9 @@ def write_backend_flat_variants(
                     )
 
                 if struct.has_filter_variant():
-                    struct_document.write("        let mut query = query.into_boxed();\n")
+                    struct_document.write(
+                        "        let mut query = query.into_boxed();\n"
+                    )
                     for filter_attribute in struct.get_filter_variant().attributes:
                         struct_document.write(
                             f"       if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
@@ -459,13 +479,13 @@ def write_backend_flat_variants(
                         "            return Err(web_common::api::ApiError::Unauthorized);\n"
                         "        }\n"
                     )
-                if table_type == "tables":
-                    struct_document.write(f"        use crate::schema::{struct.table_name};\n")
-                else:
-                    struct_document.write(
-                        f"        use crate::views::schema::{struct.table_name};\n"
-                    )
-                struct_document.write(f"        {struct.table_name}::dsl::{struct.table_name}\n")
+                struct_document.write(
+                    f"        use crate::database::schema::{struct.table_name};\n"
+                )
+
+                struct_document.write(
+                    f"        {struct.table_name}::dsl::{struct.table_name}\n"
+                )
                 for primary_key in primary_keys:
                     struct_document.write(
                         f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
@@ -499,11 +519,6 @@ def write_backend_flat_variants(
                         )
 
                     from_method_name = f"from_{'_and_'.join([column.name for column in reference_unique_columns])}"
-
-                    if table_type == "views":
-                        raise NotImplementedError(
-                            f"The `{from_method_name}` method is not implemented for views."
-                        )
 
                     from_method = struct.add_backend_method(
                         MethodDefinition(
@@ -539,7 +554,7 @@ def write_backend_flat_variants(
 
                     struct_document.write(
                         "{\n"
-                        f"        use crate::schema::{struct.table_name};\n"
+                        f"        use crate::database::schema::{struct.table_name};\n"
                         f"        let flat_variant = {struct.table_name}::dsl::{struct.table_name}\n"
                     )
                     for unique_column in reference_unique_columns:
@@ -606,7 +621,9 @@ def write_backend_flat_variants(
                         for arg_and_desc in limit_and_offset_arguments_and_description:
                             similarity_method.add_argument(*arg_and_desc)
 
-                        similarity_method.add_argument(*connection_argument_and_description)
+                        similarity_method.add_argument(
+                            *connection_argument_and_description
+                        )
 
                         return_type = "(Self, f32)" if with_score else "Self"
 
@@ -621,9 +638,7 @@ def write_backend_flat_variants(
 
                         similarity_method.write_header_to(struct_document)
 
-                        struct_document.write(
-                            "{\n"
-                        )
+                        struct_document.write("{\n")
                         if not with_score:
                             struct_document.write(
                                 "        // If the query string is empty, we run an all query with the\n"
@@ -638,15 +653,14 @@ def write_backend_flat_variants(
                             if requires_author:
                                 struct_document.write(f"{author_user_id.name}, ")
 
-                            struct_document.write("limit, offset, connection);\n        }\n")
+                            struct_document.write(
+                                "limit, offset, connection);\n        }\n"
+                            )
 
                         # We start a query using the diesel query builder.
-                        if table_type == "tables":
-                            struct_document.write(f"        use crate::schema::{struct.table_name};\n")
-                        else:
-                            raise NotImplementedError(
-                                "The search method is not implemented for views."
-                            )
+                        struct_document.write(
+                            f"        use crate::database::schema::{struct.table_name};\n"
+                        )
 
                         # If the current struct has derived search indices, we will need to
                         # execute joins. As such, we also need to add the select method to the
@@ -657,7 +671,9 @@ def write_backend_flat_variants(
                         if struct.has_filter_variant() and not with_score:
                             struct_document.write("        let mut query = ")
 
-                        struct_document.write(f"{struct.table_name}::dsl::{struct.table_name}\n")
+                        struct_document.write(
+                            f"{struct.table_name}::dsl::{struct.table_name}\n"
+                        )
 
                         if struct.has_derived_search_indices():
                             struct_document.write(
@@ -676,13 +692,15 @@ def write_backend_flat_variants(
                                 f"            .select({struct.name}::as_select())\n"
                             )
 
-                        if struct.table_metadata.has_postgres_function(can_x_function_name):
+                        if struct.table_metadata.has_postgres_function(
+                            can_x_function_name
+                        ):
                             primary_keys = ", ".join(
                                 f"{struct.table_name}::dsl::{primary_key.name}"
                                 for primary_key in struct.get_primary_keys()
                             )
                             struct_document.write(
-                                f"            .filter(crate::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
+                                f"            .filter(crate::database::sql_function_bindings::{can_x_function_name}({author_user_id.name}, {primary_keys}))\n"
                             )
 
                         struct_document.write(
@@ -691,20 +709,18 @@ def write_backend_flat_variants(
                         )
 
                         if struct.has_filter_variant() and not with_score:
-                            struct_document.write(
-                                "            .into_boxed();\n"
-                            )
+                            struct_document.write("            .into_boxed();\n")
 
-                            for filter_attribute in struct.get_filter_variant().attributes:
+                            for (
+                                filter_attribute
+                            ) in struct.get_filter_variant().attributes:
                                 struct_document.write(
                                     f"       if let Some({filter_attribute.name}) = filter.and_then(|f| f.{filter_attribute.name}) {{\n"
                                     f"            query = query.filter({struct.table_name}::dsl::{filter_attribute.name}.eq({filter_attribute.name}));\n"
                                     "        }\n"
                                 )
 
-                            struct_document.write(
-                                "        query\n"
-                            )
+                            struct_document.write("        query\n")
 
                         number_of_indices = struct.number_of_search_indices()
 
@@ -794,15 +810,19 @@ def write_backend_flat_variants(
                 f"        if !Self::can_admin_by_id({struct.get_formatted_primary_keys(include_prefix=False)}, author_user_id, connection)? {{\n"
                 "            return Err(web_common::api::ApiError::Unauthorized);\n"
                 "        }\n"
-                f"        diesel::delete({struct.table_name}::dsl::{struct.table_name}\n"
+                f"        diesel::delete(crate::database::{struct.table_name}::dsl::{struct.table_name}\n"
             )
             for primary_key in struct.get_primary_keys():
                 struct_document.write(
-                    f"            .filter({struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
+                    f"            .filter(crate::database::{struct.table_name}::dsl::{primary_key.name}.eq({primary_key.name}))\n"
                 )
             struct_document.write(
                 "        ).execute(connection).map_err(web_common::api::ApiError::from)\n    }\n"
             )
+
+        assert (
+            len(struct.backend_methods()) > 0
+        ), f"The {struct.name} struct has no backend methods. Please add at least one method to the struct."
 
         # Finally, we cluse the struct implementation.
         struct_document.write("}\n")

@@ -54,7 +54,7 @@ impl Component for MapInput {
             .create_element("div")
             .unwrap();
         let container: HtmlElement = container.dyn_into().unwrap();
-        container.set_class_name("map-input");
+        container.set_class_name("map");
 
         let marker_options = leaflet::MarkerOptions::default();
         marker_options.set_draggable(true);

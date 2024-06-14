@@ -1,8 +1,9 @@
 """This module contains the function to get the cursor to the database."""
+from typing import Tuple
 import os
 import psycopg2
 
-def get_cursor():
+def get_cursor() -> Tuple[psycopg2.extensions.connection, psycopg2.extensions.cursor]:
     """Get the cursor to the database."""
     dbname = os.getenv("POSTGRES_DB")
     user = os.getenv("POSTGRES_USER")

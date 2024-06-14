@@ -9,10 +9,9 @@
 
     label.input-label {
         display: block;
-        font-size: 0.8em;
-        margin-bottom: 0.2em;
+        font-size: 0.9em;
 
-        color: $grey;
+        color: $near_black;
         font-weight: 100;
         padding-right: 0.5em;
         display: inline-block;
@@ -26,6 +25,17 @@
 
     &.textarea {
         padding-top: 0.25em;
+    }
+
+    input {
+        background-color: white;
+        color: $near_black;
+        transition: background-color 0.2s;
+        font-size: 0.9em;
+        &:disabled {
+            background-color: $light_grey;
+            cursor: not-allowed;
+        }
     }
 
     input[type="number"],
@@ -48,13 +58,84 @@
         }
     }
 
+    .input-wrapper {
+        width: 100%;
+        position: relative;
+        // We show by default a search icon
+        // on the right side of the search input
+        &::after {
+            display: block;
+            font-family: "Font Awesome 5 Free";
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 900;
+            font-size: 1.2em;
+            color: $grey;
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            margin-top: -0.5em;
+            transition: color 0.2s;
+        }
+    }
+
     &.datalist {
         input[type="search"] {
             animation: pop-in 0.2s;
         }
 
+        /* clears the ‘X’ from Internet Explorer */
+        input[type=search]::-ms-clear { display: none; width : 0; height: 0; }
+        input[type=search]::-ms-reveal { display: none; width : 0; height: 0; }
+        /* clears the ‘X’ from Chrome */
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration { display: none; }
+
         .input-container {
             grid-template-columns: auto 1fr auto;
+            // We show by default a search icon
+            // on the right side of the search input
+            .input-wrapper {
+                &::after {
+                    content: "\f002";
+                }
+            }
+        }
+        &:focus-within {
+            .input-wrapper {
+                &::after {
+                    color: $primary;
+                }
+            }
+        }
+        &.loading {
+            .input-wrapper {
+                &::after {
+                    content: "\f110";
+                    animation: fa-spin 1s infinite linear;
+                }
+            }
+        }
+        &.disabled {
+            .input-wrapper {
+                &::after {
+                    // We apply a disable symbol for the content
+                    // to illustrate this form is disabled
+                    content: "\f05e";
+                }
+            }
+        }
+
+        &.has-selections {
+            .input-wrapper {
+                &::after {
+                    display: none;
+                }
+            }
         }
     }
 
@@ -69,7 +150,7 @@
     input[type="datetime-local"],
     textarea,
     input[type="number"] {
-        padding: 0.5em;
+        padding: 0.4em;
         box-sizing: border-box;
         max-width: 100%;
         transition: border-color 0.2s, border-radius 0.2s;
@@ -96,22 +177,70 @@
     &.scanner {
         .input-container {
             grid-template-columns: auto 1fr auto;
+            .input-wrapper {
+                &::after {
+                    content: "\f029";
+                }
+
+                &:focus-within {
+                    &::after {
+                        color: $primary;
+                    }
+                }
+            }
         }
 
         .start-scanner {
-            border: none;
             animation: fade-in-right 0.2s;
+            padding: 0.25em 0.35em;
 
             i {
-                font-size: 1.5em;
-                color: $light_grey;
+                font-size: 1.75em;
+                color: inherit;
                 transition: color 0.2s;
             }
 
             &:hover {
                 i {
-                    color: inherit;
+                   color: white; 
                 }
+            }
+        }
+    }
+}
+
+.gps-input {
+    .map {
+        position: relative;
+        height: 300px;
+        width: 100%;
+        margin-bottom: 0.5em;
+        border-radius: 0.5em;
+        z-index: 2 !important;
+    }
+
+    div.input-container {
+        position: relative;
+        &:after {
+            content: "\f041";
+            display: block;
+            font-family: "Font Awesome 5 Free";
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 900;
+            font-size: 1.2em;
+            color: $grey;
+            position: absolute;
+            right: 0.5em;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: color 0.2s;
+        }
+        &:focus-within {
+            &:after {
+                color: $primary;
             }
         }
     }
@@ -181,7 +310,8 @@ ul.input-errors {
 form.standard-form {
     width: 800px;
     max-width: 100%;
-    margin: 1em auto;
+    margin: 0 auto;
+    padding-top: 1em;
     animation: slide-in-from-bottom 0.3s;
 
     h4 {
@@ -235,6 +365,9 @@ form.standard-form {
     ul.coords-wrapper {
         &:before {
             content: "Coords:";
+            min-width: 100px;
+            padding-right: 0.5em;
+            color: $near_black;
         }
 
         >li {
@@ -242,6 +375,10 @@ form.standard-form {
 
             &:not(:last-child) {
                 margin-right: 0.5em;
+            }
+
+            .input-group {
+                padding: 0;
             }
         }
     }
@@ -380,6 +517,42 @@ form.standard-form {
 
         &.file {
             min-height: 100px;
+
+            &.processing {
+                position: relative;
+                &:before {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    border-radius: 0.5em;
+                    z-index: 1;
+                    animation: fade-in 0.3s;
+                
+                }
+                &:after {
+                    content: "\f110";
+                    animation: fa-spin 1s infinite linear;
+                    font-family: "Font Awesome 5 Free";
+                    font-style: normal;
+                    font-variant: normal;
+                    text-rendering: auto;
+                    -webkit-font-smoothing: antialiased;
+                    font-weight: 900;
+                    font-size: 3em;
+                    color: white;
+                    position: absolute;
+                    z-index: 2;
+                    width: 100%;
+                    text-align: center;
+                    top: 50%;
+                    left: 0;
+                    margin-top: -0.5em;
+                }
+            }
 
             .droparea {
                 display: flex;
@@ -539,12 +712,6 @@ form.standard-form {
             }
         }
 
-        .map-input {
-            height: 400px;
-            width: 100%;
-            border-radius: 0.5em;
-        }
-
         // We style inputs of type checkbox in such
         // a way that they look like switches.
         input[type="checkbox"] {
@@ -631,6 +798,10 @@ form.standard-form {
         .input-group.scanner {
             .start-scanner {
                 color: $red;
+                &:hover {
+                    color: white;
+                    background-color: $red;
+                }
             }
         }
 
@@ -672,6 +843,10 @@ form.standard-form {
         .input-group.scanner {
             .start-scanner {
                 color: $green;
+                &:hover {
+                    color: white;
+                    background-color: $green;
+                }
             }
         }
 
@@ -713,6 +888,10 @@ form.standard-form {
         .input-group.scanner {
             .start-scanner {
                 color: $blue;
+                &:hover {
+                    color: white;
+                    background-color: $blue;
+                }
             }
         }
 

@@ -8,11 +8,13 @@
 
 .login_box {
   width: 200px;
+  max-width: 100%;
   padding: 20px;
   border: 1px solid $primary;
   border-radius: 5px;
   text-align: center;
   animation: fade-in-up 0.5s;
+  margin-top: -$navigator-height;
 
   h2 {
     margin-bottom: 20px;

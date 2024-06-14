@@ -5,12 +5,12 @@
 //! These input fields also include the accuracy of the measurement.
 //!
 //! TODO: also handle the registration device!
-use crate::components::forms::InputType;
-use validator::Validate;
+use crate::components::forms::InputErrors;
+use std::rc::Rc;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use wasm_bindgen::JsValue;
-use web_sys::{Coordinates, Geolocation, Position, PositionError, PositionOptions};
+use web_common::api::ApiError;
+use web_sys::{Position, PositionError, PositionOptions};
 use yew::prelude::*;
 
 use super::BasicInput;
@@ -19,59 +19,12 @@ use super::MapInput;
 #[derive(Clone, PartialEq, Properties)]
 pub struct GPSInputProps {
     pub label: String,
+    pub builder: Callback<Option<web_common::types::Point>>,
+    pub errors: Vec<ApiError>,
     #[prop_or_default]
-    pub latitude: Option<f64>,
-    #[prop_or_default]
-    pub longitude: Option<f64>,
-    #[prop_or_default]
-    pub altitude: Option<f64>,
-    #[prop_or_default]
-    pub altitude_accuracy: Option<f64>,
-    #[prop_or_default]
-    pub accuracy: Option<f64>,
-}
-
-#[derive(Clone, PartialEq, Default, Validate)]
-struct Float64 {
-    value: f64,
-}
-
-impl TryFrom<String> for Float64 {
-    type Error = Vec<String>;
-
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        match value.parse::<f64>() {
-            Ok(value) => Ok(Float64 { value }),
-            Err(_) => Err(vec![format!(
-                "Unable to parse the value '{}' as a floating point number",
-                value
-            )]),
-        }
-    }
-}
-
-impl From<f64> for Float64 {
-    fn from(value: f64) -> Self {
-        Float64 { value }
-    }
-}
-
-impl From<Float64> for String {
-    fn from(value: Float64) -> String {
-        value.value.to_string()
-    }
-}
-
-impl From<Float64> for f64 {
-    fn from(value: Float64) -> f64 {
-        value.value
-    }
-}
-
-impl ToString for Float64 {
-    fn to_string(&self) -> String {
-        self.value.to_string()
-    }
+    pub coordinates: Option<web_common::types::Point>,
+    #[prop_or(false)]
+    pub optional: bool,
 }
 
 #[function_component(GPSInput)]
@@ -86,42 +39,37 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
         .enable_high_accuracy(true)
         .maximum_age(10_000);
 
-    let latitude: UseStateHandle<Option<f64>> = use_state(|| props.latitude);
-    let longitude: UseStateHandle<Option<f64>> = use_state(|| props.longitude);
-    let altitude: UseStateHandle<Option<f64>> = use_state(|| props.altitude);
-    let lat_lon_accuracy: UseStateHandle<Option<f64>> = use_state(|| props.accuracy);
-    let altitude_accuracy: UseStateHandle<Option<f64>> = use_state(|| props.altitude_accuracy);
+    // We create a state to store the errors that might happen
+    let errors = use_state(|| Vec::new());
 
-    if latitude.is_none() || longitude.is_none() {
+    if props.coordinates.is_none() {
         if let Some(geolocation) =
             web_sys::window().and_then(|win| win.navigator().geolocation().ok())
         {
-            let geolocation: Geolocation = geolocation.clone();
-            let latitude = latitude.clone();
-            let longitude = longitude.clone();
-            let altitude = altitude.clone();
-            let lat_lon_accuracy = lat_lon_accuracy.clone();
-            let altitude_accuracy = altitude_accuracy.clone();
-            let position_options = position_options.clone();
+            let builder = props.builder.clone();
 
             let callback = Closure::wrap(Box::new(move |position: Position| {
-                let coords: Coordinates = position.coords();
-                latitude.set(Some(coords.latitude()));
-                longitude.set(Some(coords.longitude()));
-                altitude.set(coords.altitude());
-                lat_lon_accuracy.set(Some(coords.accuracy()));
-                altitude_accuracy.set(coords.altitude_accuracy());
+                builder.emit(Some(position.into()))
             }) as Box<dyn Fn(Position)>);
 
-            let error_callback = Closure::wrap(Box::new(move |err: PositionError| {
-                log::error!("Error getting position: {:?}", err);
+            let errors1 = errors.clone();
+            let errors2 = errors.clone();
+
+            let error_callback = Closure::wrap(Box::new(move |_: PositionError| {
+                errors1.set(vec![ApiError::BadRequest(vec![
+                    "Unable to get the current position".to_owned(),
+                ])]);
             }) as Box<dyn Fn(PositionError)>);
 
-            if let Err(error) = geolocation.watch_position_with_error_callback_and_options(
+            if let Err(_) = geolocation.watch_position_with_error_callback_and_options(
                 &callback.as_ref().unchecked_ref(),
                 Some(&error_callback.as_ref().unchecked_ref()),
                 &position_options,
-            ) {}
+            ) {
+                errors2.set(vec![ApiError::BadRequest(vec![
+                    "Unable to get the current position".to_owned(),
+                ])]);
+            }
 
             callback.forget();
             error_callback.forget();
@@ -129,66 +77,90 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
     }
 
     let map_callback = {
-        let latitude = latitude.clone();
-        let longitude = longitude.clone();
-        let lat_lon_accuracy = lat_lon_accuracy.clone();
-        Callback::from(move |coords: (f64, f64)| {
-            latitude.set(Some(coords.0));
-            longitude.set(Some(coords.1));
-            lat_lon_accuracy.set(Some(0.0));
+        let builder = props.builder.clone();
+        Callback::from(move |coords: (f64, f64)| builder.emit(Some(coords.into())))
+    };
+
+    let latitude_callback = {
+        let builder = props.builder.clone();
+        let longitude = props.coordinates.map(|point| point.y).unwrap_or(0.0);
+        let errors = errors.clone();
+        Callback::from(move |latitude: Option<String>| {
+            if let Some(latitude) = latitude {
+                // We try to convert the latitude to a float and if it fails
+                // we add an error to the store.
+                let latitude = latitude.parse::<f64>();
+                if let Ok(latitude) = latitude {
+                    builder.emit(Some((latitude, longitude).into()));
+                } else {
+                    errors.set(vec![ApiError::BadRequest(vec![
+                        "Latitude must be a number".to_string(),
+                    ])]);
+                }
+            } else {
+                builder.emit(None);
+            }
         })
     };
 
+    let longitude_callback = {
+        let builder = props.builder.clone();
+        let latitude = props.coordinates.map(|point| point.x).unwrap_or(0.0);
+        let errors = errors.clone();
+        Callback::from(move |longitude: Option<String>| {
+            if let Some(longitude) = longitude {
+                // We try to convert the longitude to a float and if it fails
+                // we add an error to the store.
+                let longitude = longitude.parse::<f64>();
+                if let Ok(longitude) = longitude {
+                    builder.emit(Some((latitude, longitude).into()));
+                } else {
+                    errors.set(vec![ApiError::BadRequest(vec![
+                        "Longitude must be a number".to_string(),
+                    ])]);
+                }
+            } else {
+                builder.emit(None);
+            }
+        })
+    };
+
+    let (latitude, longitude) = props
+        .coordinates
+        .map(|point| (point.x, point.y))
+        .unwrap_or((0.0, 0.0));
+
+    let all_errors = props
+        .errors
+        .iter()
+        .chain(errors.iter())
+        .cloned()
+        .collect::<Vec<ApiError>>();
+
     html! {
         <div class="gps-input">
-            <MapInput latitude={(*latitude).unwrap_or(0.0)} longitude={(*longitude).unwrap_or(0.0)} callback={map_callback}/>
+            <MapInput latitude={latitude} longitude={longitude} callback={map_callback}/>
             <ul class="coords-wrapper input-group">
                 <li>
-                    <BasicInput<Float64>
+                    <BasicInput<f64>
                         label={"Latitude".to_string()}
-                        value={(*latitude).map(Float64::from)}
-                        input_type={InputType::Number}
-                        step={0.000001}
+                        value={Rc::from(latitude)}
+                        builder={latitude_callback}
+                        optional={props.optional}
+                        errors={Vec::new()}
                     />
                 </li>
                 <li>
-                    <BasicInput<Float64>
+                    <BasicInput<f64>
                         label={"Longitude".to_string()}
-                        value={(*longitude).map(Float64::from)}
-                        input_type={InputType::Number}
-                        step={0.000001}
-                    />
-                </li>
-                <li>
-                    <BasicInput<Float64>
-                        label={"Lat/Lng accuracy (meters)".to_string()}
-                        value={(*lat_lon_accuracy).map(Float64::from)}
-                        input_type={InputType::Number}
-                        optional={true}
-                        step={0.01}
+                        value={Rc::from(longitude)}
+                        builder={longitude_callback}
+                        optional={props.optional}
+                        errors={Vec::new()}
                     />
                 </li>
             </ul>
-            <ul class="altitude-wrapper input-group">
-                <li>
-                    <BasicInput<Float64>
-                        label={"Altitude (meters)".to_string()}
-                        value={(*altitude).map(Float64::from)}
-                        input_type={InputType::Number}
-                        optional={true}
-                        step={0.1}
-                    />
-                </li>
-                <li>
-                    <BasicInput<Float64>
-                        label={"Altitude accuracy (meters)".to_string()}
-                        value={(*altitude_accuracy).map(Float64::from)}
-                        input_type={InputType::Number}
-                        optional={true}
-                        step={0.1}
-                    />
-                </li>
-            </ul>
+            <InputErrors errors={all_errors} />
         </div>
     }
 }

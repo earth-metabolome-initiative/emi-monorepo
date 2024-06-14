@@ -24,7 +24,7 @@
     "Table sampled_individuals_teams_role_invitations is missing. Do you want to create it? (yes/no)": "yes",
     "Table samples_users_role_invitations is missing. Do you want to create it? (yes/no)": "yes",
     "Table samples_teams_role_invitations is missing. Do you want to create it? (yes/no)": "yes",
-    "Table spectra_collections_users_role_invitations is missing. Do you want to create it? (yes/no)": "yes",
+    "Table spectra_collections_users_role_invitations is missing. Do you want to create it? (yes/no)": "no",
     "Table spectra_collections_teams_role_invitations is missing. Do you want to create it? (yes/no)": "yes",
     "Table teams_users_role_invitations is missing. Do you want to create it? (yes/no)": "yes",
     "Table teams_teams_role_invitations is missing. Do you want to create it? (yes/no)": "yes",
@@ -119,5 +119,6 @@
     "Table derived_samples_users_role_invitations is missing. Do you want to create it? (yes/no)": "no",
     "delete_migration_00000000000100_create_nameplates_sequential_index": "no",
     "create_nameplates_can_x_trigger": "yes",
-    "delete_migration_00000000000003_enable_postgis_extension": "no"
+    "delete_migration_00000000000003_enable_postgis_extension": "no",
+    "Table projects_users_role_invitations is unexpected. Do you want to drop it? (yes/no)": "no"
 }

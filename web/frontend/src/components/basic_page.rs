@@ -18,7 +18,7 @@ use yewdux::Dispatch;
 
 use super::RowToBadge;
 
-pub(crate) trait PageLike:
+pub trait PageLike:
     RowToBadge + DeserializeOwned + Filtrable + Viewable + PartialEq + Clone + Tabular + 'static
 {
     fn section() -> String {
@@ -602,15 +602,6 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         if let Some(page) = &self.page {
-            // We set the title of the webpage to the title of the page.
-            web_sys::window()
-                .unwrap()
-                .document()
-                .unwrap()
-                .set_title(&page.badge_title());
-
-            // We render the page.
-
             html! {
                 <div class="page">
                     <h2>

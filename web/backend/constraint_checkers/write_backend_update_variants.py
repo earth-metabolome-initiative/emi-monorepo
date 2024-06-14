@@ -3,6 +3,8 @@
 from typing import List
 from tqdm.auto import tqdm
 from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def write_backend_update_variants(
@@ -15,8 +17,11 @@ def write_backend_update_variants(
     update_struct_metadatas : List[StructMetadata]
         The list of the StructMetadata objects.
     """
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing backend update variants.")
+        return
 
-    path = "./src/update_variants.rs"
+    path = "./src/database/update_variants.rs"
 
     document = open(path, "w", encoding="utf8")
 
@@ -32,8 +37,7 @@ def write_backend_update_variants(
 
     imports = [
         "use diesel::prelude::*;",
-        "use crate::models::*;",
-        "use crate::schema::*;",
+        "use crate::database::*;",
     ]
 
     document.write("\n".join(imports) + "\n")
@@ -108,10 +112,10 @@ def write_backend_update_variants(
         document.write(
             f"/// Intermediate representation of the update variant {struct.name}.\n"
             "#[derive(Identifiable, AsChangeset)]\n"
-            f"#[diesel(table_name = {struct.table_name})]\n"
+            f"#[diesel(table_name = crate::database::schema::{struct.table_name})]\n"
             "#[diesel(treat_none_as_null = true)]\n"
             f"#[diesel(primary_key({struct.get_formatted_primary_keys(include_prefix=False, include_parenthesis=False)}))]\n"
-            f"pub(super) struct {intermediate_struct_name} {{\n"
+            f"pub(crate) struct {intermediate_struct_name} {{\n"
         )
 
         all_attributes: List[AttributeMetadata] = struct.attributes
@@ -120,7 +124,7 @@ def write_backend_update_variants(
             all_attributes = [updator_user_id_attribute] + all_attributes
 
         for attribute in all_attributes:
-            document.write(f"    {attribute.name}: {attribute.format_data_type()},\n")
+            document.write(f"    {attribute.name}: {attribute.format_data_type(route='backend')},\n")
 
         document.write("}\n\n")
 
@@ -128,7 +132,7 @@ def write_backend_update_variants(
         document.write(
             f"impl UpdateRow for web_common::database::{struct.name} {{\n"
             f"    type Intermediate = {intermediate_struct_name};\n"
-            f"    type Flat = {struct.get_flat_variant().name};\n\n"
+            f"    type Flat = {struct.get_flat_variant().full_path(route='backend')};\n\n"
         )
         if struct.table_name != "users":
             document.write(
@@ -141,12 +145,17 @@ def write_backend_update_variants(
         document.write(f"        {intermediate_struct_name} {{\n")
 
         for attribute in all_attributes:
+            if attribute.has_backend_type():
+                document.write(
+                    f"            {attribute.name}: self.{attribute.name}.convert(),\n"
+                )
+                continue
             if struct.get_attribute_by_name(attribute.name) is not None:
                 document.write(
                     f"            {attribute.name}: self.{attribute.name},\n"
                 )
-            else:
-                document.write(f"            {attribute.name}: user_id,\n")
+                continue
+            document.write(f"            {attribute.name}: user_id,\n")
 
         document.write("        }\n    }\n\n")
 
@@ -156,7 +165,7 @@ def write_backend_update_variants(
             "        user_id: i32,\n"
             "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>\n"
             "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
-            "        self.to_intermediate(user_id)\n"
+            "        UpdateRow::to_intermediate(self, user_id)\n"
             "            .save_changes(connection)\n"
             "    }\n"
             "}\n\n"

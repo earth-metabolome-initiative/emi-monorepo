@@ -2,10 +2,9 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
-use serde::{Deserialize, Serialize};
 use super::*;
 
-#[derive(Debug, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewDerivedSample {
     pub parent_sample_id: uuid::Uuid,
     pub child_sample_id: uuid::Uuid,
@@ -18,11 +17,12 @@ unsafe impl Sync for NewDerivedSample {}
 impl Tabular for NewDerivedSample {
     const TABLE: Table = Table::DerivedSamples;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NewNameplate {
     pub barcode: String,
     pub project_id: i32,
     pub category_id: i32,
+    pub geolocation: crate::types::Point,
 }
 
 unsafe impl Send for NewNameplate {}
@@ -30,7 +30,7 @@ unsafe impl Sync for NewNameplate {}
 impl Tabular for NewNameplate {
     const TABLE: Table = Table::Nameplates;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewObservation {
     pub id: uuid::Uuid,
     pub parent_observation_id: Option<uuid::Uuid>,
@@ -39,7 +39,7 @@ pub struct NewObservation {
     pub sample_id: Option<uuid::Uuid>,
     pub subject_id: i32,
     pub notes: Option<String>,
-    pub picture: Vec<u8>,
+    pub picture: crate::types::JPEG,
 }
 
 unsafe impl Send for NewObservation {}
@@ -150,7 +150,7 @@ impl NewObservation {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewOrganismBioOttTaxonItem {
     pub organism_id: uuid::Uuid,
     pub taxon_id: i32,
@@ -161,15 +161,15 @@ unsafe impl Sync for NewOrganismBioOttTaxonItem {}
 impl Tabular for NewOrganismBioOttTaxonItem {
     const TABLE: Table = Table::OrganismBioOttTaxonItems;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewOrganism {
     pub id: uuid::Uuid,
     pub host_organism_id: Option<uuid::Uuid>,
     pub sample_id: Option<uuid::Uuid>,
     pub notes: Option<String>,
+    pub wild: bool,
     pub nameplate_id: i32,
     pub project_id: i32,
-    pub picture: Vec<u8>,
 }
 
 unsafe impl Send for NewOrganism {}
@@ -195,9 +195,9 @@ impl NewOrganism {
                 Some(notes) => gluesql::core::ast_builder::text(notes),
                 None => gluesql::core::ast_builder::null(),
             },
+            (self.wild.into()),
             gluesql::core::ast_builder::num(self.nameplate_id),
             gluesql::core::ast_builder::num(self.project_id),
-            gluesql::core::ast_builder::bytea(self.picture),
             gluesql::core::ast_builder::num(created_by),
         ]
     }
@@ -221,7 +221,7 @@ impl NewOrganism {
         let id = self.id;
         table("organisms")
             .insert()
-            .columns("created_by,id,host_organism_id,sample_id,notes,nameplate_id,project_id,picture,updated_by")
+            .columns("created_by,id,host_organism_id,sample_id,notes,wild,nameplate_id,project_id,updated_by")
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
@@ -251,9 +251,9 @@ impl NewOrganism {
         let mut update_row = table("organisms")
             .update()        
 .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
+.set("wild", self.wild)        
 .set("nameplate_id", gluesql::core::ast_builder::num(self.nameplate_id))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
-.set("picture", gluesql::core::ast_builder::bytea(self.picture))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(host_organism_id) = self.host_organism_id {
             update_row = update_row.set("host_organism_id", gluesql::core::ast_builder::uuid(host_organism_id.to_string()));
@@ -273,7 +273,7 @@ impl NewOrganism {
     }
 
 }
-#[derive(Debug, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewProject {
     pub name: String,
     pub description: String,
@@ -293,7 +293,7 @@ unsafe impl Sync for NewProject {}
 impl Tabular for NewProject {
     const TABLE: Table = Table::Projects;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewProjectsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
@@ -305,7 +305,7 @@ unsafe impl Sync for NewProjectsTeamsRoleInvitation {}
 impl Tabular for NewProjectsTeamsRoleInvitation {
     const TABLE: Table = Table::ProjectsTeamsRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewProjectsTeamsRoleRequest {
     pub table_id: i32,
     pub team_id: i32,
@@ -317,7 +317,7 @@ unsafe impl Sync for NewProjectsTeamsRoleRequest {}
 impl Tabular for NewProjectsTeamsRoleRequest {
     const TABLE: Table = Table::ProjectsTeamsRoleRequests;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewProjectsTeamsRole {
     pub table_id: i32,
     pub team_id: i32,
@@ -329,7 +329,7 @@ unsafe impl Sync for NewProjectsTeamsRole {}
 impl Tabular for NewProjectsTeamsRole {
     const TABLE: Table = Table::ProjectsTeamsRoles;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewProjectsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -341,7 +341,7 @@ unsafe impl Sync for NewProjectsUsersRoleInvitation {}
 impl Tabular for NewProjectsUsersRoleInvitation {
     const TABLE: Table = Table::ProjectsUsersRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewProjectsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -353,7 +353,7 @@ unsafe impl Sync for NewProjectsUsersRoleRequest {}
 impl Tabular for NewProjectsUsersRoleRequest {
     const TABLE: Table = Table::ProjectsUsersRoleRequests;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewProjectsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
@@ -365,7 +365,7 @@ unsafe impl Sync for NewProjectsUsersRole {}
 impl Tabular for NewProjectsUsersRole {
     const TABLE: Table = Table::ProjectsUsersRoles;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSampleBioOttTaxonItem {
     pub sample_id: uuid::Uuid,
     pub taxon_id: i32,
@@ -376,7 +376,7 @@ unsafe impl Sync for NewSampleBioOttTaxonItem {}
 impl Tabular for NewSampleBioOttTaxonItem {
     const TABLE: Table = Table::SampleBioOttTaxonItems;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSampleContainer {
     pub barcode: String,
     pub project_id: i32,
@@ -388,7 +388,7 @@ unsafe impl Sync for NewSampleContainer {}
 impl Tabular for NewSampleContainer {
     const TABLE: Table = Table::SampleContainers;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSample {
     pub id: uuid::Uuid,
     pub container_id: i32,
@@ -487,7 +487,7 @@ impl NewSample {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSpectraCollection {
     pub notes: Option<String>,
     pub sample_id: uuid::Uuid,
@@ -498,7 +498,7 @@ unsafe impl Sync for NewSpectraCollection {}
 impl Tabular for NewSpectraCollection {
     const TABLE: Table = Table::SpectraCollections;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewTeam {
     pub name: String,
     pub description: String,
@@ -513,7 +513,7 @@ unsafe impl Sync for NewTeam {}
 impl Tabular for NewTeam {
     const TABLE: Table = Table::Teams;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewTeamsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
@@ -525,7 +525,7 @@ unsafe impl Sync for NewTeamsTeamsRoleInvitation {}
 impl Tabular for NewTeamsTeamsRoleInvitation {
     const TABLE: Table = Table::TeamsTeamsRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewTeamsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -537,7 +537,7 @@ unsafe impl Sync for NewTeamsUsersRoleInvitation {}
 impl Tabular for NewTeamsUsersRoleInvitation {
     const TABLE: Table = Table::TeamsUsersRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewTeamsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -549,7 +549,7 @@ unsafe impl Sync for NewTeamsUsersRoleRequest {}
 impl Tabular for NewTeamsUsersRoleRequest {
     const TABLE: Table = Table::TeamsUsersRoleRequests;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewTeamsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
@@ -561,7 +561,7 @@ unsafe impl Sync for NewTeamsUsersRole {}
 impl Tabular for NewTeamsUsersRole {
     const TABLE: Table = Table::TeamsUsersRoles;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewUserEmail {
     pub email: String,
     pub login_provider_id: i32,
@@ -573,14 +573,14 @@ unsafe impl Sync for NewUserEmail {}
 impl Tabular for NewUserEmail {
     const TABLE: Table = Table::UserEmails;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewUser {
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
     pub description: Option<String>,
-    pub profile_picture: Vec<u8>,
     pub organization_id: Option<i32>,
+    pub picture: crate::types::JPEG,
 }
 
 unsafe impl Send for NewUser {}
@@ -588,7 +588,7 @@ unsafe impl Sync for NewUser {}
 impl Tabular for NewUser {
     const TABLE: Table = Table::Users;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewUsersUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -600,7 +600,7 @@ unsafe impl Sync for NewUsersUsersRoleInvitation {}
 impl Tabular for NewUsersUsersRoleInvitation {
     const TABLE: Table = Table::UsersUsersRoleInvitations;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewUsersUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -612,7 +612,7 @@ unsafe impl Sync for NewUsersUsersRoleRequest {}
 impl Tabular for NewUsersUsersRoleRequest {
     const TABLE: Table = Table::UsersUsersRoleRequests;
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Copy, Ord, Serialize, Deserialize, Default)]
+#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewUsersUsersRole {
     pub table_id: i32,
     pub user_id: i32,

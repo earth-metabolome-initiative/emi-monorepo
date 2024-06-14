@@ -1,10 +1,10 @@
 //! Home page of the application.
 
-use crate::router::AppRoute;
-use crate::stores::user_state::UserState;
+// use crate::router::AppRoute;
+// use crate::stores::user_state::UserState;
 use yew::prelude::*;
-use yew_router::prelude::*;
-use yewdux::prelude::*;
+// use yew_router::prelude::*;
+// use yewdux::prelude::*;
 
 #[function_component(Home)]
 pub fn home() -> Html {

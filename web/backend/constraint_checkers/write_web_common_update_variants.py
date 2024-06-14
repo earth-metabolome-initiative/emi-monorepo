@@ -5,12 +5,17 @@ from tqdm.auto import tqdm
 from constraint_checkers.gluesql_types_mapping import GLUESQL_TYPES_MAPPING
 from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
 from constraint_checkers.write_update_method_for_gluesql import write_update_method_for_gluesql
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def write_web_common_update_variants(
     update_struct_metadatas: List[StructMetadata],
 ):
     """Writes the update structs to the web_common crate."""
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing frontend update variants.")
+        return
 
     # For the time being, we simply write out the structs.
     # In the near future, we will also implement several
@@ -35,7 +40,6 @@ def write_web_common_update_variants(
     )
 
     imports = [
-        "use serde::{Deserialize, Serialize};",
         "use super::*;",
     ]
 
@@ -83,7 +87,7 @@ def write_web_common_update_variants(
 
         if struct.table_name != "users":
             document.write(
-                f"    pub fn into_row(self, {updator_user_id_attribute.name}: {updator_user_id_attribute.format_data_type()}) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {{\n"
+                f"    pub fn into_row(self, {updator_user_id_attribute.name}: {updator_user_id_attribute.format_data_type(route='web_common')}) -> Vec<gluesql::core::ast_builder::ExprNode<'static>> {{\n"
             )
         else:
             document.write(
@@ -100,25 +104,25 @@ def write_web_common_update_variants(
                 self_attribute_name = attribute.name
 
             if attribute.optional:
-                if attribute.data_type() in GLUESQL_TYPES_MAPPING:
+                if attribute.raw_data_type() in GLUESQL_TYPES_MAPPING:
                     document.write(
                         f"            match {self_attribute_name} {{\n"
-                        f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(attribute.name)},\n"
+                        f"                Some({attribute.name}) => {GLUESQL_TYPES_MAPPING[attribute.raw_data_type()].format(value=attribute.name)},\n"
                         "                None => gluesql::core::ast_builder::null(),\n"
                         "            },\n"
                     )
                 else:
                     raise NotImplementedError(
-                        f"The type {attribute.data_type()} is not supported. "
-                        f"The struct {struct.name} contains an {attribute.data_type()}. "
+                        f"The type {attribute.raw_data_type()} is not supported. "
+                        f"The struct {struct.name} contains an {attribute.raw_data_type()}. "
                     )
-            elif attribute.data_type() in GLUESQL_TYPES_MAPPING:
+            elif attribute.raw_data_type() in GLUESQL_TYPES_MAPPING:
                 document.write(
-                    f"            {GLUESQL_TYPES_MAPPING[attribute.data_type()].format(self_attribute_name)},\n"
+                    f"            {GLUESQL_TYPES_MAPPING[attribute.raw_data_type()].format(value=self_attribute_name)},\n"
                 )
             else:
                 raise NotImplementedError(
-                    f"The type {attribute.data_type()} is not supported."
+                    f"The type {attribute.raw_data_type()} is not supported."
                 )
 
         document.write("        ]\n    }\n\n")

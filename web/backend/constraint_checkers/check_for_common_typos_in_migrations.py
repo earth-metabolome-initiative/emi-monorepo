@@ -1,10 +1,11 @@
 """Check for common typos in migrations."""
 import os
 from constraint_checkers.migrations_changed import are_migrations_changed
+from constraint_checkers.is_file_changed import is_file_changed
 
 def check_for_common_typos_in_migrations():
     """Check for common typos in migrations."""
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Skipping the check for common typos in migrations.")
         return
     for directory in os.listdir("migrations"):

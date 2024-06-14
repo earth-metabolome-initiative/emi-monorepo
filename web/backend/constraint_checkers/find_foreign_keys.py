@@ -7,6 +7,7 @@ import re
 import pandas as pd
 from constraint_checkers.regroup_tables import get_desinences
 from constraint_checkers.cursor import get_cursor
+from constraint_checkers.write_diesel_sql_types_bindings import SQLType, get_all_postgres_types
 
 SPACED_ARGUMENT_TYPES = (
     "double precision",
@@ -112,7 +113,8 @@ def is_role_request_table(
     return table_name.endswith("_role_requests")
 
 
-class ViewColumn:
+class SQLColumn:
+    """Class providing metadata for a SQL column."""
 
     def __init__(
         self,
@@ -122,12 +124,84 @@ class ViewColumn:
         table_name: str,
         nullable: bool,
     ):
+        assert data_type != "-", (
+            f"The column {column_name} in the table {table_name} has an unsupported data type: {data_type}."
+        )
         self.column_name = column_name
         self.data_type = data_type
         self.alias_name = alias_name
         self.table_name = table_name
         self.nullable = nullable
 
+    def __repr__(self):
+        return f"SQLColumn(column_name={self.column_name}, data_type={self.data_type}, alias_name={self.alias_name}, table_name={self.table_name}, nullable={self.nullable})"
+
+def postgres_type_to_rust_type(postgres_type: str) -> str:
+    """Converts a Postgres type to a Rust type.
+    
+    Parameters
+    ----------
+    postgres_type : str
+        The Postgres type.
+    """
+    if postgres_type == "integer":
+        return "i32"
+    if postgres_type == "text":
+        return "String"
+    if postgres_type in ("timestamp without time zone", "timestamp with time zone"):
+        return "chrono::NaiveDateTime"
+    if postgres_type in ("time without time zone", "time with time zone"):
+        return "chrono::NaiveTime"
+    if postgres_type == "uuid":
+        return "uuid::Uuid"
+    if postgres_type == "boolean":
+        return "bool"
+    if postgres_type == "real":
+        return "f32"
+    if postgres_type == "double precision":
+        return "f64"
+    if postgres_type == "character varying":
+        return "String"
+    if postgres_type in ("char", "character"):
+        return "String"
+    if postgres_type == "bytea":
+        return "Vec<u8>"
+    if postgres_type == "json":
+        return "serde_json::Value"
+    if postgres_type == "jsonb":
+        return "serde_json::Value"
+    if postgres_type == "macaddr":
+        return "macaddr::MacAddr"
+    if postgres_type == "inet":
+        return "ipnetwork::IpNetwork"
+    if postgres_type == "numeric":
+        return "bigdecimal::BigDecimal"
+    if postgres_type == "oid":
+        return "u32"
+    if postgres_type == "smallint":
+        return "i16"
+    if postgres_type == "bigint":
+        return "i64"
+    if postgres_type == "cstring":
+        return "String"
+    if postgres_type == "interval":
+        return "chrono::Duration"
+    if postgres_type == "date":
+        return "chrono::NaiveDate"
+    if postgres_type == "money":
+        return "bigdecimal::BigDecimal"
+    if postgres_type == "geometry":
+        return "postgis::ewkb::Geometry"
+    if postgres_type == "geography":
+        return "postgis::ewkb::Geometry"
+    if postgres_type == "geometry(Point,4326)":
+        return "Point"
+    if postgres_type == "line":
+        return "postgis::ewkb::LineString"
+    if postgres_type == "jpeg":
+        return "JPEG"
+    
+    raise NotImplementedError(f"Unknown Postgres type: '{postgres_type}'")
 
 def postgres_type_to_diesel_type(postgres_type: str) -> str:
     """Converts a Postgres type to a Diesel type.
@@ -187,7 +261,7 @@ def postgres_type_to_diesel_type(postgres_type: str) -> str:
         return "postgis_diesel::sql_types::Geometry"
     if postgres_type == "geography":
         return "postgis_diesel::sql_types::Geography"
-    if postgres_type == "point":
+    if postgres_type == "geometry(Point,4326)":
         return "postgis_diesel::sql_types::Geometry"
         # return "postgis_diesel::types::Point"
     if postgres_type == "line":
@@ -203,6 +277,12 @@ def postgres_type_to_diesel_type(postgres_type: str) -> str:
         return "diesel_full_text_search::TsVector"
     if postgres_type == "tsquery":
         return "diesel_full_text_search::TsQuery"
+
+    # If it is amont the customly defined types, we return the correct associated
+    # custom type.
+    for sql_type in get_all_postgres_types():
+        if sql_type.name == postgres_type:
+            return sql_type.import_path()
 
     # Here we handle the recursive case of arrays.
     if postgres_type.endswith("[]"):
@@ -375,9 +455,16 @@ class TableMetadata:
         self._table_names: List[str] = []
         self._flat_variants: Dict[str, "StructMetadata"] = {}
 
-    def tables(self) -> List[str]:
-        """Returns the list of tables."""
-        return self.table_metadata["referencing_table"].unique().tolist()
+    def all_tables(self) -> List[str]:
+        """Returns the list of all tables."""
+        conn, cursor = get_cursor()
+        cursor.execute(
+            "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';"
+        )
+        tables = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return sorted([table[0] for table in tables])
 
     def is_table(self, table_name: str) -> bool:
         """Returns whether the table is a table."""
@@ -461,7 +548,57 @@ class TableMetadata:
         return is_view
 
     @cache
-    def extract_view_columns(self, view_name: str) -> List[ViewColumn]:
+    def extract_table_columns(self, table_name: str) -> List[SQLColumn]:
+        """Returns the columns of the table.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+        """
+        conn, cursor = get_cursor()
+        cursor.execute(
+            f"""SELECT 
+                a.attname AS column_name,
+                format_type(a.atttypid, a.atttypmod) AS data_type,
+                (NOT a.attnotnull) AS nullable,
+                -- Finally, we retrieve whether the column currently exists or has been deleted
+                CASE
+                    WHEN a.attisdropped THEN 'deleted'
+                    ELSE 'exists'
+                END AS column_status
+            FROM 
+                pg_attribute a
+            JOIN 
+                pg_class c ON a.attrelid = c.oid
+            JOIN 
+                pg_namespace n ON n.oid = c.relnamespace
+            WHERE 
+                c.relname = '{table_name}'
+                AND n.nspname = 'public' -- or any other schema name
+                AND a.attnum > 0
+            ORDER BY 
+                a.attnum;"""
+        )
+
+        columns = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return [
+            SQLColumn(
+                column_name=column[0],
+                data_type=column[1],
+                alias_name=column[0],
+                table_name=table_name,
+                nullable=column[2]
+            )
+            for column in columns
+            if column[3] == "exists"
+        ]
+
+    @cache
+    def extract_view_columns(self, view_name: str) -> List[SQLColumn]:
         """Returns list of columns, their alias and the original table name from a provided view name.
 
         # Example
@@ -508,12 +645,9 @@ class TableMetadata:
         columns = columns.split(", ")
 
         # For each column, we need to identify the original table name.
-        table_name_mappings = {
-            "thumbnail_documents": "documents",
-            "profile_picture_documents": "documents",
-        }
+        table_name_mappings = {}
 
-        extracted_columns: List[ViewColumn] = []
+        extracted_columns: List[SQLColumn] = []
         for column in columns:
             if " AS " in column:
                 original_column_name, alias_column_name = column.split(" AS ")
@@ -540,7 +674,7 @@ class TableMetadata:
                     original_table_name = remapped_table_name
 
                 extracted_columns.append(
-                    ViewColumn(
+                    SQLColumn(
                         column_name=original_column_name.strip(),
                         data_type=self.get_column_data_type(
                             original_table_name, original_column_name.strip()
@@ -574,7 +708,7 @@ class TableMetadata:
                     original_table_name = remapped_table_name
 
                 extracted_columns.append(
-                    ViewColumn(
+                    SQLColumn(
                         column_name=original_column_name.strip(),
                         data_type=self.get_column_data_type(
                             original_table_name, original_column_name.strip()
@@ -855,7 +989,7 @@ class TableMetadata:
     @cache
     def get_unique_constraint_columns(
         self, table_name: str
-    ) -> Union[List[List[str]], List[ViewColumn]]:
+    ) -> Union[List[List[str]], List[SQLColumn]]:
         """Returns the columns of the unique constraint."""
         if self.is_view(table_name):
             # In a view, we return as set of unique columns the columns
@@ -872,11 +1006,11 @@ class TableMetadata:
                 raise ValueError(f"The view {table_name} does not have an ID column.")
             base_unique_columns = self.get_unique_constraint_columns(base_table_name)
 
-            view_unique_columns: List[ViewColumn] = []
+            view_unique_columns: List[SQLColumn] = []
             for column in view_columns:
                 if column.column_name in base_unique_columns:
                     view_unique_columns.append(
-                        ViewColumn(
+                        SQLColumn(
                             column_name=column.column_name,
                             data_type=column.data_type,
                             alias_name=column.alias_name,
@@ -1322,7 +1456,7 @@ class TableMetadata:
                 oprresult::regtype AS result_type,
                 oprcode AS function_name
             FROM
-                pg_operator;
+                pg_operator
             """
         )
 
@@ -1351,6 +1485,14 @@ class TableMetadata:
                 continue
 
             if return_type in UNSUPPORTED_DATA_TYPES:
+                continue
+
+            skip = False
+            for target in ("eq", "le", "ge", "lt", "gt", "ne"):
+                if function_name.endswith(target):
+                    skip = True
+                    break
+            if skip:
                 continue
 
             # If the function name already appears in the list of functions, we skip it.

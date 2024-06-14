@@ -1,15 +1,14 @@
 //! Submodule providing structs relative to the database.
 pub mod selects;
 pub use selects::*;
-pub mod tables;
-pub mod views;
-pub use tables::*;
+pub mod flat_variants;
+pub use flat_variants::*;
 pub mod operations;
 pub use operations::*;
 pub mod notification_message;
 pub use notification_message::NotificationMessage;
-pub mod nested_models;
-pub use nested_models::*;
+pub mod nested_variants;
+pub use nested_variants::*;
 pub mod markers;
 pub use markers::*;
 pub mod table_names;
@@ -20,6 +19,6 @@ pub mod new_variants;
 pub use new_variants::*;
 pub mod update_variants;
 pub use update_variants::*;
-pub mod filter_structs;
+pub mod filter_variants;
 pub mod model_impls;
-pub use filter_structs::*;
+pub use filter_variants::*;

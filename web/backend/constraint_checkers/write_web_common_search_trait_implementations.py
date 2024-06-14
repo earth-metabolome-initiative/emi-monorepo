@@ -2,6 +2,9 @@
 import os
 from typing import List
 from constraint_checkers.struct_metadata import StructMetadata
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
+
 
 def write_web_common_search_trait_implementations(
     struct_metadatas: List[StructMetadata],
@@ -14,6 +17,10 @@ def write_web_common_search_trait_implementations(
         The list of the StructMetadata objects.
 
     """
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing frontend search trait implementations.")
+        return
+    
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
     # is correct.
@@ -25,7 +32,6 @@ def write_web_common_search_trait_implementations(
     imports = [
         "use crate::database::*;",
         "use std::rc::Rc;",
-        "use serde::{Serialize, Deserialize};",
     ]
 
     # Preliminarly, we write a docstring at the very head
@@ -86,7 +92,7 @@ def write_web_common_search_trait_implementations(
     # This boxed variant of the Searchable trait is used to call the search_task method
     # on all structs at once.
     document.write(
-        "#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]\n"
+        "#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]\n"
         "pub enum SearchableStruct {\n"
     )
 

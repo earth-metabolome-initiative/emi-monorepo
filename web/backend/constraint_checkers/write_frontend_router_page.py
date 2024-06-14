@@ -39,6 +39,8 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "use web_common::database::*;",
         "use crate::router::AppRoute;",
         "use super::logout::Logout;",
+        "use yew_hooks::prelude::*;",
+        "use yew_hooks::use_click_away;",
         "use crate::components::basic_page::PageLike;",
         "use crate::stores::user_state::UserState;",
     ]
@@ -49,6 +51,7 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "#[derive(Properties, Clone, PartialEq, Debug)]\n"
         "pub struct SidebarProps {\n"
         "    pub visible: bool,\n"
+        "    pub onclose: Callback<bool>,"
         "}\n\n"
     )
 
@@ -57,6 +60,14 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "pub fn sidebar(props: &SidebarProps) -> Html {\n"
         "    let (user, _) = use_store::<UserState>();\n"
         "    let route: AppRoute = use_route().unwrap_or_default();\n"
+        "    let node = use_node_ref();\n"
+        "    let onclose = props.onclose.clone();\n"
+        "    let visible = props.visible;\n"
+        "    use_click_away(node.clone(), move |_: Event| {\n"
+        "        if visible {\n"
+        "            onclose.emit(!visible);\n"
+        "        }\n"
+        "    });\n"
         "\n"
         "    let sidebar_class = if props.visible {\n"
         '        "sidebar"\n'
@@ -65,7 +76,7 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "    };\n"
         "\n"
         "    html! {\n"
-        "        <div class={sidebar_class}>\n"
+        "        <div ref={node} class={sidebar_class}>\n"
         '            <div class="sidebar-content">\n'
         "                <ul>\n"
     )
@@ -302,7 +313,7 @@ def write_frontend_router_page(
         ids_url = "".join([f"/:{primary_key.name}" for primary_key in primary_keys])
         ids_struct = ", ".join(
             [
-                f"{primary_key.name}: {primary_key.format_data_type()}"
+                f"{primary_key.name}: {primary_key.format_data_type(route='frontend')}"
                 for primary_key in primary_keys
             ]
         )
@@ -351,7 +362,7 @@ def write_frontend_router_page(
 
                 document.write(
                     f'    #[at("/{flat_variant.table_name}/new/{normalized_foreign_key_name}/:{foreign_key.name}")]\n'
-                    f"    {enum_variant_name}{{{foreign_key.name}: {foreign_key.data_type()}}},\n"
+                    f"    {enum_variant_name}{{{foreign_key.name}: {foreign_key.data_type(route='frontend')}}},\n"
                 )
 
                 enum_variants.append(enum_variant_name)

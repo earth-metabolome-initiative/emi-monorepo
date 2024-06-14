@@ -26,6 +26,7 @@ use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
 
 use crate::components::Badge;
+use gloo::timers::callback::Timeout;
 use gloo::utils::window;
 use web_common::database::NestedUser;
 use yew::prelude::*;
@@ -46,6 +47,7 @@ pub struct Navigator {
     user_dispatch: Dispatch<UserState>,
     app_state: Rc<AppState>,
     app_dispatch: Dispatch<AppState>,
+    toggle_timeout: Option<Timeout>,
 }
 
 impl Navigator {
@@ -62,7 +64,8 @@ pub enum NavigatorMessage {
     Backend(WebsocketMessage),
     UserState(Rc<UserState>),
     AppState(Rc<AppState>),
-    ToggleSidebar,
+    ToggleSidebar(bool),
+    SetSidebarVisibility(bool),
 }
 
 #[derive(Clone, Properties, PartialEq)]
@@ -100,10 +103,11 @@ impl Component for Navigator {
             user_dispatch,
             app_state,
             app_dispatch,
+            toggle_timeout: None,
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             NavigatorMessage::UserState(user_state) => {
                 if self.user_state == user_state {
@@ -133,10 +137,20 @@ impl Component for Navigator {
                 false
             }
             NavigatorMessage::Backend(_) => false,
-            NavigatorMessage::ToggleSidebar => {
+            NavigatorMessage::SetSidebarVisibility(visibility) => {
                 self.app_dispatch.reduce_mut(|state| {
-                    state.toggle_sidebar();
+                    state.set_sidebar_visibility(visibility);
                 });
+                true
+            }
+            NavigatorMessage::ToggleSidebar(visibility) => {
+                if let Some(timeout) = self.toggle_timeout.take() {
+                    timeout.cancel();
+                }
+                let link = ctx.link().clone();
+                self.toggle_timeout = Some(Timeout::new(100, move || {
+                    link.send_message(NavigatorMessage::SetSidebarVisibility(visibility));
+                }));
                 true
             }
         }
@@ -144,17 +158,17 @@ impl Component for Navigator {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         // On click, we send a message to the store to toggle the sidebar.
-        let onclick = {
+        let toggle = {
             let link = ctx.link().clone();
-            Callback::from(move |_| {
-                link.send_message(NavigatorMessage::ToggleSidebar);
+            Callback::from(move |visibility: bool| {
+                link.send_message(NavigatorMessage::ToggleSidebar(visibility));
             })
         };
 
         html! {
             <>
                 <nav>
-                    <Hamburger is_active = {self.sidebar_open()} onclick = {onclick}/>
+                    <Hamburger is_active = {self.sidebar_open()} onclick = {toggle.clone()}/>
                     <h1>
                         <Link<AppRoute> classes="logo" to={AppRoute::Home}>
                             {"EMI"}
@@ -172,14 +186,14 @@ impl Component for Navigator {
                             </Link<AppRoute>>
                         }
                     } else {
-                        <Link<AppRoute> classes="right_nav_button" to={AppRoute::Login}>
+                        <Link<AppRoute> classes="right_nav_button login" to={AppRoute::Login}>
                             <i class="fas fa-right-to-bracket"></i>
                             {'\u{00a0}'}
                             <span>{"Login"}</span>
                         </Link<AppRoute>>
                     }
                 </nav>
-                <Sidebar visible={self.sidebar_open()} />
+                <Sidebar visible={self.sidebar_open()} onclose={toggle} />
             </>
         }
     }

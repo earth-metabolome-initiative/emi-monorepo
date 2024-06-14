@@ -1,5 +1,5 @@
 //! Submodule providing websocket services post-authentication.
-use crate::DBPool;
+use crate::database::DBPool;
 use actix_web::web;
 use actix_web::{get, Error, HttpRequest, HttpResponse};
 use sqlx::{Pool as SQLxPool, Postgres};
@@ -51,6 +51,10 @@ async fn start_websocket(
                 sqlx_pool.get_ref().clone(),
                 redis_client.get_ref().clone(),
             )
+            .map_err(|_e| {
+                log::error!("Failed to start websocket");
+                actix_web::error::ErrorInternalServerError("Failed to start websocket")
+            })?
         }
     };
 

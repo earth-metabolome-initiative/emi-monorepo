@@ -71,6 +71,7 @@ def register_derived_search_indices(
         flat_variants,
         desc="Finding derived search indices",
         unit="flat variant",
+        leave=False,
     ):
         for foreign_key in flat_variant.get_foreign_keys():
             # We get the struct associated to the foreign key.

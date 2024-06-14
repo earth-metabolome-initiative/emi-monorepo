@@ -2,6 +2,7 @@
 import os
 from constraint_checkers.migrations_changed import are_migrations_changed
 from insert_migration import insert_migration
+from constraint_checkers.is_file_changed import is_file_changed
 
 def replace_serial_indices():
     """Replaces SERIAL indices with INTEGER indices in the migrations.
@@ -16,7 +17,7 @@ def replace_serial_indices():
     in two parts, we ensure that the first migration can be used as-is in the
     frontend as well, while the second migration can be used in the backend.
     """
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Skipping the replacement of SERIAL indices.")
         return
 

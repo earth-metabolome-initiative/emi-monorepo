@@ -1,4 +1,4 @@
-use crate::nested_models::*;
+use crate::database::*;
 use diesel::RunQueryDsl;
 use strsim::normalized_damerau_levenshtein;
 use web_common::api::ApiError;

@@ -3,10 +3,9 @@
 //! Some of the update variants would be identical to the new variants, //! and as such we do not generate them. You will find here the update variants //! only for the tables that have a primary key that is not a UUID.
 //! This module is automatically generated. Do not write anything here.
 
-use serde::{Deserialize, Serialize};
 use super::*;
 
-#[derive(Debug, PartialEq, PartialOrd, Clone, Copy, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateDerivedSample {
     pub parent_sample_id: uuid::Uuid,
     pub child_sample_id: uuid::Uuid,
@@ -62,12 +61,13 @@ impl UpdateDerivedSample {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UpdateNameplate {
     pub id: i32,
     pub barcode: String,
     pub project_id: i32,
     pub category_id: i32,
+    pub geolocation: crate::types::Point,
 }
 
 unsafe impl Send for UpdateNameplate {}
@@ -84,6 +84,7 @@ impl UpdateNameplate {
             gluesql::core::ast_builder::text(self.barcode),
             gluesql::core::ast_builder::num(self.project_id),
             gluesql::core::ast_builder::num(self.category_id),
+            gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)),
         ]
     }
 
@@ -109,6 +110,7 @@ impl UpdateNameplate {
 .set("barcode", gluesql::core::ast_builder::text(self.barcode))        
 .set("project_id", gluesql::core::ast_builder::num(self.project_id))        
 .set("category_id", gluesql::core::ast_builder::num(self.category_id))        
+.set("geolocation", gluesql::core::ast_builder::function::point(gluesql::core::ast_builder::num(self.geolocation.x), gluesql::core::ast_builder::num(self.geolocation.y)))        
 .set("updated_by", gluesql::core::ast_builder::num(user_id))            .execute(connection)
             .await
              .map(|payload| match payload {
@@ -118,7 +120,7 @@ impl UpdateNameplate {
     }
 
 }
-#[derive(Debug, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateProject {
     pub id: i32,
     pub name: String,
@@ -224,7 +226,7 @@ impl UpdateProject {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateSampleContainer {
     pub id: i32,
     pub barcode: String,
@@ -280,7 +282,7 @@ impl UpdateSampleContainer {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateSpectraCollection {
     pub id: i32,
     pub notes: Option<String>,
@@ -339,7 +341,7 @@ impl UpdateSpectraCollection {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateTeam {
     pub id: i32,
     pub name: String,
@@ -410,15 +412,15 @@ impl UpdateTeam {
     }
 
 }
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct UpdateUser {
     pub id: i32,
     pub first_name: String,
     pub middle_name: Option<String>,
     pub last_name: String,
     pub description: Option<String>,
-    pub profile_picture: Vec<u8>,
     pub organization_id: Option<i32>,
+    pub picture: crate::types::JPEG,
 }
 
 unsafe impl Send for UpdateUser {}
@@ -441,11 +443,11 @@ impl UpdateUser {
                 Some(description) => gluesql::core::ast_builder::text(description),
                 None => gluesql::core::ast_builder::null(),
             },
-            gluesql::core::ast_builder::bytea(self.profile_picture),
             match self.organization_id {
                 Some(organization_id) => gluesql::core::ast_builder::num(organization_id),
                 None => gluesql::core::ast_builder::null(),
             },
+            gluesql::core::ast_builder::bytea(self.picture),
         ]
     }
 
@@ -468,7 +470,7 @@ impl UpdateUser {
 .set("id", gluesql::core::ast_builder::num(self.id))        
 .set("first_name", gluesql::core::ast_builder::text(self.first_name))        
 .set("last_name", gluesql::core::ast_builder::text(self.last_name))        
-.set("profile_picture", gluesql::core::ast_builder::bytea(self.profile_picture));
+.set("picture", gluesql::core::ast_builder::bytea(self.picture));
         if let Some(middle_name) = self.middle_name {
             update_row = update_row.set("middle_name", gluesql::core::ast_builder::text(middle_name));
         }

@@ -1,6 +1,5 @@
 //! Functions and APIs dealing with JWT cookies necessary for OAuth2 logins.
-use crate::models::User;
-use crate::DieselConn;
+use crate::database::*;
 use actix_web::cookie::time::Duration as ActixWebDuration;
 use actix_web::cookie::Cookie;
 use actix_web::dev::Payload;

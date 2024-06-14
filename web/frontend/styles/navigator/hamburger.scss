@@ -2,11 +2,11 @@
 @use "sass:math";
 
 
-$hamburger-padding-x: 15px !default;
+$hamburger-padding-x: 0px !default;
 $hamburger-padding-y: 10px !default;
-$hamburger-layer-width: 40px !default;
-$hamburger-layer-height: 4px !default;
-$hamburger-layer-spacing: 6px !default;
+$hamburger-layer-width: 30px !default;
+$hamburger-layer-height: 6px !default;
+$hamburger-layer-spacing: 3px !default;
 $hamburger-layer-color: $primary !default;
 $hamburger-layer-border-radius: 4px !default;
 $hamburger-hover-opacity: 0.7 !default;
@@ -83,6 +83,7 @@ $hamburger-types: (
     color: inherit;
     text-transform: none;
     background-color: transparent;
+    box-sizing: border-box;
     border: 0;
     margin: 0;
     overflow: visible;
@@ -107,7 +108,9 @@ $hamburger-types: (
         .hamburger-inner,
         .hamburger-inner::before,
         .hamburger-inner::after {
-            background-color: $hamburger-active-layer-color;
+            background-color: white;
+            box-sizing: border-box;
+            border-color: $hamburger-active-layer-color;
         }
     }
 }
@@ -129,7 +132,10 @@ $hamburger-types: (
     &::after {
         width: $hamburger-layer-width;
         height: $hamburger-layer-height;
-        background-color: $hamburger-layer-color;
+        background-color: white;
+        box-sizing: border-box;
+        left: -1px;
+        border: 1px solid $hamburger-layer-color;
         border-radius: $hamburger-layer-border-radius;
         position: absolute;
         transition-property: transform;
@@ -193,19 +199,3 @@ $hamburger-types: (
         }
     }
 }
-
-// ==================================================
-// Cooking up additional types:
-//
-// The Sass for each hamburger type should be nested
-// inside an @if directive to check whether or not
-// it exists in $hamburger-types so only the CSS for
-// included types are generated.
-//
-// e.g. hamburgers/types/_new-type.scss
-//
-// @if index($hamburger-types, new-type) {
-//   .hamburger--new-type {
-//     ...
-//   }
-// }

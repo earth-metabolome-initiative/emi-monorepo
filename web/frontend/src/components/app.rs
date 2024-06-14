@@ -12,7 +12,9 @@ pub fn App() -> Html {
             <BrowserRouter>
                 <crate::components::NavigatorWrapper />
                 <div class="app">
-                    <Switch<AppRoute> render={switch} />
+                    <div class="page-container">
+                        <Switch<AppRoute> render={switch} />
+                    </div>
                     <Footer />
                 </div>
             </BrowserRouter>

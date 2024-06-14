@@ -9,12 +9,15 @@ in such a way that all the migrations relative to a table are grouped together.
 """
 
 import os
-from typing import Dict, List
 import shutil
+from functools import lru_cache
+from typing import Dict, List
+
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 from jaro import jaro_winkler_metric
 from userinput import userinput
 from userinput.utils import set_validator
-from constraint_checkers.migrations_changed import are_migrations_changed
 
 ALLOW_LISTED_MIGRATIONS = [
     "00000000000000_diesel_initial_setup",
@@ -23,13 +26,9 @@ ALLOW_LISTED_MIGRATIONS = [
     "00000000000003_enable_postgis_extension",
 ]
 
-ALLOW_LISTED_SINGLETONS = [
-    "units"
-]
+ALLOW_LISTED_SINGLETONS = ["units"]
 
-POSTGIS_TABLES = [
-    "spatial_ref_sys"
-]
+POSTGIS_TABLES = ["spatial_ref_sys"]
 
 SUPPORT_TABLE_NAMES = [
     "units",
@@ -45,8 +44,9 @@ SUPPORT_TABLE_NAMES = [
     "project_states",
     "sample_container_categories",
     "nameplate_categories",
-    "permanence_categories"
+    "permanence_categories",
 ] + POSTGIS_TABLES
+
 
 def get_best_insertion_point(table_name: str, expected_desinence: str) -> int:
     """Get the best insertion point for a new migration related to a table.
@@ -108,10 +108,16 @@ def get_best_insertion_point(table_name: str, expected_desinence: str) -> int:
     return int(migration_number) + 1
 
 
+def get_create_table_desinence(table_name: str) -> str:
+    """Get the desinence of the migration that creates a table."""
+    return f"create_{table_name}_table"
+
+
 def get_desinences(table_name: str) -> List[str]:
     """Get the possible desinences of a table."""
     return [
-        f"create_{table_name}_table",
+        get_create_table_desinence(table_name),
+        f"change_{table_name}_column_types",
         f"create_{table_name}_sequential_index",
         f"create_{table_name}_updated_at_trigger",
         f"create_{table_name}_parent_circularity_trigger",
@@ -119,6 +125,78 @@ def get_desinences(table_name: str) -> List[str]:
         f"populate_{table_name}_table",
         f"create_{table_name}_gin_index",
     ]
+
+
+def get_type_desinences(type_name: str) -> List[str]:
+    """Get the possible desinences of a type."""
+    return [
+        f"create_{type_name}_type",
+    ]
+
+
+@lru_cache
+def get_types() -> List[str]:
+    """Extracts the list of types from the migrations.
+
+    Implementative details
+    ----------------------
+    The types are extracted from the migrations by searching for the string
+    "CREATE TYPE {type_name} AS" in the up migrations.
+    """
+    types = []
+
+    targets = ["CREATE TYPE IF NOT EXISTS", "CREATE TYPE"]
+
+    migrations = os.listdir("migrations")
+    migrations = sorted(migrations)
+
+    for migration in migrations:
+        if not os.path.isdir(f"migrations/{migration}"):
+            continue
+        with open(f"migrations/{migration}/up.sql", "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            for line in lines:
+                if "--" in line:
+                    line = line.split("--")[0]
+                for target in targets:
+                    if target in line:
+                        type_name = line.split(target)[1].split("AS")[0].strip()
+                        types.append(type_name)
+                        break
+
+    return types
+
+
+def is_type_migration(migration: str) -> bool:
+    """Check if a migration is a type migration.
+
+    Parameters
+    ----------
+    migration : str
+        The name of the migration to check.
+    """
+    _number, migration_desinence = migration.split("_", 1)
+    return any(
+        migration_desinence in get_type_desinences(type_name)
+        for type_name in get_types()
+    )
+
+
+def is_create_table_migration(migration: str) -> bool:
+    """Check if a migration is a create table migration.
+
+    Parameters
+    ----------
+    migration : str
+        The name of the migration to check.
+    """
+    if migration in ALLOW_LISTED_MIGRATIONS:
+        return False
+    _number, migration_desinence = migration.split("_", 1)
+    return any(
+        migration_desinence == get_create_table_desinence(table_name)
+        for table_name in get_tables()
+    )
 
 
 def get_tables() -> List[str]:
@@ -142,6 +220,9 @@ def get_tables() -> List[str]:
         with open(f"migrations/{migration}/up.sql", "r", encoding="utf-8") as f:
             lines = f.readlines()
             for line in lines:
+                if "--" in line:
+                    line = line.split("--")[0]
+
                 if target in line:
                     table_name = line.split(target)[1].split("(")[0].strip()
                     tables.append(table_name)
@@ -159,6 +240,9 @@ def table_dependencies() -> Dict[str, List[str]]:
             continue
 
         if migration in ALLOW_LISTED_MIGRATIONS:
+            continue
+
+        if is_type_migration(migration):
             continue
 
         _, migration_desinence = migration.split("_", 1)
@@ -206,7 +290,7 @@ def table_dependencies() -> Dict[str, List[str]]:
                     raise RuntimeError("Could not revert the migrations.")
                 shutil.rmtree(f"migrations/{migration}")
                 raise RuntimeError("Migration deleted. Please re-run the script.")
-            
+
             should_rename = userinput(
                 name=f"should_rename_migration_{migration}",
                 label="Do you want to rename this migration?",
@@ -235,7 +319,7 @@ def table_dependencies() -> Dict[str, List[str]]:
                 )
 
             raise RuntimeError("Migration not associated to any table.")
-            
+
         # We identify the tables that are being referenced in the migration.
         with open(f"migrations/{migration}/up.sql", "r", encoding="utf-8") as f:
             for line in f.readlines():
@@ -261,7 +345,7 @@ def get_sort_tables_by_dependencies() -> List[str]:
     The tables are sorted by dependencies using a topological sort algorithm.
     """
     dependencies = table_dependencies()
-    tables = list(dependencies.keys())
+    tables = sorted(list(dependencies.keys()))
     sorted_tables = []
 
     while len(tables) > 0:
@@ -295,7 +379,7 @@ def detect_singleton_tables():
         if len(deps) == 0 and not any(table in dep for dep in dependencies.values()):
             if table not in ALLOW_LISTED_SINGLETONS:
                 singleton_tables.append(table)
-    
+
     if len(singleton_tables) > 0:
         raise RuntimeError(
             f"We found {len(singleton_tables)} singleton tables. "
@@ -308,7 +392,7 @@ def detect_singleton_tables():
 
 def regroup_tables():
     """Regroup the tables."""
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Skipping the regrouping of tables.")
         return
 
@@ -317,6 +401,8 @@ def regroup_tables():
     associated_tables = {}
     orphan_migrations = []
     mapped_migrations = []
+
+    type_migrations = []
 
     table_names = get_sort_tables_by_dependencies()
 
@@ -327,7 +413,11 @@ def regroup_tables():
             if not os.path.isdir(f"migrations/{migration}"):
                 continue
 
-            if migration in ALLOW_LISTED_MIGRATIONS:
+            if migration in ALLOW_LISTED_MIGRATIONS or migration in type_migrations:
+                continue
+
+            if is_type_migration(migration):
+                type_migrations.append(migration)
                 continue
 
             if migration in mapped_migrations:
@@ -338,9 +428,9 @@ def regroup_tables():
 
             # We check if the directory contains an up.sql and a down.sql file.
             # If not, we ask the user what to do with it.
-            if not os.path.exists(f"migrations/{migration}/up.sql") or not os.path.exists(
-                f"migrations/{migration}/down.sql"
-            ):
+            if not os.path.exists(
+                f"migrations/{migration}/up.sql"
+            ) or not os.path.exists(f"migrations/{migration}/down.sql"):
                 print(
                     f"Migration {migration} does not contain both up.sql and down.sql files."
                 )
@@ -381,6 +471,16 @@ def regroup_tables():
         raise RuntimeError(f"Orphaned migrations found {orphan_migrations}")
 
     starting_number = len(ALLOW_LISTED_MIGRATIONS)
+
+    # First, we handle the type migrations.
+    for migration in type_migrations:
+        _number, desinence = migration.split("_", 1)
+        padded_migration_number = str(starting_number).zfill(14)
+        full_migration_name = f"{padded_migration_number}_{desinence}"
+        if migration != full_migration_name:
+            os.rename(f"migrations/{migration}", f"migrations/{full_migration_name}")
+
+        starting_number += 1
 
     for table_name in table_names:
         migrations = associated_tables[table_name]

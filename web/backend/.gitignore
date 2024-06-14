@@ -5,3 +5,4 @@ downloads
 cache
 migration_hashes.json
 migrations_metadata.json
+file_hashes.json

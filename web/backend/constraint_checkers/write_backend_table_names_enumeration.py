@@ -8,19 +8,31 @@ from constraint_checkers.struct_metadata import (
     MethodDefinition,
     AttributeMetadata,
 )
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def write_backend_table_names_enumeration(
     tables: List[TableStructMetadata],
 ):
     """Write the table names enumeration in the backend crate."""
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change in migrations or file. Skipping writing backend table enum.")
+        return
+
+    assert isinstance(tables, list), "Tables must be a list."
+    assert len(tables) > 0, "Tables must not be empty."
+    assert all(
+        isinstance(table, TableStructMetadata) for table in tables
+    ), "All tables must be of type TableStructMetadata."
+
     # We check that we are currently executing in the `backend` crate
     # so to make sure that the relative path to the `web_common` crate
     # is correct.
     if not os.getcwd().endswith("backend"):
         raise RuntimeError("This script must be executed in the `backend` crate.")
 
-    path = "src/table_enumeration.rs"
+    path = "src/database/table_enumeration.rs"
 
     # Since the table enumeration is defined in the web_common crate, we cannot
     # directly implement methods in the backend on the Table enum. Instead, we
@@ -42,16 +54,13 @@ def write_backend_table_names_enumeration(
 
     # We start with the necessary imports.
     imports = [
-        "use crate::models::*;",
-        "use crate::nested_models::*;",
-        # "use crate::views::*;",
-        "use web_common::database::filter_structs::*;",
+        "use crate::database::*;",
         "use web_common::database::PrimaryKey;",
         "use diesel::r2d2::PooledConnection;",
         "use diesel::r2d2::ConnectionManager;",
-        "use crate::new_variants::InsertRow;",
-        "use crate::update_variants::UpdateRow;",
     ]
+
+    table_enum_struct = StructMetadata(struct_name="Table", table_name=None)
 
     document.write("\n".join(imports) + "\n\n")
 
@@ -88,15 +97,17 @@ def write_backend_table_names_enumeration(
             not method.has_self_reference()
         ), f"Method {method.name} has a self reference."
 
-        table_method = MethodDefinition(
-            name=method.name, summary=method.summary, visibility=""
+        table_method = table_enum_struct.add_backend_method(
+            MethodDefinition(name=method.name, summary=method.summary, visibility="")
         )
         table_method.include_self_ref()
         method_return_type = method.get_return_type()
         return_type = AttributeMetadata(
             original_name=method_return_type.original_name,
             name=method_return_type.name,
-            data_type=method_return_type.data_type().replace("Vec<Self>", "Vec<u8>").replace("Self", "Vec<u8>"),
+            data_type=method_return_type.data_type(route="backend")
+            .replace("Vec<Self>", "Vec<u8>")
+            .replace("Self", "Vec<u8>"),
             optional=method_return_type.optional,
         )
         table_method.set_return_type(return_type)
@@ -164,14 +175,10 @@ def write_backend_table_names_enumeration(
                     f"            web_common::database::Table::{table.camel_cased()} => {{\n"
                 )
 
-                if "Self" in struct_method.get_return_type().data_type():
-                    document.write(
-                        "bincode::serialize(&"
-                    )
+                if "Self" in struct_method.get_return_type().data_type(route="backend"):
+                    document.write("bincode::serialize(&")
 
-                document.write(
-                f"{table.richest_struct_name()}::{method.name}(\n"
-                )
+                document.write(f"{table.richest_struct_name()}::{method.name}(\n")
                 arguments = []
                 for argument in method.arguments:
                     if argument.name == "self":
@@ -184,15 +191,18 @@ def write_backend_table_names_enumeration(
                         and original_argument.has_struct_data_type()
                     ):
                         if original_argument.optional:
-                            formatted_argument = f"{argument.name}.map(|{argument.name}| bincode::deserialize::<{original_argument.data_type()}>(&{argument.name})).transpose()?"
+                            formatted_argument = f"{argument.name}.map(|{argument.name}| bincode::deserialize::<{original_argument.data_type(route='backend')}>(&{argument.name})).transpose()?"
                         else:
-                            formatted_argument = f"bincode::deserialize::<{original_argument.data_type()}>(&{argument.name})?"
+                            formatted_argument = f"bincode::deserialize::<{original_argument.data_type(route='backend')}>(&{argument.name})?"
 
                         if original_argument.reference:
                             formatted_argument = f"{formatted_argument}.as_ref()"
 
                         arguments.append(formatted_argument)
-                    elif argument.name == "primary_key" and struct_method.has_primary_key_as_argument():
+                    elif (
+                        argument.name == "primary_key"
+                        and struct_method.has_primary_key_as_argument()
+                    ):
                         if argument.optional:
                             arguments.append("primary_key.map(|pk| pk.into())")
                         else:
@@ -201,12 +211,10 @@ def write_backend_table_names_enumeration(
                         arguments.append(argument.name)
                 document.write(",\n".join(arguments))
                 document.write(")")
-                if "Result" in struct_method.get_return_type().format_data_type():
+                if "Result" in struct_method.get_return_type().format_data_type(route="backend"):
                     document.write("?")
-                if "Self" in struct_method.get_return_type().data_type():
-                    document.write(
-                        ")?\n"
-                    )
+                if "Self" in struct_method.get_return_type().data_type(route="backend"):
+                    document.write(")?\n")
                 document.write("            },\n")
             else:
                 document.write(
@@ -269,8 +277,8 @@ def write_backend_table_names_enumeration(
 
         document.write(
             f"            web_common::database::Table::{table.camel_cased()} => {{\n"
-            f"                let row: web_common::database::{table.new_flat_variant_name()} = bincode::deserialize::<web_common::database::{table.new_flat_variant_name()}>(&row)?;\n"
-            f"                let inserted_row: crate::models::{table.flat_variant_name()} = <web_common::database::{table.new_flat_variant_name()} as InsertRow>::insert(row, user_id, connection)?;\n"
+            f"                let row: {table.get_new_flat_variant().full_path(route='backend')} = bincode::deserialize::<{table.get_new_flat_variant().full_path(route='backend')}>(&row)?;\n"
+            f"                let inserted_row: {table.flat_variant.full_path(route='backend')} = <{table.get_new_flat_variant().full_path(route='backend')} as InsertRow>::insert(row, user_id, connection)?;\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
@@ -279,19 +287,15 @@ def write_backend_table_names_enumeration(
         if richest_struct.is_nested():
             if richest_struct.has_attribute_that_may_be_hidden():
                 document.write(
-                    f"                let nested_row = crate::nested_models::{richest_struct.name}::from_flat(inserted_row, Some(user_id), connection)?;\n"
+                    f"                let nested_row = {richest_struct.full_path(route='backend')}::from_flat(inserted_row, Some(user_id), connection)?;\n"
                 )
             else:
                 document.write(
-                    f"                let nested_row = crate::nested_models::{richest_struct.name}::from_flat(inserted_row, connection)?;\n"
+                    f"                let nested_row = {richest_struct.full_path(route='backend')}::from_flat(inserted_row, connection)?;\n"
                 )
-            document.write(
-                "                 bincode::serialize(&nested_row)?\n"
-            )
+            document.write("                 bincode::serialize(&nested_row)?\n")
         else:
-            document.write(
-                "                 bincode::serialize(&inserted_row)?\n"
-            )
+            document.write("                 bincode::serialize(&inserted_row)?\n")
 
         document.write("            },\n")
 
@@ -352,7 +356,7 @@ def write_backend_table_names_enumeration(
         document.write(
             f"            web_common::database::Table::{table.camel_cased()} => {{\n"
             f"                let row: web_common::database::{table.update_flat_variant_name()} = bincode::deserialize::<web_common::database::{table.update_flat_variant_name()}>(&row)?;\n"
-            f"                let updated_row: crate::models::{table.flat_variant_name()} = <web_common::database::{table.update_flat_variant_name()} as UpdateRow>::update(row, user_id, connection)?;\n"
+            f"                let updated_row: crate::database::flat_variants::{table.flat_variant_name()} = <web_common::database::{table.update_flat_variant_name()} as UpdateRow>::update(row, user_id, connection)?;\n"
         )
 
         richest_struct = table.get_richest_struct()
@@ -361,19 +365,15 @@ def write_backend_table_names_enumeration(
         if richest_struct.is_nested():
             if richest_struct.has_attribute_that_may_be_hidden():
                 document.write(
-                    f"                let nested_row = crate::nested_models::{richest_struct.name}::from_flat(updated_row, Some(user_id), connection)?;\n"
+                    f"                let nested_row = crate::database::nested_variants::{richest_struct.name}::from_flat(updated_row, Some(user_id), connection)?;\n"
                 )
             else:
                 document.write(
-                    f"                let nested_row = crate::nested_models::{richest_struct.name}::from_flat(updated_row, connection)?;\n"
+                    f"                let nested_row = crate::database::nested_variants::{richest_struct.name}::from_flat(updated_row, connection)?;\n"
                 )
-            document.write(
-                "                 bincode::serialize(&nested_row)?\n"
-            )
+            document.write("                 bincode::serialize(&nested_row)?\n")
         else:
-            document.write(
-                "                 bincode::serialize(&updated_row)?\n"
-            )
+            document.write("                 bincode::serialize(&updated_row)?\n")
 
         document.write("            },\n")
 
@@ -425,25 +425,24 @@ def write_backend_table_names_enumeration(
 
         if not richest_variant.is_nested():
             document.write(
-                f"            web_common::database::Table::{table.camel_cased()} => bincode::serialize(&serde_json::from_str::<crate::models::{table.flat_variant_name()}>(row)?)?,\n"
+                f"            web_common::database::Table::{table.camel_cased()} => bincode::serialize(&serde_json::from_str::<crate::database::flat_variants::{table.flat_variant_name()}>(row)?)?,\n"
             )
             continue
 
         document.write(
             f"            web_common::database::Table::{table.camel_cased()} => {{\n"
-            f"                let flat_row: crate::models::{flat_variant.name} = serde_json::from_str::<crate::models::{flat_variant.name}>(row)?;\n"
+            f"                let flat_row: crate::database::flat_variants::{flat_variant.name} = serde_json::from_str::<crate::database::flat_variants::{flat_variant.name}>(row)?;\n"
         )
         if richest_variant.has_attribute_that_may_be_hidden():
             document.write(
-                f"                 let richest_row = crate::nested_models::{richest_variant.name}::from_flat(flat_row, user_id, connection)?;\n"
+                f"                 let richest_row = crate::database::nested_variants::{richest_variant.name}::from_flat(flat_row, user_id, connection)?;\n"
             )
         else:
             document.write(
-                f"                 let richest_row = crate::nested_models::{richest_variant.name}::from_flat(flat_row, connection)?;\n"
+                f"                 let richest_row = crate::database::nested_variants::{richest_variant.name}::from_flat(flat_row, connection)?;\n"
             )
         document.write(
-            "                 bincode::serialize(&richest_row)?\n"
-            "            },\n"
+            "                 bincode::serialize(&richest_row)?\n            },\n"
         )
 
     document.write("        })\n    }\n}\n")

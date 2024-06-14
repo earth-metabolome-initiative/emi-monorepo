@@ -5,11 +5,12 @@ import shutil
 import os
 from userinput import userinput
 from constraint_checkers.migrations_changed import are_migrations_changed
+from constraint_checkers.is_file_changed import is_file_changed
 
 
 def ensures_no_duplicated_migrations():
     """Ensures that there are not migrations that are equal one another by quadratically comparing them."""
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Skipping the check for duplicated migrations.")
         return
     # List containing the names of the migration files and their content

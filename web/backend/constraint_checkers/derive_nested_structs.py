@@ -4,6 +4,7 @@ from typing import List
 from tqdm import tqdm
 from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
 
+
 def derive_nested_structs(
     flat_variants: List[StructMetadata],
 ) -> List[StructMetadata]:
@@ -21,33 +22,29 @@ def derive_nested_structs(
     structs for the referenced tables. The nested structs are written to the file `src/models.rs`.
     """
 
-    def get_struct_by_table_name(table_name: str) -> StructMetadata:
-        for struct in flat_variants:
-            if struct.table_name == table_name:
-                return struct
-        raise ValueError(f"Table name {table_name} not found in the struct metadata.")
-
     nested_structs = []
 
     # For each of the struct, we generated the Nested{struct_name} version
     # if the struct contains a reference to another struct.
-    for struct in tqdm(
+    for flat_variant in tqdm(
         flat_variants, desc="Generating nested structs", leave=False, unit="struct"
     ):
-        foreign_keys = struct.get_foreign_keys()
+        foreign_keys = flat_variant.get_foreign_keys()
 
         if len(foreign_keys) == 0:
             continue
 
-        nested_struct = StructMetadata(f"Nested{struct.name}", struct.table_name)
-        nested_struct.set_flat_variant(struct)
+        nested_struct = StructMetadata(
+            f"Nested{flat_variant.name}", flat_variant.table_name
+        )
+        nested_struct.set_flat_variant(flat_variant)
 
-        if not struct.has_only_foreign_keys():
+        if not flat_variant.has_only_foreign_keys():
             nested_struct.add_attribute(
                 AttributeMetadata(
                     original_name="inner",
                     name="inner",
-                    data_type=struct,
+                    data_type=flat_variant,
                     optional=False,
                 )
             )
@@ -57,15 +54,21 @@ def derive_nested_structs(
             # with the foreign struct. This struct may be also nested if the foreign
             # table has foreign keys, which we check by using the `has_foreign_keys`
             # method of the `tables_metadata` object.
-            foreign_key_table_name = struct.table_metadata.get_foreign_key_table_name(
-                struct.table_name, attribute.name
+            foreign_key_table_name = (
+                flat_variant.table_metadata.get_foreign_key_table_name(
+                    flat_variant.table_name, attribute.name
+                )
             )
 
             normalized_attribute_name = attribute.normalized_name()
-            foreign_struct = get_struct_by_table_name(foreign_key_table_name)
+
+            for this_struct in flat_variants:
+                if this_struct.table_name == foreign_key_table_name:
+                    foreign_struct = this_struct
+                    break
 
             if (
-                struct.name == foreign_struct.name
+                flat_variant.name == foreign_struct.name
                 or not foreign_struct.has_foreign_keys()
             ):
                 nested_struct.add_attribute(
@@ -117,7 +120,7 @@ def derive_nested_structs(
                 if attribute.is_undefined_nested_dependencies():
                     struct_identified = False
                     for struct in nested_structs + flat_variants:
-                        if struct.name == attribute.data_type():
+                        if struct.name == attribute.raw_data_type():
                             struct_identified = True
                             if struct.has_undefined_nested_dependencies():
                                 converged = False
@@ -168,9 +171,9 @@ def derive_nested_structs(
     # Finally, we set the richest variant for each of the provided
     # flat variants that now have a nested version.
     for nested_struct in nested_structs:
-        assert nested_struct.is_nested(), (
-            f"Expected the struct {nested_struct.name} to be a nested struct."
-        )
+        assert (
+            nested_struct.is_nested()
+        ), f"Expected the struct {nested_struct.name} to be a nested struct."
         found = False
         for flat_variant in flat_variants:
             if flat_variant == nested_struct.get_flat_variant():

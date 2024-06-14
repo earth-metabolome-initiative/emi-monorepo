@@ -2,7 +2,7 @@
 //! query on species names using either Diesel + PostgreSQL or alternatively Ngrammatics.
 #![feature(test)]
 extern crate test;
-use backend::models::BioOttTaxonItem;
+use backend::database::flat_variants::BioOttTaxonItem;
 use criterion::{criterion_group, criterion_main, Criterion};
 use diesel::{r2d2::ConnectionManager, PgConnection};
 use ngrammatic::prelude::*;

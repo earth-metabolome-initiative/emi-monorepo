@@ -2,29 +2,22 @@
     color: $primary;
     box-sizing: border-box;
     border-top: 1px solid $primary;
-    padding: 10px;
+    padding: 0.5rem;
+    padding-right: 1rem;
     text-align: center; // Center align text
     font-size: 14px; // Adjust font size as needed
     position: absolute;
     bottom: 0;
+    left: 0;
     width: 100%; // Full width
     padding-left: $sidebar-width + 1; // Add padding to the left to account for the sidebar
-    margin-left: -$sidebar-width;
 
     @media screen and (max-width: $small-screen-width) {
-        position: relative; // Reset position on small screens
         margin-left: 0; // Reset margin on small screens
-        padding-left: 10px; // Reset padding on small screens
-    }
-
-    @media screen and (max-height: $small-screen-height) {
-        position: relative; // Reset position on small screens
-        margin-left: 0; // Reset margin on small screens
-        padding-left: 10px; // Reset padding on small screens
+        padding-left: 0.5em; // Reset padding on small screens
     }
 
     .container {
-        max-width: 1200px; // Adjust max-width as needed
         margin: 0 auto; // Center the container horizontally
         display: flex; // Use flexbox for layout
         justify-content: space-between; // Space elements evenly
@@ -57,7 +50,7 @@
         }
 
         @media screen and (max-width: $small-screen-width) {
-            margin-bottom: 20px; // Add spacing between sections on small screens
+            display: none;
         }
     }
 

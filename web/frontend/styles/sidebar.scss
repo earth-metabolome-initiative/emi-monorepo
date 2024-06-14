@@ -1,5 +1,5 @@
 // Define variables for easy customization
-$sidebar-width: 16em;
+$sidebar-width: 16rem;
 $sidebar-hover-color: #f76a00;
 
 .sidebar {
@@ -7,13 +7,15 @@ $sidebar-hover-color: #f76a00;
     left: 0;
     top: $navigator-height;
     height: 100%;
+    max-width: 80%;
     width: $sidebar-width;
     color: $near_black;
     transition: transform 0.3s ease;
     background-color: white;
-    z-index: 100;
+    z-index: 10;
     box-sizing: border-box;
     border-right: 1px solid $primary;
+    padding-bottom: $navigator-height;
     overflow-y: scroll;
 
     .sidebar-content {
@@ -60,8 +62,6 @@ $sidebar-hover-color: #f76a00;
 // Media query for smaller screens
 @media screen and (max-width: $small-screen-width) {
     .sidebar {
-        width: 200px; // Adjust width for smaller screens
-
         &.hidden {
             transform: translateX(-$sidebar-width);
         }

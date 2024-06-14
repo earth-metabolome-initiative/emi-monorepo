@@ -1,11 +1,12 @@
 """Submodule containing the enforcement of the migration naming convention."""
 import os
 from constraint_checkers.migrations_changed import are_migrations_changed
+from constraint_checkers.is_file_changed import is_file_changed
 
 
 def enforce_migration_naming_convention():
     """Check that the migrations are named according to the convention."""
-    if not are_migrations_changed():
+    if not (are_migrations_changed() or is_file_changed(__file__)):
         print("Migrations have not changed. Skipping the check for the migration naming convention.")
         return
 

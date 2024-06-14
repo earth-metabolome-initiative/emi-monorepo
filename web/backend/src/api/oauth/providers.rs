@@ -1,5 +1,5 @@
 //! This module contains the API for the OAuth2 providers.
-use crate::nested_models::NestedLoginProvider;
+use crate::database::*;
 use actix_web::{get, web, HttpResponse, Responder};
 use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;

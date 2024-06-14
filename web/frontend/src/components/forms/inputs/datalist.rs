@@ -9,7 +9,6 @@ use crate::workers::ws_worker::ComponentMessage;
 use crate::workers::ws_worker::WebsocketMessage;
 use crate::workers::WebsocketWorker;
 use gloo::timers::callback::Timeout;
-use gloo::utils::errors::JsError;
 use serde::de::DeserializeOwned;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
@@ -93,8 +92,22 @@ where
     is_focused: bool,
     /// The number of search queries that are currently being processed.
     number_of_search_queries: usize,
+    /// The total number of search queries that have been processed.
+    total_number_of_search_queries: usize,
     /// Last executed filter
     last_filter: Option<Data::Filter>,
+}
+
+impl<Data: Filtrable, const EDIT: bool> MultiDatalist<Data, EDIT> {
+    fn disable(&self) -> bool {
+        self.total_number_of_search_queries == 1
+            && self.number_of_search_queries == 0
+            && self.candidates.is_empty()
+            && self
+                .current_value
+                .as_ref()
+                .map_or(true, |value| value.is_empty())
+    }
 }
 
 pub enum DatalistMessage<Data> {
@@ -102,7 +115,6 @@ pub enum DatalistMessage<Data> {
     UpdateCurrentValue(String),
     SearchCandidatesTimeout,
     SearchCandidates,
-    LoadMore,
     UpdateCandidates(Vec<Rc<Data>>),
     SelectCandidate(usize),
     DeleteSelection(usize),
@@ -137,6 +149,7 @@ where
             selections_to_delete: Vec::new(),
             is_focused: false,
             number_of_search_queries: 0,
+            total_number_of_search_queries: 0,
             last_filter: None,
         }
     }
@@ -200,24 +213,7 @@ where
                     .into(),
                 ));
                 self.number_of_search_queries += 1;
-                false
-            }
-            DatalistMessage::LoadMore => {
-                let query = self
-                    .current_value
-                    .as_ref()
-                    .map(|s| s.to_string())
-                    .unwrap_or_else(|| "".to_string());
-                self.websocket.send(ComponentMessage::Operation(
-                    Data::search_task(
-                        ctx.props().filters.as_ref(),
-                        query,
-                        ctx.props().number_of_candidates,
-                        self.candidates.len() as i64,
-                    )
-                    .into(),
-                ));
-                self.number_of_search_queries += 1;
+                self.total_number_of_search_queries += 1;
                 true
             }
             DatalistMessage::SearchCandidatesTimeout => {
@@ -333,7 +329,7 @@ where
             .collect::<Vec<usize>>();
 
         let classes = format!(
-            "input-group datalist{}{}",
+            "input-group datalist{}{}{}{}{}",
             if ctx.props().show_label {
                 ""
             } else {
@@ -350,6 +346,21 @@ where
                         _ => "many",
                     }
                 )
+            },
+            if self.number_of_search_queries > 0 {
+                " loading".to_string()
+            } else {
+                "".to_string()
+            },
+            if self.selections.len() > 0 {
+                " has-selections".to_string()
+            } else {
+                "".to_string()
+            },
+            if self.disable() {
+                " disabled".to_string()
+            } else {
+                "".to_string()
             }
         );
 
@@ -379,13 +390,10 @@ where
                 link.send_message(DatalistMessage::UpdateCurrentValue(value));
             })
         };
-        let on_scan_error: Callback<JsError> = {
+        let on_scan_error: Callback<ApiError> = {
             let link = ctx.link().clone();
-            Callback::from(move |error: JsError| {
-                let value = error.to_string();
-                link.send_message(DatalistMessage::ScannerError(ApiError::BadRequest(vec![
-                    value,
-                ])));
+            Callback::from(move |error: ApiError| {
+                link.send_message(DatalistMessage::ScannerError(error));
             })
         };
 
@@ -411,43 +419,45 @@ where
             }
         );
 
-        let input_field = html! {
-            <>
-                if props.show_label {
-                    <label for={props.normalized_label()} class={label_classes}>
-                        {props.label()}
-                    </label>
-                }
-                if self.is_focused || self.selections.is_empty(){
-                    <input
-                        type="search"
-                        class="input-control"
-                        value={input_value}
-                        placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
-                        oninput={on_input}
-                        onfocus={on_focus}
-                        autocomplete="off"
-                        spellcheck="false"
-                        id={props.normalized_label()}
-                        name={props.normalized_label()}
-                    />
-                    if ctx.props().show_load_more {
-                        <button class="retrieve" onclick={ctx.link().callback(|_| DatalistMessage::<Data>::LoadMore)} disabled={self.number_of_search_queries > 0 || self.candidates.is_empty()}>
-                            if self.number_of_search_queries >0 {
-                                <i class="fas fa-arrows-rotate fa-spin"></i>
-                            } else {
-                                <i class="fas fa-arrows-rotate"></i>
-                            }
-                            {'\u{00a0}'}
-                            <span>{"Load more"}</span>
-                        </button>
+        let all_errors: Vec<ApiError> = if self.disable() {
+            Vec::new()
+        } else {
+            self.errors
+                .iter()
+                .chain(ctx.props().errors.iter())
+                .cloned()
+                .collect()
+        };
+
+        html! {
+            <div class={classes}>
+                <div class="input-container">
+                    if props.show_label {
+                        <label for={props.normalized_label()} class={label_classes}>
+                            {props.label()}
+                        </label>
                     }
-                    if ctx.props().scanner {
-                        <Scanner onscan={on_scan} onerror={on_scan_error}/>
+                    if self.is_focused || self.selections.is_empty() {
+                        <div class="input-wrapper">
+                            <input
+                                type="search"
+                                class="input-control"
+                                value={input_value}
+                                placeholder={props.placeholder.clone().unwrap_or_else(|| props.label())}
+                                oninput={on_input}
+                                onfocus={on_focus}
+                                disabled={self.disable()}
+                                autocomplete="off"
+                                spellcheck="false"
+                                id={props.normalized_label()}
+                                name={props.normalized_label()}
+                            />
+                        </div>
+                        if ctx.props().scanner {
+                            <Scanner onscan={on_scan} onerror={on_scan_error}/>
+                        }
                     }
-                }
-                {if !self.selections.is_empty() {
-                    html! {
+                    if !self.selections.is_empty() {
                         <ul class="selected-datalist-badges">
                         {for self.selections.iter().enumerate().map(|(i, selection)| {
                             let onclick = {
@@ -488,23 +498,6 @@ where
                         }
                         </ul>
                     }
-                } else {
-                    html!{}
-                }}
-            </>
-        };
-
-        let all_errors: Vec<ApiError> = self
-            .errors
-            .iter()
-            .chain(ctx.props().errors.iter())
-            .cloned()
-            .collect();
-
-        html! {
-            <div class={classes}>
-                <div class="input-container">
-                    {input_field}
                 </div>
                 {if !ctx.props().always_shows_candidates && (!self.is_focused || self.candidates.is_empty() || self.selections.len() == ctx.props().maximum_number_of_choices){
                     html! {}

@@ -1,123 +1,171 @@
-div {
-    position: relative;
-}
-
 .active-scanner-ui {
-    display: block;
-    position: absolute;
-    z-index: 1;
-    padding-top: 200px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-}
-
-.active-scanner-ui-content {
-    top: 0;
-    left: 0;
     position: fixed;
-    height: 100%;
+    z-index: 100;
+    transform: translate3d(0px, 0px, 0px);
+    background-color: rgba(0, 0, 0, 0.5);
+    // We blur the background to make the scanner more visible
+    backdrop-filter: blur(5px);
+    left: 0;
+    top: 0;
     width: 100%;
-    z-index: 10000;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-}
+    transition: opacity 0.3s;
+    opacity: 0;
 
-.active-scanner-ui-content video {
-    width: 40%;
-    height: 40%;
-    object-fit: cover;
-    /* Ensures the video covers the entire area without distortion */
-}
-
-.close,
-.toggle-flashlight {
-    position: absolute;
-    background: white;
-    border: none;
-    color: #000;
-    font-size: 50px;
-    cursor: pointer;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.close {
-    bottom: 10px;
-    right: 10px;
-}
-
-.toggle-flashlight {
-    bottom: 10px;
-    left: 10px;
-}
-
-@media screen and (max-width: $small-screen-width) {
-
-    // Mobile version of the scanner
-    .active-scanner-ui {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        z-index: 10000;
-        top: 0;
-        left: 0;
-        background: red;
+    video {
+        opacity: 0;
+        transition: opacity 0.3s;
     }
 
-    .active-scanner-ui-content {
-        background-color: blue;
-        top: 0;
-        left: 0;
-        position: fixed;
-        height: 100%;
-        width: 100%;
-        z-index: 10000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    .scanner-focus-container {
+        opacity: 0;
+        transition: opacity 0.3s;
     }
 
-    .active-scanner-ui-content video {
+    &.opening {
+        opacity: 1;
+        video {
+            opacity: 1;
+        }
+
+        .scanner-focus-container {
+            opacity: 1;
+            &::after {
+                animation: fade-in-up 0.3s;
+            }
+
+            .scanner-focus {
+                &::before {
+                    animation: pop-in 0.3s;
+                }
+
+                &::after {
+                    animation: fade-in-up 0.3s;
+                }
+            }
+        }
+    }
+
+    &.closing {
+        opacity: 0;
+        video {
+            opacity: 0;
+        }
+
+        .scanner-focus-container {
+            opacity: 0;
+            &::after {
+                animation: fade-out-up 0.3s;
+            }
+
+            .scanner-focus {
+                &::before {
+                    animation: pop-out 0.3s;
+                }
+
+                &::after {
+                    animation: fade-out-up 0.3s;
+                }
+            }
+        }
+    }
+
+    video {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
+        // We make it cover the whole screen
         object-fit: cover;
-        /* Ensures the video covers the entire area without distortion */
+        transform: rotateY(180deg);
+        -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+        -moz-transform:rotateY(180deg); /* Firefox */
     }
 
-    .close {
-        bottom: 10px;
-        right: 10px;
+    canvas {
+        display: none;
     }
 
-    .toggle-flashlight {
-        bottom: 10px;
-        left: 10px;
+    .scanner-focus-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-left: 50vw;
+        border-right: 50vw;
+        border-top: 50vh;
+        border-bottom: 50vh;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.5);
+        height:0;
+        width: min(30vw, 30vh);
+        padding-bottom: min(30vw, 30vh);
+
+        &::after {
+            content: "Click anywhere to close";
+            position: absolute;
+            bottom: max(-6vh, -6vw);
+            width: 150%;
+            left: -25%;
+            font-weight: 100;
+            max-width: 100vw;
+            font-size: min(2.5vh, 2.5vw);
+            text-align: center;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .scanner-focus {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            border-radius: min(8vh, 8vw);
+            border: min(3vh, 3vw) solid white;
+            top: max(-2.95vh, -2.95vw);
+            left: max(-2.95vh, -2.95vw);
+            &::before {
+                content: "";
+                font-family: "Font Awesome 5 Free";
+                position: absolute;
+                font-weight: 900;
+                font-size: min(25vw, 25vh);
+                width: 100%;
+                color: white;
+                text-align: center;
+                top: 50%;
+                margin-top: max(-12.5vw, -12.5vh);
+            }
+
+            &::after {
+                content: "SCAN QR CODE";
+                position: absolute;
+                font-size: min(2.75vh, 2.75vw);
+                width: 100%;
+                font-size: 100;
+                color: white;
+                text-align: center;
+                bottom: min(1vh, 1vw);
+            }
+        }
     }
 
-    // button to close the scanner and open the flashlight should be at the bottom (one on the left and the other on the right)
-    .close {
-
-        z-index: 10000;
-        border: none;
-        color: #000;
-        font-size: 150px;
-        background: rgba(211, 211, 211, 0.5);
-    }
-
-    .toggle-flashlight {
-        z-index: 10000;
-        border: none;
-        color: #000;
-        font-size: 150px;
-        background: rgba(211, 211, 211, 0.5);
+    &.loading {
+        .scanner-focus-container {
+            .scanner-focus {
+                &::before {
+                    content: "\f110";
+                    display: block;
+                    animation: fa-spin 1s linear infinite;
+                }
+                &::after {
+                    content: "";
+                }
+            }
+        }
     }
 }
+

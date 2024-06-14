@@ -8,6 +8,8 @@ from constraint_checkers.regroup_tables import get_best_insertion_point
 from constraint_checkers.find_foreign_keys import is_role_table
 from constraint_checkers.table_metadata import TableStructMetadata
 from constraint_checkers.struct_metadata import AttributeMetadata
+from constraint_checkers.is_file_changed import is_file_changed
+from constraint_checkers.migrations_changed import are_migrations_changed
 
 
 def handle_missing_can_x_function(
@@ -333,6 +335,10 @@ def handle_missing_can_x_function(
 
 def ensure_can_x_function_existance(tables: List[TableStructMetadata]):
     """Returns whether the function exists."""
+    if not (are_migrations_changed() or is_file_changed(__file__)):
+        print("No change detected in the migrations or the file. Skipping the can_x function check.")
+        return
+    
     assert isinstance(tables, list)
     assert all(isinstance(table, TableStructMetadata) for table in tables)
     raise_exception = False

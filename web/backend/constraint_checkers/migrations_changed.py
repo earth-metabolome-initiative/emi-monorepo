@@ -11,7 +11,7 @@ import compress_json
 from dict_hash import sha256
 from tqdm.auto import tqdm
 
-
+@cache
 def compute_migrations_hash() -> str:
     """Compute the hash of the migrations."""
     paths = glob("./migrations/**/*.sql", recursive=True)
@@ -32,6 +32,13 @@ def compute_migrations_hash() -> str:
 
     return current_hash
 
+def update_migrations_hash():
+    """Update the migrations hash."""
+    migrations_metadata = "./migrations_metadata.json"
+    data = {"hash": compute_migrations_hash()}
+    print(f"Updating migrations hash {migrations_metadata} to ", data["hash"])
+    compress_json.dump(data, migrations_metadata)
+
 
 @cache
 def are_migrations_changed() -> bool:
@@ -43,7 +50,5 @@ def are_migrations_changed() -> bool:
         old_hash = compress_json.load(migrations_metadata)["hash"]
         if old_hash == current_hash:
             return False
-
-    compress_json.dump({"hash": current_hash}, migrations_metadata)
-
+        print(f"Migrations were changed: {old_hash} -> {current_hash}")
     return True
