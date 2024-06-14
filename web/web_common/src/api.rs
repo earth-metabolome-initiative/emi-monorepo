@@ -24,6 +24,7 @@ pub enum ApiError {
     InternalServerError,
     InvalidFileFormat(String),
     JPEGError(JPEGError),
+    DeviceError(DeviceError),
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
@@ -57,6 +58,19 @@ impl ToString for JPEGError {
     }
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
+pub enum DeviceError {
+    NoCameras
+}
+
+impl ToString for DeviceError {
+    fn to_string(&self) -> String {
+        match self {
+            DeviceError::NoCameras => "No cameras found.".to_string(),
+        }
+    }
+}
+
 impl ApiError {
     pub fn font_awesome_icon(&self) -> &'static str {
         match self {
@@ -75,6 +89,9 @@ impl ApiError {
                 JPEGError::ImageIsBlurry => "eye-slash",
                 JPEGError::ImageHasFewColors => "palette",
                 JPEGError::UnableToEncode => "file-image",
+            },
+            Self::DeviceError(e) => match e {
+                DeviceError::NoCameras => "camera",
             },
         }
     }
@@ -154,6 +171,7 @@ impl Into<Vec<String>> for ApiError {
             ApiError::InternalServerError => vec!["Internal Server Error".to_string()],
             ApiError::InvalidFileFormat(format) => vec![format!("Invalid file format: {}", format)],
             ApiError::JPEGError(e) => vec![e.to_string()],
+            ApiError::DeviceError(e) => vec![e.to_string()],
         }
     }
 }
@@ -181,6 +199,12 @@ impl From<reqwest::Error> for ApiError {
 impl From<JPEGError> for ApiError {
     fn from(e: JPEGError) -> Self {
         Self::JPEGError(e)
+    }
+}
+
+impl From<DeviceError> for ApiError {
+    fn from(e: DeviceError) -> Self {
+        Self::DeviceError(e)
     }
 }
 
@@ -260,6 +284,7 @@ impl From<ApiError> for actix_web::HttpResponse {
             ApiError::InvalidFileFormat(format) => actix_web::HttpResponse::BadRequest()
                 .json(format!("Invalid file format: {}", format)),
             ApiError::JPEGError(e) => actix_web::HttpResponse::BadRequest().json(e.to_string()),
+            ApiError::DeviceError(e) => actix_web::HttpResponse::BadRequest().json(e.to_string()),
         }
     }
 }
