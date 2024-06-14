@@ -3,8 +3,7 @@ use super::*;
 impl User {
     /// Returns whether the user has a complete profile.
     pub fn has_complete_profile(&self) -> bool {
-        !self.first_name.is_empty()
-            && !self.last_name.is_empty()
+        !self.first_name.is_empty() && !self.last_name.is_empty()
     }
 
     /// Get the full name of the user.

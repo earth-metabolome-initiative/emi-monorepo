@@ -2,7 +2,9 @@
 //! within the context of postgis. This is the variant of the Point struct that is used in the
 //! frontend, and as such does not have any diesel-specific code.
 
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, PartialOrd, Default, serde::Serialize, serde::Deserialize,
+)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
@@ -16,7 +18,7 @@ impl From<gluesql::core::data::Point> for Point {
         Self {
             x: point.x,
             y: point.y,
-            srid: None
+            srid: None,
         }
     }
 }

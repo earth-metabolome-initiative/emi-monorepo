@@ -60,7 +60,7 @@ impl ToString for JPEGError {
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
 pub enum DeviceError {
-    NoCameras
+    NoCameras,
 }
 
 impl ToString for DeviceError {
@@ -219,7 +219,6 @@ impl From<gluesql::prelude::Error> for ApiError {
 #[cfg(feature = "backend")]
 impl From<diesel::result::Error> for ApiError {
     fn from(e: diesel::result::Error) -> Self {
-        
         match e {
             diesel::result::Error::DatabaseError(kind, information) => {
                 log::error!("Database error {:?}: message: {:?}, details: {:?}, hint: {:?}, table_name: {:?}, column_name: {:?}, constraint_name: {:?}, statement_position: {:?}", kind, information.message(), information.details(), information.hint(), information.table_name(), information.column_name(), information.constraint_name(), information.statement_position());

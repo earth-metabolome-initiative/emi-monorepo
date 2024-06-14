@@ -110,7 +110,13 @@ impl Select {
     /// * `query` - The query to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
-    pub fn search<F: Serialize>(table: super::Table, filter: Option<&F>, query: String, limit: i64, offset: i64) -> Self {
+    pub fn search<F: Serialize>(
+        table: super::Table,
+        filter: Option<&F>,
+        query: String,
+        limit: i64,
+        offset: i64,
+    ) -> Self {
         Self::SearchTable {
             table_name: table.into(),
             filter: filter.map(|f| bincode::serialize(f).unwrap()),
@@ -128,7 +134,13 @@ impl Select {
     /// * `query` - The query to search for.
     /// * `limit` - The maximum number of results to return.
     /// * `offset` - The number of results to skip.
-    pub fn search_updatables<F: Serialize>(table: super::Table, filter: Option<&F>, query: String, limit: i64, offset: i64) -> Self {
+    pub fn search_updatables<F: Serialize>(
+        table: super::Table,
+        filter: Option<&F>,
+        query: String,
+        limit: i64,
+        offset: i64,
+    ) -> Self {
         Self::SearchEditableTable {
             table_name: table.into(),
             filter: filter.map(|f| bincode::serialize(f).unwrap()),
@@ -139,15 +151,12 @@ impl Select {
     }
 
     /// Create a new `Select` query for all tables.
-    /// 
+    ///
     /// # Arguments
     /// * `query` - The query to search for.
     /// * `limit` - The maximum number of results to return.
     pub fn search_all(query: String, limit: i64) -> Self {
-        Self::SearchAll {
-            query,
-            limit,
-        }
+        Self::SearchAll { query, limit }
     }
 
     /// Create a new `Select::CanView` query for a given `Table` and `PrimaryKey`.

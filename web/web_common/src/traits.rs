@@ -16,7 +16,6 @@ pub use is_dark::IsDark;
 mod is_light;
 pub use is_light::IsLight;
 
-
 pub trait CapitalizeString {
     /// Returns the provided string with the first letter capitalized.
     fn capitalize(&self) -> String;
