@@ -25,7 +25,6 @@ pub struct Scanner {
     closing: Option<Timeout>,
     interval: Option<Interval>,
     image: Option<Vec<u8>>,
-    device_change_closure: wasm_bindgen::closure::Closure<dyn FnMut()>,
 }
 
 fn is_mobile_device() -> bool {
@@ -99,21 +98,7 @@ impl Component for Scanner {
     type Message = ScannerMessage;
     type Properties = ScannerProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
-        // We listen to the deviceconnected event to start the scanner when a camera is connected.
-        // This is useful when the scanner is opened before a camera is connected.
-        let usb: web_sys::Usb = web_sys::window()
-            .expect("window should be available")
-            .navigator()
-            .usb();
-        let link = ctx.link().clone();
-        let device_change_closure = wasm_bindgen::closure::Closure::wrap(Box::new(move || {
-            link.send_message(ScannerMessage::DeviceChange);
-        })
-            as Box<dyn FnMut()>);
-        usb.set_onconnect(Some(device_change_closure.as_ref().unchecked_ref()));
-        usb.set_ondisconnect(Some(device_change_closure.as_ref().unchecked_ref()));
-
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             video_ref: NodeRef::default(),
             canvas_ref: NodeRef::default(),
@@ -127,7 +112,6 @@ impl Component for Scanner {
             interval: None,
             closing: None,
             image: None,
-            device_change_closure,
         }
     }
 
