@@ -23,7 +23,8 @@ pub(super) fn decode_barcode(
     crop_percentage: f64,
     crop_dimension: u32,
 ) -> Result<rxing::RXingResult, rxing::Exceptions> {
-    let (luma_data, square_side) = preprocess_image_data(image_data, crop_percentage, crop_dimension);
+    let (luma_data, square_side) =
+        preprocess_image_data(image_data, crop_percentage, crop_dimension);
     rxing::helpers::detect_in_luma_with_hints(
         luma_data,
         square_side as u32,

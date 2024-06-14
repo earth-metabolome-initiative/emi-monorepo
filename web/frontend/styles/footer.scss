@@ -6,14 +6,10 @@
     padding-right: 1rem;
     text-align: center; // Center align text
     font-size: 14px; // Adjust font size as needed
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%; // Full width
     padding-left: $sidebar-width + 1; // Add padding to the left to account for the sidebar
 
     @media screen and (max-width: $small-screen-width) {
-        margin-left: 0; // Reset margin on small screens
         padding-left: 0.5em; // Reset padding on small screens
     }
 

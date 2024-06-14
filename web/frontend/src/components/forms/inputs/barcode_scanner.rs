@@ -35,7 +35,7 @@ pub enum ScannerMessage {
     VideoTimeUpdate,
     Loaded,
     SetLoaded,
-    EffectivelyClose
+    EffectivelyClose,
 }
 
 #[derive(Properties, PartialEq, Clone)]
@@ -53,7 +53,6 @@ pub struct ScannerProps {
     #[prop_or(300)]
     crop_dimension: u32,
 }
-
 
 impl Component for Scanner {
     type Message = ScannerMessage;
@@ -113,7 +112,7 @@ impl Component for Scanner {
             }
 
             ScannerMessage::CapturedImage => {
-                if !self.is_scanning || !self.has_loaded{
+                if !self.is_scanning || !self.has_loaded {
                     return false;
                 }
 
@@ -305,7 +304,11 @@ impl Component for Scanner {
         let classes = format!(
             "active-scanner-ui{}{}",
             if self.has_loaded { "" } else { " loading" },
-            if self.closing.is_some() { " closing" } else { " opening" }
+            if self.closing.is_some() {
+                " closing"
+            } else {
+                " opening"
+            }
         );
 
         let onloaded = ctx.link().callback(|_| ScannerMessage::Loaded);

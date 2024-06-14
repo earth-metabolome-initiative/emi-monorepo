@@ -159,7 +159,8 @@ where
             }
             MultiFileInputMessage::FileProcessingFailed(error) => {
                 self.number_of_files_currently_processing -= 1;
-                ctx.link().send_message(MultiFileInputMessage::AddError(error));
+                ctx.link()
+                    .send_message(MultiFileInputMessage::AddError(error));
                 false
             }
             MultiFileInputMessage::AddError(error) => self.errors.insert(error),
@@ -168,9 +169,7 @@ where
                 ctx.link().run_oneshot::<FileProcessor<Data>>(
                     data,
                     Callback::from(move |data: Result<Data, ApiError>| match data {
-                        Ok(data) => {
-                            link.send_message(MultiFileInputMessage::FileProcessed(data))
-                        }
+                        Ok(data) => link.send_message(MultiFileInputMessage::FileProcessed(data)),
                         Err(error) => {
                             link.send_message(MultiFileInputMessage::FileProcessingFailed(error));
                         }

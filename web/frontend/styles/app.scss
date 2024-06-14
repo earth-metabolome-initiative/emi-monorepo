@@ -1,10 +1,10 @@
 .app {
     padding-top: $navigator-height;
     padding-left: $sidebar-width;
-    padding-bottom: 2rem;
     padding-right: 0;
     min-width: 100%;
-    min-height: 100dvh;
+    min-height: 100vh;
+    height: auto !important;
     box-sizing: border-box;
     position: relative;
     transition: padding-left 0.5s;

@@ -179,10 +179,10 @@ impl Component for Navigator {
                         if user.inner.has_complete_profile() {
                             <Badge<NestedUser> size={BadgeSize::Small} badge={user.clone()}/>
                         } else {
-                            <Link<AppRoute> classes="right_nav_button" to={AppRoute::UsersUpdate { id: user.inner.id }}>
+                            <Link<AppRoute> classes="right_nav_button fill-profile" to={AppRoute::UsersUpdate { id: user.inner.id }}>
                                 <i class="fas fa-clipboard-check"></i>
                                 {'\u{00a0}'}
-                                <span>{"Complete profile"}</span>
+                                <span>{"Fill profile"}</span>
                             </Link<AppRoute>>
                         }
                     } else {

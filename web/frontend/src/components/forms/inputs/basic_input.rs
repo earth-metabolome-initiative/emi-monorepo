@@ -204,7 +204,12 @@ pub fn basic_input<Data: Inputtable>(props: &InputProp<Data>) -> Html {
         }
     );
 
-    let errors = props.errors.clone().into_iter().chain((*input_errors).clone().into_iter()).collect::<Vec<ApiError>>();
+    let errors = props
+        .errors
+        .clone()
+        .into_iter()
+        .chain((*input_errors).clone().into_iter())
+        .collect::<Vec<ApiError>>();
 
     html! {
         <div class={classes}>
