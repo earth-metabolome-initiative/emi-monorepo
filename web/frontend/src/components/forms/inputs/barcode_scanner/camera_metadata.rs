@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_common::api::DeviceError;
+use web_sys::VideoFacingModeEnum;
 use web_sys::{window, MediaDeviceInfo, MediaStreamConstraints};
 
 /// A struct to hold information about a camera and its torch capability.
@@ -110,7 +111,10 @@ pub async fn get_device_stream(
     )
     .unwrap();
     advanced_constraints.push(&torch_constraint);
-    video_constraints.advanced(&advanced_constraints);
+    video_constraints
+        .advanced(&advanced_constraints)
+        .facing_mode(&VideoFacingModeEnum::Environment.into())
+        .frame_rate(&20.into());
     constraints.video(&video_constraints);
 
     // Request media stream using the specified constraints.

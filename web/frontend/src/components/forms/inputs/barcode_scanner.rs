@@ -76,6 +76,7 @@ pub enum ScannerMessage {
     DeviceChange,
     Mirrored,
     VideoEnded,
+    RequireUserMedia,
     Cameras(Vec<CameraInfo>),
 }
 
@@ -119,6 +120,22 @@ impl Component for Scanner {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            ScannerMessage::RequireUserMedia => {
+                let promise = match web_sys::window().unwrap().navigator().media_devices().unwrap().get_user_media() {
+                    Ok(promise) => promise,
+                    Err(error) => {
+                        ctx.link().send_message(ScannerMessage::Error(ApiError::from(error)));
+                        return false;
+                    }
+                };
+                ctx.link().send_future(async {
+                    match wasm_bindgen_futures::JsFuture::from(promise).await {
+                        Ok(stream) => ScannerMessage::FindCameras,
+                        Err(error) => ScannerMessage::Error(ApiError::from(error)),
+                    }
+                });
+                false
+            }
             ScannerMessage::VideoTimeUpdate => {
                 if self.interval.is_some() {
                     return false;
@@ -285,6 +302,13 @@ impl Component for Scanner {
                 true
             }
             ScannerMessage::Start => {
+                if let Some(stream) = self.stream.as_ref() {
+                    for track in stream.get_tracks().iter() {
+                        if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
+                            track.stop();
+                        }
+                    }
+                }
                 let current_device = if let Some((_, current_device)) = self.current_camera.as_ref()
                 {
                     current_device.clone()
@@ -399,7 +423,7 @@ impl Component for Scanner {
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         if first_render {
-            ctx.link().send_message(ScannerMessage::FindCameras);
+            ctx.link().send_message(ScannerMessage::RequireUserMedia);
         }
     }
 
@@ -407,6 +431,7 @@ impl Component for Scanner {
         if self.cameras.is_empty() {
             return html! {};
         }
+
 
         let time_update = ctx.link().callback(|_| ScannerMessage::VideoTimeUpdate);
         let toggle_scanner = ctx.link().callback(|event: MouseEvent| {
@@ -455,15 +480,11 @@ impl Component for Scanner {
         };
 
         html! {
-            <>
-                // Button to start or stop the scanner
             if !self.is_scanning {
                 <button onclick={toggle_scanner} title="Start Scanner" class="start-scanner">
                     <i class="fas fa-qrcode"></i>
                 </button>
-            }
-            // Modal for the scanner
-            if self.is_scanning {
+            } else {
                 <div class={classes} onclick={&close_scanner}>
                     <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update} onplaying={onloaded}></video>
                     if let Some(video) = self.video_ref.cast::<HtmlVideoElement>() {
@@ -492,8 +513,7 @@ impl Component for Scanner {
                         </ul>
                     </div>
                 </div>
-                }
-            </>
+            }
         }
     }
 }
