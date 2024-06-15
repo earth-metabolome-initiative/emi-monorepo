@@ -441,7 +441,7 @@ impl Component for Scanner {
 
         html! {
             <>
-            <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update} onplaying={onloaded}></video>
+            <video ref={&self.video_ref} autoPlay="true" style="display:none;" ontimeupdate={time_update} onplaying={onloaded}></video>
             if !self.is_scanning {
                 <button onclick={toggle_scanner} title="Start Scanner" class="start-scanner">
                     <i class="fas fa-qrcode"></i>
