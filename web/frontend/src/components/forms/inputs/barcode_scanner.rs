@@ -465,23 +465,17 @@ impl Component for Scanner {
                         <div class="scanner-focus"></div>
                         <ul class="operations">
                             if self.current_camera.as_ref().map_or(false, |(_, camera)| camera.torch) {
-                                <li>
-                                    <button title={flash_light_message} onclick={toggle_flashlight}>
-                                        <i class="fas fa-lightbulb"></i>
-                                    </button>
+                                <li title={flash_light_message} onclick={toggle_flashlight}>
+                                    <i class="fas fa-lightbulb"></i>
                                 </li>
                             }
                             if let Some((camera_number, camera)) = self.get_next_camera() {
-                                <li>
-                                    <button class="switch-camera" camera-number={camera_number.to_string()} camera-total={self.number_of_cameras().to_string()} title={camera.label} onclick={toggle_camera}>
-                                        <i class="fas fa-sync-alt"></i>
-                                    </button>
+                                <li class="switch-camera" camera-number={camera_number.to_string()} camera-total={self.number_of_cameras().to_string()} title={camera.label} onclick={toggle_camera}>
+                                    <i class="fas fa-sync-alt"></i>
                                 </li>
                             }
-                            <li>
-                                <button title="Mirror" onclick={mirror}>
-                                    <i class="fas fa-arrows-alt-h"></i>
-                                </button>
+                            <li title="Mirror" onclick={mirror}>
+                                <i class="fas fa-arrows-alt-h"></i>
                             </li>
                         </ul>
                     </div>

@@ -152,37 +152,36 @@
             list-style: none;
             border-radius: 0 0 min(8vh, 8vw) min(8vh, 8vw);
             li {
-                button {
-                    position: relative;
-                    border: 1px solid white;
-                    cursor: pointer;
-                    border-radius: 100%;
-                    width: min(8vh, 8vw);
-                    height: min(8vh, 8vw);
-                    background-color: transparent;
-                    color: white;
-                    font-size: min(2.5vh, 2.5vw);
-                    padding: 0;
-                    margin: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    transition: background-color 0.3s;
-                    animation: pop-in 0.3s;
-                    &:hover {
-                        background-color: rgba(255, 255, 255, 0.5);
-                    }
-                    &.switch-camera {
-                        &::after {
-                            content: attr(camera-number) '/' attr(camera-total);
-                            position: absolute;
-                            bottom: 0;
-                            left: 50%;
-                            color: black;
-                            background-color: white;
-                            font-size: min(1vh, 1vw);
-                            padding: 0.5vh 1vw;
-                        }
+                position: relative;
+                border: 1px solid white;
+                cursor: pointer;
+                border-radius: 100%;
+                width: min(8vh, 8vw);
+                height: min(8vh, 8vw);
+                background-color: transparent;
+                color: white;
+                font-size: min(2.5vh, 2.5vw);
+                padding: 0;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: background-color 0.3s;
+                animation: pop-in 0.3s;
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.5);
+                }
+                &.switch-camera {
+                    &::after {
+                        content: attr(camera-number) '/' attr(camera-total);
+                        position: absolute;
+                        bottom: 0;
+                        left: 50%;
+                        border-radius: 5px;
+                        color: black;
+                        background-color: white;
+                        font-size: min(1.5vh, 1.5vw);
+                        padding: 0.5vh 1vw;
                     }
                 }
             }
