@@ -151,7 +151,7 @@ pub async fn apply_stream_filter(
         };
 
         if let Err(err) = wasm_bindgen_futures::JsFuture::from(promise).await {
-            log::error!("Error applying constraints: {:?}, device_id: {}, torch: {}, facing_mode: {:?}", err, device_id, torch, facing_mode);
+            log::error!("Error applying constraints: {:?}, constraints: {:?}", err, video_constraints);
             return false;
         }
     }
