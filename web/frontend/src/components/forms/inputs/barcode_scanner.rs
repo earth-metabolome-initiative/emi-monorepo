@@ -469,7 +469,7 @@ impl Component for Scanner {
                                 </li>
                             }
                             if let Some((camera_number, camera)) = self.get_next_camera() {
-                                <li class="switch-camera" camera-number={camera_number.to_string()} camera-total={self.number_of_cameras().to_string()} title={camera.label} onclick={toggle_camera}>
+                                <li class="switch-camera" camera-number={(camera_number + 1).to_string()} camera-total={self.number_of_cameras().to_string()} title={camera.label} onclick={toggle_camera}>
                                     <i class="fas fa-sync-alt"></i>
                                 </li>
                             }
