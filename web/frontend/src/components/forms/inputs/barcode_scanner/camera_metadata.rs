@@ -136,12 +136,12 @@ pub async fn apply_stream_filter(
         advanced_constraints.push(&torch_constraint);
 
         let mut video_constraints = web_sys::MediaTrackConstraints::new();
-        video_constraints
-            .advanced(&advanced_constraints)
-            .device_id(&device_id.into());
-        if let Some(facing_mode) = facing_mode {
-            video_constraints.facing_mode(&facing_mode.into());
-        }
+        // video_constraints
+        //     .advanced(&advanced_constraints)
+        //     .device_id(&device_id.into());
+        // if let Some(facing_mode) = facing_mode {
+        //     video_constraints.facing_mode(&facing_mode.into());
+        // }
 
         let promise = match track.apply_constraints_with_constraints(&video_constraints) {
             Ok(promise) => promise,
