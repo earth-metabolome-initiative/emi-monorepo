@@ -5,12 +5,32 @@ use web_sys::VideoFacingModeEnum;
 use web_sys::{window, MediaDeviceInfo, MediaStreamConstraints};
 
 /// A struct to hold information about a camera and its torch capability.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone)]
 pub struct CameraInfo {
     pub device_id: String,
     pub group_id: String,
     pub label: String,
-    pub environment: bool,
+    pub torch: bool,
+    pub facing_mode: Option<VideoFacingModeEnum>,
+}
+
+/// Returns the device facing mode by testing all possible modes.
+async fn get_facing_mode(
+    device: &MediaDeviceInfo,
+    stream: &web_sys::MediaStream,
+) -> Option<VideoFacingModeEnum> {
+    let modes = vec![VideoFacingModeEnum::User, VideoFacingModeEnum::Environment];
+    for mode in modes {
+        if apply_stream_filter(stream, &device.device_id(), false, Some(mode)).await {
+            return Some(mode);
+        }
+    }
+    None
+}
+
+/// Returns whether the device has a torch.
+pub async fn has_torch(device_id: &str, stream: &web_sys::MediaStream) -> bool {
+    apply_stream_filter(stream, device_id, true, None).await
 }
 
 /// Checks available cameras and their torch capabilities.
@@ -21,15 +41,15 @@ pub struct CameraInfo {
 ///
 /// # Returns
 /// A `Result` containing a vector of `CameraInfo` or a `ApiError` error if the process fails.
-pub async fn get_available_cameras() -> Result<Vec<CameraInfo>, web_common::api::ApiError> {
-    let window = window().ok_or_else(|| JsValue::from_str("No global `window` exists"))?;
-    let navigator = window.navigator();
-    let media_devices = navigator
-        .media_devices()
-        .map_err(|_| DeviceError::NoCameras)?;
-
+pub async fn get_available_cameras(
+    stream: &web_sys::MediaStream,
+) -> Result<Vec<CameraInfo>, web_common::api::ApiError> {
     let devices = wasm_bindgen_futures::JsFuture::from(
-        media_devices
+        window()
+            .unwrap()
+            .navigator()
+            .media_devices()
+            .map_err(|_| DeviceError::NoCameras)?
             .enumerate_devices()
             .map_err(|_| DeviceError::NoCameras)?,
     )
@@ -60,24 +80,16 @@ pub async fn get_available_cameras() -> Result<Vec<CameraInfo>, web_common::api:
             continue;
         }
 
-        let environment: bool = match get_device_stream(&device.device_id(), false, true).await {
-            Ok(stream) => {
-                // Closing the stream.
-                for track in stream.get_tracks().iter() {
-                    if let Ok(track) = track.dyn_into::<web_sys::MediaStreamTrack>() {
-                        track.stop();
-                    }
-                }
-                true
-            },
-            Err(_) => false,
-        };
+        if device.device_id().is_empty() {
+            continue;
+        }
 
         cameras.push(CameraInfo {
             device_id: device.device_id(),
             label: device.label(),
             group_id: device.group_id(),
-            environment
+            torch: has_torch(&device.device_id(), stream).await,
+            facing_mode: get_facing_mode(&device, stream).await,
         });
     }
 
@@ -91,51 +103,55 @@ pub async fn get_available_cameras() -> Result<Vec<CameraInfo>, web_common::api:
 /// Attempts to get a media stream from a specific camera using its device ID.
 ///
 /// # Arguments
+/// * `stream` - A reference to a `MediaStream` object.
 /// * `device_id` - A string slice that holds the device ID of the camera.
 /// * `torch` - A boolean that indicates if the torch should be enabled.
-/// * `environment` - A boolean that indicates if the camera should be set to environment mode.
+/// * `facing_mode` - An optional `VideoFacingModeEnum` that specifies the camera facing mode.
 ///
 /// # Returns
 /// A `Result` containing a `MediaStream` if successful, or a `JsValue` error if failed.
-pub async fn get_device_stream(
+pub async fn apply_stream_filter(
+    stream: &web_sys::MediaStream,
     device_id: &str,
     torch: bool,
-    environment: bool,
-) -> Result<web_sys::MediaStream, JsValue> {
-    // Access the window's navigator object to get media devices.
-    let media_devices = window().unwrap().navigator().media_devices().unwrap();
-
-    // Create a new MediaStreamConstraints object and set video constraints with the device ID.
-    let mut constraints = MediaStreamConstraints::new();
-    let mut video_constraints = web_sys::MediaTrackConstraints::new();
-    js_sys::Reflect::set(
-        &video_constraints,
-        &JsValue::from("deviceId"),
-        &JsValue::from(device_id),
-    )?;
-    let advanced_constraints = js_sys::Array::new();
-    let torch_constraint = js_sys::Object::new();
-    js_sys::Reflect::set(
-        &torch_constraint,
-        &JsValue::from_str("torch"),
-        &JsValue::from_bool(torch),
-    )
-    .unwrap();
-    advanced_constraints.push(&torch_constraint);
-    video_constraints
-        .advanced(&advanced_constraints);
-    if environment {
+    facing_mode: Option<VideoFacingModeEnum>,
+) -> bool {
+    stream.get_video_tracks().into_iter().any(|video_track| {
+        let track = match video_track.dyn_into::<web_sys::MediaStreamTrack>() {
+            Ok(track) => Some(track),
+            Err(_) => {
+                return false;
+            }
+        };
+        let advanced_constraints = js_sys::Array::new();
+        let torch_constraint = js_sys::Object::new();
+        if let Err(_err) = js_sys::Reflect::set(
+            &torch_constraint,
+            &JsValue::from_str("torch"),
+            &JsValue::from_bool(torch),
+        ) {
+            return false;
+        }
+        advanced_constraints.push(&torch_constraint);
+        let mut video_constraints = web_sys::MediaTrackConstraints::new();
+        if let Err(_err) = js_sys::Reflect::set(
+            &video_constraints,
+            &JsValue::from("deviceId"),
+            &JsValue::from(device_id),
+        ) {
+            return false;
+        }
         video_constraints
-        .facing_mode(&VideoFacingModeEnum::Environment.into());
-    }
-    constraints.video(&video_constraints);
+            .advanced(&advanced_constraints)
+            .frame_rate(&10.into());
 
-    // Request media stream using the specified constraints.
-    let media_stream_promise = media_devices.get_user_media_with_constraints(&constraints)?;
-    let media_stream = wasm_bindgen_futures::JsFuture::from(media_stream_promise)
-        .await?
-        .dyn_into::<web_sys::MediaStream>()
-        .map_err(|_| JsValue::from_str("Failed to get media stream with specified device ID"))?;
+        if let Some(facing_mode) = facing_mode {
+            video_constraints.facing_mode(&facing_mode.into());
+        }
 
-    Ok(media_stream)
+        track
+            .expect("Cannot apply constrait")
+            .apply_constraints_with_constraints(&video_constraints)
+            .is_ok()
+    })
 }

@@ -1,3 +1,4 @@
+use crate::utils::is_mobile_device;
 use gloo::timers::callback::Interval;
 use gloo::timers::callback::Timeout;
 use wasm_bindgen::JsCast;
@@ -10,7 +11,7 @@ mod barcode_preprocessing;
 mod decode_barcode;
 use decode_barcode::decode_barcode;
 mod camera_metadata;
-use camera_metadata::{get_available_cameras, get_device_stream, CameraInfo};
+use camera_metadata::{apply_stream_filter, get_available_cameras, CameraInfo};
 
 pub struct Scanner {
     video_ref: NodeRef,
@@ -28,32 +29,25 @@ pub struct Scanner {
     image: Option<Vec<u8>>,
 }
 
-fn is_mobile_device() -> bool {
-    let user_agent = web_sys::window()
-        .unwrap()
-        .navigator()
-        .user_agent()
-        .unwrap_or_else(|_| String::default())
-        .to_lowercase();
-
-    let mobile_regex = regex::Regex::new(r"(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-").unwrap();
-    mobile_regex.is_match(&user_agent)
-}
-
 impl Scanner {
+    /// Returns whether the scanner has cameras.
+    pub fn has_cameras(&self) -> bool {
+        !self.cameras.is_empty()
+    }
+
     /// Returns the number of cameras currently detected.
-    pub fn camera_count(&self) -> usize {
+    pub fn number_of_cameras(&self) -> usize {
         self.cameras.len()
     }
 
     /// Get the next camera label in the list of available cameras.
-    fn get_next_camera_label(&self) -> Option<String> {
-        if self.camera_count() < 2 {
+    fn get_next_camera(&self) -> Option<(usize, CameraInfo)> {
+        if self.number_of_cameras() < 2 {
             return None;
         }
         if let Some((index, _)) = self.current_camera {
             let next_index = (index + 1) % self.cameras.len();
-            Some(self.cameras[next_index].label.clone())
+            Some((next_index, self.cameras[next_index].clone()))
         } else {
             None
         }
@@ -69,13 +63,10 @@ pub enum ScannerMessage {
     ToggleFlashlight,
     VideoTimeUpdate,
     Loaded,
-    SetLoaded,
     EffectivelyClose,
     SwitchCamera,
     FindCameras,
-    DeviceChange,
     Mirrored,
-    VideoEnded,
     RequireUserMedia,
     Cameras(Vec<CameraInfo>),
 }
@@ -121,15 +112,15 @@ impl Component for Scanner {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             ScannerMessage::RequireUserMedia => {
-                let mut constraints = web_sys::MediaStreamConstraints::new();
-                constraints.video(&web_sys::MediaTrackConstraints::default());
                 let promise = match web_sys::window()
                     .unwrap()
                     .navigator()
                     .media_devices()
                     .unwrap()
-                    .get_user_media_with_constraints(&constraints)
-                {
+                    .get_user_media_with_constraints(
+                        &web_sys::MediaStreamConstraints::new()
+                            .video(&web_sys::MediaTrackConstraints::default()),
+                    ) {
                     Ok(promise) => promise,
                     Err(error) => {
                         ctx.link()
@@ -139,16 +130,7 @@ impl Component for Scanner {
                 };
                 ctx.link().send_future(async {
                     match wasm_bindgen_futures::JsFuture::from(promise).await {
-                        Ok(stream) => {
-                            let stream: MediaStream = stream.dyn_into().unwrap();
-                            // We immediately stop the stream because we only need it to get the list of cameras.
-                            for track in stream.get_tracks().iter() {
-                                if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
-                                    track.stop();
-                                }
-                            }
-                            ScannerMessage::FindCameras
-                        }
+                        Ok(stream) => ScannerMessage::ReceivedStream(stream.dyn_into().unwrap()),
                         Err(error) => ScannerMessage::Error(ApiError::from(error)),
                     }
                 });
@@ -164,10 +146,6 @@ impl Component for Scanner {
                 }));
                 false
             }
-            ScannerMessage::DeviceChange => {
-                ctx.link().send_message(ScannerMessage::FindCameras);
-                false
-            }
             ScannerMessage::Loaded => {
                 if self.has_loaded {
                     return false;
@@ -175,21 +153,17 @@ impl Component for Scanner {
                 self.has_loaded = true;
                 true
             }
-            ScannerMessage::SetLoaded => {
-                self.has_loaded = true;
-                true
-            }
             ScannerMessage::ReceivedStream(stream) => {
                 self.stream = Some(stream);
-                let video = self
-                    .video_ref
+                self.video_ref
                     .cast::<HtmlVideoElement>()
-                    .expect("video should be an HtmlVideoElement");
+                    .expect("video should be an HtmlVideoElement")
+                    .set_src_object(self.stream.as_ref().clone());
 
-                video.set_src_object(self.stream.as_ref().clone());
-                true
+                ctx.link().send_message(ScannerMessage::FindCameras);
+
+                false
             }
-
             ScannerMessage::CapturedImage => {
                 if !self.is_scanning || !self.has_loaded {
                     return false;
@@ -274,7 +248,7 @@ impl Component for Scanner {
                 if previous_image_data.data() == image_data.data() {
                     self.number_of_identical_frames += 1;
                     if self.number_of_identical_frames > 10 {
-                        ctx.link().send_message(ScannerMessage::VideoEnded);
+                        ctx.link().send_message(ScannerMessage::Close);
                         return false;
                     }
                 }
@@ -315,13 +289,6 @@ impl Component for Scanner {
                 true
             }
             ScannerMessage::Start => {
-                if let Some(stream) = self.stream.as_ref() {
-                    for track in stream.get_tracks().iter() {
-                        if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
-                            track.stop();
-                        }
-                    }
-                }
                 let current_device = if let Some((_, current_device)) = self.current_camera.as_ref()
                 {
                     current_device.clone()
@@ -329,13 +296,17 @@ impl Component for Scanner {
                     return false;
                 };
                 let torch = self.is_flashlight_on;
+                let stream = self.stream.as_ref().unwrap().clone();
+                self.has_loaded = false;
+                self.is_scanning = true;
+
                 ctx.link().send_future(async move {
-                    match get_device_stream(&current_device.device_id, torch, false).await {
-                        Ok(stream) => ScannerMessage::ReceivedStream(stream),
-                        Err(error) => ScannerMessage::Error(ApiError::from(error)),
+                    if apply_stream_filter(&stream, &current_device.device_id, torch, None).await {
+                        ScannerMessage::Loaded
+                    } else {
+                        ScannerMessage::Close
                     }
                 });
-                self.is_scanning = true;
                 true
             }
             ScannerMessage::Close => {
@@ -349,30 +320,10 @@ impl Component for Scanner {
                 }));
                 true
             }
-            ScannerMessage::VideoEnded => {
-                // When the video ends but we are still scanning, it may be because the camera
-                // has been disconnected. If there are more cameras available, switch to the next one.
-                if self.is_scanning && self.has_loaded {
-                    // If there is more than one camera, switch to the next one
-                    self.has_loaded = false;
-                    let current_camera = self.current_camera.take().unwrap();
-                    self.cameras
-                        .retain(|camera| camera.device_id != current_camera.1.device_id);
-                    if self.camera_count() > 0 {
-                        self.current_camera = Some((0, self.cameras[0].clone()));
-                        ctx.link().send_message(ScannerMessage::Start);
-                    } else {
-                        ctx.link().send_message(ScannerMessage::Close);
-                    }
-                    // We also need to search for cameras again, so that our cameras data
-                    // is up to date.
-                    ctx.link().send_message(ScannerMessage::FindCameras);
-                }
-                false
-            }
             ScannerMessage::FindCameras => {
-                ctx.link().send_future(async {
-                    match get_available_cameras().await {
+                let stream = self.stream.as_ref().unwrap().clone();
+                ctx.link().send_future(async move {
+                    match get_available_cameras(&stream).await {
                         Ok(cameras) => ScannerMessage::Cameras(cameras),
                         Err(_) => ScannerMessage::Close,
                     }
@@ -406,41 +357,22 @@ impl Component for Scanner {
                 false
             }
             ScannerMessage::Cameras(cameras) => {
-                if let Some((_, current_device)) = self.current_camera.as_ref() {
-                    // If there is already a current camera, we need to check if it is still available.
-                    if !cameras
-                        .iter()
-                        .any(|camera| camera.device_id == current_device.device_id)
-                    {
-                        // If the current camera is not available, we need to select the first
-                        // that has support for environment mode. If there is no camera with
-                        // support for environment mode, we select the first camera.
-                        let next_camera = cameras
-                            .iter()
-                            .enumerate()
-                            .find(|(_, camera)| camera.environment);
-                        if let Some(next_camera) = next_camera {
-                            self.current_camera = Some((next_camera.0, next_camera.1.clone()));
-                        } else {
-                            self.current_camera = Some((0, cameras[0].clone()));
-                        }
-                    }
-                } else {
-                    // If there is no current camera, we need to select the first one.
-                    let next_camera = cameras
-                        .iter()
-                        .enumerate()
-                        .find(|(_, camera)| camera.environment);
-                    if let Some(next_camera) = next_camera {
-                        self.current_camera = Some((next_camera.0, next_camera.1.clone()));
-                    } else {
-                        self.current_camera = Some((0, cameras[0].clone()));
-                    }
-                }
+                let new_position = self
+                    .current_camera
+                    .as_ref()
+                    .and_then(|(_, camera)| {
+                        cameras.iter().position(|c| c.device_id == camera.device_id)
+                    })
+                    .unwrap_or(0);
+                self.current_camera = Some((new_position, cameras[new_position].clone()));
                 self.cameras = cameras;
                 true
             }
             ScannerMessage::SwitchCamera => {
+                if !self.has_cameras() {
+                    ctx.link().send_message(ScannerMessage::Close);
+                    return false;
+                }
                 if let Some((index, _)) = self.current_camera {
                     self.has_loaded = false;
                     let next_index = (index + 1) % self.cameras.len();
@@ -452,17 +384,7 @@ impl Component for Scanner {
         }
     }
 
-    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
-        if first_render {
-            ctx.link().send_message(ScannerMessage::RequireUserMedia);
-        }
-    }
-
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if self.cameras.is_empty() {
-            return html! {};
-        }
-
         let time_update = ctx.link().callback(|_| ScannerMessage::VideoTimeUpdate);
         let toggle_scanner = ctx.link().callback(|event: MouseEvent| {
             event.prevent_default();
@@ -523,14 +445,16 @@ impl Component for Scanner {
                     <div class="scanner-focus-container">
                         <div class="scanner-focus"></div>
                         <ul class="operations">
-                            <li>
-                                <button title={flash_light_message} onclick={toggle_flashlight}>
-                                    <i class="fas fa-lightbulb"></i>
-                                </button>
-                            </li>
-                            if let Some(label) = self.get_next_camera_label() {
+                            if self.current_camera.as_ref().map_or(false, |(_, camera)| camera.torch) {
                                 <li>
-                                    <button title={label} onclick={toggle_camera}>
+                                    <button title={flash_light_message} onclick={toggle_flashlight}>
+                                        <i class="fas fa-lightbulb"></i>
+                                    </button>
+                                </li>
+                            }
+                            if let Some((camera_number, camera)) = self.get_next_camera() {
+                                <li>
+                                    <button class="switch-camera" camera-number={camera_number.to_string()} camera-total={self.number_of_cameras().to_string()} title={camera.label} onclick={toggle_camera}>
                                         <i class="fas fa-sync-alt"></i>
                                     </button>
                                 </li>
