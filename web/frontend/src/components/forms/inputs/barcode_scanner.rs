@@ -440,13 +440,14 @@ impl Component for Scanner {
         };
 
         html! {
+            <>
+            <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update} onplaying={onloaded}></video>
             if !self.is_scanning {
                 <button onclick={toggle_scanner} title="Start Scanner" class="start-scanner">
                     <i class="fas fa-qrcode"></i>
                 </button>
             } else {
                 <div class={classes} onclick={&close_scanner}>
-                    <video ref={&self.video_ref} autoPlay="true" ontimeupdate={time_update} onplaying={onloaded}></video>
                     if let Some(video) = self.video_ref.cast::<HtmlVideoElement>() {
                         <canvas ref={&self.canvas_ref} width={video.video_width().to_string()} height={video.video_height().to_string()}></canvas>
                     }
@@ -476,6 +477,7 @@ impl Component for Scanner {
                     </div>
                 </div>
             }
+            </>
         }
     }
 }
