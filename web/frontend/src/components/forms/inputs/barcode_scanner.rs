@@ -321,8 +321,9 @@ impl Component for Scanner {
                         ScannerMessage::StreamReady
                     } else {
                         ScannerMessage::Error(ApiError::from(vec![format!(
-                            "Failed to apply stream filter to camera '{}'",
-                            current_device.label
+                            "Failed to apply stream filter to camera '{}' with id {}",
+                            current_device.label,
+                            current_device.device_id
                         )]))
                     }
                 });
