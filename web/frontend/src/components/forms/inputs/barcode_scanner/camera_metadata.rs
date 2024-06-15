@@ -120,7 +120,7 @@ pub async fn apply_stream_filter(
         let track = match video_track.dyn_into::<web_sys::MediaStreamTrack>() {
             Ok(track) => track,
             Err(_) => {
-                return false;
+                continue;
             }
         };
 
@@ -131,7 +131,7 @@ pub async fn apply_stream_filter(
             &JsValue::from_str("torch"),
             &JsValue::from_bool(torch),
         ) {
-            return false;
+            continue;
         }
         advanced_constraints.push(&torch_constraint);
 
@@ -146,14 +146,16 @@ pub async fn apply_stream_filter(
         let promise = match track.apply_constraints_with_constraints(&video_constraints) {
             Ok(promise) => promise,
             Err(_) => {
-                return false;
+                continue;
             }
         };
 
-        if let Err(err) = wasm_bindgen_futures::JsFuture::from(promise).await {
-            log::error!("Error applying constraints: {:?}, constraints: {:?}", err, video_constraints);
-            return false;
+        if let Err(_err) = wasm_bindgen_futures::JsFuture::from(promise).await {
+            continue;
         }
+
+        return true;
     }
-    true
+
+    false
 }
