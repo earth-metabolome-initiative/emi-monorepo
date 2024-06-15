@@ -309,7 +309,9 @@ impl Component for Scanner {
                     if apply_stream_filter(&stream, &current_device.device_id, torch, None).await {
                         ScannerMessage::Loaded
                     } else {
-                        ScannerMessage::Close
+                        ScannerMessage::Error(ApiError::from(vec![
+                            format!("Failed to apply stream filter to camera '{}'", current_device.label),
+                        ]))
                     }
                 });
                 true
