@@ -289,6 +289,11 @@ impl Component for Scanner {
                 true
             }
             ScannerMessage::Start => {
+                if self.stream.is_none() {
+                    ctx.link().send_message(ScannerMessage::RequireUserMedia);
+                    return false;
+                }
+
                 let current_device = if let Some((_, current_device)) = self.current_camera.as_ref()
                 {
                     current_device.clone()
