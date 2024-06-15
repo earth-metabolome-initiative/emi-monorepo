@@ -19,7 +19,8 @@ pub struct Scanner {
     stream: Option<MediaStream>,
     is_scanning: bool,
     is_flashlight_on: bool,
-    has_loaded: bool,
+    video_ready: bool,
+    stream_ready: bool,
     mirrored: bool,
     current_camera: Option<(usize, CameraInfo)>,
     number_of_identical_frames: u32,
@@ -62,7 +63,8 @@ pub enum ScannerMessage {
     Close,
     ToggleFlashlight,
     VideoTimeUpdate,
-    Loaded,
+    VideoReady,
+    StreamReady,
     EffectivelyClose,
     SwitchCamera,
     FindCameras,
@@ -98,7 +100,8 @@ impl Component for Scanner {
             stream: None,
             is_scanning: false,
             is_flashlight_on: false,
-            has_loaded: false,
+            video_ready: false,
+            stream_ready: false,
             current_camera: None,
             cameras: Vec::new(),
             mirrored: !is_mobile_device(),
@@ -146,11 +149,18 @@ impl Component for Scanner {
                 }));
                 false
             }
-            ScannerMessage::Loaded => {
-                if self.has_loaded {
+            ScannerMessage::VideoReady => {
+                if self.video_ready {
                     return false;
                 }
-                self.has_loaded = true;
+                self.video_ready = true;
+                true
+            }
+            ScannerMessage::StreamReady => {
+                if self.stream_ready {
+                    return false;
+                }
+                self.stream_ready = true;
                 true
             }
             ScannerMessage::ReceivedStream(stream) => {
@@ -165,7 +175,7 @@ impl Component for Scanner {
                 false
             }
             ScannerMessage::CapturedImage => {
-                if !self.is_scanning || !self.has_loaded {
+                if !self.is_scanning || !self.stream_ready || !self.video_ready {
                     return false;
                 }
 
@@ -289,6 +299,8 @@ impl Component for Scanner {
                 true
             }
             ScannerMessage::Start => {
+                self.stream_ready = false;
+
                 if self.stream.is_none() {
                     ctx.link().send_message(ScannerMessage::RequireUserMedia);
                     return false;
@@ -302,16 +314,16 @@ impl Component for Scanner {
                 };
                 let torch = self.is_flashlight_on;
                 let stream = self.stream.as_ref().unwrap().clone();
-                self.has_loaded = false;
                 self.is_scanning = true;
 
                 ctx.link().send_future(async move {
                     if apply_stream_filter(&stream, &current_device.device_id, torch, None).await {
-                        ScannerMessage::Loaded
+                        ScannerMessage::StreamReady
                     } else {
-                        ScannerMessage::Error(ApiError::from(vec![
-                            format!("Failed to apply stream filter to camera '{}'", current_device.label),
-                        ]))
+                        ScannerMessage::Error(ApiError::from(vec![format!(
+                            "Failed to apply stream filter to camera '{}'",
+                            current_device.label
+                        )]))
                     }
                 });
                 true
@@ -349,7 +361,8 @@ impl Component for Scanner {
 
                 self.closing = None;
                 self.is_scanning = false;
-                self.has_loaded = false;
+                self.video_ready = false;
+                self.stream_ready = false;
                 self.stream = None;
                 self.is_flashlight_on = false;
                 if let Some(interval) = self.interval.take() {
@@ -382,7 +395,6 @@ impl Component for Scanner {
                     return false;
                 }
                 if let Some((index, _)) = self.current_camera {
-                    self.has_loaded = false;
                     let next_index = (index + 1) % self.cameras.len();
                     self.current_camera = Some((next_index, self.cameras[next_index].clone()));
                     ctx.link().send_message(ScannerMessage::Start);
@@ -422,7 +434,7 @@ impl Component for Scanner {
 
         let classes = format!(
             "active-scanner-ui{}{}{}",
-            if self.has_loaded { "" } else { " loading" },
+            if self.video_ready && self.stream_ready { "" } else { " loading" },
             if self.closing.is_some() {
                 " closing"
             } else {
@@ -430,8 +442,6 @@ impl Component for Scanner {
             },
             if self.mirrored { " mirrored" } else { "" }
         );
-
-        let onloaded = ctx.link().callback(|_| ScannerMessage::Loaded);
 
         let flash_light_message = if self.is_flashlight_on {
             "Turn off flashlight"
@@ -441,7 +451,7 @@ impl Component for Scanner {
 
         html! {
             <>
-            <video ref={&self.video_ref} autoPlay="true" style="display:none;" ontimeupdate={time_update} onplaying={onloaded}></video>
+            <video ref={&self.video_ref} autoPlay="true" style="display:none;" ontimeupdate={time_update} onplaying={ctx.link().callback(|_| ScannerMessage::VideoReady)}></video>
             if !self.is_scanning {
                 <button onclick={toggle_scanner} title="Start Scanner" class="start-scanner">
                     <i class="fas fa-qrcode"></i>
