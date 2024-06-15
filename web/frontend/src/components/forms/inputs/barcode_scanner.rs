@@ -351,7 +351,7 @@ impl Component for Scanner {
             }
             ScannerMessage::EffectivelyClose => {
                 // close event
-                if let Some(stream) = self.stream.as_ref() {
+                if let Some(stream) = self.stream.take() {
                     for track in stream.get_tracks().iter() {
                         if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
                             track.stop();
@@ -363,7 +363,6 @@ impl Component for Scanner {
                 self.is_scanning = false;
                 self.video_ready = false;
                 self.stream_ready = false;
-                self.stream = None;
                 self.is_flashlight_on = false;
                 if let Some(interval) = self.interval.take() {
                     interval.cancel();
