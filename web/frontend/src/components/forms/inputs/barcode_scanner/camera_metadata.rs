@@ -136,8 +136,16 @@ pub async fn apply_stream_filter(
         advanced_constraints.push(&torch_constraint);
 
         let mut video_constraints = web_sys::MediaTrackConstraints::new();
+
+        if let Err(_err) = js_sys::Reflect::set(
+            &video_constraints,
+            &JsValue::from_str("torch"),
+            &JsValue::from_bool(torch),
+        ) {
+            continue;
+        }
+
         video_constraints
-        //     .advanced(&advanced_constraints)
             .device_id(&device_id.into());
         if let Some(facing_mode) = facing_mode {
             video_constraints.facing_mode(&facing_mode.into());
