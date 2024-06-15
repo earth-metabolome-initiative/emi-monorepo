@@ -62,7 +62,6 @@ def write_frontend_database_schema():
     files_to_load = [
         f'if let Err(error) = database.execute(load_sql!("../backend/{table_creation}")).await {{\n'
         f'    log::error!("Failed to create table {table_creation}: {{:?}}", error);\n'
-        '     unreachable!("Failed to create table");\n'
         "}"
         for table_creation in create_table_migrations
     ]

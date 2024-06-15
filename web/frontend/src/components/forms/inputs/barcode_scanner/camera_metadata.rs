@@ -56,7 +56,7 @@ pub async fn get_available_cameras(
     .await
     .map_err(|_| DeviceError::NoCameras)?
     .dyn_into::<js_sys::Array>()
-    .unwrap();
+    .map_err(|_| DeviceError::NoCameras)?;
 
     let mut cameras: Vec<CameraInfo> = vec![];
 
@@ -118,7 +118,7 @@ pub async fn apply_stream_filter(
 ) -> bool {
     stream.get_video_tracks().into_iter().any(|video_track| {
         let track = match video_track.dyn_into::<web_sys::MediaStreamTrack>() {
-            Ok(track) => Some(track),
+            Ok(track) => track,
             Err(_) => {
                 return false;
             }
@@ -142,15 +142,13 @@ pub async fn apply_stream_filter(
             return false;
         }
         video_constraints
-            .advanced(&advanced_constraints)
-            .frame_rate(&10.into());
+            .advanced(&advanced_constraints);
 
         if let Some(facing_mode) = facing_mode {
             video_constraints.facing_mode(&facing_mode.into());
         }
 
         track
-            .expect("Cannot apply constrait")
             .apply_constraints_with_constraints(&video_constraints)
             .is_ok()
     })
