@@ -116,13 +116,14 @@ pub async fn apply_stream_filter(
     torch: bool,
     facing_mode: Option<VideoFacingModeEnum>,
 ) -> bool {
-    stream.get_video_tracks().into_iter().any(|video_track| {
+    for video_track in stream.get_video_tracks() {
         let track = match video_track.dyn_into::<web_sys::MediaStreamTrack>() {
             Ok(track) => track,
             Err(_) => {
                 return false;
             }
         };
+
         let advanced_constraints = js_sys::Array::new();
         let torch_constraint = js_sys::Object::new();
         if let Err(_err) = js_sys::Reflect::set(
@@ -133,22 +134,26 @@ pub async fn apply_stream_filter(
             return false;
         }
         advanced_constraints.push(&torch_constraint);
-        let mut video_constraints = web_sys::MediaTrackConstraints::new();
-        if let Err(_err) = js_sys::Reflect::set(
-            &video_constraints,
-            &JsValue::from("deviceId"),
-            &JsValue::from(device_id),
-        ) {
-            return false;
-        }
-        video_constraints.advanced(&advanced_constraints);
 
+        let mut video_constraints = web_sys::MediaTrackConstraints::new();
+        video_constraints
+            .advanced(&advanced_constraints)
+            .device_id(&device_id.into());
         if let Some(facing_mode) = facing_mode {
             video_constraints.facing_mode(&facing_mode.into());
         }
 
-        track
-            .apply_constraints_with_constraints(&video_constraints)
-            .is_ok()
-    })
+        let promise = match track.apply_constraints_with_constraints(&video_constraints) {
+            Ok(promise) => promise,
+            Err(_) => {
+                return false;
+            }
+        };
+
+        if let Err(err) = wasm_bindgen_futures::JsFuture::from(promise).await {
+            log::error!("Error applying constraints: {:?}", err);
+            return false;
+        }
+    }
+    true
 }
