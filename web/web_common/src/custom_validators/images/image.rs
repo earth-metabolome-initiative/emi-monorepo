@@ -147,44 +147,6 @@ impl Image {
             .and_then(|r| r.format())
     }
 
-    #[cfg(feature = "backend")]
-    /// Cuts a square from the image, centered around the face detected in the image.
-    ///
-    /// # Implementative details
-    /// The face detection is implemented using the `rustface` crate.
-    pub fn to_face_square(&self) -> Result<DynamicImage, Vec<String>> {
-        let faces = crate::custom_validators::images::contains_face::get_faces(self)
-            .map_err(|e| vec![e.to_string()])?;
-
-        if faces.len() != 1 {
-            return Err(vec!["Expected exactly one face.".to_string()]);
-        }
-
-        let face = faces[0].bbox();
-
-        // We get the central coordinates of the face
-        let mut x = face.x() as u32 + face.width() / 2;
-        let mut y = face.y() as u32 + face.height() / 2;
-
-        let mut image = image::load_from_memory(&self.data).map_err(|e| vec![e.to_string()])?;
-        let (width, height) = image.dimensions();
-        let size = std::cmp::min(width, height);
-
-        // We need to crop the image to a square
-        let mut square = image::DynamicImage::new_rgba8(size, size);
-
-        x = x.saturating_sub(size);
-        y = y.saturating_sub(size);
-        let cropped_image = image.crop(x, y, x + size, y + size);
-
-        // Paste the cropped image onto the square canvas
-        square
-            .copy_from(&cropped_image, 0, 0)
-            .map_err(|e| vec![e.to_string()])?;
-
-        Ok(square)
-    }
-
     pub fn shape(&self) -> Result<(u32, u32), String> {
         let reader = Reader::new(std::io::Cursor::new(&self.data))
             .with_guessed_format()

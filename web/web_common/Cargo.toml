@@ -39,7 +39,6 @@ web_common_derive = { path = "web_common_derive" }
 rustrict = "0.7.24"
 image = "0.24.0"
 js-sys = "0.3.69"
-rustface = { version="0.1.7", optional = true }
 wasm-bindgen-futures = {version="0.4.42", optional = true}
 futures-util = "0.3.30"
 wasm-bindgen = {version="0.2.92", optional = true}
@@ -86,7 +85,7 @@ features = [
 [features]
 # The `backend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the backend.
-backend = [ "actix-web", "actix-web-actors", "bytes", "actix", "rustface", "diesel", "r2d2" ]
+backend = [ "actix-web", "actix-web-actors", "bytes", "actix", "diesel", "r2d2" ]
 
 # The `frontend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the frontend.

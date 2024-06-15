@@ -174,8 +174,6 @@ def postgres_type_to_rust_type(postgres_type: str) -> str:
         return "macaddr::MacAddr"
     if postgres_type == "inet":
         return "ipnetwork::IpNetwork"
-    if postgres_type == "numeric":
-        return "bigdecimal::BigDecimal"
     if postgres_type == "oid":
         return "u32"
     if postgres_type == "smallint":
@@ -188,8 +186,6 @@ def postgres_type_to_rust_type(postgres_type: str) -> str:
         return "chrono::Duration"
     if postgres_type == "date":
         return "chrono::NaiveDate"
-    if postgres_type == "money":
-        return "bigdecimal::BigDecimal"
     if postgres_type == "geometry":
         return "postgis::ewkb::Geometry"
     if postgres_type == "geography":
