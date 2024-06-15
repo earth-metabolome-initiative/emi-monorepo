@@ -366,7 +366,8 @@ impl Component for Scanner {
                     .unwrap_or(0);
                 self.current_camera = Some((new_position, cameras[new_position].clone()));
                 self.cameras = cameras;
-                true
+                ctx.link().send_message(ScannerMessage::Start);
+                false
             }
             ScannerMessage::SwitchCamera => {
                 if !self.has_cameras() {
