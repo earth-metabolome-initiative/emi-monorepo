@@ -433,7 +433,11 @@ impl Component for Scanner {
 
         let classes = format!(
             "active-scanner-ui{}{}{}",
-            if self.video_ready && self.stream_ready { "" } else { " loading" },
+            if self.video_ready && self.stream_ready {
+                ""
+            } else {
+                " loading"
+            },
             if self.closing.is_some() {
                 " closing"
             } else {

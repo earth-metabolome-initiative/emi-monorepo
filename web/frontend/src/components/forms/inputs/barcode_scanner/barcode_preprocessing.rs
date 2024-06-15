@@ -67,7 +67,6 @@ fn downscale_image(
 }
 
 /// Preprocess image data for barcode detection.
-///
 pub(super) fn preprocess_image_data(
     image_data: web_sys::ImageData,
     crop_percentage: f64,

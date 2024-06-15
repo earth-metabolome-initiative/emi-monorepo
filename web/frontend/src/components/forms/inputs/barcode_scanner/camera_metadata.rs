@@ -141,8 +141,7 @@ pub async fn apply_stream_filter(
         ) {
             return false;
         }
-        video_constraints
-            .advanced(&advanced_constraints);
+        video_constraints.advanced(&advanced_constraints);
 
         if let Some(facing_mode) = facing_mode {
             video_constraints.facing_mode(&facing_mode.into());
