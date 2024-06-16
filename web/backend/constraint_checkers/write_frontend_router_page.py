@@ -39,7 +39,6 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "use web_common::database::*;",
         "use crate::router::AppRoute;",
         "use super::logout::Logout;",
-        "use yew_hooks::prelude::*;",
         "use yew_hooks::use_click_away;",
         "use crate::components::basic_page::PageLike;",
         "use crate::stores::user_state::UserState;",
@@ -74,6 +73,12 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "    } else {\n"
         '        "sidebar hidden"\n'
         "    };\n"
+        "    let on_click_close = {\n"
+        "        let onclose = props.onclose.clone();\n"
+        "        Callback::from(move |_| {\n"
+        "            onclose.emit(false);\n"
+        "        })\n"
+        "    };\n"
         "\n"
         "    html! {\n"
         "        <div ref={node} class={sidebar_class}>\n"
@@ -97,7 +102,7 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         rich_variant = flat_variant.get_richest_variant()
 
         document.write(
-            f'                    <li class={{if route == AppRoute::{flat_variant.get_capitalized_table_name()} {{ "active" }} else {{ "" }}}}>\n'
+            f'                    <li class={{if route == AppRoute::{flat_variant.get_capitalized_table_name()} {{ "active" }} else {{ "" }}}} onclick={{&on_click_close}}>\n'
             f"                        <Link<AppRoute> to={{AppRoute::{flat_variant.get_capitalized_table_name()}}}>\n"
             f"                            <i class={{format!(\"fas fa-{{}}\", {rich_variant.name}::icon())}}></i>\n"
             "                             {'\\u{00a0}'}\n"
@@ -113,7 +118,7 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "                        }\n"
         "                    } else {\n"
         "                        html! {\n"
-        "                            <li>\n"
+        "                            <li onclick={&on_click_close}>\n"
         "                                <Link<AppRoute> to={AppRoute::Login}>\n"
         '                                    <i class="fas fa-right-to-bracket"></i>\n'
         "                                     {'\\u{00a0}'}\n"

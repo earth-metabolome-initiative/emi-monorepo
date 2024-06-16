@@ -57,7 +57,6 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
                 builder.emit(Some(position.into()))
             }) as Box<dyn Fn(Position)>);
 
-
             let error_callback = Closure::wrap(Box::new(move |error: PositionError| {
                 errors1.set(Some(error.into()));
             }) as Box<dyn Fn(PositionError)>);

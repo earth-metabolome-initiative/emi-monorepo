@@ -7,7 +7,6 @@ use crate::router::AppRoute;
 use crate::stores::user_state::UserState;
 use web_common::database::*;
 use yew::prelude::*;
-use yew_hooks::prelude::*;
 use yew_hooks::use_click_away;
 use yew_router::prelude::*;
 use yewdux::use_store;
@@ -31,115 +30,123 @@ pub fn sidebar(props: &SidebarProps) -> Html {
         }
     });
 
+    let on_click_close = {
+        let onclose = props.onclose.clone();
+        Callback::from(move |_| {
+            onclose.emit(false);
+        })
+    };
+
     let sidebar_class = if props.visible {
         "sidebar"
     } else {
         "sidebar hidden"
     };
+    
 
     html! {
         <div ref={node} class={sidebar_class}>
             <div class="sidebar-content">
                 <ul>
-                    <li class={if route == AppRoute::BioOttRanks { "active" } else { "" }}>
+                    <li class={if route == AppRoute::BioOttRanks { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::BioOttRanks}>
                             <i class={format!("fas fa-{}", NestedBioOttRank::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedBioOttRank::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::BioOttTaxonItems { "active" } else { "" }}>
+                    <li class={if route == AppRoute::BioOttTaxonItems { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::BioOttTaxonItems}>
                             <i class={format!("fas fa-{}", NestedBioOttTaxonItem::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedBioOttTaxonItem::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::Countries { "active" } else { "" }}>
+                    <li class={if route == AppRoute::Countries { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Countries}>
                             <i class={format!("fas fa-{}", Country::icon())}></i>
                              {'\u{00a0}'}
                             <span>{Country::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::Nameplates { "active" } else { "" }}>
+                    <li class={if route == AppRoute::Nameplates { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Nameplates}>
                             <i class={format!("fas fa-{}", NestedNameplate::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedNameplate::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::ObservationSubjects { "active" } else { "" }}>
+                    <li class={if route == AppRoute::ObservationSubjects { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::ObservationSubjects}>
                             <i class={format!("fas fa-{}", NestedObservationSubject::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedObservationSubject::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::Observations { "active" } else { "" }}>
+                    <li class={if route == AppRoute::Observations { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Observations}>
                             <i class={format!("fas fa-{}", NestedObservation::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedObservation::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::Organisms { "active" } else { "" }}>
+                    <li class={if route == AppRoute::Organisms { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Organisms}>
                             <i class={format!("fas fa-{}", NestedOrganism::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedOrganism::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::Organizations { "active" } else { "" }}>
+                    <li class={if route == AppRoute::Organizations { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Organizations}>
                             <i class={format!("fas fa-{}", NestedOrganization::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedOrganization::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::Projects { "active" } else { "" }}>
+                    <li class={if route == AppRoute::Projects { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Projects}>
                             <i class={format!("fas fa-{}", NestedProject::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedProject::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::SampleContainers { "active" } else { "" }}>
+                    <li class={if route == AppRoute::SampleContainers { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::SampleContainers}>
                             <i class={format!("fas fa-{}", NestedSampleContainer::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedSampleContainer::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::SampleStates { "active" } else { "" }}>
+                    <li class={if route == AppRoute::SampleStates { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::SampleStates}>
                             <i class={format!("fas fa-{}", NestedSampleState::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedSampleState::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::Samples { "active" } else { "" }}>
+                    <li class={if route == AppRoute::Samples { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Samples}>
                             <i class={format!("fas fa-{}", NestedSample::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedSample::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::SpectraCollections { "active" } else { "" }}>
+                    <li class={if route == AppRoute::SpectraCollections { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::SpectraCollections}>
                             <i class={format!("fas fa-{}", NestedSpectraCollection::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedSpectraCollection::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::Teams { "active" } else { "" }}>
+                    <li class={if route == AppRoute::Teams { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Teams}>
                             <i class={format!("fas fa-{}", NestedTeam::icon())}></i>
                              {'\u{00a0}'}
                             <span>{NestedTeam::section()}</span>
                         </Link<AppRoute>>
                     </li>
-                    <li class={if route == AppRoute::Users { "active" } else { "" }}>
+                    <li class={if route == AppRoute::Users { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Users}>
                             <i class={format!("fas fa-{}", NestedUser::icon())}></i>
                              {'\u{00a0}'}
@@ -152,7 +159,7 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                         }
                     } else {
                         html! {
-                            <li>
+                            <li onclick={&on_click_close}>
                                 <Link<AppRoute> to={AppRoute::Login}>
                                     <i class="fas fa-right-to-bracket"></i>
                                      {'\u{00a0}'}
