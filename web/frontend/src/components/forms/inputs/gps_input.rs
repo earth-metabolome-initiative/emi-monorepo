@@ -48,12 +48,15 @@ pub fn gps_input(props: &GPSInputProps) -> Html {
         {
             let builder = props.builder.clone();
 
+            let errors1 = errors.clone();
+            let errors2 = errors.clone();
+            let errors3 = errors.clone();
+
             let callback = Closure::wrap(Box::new(move |position: Position| {
+                errors3.set(None);
                 builder.emit(Some(position.into()))
             }) as Box<dyn Fn(Position)>);
 
-            let errors1 = errors.clone();
-            let errors2 = errors.clone();
 
             let error_callback = Closure::wrap(Box::new(move |error: PositionError| {
                 errors1.set(Some(error.into()));

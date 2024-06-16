@@ -79,7 +79,7 @@ pub enum ScannerMessage {
     SwitchCamera,
     Mirrored,
     RequireAuthorization,
-    Authorized,
+    Authorized(web_sys::MediaStream),
     Cameras(Vec<web_sys::MediaDeviceInfo>),
 }
 
@@ -132,8 +132,10 @@ impl Component for Scanner {
                     .media_devices()
                     .unwrap()
                     .get_user_media_with_constraints(
-                        &web_sys::MediaStreamConstraints::new()
-                            .video(&web_sys::MediaTrackConstraints::default()),
+                        &web_sys::MediaStreamConstraints::new().video(
+                            &web_sys::MediaTrackConstraints::default()
+                                .facing_mode(&web_sys::VideoFacingModeEnum::Environment.into()),
+                        ),
                     ) {
                     Ok(promise) => promise,
                     Err(error) => {
@@ -145,17 +147,16 @@ impl Component for Scanner {
                 ctx.link().send_future(async {
                     match wasm_bindgen_futures::JsFuture::from(promise).await {
                         Ok(stream) => {
-                            close_stream(&stream.dyn_into().unwrap());
-                            ScannerMessage::Authorized
+                            ScannerMessage::Authorized(stream.unchecked_into::<MediaStream>())
                         }
                         Err(error) => ScannerMessage::Error(ApiError::from(error)),
                     }
                 });
                 false
             }
-            ScannerMessage::Authorized => {
+            ScannerMessage::Authorized(stream) => {
                 self.authorized = true;
-                ctx.link().send_message(ScannerMessage::Start);
+                ctx.link().send_message(ScannerMessage::ReceivedStream(stream));
                 false
             }
             ScannerMessage::VideoTimeUpdate => {
