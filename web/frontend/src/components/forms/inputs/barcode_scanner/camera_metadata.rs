@@ -149,7 +149,8 @@ pub async fn apply_stream_filter(
             }
         };
 
-        if let Err(_err) = wasm_bindgen_futures::JsFuture::from(promise).await {
+        if let Err(err) = wasm_bindgen_futures::JsFuture::from(promise).await {
+            log::error!("Failed to apply constraints, errror: {:?}, constraint: {:?}", err, video_constraints);
             continue;
         }
 
