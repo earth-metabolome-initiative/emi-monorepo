@@ -106,18 +106,19 @@
         border-color: rgba(0, 0, 0, 0.5);
         height:0;
         width: min(40vw, 40vh);
-        padding-bottom: min(40vw, 40vh);
+        height: min(40vw, 40vh);
 
         .scanner-focus {
             position: relative;
             width: min(40vw, 40vh);
-            padding-bottom: min(40vw, 40vh);
+            height: min(40vw, 40vh);
             border-radius: min(8vh, 8vw);
             border: min(2.75vh, 2.75vw) solid white;
             top: max(-2.7vh, -2.7vw);
             left: max(-2.7vh, -2.7vw);
             &::before {
-                content: "";
+                content: "\f110";
+                animation: fa-spin 1s linear infinite;
                 font-family: "Font Awesome 5 Free";
                 position: absolute;
                 font-weight: 900;
@@ -127,6 +128,8 @@
                 text-align: center;
                 top: 50%;
                 margin-top: max(-12.5vw, -12.5vh);
+                opacity: 0;
+                transition: opacity 0.3s;
             }
 
             &::after {
@@ -138,6 +141,9 @@
                 color: white;
                 text-align: center;
                 bottom: min(1vh, 1vw);
+                left: 0;
+                opacity: 1;
+                transition: opacity 0.3s;
             }
         }
 
@@ -192,12 +198,10 @@
         .scanner-focus-container {
             .scanner-focus {
                 &::before {
-                    content: "\f110";
-                    display: block;
-                    animation: fa-spin 1s linear infinite;
+                    opacity: 1;
                 }
                 &::after {
-                    content: "";
+                    opacity: 0;
                 }
             }
         }
