@@ -11,7 +11,7 @@ mod barcode_preprocessing;
 mod decode_barcode;
 use decode_barcode::decode_barcode;
 mod camera_metadata;
-use camera_metadata::{apply_stream_filter, get_available_cameras, CameraInfo};
+use camera_metadata::{apply_torch_filter, get_available_cameras, get_camera_media_stream};
 
 pub struct Scanner {
     video_ref: NodeRef,
@@ -22,9 +22,10 @@ pub struct Scanner {
     video_ready: bool,
     stream_ready: bool,
     mirrored: bool,
-    current_camera: Option<(usize, CameraInfo)>,
+    authorized: bool,
+    current_camera: Option<(usize, web_sys::MediaDeviceInfo)>,
     number_of_identical_frames: u32,
-    cameras: Vec<CameraInfo>,
+    cameras: Vec<web_sys::MediaDeviceInfo>,
     closing: Option<Timeout>,
     interval: Option<Interval>,
     image: Option<Vec<u8>>,
@@ -42,7 +43,7 @@ impl Scanner {
     }
 
     /// Get the next camera label in the list of available cameras.
-    fn get_next_camera(&self) -> Option<(usize, CameraInfo)> {
+    fn get_next_camera(&self) -> Option<(usize, web_sys::MediaDeviceInfo)> {
         if self.number_of_cameras() < 2 {
             return None;
         }
@@ -51,6 +52,14 @@ impl Scanner {
             Some((next_index, self.cameras[next_index].clone()))
         } else {
             None
+        }
+    }
+}
+
+fn close_stream(stream: &MediaStream) {
+    for track in stream.get_tracks().iter() {
+        if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
+            track.stop();
         }
     }
 }
@@ -67,10 +76,10 @@ pub enum ScannerMessage {
     StreamReady,
     EffectivelyClose,
     SwitchCamera,
-    FindCameras,
     Mirrored,
-    RequireUserMedia,
-    Cameras(Vec<CameraInfo>),
+    RequireAuthorization,
+    Authorized,
+    Cameras(Vec<web_sys::MediaDeviceInfo>),
 }
 
 #[derive(Properties, PartialEq, Clone)]
@@ -103,6 +112,7 @@ impl Component for Scanner {
             video_ready: false,
             stream_ready: false,
             current_camera: None,
+            authorized: false,
             cameras: Vec::new(),
             mirrored: !is_mobile_device(),
             interval: None,
@@ -114,7 +124,7 @@ impl Component for Scanner {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            ScannerMessage::RequireUserMedia => {
+            ScannerMessage::RequireAuthorization => {
                 let promise = match web_sys::window()
                     .unwrap()
                     .navigator()
@@ -133,10 +143,18 @@ impl Component for Scanner {
                 };
                 ctx.link().send_future(async {
                     match wasm_bindgen_futures::JsFuture::from(promise).await {
-                        Ok(stream) => ScannerMessage::ReceivedStream(stream.dyn_into().unwrap()),
+                        Ok(stream) => {
+                            close_stream(&stream.dyn_into().unwrap());
+                            ScannerMessage::Authorized
+                        }
                         Err(error) => ScannerMessage::Error(ApiError::from(error)),
                     }
                 });
+                false
+            }
+            ScannerMessage::Authorized => {
+                self.authorized = true;
+                ctx.link().send_message(ScannerMessage::Start);
                 false
             }
             ScannerMessage::VideoTimeUpdate => {
@@ -170,7 +188,7 @@ impl Component for Scanner {
                     .expect("video should be an HtmlVideoElement")
                     .set_src_object(self.stream.as_ref().clone());
 
-                ctx.link().send_message(ScannerMessage::FindCameras);
+                ctx.link().send_message(ScannerMessage::Start);
 
                 false
             }
@@ -300,34 +318,37 @@ impl Component for Scanner {
             }
             ScannerMessage::Start => {
                 self.stream_ready = false;
+                self.is_scanning = true;
 
-                if self.stream.is_none() {
-                    ctx.link().send_message(ScannerMessage::RequireUserMedia);
+                if !self.authorized {
+                    ctx.link()
+                        .send_message(ScannerMessage::RequireAuthorization);
                     return false;
                 }
 
-                let current_device = if let Some((_, current_device)) = self.current_camera.as_ref()
-                {
-                    current_device.clone()
-                } else {
+                if !self.has_cameras() {
+                    ctx.link().send_future(async {
+                        match get_available_cameras().await {
+                            Ok(cameras) => ScannerMessage::Cameras(cameras),
+                            Err(error) => ScannerMessage::Error(ApiError::from(error)),
+                        }
+                    });
                     return false;
-                };
-                let torch = self.is_flashlight_on;
-                let stream = self.stream.as_ref().unwrap().clone();
-                self.is_scanning = true;
+                }
 
-                ctx.link().send_future(async move {
-                    if apply_stream_filter(&stream, &current_device.device_id, torch, None).await {
-                        ScannerMessage::StreamReady
-                    } else {
-                        ScannerMessage::Error(ApiError::from(vec![format!(
-                            "Failed to apply stream filter to camera '{}' with id {}",
-                            current_device.label,
-                            current_device.device_id
-                        )]))
-                    }
-                });
-                true
+                if self.stream.is_none() {
+                    let (_, camera) = self.current_camera.as_ref().unwrap().clone();
+                    ctx.link().send_future(async move {
+                        match get_camera_media_stream(&camera.device_id()).await {
+                            Ok(stream) => ScannerMessage::ReceivedStream(stream),
+                            Err(error) => ScannerMessage::Error(ApiError::from(error)),
+                        }
+                    });
+                    return false;
+                }
+
+                ctx.link().send_message(ScannerMessage::StreamReady);
+                false
             }
             ScannerMessage::Close => {
                 if self.closing.is_some() {
@@ -340,24 +361,10 @@ impl Component for Scanner {
                 }));
                 true
             }
-            ScannerMessage::FindCameras => {
-                let stream = self.stream.as_ref().unwrap().clone();
-                ctx.link().send_future(async move {
-                    match get_available_cameras(&stream).await {
-                        Ok(cameras) => ScannerMessage::Cameras(cameras),
-                        Err(_) => ScannerMessage::Close,
-                    }
-                });
-                false
-            }
             ScannerMessage::EffectivelyClose => {
                 // close event
                 if let Some(stream) = self.stream.take() {
-                    for track in stream.get_tracks().iter() {
-                        if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
-                            track.stop();
-                        }
-                    }
+                    close_stream(&stream);
                 }
 
                 self.closing = None;
@@ -373,18 +380,22 @@ impl Component for Scanner {
             }
             ScannerMessage::ToggleFlashlight => {
                 self.is_flashlight_on = !self.is_flashlight_on;
-                ctx.link().send_message(ScannerMessage::Start);
+                self.stream_ready = false;
+                let is_flashlight_on = self.is_flashlight_on;
+                let stream = self.stream.as_ref().unwrap().clone();
+                ctx.link().send_future(async move {
+                    if apply_torch_filter(&stream, is_flashlight_on).await {
+                        ScannerMessage::StreamReady
+                    } else {
+                        ScannerMessage::Error(ApiError::from(vec![
+                            "Failed to apply torch filter".to_string()
+                        ]))
+                    }
+                });
                 false
             }
             ScannerMessage::Cameras(cameras) => {
-                let new_position = self
-                    .current_camera
-                    .as_ref()
-                    .and_then(|(_, camera)| {
-                        cameras.iter().position(|c| c.device_id == camera.device_id)
-                    })
-                    .unwrap_or(0);
-                self.current_camera = Some((new_position, cameras[new_position].clone()));
+                self.current_camera = Some((0, cameras[0].clone()));
                 self.cameras = cameras;
                 ctx.link().send_message(ScannerMessage::Start);
                 false
@@ -393,9 +404,22 @@ impl Component for Scanner {
                 if let Some((index, _)) = self.current_camera {
                     let next_index = (index + 1) % self.cameras.len();
                     self.current_camera = Some((next_index, self.cameras[next_index].clone()));
+                    if let Some(stream) = self.stream.take() {
+                        close_stream(&stream);
+                    }
                     ctx.link().send_message(ScannerMessage::Start);
                 }
                 false
+            }
+        }
+    }
+
+    fn destroy(&mut self, _ctx: &Context<Self>) {
+        if let Some(stream) = self.stream.take() {
+            for track in stream.get_tracks().iter() {
+                if let Ok(track) = track.dyn_into::<MediaStreamTrack>() {
+                    track.stop();
+                }
             }
         }
     }
@@ -464,13 +488,11 @@ impl Component for Scanner {
                     <div class="scanner-focus-container">
                         <div class="scanner-focus"></div>
                         <ul class="operations">
-                            if self.current_camera.as_ref().map_or(false, |(_, camera)| camera.torch) {
-                                <li title={flash_light_message} onclick={toggle_flashlight}>
-                                    <i class="fas fa-lightbulb"></i>
-                                </li>
-                            }
+                            <li title={flash_light_message} onclick={toggle_flashlight}>
+                                <i class="fas fa-lightbulb"></i>
+                            </li>
                             if let Some((camera_number, camera)) = self.get_next_camera() {
-                                <li class="switch-camera" camera-number={(camera_number + 1).to_string()} camera-total={self.number_of_cameras().to_string()} camera-id={camera.device_id} title={camera.label} onclick={toggle_camera}>
+                                <li class="switch-camera" camera-number={(camera_number + 1).to_string()} camera-total={self.number_of_cameras().to_string()} title={camera.label()} onclick={toggle_camera}>
                                     <i class="fas fa-sync-alt"></i>
                                 </li>
                             }
