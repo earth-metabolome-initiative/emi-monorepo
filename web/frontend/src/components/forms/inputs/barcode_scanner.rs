@@ -26,6 +26,8 @@ pub struct Scanner {
     authorized: bool,
     current_camera: Option<(usize, web_sys::MediaDeviceInfo)>,
     number_of_identical_frames: u32,
+    number_of_scan_attempts: u32,
+    start_scanning_time: chrono::DateTime<chrono::Local>,
     cameras: Vec<web_sys::MediaDeviceInfo>,
     closing: Option<Timeout>,
     interval: Option<Interval>,
@@ -54,6 +56,15 @@ impl Scanner {
         } else {
             None
         }
+    }
+
+    /// Get the average number of scan attempts per second.
+    fn average_scan_attempts_per_second(&self) -> usize {
+        let elapsed_time = chrono::Local::now() - self.start_scanning_time;
+        if elapsed_time.num_seconds() == 0 {
+            return 0;
+        }
+        (self.number_of_scan_attempts / elapsed_time.num_seconds() as u32) as usize
     }
 }
 
@@ -117,6 +128,8 @@ impl Component for Scanner {
             cameras: Vec::new(),
             mirrored: !is_mobile_device(),
             interval: None,
+            number_of_scan_attempts: 0,
+            start_scanning_time: chrono::Local::now(),
             closing: None,
             image: None,
             number_of_identical_frames: 0,
@@ -286,6 +299,7 @@ impl Component for Scanner {
                 }
 
                 self.number_of_identical_frames = 0;
+                self.start_scanning_time = chrono::Local::now();
 
                 match decode_barcode(
                     image_data,
@@ -294,12 +308,14 @@ impl Component for Scanner {
                 ) {
                     Ok(s) => {
                         ctx.props().onscan.emit(s);
+                        self.number_of_scan_attempts = 0;
                         ctx.link().send_message(ScannerMessage::Close);
                     }
                     Err(error) => {
                         match error {
                             rxing::Exceptions::NotFoundException(_) => {
                                 // No barcode found, continue scanning
+                                self.number_of_scan_attempts += 1;
                             }
                             error => {
                                 ctx.link()
@@ -377,6 +393,7 @@ impl Component for Scanner {
                 self.video_ready = false;
                 self.stream_ready = false;
                 self.is_flashlight_on = false;
+                self.number_of_scan_attempts = 0;
                 if let Some(interval) = self.interval.take() {
                     interval.cancel();
                 }
@@ -505,6 +522,10 @@ impl Component for Scanner {
                                 <i class="fas fa-arrows-alt-h"></i>
                             </li>
                         </ul>
+                    </div>
+                    <div class="scan-per-second">
+                        <span>{self.average_scan_attempts_per_second()}</span>
+                        <span>{" scans/s"}</span>
                     </div>
                 </div>
             }
