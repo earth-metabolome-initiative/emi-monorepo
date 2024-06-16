@@ -102,7 +102,7 @@ pub struct ScannerProps {
     pub onerror: Callback<ApiError>,
     #[prop_or_default]
     pub onclose: Callback<()>,
-    #[prop_or(100)]
+    #[prop_or(50)]
     pub refresh_milliseconds: u32,
     #[prop_or(0.4)]
     crop_percentage: f64,
@@ -147,6 +147,7 @@ impl Component for Scanner {
                     .get_user_media_with_constraints(
                         &web_sys::MediaStreamConstraints::new().video(
                             &web_sys::MediaTrackConstraints::default()
+                                .frame_rate(&20.into())
                                 .facing_mode(&web_sys::VideoFacingModeEnum::Environment.into()),
                         ),
                     ) {
