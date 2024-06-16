@@ -276,7 +276,9 @@ impl Component for Scanner {
                 if previous_image_data.data() == image_data.data() {
                     self.number_of_identical_frames += 1;
                     if self.number_of_identical_frames > 10 {
-                        ctx.link().send_message(ScannerMessage::Close);
+                        ctx.link().send_message(ScannerMessage::Error(ApiError::from(vec![
+                            "Video stream has stopped".to_string(),
+                        ])));
                         return false;
                     }
                 }
@@ -287,7 +289,6 @@ impl Component for Scanner {
                     ctx.props().crop_dimension,
                 ) {
                     Ok(s) => {
-                        log::info!("Barcode found: {}", s);
                         ctx.props().onscan.emit(s);
                         ctx.link().send_message(ScannerMessage::Close);
                     }
@@ -491,8 +492,8 @@ impl Component for Scanner {
                             <li title={flash_light_message} onclick={toggle_flashlight}>
                                 <i class="fas fa-lightbulb"></i>
                             </li>
-                            if let Some((camera_number, camera)) = self.get_next_camera() {
-                                <li class="switch-camera" camera-number={(camera_number + 1).to_string()} camera-total={self.number_of_cameras().to_string()} title={camera.label()} onclick={toggle_camera}>
+                            if let Some((_, camera)) = self.get_next_camera() {
+                                <li class="switch-camera" camera-number={self.current_camera.as_ref().unwrap().0.to_string()} camera-total={self.number_of_cameras().to_string()} title={camera.label()} onclick={toggle_camera}>
                                     <i class="fas fa-sync-alt"></i>
                                 </li>
                             }

@@ -48,8 +48,6 @@ pub async fn get_available_cameras() -> Result<Vec<MediaDeviceInfo>, web_common:
         return Err(DeviceError::NoCameras.into());
     }
 
-    log::error!("Cameras: {:?}", cameras);
-
     Ok(cameras)
 }
 
