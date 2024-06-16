@@ -118,7 +118,6 @@
             left: max(-2.7vh, -2.7vw);
             &::before {
                 content: "\f110";
-                animation: fa-spin 1s linear infinite;
                 font-family: "Font Awesome 5 Free";
                 position: absolute;
                 font-weight: 900;
@@ -198,6 +197,7 @@
         .scanner-focus-container {
             .scanner-focus {
                 &::before {
+                    animation: fa-spin 1s linear infinite;
                     opacity: 1;
                 }
                 &::after {
