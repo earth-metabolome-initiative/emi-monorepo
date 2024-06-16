@@ -97,6 +97,8 @@ pub async fn get_available_cameras(
         return Err(DeviceError::NoCameras.into());
     }
 
+    log::error!("Cameras: {:?}", cameras);
+
     Ok(cameras)
 }
 
@@ -126,22 +128,12 @@ pub async fn apply_stream_filter(
 
         let mut video_constraints = web_sys::MediaTrackConstraints::new();
 
-        if torch {
-            if let Err(_err) = js_sys::Reflect::set(
-                &video_constraints,
-                &JsValue::from_str("torch"),
-                &JsValue::from_bool(true),
-            ) {
-                continue;
-            }
-        }
-
-        video_constraints
-            .device_id(&device_id.into());
+        video_constraints.device_id(&device_id.into());
         if let Some(facing_mode) = facing_mode {
             video_constraints.facing_mode(&facing_mode.into());
         }
 
+        // First, we apply the constraints regarding the device
         let promise = match track.apply_constraints_with_constraints(&video_constraints) {
             Ok(promise) => promise,
             Err(_) => {
@@ -150,8 +142,41 @@ pub async fn apply_stream_filter(
         };
 
         if let Err(err) = wasm_bindgen_futures::JsFuture::from(promise).await {
-            log::error!("Failed to apply constraints, errror: {:?}, constraint: {:?}", err, video_constraints);
+            log::error!(
+                "Failed to apply constraints, errror: {:?}, constraint: {:?}",
+                err,
+                video_constraints
+            );
             continue;
+        }
+
+        // Next, we try to apply if requested the constraints relative to the torch.
+        if torch {
+            let video_constraints = web_sys::MediaTrackConstraints::new();
+            if let Err(_err) = js_sys::Reflect::set(
+                &video_constraints,
+                &JsValue::from_str("torch"),
+                &JsValue::from_bool(true),
+            ) {
+                continue;
+            }
+
+            // First, we apply the constraints regarding the device
+            let promise = match track.apply_constraints_with_constraints(&video_constraints) {
+                Ok(promise) => promise,
+                Err(_) => {
+                    continue;
+                }
+            };
+
+            if let Err(err) = wasm_bindgen_futures::JsFuture::from(promise).await {
+                log::error!(
+                    "Failed to apply constraints, errror: {:?}, constraint: {:?}",
+                    err,
+                    video_constraints
+                );
+                continue;
+            }
         }
 
         return true;
