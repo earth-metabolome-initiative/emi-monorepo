@@ -124,25 +124,16 @@ pub async fn apply_stream_filter(
             }
         };
 
-        let advanced_constraints = js_sys::Array::new();
-        let torch_constraint = js_sys::Object::new();
-        if let Err(_err) = js_sys::Reflect::set(
-            &torch_constraint,
-            &JsValue::from_str("torch"),
-            &JsValue::from_bool(torch),
-        ) {
-            continue;
-        }
-        advanced_constraints.push(&torch_constraint);
-
         let mut video_constraints = web_sys::MediaTrackConstraints::new();
 
-        if let Err(_err) = js_sys::Reflect::set(
-            &video_constraints,
-            &JsValue::from_str("torch"),
-            &JsValue::from_bool(torch),
-        ) {
-            continue;
+        if torch {
+            if let Err(_err) = js_sys::Reflect::set(
+                &video_constraints,
+                &JsValue::from_str("torch"),
+                &JsValue::from_bool(true),
+            ) {
+                continue;
+            }
         }
 
         video_constraints

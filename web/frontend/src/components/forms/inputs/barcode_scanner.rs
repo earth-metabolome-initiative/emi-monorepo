@@ -390,10 +390,6 @@ impl Component for Scanner {
                 false
             }
             ScannerMessage::SwitchCamera => {
-                if !self.has_cameras() {
-                    ctx.link().send_message(ScannerMessage::Close);
-                    return false;
-                }
                 if let Some((index, _)) = self.current_camera {
                     let next_index = (index + 1) % self.cameras.len();
                     self.current_camera = Some((next_index, self.cameras[next_index].clone()));
