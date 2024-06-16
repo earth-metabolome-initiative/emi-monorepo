@@ -299,7 +299,6 @@ impl Component for Scanner {
                 }
 
                 self.number_of_identical_frames = 0;
-                self.start_scanning_time = chrono::Local::now();
 
                 match decode_barcode(
                     image_data,
@@ -368,6 +367,7 @@ impl Component for Scanner {
                     return false;
                 }
 
+                self.start_scanning_time = chrono::Local::now();
                 ctx.link().send_message(ScannerMessage::StreamReady);
                 false
             }
