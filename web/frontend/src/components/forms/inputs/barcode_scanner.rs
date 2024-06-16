@@ -283,6 +283,8 @@ impl Component for Scanner {
                     }
                 }
 
+                self.number_of_identical_frames = 0;
+
                 match decode_barcode(
                     image_data,
                     ctx.props().crop_percentage,
@@ -482,7 +484,7 @@ impl Component for Scanner {
                     <i class="fas fa-qrcode"></i>
                 </button>
             } else {
-                <div class={classes}>
+                <div class={classes} onclick={&close_scanner}>
                     if let Some(video) = self.video_ref.cast::<HtmlVideoElement>() {
                         <canvas ref={&self.canvas_ref} width={video.video_width().to_string()} height={video.video_height().to_string()}></canvas>
                     }
@@ -499,9 +501,6 @@ impl Component for Scanner {
                             }
                             <li title="Mirror" onclick={mirror}>
                                 <i class="fas fa-arrows-alt-h"></i>
-                            </li>
-                            <li title="Close" onclick={&close_scanner}>
-                                <i class="fas fa-times"></i>
                             </li>
                         </ul>
                     </div>
