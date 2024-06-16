@@ -392,7 +392,7 @@ impl Component for Scanner {
                         ]))
                     }
                 });
-                false
+                true
             }
             ScannerMessage::Cameras(cameras) => {
                 self.current_camera = Some((0, cameras[0].clone()));
@@ -401,15 +401,15 @@ impl Component for Scanner {
                 false
             }
             ScannerMessage::SwitchCamera => {
-                if let Some((index, _)) = self.current_camera {
-                    let next_index = (index + 1) % self.cameras.len();
-                    self.current_camera = Some((next_index, self.cameras[next_index].clone()));
-                    if let Some(stream) = self.stream.take() {
-                        close_stream(&stream);
-                    }
-                    ctx.link().send_message(ScannerMessage::Start);
+                let (index, _) = self.current_camera.as_ref().unwrap().clone();
+                let next_index = (index + 1) % self.cameras.len();
+                self.current_camera = Some((next_index, self.cameras[next_index].clone()));
+                if let Some(stream) = self.stream.take() {
+                    close_stream(&stream);
                 }
-                false
+                self.stream_ready = false;
+                ctx.link().send_message(ScannerMessage::Start);
+                true
             }
         }
     }
@@ -481,7 +481,7 @@ impl Component for Scanner {
                     <i class="fas fa-qrcode"></i>
                 </button>
             } else {
-                <div class={classes} onclick={&close_scanner}>
+                <div class={classes}>
                     if let Some(video) = self.video_ref.cast::<HtmlVideoElement>() {
                         <canvas ref={&self.canvas_ref} width={video.video_width().to_string()} height={video.video_height().to_string()}></canvas>
                     }
@@ -498,6 +498,9 @@ impl Component for Scanner {
                             }
                             <li title="Mirror" onclick={mirror}>
                                 <i class="fas fa-arrows-alt-h"></i>
+                            </li>
+                            <li title="Close" onclick={&close_scanner}>
+                                <i class="fas fa-times"></i>
                             </li>
                         </ul>
                     </div>
