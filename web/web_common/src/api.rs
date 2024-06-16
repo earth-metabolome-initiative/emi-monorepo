@@ -61,12 +61,14 @@ impl ToString for JPEGError {
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
 pub enum DeviceError {
     NoCameras,
+    DeviceStoppedResponding,
 }
 
 impl ToString for DeviceError {
     fn to_string(&self) -> String {
         match self {
             DeviceError::NoCameras => "No cameras found.".to_string(),
+            DeviceError::DeviceStoppedResponding => "Device stopped responding.".to_string(),
         }
     }
 }
@@ -92,6 +94,7 @@ impl ApiError {
             },
             Self::DeviceError(e) => match e {
                 DeviceError::NoCameras => "camera",
+                DeviceError::DeviceStoppedResponding => "heart-crack",
             },
         }
     }
