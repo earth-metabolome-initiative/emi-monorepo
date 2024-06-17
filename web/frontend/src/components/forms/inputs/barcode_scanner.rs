@@ -220,24 +220,25 @@ impl Component for Scanner {
                 // We prepare context options with desynchronized flag to avoid blocking the main thread.
 
                 let context_options = js_sys::Object::new();
-                // js_sys::Reflect::set(
-                //     &context_options,
-                //     &wasm_bindgen::JsValue::from_str("alpha"),
-                //     &wasm_bindgen::JsValue::from_bool(false),
-                // )
-                // .unwrap();
+                js_sys::Reflect::set(
+                    &context_options,
+                    &wasm_bindgen::JsValue::from_str("alpha"),
+                    &wasm_bindgen::JsValue::from_bool(false),
+                )
+                .unwrap();
+                // DESYNCHRONIZED IS NOT SUPPORTED IN SEVERAL ANDROID DEVICES
                 // js_sys::Reflect::set(
                 //     &context_options,
                 //     &wasm_bindgen::JsValue::from_str("desynchronized"),
                 //     &wasm_bindgen::JsValue::from_bool(true),
                 // )
                 // .unwrap();
-                // js_sys::Reflect::set(
-                //     &context_options,
-                //     &wasm_bindgen::JsValue::from_str("willReadFrequently"),
-                //     &wasm_bindgen::JsValue::from_bool(true),
-                // )
-                // .unwrap();
+                js_sys::Reflect::set(
+                    &context_options,
+                    &wasm_bindgen::JsValue::from_str("willReadFrequently"),
+                    &wasm_bindgen::JsValue::from_bool(true),
+                )
+                .unwrap();
 
                 let context = canvas
                     .get_context_with_context_options("2d", &context_options)
