@@ -34,6 +34,30 @@ pub struct Scanner {
     image: Option<Vec<u8>>,
 }
 
+impl Default for Scanner {
+    fn default() -> Self {
+        Self {
+            video_ref: NodeRef::default(),
+            canvas_ref: NodeRef::default(),
+            stream: None,
+            is_scanning: false,
+            is_flashlight_on: false,
+            video_ready: false,
+            stream_ready: false,
+            current_camera: None,
+            authorized: false,
+            cameras: Vec::new(),
+            mirrored: !is_mobile_device(),
+            interval: None,
+            number_of_scan_attempts: 0,
+            start_scanning_time: chrono::Local::now(),
+            closing: None,
+            image: None,
+            number_of_identical_frames: 0,
+        }
+    }
+}
+
 impl Scanner {
     /// Returns whether the scanner has cameras.
     pub fn has_cameras(&self) -> bool {
@@ -115,25 +139,7 @@ impl Component for Scanner {
     type Properties = ScannerProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            video_ref: NodeRef::default(),
-            canvas_ref: NodeRef::default(),
-            stream: None,
-            is_scanning: false,
-            is_flashlight_on: false,
-            video_ready: false,
-            stream_ready: false,
-            current_camera: None,
-            authorized: false,
-            cameras: Vec::new(),
-            mirrored: !is_mobile_device(),
-            interval: None,
-            number_of_scan_attempts: 0,
-            start_scanning_time: chrono::Local::now(),
-            closing: None,
-            image: None,
-            number_of_identical_frames: 0,
-        }
+        Self::default()
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -388,16 +394,11 @@ impl Component for Scanner {
                 if let Some(stream) = self.stream.take() {
                     close_stream(&stream);
                 }
-
-                self.closing = None;
-                self.is_scanning = false;
-                self.video_ready = false;
-                self.stream_ready = false;
-                self.is_flashlight_on = false;
-                self.number_of_scan_attempts = 0;
                 if let Some(interval) = self.interval.take() {
                     interval.cancel();
                 }
+
+                *self = Self::default();
                 ctx.props().onclose.emit(());
                 true
             }
