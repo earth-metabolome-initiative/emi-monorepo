@@ -87,6 +87,20 @@ impl Component for GPSInput {
                             }) as Box<dyn FnMut(_)>)
                         };
 
+                        if let Err(_err) = geolocation
+                            .get_current_position_with_error_callback_and_options(
+                                success_callback.as_ref().unchecked_ref(),
+                                Some(error_callback.as_ref().unchecked_ref()),
+                                PositionOptions::new()
+                                    .enable_high_accuracy(true)
+                                    .maximum_age(10_000),
+                            )
+                        {
+                            ctx.link().send_message(GPSInputMessage::Error(
+                                GeolocationError::NotSupported.into(),
+                            ));
+                        };
+
                         match geolocation.watch_position_with_error_callback_and_options(
                             success_callback.as_ref().unchecked_ref(),
                             Some(error_callback.as_ref().unchecked_ref()),
