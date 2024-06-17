@@ -83,6 +83,8 @@ def derive_frontend_builders(
             builder.set_update_variant(struct)
 
         builder.add_derive("Store")
+        builder.add_decorator("store(storage = \"local\", storage_tab_sync)")
+
         for derive in richest_variant.derives():
             builder.add_derive(derive)
 

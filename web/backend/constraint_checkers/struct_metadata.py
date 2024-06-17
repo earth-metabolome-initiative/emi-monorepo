@@ -1461,6 +1461,21 @@ class StructMetadata:
         """
         return not self.is_insertable() and not self.is_updatable()
 
+    def add_decorator(self, decorator: str):
+        """Adds a decorator to the struct.
+
+        Parameters
+        ----------
+        decorator : str
+            The decorator to add to the struct.
+        """
+        assert isinstance(decorator, str), (
+            "The decorator must be a string. "
+            f"The provided decorator is a {type(decorator)}."
+        )
+        assert len(decorator) > 0, "The decorator must not be empty."
+        self._decorators.append(decorator)
+
     # def get_belonging_structs(self) -> List[Tuple["StructMetadata", AttributeMetadata]]:
     #     """Returns the structs that the struct belongs to."""
 
