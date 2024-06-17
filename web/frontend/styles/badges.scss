@@ -99,7 +99,6 @@ form, .search {
 }
 
 .badge {
-    // flex-direction: column;
     justify-content: space-between; 
     border-radius: 0.25rem;
     border: 1px solid;
@@ -211,6 +210,12 @@ form, .search {
             position: absolute;
             top: 0;
             right: 0;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
             cursor: pointer;
             color: $light_grey;
             transition: color 0.2s;
