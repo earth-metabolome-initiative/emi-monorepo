@@ -13,6 +13,7 @@ use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
 #[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
 pub struct ProjectsUsersRoleBuilder {
     pub table: Option<Rc<web_common::database::nested_variants::NestedProject>>,
     pub user: Option<Rc<web_common::database::nested_variants::NestedUser>>,

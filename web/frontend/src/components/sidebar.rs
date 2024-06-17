@@ -30,19 +30,17 @@ pub fn sidebar(props: &SidebarProps) -> Html {
         }
     });
 
+    let sidebar_class = if props.visible {
+        "sidebar"
+    } else {
+        "sidebar hidden"
+    };
     let on_click_close = {
         let onclose = props.onclose.clone();
         Callback::from(move |_| {
             onclose.emit(false);
         })
     };
-
-    let sidebar_class = if props.visible {
-        "sidebar"
-    } else {
-        "sidebar hidden"
-    };
-    
 
     html! {
         <div ref={node} class={sidebar_class}>

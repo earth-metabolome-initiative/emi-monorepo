@@ -57,8 +57,7 @@ pub async fn get_camera_media_stream(
 ) -> Result<web_sys::MediaStream, web_common::api::ApiError> {
     let mut constraints = MediaStreamConstraints::new();
     let mut video = web_sys::MediaTrackConstraints::new();
-    video
-        .device_id(&device_id.into());
+    video.device_id(&device_id.into());
     constraints.video(&video);
 
     Ok(wasm_bindgen_futures::JsFuture::from(

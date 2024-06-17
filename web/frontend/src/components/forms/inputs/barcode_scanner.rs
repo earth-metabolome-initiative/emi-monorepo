@@ -175,7 +175,8 @@ impl Component for Scanner {
             }
             ScannerMessage::Authorized(stream) => {
                 self.authorized = true;
-                ctx.link().send_message(ScannerMessage::ReceivedStream(stream));
+                ctx.link()
+                    .send_message(ScannerMessage::ReceivedStream(stream));
                 false
             }
             ScannerMessage::VideoTimeUpdate => {

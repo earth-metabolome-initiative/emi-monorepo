@@ -13,6 +13,7 @@ use yew::prelude::*;
 use yewdux::Dispatch;
 use yewdux::{Reducer, Store};
 #[derive(Store, PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[store(storage = "local", storage_tab_sync)]
 pub struct ObservationBuilder {
     pub id: Option<uuid::Uuid>,
     pub notes: Option<Rc<String>>,
