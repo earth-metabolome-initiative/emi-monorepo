@@ -1444,7 +1444,7 @@ def write_frontend_forms(
         leave=False,
     ):
         module_document.write(
-            f"mod {builder.table_name};\n" f"pub use {builder.table_name}::*;\n\n"
+            f"mod {builder.table_name};\npub use {builder.table_name}::*;\n\n"
         )
         with open(
             f"{directory_path}/{builder.table_name}.rs", "w", encoding="utf8"

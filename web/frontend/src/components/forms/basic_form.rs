@@ -280,17 +280,10 @@ where
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
-        log::info!("Rendering the form for the first time: {}", first_render);
         if first_render {
-            // If it is the first time that we are rendering this component,
-            // we check whether the provided builder has an ID. If it does,
-            // we retrieve from the backend the most up to date version of the
-            // data that we are editing.
-            if ctx.props().method.is_post() {
-                ctx.props().builder_dispatch.reduce_mut(|state| {
-                    *state = Default::default();
-                });
-            }
+            ctx.props().builder_dispatch.reduce_mut(|state| {
+                *state = Default::default();
+            });
             for operation in ctx.props().named_requests.iter() {
                 ctx.link().send_message(operation.clone());
             }

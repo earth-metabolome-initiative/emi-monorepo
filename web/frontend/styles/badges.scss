@@ -219,7 +219,7 @@ form, .search {
             cursor: pointer;
             color: $light_grey;
             transition: color 0.2s;
-            padding-right: 0.25em;
+            padding: inherit;
         }
     }
 
