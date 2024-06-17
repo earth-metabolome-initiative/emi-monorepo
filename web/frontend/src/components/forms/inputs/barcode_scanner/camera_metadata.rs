@@ -58,7 +58,6 @@ pub async fn get_camera_media_stream(
     let mut constraints = MediaStreamConstraints::new();
     let mut video = web_sys::MediaTrackConstraints::new();
     video
-        .frame_rate(&10.into())
         .device_id(&device_id.into());
     constraints.video(&video);
 
