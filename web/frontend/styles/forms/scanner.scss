@@ -16,7 +16,6 @@
     opacity: 0;
 
     canvas {
-        transition: opacity 0.3s;
         position: absolute;
         top: 0;
         left: 0;
@@ -92,17 +91,17 @@
         border-bottom: 50vh;
         border-style: solid;
         border-color: rgba(0, 0, 0, 0.5);
-        width: min(40vw, 40vh);
-        height: min(40vw, 40vh);
+        width: min(50vw, 50vh);
+        height: min(50vw, 50vh);
 
         .scanner-focus {
             position: relative;
-            width: min(40vw, 40vh);
-            height: min(40vw, 40vh);
+            width: min(50vw, 50vh);
+            height: min(50vw, 50vh);
             border-radius: min(8vh, 8vw);
-            border: min(2.75vh, 2.75vw) solid white;
-            top: max(-2.7vh, -2.7vw);
-            left: max(-2.7vh, -2.7vw);
+            border: min(3vh, 3vw) solid white;
+            top: max(-2.9vh, -2.9vw);
+            left: max(-2.9vh, -2.9vw);
             &::before {
                 content: "\f110";
                 font-family: "Font Awesome 5 Free";

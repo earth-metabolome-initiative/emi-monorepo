@@ -104,9 +104,9 @@ pub struct ScannerProps {
     pub onclose: Callback<()>,
     #[prop_or(50)]
     pub refresh_milliseconds: u32,
-    #[prop_or(0.4)]
+    #[prop_or(0.5)]
     crop_percentage: f64,
-    #[prop_or(256)]
+    #[prop_or(300)]
     crop_dimension: u32,
 }
 
@@ -147,7 +147,6 @@ impl Component for Scanner {
                     .get_user_media_with_constraints(
                         &web_sys::MediaStreamConstraints::new().video(
                             &web_sys::MediaTrackConstraints::default()
-                                .frame_rate(&20.into())
                                 .facing_mode(&web_sys::VideoFacingModeEnum::Environment.into()),
                         ),
                     ) {
@@ -221,24 +220,24 @@ impl Component for Scanner {
                 // We prepare context options with desynchronized flag to avoid blocking the main thread.
 
                 let context_options = js_sys::Object::new();
-                js_sys::Reflect::set(
-                    &context_options,
-                    &wasm_bindgen::JsValue::from_str("alpha"),
-                    &wasm_bindgen::JsValue::from_bool(false),
-                )
-                .unwrap();
-                js_sys::Reflect::set(
-                    &context_options,
-                    &wasm_bindgen::JsValue::from_str("desynchronized"),
-                    &wasm_bindgen::JsValue::from_bool(true),
-                )
-                .unwrap();
-                js_sys::Reflect::set(
-                    &context_options,
-                    &wasm_bindgen::JsValue::from_str("willReadFrequently"),
-                    &wasm_bindgen::JsValue::from_bool(true),
-                )
-                .unwrap();
+                // js_sys::Reflect::set(
+                //     &context_options,
+                //     &wasm_bindgen::JsValue::from_str("alpha"),
+                //     &wasm_bindgen::JsValue::from_bool(false),
+                // )
+                // .unwrap();
+                // js_sys::Reflect::set(
+                //     &context_options,
+                //     &wasm_bindgen::JsValue::from_str("desynchronized"),
+                //     &wasm_bindgen::JsValue::from_bool(true),
+                // )
+                // .unwrap();
+                // js_sys::Reflect::set(
+                //     &context_options,
+                //     &wasm_bindgen::JsValue::from_str("willReadFrequently"),
+                //     &wasm_bindgen::JsValue::from_bool(true),
+                // )
+                // .unwrap();
 
                 let context = canvas
                     .get_context_with_context_options("2d", &context_options)
