@@ -345,6 +345,10 @@ form.standard-form {
             flex: 1;
             padding: 0;
         }
+
+        @media screen and (max-width: $small-screen-width) {
+            flex-direction: column;
+        }
     }
 
     ul.name-wrapper {
