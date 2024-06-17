@@ -384,20 +384,11 @@ form.standard-form {
                 padding: 0;
             }
         }
-    }
 
-    ul.altitude-wrapper {
-        padding-top: 0;
-
-        &:before {
-            content: "Altitude:";
-        }
-
-        >li {
-            width: calc(100% / 2 - 0.5em);
-
-            &:not(:last-child) {
-                margin-right: 0.5em;
+        @media screen and (max-width: $small-screen-width) {
+            >li {
+                width: 100%;
+                margin-right: 0;
             }
         }
     }
