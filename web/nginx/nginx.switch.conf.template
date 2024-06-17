@@ -29,14 +29,12 @@ http {
                                                                                         
         location /.well-known/acme-challenge/ { 
             root /var/www/certbot;
+            return 200 §request_uri;
         }
-    }
 
-    server {
-        listen 80 default_server;
-        server_name _;
-        # Redirect HTTP requests to HTTPS
-        return 301 https://§host§request_uri;
+        location / {
+            return 301 https://§server_name§request_uri;
+        }
     }
 
     upstream develop {
