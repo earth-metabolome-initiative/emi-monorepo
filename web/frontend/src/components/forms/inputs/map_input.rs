@@ -1,5 +1,5 @@
 use leaflet::DragEndEvent;
-use leaflet::{DivIcon, DivIconOptions, DragEvents, LatLng, MapOptions, Marker, TileLayer};
+use leaflet::{DragEvents, LatLng, MapOptions, Marker, TileLayer};
 use wasm_bindgen::JsCast;
 use web_sys::Element;
 use web_sys::HtmlElement;

@@ -236,8 +236,11 @@ impl Component for GPSInput {
             })
         };
 
-        let latitude = self.latitude.unwrap_or_default();
-        let longitude = self.longitude.unwrap_or_default();
+        let (latitude, longitude) = if let Some(point) = ctx.props().coordinates {
+            (point.x, point.y)
+        } else {
+            (self.latitude.unwrap_or(0.0), self.longitude.unwrap_or(0.0))
+        };
 
         let all_errors = ctx
             .props()
