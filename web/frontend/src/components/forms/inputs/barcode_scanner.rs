@@ -500,7 +500,7 @@ impl Component for Scanner {
 
         html! {
             <>
-            <video ref={&self.video_ref} autoPlay="true" style="display:none;" ontimeupdate={time_update} onplaying={ctx.link().callback(|_| ScannerMessage::VideoReady)}></video>
+            <video ref={&self.video_ref} autoPlay="true" style="display:none;" ontimeupdate={time_update} onplaying={ctx.link().callback(|_| ScannerMessage::VideoReady)} playsinline={true}></video>
             if !self.is_scanning {
                 <button onclick={toggle_scanner} title="Start Scanner" class="start-scanner">
                     <i class="fas fa-qrcode"></i>
