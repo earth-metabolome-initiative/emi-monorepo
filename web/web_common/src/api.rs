@@ -25,6 +25,7 @@ pub enum ApiError {
     InvalidFileFormat(String),
     JPEGError(JPEGError),
     DeviceError(DeviceError),
+    Geolocation(GeolocationError)
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
@@ -73,6 +74,27 @@ impl ToString for DeviceError {
     }
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
+pub enum GeolocationError {
+    NotSupported,
+    PermissionDenied,
+    PositionUnavailable,
+    Timeout,
+    Unknown(String)
+}
+
+impl ToString for GeolocationError {
+    fn to_string(&self) -> String {
+        match self {
+            GeolocationError::NotSupported => "Geolocation is not supported.".to_string(),
+            GeolocationError::PermissionDenied => "Permission to geolocate was denied.".to_string(),
+            GeolocationError::PositionUnavailable => "Position unavailable.".to_string(),
+            GeolocationError::Timeout => "Geolocation request timed out.".to_string(),
+            GeolocationError::Unknown(e) => format!("Geolocation error: {}", e),
+        }
+    }
+}
+
 impl ApiError {
     pub fn font_awesome_icon(&self) -> &'static str {
         match self {
@@ -95,6 +117,13 @@ impl ApiError {
             Self::DeviceError(e) => match e {
                 DeviceError::NoCameras => "camera",
                 DeviceError::DeviceStoppedResponding => "heart-crack",
+            },
+            Self::Geolocation(e) => match e {
+                GeolocationError::NotSupported => "person-circle-question",
+                GeolocationError::PermissionDenied => "map-location-dot",
+                GeolocationError::PositionUnavailable => "person-circle-question",
+                GeolocationError::Timeout => "stopwatch",
+                GeolocationError::Unknown(_) => "map-location-dot",
             },
         }
     }
@@ -175,6 +204,7 @@ impl Into<Vec<String>> for ApiError {
             ApiError::InvalidFileFormat(format) => vec![format!("Invalid file format: {}", format)],
             ApiError::JPEGError(e) => vec![e.to_string()],
             ApiError::DeviceError(e) => vec![e.to_string()],
+            ApiError::Geolocation(e) => vec![e.to_string()],
         }
     }
 }
@@ -208,6 +238,12 @@ impl From<JPEGError> for ApiError {
 impl From<DeviceError> for ApiError {
     fn from(e: DeviceError) -> Self {
         Self::DeviceError(e)
+    }
+}
+
+impl From<GeolocationError> for ApiError {
+    fn from(e: GeolocationError) -> Self {
+        Self::Geolocation(e)
     }
 }
 
@@ -273,21 +309,13 @@ impl From<wasm_bindgen::JsValue> for ApiError {
 }
 
 #[cfg(feature = "frontend")]
-impl From<web_sys::PositionError> for ApiError {
+impl From<web_sys::PositionError> for GeolocationError {
     fn from(e: web_sys::PositionError) -> Self {
         match e.code() {
-            web_sys::PositionError::PERMISSION_DENIED => Self::BadRequest(vec![
-                "Location permission denied. Please enable location services.".to_string(),
-            ]),
-            web_sys::PositionError::POSITION_UNAVAILABLE => Self::BadRequest(vec![
-                "Location unavailable. Please enable location services.".to_string(),
-            ]),
-            web_sys::PositionError::TIMEOUT => Self::BadRequest(vec![
-                "Location request timed out. Please enable location services.".to_string(),
-            ]),
-            _ => Self::BadRequest(vec![
-                "Location request failed. Please enable location services.".to_string(),
-            ]),
+            web_sys::PositionError::PERMISSION_DENIED => GeolocationError::PermissionDenied,
+            web_sys::PositionError::POSITION_UNAVAILABLE => GeolocationError::PositionUnavailable,
+            web_sys::PositionError::TIMEOUT => GeolocationError::Timeout,
+            unknown => GeolocationError::Unknown(format!("Position error code: {:?}", unknown)),
         }
     }
 }
@@ -307,6 +335,7 @@ impl From<ApiError> for actix_web::HttpResponse {
                 .json(format!("Invalid file format: {}", format)),
             ApiError::JPEGError(e) => actix_web::HttpResponse::BadRequest().json(e.to_string()),
             ApiError::DeviceError(e) => actix_web::HttpResponse::BadRequest().json(e.to_string()),
+            ApiError::Geolocation(e) => actix_web::HttpResponse::BadRequest().json(e.to_string()),
         }
     }
 }
