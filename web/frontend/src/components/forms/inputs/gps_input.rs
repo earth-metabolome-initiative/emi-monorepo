@@ -34,8 +34,6 @@ pub struct GPSInput {
     latitude: Option<f64>,
     longitude: Option<f64>,
     watch_id: Option<i32>,
-    success_callback: Option<Closure<dyn FnMut(web_sys::Position)>>,
-    error_callback: Option<Closure<dyn FnMut(PositionError)>>,
 }
 
 pub enum GPSInputMessage {
@@ -57,8 +55,6 @@ impl Component for GPSInput {
             latitude: ctx.props().coordinates.map(|point| point.x),
             longitude: ctx.props().coordinates.map(|point| point.y),
             watch_id: None,
-            success_callback: None,
-            error_callback: None,
         }
     }
 
@@ -67,7 +63,7 @@ impl Component for GPSInput {
             GPSInputMessage::RequireAuthorization => {
                 match web_sys::window().unwrap().navigator().geolocation() {
                     Ok(geolocation) => {
-                        let success_callback = {
+                        let success_callback: Closure<dyn FnMut(web_sys::Position)> = {
                             let link = ctx.link().clone();
                             Closure::new(move |position: web_sys::Position| {
                                 let coords = position.coords();
@@ -78,7 +74,7 @@ impl Component for GPSInput {
                             })
                         };
 
-                        let error_callback = {
+                        let error_callback:Closure<dyn FnMut(PositionError)> = {
                             let link = ctx.link().clone();
                             Closure::new(move |error: PositionError| {
                                 link.send_message(GPSInputMessage::Error(
@@ -118,9 +114,9 @@ impl Component for GPSInput {
                                 ));
                             }
                         };
-
-                        self.success_callback = Some(success_callback);
-                        self.error_callback = Some(error_callback);
+                        
+                        success_callback.forget();
+                        error_callback.forget();
                     }
                     Err(_) => {
                         ctx.link().send_message(GPSInputMessage::Error(
