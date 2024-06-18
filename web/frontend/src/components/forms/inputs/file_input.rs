@@ -72,6 +72,8 @@ pub struct MultiFileInput<Data> {
     hide_box_timeout: Option<Timeout>,
     box_visible: bool,
     number_of_files_currently_processing: usize,
+    drag_over_closure: Closure<dyn FnMut(DragEvent)>,
+    drop_closure: Closure<dyn FnMut(DragEvent)>,
     _phantom: std::marker::PhantomData<Data>,
 }
 
@@ -98,29 +100,27 @@ where
         // on the document. When this event is triggered, we send the DragStart message to the component.
         let document = web_sys::window().unwrap().document().unwrap();
         let link = ctx.link().clone();
-        let drag_over_closure = Closure::wrap(Box::new(move |e: DragEvent| {
+        let drag_over_closure = Closure::new(move |e: DragEvent| {
             e.prevent_default();
             e.stop_propagation();
             link.send_message(MultiFileInputMessage::DragStart);
-        }) as Box<dyn FnMut(_)>);
+        });
         document
             .add_event_listener_with_callback(
                 "dragover",
                 drag_over_closure.as_ref().unchecked_ref(),
             )
             .unwrap();
-        drag_over_closure.forget();
 
         let link = ctx.link().clone();
-        let drop_closure = Closure::wrap(Box::new(move |e: DragEvent| {
+        let drop_closure = Closure::new(move |e: DragEvent| {
             e.prevent_default();
             e.stop_propagation();
             link.send_message(MultiFileInputMessage::HideDropBox);
-        }) as Box<dyn FnMut(_)>);
+        });
         document
             .add_event_listener_with_callback("drop", drop_closure.as_ref().unchecked_ref())
             .unwrap();
-        drop_closure.forget();
 
         Self {
             input_ref: NodeRef::default(),
@@ -128,6 +128,8 @@ where
             hide_box_timeout: None,
             box_visible: ctx.props().files.is_empty(),
             number_of_files_currently_processing: 0,
+            drag_over_closure,
+            drop_closure,
             _phantom: std::marker::PhantomData,
         }
     }
