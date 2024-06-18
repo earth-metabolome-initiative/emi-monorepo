@@ -16,7 +16,7 @@ impl NestedSpectra {
     /// * `flat_variant` - The flat struct.
     /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
-    fn from_flat(
+    pub(crate) fn from_flat(
         flat_variant: Spectra,
         author_user_id: Option<i32>,
         connection: &mut diesel::r2d2::PooledConnection<

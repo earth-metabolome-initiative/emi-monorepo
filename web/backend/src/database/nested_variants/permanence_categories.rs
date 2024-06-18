@@ -16,7 +16,7 @@ impl NestedPermanenceCategory {
     /// # Arguments
     /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
-    fn from_flat(
+    pub(crate) fn from_flat(
         flat_variant: PermanenceCategory,
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::prelude::PgConnection>,
