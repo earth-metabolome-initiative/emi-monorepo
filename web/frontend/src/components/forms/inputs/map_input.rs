@@ -1,4 +1,4 @@
-use leaflet::DragEndEvent;
+use leaflet::{DragEndEvent, Layer};
 use leaflet::{DragEvents, LatLng, MapOptions, Marker, TileLayer};
 use wasm_bindgen::JsCast;
 use web_sys::Element;
@@ -11,12 +11,17 @@ pub struct MapInput {
     map: leaflet::Map,
     container: HtmlElement,
     marker: Marker,
+    layer: Option<Layer>,
 }
 
 impl MapInput {
     fn set_marker(&mut self, latlng: &LatLng) {
         self.map.set_view(&latlng, self.map.get_zoom());
-        TileLayer::new("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").add_to(&self.map);
+        let layer = TileLayer::new("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").add_to(&self.map);
+        if let Some(layer) = self.layer.as_ref() {
+            self.map.remove_layer(layer);
+        }
+        self.layer = Some(layer);
         self.marker.set_lat_lng(&latlng);
     }
 }
@@ -61,7 +66,6 @@ impl Component for MapInput {
 
         let map_options = MapOptions::default();
         map_options.set_zoom(ctx.props().zoom);
-        map_options.set_prefer_canvas(true);
 
         let map = leaflet::Map::new_with_element(&container, &map_options);
         marker.add_to(&map);
@@ -81,6 +85,7 @@ impl Component for MapInput {
             map,
             container,
             marker,
+            layer: None,
         }
     }
 
@@ -99,7 +104,7 @@ impl Component for MapInput {
         }
 
         let center = self.map.get_center();
-        if center.lat() != ctx.props().latitude || center.lng() != ctx.props().longitude {
+        if (center.lat() - ctx.props().latitude).abs() < f64::EPSILON * 10.0 || (center.lng() - ctx.props().longitude) < f64::EPSILON * 10.0{
             self.set_marker(&ctx.props().latlng());
         }
     }
