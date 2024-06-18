@@ -61,6 +61,7 @@ impl Component for MapInput {
 
         let map_options = MapOptions::default();
         map_options.set_zoom(ctx.props().zoom);
+        map_options.set_prefer_canvas(true);
 
         let map = leaflet::Map::new_with_element(&container, &map_options);
         marker.add_to(&map);
