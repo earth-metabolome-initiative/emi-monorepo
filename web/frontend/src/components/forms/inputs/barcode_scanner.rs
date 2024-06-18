@@ -169,7 +169,7 @@ pub struct ScannerProps {
     pub onerror: Callback<ApiError>,
     #[prop_or_default]
     pub onclose: Callback<()>,
-    #[prop_or(50)]
+    #[prop_or(25)]
     pub refresh_milliseconds: u32,
     #[prop_or(0.5)]
     crop_percentage: f64,
@@ -423,6 +423,7 @@ impl Component for Scanner {
                 
                 self.status = ScannerStatus::Scanning;
                 self.start_scanning_time = chrono::Local::now();
+                self.number_of_scan_attempts = 0;
                 ctx.link().send_message(ScannerMessage::StreamReady);
                 false
             }
