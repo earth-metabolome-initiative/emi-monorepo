@@ -104,7 +104,7 @@ impl Component for MapInput {
         }
 
         let center = self.map.get_center();
-        if (center.lat() - ctx.props().latitude).abs() < f64::EPSILON * 10.0 || (center.lng() - ctx.props().longitude) < f64::EPSILON * 10.0{
+        if (center.lat() - ctx.props().latitude).abs() > f32::EPSILON as f64 * 10.0 || (center.lng() - ctx.props().longitude).abs() > f32::EPSILON  as f64 * 10.0{
             self.set_marker(&ctx.props().latlng());
         }
     }
