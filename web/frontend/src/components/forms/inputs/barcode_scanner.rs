@@ -14,6 +14,47 @@ use decode_barcode::decode_barcode;
 mod camera_metadata;
 use camera_metadata::{apply_torch_filter, get_available_cameras, get_camera_media_stream};
 
+enum ScannerStatus {
+    SwitchingCamera,
+    RetrievingCameras,
+    RetrievingStream,
+    RetrievingAuthorization,
+    Scanning,
+    Closing,
+    StartingFlashlight,
+    Closed
+}
+
+impl ScannerStatus {
+    fn icon(&self) -> &str {
+        match self {
+            ScannerStatus::SwitchingCamera => "camera-retro",
+            ScannerStatus::RetrievingCameras => "camera",
+            ScannerStatus::RetrievingStream => "film",
+            ScannerStatus::RetrievingAuthorization => "lock",
+            ScannerStatus::Scanning => "qrcode",
+            ScannerStatus::Closing => "trash",
+            ScannerStatus::StartingFlashlight => "bolt",
+            ScannerStatus::Closed => "trash",
+        }
+    }
+}
+
+impl std::fmt::Display for ScannerStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ScannerStatus::SwitchingCamera => write!(f, "Switching Camera"),
+            ScannerStatus::RetrievingCameras => write!(f, "Retrieving Cameras"),
+            ScannerStatus::RetrievingStream => write!(f, "Retrieving Stream"),
+            ScannerStatus::RetrievingAuthorization => write!(f, "Retrieving Authorization"),
+            ScannerStatus::Scanning => write!(f, "Scanning"),
+            ScannerStatus::Closing => write!(f, "Closing"),
+            ScannerStatus::StartingFlashlight => write!(f, "Starting Flashlight"),
+            ScannerStatus::Closed => write!(f, "Closed"),
+        }
+    }
+}
+
 pub struct Scanner {
     video_ref: NodeRef,
     canvas_ref: NodeRef,
@@ -32,6 +73,7 @@ pub struct Scanner {
     closing: Option<Timeout>,
     interval: Option<Interval>,
     image: Option<Vec<u8>>,
+    status: ScannerStatus,
 }
 
 impl Default for Scanner {
@@ -54,6 +96,7 @@ impl Default for Scanner {
             closing: None,
             image: None,
             number_of_identical_frames: 0,
+            status: ScannerStatus::Closed,
         }
     }
 }
@@ -349,22 +392,25 @@ impl Component for Scanner {
                 self.is_scanning = true;
 
                 if !self.authorized {
+                    self.status = ScannerStatus::RetrievingAuthorization;
                     ctx.link()
                         .send_message(ScannerMessage::RequireAuthorization);
-                    return false;
+                    return true;
                 }
 
                 if !self.has_cameras() {
+                    self.status = ScannerStatus::RetrievingCameras;
                     ctx.link().send_future(async {
                         match get_available_cameras().await {
                             Ok(cameras) => ScannerMessage::Cameras(cameras),
                             Err(error) => ScannerMessage::Error(ApiError::from(error)),
                         }
                     });
-                    return false;
+                    return true;
                 }
 
                 if self.stream.is_none() {
+                    self.status = ScannerStatus::RetrievingStream;
                     let (_, camera) = self.current_camera.as_ref().unwrap().clone();
                     ctx.link().send_future(async move {
                         match get_camera_media_stream(&camera.device_id()).await {
@@ -372,9 +418,10 @@ impl Component for Scanner {
                             Err(error) => ScannerMessage::Error(ApiError::from(error)),
                         }
                     });
-                    return false;
+                    return true;
                 }
-
+                
+                self.status = ScannerStatus::Scanning;
                 self.start_scanning_time = chrono::Local::now();
                 ctx.link().send_message(ScannerMessage::StreamReady);
                 false
@@ -384,6 +431,7 @@ impl Component for Scanner {
                     return false;
                 }
 
+                self.status = ScannerStatus::Closing;
                 let link = ctx.link().clone();
                 self.closing = Some(Timeout::new(300, move || {
                     link.send_message(ScannerMessage::EffectivelyClose);
@@ -408,6 +456,7 @@ impl Component for Scanner {
                 self.stream_ready = false;
                 let is_flashlight_on = self.is_flashlight_on;
                 let stream = self.stream.as_ref().unwrap().clone();
+                self.status = ScannerStatus::StartingFlashlight;
                 ctx.link().send_future(async move {
                     if apply_torch_filter(&stream, is_flashlight_on).await {
                         ScannerMessage::StreamReady
@@ -500,7 +549,7 @@ impl Component for Scanner {
 
         html! {
             <>
-            <video ref={&self.video_ref} autoPlay="true" style="display:none;" ontimeupdate={time_update} onplaying={ctx.link().callback(|_| ScannerMessage::VideoReady)} playsinline={true}></video>
+            <video ref={&self.video_ref} autoPlay="true" style="display:none;" ontimeupdate={time_update} onplaying={ctx.link().callback(|_| ScannerMessage::VideoReady)} muted={true} playsinline={true}></video>
             if !self.is_scanning {
                 <button onclick={toggle_scanner} title="Start Scanner" class="start-scanner">
                     <i class="fas fa-qrcode"></i>
@@ -514,7 +563,7 @@ impl Component for Scanner {
                         <div class="scanner-focus"></div>
                         <ul class="operations">
                             <li title={flash_light_message} onclick={toggle_flashlight}>
-                                <i class="fas fa-lightbulb"></i>
+                                <i class="fas fa-bolt"></i>
                             </li>
                             if let Some((_, camera)) = self.get_next_camera() {
                                 <li class="switch-camera" camera-number={(self.current_camera.as_ref().unwrap().0 + 1).to_string()} camera-total={self.number_of_cameras().to_string()} title={camera.label()} onclick={toggle_camera}>
@@ -529,6 +578,10 @@ impl Component for Scanner {
                     <div class="scan-per-second">
                         <span>{self.average_scan_attempts_per_second()}</span>
                         <span>{" scans/s"}</span>
+                    </div>
+                    <div class="ongoing-operation">
+                        <i class={format!("fas fa-{}", self.status.icon())}></i>
+                        <span>{self.status.to_string()}</span>
                     </div>
                 </div>
             }

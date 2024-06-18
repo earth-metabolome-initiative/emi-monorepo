@@ -201,5 +201,16 @@
         font-size: min(2.5vh, 2.5vw);
         padding: 0.5em;
     }
+
+    .ongoing-operation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        color: white;
+        font-size: min(2.5vh, 2.5vw);
+        padding: 0.5em;
+        text-align: left;
+    }
 }
 
