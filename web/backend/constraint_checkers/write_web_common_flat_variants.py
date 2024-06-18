@@ -165,6 +165,7 @@ def write_web_common_flat_variants(
         "pub trait Colorable {\n"
         "    fn color(&self) -> Option<&str>;\n"
         "}\n\n"
+        "#[cfg(feature = \"frontend\")]\n"
         "/// A struct that can be queries with an all method.\n"
         "pub trait AllRecords: Filtrable + Sized {\n"
         "    fn all_records<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(\n"

@@ -20,6 +20,7 @@ pub trait Colorable {
     fn color(&self) -> Option<&str>;
 }
 
+#[cfg(feature = "frontend")]
 /// A struct that can be queries with an all method.
 pub trait AllRecords: Filtrable + Sized {
     fn all_records<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
