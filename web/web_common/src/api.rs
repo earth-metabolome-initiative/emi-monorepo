@@ -25,7 +25,7 @@ pub enum ApiError {
     InvalidFileFormat(String),
     JPEGError(JPEGError),
     DeviceError(DeviceError),
-    Geolocation(GeolocationError)
+    Geolocation(GeolocationError),
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
@@ -80,14 +80,14 @@ pub enum GeolocationError {
     PermissionDenied,
     PositionUnavailable,
     Timeout,
-    Unknown(String)
+    Unknown(String),
 }
 
 impl ToString for GeolocationError {
     fn to_string(&self) -> String {
         match self {
             GeolocationError::NotSupported => "Geolocation is not supported.".to_string(),
-            GeolocationError::PermissionDenied => "Permission to geolocate was denied.".to_string(),
+            GeolocationError::PermissionDenied => "Permission to geolocate was denied - You may need to authorize this in your device privacy settings.".to_string(),
             GeolocationError::PositionUnavailable => "Position unavailable.".to_string(),
             GeolocationError::Timeout => "Geolocation request timed out.".to_string(),
             GeolocationError::Unknown(e) => format!("Geolocation error: {}", e),
@@ -120,7 +120,7 @@ impl ApiError {
             },
             Self::Geolocation(e) => match e {
                 GeolocationError::NotSupported => "person-circle-question",
-                GeolocationError::PermissionDenied => "map-location-dot",
+                GeolocationError::PermissionDenied => "lock",
                 GeolocationError::PositionUnavailable => "person-circle-question",
                 GeolocationError::Timeout => "stopwatch",
                 GeolocationError::Unknown(_) => "map-location-dot",

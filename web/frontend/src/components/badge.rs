@@ -4,7 +4,7 @@ use crate::router::AppRoute;
 use crate::traits::format_match::FormatMatch;
 use core::fmt::Debug;
 use std::rc::Rc;
-use web_common::database::{Colorable, Describable};
+use web_common::database::{Colorable, Describable, SimilarityScore};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -53,23 +53,9 @@ pub mod users_users_role_requests;
 pub mod users_users_roles;
 
 /// Trait for types that can be converted to a badge.
-pub trait RowToBadge: Colorable + Describable + Sized + Clone + PartialEq + Debug {
-    /// Returns the similarity score of the implementing type with respect to the query.
-    ///
-    /// # Arguments
-    /// * `query` - The query to compare the implementing type with.
-    fn similarity_score<S: AsRef<str>>(&self, query: S) -> isize {
-        let query = query.as_ref();
-        (self.badge_title().similarity_score(query)
-            + self.description().map_or(0, |d| d.similarity_score(query)))
-            / 2
-    }
-
-    /// Returns the similarity score of the implementing type with respect to the query if the query is not empty.
-    fn maybe_similarity_score<S: AsRef<str>>(&self, query: Option<S>) -> isize {
-        query.map_or(0, |q| self.similarity_score(q))
-    }
-
+pub trait RowToBadge:
+    Colorable + Describable + Sized + Clone + PartialEq + Debug + SimilarityScore
+{
     /// Returns the title for the badge.
     fn badge_title(&self) -> String;
 

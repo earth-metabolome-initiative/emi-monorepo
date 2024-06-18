@@ -1,6 +1,6 @@
 """This module writes the `update` method for the struct in the GlueSQL database."""
 
-from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
+from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata, MethodDefinition
 from constraint_checkers.gluesql_types_mapping import GLUESQL_TYPES_MAPPING
 
 
@@ -19,41 +19,54 @@ def write_update_method_for_gluesql(
     update_types_and_methods = GLUESQL_TYPES_MAPPING.copy()
     update_types_and_methods["bool"] = "{value}"
 
-    # We implement the `update` method for the struct. This method updates
-    # the struct in the GlueSQL database.
-    writer.write(
-        "    /// Update the struct in the database.\n"
-        "    ///\n"
-        "    /// # Arguments\n"
+    update_method = struct.add_webcommon_method(
+        MethodDefinition(
+            name="update",
+            summary="Update the struct in the database.",
+            is_async=True,
+        )
     )
 
+    update_method.include_self()
+    update_method.add_generic("C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut")
+
     if updator_user_id_attribute is not None:
-        writer.write(
-            "    /// * `user_id` - The ID of the user who is updating the struct.\n"
+        update_method.add_argument(
+            AttributeMetadata(
+                original_name="user_id",
+                name="user_id",
+                data_type="i32",
+                optional=False,
+            ),
+            description="The user ID of the user who is updating the struct.",
         )
 
-    writer.write(
-        "    /// * `connection` - The connection to the database.\n"
-        "    ///\n"
-        "    /// # Returns\n"
-        "    /// The number of rows updated.\n"
-        "    pub async fn update<C>(\n"
-        "        self,\n"
+    update_method.add_argument(
+        AttributeMetadata(
+            original_name="connection",
+            name="connection",
+            data_type="gluesql::prelude::Glue<C>",
+            reference=True,
+            mutable=True,
+        ),
+        "The connection to the database.",
     )
 
-    if updator_user_id_attribute is not None:
-        writer.write("        user_id: i32,\n")
+    update_method.set_return_type(
+        AttributeMetadata(
+            original_name="_",
+            name="_",
+            data_type="Result<usize, crate::api::ApiError>",
+            optional=False,
+        )
+    )
+
+    update_method.write_header_to(writer)
 
     writer.write(
-        "        connection: &mut gluesql::prelude::Glue<C>,\n"
-        "    ) -> Result<usize, gluesql::prelude::Error> where\n"
-        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
         "    {\n"
         "        use gluesql::core::ast_builder::*;\n"
     )
-    # We use the AST builder as much as possible so to avoid SQL injection attacks.
-
-    # First, we determine whether the current struct has at least an optional field.
 
     if struct.contains_optional_fields():
         writer.write(f'        let mut update_row = table("{struct.table_name}")\n')
@@ -119,6 +132,6 @@ def write_update_method_for_gluesql(
         "             .map(|payload| match payload {\n"
         "                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,\n"
         '                 _ => unreachable!("Expected Payload::Update")\n'
-        "})\n"
+        "}).map_err(crate::api::ApiError::from)\n"
         "    }\n\n"
     )

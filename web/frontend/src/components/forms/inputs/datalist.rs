@@ -308,13 +308,18 @@ where
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
 
-        let candidate_score: Vec<isize> = self
+        let candidate_score: Vec<f64> = self
             .candidates
             .iter()
-            .map(|candidate| -candidate.maybe_similarity_score(self.current_value.as_deref()))
+            .map(|candidate| {
+                self.current_value
+                    .as_deref()
+                    .map_or(0.0, |query| candidate.similarity_score(query))
+            })
             .collect();
         let mut indices_to_sort: Vec<usize> = (0..self.candidates.len()).collect::<Vec<usize>>();
-        indices_to_sort.sort_by_key(|&i| candidate_score[i]);
+        indices_to_sort
+            .sort_by(|&a, &b| candidate_score[b].partial_cmp(&candidate_score[a]).unwrap());
         let filtered_indices = indices_to_sort
             .into_iter()
             .filter(|&i| {

@@ -3,6 +3,7 @@ pub mod components;
 mod cookies;
 mod pages;
 mod router;
+// mod search;
 mod stores;
 pub mod traits;
 mod utils;

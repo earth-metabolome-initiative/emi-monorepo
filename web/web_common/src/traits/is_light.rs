@@ -5,7 +5,6 @@ pub trait IsLight {
     ///
     /// # Arguments
     /// * `threshold` - The threshold for the luma value of a pixel to be considered light. If not provided, the default value is 0.8.
-    ///
     fn is_light(&self, threshold: Option<f32>) -> bool;
 }
 

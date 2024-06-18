@@ -69,22 +69,22 @@ impl Component for GPSInput {
                     Ok(geolocation) => {
                         let success_callback = {
                             let link = ctx.link().clone();
-                            Closure::wrap(Box::new(move |position: web_sys::Position| {
+                            Closure::new(move |position: web_sys::Position| {
                                 let coords = position.coords();
                                 link.send_message(GPSInputMessage::Coordinates(
                                     Some(coords.latitude()),
                                     Some(coords.longitude()),
                                 ));
-                            }) as Box<dyn FnMut(_)>)
+                            })
                         };
 
                         let error_callback = {
                             let link = ctx.link().clone();
-                            Closure::wrap(Box::new(move |error: PositionError| {
+                            Closure::new(move |error: PositionError| {
                                 link.send_message(GPSInputMessage::Error(
                                     GeolocationError::from(error).into(),
                                 ));
-                            }) as Box<dyn FnMut(_)>)
+                            })
                         };
 
                         if let Err(_err) = geolocation

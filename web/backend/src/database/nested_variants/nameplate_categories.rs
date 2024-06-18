@@ -18,7 +18,7 @@ impl NestedNameplateCategory {
     /// # Arguments
     /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
-    pub fn from_flat(
+    fn from_flat(
         flat_variant: NameplateCategory,
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::prelude::PgConnection>,

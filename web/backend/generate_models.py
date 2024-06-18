@@ -219,4 +219,11 @@ if __name__ == "__main__":
     if status != 0:
         print("Error running 'cargo fmt'!")
         exit(1)
+    # And the webcommon code.
+    os.chdir("../web_common")
+    status = os.system("cargo fmt")
+    if status != 0:
+        print("Error running 'cargo fmt'!")
+        exit(1)
+
     print("Formatted frontend rust code.")

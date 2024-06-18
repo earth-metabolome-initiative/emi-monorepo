@@ -27,12 +27,6 @@ pub trait FormatMatch {
     /// # Arguments
     /// * `query` - The optional query to match against.
     fn maybe_format_match<S: AsRef<str>>(&self, query: Option<S>) -> yew::Html;
-
-    /// Returns the similarity score of the implementing type with respect to the query.
-    ///
-    /// # Arguments
-    /// * `query` - The query to compare the implementing type with.
-    fn similarity_score<S: AsRef<str>>(&self, query: S) -> isize;
 }
 
 impl<T: AsRef<str>> FormatMatch for T {
@@ -49,13 +43,5 @@ impl<T: AsRef<str>> FormatMatch for T {
         query
             .map(|query| self.format_match(query))
             .unwrap_or_else(|| yew::Html::from(self.as_ref().to_string()))
-    }
-
-    fn similarity_score<S: AsRef<str>>(&self, query: S) -> isize {
-        let matches = custom_best_matches(query, self);
-        if matches.is_empty() {
-            return 0;
-        }
-        matches.iter().map(|m| m.score()).sum::<isize>() / matches.len() as isize
     }
 }

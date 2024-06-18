@@ -6,7 +6,6 @@ pub trait IsDark {
     ///
     /// # Arguments
     /// * `threshold` - The threshold for the luma value of a pixel to be considered dark. If not provided, the default value is 0.1.
-    ///
     fn is_dark(&self, threshold: Option<f32>) -> bool;
 }
 

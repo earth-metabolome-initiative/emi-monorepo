@@ -22,7 +22,7 @@ impl NestedObservation {
     /// * `flat_variant` - The flat struct.
     /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
-    pub fn from_flat(
+    fn from_flat(
         flat_variant: Observation,
         author_user_id: Option<i32>,
         connection: &mut diesel::r2d2::PooledConnection<

@@ -54,7 +54,9 @@ impl NewObservation {
             gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             match self.parent_observation_id {
-                Some(parent_observation_id) => gluesql::core::ast_builder::uuid(parent_observation_id.to_string()),
+                Some(parent_observation_id) => {
+                    gluesql::core::ast_builder::uuid(parent_observation_id.to_string())
+                }
                 None => gluesql::core::ast_builder::null(),
             },
             gluesql::core::ast_builder::num(self.project_id),
@@ -88,7 +90,8 @@ impl NewObservation {
         self,
         created_by: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<super::Observation, gluesql::prelude::Error> where
+    ) -> Result<super::Observation, crate::api::ApiError>
+    where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
@@ -103,52 +106,64 @@ impl NewObservation {
                  gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
                  _ => unreachable!("Payload must be an Insert"),
              })?;
-        super::Observation::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+        super::Observation::get(id, connection)
+            .await
+            .map(|maybe_row| maybe_row.unwrap())
     }
 
     /// Update the struct in the database.
     ///
-    /// # Arguments
-    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `user_id` - The user ID of the user who is updating the struct.
     /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
+    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("observations")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
-.set("subject_id", gluesql::core::ast_builder::num(self.subject_id))        
-.set("picture", gluesql::core::ast_builder::bytea(self.picture))        
-.set("updated_by", gluesql::core::ast_builder::num(user_id));
+            .update()
+            .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))
+            .set(
+                "project_id",
+                gluesql::core::ast_builder::num(self.project_id),
+            )
+            .set(
+                "subject_id",
+                gluesql::core::ast_builder::num(self.subject_id),
+            )
+            .set("picture", gluesql::core::ast_builder::bytea(self.picture))
+            .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(parent_observation_id) = self.parent_observation_id {
-            update_row = update_row.set("parent_observation_id", gluesql::core::ast_builder::uuid(parent_observation_id.to_string()));
+            update_row = update_row.set(
+                "parent_observation_id",
+                gluesql::core::ast_builder::uuid(parent_observation_id.to_string()),
+            );
         }
         if let Some(organism_id) = self.organism_id {
-            update_row = update_row.set("organism_id", gluesql::core::ast_builder::uuid(organism_id.to_string()));
+            update_row = update_row.set(
+                "organism_id",
+                gluesql::core::ast_builder::uuid(organism_id.to_string()),
+            );
         }
         if let Some(sample_id) = self.sample_id {
-            update_row = update_row.set("sample_id", gluesql::core::ast_builder::uuid(sample_id.to_string()));
+            update_row = update_row.set(
+                "sample_id",
+                gluesql::core::ast_builder::uuid(sample_id.to_string()),
+            );
         }
         if let Some(notes) = self.notes {
             update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
         }
-            update_row.execute(connection)
+        update_row
+            .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                _ => unreachable!("Expected Payload::Update"),
+            })
+            .map_err(crate::api::ApiError::from)
     }
-
 }
 #[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewOrganismBioOttTaxonItem {
@@ -184,7 +199,9 @@ impl NewOrganism {
             gluesql::core::ast_builder::num(created_by),
             gluesql::core::ast_builder::uuid(self.id.to_string()),
             match self.host_organism_id {
-                Some(host_organism_id) => gluesql::core::ast_builder::uuid(host_organism_id.to_string()),
+                Some(host_organism_id) => {
+                    gluesql::core::ast_builder::uuid(host_organism_id.to_string())
+                }
                 None => gluesql::core::ast_builder::null(),
             },
             match self.sample_id {
@@ -214,7 +231,8 @@ impl NewOrganism {
         self,
         created_by: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<super::Organism, gluesql::prelude::Error> where
+    ) -> Result<super::Organism, crate::api::ApiError>
+    where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
@@ -229,49 +247,58 @@ impl NewOrganism {
                  gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
                  _ => unreachable!("Payload must be an Insert"),
              })?;
-        super::Organism::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+        super::Organism::get(id, connection)
+            .await
+            .map(|maybe_row| maybe_row.unwrap())
     }
 
     /// Update the struct in the database.
     ///
-    /// # Arguments
-    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `user_id` - The user ID of the user who is updating the struct.
     /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
+    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("organisms")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("wild", self.wild)        
-.set("nameplate_id", gluesql::core::ast_builder::num(self.nameplate_id))        
-.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
-.set("updated_by", gluesql::core::ast_builder::num(user_id));
+            .update()
+            .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))
+            .set("wild", self.wild)
+            .set(
+                "nameplate_id",
+                gluesql::core::ast_builder::num(self.nameplate_id),
+            )
+            .set(
+                "project_id",
+                gluesql::core::ast_builder::num(self.project_id),
+            )
+            .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(host_organism_id) = self.host_organism_id {
-            update_row = update_row.set("host_organism_id", gluesql::core::ast_builder::uuid(host_organism_id.to_string()));
+            update_row = update_row.set(
+                "host_organism_id",
+                gluesql::core::ast_builder::uuid(host_organism_id.to_string()),
+            );
         }
         if let Some(sample_id) = self.sample_id {
-            update_row = update_row.set("sample_id", gluesql::core::ast_builder::uuid(sample_id.to_string()));
+            update_row = update_row.set(
+                "sample_id",
+                gluesql::core::ast_builder::uuid(sample_id.to_string()),
+            );
         }
         if let Some(notes) = self.notes {
             update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
         }
-            update_row.execute(connection)
+        update_row
+            .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                _ => unreachable!("Expected Payload::Update"),
+            })
+            .map_err(crate::api::ApiError::from)
     }
-
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewProject {
@@ -293,7 +320,18 @@ unsafe impl Sync for NewProject {}
 impl Tabular for NewProject {
     const TABLE: Table = Table::Projects;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewProjectsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
@@ -305,7 +343,18 @@ unsafe impl Sync for NewProjectsTeamsRoleInvitation {}
 impl Tabular for NewProjectsTeamsRoleInvitation {
     const TABLE: Table = Table::ProjectsTeamsRoleInvitations;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewProjectsTeamsRoleRequest {
     pub table_id: i32,
     pub team_id: i32,
@@ -317,7 +366,18 @@ unsafe impl Sync for NewProjectsTeamsRoleRequest {}
 impl Tabular for NewProjectsTeamsRoleRequest {
     const TABLE: Table = Table::ProjectsTeamsRoleRequests;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewProjectsTeamsRole {
     pub table_id: i32,
     pub team_id: i32,
@@ -329,7 +389,18 @@ unsafe impl Sync for NewProjectsTeamsRole {}
 impl Tabular for NewProjectsTeamsRole {
     const TABLE: Table = Table::ProjectsTeamsRoles;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewProjectsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -341,7 +412,18 @@ unsafe impl Sync for NewProjectsUsersRoleInvitation {}
 impl Tabular for NewProjectsUsersRoleInvitation {
     const TABLE: Table = Table::ProjectsUsersRoleInvitations;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewProjectsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -353,7 +435,18 @@ unsafe impl Sync for NewProjectsUsersRoleRequest {}
 impl Tabular for NewProjectsUsersRoleRequest {
     const TABLE: Table = Table::ProjectsUsersRoleRequests;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewProjectsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
@@ -433,7 +526,8 @@ impl NewSample {
         self,
         created_by: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<super::Sample, gluesql::prelude::Error> where
+    ) -> Result<super::Sample, crate::api::ApiError>
+    where
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         use gluesql::core::ast_builder::*;
@@ -444,48 +538,56 @@ impl NewSample {
             .values(vec![self.into_row(created_by)])
             .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Insert ( number_of_inserted_rows ) => number_of_inserted_rows,
-                 _ => unreachable!("Payload must be an Insert"),
-             })?;
-        super::Sample::get(id, connection).await.map(|maybe_row| maybe_row.unwrap())
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Insert(number_of_inserted_rows) => {
+                    number_of_inserted_rows
+                }
+                _ => unreachable!("Payload must be an Insert"),
+            })?;
+        super::Sample::get(id, connection)
+            .await
+            .map(|maybe_row| maybe_row.unwrap())
     }
 
     /// Update the struct in the database.
     ///
-    /// # Arguments
-    /// * `user_id` - The ID of the user who is updating the struct.
+    /// * `user_id` - The user ID of the user who is updating the struct.
     /// * `connection` - The connection to the database.
-    ///
-    /// # Returns
-    /// The number of rows updated.
-    pub async fn update<C>(
+    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
         self,
         user_id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, gluesql::prelude::Error> where
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    {
+    ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
         let mut update_row = table("samples")
-            .update()        
-.set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))        
-.set("container_id", gluesql::core::ast_builder::num(self.container_id))        
-.set("project_id", gluesql::core::ast_builder::num(self.project_id))        
-.set("sampled_by", gluesql::core::ast_builder::num(self.sampled_by))        
-.set("state_id", gluesql::core::ast_builder::num(self.state_id))        
-.set("updated_by", gluesql::core::ast_builder::num(user_id));
+            .update()
+            .set("id", gluesql::core::ast_builder::uuid(self.id.to_string()))
+            .set(
+                "container_id",
+                gluesql::core::ast_builder::num(self.container_id),
+            )
+            .set(
+                "project_id",
+                gluesql::core::ast_builder::num(self.project_id),
+            )
+            .set(
+                "sampled_by",
+                gluesql::core::ast_builder::num(self.sampled_by),
+            )
+            .set("state_id", gluesql::core::ast_builder::num(self.state_id))
+            .set("updated_by", gluesql::core::ast_builder::num(user_id));
         if let Some(notes) = self.notes {
             update_row = update_row.set("notes", gluesql::core::ast_builder::text(notes));
         }
-            update_row.execute(connection)
+        update_row
+            .execute(connection)
             .await
-             .map(|payload| match payload {
-                 gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
-                 _ => unreachable!("Expected Payload::Update")
-})
+            .map(|payload| match payload {
+                gluesql::prelude::Payload::Update(number_of_updated_rows) => number_of_updated_rows,
+                _ => unreachable!("Expected Payload::Update"),
+            })
+            .map_err(crate::api::ApiError::from)
     }
-
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSpectraCollection {
@@ -513,7 +615,18 @@ unsafe impl Sync for NewTeam {}
 impl Tabular for NewTeam {
     const TABLE: Table = Table::Teams;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewTeamsTeamsRoleInvitation {
     pub table_id: i32,
     pub team_id: i32,
@@ -525,7 +638,18 @@ unsafe impl Sync for NewTeamsTeamsRoleInvitation {}
 impl Tabular for NewTeamsTeamsRoleInvitation {
     const TABLE: Table = Table::TeamsTeamsRoleInvitations;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewTeamsUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -537,7 +661,18 @@ unsafe impl Sync for NewTeamsUsersRoleInvitation {}
 impl Tabular for NewTeamsUsersRoleInvitation {
     const TABLE: Table = Table::TeamsUsersRoleInvitations;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewTeamsUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -549,7 +684,18 @@ unsafe impl Sync for NewTeamsUsersRoleRequest {}
 impl Tabular for NewTeamsUsersRoleRequest {
     const TABLE: Table = Table::TeamsUsersRoleRequests;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewTeamsUsersRole {
     pub table_id: i32,
     pub user_id: i32,
@@ -588,7 +734,18 @@ unsafe impl Sync for NewUser {}
 impl Tabular for NewUser {
     const TABLE: Table = Table::Users;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewUsersUsersRoleInvitation {
     pub table_id: i32,
     pub user_id: i32,
@@ -600,7 +757,18 @@ unsafe impl Sync for NewUsersUsersRoleInvitation {}
 impl Tabular for NewUsersUsersRoleInvitation {
     const TABLE: Table = Table::UsersUsersRoleInvitations;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewUsersUsersRoleRequest {
     pub table_id: i32,
     pub user_id: i32,
@@ -612,7 +780,18 @@ unsafe impl Sync for NewUsersUsersRoleRequest {}
 impl Tabular for NewUsersUsersRoleRequest {
     const TABLE: Table = Table::UsersUsersRoleRequests;
 }
-#[derive(Eq, PartialEq, PartialOrd, Debug, Clone, Copy, Ord, serde::Serialize, serde::Deserialize, Default)]
+#[derive(
+    Eq,
+    PartialEq,
+    PartialOrd,
+    Debug,
+    Clone,
+    Copy,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+)]
 pub struct NewUsersUsersRole {
     pub table_id: i32,
     pub user_id: i32,

@@ -155,7 +155,7 @@ def data_type_to_absolute_import_path(
         if route == "frontend":
             return "web_common::types::Point"
 
-    raise ValueError(f"Unsupported data type: {data_type}")
+    raise NotImplementedError(f"Unsupported data type: {data_type}")
 
 
 class AttributeMetadata:
@@ -305,6 +305,10 @@ class AttributeMetadata:
         """Returns whether the attribute is a point."""
         return self.data_type(route="frontend") == "web_common::types::Point"
 
+    def is_boolean(self) -> bool:
+        """Returns whether the attribute is a boolean."""
+        return self.data_type(route="frontend") == "bool"
+
     def is_date_type(self) -> bool:
         """Returns whether the attribute is a date type."""
         return self.data_type(route="frontend") == "chrono::NaiveDateTime"
@@ -317,7 +321,7 @@ class AttributeMetadata:
         """Returns whether the attribute has a struct data type."""
         return isinstance(self._data_type, StructMetadata)
 
-    def format_data_type(self, route: str, diesel: bool = False) -> str:
+    def format_data_type(self, route: str, diesel: bool = False, skip_remap: bool = False) -> str:
         """Returns the formatted data type of the attribute.
 
         Parameters
@@ -331,7 +335,15 @@ class AttributeMetadata:
         if diesel:
             assert not self.has_struct_data_type()
 
-        data_type = self.data_type(route=route)
+        if skip_remap:
+            data_type = self.raw_data_type()
+        else:
+            try:
+                data_type = self.data_type(route=route)
+            except NotImplementedError as e:
+                raise NotImplementedError(
+                    f"Could not format the data type of the attribute {self.name}."
+                ) from e
 
         if diesel:
             data_type = rust_type_to_diesel_type(data_type)
@@ -369,9 +381,7 @@ class AttributeMetadata:
             The route of the file.
             Can either be 'backend', 'web_common', or 'frontend'.
         """
-        if isinstance(self._data_type, StructMetadata):
-            return data_type_to_absolute_import_path(self._data_type, route)
-        elif isinstance(self._data_type, str):
+        if isinstance(self._data_type, StructMetadata) or isinstance(self._data_type, str):
             return data_type_to_absolute_import_path(self._data_type, route)
 
         raise ValueError("The data type must be either a string or a StructMetadata.")
@@ -462,6 +472,10 @@ class AttributeMetadata:
                 "chrono::NaiveDateTime",
             ]
         )
+
+    def implements_as_ref_str(self) -> bool:
+        """Returns whether the attribute implements AsRef<str>"""
+        return self.data_type(route="frontend") in ("str", "String")
 
     def is_creator_user_id(self) -> bool:
         """Returns whether the attribute is the creator user ID."""
@@ -716,6 +730,7 @@ class MethodDefinition:
         self.owner: Optional["StructMetadata"] = None
         self.is_async = is_async
         self.generics: List[str] = []
+        self.where_clauses: List[str] = []
         assert isinstance(summary, str), (
             "The summary must be a string. "
             f"The provided summary is a {type(summary)}."
@@ -778,6 +793,17 @@ class MethodDefinition:
         """
         assert len(generic) > 0, "The generic must not be empty."
         self.generics.append(generic)
+
+    def add_where_clause(self, where_clause: str):
+        """Adds a where clause to the method.
+
+        Parameters
+        ----------
+        where_clause : str
+            The where clause to add to the method.
+        """
+        assert len(where_clause) > 0, "The where clause must not be empty."
+        self.where_clauses.append(where_clause)
 
     def set_owner(self, owner: "StructMetadata"):
         """Sets the owner of the method.
@@ -923,6 +949,16 @@ class MethodDefinition:
 
         return result
 
+    def has_self_owned(self) -> bool:
+        """Returns whether the method has a reference to self."""
+        return any(
+            argument.name == "self"
+            and not argument.reference
+            and argument.has_struct_data_type()
+            and argument.raw_data_type().name == self.owner.name
+            for argument in self.arguments
+        )
+
     def __eq__(self, other: "MethodDefinition") -> bool:
         if not isinstance(other, MethodDefinition):
             return False
@@ -965,15 +1001,35 @@ class MethodDefinition:
 
         document.write(f"    {self.visibility} {async_name}fn {self.name}{generics}(\n")
         for argument in self.arguments:
-            if argument.name == "self" and argument.reference:
-                document.write("        &self,\n")
-                continue
-            document.write(
-                f"{argument.name}: {argument.format_data_type(route=route)},\n"
-            )
+            if argument.name == "self":
+                if argument.reference:
+                    document.write("        &self,\n")
+                    continue
+                else:
+                    document.write("        self,\n")
+                    continue
+            try:
+                document.write(
+                    f"{argument.name}: {argument.format_data_type(route=route)},\n"
+                )
+            except NotImplementedError as e:
+                raise NotImplementedError(
+                    f"Could not write the header of the method {self.name}."
+                ) from e
         document.write(")")
         if self.return_type is not None:
-            document.write(f" -> {self.return_type.format_data_type(route=route)}")
+            if not self.return_type.has_struct_data_type() and any(
+                self.return_type.raw_data_type() == generic or generic.startswith(f"{self.return_type.raw_data_type()}:")
+                for generic in self.generics
+            ):
+                return_type = self.return_type.format_data_type(route=route, skip_remap=True)
+            else:
+                return_type = self.return_type.format_data_type(route=route)
+            document.write(f" -> {return_type}")
+        
+        if len(self.where_clauses) > 0:
+            document.write(" where\n")
+            document.write(",\n".join(self.where_clauses))
 
 
 class StructMetadata:
@@ -1389,6 +1445,10 @@ class StructMetadata:
     def backend_methods(self) -> List[MethodDefinition]:
         """Returns the methods of the struct."""
         return self._backend_methods
+
+    def webcommon_methods(self) -> List[MethodDefinition]:
+        """Returns the methods of the struct."""
+        return self._webcommon_methods
 
     def human_readable_name(self) -> str:
         """Returns the human readable name of the struct.
@@ -2311,6 +2371,10 @@ class StructMetadata:
         """Returns whether the struct has a public column."""
         return self.get_public_column() is not None
 
+    def has_images(self) -> bool:
+        """Returns whether the struct has JPEGs."""
+        return any(attribute.is_jpeg() for attribute in self.attributes)
+
     def get_public_column(self) -> Optional[AttributeMetadata]:
         """Returns the public column of the struct."""
         if self._flat_variant is not None:
@@ -2476,6 +2540,18 @@ class StructMetadata:
         if self._flat_variant is not None:
             return self._flat_variant.is_searchable()
         return self.has_primary_search_index() or self.has_derived_search_indices()
+
+    def has_searchable_attributes(self) -> bool:
+        """Returns whether the struct has searchable attributes.
+
+        Implementation details
+        -----------------------
+        A struct has searchable attributes if it has a trigram index on the table.
+        """
+        return any(
+            attribute.implements_as_ref_str() or attribute.has_struct_data_type() and attribute.raw_data_type().is_searchable()
+            for attribute in self.attributes
+        )
 
     def get_can_update_function_name(self) -> str:
         """Returns the name of the can_update function."""

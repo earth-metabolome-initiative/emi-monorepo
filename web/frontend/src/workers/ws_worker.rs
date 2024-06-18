@@ -5,8 +5,6 @@ use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
 use gluesql::prelude::*;
-use web_common::database::*;
-// use sql_minifier::macros::load_sql;
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -17,6 +15,7 @@ use web_common::api::ws::messages::BackendMessage;
 use web_common::api::ws::messages::CloseReason;
 use web_common::api::ws::messages::FrontendMessage;
 use web_common::api::ApiError;
+use web_common::database::*;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;
@@ -59,19 +58,6 @@ impl ComponentMessage {
         ))
     }
 
-    pub(crate) fn all_by_updated_at<R: Tabular + Filtrable>(
-        filter: Option<R::Filter>,
-        limit: i64,
-        offset: i64,
-    ) -> Self {
-        Self::Operation(Operation::Select(Select::all_by_updated_at(
-            R::TABLE,
-            filter.map(|filter| bincode::serialize(&filter).unwrap()),
-            limit,
-            offset,
-        )))
-    }
-
     pub(crate) fn get<R: Tabular>(primary_key: PrimaryKey) -> Self {
         Self::Operation(Operation::Select(Select::id(R::TABLE, primary_key)))
     }
@@ -106,7 +92,6 @@ pub enum WebsocketMessage {
     Notification(NotificationMessage),
     SearchTable(Vec<u8>),
     GetTable(Option<String>, Vec<u8>),
-    AllTable(Vec<u8>),
     CanView(bool),
     CanUpdate(bool),
     CanDelete(bool),
@@ -182,12 +167,6 @@ impl WebsocketWorker {
                                 ),
                                 Err(err) => BackendMessage::Error(task_id, err),
                             }
-                        }
-                        Select::All { .. } => {
-                            todo!()
-                        }
-                        Select::AllByUpdatedAt { .. } => {
-                            todo!()
                         }
                         Select::SearchTable { .. } => {
                             todo!()
@@ -361,13 +340,6 @@ impl Worker for WebsocketWorker {
                         if let Some(subscriber_id) = self.tasks.remove(&task_id) {
                             scope
                                 .respond(subscriber_id, WebsocketMessage::GetTable(task_name, row));
-                        }
-                    }
-                    BackendMessage::AllTable(task_id, rows) => {
-                        log::debug!("Received all table message");
-                        // We save locally the table data (maybe?)
-                        if let Some(subscriber_id) = self.tasks.remove(&task_id) {
-                            scope.respond(subscriber_id, WebsocketMessage::AllTable(rows));
                         }
                     }
                     BackendMessage::SearchTable(task_id, rows) => {

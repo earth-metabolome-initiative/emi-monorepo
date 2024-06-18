@@ -84,7 +84,7 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
             )
         document.write(
             "    /// * `connection` - The database connection.\n"
-            "    pub fn from_flat(\n"
+            "    fn from_flat(\n"
             f"        flat_variant: {flat_variant.name},\n"
         )
 

@@ -8,65 +8,6 @@ use web_common::database::*;
 use yew::prelude::*;
 
 impl RowToBadge for SearchableStruct {
-    fn similarity_score<S: AsRef<str>>(&self, query: S) -> isize {
-        match self {
-            SearchableStruct::NestedBioOttRank(value) => value.similarity_score(query),
-            SearchableStruct::NestedBioOttTaxonItem(value) => value.similarity_score(query),
-            SearchableStruct::NestedDerivedSample(value) => value.similarity_score(query),
-            SearchableStruct::NestedDocumentFormat(value) => value.similarity_score(query),
-            SearchableStruct::NestedNameplateCategory(value) => value.similarity_score(query),
-            SearchableStruct::NestedNameplate(value) => value.similarity_score(query),
-            SearchableStruct::NestedObservationSubject(value) => value.similarity_score(query),
-            SearchableStruct::NestedObservation(value) => value.similarity_score(query),
-            SearchableStruct::NestedOrganismBioOttTaxonItem(value) => value.similarity_score(query),
-            SearchableStruct::NestedOrganism(value) => value.similarity_score(query),
-            SearchableStruct::NestedOrganization(value) => value.similarity_score(query),
-            SearchableStruct::NestedProjectState(value) => value.similarity_score(query),
-            SearchableStruct::NestedProject(value) => value.similarity_score(query),
-            SearchableStruct::NestedProjectsTeamsRoleInvitation(value) => {
-                value.similarity_score(query)
-            }
-            SearchableStruct::NestedProjectsTeamsRoleRequest(value) => {
-                value.similarity_score(query)
-            }
-            SearchableStruct::NestedProjectsTeamsRole(value) => value.similarity_score(query),
-            SearchableStruct::NestedProjectsUsersRoleInvitation(value) => {
-                value.similarity_score(query)
-            }
-            SearchableStruct::NestedProjectsUsersRoleRequest(value) => {
-                value.similarity_score(query)
-            }
-            SearchableStruct::NestedProjectsUsersRole(value) => value.similarity_score(query),
-            SearchableStruct::NestedRole(value) => value.similarity_score(query),
-            SearchableStruct::NestedSampleBioOttTaxonItem(value) => value.similarity_score(query),
-            SearchableStruct::NestedSampleContainerCategory(value) => value.similarity_score(query),
-            SearchableStruct::NestedSampleContainer(value) => value.similarity_score(query),
-            SearchableStruct::NestedSampleState(value) => value.similarity_score(query),
-            SearchableStruct::NestedSample(value) => value.similarity_score(query),
-            SearchableStruct::NestedSpectraCollection(value) => value.similarity_score(query),
-            SearchableStruct::NestedTeamState(value) => value.similarity_score(query),
-            SearchableStruct::NestedTeam(value) => value.similarity_score(query),
-            SearchableStruct::NestedTeamsTeamsRoleInvitation(value) => {
-                value.similarity_score(query)
-            }
-            SearchableStruct::NestedTeamsUsersRoleInvitation(value) => {
-                value.similarity_score(query)
-            }
-            SearchableStruct::NestedTeamsUsersRoleRequest(value) => value.similarity_score(query),
-            SearchableStruct::NestedTeamsUsersRole(value) => value.similarity_score(query),
-            SearchableStruct::NestedUnit(value) => value.similarity_score(query),
-            SearchableStruct::NestedUser(value) => value.similarity_score(query),
-            SearchableStruct::NestedUsersUsersRoleInvitation(value) => {
-                value.similarity_score(query)
-            }
-            SearchableStruct::NestedUsersUsersRoleRequest(value) => value.similarity_score(query),
-            SearchableStruct::NestedUsersUsersRole(value) => value.similarity_score(query),
-            SearchableStruct::Color(value) => value.similarity_score(query),
-            SearchableStruct::Country(value) => value.similarity_score(query),
-            SearchableStruct::FontAwesomeIcon(value) => value.similarity_score(query),
-        }
-    }
-
     fn badge_title(&self) -> String {
         match self {
             SearchableStruct::NestedBioOttRank(value) => value.badge_title(),

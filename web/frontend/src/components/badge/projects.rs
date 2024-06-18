@@ -1,5 +1,4 @@
 use super::{Badge, BadgeSize, RowToBadge};
-use crate::traits::format_match::FormatMatch;
 use web_common::database::*;
 use yew::prelude::*;
 
@@ -14,15 +13,6 @@ impl RowToBadge for NestedProject {
 
     fn font_awesome_icon(&self) -> Option<&str> {
         self.icon.font_awesome_icon()
-    }
-
-    fn similarity_score<S: AsRef<str>>(&self, query: S) -> isize {
-        let query = query.as_ref();
-        (self.inner.name.similarity_score(query)
-            + self.inner.description.similarity_score(query)
-            + self.created_by.similarity_score(query)
-            + self.updated_by.similarity_score(query))
-            / 4
     }
 
     fn children(&self, props: &super::BadgeProps<Self>) -> Option<yew::prelude::Html> {

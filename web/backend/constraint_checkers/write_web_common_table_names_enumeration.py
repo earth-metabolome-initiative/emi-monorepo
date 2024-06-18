@@ -161,7 +161,7 @@ def write_web_common_table_names_enumeration(
         "        &self,\n"
         "        primary_key: crate::database::operations::PrimaryKey,\n"
         "        connection: &mut gluesql::prelude::Glue<C>,\n"
-        "    ) -> Result<usize, gluesql::prelude::Error> where\n"
+        "    ) -> Result<usize, crate::api::ApiError> where\n"
         "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
         "    {\n"
         "        match self {\n"
@@ -251,56 +251,6 @@ def write_web_common_table_names_enumeration(
             )
 
         document.write("            },\n")
-
-    document.write("        }\n    }\n")
-
-    # Next, for all the tables that have an updated_at column, we implement the
-    # `all_by_updated_at` method, which returns all of the rows ordered by the
-    # `updated_at` column. When the table does not have an `updated_at` column,
-    # we panic with an unimplemented!() macro.
-
-    document.write(
-        "    /// Get all the rows from the table ordered by the `updated_at` column.\n"
-        "    ///\n"
-        "    /// # Arguments\n"
-        "    /// * `filter` - The filter to apply to the rows.\n"
-        "    /// * `limit` - The maximum number of rows to return.\n"
-        "    /// * `offset` - The number of rows to skip. By default `0`.\n"
-        "    /// * `connection` - The database connection.\n"
-        "    ///\n"
-        "    /// # Returns\n"
-        "    /// A vector of the rows of the table.\n"
-        "    pub async fn all_by_updated_at<C>(\n"
-        "        &self,\n"
-        "        filter: Option<Vec<u8>>,\n"
-        "        limit: Option<i64>,\n"
-        "        offset: Option<i64>,\n"
-        "        connection: &mut gluesql::prelude::Glue<C>,\n"
-        "    ) -> Result<Vec<Vec<u8>>, crate::api::ApiError> where\n"
-        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
-        "    {\n"
-        "        match self {\n"
-    )
-
-    for table in tables:
-        if table.has_updated_at_column():
-            document.write(f"            Table::{table.camel_cased()} => {{\n")
-            if table.has_filter_variant():
-                filter_variant = table.get_filter_variant()
-                document.write(
-                    f"                let filter: Option<crate::database::{filter_variant.name}> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;\n"
-                    f"                crate::database::{table.richest_struct_name()}::all_by_updated_at(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
-                )
-            else:
-                document.write(
-                    '                 assert!(filter.is_none(), "Filter not implemented for this table.");\n'
-                    f"                crate::database::{table.richest_struct_name()}::all_by_updated_at(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
-                )
-            document.write("            },\n")
-        else:
-            document.write(
-                f'            Table::{table.camel_cased()} => unimplemented!("all_by_updated_at not implemented for {table.name}."),\n'
-            )
 
     document.write("        }\n    }\n")
 

@@ -151,7 +151,7 @@ def write_web_common_new_variants(
             "        self,\n"
             f"        {creator_user_id_attribute.name}: {creator_user_id_attribute.format_data_type(route='web_common')},\n"
             "        connection: &mut gluesql::prelude::Glue<C>,\n"
-            f"    ) -> Result<super::{struct.get_flat_variant().name}, gluesql::prelude::Error> where\n"
+            f"    ) -> Result<super::{struct.get_flat_variant().name}, crate::api::ApiError> where\n"
             "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
             "    {\n"
             "        use gluesql::core::ast_builder::*;\n"

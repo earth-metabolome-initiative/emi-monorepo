@@ -22,7 +22,7 @@ enum ScannerStatus {
     Scanning,
     Closing,
     StartingFlashlight,
-    Closed
+    Closed,
 }
 
 impl ScannerStatus {
@@ -169,7 +169,7 @@ pub struct ScannerProps {
     pub onerror: Callback<ApiError>,
     #[prop_or_default]
     pub onclose: Callback<()>,
-    #[prop_or(25)]
+    #[prop_or(30)]
     pub refresh_milliseconds: u32,
     #[prop_or(0.5)]
     crop_percentage: f64,
@@ -420,7 +420,7 @@ impl Component for Scanner {
                     });
                     return true;
                 }
-                
+
                 self.status = ScannerStatus::Scanning;
                 self.start_scanning_time = chrono::Local::now();
                 self.number_of_scan_attempts = 0;
@@ -582,6 +582,7 @@ impl Component for Scanner {
                     </div>
                     <div class="ongoing-operation">
                         <i class={format!("fas fa-{}", self.status.icon())}></i>
+                        {"\u{00A0}"}
                         <span>{self.status.to_string()}</span>
                     </div>
                 </div>
