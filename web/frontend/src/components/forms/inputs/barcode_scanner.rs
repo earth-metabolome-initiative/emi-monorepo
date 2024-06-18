@@ -549,7 +549,7 @@ impl Component for Scanner {
 
         html! {
             <>
-            <video ref={&self.video_ref} autoPlay="true" style="display:none;" ontimeupdate={time_update} onplaying={ctx.link().callback(|_| ScannerMessage::VideoReady)} muted={true} playsinline={true}></video>
+            <video ref={&self.video_ref} ontimeupdate={time_update} onplaying={ctx.link().callback(|_| ScannerMessage::VideoReady)} muted={true} playsinline={true} autoplay={true}></video>
             if !self.is_scanning {
                 <button onclick={toggle_scanner} title="Start Scanner" class="start-scanner">
                     <i class="fas fa-qrcode"></i>
@@ -557,7 +557,7 @@ impl Component for Scanner {
             } else {
                 <div class={classes} onclick={&close_scanner}>
                     if let Some(video) = self.video_ref.cast::<HtmlVideoElement>() {
-                        <canvas ref={&self.canvas_ref} width={video.video_width().to_string()} height={video.video_height().to_string()}></canvas>
+                        <canvas ref={&self.canvas_ref} style="display:none;" width={video.video_width().to_string()} height={video.video_height().to_string()}></canvas>
                     }
                     <div class="scanner-focus-container">
                         <div class="scanner-focus"></div>

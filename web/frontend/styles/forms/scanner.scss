@@ -15,7 +15,7 @@
     transition: opacity 0.3s;
     opacity: 0;
 
-    canvas {
+    video {
         position: absolute;
         top: 0;
         left: 0;
@@ -73,7 +73,7 @@
     }
 
     &.mirrored {
-        canvas {
+        video {
             transform: rotateY(180deg);
             -webkit-transform:rotateY(180deg); /* Safari and Chrome */
             -moz-transform:rotateY(180deg); /* Firefox */
