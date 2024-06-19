@@ -138,7 +138,7 @@ fn insert_user_emails(
     provider_id: i32,
     emails: &[String],
     pool: &Pool<ConnectionManager<PgConnection>>,
-) -> QueryResult<()> {
+) -> Result<(), web_common::api::ApiError> {
     let mut conn = pool.get().unwrap();
 
     for email in emails {
@@ -167,7 +167,7 @@ pub(crate) fn renormalize_user_emails(
     provider_id: i32,
     emails: Emails,
     pool: &Pool<ConnectionManager<PgConnection>>,
-) -> QueryResult<User> {
+) -> Result<User, web_common::api::ApiError> {
     use crate::database::schema::users::dsl::*;
 
     // First, we need to identify how many of the emails are already associated with users.

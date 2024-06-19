@@ -30,7 +30,7 @@ pub(crate) fn create_user(
     provider_id: i32,
     user_emails: Emails,
     pool: &Pool<ConnectionManager<PgConnection>>,
-) -> QueryResult<User> {
+) -> Result<User, web_common::api::ApiError> {
     let chained_emails = user_emails.emails().join(", ");
     let mut identicon = Identicon::new(&chained_emails);
     identicon.set_scale(256).unwrap();
@@ -59,7 +59,7 @@ pub(crate) fn create_user(
     conn.batch_execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;")
         .expect("Failed to set transaction isolation level");
 
-    conn.transaction::<_, diesel::result::Error, _>(|conn| {
+    conn.transaction::<_, web_common::api::ApiError, _>(|conn| {
         // Step 1: Insert the user into the users table
         log::debug!("Inserting new user in table from provider {}", provider_id);
         let user = new_user.insert(0, conn)?;
