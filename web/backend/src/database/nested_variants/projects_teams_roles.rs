@@ -194,31 +194,12 @@ impl NestedProjectsTeamsRole {
         .collect()
     }
     /// Check whether the user can update the struct.
-    ///
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update(
-        &self,
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        self.inner.can_update(author_user_id, connection)
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        self.inner.can_update()
     }
     /// Check whether the user can update the struct associated to the provided ids.
-    ///
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update_by_id(
-        (table_id, team_id): (i32, i32),
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        ProjectsTeamsRole::can_update_by_id((table_id, team_id), author_user_id, connection)
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        ProjectsTeamsRole::can_update_by_id()
     }
     /// Get all of the updatable structs from the database.
     ///

@@ -22,7 +22,7 @@ pub(crate) trait InsertRow {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error>;
+    ) -> Result<Self::Flat, web_common::api::ApiResult>;
 }
 
 /// Intermediate representation of the new variant NewDerivedSample.
@@ -58,11 +58,11 @@ impl InsertRow for web_common::database::NewDerivedSample {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::derived_samples;
-        diesel::insert_into(derived_samples::dsl::derived_samples)
+        Ok(diesel::insert_into(derived_samples::dsl::derived_samples)
             .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+            .get_result(connection)?)
     }
 }
 
@@ -99,11 +99,11 @@ impl InsertRow for web_common::database::NewNameplate {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::nameplates;
-        diesel::insert_into(nameplates::dsl::nameplates)
+        Ok(diesel::insert_into(nameplates::dsl::nameplates)
             .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+            .get_result(connection)?)
     }
 }
 
@@ -148,11 +148,11 @@ impl InsertRow for web_common::database::NewObservation {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::observations;
-        diesel::insert_into(observations::dsl::observations)
+        Ok(diesel::insert_into(observations::dsl::observations)
             .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+            .get_result(connection)?)
     }
 }
 
@@ -183,11 +183,13 @@ impl InsertRow for web_common::database::NewOrganismBioOttTaxonItem {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::organism_bio_ott_taxon_items;
-        diesel::insert_into(organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -230,11 +232,11 @@ impl InsertRow for web_common::database::NewOrganism {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::organisms;
-        diesel::insert_into(organisms::dsl::organisms)
+        Ok(diesel::insert_into(organisms::dsl::organisms)
             .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+            .get_result(connection)?)
     }
 }
 
@@ -285,11 +287,11 @@ impl InsertRow for web_common::database::NewProject {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::projects;
-        diesel::insert_into(projects::dsl::projects)
+        Ok(diesel::insert_into(projects::dsl::projects)
             .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+            .get_result(connection)?)
     }
 }
 
@@ -322,11 +324,13 @@ impl InsertRow for web_common::database::NewProjectsTeamsRoleInvitation {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::projects_teams_role_invitations;
-        diesel::insert_into(projects_teams_role_invitations::dsl::projects_teams_role_invitations)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(diesel::insert_into(
+            projects_teams_role_invitations::dsl::projects_teams_role_invitations,
+        )
+        .values(InsertRow::to_intermediate(self, user_id))
+        .get_result(connection)?)
     }
 }
 
@@ -359,11 +363,13 @@ impl InsertRow for web_common::database::NewProjectsTeamsRoleRequest {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::projects_teams_role_requests;
-        diesel::insert_into(projects_teams_role_requests::dsl::projects_teams_role_requests)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(projects_teams_role_requests::dsl::projects_teams_role_requests)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -396,11 +402,13 @@ impl InsertRow for web_common::database::NewProjectsTeamsRole {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::projects_teams_roles;
-        diesel::insert_into(projects_teams_roles::dsl::projects_teams_roles)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(projects_teams_roles::dsl::projects_teams_roles)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -433,11 +441,13 @@ impl InsertRow for web_common::database::NewProjectsUsersRoleInvitation {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::projects_users_role_invitations;
-        diesel::insert_into(projects_users_role_invitations::dsl::projects_users_role_invitations)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(diesel::insert_into(
+            projects_users_role_invitations::dsl::projects_users_role_invitations,
+        )
+        .values(InsertRow::to_intermediate(self, user_id))
+        .get_result(connection)?)
     }
 }
 
@@ -470,11 +480,13 @@ impl InsertRow for web_common::database::NewProjectsUsersRoleRequest {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::projects_users_role_requests;
-        diesel::insert_into(projects_users_role_requests::dsl::projects_users_role_requests)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(projects_users_role_requests::dsl::projects_users_role_requests)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -507,11 +519,13 @@ impl InsertRow for web_common::database::NewProjectsUsersRole {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::projects_users_roles;
-        diesel::insert_into(projects_users_roles::dsl::projects_users_roles)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(projects_users_roles::dsl::projects_users_roles)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -542,11 +556,13 @@ impl InsertRow for web_common::database::NewSampleBioOttTaxonItem {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::sample_bio_ott_taxon_items;
-        diesel::insert_into(sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -581,11 +597,13 @@ impl InsertRow for web_common::database::NewSampleContainer {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::sample_containers;
-        diesel::insert_into(sample_containers::dsl::sample_containers)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(sample_containers::dsl::sample_containers)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -626,11 +644,11 @@ impl InsertRow for web_common::database::NewSample {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::samples;
-        diesel::insert_into(samples::dsl::samples)
+        Ok(diesel::insert_into(samples::dsl::samples)
             .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+            .get_result(connection)?)
     }
 }
 
@@ -663,11 +681,13 @@ impl InsertRow for web_common::database::NewSpectraCollection {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::spectra_collections;
-        diesel::insert_into(spectra_collections::dsl::spectra_collections)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(spectra_collections::dsl::spectra_collections)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -708,11 +728,11 @@ impl InsertRow for web_common::database::NewTeam {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::teams;
-        diesel::insert_into(teams::dsl::teams)
+        Ok(diesel::insert_into(teams::dsl::teams)
             .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+            .get_result(connection)?)
     }
 }
 
@@ -745,11 +765,13 @@ impl InsertRow for web_common::database::NewTeamsTeamsRoleInvitation {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::teams_teams_role_invitations;
-        diesel::insert_into(teams_teams_role_invitations::dsl::teams_teams_role_invitations)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(teams_teams_role_invitations::dsl::teams_teams_role_invitations)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -782,11 +804,13 @@ impl InsertRow for web_common::database::NewTeamsUsersRoleInvitation {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::teams_users_role_invitations;
-        diesel::insert_into(teams_users_role_invitations::dsl::teams_users_role_invitations)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(teams_users_role_invitations::dsl::teams_users_role_invitations)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -819,11 +843,13 @@ impl InsertRow for web_common::database::NewTeamsUsersRoleRequest {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::teams_users_role_requests;
-        diesel::insert_into(teams_users_role_requests::dsl::teams_users_role_requests)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(teams_users_role_requests::dsl::teams_users_role_requests)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -856,11 +882,13 @@ impl InsertRow for web_common::database::NewTeamsUsersRole {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::teams_users_roles;
-        diesel::insert_into(teams_users_roles::dsl::teams_users_roles)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(teams_users_roles::dsl::teams_users_roles)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -893,11 +921,11 @@ impl InsertRow for web_common::database::NewUserEmail {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::user_emails;
-        diesel::insert_into(user_emails::dsl::user_emails)
+        Ok(diesel::insert_into(user_emails::dsl::user_emails)
             .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+            .get_result(connection)?)
     }
 }
 
@@ -934,12 +962,12 @@ impl InsertRow for web_common::database::NewUser {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::users;
         assert_eq!(user_id, 0);
-        diesel::insert_into(users::dsl::users)
+        Ok(diesel::insert_into(users::dsl::users)
             .values(InsertRow::to_intermediate(self, 0))
-            .get_result(connection)
+            .get_result(connection)?)
     }
 }
 
@@ -972,11 +1000,13 @@ impl InsertRow for web_common::database::NewUsersUsersRoleInvitation {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::users_users_role_invitations;
-        diesel::insert_into(users_users_role_invitations::dsl::users_users_role_invitations)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(users_users_role_invitations::dsl::users_users_role_invitations)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -1009,11 +1039,13 @@ impl InsertRow for web_common::database::NewUsersUsersRoleRequest {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::users_users_role_requests;
-        diesel::insert_into(users_users_role_requests::dsl::users_users_role_requests)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(users_users_role_requests::dsl::users_users_role_requests)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }
 
@@ -1046,10 +1078,12 @@ impl InsertRow for web_common::database::NewUsersUsersRole {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, diesel::result::Error> {
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
         use crate::database::schema::users_users_roles;
-        diesel::insert_into(users_users_roles::dsl::users_users_roles)
-            .values(InsertRow::to_intermediate(self, user_id))
-            .get_result(connection)
+        Ok(
+            diesel::insert_into(users_users_roles::dsl::users_users_roles)
+                .values(InsertRow::to_intermediate(self, user_id))
+                .get_result(connection)?,
+        )
     }
 }

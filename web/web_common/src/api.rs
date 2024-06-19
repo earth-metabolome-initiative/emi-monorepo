@@ -261,11 +261,21 @@ impl From<diesel::result::Error> for ApiError {
         match e {
             diesel::result::Error::DatabaseError(kind, information) => {
                 log::error!("Database error {:?}: message: {:?}, details: {:?}, hint: {:?}, table_name: {:?}, column_name: {:?}, constraint_name: {:?}, statement_position: {:?}", kind, information.message(), information.details(), information.hint(), information.table_name(), information.column_name(), information.constraint_name(), information.statement_position());
+
                 match kind {
                     diesel::result::DatabaseErrorKind::UniqueViolation => Self::BadRequest(vec![
                         "You are attempting to create a duplicate entry".to_string(),
                     ]),
-                    _ => Self::InternalServerError,
+                    diesel::result::DatabaseErrorKind::ForeignKeyViolation => {
+                        Self::BadRequest(vec![
+                            "You are attempting to create a reference to a non-existent entry"
+                                .to_string(),
+                        ])
+                    }
+                    _ => match information.message() {
+                        "unauthorized_update" => Self::Unauthorized,
+                        _ => Self::InternalServerError,
+                    },
                 }
             }
             diesel::result::Error::NotFound => Self::BadRequest(vec!["Not found".to_string()]),

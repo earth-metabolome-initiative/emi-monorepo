@@ -443,39 +443,12 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.
-    ///
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update(
-        &self,
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        Self::can_update_by_id((self.table_id, self.team_id), author_user_id, connection)
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
     }
     /// Check whether the user can update the struct associated to the provided ids.
-    ///
-    /// * `( table_id, team_id )` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update_by_id(
-        (table_id, team_id): (i32, i32),
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(
-            crate::database::sql_function_bindings::can_update_teams_teams_role_invitations(
-                author_user_id,
-                table_id,
-                team_id,
-            ),
-        )
-        .get_result(connection)
-        .map_err(web_common::api::ApiError::from)
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
     }
     /// Get all of the updatable structs from the database.
     ///
@@ -496,13 +469,6 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
         use crate::database::schema::teams_teams_role_invitations;
         let query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
             .select(TeamsTeamsRoleInvitation::as_select())
-            .filter(
-                crate::database::sql_function_bindings::can_update_teams_teams_role_invitations(
-                    author_user_id,
-                    teams_teams_role_invitations::dsl::table_id,
-                    teams_teams_role_invitations::dsl::team_id,
-                ),
-            )
             .order_by(teams_teams_role_invitations::dsl::table_id);
         let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
@@ -542,13 +508,6 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
         use crate::database::schema::teams_teams_role_invitations;
         let query = teams_teams_role_invitations::dsl::teams_teams_role_invitations
             .select(TeamsTeamsRoleInvitation::as_select())
-            .filter(
-                crate::database::sql_function_bindings::can_update_teams_teams_role_invitations(
-                    author_user_id,
-                    teams_teams_role_invitations::dsl::table_id,
-                    teams_teams_role_invitations::dsl::team_id,
-                ),
-            )
             .order_by(teams_teams_role_invitations::dsl::created_at.desc());
         let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
@@ -614,13 +573,6 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
                         .on(teams_teams_role_invitations::dsl::role_id.eq(roles::dsl::id)),
                 )
                 .select(TeamsTeamsRoleInvitation::as_select())
-                .filter(
-                    crate::database::sql_function_bindings::can_update_teams_teams_role_invitations(
-                        author_user_id,
-                        teams_teams_role_invitations::dsl::table_id,
-                        teams_teams_role_invitations::dsl::team_id,
-                    ),
-                )
                 .filter(
                     crate::database::sql_function_bindings::concat_teams_name_description(
                         teams0.field(teams::dsl::name),

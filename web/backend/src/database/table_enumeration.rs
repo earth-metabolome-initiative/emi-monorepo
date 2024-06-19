@@ -1763,11 +1763,7 @@ connection)?)?
                 NestedObservation::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::OrganismBioOttTaxonItems => {
-                NestedOrganismBioOttTaxonItem::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedOrganismBioOttTaxonItem::can_update_by_id()?
             }
             web_common::database::Table::Organisms => {
                 NestedOrganism::can_update_by_id(primary_key.into(), author_user_id, connection)?
@@ -1781,54 +1777,26 @@ connection)?)?
                 NestedProject::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::ProjectsTeamsRoleInvitations => {
-                NestedProjectsTeamsRoleInvitation::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedProjectsTeamsRoleInvitation::can_update_by_id()?
             }
             web_common::database::Table::ProjectsTeamsRoleRequests => {
-                NestedProjectsTeamsRoleRequest::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedProjectsTeamsRoleRequest::can_update_by_id()?
             }
             web_common::database::Table::ProjectsTeamsRoles => {
-                NestedProjectsTeamsRole::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedProjectsTeamsRole::can_update_by_id()?
             }
             web_common::database::Table::ProjectsUsersRoleInvitations => {
-                NestedProjectsUsersRoleInvitation::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedProjectsUsersRoleInvitation::can_update_by_id()?
             }
             web_common::database::Table::ProjectsUsersRoleRequests => {
-                NestedProjectsUsersRoleRequest::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedProjectsUsersRoleRequest::can_update_by_id()?
             }
             web_common::database::Table::ProjectsUsersRoles => {
-                NestedProjectsUsersRole::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedProjectsUsersRole::can_update_by_id()?
             }
             web_common::database::Table::Roles => NestedRole::can_update_by_id()?,
             web_common::database::Table::SampleBioOttTaxonItems => {
-                NestedSampleBioOttTaxonItem::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedSampleBioOttTaxonItem::can_update_by_id()?
             }
             web_common::database::Table::SampleContainerCategories => {
                 NestedSampleContainerCategory::can_update_by_id()?
@@ -1857,57 +1825,31 @@ connection)?)?
                 NestedTeam::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::TeamsTeamsRoleInvitations => {
-                NestedTeamsTeamsRoleInvitation::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedTeamsTeamsRoleInvitation::can_update_by_id()?
             }
             web_common::database::Table::TeamsUsersRoleInvitations => {
-                NestedTeamsUsersRoleInvitation::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedTeamsUsersRoleInvitation::can_update_by_id()?
             }
             web_common::database::Table::TeamsUsersRoleRequests => {
-                NestedTeamsUsersRoleRequest::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedTeamsUsersRoleRequest::can_update_by_id()?
             }
-            web_common::database::Table::TeamsUsersRoles => NestedTeamsUsersRole::can_update_by_id(
-                primary_key.into(),
-                author_user_id,
-                connection,
-            )?,
+            web_common::database::Table::TeamsUsersRoles => {
+                NestedTeamsUsersRole::can_update_by_id()?
+            }
             web_common::database::Table::Units => NestedUnit::can_update_by_id()?,
-            web_common::database::Table::UserEmails => {
-                NestedUserEmail::can_update_by_id(primary_key.into(), author_user_id, connection)?
-            }
+            web_common::database::Table::UserEmails => NestedUserEmail::can_update_by_id()?,
             web_common::database::Table::Users => {
                 NestedUser::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::UsersUsersRoleInvitations => {
-                NestedUsersUsersRoleInvitation::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedUsersUsersRoleInvitation::can_update_by_id()?
             }
             web_common::database::Table::UsersUsersRoleRequests => {
-                NestedUsersUsersRoleRequest::can_update_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+                NestedUsersUsersRoleRequest::can_update_by_id()?
             }
-            web_common::database::Table::UsersUsersRoles => NestedUsersUsersRole::can_update_by_id(
-                primary_key.into(),
-                author_user_id,
-                connection,
-            )?,
+            web_common::database::Table::UsersUsersRoles => {
+                NestedUsersUsersRole::can_update_by_id()?
+            }
         })
     }
 

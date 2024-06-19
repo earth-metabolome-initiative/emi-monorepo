@@ -427,43 +427,12 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.
-    ///
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update(
-        &self,
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        Self::can_update_by_id(
-            (self.organism_id, self.taxon_id),
-            author_user_id,
-            connection,
-        )
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
     }
     /// Check whether the user can update the struct associated to the provided ids.
-    ///
-    /// * `( organism_id, taxon_id )` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update_by_id(
-        (organism_id, taxon_id): (uuid::Uuid, i32),
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(
-            crate::database::sql_function_bindings::can_update_organism_bio_ott_taxon_items(
-                author_user_id,
-                organism_id,
-                taxon_id,
-            ),
-        )
-        .get_result(connection)
-        .map_err(web_common::api::ApiError::from)
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
     }
     /// Get all of the updatable structs from the database.
     ///
@@ -484,13 +453,6 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
         use crate::database::schema::organism_bio_ott_taxon_items;
         let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
             .select(OrganismBioOttTaxonItem::as_select())
-            .filter(
-                crate::database::sql_function_bindings::can_update_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
             .order_by(organism_bio_ott_taxon_items::dsl::organism_id);
         let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
@@ -527,13 +489,6 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
         use crate::database::schema::organism_bio_ott_taxon_items;
         let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
             .select(OrganismBioOttTaxonItem::as_select())
-            .filter(
-                crate::database::sql_function_bindings::can_update_organism_bio_ott_taxon_items(
-                    author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
-                ),
-            )
             .order_by(organism_bio_ott_taxon_items::dsl::created_at.desc());
         let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
@@ -625,7 +580,6 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
             .select(OrganismBioOttTaxonItem::as_select())
-            .filter(crate::database::sql_function_bindings::can_update_organism_bio_ott_taxon_items(author_user_id, organism_bio_ott_taxon_items::dsl::organism_id, organism_bio_ott_taxon_items::dsl::taxon_id))
             .filter(
 bio_ott_taxon_items::dsl::name.strict_word_similarity_commutator_op(query).or(
     bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))

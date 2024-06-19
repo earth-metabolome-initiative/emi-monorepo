@@ -226,35 +226,12 @@ impl UserEmail {
         Ok(flat_variant)
     }
     /// Check whether the user can update the struct.
-    ///
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update(
-        &self,
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        Self::can_update_by_id(self.id, author_user_id, connection)
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
     }
     /// Check whether the user can update the struct associated to the provided ids.
-    ///
-    /// * `id` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update_by_id(
-        id: i32,
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(
-            crate::database::sql_function_bindings::can_update_user_emails(author_user_id, id),
-        )
-        .get_result(connection)
-        .map_err(web_common::api::ApiError::from)
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
     }
     /// Get all of the updatable structs from the database.
     ///
@@ -275,12 +252,6 @@ impl UserEmail {
         use crate::database::schema::user_emails;
         let query = user_emails::dsl::user_emails
             .select(UserEmail::as_select())
-            .filter(
-                crate::database::sql_function_bindings::can_update_user_emails(
-                    author_user_id,
-                    user_emails::dsl::id,
-                ),
-            )
             .order_by(user_emails::dsl::id);
         let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
@@ -314,12 +285,6 @@ impl UserEmail {
         use crate::database::schema::user_emails;
         let query = user_emails::dsl::user_emails
             .select(UserEmail::as_select())
-            .filter(
-                crate::database::sql_function_bindings::can_update_user_emails(
-                    author_user_id,
-                    user_emails::dsl::id,
-                ),
-            )
             .order_by(user_emails::dsl::created_at.desc());
         let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {

@@ -236,14 +236,6 @@ diesel::define_sql_function! {
 }
 
 diesel::define_sql_function! {
-   fn can_update_organism_bio_ott_taxon_items(
-        author_user_id: diesel::sql_types::Integer,
-        this_organism_bio_ott_taxon_items_organism_id: diesel::sql_types::Uuid,
-        this_organism_bio_ott_taxon_items_taxon_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
    fn can_update_organisms(
         author_user_id: diesel::sql_types::Integer,
         this_organisms_id: diesel::sql_types::Uuid,
@@ -254,62 +246,6 @@ diesel::define_sql_function! {
    fn can_update_projects(
         author_user_id: diesel::sql_types::Integer,
         this_projects_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_projects_teams_role_invitations(
-        author_user_id: diesel::sql_types::Integer,
-        this_projects_teams_role_invitations_table_id: diesel::sql_types::Integer,
-        this_projects_teams_role_invitations_team_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_projects_teams_role_requests(
-        author_user_id: diesel::sql_types::Integer,
-        this_projects_teams_role_requests_table_id: diesel::sql_types::Integer,
-        this_projects_teams_role_requests_team_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_projects_teams_roles(
-        author_user_id: diesel::sql_types::Integer,
-        this_projects_teams_roles_table_id: diesel::sql_types::Integer,
-        this_projects_teams_roles_team_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_projects_users_role_invitations(
-        author_user_id: diesel::sql_types::Integer,
-        this_projects_users_role_invitations_table_id: diesel::sql_types::Integer,
-        this_projects_users_role_invitations_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_projects_users_role_requests(
-        author_user_id: diesel::sql_types::Integer,
-        this_projects_users_role_requests_table_id: diesel::sql_types::Integer,
-        this_projects_users_role_requests_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_projects_users_roles(
-        author_user_id: diesel::sql_types::Integer,
-        this_projects_users_roles_table_id: diesel::sql_types::Integer,
-        this_projects_users_roles_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_sample_bio_ott_taxon_items(
-        author_user_id: diesel::sql_types::Integer,
-        this_sample_bio_ott_taxon_items_sample_id: diesel::sql_types::Uuid,
-        this_sample_bio_ott_taxon_items_taxon_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
@@ -342,72 +278,9 @@ diesel::define_sql_function! {
 }
 
 diesel::define_sql_function! {
-   fn can_update_teams_teams_role_invitations(
-        author_user_id: diesel::sql_types::Integer,
-        this_teams_teams_role_invitations_table_id: diesel::sql_types::Integer,
-        this_teams_teams_role_invitations_team_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_teams_users_role_invitations(
-        author_user_id: diesel::sql_types::Integer,
-        this_teams_users_role_invitations_table_id: diesel::sql_types::Integer,
-        this_teams_users_role_invitations_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_teams_users_role_requests(
-        author_user_id: diesel::sql_types::Integer,
-        this_teams_users_role_requests_table_id: diesel::sql_types::Integer,
-        this_teams_users_role_requests_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_teams_users_roles(
-        author_user_id: diesel::sql_types::Integer,
-        this_teams_users_roles_table_id: diesel::sql_types::Integer,
-        this_teams_users_roles_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_user_emails(
-        author_user_id: diesel::sql_types::Integer,
-        this_user_emails_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
    fn can_update_users(
         author_user_id: diesel::sql_types::Integer,
         this_users_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_users_users_role_invitations(
-        author_user_id: diesel::sql_types::Integer,
-        this_users_users_role_invitations_table_id: diesel::sql_types::Integer,
-        this_users_users_role_invitations_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_users_users_role_requests(
-        author_user_id: diesel::sql_types::Integer,
-        this_users_users_role_requests_table_id: diesel::sql_types::Integer,
-        this_users_users_role_requests_user_id: diesel::sql_types::Integer,
-    ) -> diesel::sql_types::Bool;
-}
-
-diesel::define_sql_function! {
-   fn can_update_users_users_roles(
-        author_user_id: diesel::sql_types::Integer,
-        this_users_users_roles_table_id: diesel::sql_types::Integer,
-        this_users_users_roles_user_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 

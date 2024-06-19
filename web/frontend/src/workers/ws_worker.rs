@@ -130,7 +130,9 @@ impl WebsocketWorker {
                     Operation::Delete(table_name, primary_key) => {
                         let table: Table = table_name.try_into().unwrap();
                         match table.delete_from_id(primary_key, &mut database).await {
-                            Ok(_number_of_affected_rows) => BackendMessage::Completed(task_id, None),
+                            Ok(_number_of_affected_rows) => {
+                                BackendMessage::Completed(task_id, None)
+                            }
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }

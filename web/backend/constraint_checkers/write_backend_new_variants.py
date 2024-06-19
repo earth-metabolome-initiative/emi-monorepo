@@ -76,7 +76,7 @@ def write_backend_new_variants(
         "        self,\n"
         "        user_id: i32,\n"
         "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>\n"
-        "    ) -> Result<Self::Flat, diesel::result::Error>;\n"
+        "    ) -> Result<Self::Flat, web_common::api::ApiResult>;\n"
         "}\n\n"
     )
 
@@ -177,11 +177,11 @@ def write_backend_new_variants(
             "        self,\n"
             f"       user_id: i32,\n"
             "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>\n"
-            "    ) -> Result<Self::Flat, diesel::result::Error> {\n"
+            "    ) -> Result<Self::Flat, web_common::api::ApiError> {\n"
             f"        use crate::database::schema::{struct.table_name};\n{assert_user_id_check}"
-            f"        diesel::insert_into({struct.table_name}::dsl::{struct.table_name})\n"
+            f"        Ok(diesel::insert_into({struct.table_name}::dsl::{struct.table_name})\n"
             f"            .values(InsertRow::to_intermediate(self, {defaulted_user_id}))\n"
-            "            .get_result(connection)\n"
+            "            .get_result(connection)?)\n"
             "    }\n"
             "}\n\n"
         )

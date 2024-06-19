@@ -23,7 +23,7 @@ def handle_missing_can_x_function(
         operations.append("view")
 
     if table.is_insertable():
-        operations.append("delete")
+        operations.append("admin")
 
     if table.is_updatable():
         operations.append("update")
@@ -51,13 +51,13 @@ def handle_missing_can_x_function(
     roles: Dict[str, int] = {
         "update": 2,
         "view": 3,
-        "delete": 1,
+        "admin": 1,
     }
 
     method_names: Dict[str, str] = {
         "update": table.get_can_update_function_name(),
         "view": table.get_can_view_function_name(),
-        "delete": table.get_can_admin_function_name(),
+        "admin": table.get_can_admin_function_name(),
     }
 
     trigger_desinence_name = f"create_{table.name}_can_x_trigger"
@@ -155,10 +155,10 @@ def handle_missing_can_x_function(
         up_index_migration.write(
             "BEGIN\n"
         )
-        # If the operation if either an edit or a delete, we check that the provided
+        # If the operation if either an edit or a admin, we check that the provided
         # author_user_id is not NULL. If it is, this is most likely a bug in the code and
         # we should raise an exception.
-        if operation in ("update", "delete"):
+        if operation in ("update", "admin"):
             up_index_migration.write(
                 "-- If the author_user_id is NULL, we return FALSE.\n"
                 "    IF author_user_id IS NULL THEN\n"
@@ -263,50 +263,50 @@ def handle_missing_can_x_function(
         # Otherwise, we return FALSE.
         up_index_migration.write("END;\n$$\nLANGUAGE plpgsql PARALLEL SAFE;\n\n")
 
-        if operation == "update":
+        exception = f"RAISE EXCEPTION 'unauthorized_{operation}' USING DETAIL = 'Unauthorized to {operation} this row of the `{table.name}` table.';"
+
+        if operation == "update" and table.is_updatable():
             # We then implement the trigger function, which does not receive any arguments as trigger functions
             # cannot receive arguments. This method checks that the created_by and updated_by columns values are
             # indeed autorized to run this edit operation as defined by the can_update function of the parent column,
             # when it is not None. This method is only called when the row is being inserted or updated. Another method
-            # is used to check whether the row can be deleted.
-            if table.is_updatable():
+            # is used to check whether the row can be admind.
+            up_index_migration.write(
+                f"-- The function `{can_x_function}_trigger` is a trigger function that checks whether the user can {operation} the row.\n"
+                f"CREATE FUNCTION {can_x_function}_trigger()\n"
+                "RETURNS TRIGGER AS $$\n"
+                "BEGIN\n"
+            )
+            if table.has_column("updated_by"):
                 up_index_migration.write(
-                    f"-- The function `{can_x_function}_trigger` is a trigger function that checks whether the user can {operation} the row.\n"
-                    f"CREATE FUNCTION {can_x_function}_trigger()\n"
-                    "RETURNS TRIGGER AS $$\n"
-                    "BEGIN\n"
+                    "    IF TG_OP = 'UPDATE' THEN\n"
+                    f"        IF NOT {can_x_function}(NEW.updated_by, {flat_variant.get_formatted_primary_keys(include_prefix=True, prefix='NEW')}) THEN\n"
+                    f"            {exception}\n"
+                    "        END IF;\n"
+                    "    END IF;\n"
                 )
-                if table.has_column("updated_by"):
-                    up_index_migration.write(
-                        "    IF TG_OP = 'UPDATE' THEN\n"
-                        f"        IF NOT {can_x_function}(NEW.updated_by, {flat_variant.get_formatted_primary_keys(include_prefix=True, prefix='NEW')}) THEN\n"
-                        f"            RAISE EXCEPTION 'The user does not have the permission to {operation} this row.';\n"
-                        "        END IF;\n"
-                        "    END IF;\n"
-                    )
-                # Otherwise, if the operation is an insert and the parent column is not NULL, we check whether the user can edit
-                # the parent column.
-                for parent_column in parent_columns:
-                    if parent_column.optional:
-                        null_check = f" AND NEW.{parent_column.name} IS NOT NULL"
-                    else:
-                        null_check = ""
-                    foreign_table = table.get_foreign_key_table_name(parent_column.name)
+            # Otherwise, if the operation is an insert and the parent column is not NULL, we check whether the user can edit
+            # the parent column.
+            for parent_column in parent_columns:
+                if parent_column.optional:
+                    null_check = f" AND NEW.{parent_column.name} IS NOT NULL"
+                else:
+                    null_check = ""
+                foreign_table = table.get_foreign_key_table_name(parent_column.name)
 
-                    up_index_migration.write(
-                        f"-- We check whether the user can {operation} the row.\n"
-                        f"    IF TG_OP = 'INSERT'{null_check} THEN\n"
-                        f"        IF NOT can_{operation}_{foreign_table}(NEW.created_by, NEW.{parent_column.name}) THEN\n"
-                        f"            RAISE EXCEPTION 'The user does not have the permission to {operation} this row.';\n"
-                        "        END IF;\n"
-                        "    END IF;\n"
-                    )
                 up_index_migration.write(
-                    "    RETURN NEW;\nEND;\n$$\nLANGUAGE plpgsql PARALLEL SAFE;\n\n"
+                    f"-- We check whether the user can {operation} the row.\n"
+                    f"    IF TG_OP = 'INSERT'{null_check} THEN\n"
+                    f"        IF NOT can_{operation}_{foreign_table}(NEW.created_by, NEW.{parent_column.name}) THEN\n"
+                    f"            {exception}\n"
+                    "        END IF;\n"
+                    "    END IF;\n"
                 )
+            up_index_migration.write(
+                "    RETURN NEW;\nEND;\n$$\nLANGUAGE plpgsql PARALLEL SAFE;\n\n"
+            )
 
-        # We then create the trigger that calls the trigger function.
-        if operation == "update" and table.is_updatable():
+            # We then create the trigger that calls the trigger function.
             up_index_migration.write(
                 f"-- We create a trigger that calls the `{can_x_function}` function before each INSERT or UPDATE.\n"
                 f"CREATE TRIGGER {can_x_function}\n"
@@ -380,7 +380,6 @@ def ensure_can_x_function_existance(tables: List[TableStructMetadata]):
                 f"The table {table.name} cannot be hidden, but it has a can_view function. "
                 f"This function is not needed for tables that are not hidden.{visibility_message}"
             )
-
 
         if (
             table.is_insertable()

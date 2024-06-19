@@ -346,39 +346,12 @@ impl TeamsUsersRole {
             .map_err(web_common::api::ApiError::from)
     }
     /// Check whether the user can update the struct.
-    ///
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update(
-        &self,
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        Self::can_update_by_id((self.table_id, self.user_id), author_user_id, connection)
+    pub fn can_update(&self) -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
     }
     /// Check whether the user can update the struct associated to the provided ids.
-    ///
-    /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
-    /// * `author_user_id` - The ID of the user to check.
-    /// * `connection` - The connection to the database.
-    pub fn can_update_by_id(
-        (table_id, user_id): (i32, i32),
-        author_user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<bool, web_common::api::ApiError> {
-        diesel::select(
-            crate::database::sql_function_bindings::can_update_teams_users_roles(
-                author_user_id,
-                table_id,
-                user_id,
-            ),
-        )
-        .get_result(connection)
-        .map_err(web_common::api::ApiError::from)
+    pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
+        Ok(false)
     }
     /// Get all of the updatable structs from the database.
     ///
@@ -399,13 +372,6 @@ impl TeamsUsersRole {
         use crate::database::schema::teams_users_roles;
         let query = teams_users_roles::dsl::teams_users_roles
             .select(TeamsUsersRole::as_select())
-            .filter(
-                crate::database::sql_function_bindings::can_update_teams_users_roles(
-                    author_user_id,
-                    teams_users_roles::dsl::table_id,
-                    teams_users_roles::dsl::user_id,
-                ),
-            )
             .order_by(teams_users_roles::dsl::table_id);
         let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
@@ -445,13 +411,6 @@ impl TeamsUsersRole {
         use crate::database::schema::teams_users_roles;
         let query = teams_users_roles::dsl::teams_users_roles
             .select(TeamsUsersRole::as_select())
-            .filter(
-                crate::database::sql_function_bindings::can_update_teams_users_roles(
-                    author_user_id,
-                    teams_users_roles::dsl::table_id,
-                    teams_users_roles::dsl::user_id,
-                ),
-            )
             .order_by(teams_users_roles::dsl::created_at.desc());
         let mut query = query.into_boxed();
         if let Some(table_id) = filter.and_then(|f| f.table_id) {
@@ -503,13 +462,6 @@ impl TeamsUsersRole {
             // This operation is defined by a first order index linking teams_users_roles.role_id to roles.
             .inner_join(roles::dsl::roles.on(teams_users_roles::dsl::role_id.eq(roles::dsl::id)))
             .select(TeamsUsersRole::as_select())
-            .filter(
-                crate::database::sql_function_bindings::can_update_teams_users_roles(
-                    author_user_id,
-                    teams_users_roles::dsl::table_id,
-                    teams_users_roles::dsl::user_id,
-                ),
-            )
             .filter(
                 crate::database::sql_function_bindings::concat_teams_name_description(
                     teams::dsl::name,
