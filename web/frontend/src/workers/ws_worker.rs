@@ -1,4 +1,5 @@
 use crate::components::forms::FormBuildable;
+use crate::search::search_all;
 
 use super::database_type::*;
 use futures::{SinkExt, StreamExt};
@@ -19,6 +20,7 @@ use web_common::database::*;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;
+use crate::search_dispatch::SearchableTable;
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
@@ -128,10 +130,8 @@ impl WebsocketWorker {
                 scope.send_message(InternalMessage::Backend(match operation {
                     Operation::Delete(table_name, primary_key) => {
                         let table: Table = table_name.try_into().unwrap();
-                        match table.delete(primary_key, &mut database).await {
-                            Ok(_row) => {
-                                todo!()
-                            }
+                        match table.delete_from_id(primary_key, &mut database).await {
+                            Ok(row) => BackendMessage::Completed(task_id, None),
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
@@ -141,9 +141,7 @@ impl WebsocketWorker {
                             .insert(serialized_row, user_id.unwrap(), &mut database)
                             .await
                         {
-                            Ok(_row) => {
-                                todo!()
-                            }
+                            Ok(row) => BackendMessage::Completed(task_id, Some(row)),
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
@@ -168,14 +166,34 @@ impl WebsocketWorker {
                                 Err(err) => BackendMessage::Error(task_id, err),
                             }
                         }
-                        Select::SearchTable { .. } => {
-                            todo!()
+                        Select::SearchTable {
+                            table_name,
+                            query,
+                            limit,
+                            offset,
+                            filter,
+                        } => {
+                            let table: Table = table_name.try_into().unwrap();
+                            let lowercase_query = query.to_lowercase();
+                            match table.search(&lowercase_query, filter, Some(limit), Some(offset), &mut database).await {
+                                Ok(rows) => BackendMessage::SearchTable(
+                                    task_id,
+                                    rows
+                                ),
+                                Err(err) => BackendMessage::Error(task_id, err),
+                            }
                         }
                         Select::SearchEditableTable { .. } => {
                             todo!()
                         }
-                        Select::SearchAll { .. } => {
-                            todo!()
+                        Select::SearchAll { query, limit } => {
+                            match search_all(&query, Some(limit), None, &mut database).await {
+                                Ok(rows) => BackendMessage::SearchTable(
+                                    task_id,
+                                    bincode::serialize(&rows).unwrap(),
+                                ),
+                                Err(err) => BackendMessage::Error(task_id, err),
+                            }
                         }
                         Select::CanView { .. } => {
                             todo!()
@@ -193,9 +211,7 @@ impl WebsocketWorker {
                             .update(serialized_row, user_id.unwrap(), &mut database)
                             .await
                         {
-                            Ok(_row) => {
-                                todo!()
-                            }
+                            Ok(row) => BackendMessage::Completed(task_id, Some(row)),
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }

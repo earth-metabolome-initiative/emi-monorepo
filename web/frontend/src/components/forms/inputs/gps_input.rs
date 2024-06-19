@@ -74,7 +74,7 @@ impl Component for GPSInput {
                             })
                         };
 
-                        let error_callback:Closure<dyn FnMut(PositionError)> = {
+                        let error_callback: Closure<dyn FnMut(PositionError)> = {
                             let link = ctx.link().clone();
                             Closure::new(move |error: PositionError| {
                                 link.send_message(GPSInputMessage::Error(
@@ -114,7 +114,7 @@ impl Component for GPSInput {
                                 ));
                             }
                         };
-                        
+
                         success_callback.forget();
                         error_callback.forget();
                     }

@@ -2,18 +2,6 @@
 //! for all types that implement ToString.
 use sublime_fuzzy::{best_match, format_simple};
 
-fn custom_best_matches<S: AsRef<str>, T: AsRef<str>>(
-    query: S,
-    target: T,
-) -> Vec<sublime_fuzzy::Match> {
-    query
-        .as_ref()
-        .split_whitespace()
-        .map(|query| best_match(query, target.as_ref()))
-        .filter_map(|x| x)
-        .collect::<Vec<sublime_fuzzy::Match>>()
-}
-
 /// Trait formatting string for a given query using sublime_fuzzy.
 pub trait FormatMatch {
     /// Format the string for a given query using sublime_fuzzy.

@@ -1,8 +1,12 @@
 """Writes the table names enumeration to the web_common crate."""
 
 import os
-from typing import List, Dict
-from constraint_checkers.struct_metadata import StructMetadata
+from typing import List, Dict, Optional, Tuple
+from constraint_checkers.struct_metadata import (
+    StructMetadata,
+    MethodDefinition,
+    AttributeMetadata,
+)
 from constraint_checkers.table_metadata import TableStructMetadata
 
 
@@ -12,7 +16,11 @@ def write_web_common_table_names_enumeration(
     update_model_structs: List[StructMetadata],
 ) -> List[TableStructMetadata]:
     """Writes the table names enumeration to the web_common crate."""
-    imports = ["use serde::Deserialize;", "use serde::Serialize;"]
+    imports = [
+        "use serde::Deserialize;",
+        "use serde::Serialize;",
+        "use crate::database::*;",
+    ]
 
     # The derives to apply to the structs in the `src/database/tables.rs` document
     derives = ["Deserialize", "Serialize", "Clone", "Debug", "PartialEq", "Eq", "Copy"]
@@ -35,6 +43,8 @@ def write_web_common_table_names_enumeration(
         "//!\n"
         "//! This module is automatically generated. Do not write anything here.\n\n"
     )
+
+    table_enum_struct = StructMetadata(struct_name="Table", table_name=None)
 
     for import_statement in imports:
         document.write(f"{import_statement}\n")
@@ -142,117 +152,185 @@ def write_web_common_table_names_enumeration(
         "}\n"
     )
 
-    # We implement methods for the frontend when the frontend feature is enabled.
-    # These methods include:
-    # - delete, which receives a primary key and a connection to the GlueSQL database
-
-    document.write(
-        '#[cfg(feature = "frontend")]\n'
-        "impl Table {\n"
-        "    /// Delete the row from the table.\n"
-        "    ///\n"
-        "    /// # Arguments\n"
-        "    /// * `primary_key` - The primary key of the row.\n"
-        "    /// * `connection` - The database connection.\n"
-        "    ///\n"
-        "    /// # Returns\n"
-        "    /// The number of rows deleted.\n"
-        "    pub async fn delete<C>(\n"
-        "        &self,\n"
-        "        primary_key: crate::database::operations::PrimaryKey,\n"
-        "        connection: &mut gluesql::prelude::Glue<C>,\n"
-        "    ) -> Result<usize, crate::api::ApiError> where\n"
-        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
-        "    {\n"
-        "        match self {\n"
-    )
-
+    # First, we determine the methods that are common across all tables associated
+    # richest structs, and we implement them for the Table enum.
+    method_counts: Dict[MethodDefinition, Tuple[MethodDefinition, int]] = {}
     for table in tables:
-        document.write(
-            f"            Table::{table.camel_cased()} => {{\n"
-            f"                crate::database::{table.flat_variant_name()}::delete_from_id(primary_key.into(), connection).await\n"
-            "            },\n"
+        methods = table.get_richest_struct().webcommon_methods()
+        assert len(methods) > 0, f"No methods found for table {table.name}."
+        for method in methods:
+            if method.is_private():
+                continue
+            if method.has_self_reference():
+                continue
+            if method.name.startswith("from_"):
+                continue
+
+            # For the time being, we skip the search methods that return a score.
+            if "with_score" in method.name:
+                continue
+            if method not in method_counts:
+                method_counts[method] = (0, method)
+
+            (count, registered_method) = method_counts[method]
+
+            if len(method.arguments) > len(registered_method.arguments):
+                registered_method = method
+            method_counts[method] = (method_counts[method][0] + 1, registered_method)
+
+    # We implement the table dispatching for all methods that have at least 4 implementations.
+    table_methods: List[MethodDefinition] = []
+    for count, method in method_counts.values():
+        if count < 3:
+            print(f"Skipping method {method.name} with {count} implementations.")
+            continue
+
+        assert (
+            not method.has_self_reference()
+        ), f"Method {method.name} has a self reference."
+
+        table_method = table_enum_struct.add_webcommon_method(
+            MethodDefinition(name=method.name, summary=method.summary)
         )
-
-    document.write("        }\n    }\n")
-
-    # Next, we implement the `get` method for the Table enum, which receives a primary key
-    # enum and a connection to the database. The method returns a Result, where the Ok variant
-    # is a bincode-serialized version of the row of the table variant, while the Err variant
-    # contains an ApiError. The get method is available for all tables with a primary key.
-    # For the others, we panic with an unimplemented!() macro.
-
-    document.write(
-        "    /// Get the row from the table by the primary key.\n"
-        "    ///\n"
-        "    /// # Arguments\n"
-        "    /// * `primary_key` - The primary key of the row.\n"
-        "    /// * `connection` - The database connection.\n"
-        "    ///\n"
-        "    /// # Returns\n"
-        "    /// The row of the table.\n"
-        "    pub async fn get<C>(\n"
-        "        &self,\n"
-        "        primary_key: crate::database::operations::PrimaryKey,\n"
-        "        connection: &mut gluesql::prelude::Glue<C>,\n"
-        "    ) -> Result<Option<Vec<u8>>, crate::api::ApiError> where\n"
-        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
-        "    {\n"
-        "        Ok(match self {\n"
-    )
-
-    for table in tables:
-        document.write(
-            f"            Table::{table.camel_cased()} => crate::database::{table.richest_struct_name()}::get(primary_key.into(), connection).await?.map(|row| bincode::serialize(&row)).transpose()?,\n"
+        table_method.include_self_ref()
+        table_method.is_async = method.is_async
+        method_return_type = method.get_return_type()
+        return_type = AttributeMetadata(
+            original_name=method_return_type.name,
+            name=method_return_type.name,
+            data_type=method_return_type.data_type(route="web_common")
+            .replace("Vec<Self>", "Vec<u8>")
+            .replace("Self", "Vec<u8>"),
+            optional=method_return_type.optional,
         )
+        table_method.set_return_type(return_type)
 
-    document.write("        })\n    }\n")
+        for generic in method.generics:
+            table_method.add_generic(generic)
 
-    # Next, we implement the all method for the Table enum, which receives a connection
-    # to the database and returns a Result, where the Ok variant is a bincode-serialized
-    # vector of the rows of the table variant, while the Err variant contains an ApiError.
-    # The all method is available for all tables.
+        for where_clause in method.where_clauses:
+            table_method.add_where_clause(where_clause)
 
-    document.write(
-        "    /// Get all the rows from the table.\n"
-        "    ///\n"
-        "    /// # Arguments\n"
-        "    /// * `filter` - The filter to apply to the rows.\n"
-        "    /// * `limit` - The maximum number of rows to return.\n"
-        "    /// * `offset` - The number of rows to skip. By default `0`.\n"
-        "    /// * `connection` - The database connection.\n"
-        "    ///\n"
-        "    /// # Returns\n"
-        "    /// A vector of the rows of the table.\n"
-        "    pub async fn all<C>(\n"
-        "        &self,\n"
-        "        filter: Option<Vec<u8>>,\n"
-        "        limit: Option<i64>,\n"
-        "        offset: Option<i64>,\n"
-        "        connection: &mut gluesql::prelude::Glue<C>,\n"
-        "    ) -> Result<Vec<Vec<u8>>, crate::api::ApiError> where\n"
-        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
-        "    {\n"
-        "        match self {\n"
-    )
-
-    for table in tables:
-        document.write(f"            Table::{table.camel_cased()} => {{\n")
-        if table.has_filter_variant():
-            filter_variant = table.get_filter_variant()
-            document.write(
-                f"                let filter: Option<crate::database::{filter_variant.name}> = filter.map(|filter| bincode::deserialize(&filter).map_err(crate::api::ApiError::from)).transpose()?;\n"
-                f"                crate::database::{table.richest_struct_name()}::all(filter.as_ref(), limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
-            )
-        else:
-            document.write(
-                '                 assert!(filter.is_none(), "Filter not implemented for this table.");\n'
-                f"                crate::database::{table.richest_struct_name()}::all(limit, offset, connection).await?.into_iter().map(|row| bincode::serialize(&row).map_err(crate::api::ApiError::from)).collect()\n"
+        if method.has_primary_key_as_argument():
+            argument = method.get_primary_key_argument()
+            table_method.add_argument(
+                AttributeMetadata(
+                    original_name="primary_key",
+                    name="primary_key",
+                    data_type="PrimaryKey",
+                    optional=argument.optional,
+                ),
+                description=method.get_argument_description(argument),
             )
 
-        document.write("            },\n")
+        for argument in method.arguments:
+            # If the argument is a struct, we need to convert it to a Vec<u8>
+            if argument.has_struct_data_type():
+                table_method.add_argument(
+                    AttributeMetadata(
+                        original_name=argument.name,
+                        name=(
+                            "row" if argument.name == "self" else argument.name
+                        ),
+                        data_type="Vec<u8>",
+                        optional=argument.optional,
+                    ),
+                    description=(
+                        "Row to be processed"
+                        if argument.name == "self"
+                        else method.get_argument_description(argument)
+                    ),
+                )
+            elif method.is_primary_key_argument(argument):
+                continue
+            else:
+                table_method.add_argument(
+                    argument,
+                    description=method.get_argument_description(argument),
+                )
+        table_methods.append(table_method)
 
-    document.write("        }\n    }\n")
+    assert len(table_methods) > 0, "No table methods found."
+
+    # Next, we actually implement the trait for the Table enum.
+    document.write('#[cfg(feature = "frontend")]\nimpl crate::database::Table {\n')
+
+    for method in table_methods:
+        method.write_header_to(document)
+        document.write(" {\n        Ok(match self {\n")
+        for table in tables:
+            richest_variant: StructMetadata = table.get_richest_struct()
+            struct_method: Optional[MethodDefinition] = (
+                richest_variant.get_webcommon_method_by_name(method.name)
+            )
+            if struct_method is not None:
+                document.write(
+                    f"            crate::database::Table::{table.camel_cased()} => {{\n"
+                )
+
+                return_type = struct_method.get_return_type()
+                if "Self" in return_type.data_type(route="web_common"):
+                    document.write("let result = ")
+
+                awaits = ".await" if struct_method.is_async else ""
+
+                document.write(f"{table.richest_struct_name()}::{method.name}(\n")
+                arguments = []
+                for argument in method.arguments:
+                    if argument.name == "self":
+                        continue
+                    original_argument = struct_method.get_argument_by_name(
+                        argument.original_name
+                    )
+                    if (
+                        original_argument is not None
+                        and original_argument.has_struct_data_type()
+                    ):
+                        if original_argument.optional:
+                            formatted_argument = f"{argument.name}.map(|{argument.name}| bincode::deserialize::<{original_argument.data_type(route='web_common')}>(&{argument.name})).transpose()?"
+                        else:
+                            formatted_argument = f"bincode::deserialize::<{original_argument.data_type(route='web_common')}>(&{argument.name})?"
+
+                        if original_argument.reference:
+                            formatted_argument = f"{formatted_argument}.as_ref()"
+
+                        arguments.append(formatted_argument)
+                    elif (
+                        argument.name == "primary_key"
+                        and struct_method.has_primary_key_as_argument()
+                    ):
+                        if argument.optional:
+                            arguments.append("primary_key.map(|pk| pk.into())")
+                        else:
+                            arguments.append("primary_key.into()")
+                    elif original_argument:
+                        arguments.append(argument.name)
+                document.write(",\n".join(arguments))
+                document.write(f"){awaits}")
+                if "Result" in return_type.format_data_type(
+                    route="web_common"
+                ):
+                    document.write("?")
+                if "Self" in return_type.data_type(
+                    route="web_common"
+                ):
+                    document.write(
+                        ";\n"
+                    )
+                    if return_type.optional or "Option" in return_type.data_type(route="web_common"):
+                        document.write("result.map(|result| bincode::serialize(&result)).transpose()?")
+                    else:
+                        document.write("bincode::serialize(&result)?")
+
+                document.write("            },\n")
+            else:
+                document.write(
+                    f'            crate::database::Table::{table.camel_cased()} => unimplemented!("Method {method.name} not implemented for table {table.name}."),\n'
+                )
+        # We close the match
+        document.write("        })\n")
+        # And we close the method
+        document.write("    }\n\n")
 
     # Next, we implement the insert method for the Table enum, which receives a bincode-serialized
     # row of the new flat table variant and a connection to the database. The method returns a Result,
@@ -440,7 +518,96 @@ def write_web_common_table_names_enumeration(
             "            },\n"
         )
 
-    document.write("        }\n    Ok(())}\n}\n")
+    document.write("        }\n    Ok(())}\n")
+
+    document.write("}\n")
+
+    document.flush()
+    document.close()
+
+    # Next, we implement for the frontend the search method for the Table enum, which receives a search
+    # query, a filter, a limit, an offset, and a connection to the database. The method returns a Result,
+    # where the Ok variant is a vector of bincode-serialized rows of the richest struct of the table variant,
+    # while the Err variant contains an ApiError.
+
+    # /// Searches for records in the database.
+    # ///
+    # /// # Arguments
+    # /// * `lowercase_query` - The search query.
+    # /// * `filter` - The filter to apply to the search.
+    # /// * `limit` - The maximum number of records to return, defaults to 10.
+    # /// * `offset` - The number of records to skip, defaults to 0.
+    # /// * `connection` - The database connection.
+    # pub(crate) async fn search<C, T>(
+    #     lowercase_query: &str,
+    #     filter: Option<&T::Filter>,
+    #     limit: Option<i64>,
+    #     offset: Option<i64>,
+    #     connection: &mut gluesql::prelude::Glue<C>,
+    # ) -> Result<Vec<T>, web_common::api::ApiError>
+    # where
+    #     C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    #     T: Filtrable + Tabular + SimilarityScore + AllRecords,
+    # {
+
+    document = open("../frontend/src/search_dispatch.rs", "w", encoding="utf8")
+
+    document.write(
+        "//! This module contains the search method for the Table enum.\n"
+        "//!\n"
+        "//! This module is automatically generated. Do not write anything here.\n\n"
+    )
+
+    document.write(
+        "use web_common::database::*;\n"
+        "use crate::search::*;\n"
+    )
+
+    document.write(
+        "pub(crate) trait SearchableTable {\n"
+        "    fn search<C>(\n"
+        "        &self,\n"
+        "        lowercase_query: &str,\n"
+        "        filter: Option<Vec<u8>>,\n"
+        "        limit: Option<i64>,\n"
+        "        offset: Option<i64>,\n"
+        "        connection: &mut gluesql::prelude::Glue<C>,\n"
+        "    ) -> impl std::future::Future<Output = Result<Vec<u8>, web_common::api::ApiError>>\n"
+        "    where\n"
+        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut;\n"
+        "}\n\n"
+    )
+
+    document.write(
+        "impl SearchableTable for Table {\n"
+        "    async fn search<C>(\n"
+        "        &self,\n"
+        "        lowercase_query: &str,\n"
+        "        filter: Option<Vec<u8>>,\n"
+        "        limit: Option<i64>,\n"
+        "        offset: Option<i64>,\n"
+        "        connection: &mut gluesql::prelude::Glue<C>,\n"
+        "    ) -> Result<Vec<u8>, web_common::api::ApiError>\n"
+        "    where\n"
+        "        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,\n"
+        "    {\n"
+        "        Ok(match self {\n"
+    )
+    for table in tables:
+        document.write(
+            f"Table::{table.camel_cased()} => {{\n"
+            "     let filter = filter.map(|filter| bincode::deserialize(&filter)).transpose()?;\n"
+            f"    bincode::serialize(&search::<C, {table.get_richest_struct().full_path('frontend')}>(\n"
+            "         lowercase_query,\n"
+            "         filter.as_ref(),\n"
+            "         limit,\n"
+            "         offset,\n"
+            "         connection\n"
+            "     ).await?)?\n"
+            "}\n"
+        )
+
+    document.write("        })\n    }\n}\n")
 
     document.flush()
     document.close()

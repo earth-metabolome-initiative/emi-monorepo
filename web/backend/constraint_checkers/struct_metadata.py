@@ -741,6 +741,10 @@ class MethodDefinition:
             f"The provided method name is {self.name}."
         )
 
+    def is_private(self) -> bool:
+        """Returns whether the method is private."""
+        return self.visibility == ""
+
     def has_primary_key_as_argument(self) -> bool:
         """Returns whether the method has the primary key as an argument."""
         return self.get_primary_key_argument() is not None
@@ -776,11 +780,17 @@ class MethodDefinition:
         new_method.set_owner(owner)
         if self.has_self_reference():
             new_method.include_self_ref()
+        if self.has_self_owned():
+            new_method.include_self()
         for argument in self.arguments:
             if argument.name == "self":
                 continue
             new_method.add_argument(argument, self.argument_descriptions[argument.name])
         new_method.return_type = self.return_type
+        new_method.is_async = self.is_async
+        new_method.generics = self.generics
+        new_method.where_clauses = self.where_clauses
+        new_method.visibility = self.visibility
         return new_method
 
     def add_generic(self, generic: str):
@@ -1905,7 +1915,7 @@ class StructMetadata:
         method.set_owner(self)
         return method
 
-    def get_method_by_name(self, method_name: str) -> Optional[MethodDefinition]:
+    def get_backend_method_by_name(self, method_name: str) -> Optional[MethodDefinition]:
         """Returns the method by name.
 
         Parameters
@@ -1918,6 +1928,25 @@ class StructMetadata:
             f"The provided method name is a {type(method_name)}."
         )
         for method in self._backend_methods:
+            if method.name == method_name:
+                return method
+        return None
+
+    def get_webcommon_method_by_name(
+        self, method_name: str
+    ) -> Optional[MethodDefinition]:
+        """Returns the method by name.
+
+        Parameters
+        ----------
+        method_name : str
+            The name of the method to retrieve.
+        """
+        assert isinstance(method_name, str), (
+            "The method name must be a string. "
+            f"The provided method name is a {type(method_name)}."
+        )
+        for method in self._webcommon_methods:
             if method.name == method_name:
                 return method
         return None

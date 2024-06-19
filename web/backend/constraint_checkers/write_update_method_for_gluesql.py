@@ -7,6 +7,7 @@ from constraint_checkers.gluesql_types_mapping import GLUESQL_TYPES_MAPPING
 def write_update_method_for_gluesql(
     struct: StructMetadata,
     writer: "io.TextIOWrapper",
+    visibility: str = "pub",
 ):
     """Write the `update` method for the struct in the GlueSQL database."""
     if struct.is_update_variant() and struct.table_name != "users":
@@ -24,6 +25,7 @@ def write_update_method_for_gluesql(
             name="update",
             summary="Update the struct in the database.",
             is_async=True,
+            visibility=visibility
         )
     )
 

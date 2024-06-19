@@ -131,15 +131,6 @@ impl NestedSpectraCollection {
     {
         self.inner.get_updated_at()
     }
-    /// Insert the SpectraCollection into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().insert(connection).await
-    }
     /// Get the SpectraCollection from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to check.
@@ -177,30 +168,6 @@ impl NestedSpectraCollection {
     ) -> Result<usize, crate::api::ApiError> {
         crate::database::flat_variants::SpectraCollection::delete_from_id(id, connection).await
     }
-    /// Update the struct in the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().update(connection).await
-    }
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update_or_insert<
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    >(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner
-            .as_ref()
-            .clone()
-            .update_or_insert(connection)
-            .await
-    }
     /// Get all SpectraCollection from the database.
     ///
     /// * `filter` - The filter to apply to the results.
@@ -223,5 +190,35 @@ impl NestedSpectraCollection {
             spectra_collections.push(Self::from_flat(flat_variant, connection).await?);
         }
         Ok(spectra_collections)
+    }
+    /// Update or insert the record in the database.
+    ///
+    /// * `connection` - The connection to the database.
+    pub async fn update_or_insert<
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    >(
+        &self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, crate::api::ApiError> {
+        crate::database::nested_variants::NestedSample::update_or_insert(
+            self.sample.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.created_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.updated_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::flat_variants::SpectraCollection::update_or_insert(
+            self.inner.as_ref(),
+            connection,
+        )
+        .await
     }
 }

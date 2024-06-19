@@ -120,15 +120,6 @@ impl NestedProjectsUsersRoleInvitation {
     {
         self.inner.get_created_at()
     }
-    /// Insert the ProjectsUsersRoleInvitation into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.insert(connection).await
-    }
     /// Get the ProjectsUsersRoleInvitation from the database by its ID.
     ///
     /// * `( table_id, user_id )` - The primary key(s) of the struct to check.
@@ -174,26 +165,6 @@ impl NestedProjectsUsersRoleInvitation {
         )
         .await
     }
-    /// Update the struct in the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.update(connection).await
-    }
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update_or_insert<
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    >(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.update_or_insert(connection).await
-    }
     /// Get all ProjectsUsersRoleInvitation from the database.
     ///
     /// * `filter` - The filter to apply to the results.
@@ -216,5 +187,40 @@ impl NestedProjectsUsersRoleInvitation {
             projects_users_role_invitations.push(Self::from_flat(flat_variant, connection).await?);
         }
         Ok(projects_users_role_invitations)
+    }
+    /// Update or insert the record in the database.
+    ///
+    /// * `connection` - The connection to the database.
+    pub async fn update_or_insert<
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    >(
+        &self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, crate::api::ApiError> {
+        crate::database::nested_variants::NestedProject::update_or_insert(
+            self.table.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.user.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedRole::update_or_insert(
+            self.role.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.created_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::flat_variants::ProjectsUsersRoleInvitation::update_or_insert(
+            &self.inner,
+            connection,
+        )
+        .await
     }
 }

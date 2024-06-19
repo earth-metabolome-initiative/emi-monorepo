@@ -153,15 +153,6 @@ impl NestedDerivedSample {
     {
         self.inner.get_unit_id()
     }
-    /// Insert the DerivedSample into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.insert(connection).await
-    }
     /// Get the DerivedSample from the database by its ID.
     ///
     /// * `( parent_sample_id, child_sample_id )` - The primary key(s) of the struct to check.
@@ -206,26 +197,6 @@ impl NestedDerivedSample {
         )
         .await
     }
-    /// Update the struct in the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.update(connection).await
-    }
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update_or_insert<
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    >(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.update_or_insert(connection).await
-    }
     /// Get all DerivedSample from the database.
     ///
     /// * `filter` - The filter to apply to the results.
@@ -247,5 +218,42 @@ impl NestedDerivedSample {
             derived_samples.push(Self::from_flat(flat_variant, connection).await?);
         }
         Ok(derived_samples)
+    }
+    /// Update or insert the record in the database.
+    ///
+    /// * `connection` - The connection to the database.
+    pub async fn update_or_insert<
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    >(
+        &self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, crate::api::ApiError> {
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.created_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.updated_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedSample::update_or_insert(
+            self.parent_sample.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedSample::update_or_insert(
+            self.child_sample.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedUnit::update_or_insert(
+            self.unit.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::flat_variants::DerivedSample::update_or_insert(&self.inner, connection)
+            .await
     }
 }

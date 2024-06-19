@@ -3,7 +3,7 @@
 from typing import List
 import os
 from tqdm.auto import tqdm
-from constraint_checkers.struct_metadata import StructMetadata
+from constraint_checkers.struct_metadata import StructMetadata, MethodDefinition, AttributeMetadata
 
 # from constraint_checkers.rust_implementation_check import trait_implementation_exist
 from constraint_checkers.is_file_changed import is_file_changed
@@ -211,6 +211,12 @@ def write_web_common_nested_variants(nested_structs: List[StructMetadata]):
             f"The struct {flat_variant.name} has no methods."
         )
         for method in flat_variant.webcommon_methods():
+            if method.is_private():
+                continue
+
+            if method.name == "update_or_insert":
+                # We handle the update_or_insert method separately.
+                continue
             return_type = method.get_return_type()
             nested_struct.add_webcommon_method(method.into_new_owner(nested_struct))
             author_user_id = method.get_argument_by_name("author_user_id")
@@ -309,7 +315,82 @@ def write_web_common_nested_variants(nested_structs: List[StructMetadata]):
                     "}\n"
                 )
 
-        document.write("}\n")
+        # Here we implement the `update_or_insert` method for the nested struct, which
+        # dispatches the update_or_insert call to all the internal structs.
+        update_or_insert_method = nested_struct.add_webcommon_method(
+            MethodDefinition(
+                name="update_or_insert",
+                summary="Update or insert the record in the database.",
+                is_async=True,
+            )
+        )
+        
+        update_or_insert_method.add_generic(
+            "C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut"
+        )
+
+        update_or_insert_method.include_self_ref()
+
+        update_or_insert_method.add_argument(
+            AttributeMetadata(
+                original_name="connection",
+                name="connection",
+                data_type="gluesql::prelude::Glue<C>",
+                reference=True,
+                mutable=True,
+            ),
+            "The connection to the database.",
+        )
+
+        update_or_insert_method.set_return_type(
+            AttributeMetadata(
+                original_name="_",
+                name="_",
+                data_type="Result<usize, crate::api::ApiError>",
+                optional=False,
+            ),
+        )
+        assert nested_struct.is_nested()
+
+        update_or_insert_method.write_header_to(document)
+
+        document.write(
+            "{\n"
+        )
+        for attribute in nested_struct.attributes:
+            if attribute.is_inner():
+                continue
+            assert attribute.rc
+            if attribute.optional:
+                document.write(
+                    f"if let Some({attribute.name}) = self.{attribute.name}.as_ref() {{\n"
+                    f"    {attribute.data_type(route='web_common')}::update_or_insert({attribute.name}, connection).await?;\n"
+                    "}\n"
+                )
+            else:
+                document.write(
+                    f"{attribute.data_type(route='web_common')}::update_or_insert(self.{attribute.name}.as_ref(), connection).await?;\n"
+                )
+
+        inner_attribute = nested_struct.get_inner_attribute()
+        if inner_attribute is not None:
+            assert not inner_attribute.optional
+            if inner_attribute.rc:
+                document.write(
+                    f"{inner_attribute.data_type(route='web_common')}::update_or_insert(self.inner.as_ref(), connection).await\n"
+                )
+            else:
+                document.write(
+                    f"{inner_attribute.data_type(route='web_common')}::update_or_insert(&self.inner, connection).await\n"
+                )
+        else:
+            document.write(
+                "        Ok(1)\n"
+            )
+
+        document.write(
+            "}\n}\n"
+        )
 
     document.flush()
     document.close()

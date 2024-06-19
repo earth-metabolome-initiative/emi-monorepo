@@ -124,34 +124,15 @@ if __name__ == "__main__":
     update_model_structs = derive_webcommon_update_variants(flat_variants)
     print(f"Derived {len(update_model_structs)} structs for the Update versions")
 
-    tables: List[TableStructMetadata] = write_web_common_table_names_enumeration(
-        flat_variants + nested_structs,
-        new_model_structs,
-        update_model_structs,
-    )
-    assert len(tables) > 0, (
-        "No table structs were written. This is likely due some error in the "
-        "generation process. Please rerun the generation script."
-    )
-
     write_diesel_sql_function_bindings(StructMetadata.table_metadata)
     write_diesel_sql_operator_bindings(StructMetadata.table_metadata)
     write_diesel_sql_types_bindings()
-    ensure_updatable_tables_have_roles_tables(tables, StructMetadata.table_metadata)
-    ensure_can_x_function_existance(tables)
-    ensure_tables_have_creation_notification_trigger(
-        tables, StructMetadata.table_metadata
-    )
-    print("Generated table names enumeration for web_common.")
-
+    
     write_backend_flat_variants(flat_variants)
     print(f"Generated {len(flat_variants)} tables implementations for backend.")
 
     write_backend_nested_structs(nested_structs)
     print(f"Generated {len(nested_structs)} nested structs for backend.")
-
-    write_backend_table_names_enumeration(tables)
-    print("Generated table names enumeration for diesel.")
 
     write_backend_new_variants(new_model_structs)
     write_backend_update_variants(
@@ -176,6 +157,25 @@ if __name__ == "__main__":
 
     write_web_common_search_trait_implementations(nested_structs + flat_variants)
     print("Generated search trait implementations for web_common.")
+
+    tables: List[TableStructMetadata] = write_web_common_table_names_enumeration(
+        flat_variants + nested_structs,
+        new_model_structs,
+        update_model_structs,
+    )
+    assert len(tables) > 0, (
+        "No table structs were written. This is likely due some error in the "
+        "generation process. Please rerun the generation script."
+    )
+    ensure_updatable_tables_have_roles_tables(tables, StructMetadata.table_metadata)
+    ensure_can_x_function_existance(tables)
+    ensure_tables_have_creation_notification_trigger(
+        tables, StructMetadata.table_metadata
+    )
+    print("Generated table names enumeration for web_common.")
+
+    write_backend_table_names_enumeration(tables)
+    print("Generated table names enumeration for diesel.")
 
     builder_structs = derive_frontend_builders(new_model_structs + update_model_structs)
     print(f"Derived {len(builder_structs)} builders for the New & Update versions")

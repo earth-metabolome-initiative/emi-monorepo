@@ -110,15 +110,6 @@ impl NestedSampleBioOttTaxonItem {
     {
         self.inner.get_taxon_id()
     }
-    /// Insert the SampleBioOttTaxonItem into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.insert(connection).await
-    }
     /// Get the SampleBioOttTaxonItem from the database by its ID.
     ///
     /// * `( sample_id, taxon_id )` - The primary key(s) of the struct to check.
@@ -163,26 +154,6 @@ impl NestedSampleBioOttTaxonItem {
         )
         .await
     }
-    /// Update the struct in the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.update(connection).await
-    }
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update_or_insert<
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    >(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.update_or_insert(connection).await
-    }
     /// Get all SampleBioOttTaxonItem from the database.
     ///
     /// * `filter` - The filter to apply to the results.
@@ -205,5 +176,35 @@ impl NestedSampleBioOttTaxonItem {
             sample_bio_ott_taxon_items.push(Self::from_flat(flat_variant, connection).await?);
         }
         Ok(sample_bio_ott_taxon_items)
+    }
+    /// Update or insert the record in the database.
+    ///
+    /// * `connection` - The connection to the database.
+    pub async fn update_or_insert<
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    >(
+        &self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, crate::api::ApiError> {
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.created_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedSample::update_or_insert(
+            self.sample.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedBioOttTaxonItem::update_or_insert(
+            self.taxon.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::flat_variants::SampleBioOttTaxonItem::update_or_insert(
+            &self.inner,
+            connection,
+        )
+        .await
     }
 }

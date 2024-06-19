@@ -1,30 +1,8 @@
 use crate::database::*;
 use diesel::RunQueryDsl;
-use strsim::normalized_damerau_levenshtein;
 use web_common::api::ApiError;
+use web_common::database::convert_search;
 use web_common::database::search_tables::SearchableStruct;
-
-/// Converts into a vector of SearchableStructs.
-fn convert<B, F>(query: &str, backends: Vec<(B, f32)>) -> Vec<(SearchableStruct, f32)>
-where
-    F: From<B> + web_common::database::Tabular,
-    SearchableStruct: From<F>,
-{
-    // We compute the normalized Damerau-Levenshtein similarity between the query and the name of the
-    // table associated to the backend.
-    let table_name = F::TABLE.as_ref();
-    let similarity = normalized_damerau_levenshtein(query, &table_name) as f32;
-
-    backends
-        .into_iter()
-        .map(|(backend, distance)| {
-            (
-                SearchableStruct::from(F::from(backend)),
-                (1.0 + similarity) / (1.0 + distance),
-            )
-        })
-        .collect()
-}
 
 /// Set the strict word similarity threshold for the search.
 ///
@@ -72,31 +50,10 @@ pub(crate) fn search_all(
 
     let limit = limit.unwrap_or(10);
 
-    results.extend(convert::<NestedUser, web_common::database::NestedUser>(
-        query,
-        NestedUser::strict_word_similarity_search_with_score_viewable(
-            query,
-            Some(limit),
-            None,
-            connection,
-        )?,
-    ));
-
-    if results.len() as i64 >= limit {
-        // We sort the results by relevance and take the last one to set the threshold.
-        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-        // We only take the first `limit` results.
-        results = results.into_iter().take(limit as usize).collect();
-        // And we increase the threshold to the last result, so that the subsequent queries are
-        // faster and stricter.
-        set_threshold(results.last().unwrap().1, connection)?;
-    }
-
     results.extend(
-        convert::<NestedProject, web_common::database::NestedProject>(
+        convert_search::<NestedUser, web_common::database::NestedUser>(
             query,
-            NestedProject::strict_word_similarity_search_with_score_viewable(
-                author_user_id,
+            NestedUser::strict_word_similarity_search_with_score_viewable(
                 query,
                 Some(limit),
                 None,
@@ -115,7 +72,31 @@ pub(crate) fn search_all(
         set_threshold(results.last().unwrap().1, connection)?;
     }
 
-    results.extend(convert::<
+    results.extend(convert_search::<
+        NestedProject,
+        web_common::database::NestedProject,
+    >(
+        query,
+        NestedProject::strict_word_similarity_search_with_score_viewable(
+            author_user_id,
+            query,
+            Some(limit),
+            None,
+            connection,
+        )?,
+    ));
+
+    if results.len() as i64 >= limit {
+        // We sort the results by relevance and take the last one to set the threshold.
+        results.sort_unstable_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+        // We only take the first `limit` results.
+        results = results.into_iter().take(limit as usize).collect();
+        // And we increase the threshold to the last result, so that the subsequent queries are
+        // faster and stricter.
+        set_threshold(results.last().unwrap().1, connection)?;
+    }
+
+    results.extend(convert_search::<
         NestedObservation,
         web_common::database::NestedObservation,
     >(
@@ -139,7 +120,7 @@ pub(crate) fn search_all(
         set_threshold(results.last().unwrap().1, connection)?;
     }
 
-    results.extend(convert::<
+    results.extend(convert_search::<
         NestedOrganism,
         web_common::database::NestedOrganism,
     >(
@@ -163,7 +144,10 @@ pub(crate) fn search_all(
         set_threshold(results.last().unwrap().1, connection)?;
     }
 
-    results.extend(convert::<NestedSample, web_common::database::NestedSample>(
+    results.extend(convert_search::<
+        NestedSample,
+        web_common::database::NestedSample,
+    >(
         query,
         NestedSample::strict_word_similarity_search_with_score_viewable(
             author_user_id,
@@ -184,7 +168,7 @@ pub(crate) fn search_all(
         set_threshold(results.last().unwrap().1, connection)?;
     }
 
-    results.extend(convert::<
+    results.extend(convert_search::<
         NestedNameplate,
         web_common::database::NestedNameplate,
     >(
@@ -208,7 +192,7 @@ pub(crate) fn search_all(
         set_threshold(results.last().unwrap().1, connection)?;
     }
 
-    results.extend(convert::<
+    results.extend(convert_search::<
         NestedSampleContainer,
         web_common::database::NestedSampleContainer,
     >(
@@ -232,15 +216,17 @@ pub(crate) fn search_all(
         set_threshold(results.last().unwrap().1, connection)?;
     }
 
-    results.extend(convert::<NestedTeam, web_common::database::NestedTeam>(
-        query,
-        NestedTeam::strict_word_similarity_search_with_score_viewable(
+    results.extend(
+        convert_search::<NestedTeam, web_common::database::NestedTeam>(
             query,
-            Some(limit),
-            None,
-            connection,
-        )?,
-    ));
+            NestedTeam::strict_word_similarity_search_with_score_viewable(
+                query,
+                Some(limit),
+                None,
+                connection,
+            )?,
+        ),
+    );
 
     if results.len() as i64 >= limit {
         // We sort the results by relevance and take the last one to set the threshold.
@@ -252,7 +238,7 @@ pub(crate) fn search_all(
         set_threshold(results.last().unwrap().1, connection)?;
     }
 
-    results.extend(convert::<
+    results.extend(convert_search::<
         NestedBioOttRank,
         web_common::database::NestedBioOttRank,
     >(
@@ -275,7 +261,7 @@ pub(crate) fn search_all(
         set_threshold(results.last().unwrap().1, connection)?;
     }
 
-    results.extend(convert::<
+    results.extend(convert_search::<
         NestedBioOttTaxonItem,
         web_common::database::NestedBioOttTaxonItem,
     >(

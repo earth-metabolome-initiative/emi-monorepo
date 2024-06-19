@@ -184,15 +184,6 @@ impl NestedOrganism {
     {
         self.inner.get_updated_at()
     }
-    /// Insert the Organism into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().insert(connection).await
-    }
     /// Get the Organism from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to check.
@@ -230,30 +221,6 @@ impl NestedOrganism {
     ) -> Result<usize, crate::api::ApiError> {
         crate::database::flat_variants::Organism::delete_from_id(id, connection).await
     }
-    /// Update the struct in the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().update(connection).await
-    }
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update_or_insert<
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    >(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner
-            .as_ref()
-            .clone()
-            .update_or_insert(connection)
-            .await
-    }
     /// Get all Organism from the database.
     ///
     /// * `filter` - The filter to apply to the results.
@@ -275,5 +242,45 @@ impl NestedOrganism {
             organisms.push(Self::from_flat(flat_variant, connection).await?);
         }
         Ok(organisms)
+    }
+    /// Update or insert the record in the database.
+    ///
+    /// * `connection` - The connection to the database.
+    pub async fn update_or_insert<
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    >(
+        &self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, crate::api::ApiError> {
+        if let Some(host_organism) = self.host_organism.as_ref() {
+            crate::database::flat_variants::Organism::update_or_insert(host_organism, connection)
+                .await?;
+        }
+        if let Some(sample) = self.sample.as_ref() {
+            crate::database::nested_variants::NestedSample::update_or_insert(sample, connection)
+                .await?;
+        }
+        crate::database::nested_variants::NestedNameplate::update_or_insert(
+            self.nameplate.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedProject::update_or_insert(
+            self.project.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.created_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.updated_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::flat_variants::Organism::update_or_insert(self.inner.as_ref(), connection)
+            .await
     }
 }

@@ -16,7 +16,7 @@ def write_backend_table_names_enumeration(
     tables: List[TableStructMetadata],
 ):
     """Write the table names enumeration in the backend crate."""
-    if not (are_migrations_changed() or is_file_changed(__file__)):
+    if not (are_migrations_changed() or is_file_changed(__file__) or is_file_changed("./constraint_checkers/write_backend_flat_variants.py")):
         print("No change in migrations or file. Skipping writing backend table enum.")
         return
 
@@ -168,7 +168,7 @@ def write_backend_table_names_enumeration(
         for table in tables:
             richest_variant: StructMetadata = table.get_richest_struct()
             struct_method: Optional[MethodDefinition] = (
-                richest_variant.get_method_by_name(method.name)
+                richest_variant.get_backend_method_by_name(method.name)
             )
             if struct_method is not None:
                 document.write(

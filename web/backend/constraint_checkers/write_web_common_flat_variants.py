@@ -12,6 +12,7 @@ from constraint_checkers.gluesql_types_mapping import GLUESQL_TYPES_MAPPING
 from constraint_checkers.write_update_method_for_gluesql import (
     write_update_method_for_gluesql,
 )
+
 # from constraint_checkers.rust_implementation_check import trait_implementation_exist
 from constraint_checkers.is_file_changed import is_file_changed
 from constraint_checkers.migrations_changed import are_migrations_changed
@@ -38,7 +39,7 @@ def write_image_as_url_getter_method(
     )
 
     url.include_self_ref()
-    
+
     url.set_return_type(
         AttributeMetadata(
             original_name="_",
@@ -129,7 +130,14 @@ def write_web_common_flat_variants(
     structs : List[StructMetadata]
         The list of structs to write in the `web_common` crate.
     """
-    if not (are_migrations_changed() or is_file_changed(__file__) or is_file_changed("constraint_checkers/write_web_common_nested_variants.py")):
+    if not (
+        are_migrations_changed()
+        or is_file_changed(__file__)
+        or is_file_changed("constraint_checkers/write_web_common_nested_variants.py")
+        or is_file_changed(
+            "constraint_checkers/write_web_common_table_names_enumeration.py"
+        )
+    ):
         print(
             "No change in migrations or file. Skipping writing frontend flat variants."
         )
@@ -165,7 +173,7 @@ def write_web_common_flat_variants(
         "pub trait Colorable {\n"
         "    fn color(&self) -> Option<&str>;\n"
         "}\n\n"
-        "#[cfg(feature = \"frontend\")]\n"
+        '#[cfg(feature = "frontend")]\n'
         "/// A struct that can be queries with an all method.\n"
         "pub trait AllRecords: Filtrable + Sized {\n"
         "    fn all_records<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(\n"
@@ -264,9 +272,7 @@ def write_web_common_flat_variants(
             if color_attribute.optional:
                 document.write(f"        self.{color_attribute.name}.as_deref()\n")
             else:
-                document.write(
-                    f"        Some(self.{color_attribute.name}.as_str())\n"
-                )
+                document.write(f"        Some(self.{color_attribute.name}.as_str())\n")
         else:
             document.write("        None\n")
         document.write("    }\n}\n")
@@ -291,7 +297,7 @@ def write_web_common_flat_variants(
         underscored_filter = "" if struct.has_filter_variant() else "_"
 
         document.write(
-            "#[cfg(feature = \"frontend\")]\n"
+            '#[cfg(feature = "frontend")]\n'
             f"impl AllRecords for {struct.name} {{\n"
             "    fn all_records<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(\n"
             f"        {underscored_filter}filter: Option<&<Self as Filtrable>::Filter>,\n"
@@ -303,18 +309,11 @@ def write_web_common_flat_variants(
         # Depending on whether the struct has a filter variant or not, we
         # write the appropriate code to query the database.
         if struct.has_filter_variant():
-            document.write(
-                "Self::all(filter, limit, offset, connection)\n"
-            )
+            document.write("Self::all(filter, limit, offset, connection)\n")
         else:
-            document.write(
-                "Self::all(limit, offset, connection)\n"
-            )
+            document.write("Self::all(limit, offset, connection)\n")
 
-        document.write(
-            "    }\n"
-            "}\n"
-        )
+        document.write("    }\n}\n")
 
         # This variant of the struct implementation is only
         # available when in the web_common is enabled the frontend
@@ -373,6 +372,7 @@ def write_web_common_flat_variants(
                 name="insert",
                 summary=f"Insert the {struct.name} into the database.",
                 is_async=True,
+                visibility=""
             )
         )
 
@@ -509,7 +509,7 @@ def write_web_common_flat_variants(
 
         # We implement the `delete_from_id` method for the struct. This method deletes
         # the struct from the GlueSQL database by its ID.
-        
+
         delete_from_id_method = struct.add_webcommon_method(
             MethodDefinition(
                 name="delete_from_id",
@@ -569,7 +569,7 @@ def write_web_common_flat_variants(
 
         # We implement the `update` method for the struct. This method updates
         # the struct in the GlueSQL database.
-        write_update_method_for_gluesql(struct, document)
+        write_update_method_for_gluesql(struct, document, visibility="")
 
         # Next, we implement the `update_or_insert` method for the struct. This method
         # inserts the struct into the GlueSQL database if it does not exist, otherwise
@@ -586,7 +586,7 @@ def write_web_common_flat_variants(
             "C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut"
         )
 
-        update_or_insert_method.include_self()
+        update_or_insert_method.include_self_ref()
 
         update_or_insert_method.add_argument(**connection)
 
@@ -605,7 +605,7 @@ def write_web_common_flat_variants(
             "    {\n"
             "        let number_of_rows = self.clone().update(connection).await?;\n"
             "        if number_of_rows == 0 {\n"
-            "            self.insert(connection).await\n"
+            "            self.clone().insert(connection).await\n"
             "        } else {\n"
             "            Ok(number_of_rows)\n"
             "        }\n"
@@ -684,12 +684,9 @@ def write_web_common_flat_variants(
             document.write(
                 "            .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))\n"
             )
-        document.write(
-            f'           .project("{columns}")\n'
-        )
-        order_by_statement = ', '.join(
-            f"{attribute.name} DESC"
-            for primary_key in struct.get_primary_keys()
+        document.write(f'           .project("{columns}")\n')
+        order_by_statement = ", ".join(
+            f"{attribute.name} DESC" for primary_key in struct.get_primary_keys()
         )
         document.write(
             f'            .order_by("{order_by_statement}")\n'

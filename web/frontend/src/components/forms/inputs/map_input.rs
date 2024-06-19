@@ -17,7 +17,8 @@ pub struct MapInput {
 impl MapInput {
     fn set_marker(&mut self, latlng: &LatLng) {
         self.map.set_view(&latlng, self.map.get_zoom());
-        let layer = TileLayer::new("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").add_to(&self.map);
+        let layer =
+            TileLayer::new("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").add_to(&self.map);
         if let Some(layer) = self.layer.as_ref() {
             self.map.remove_layer(layer);
         }
@@ -104,7 +105,9 @@ impl Component for MapInput {
         }
 
         let center = self.map.get_center();
-        if (center.lat() - ctx.props().latitude).abs() > f32::EPSILON as f64 * 10.0 || (center.lng() - ctx.props().longitude).abs() > f32::EPSILON  as f64 * 10.0{
+        if (center.lat() - ctx.props().latitude).abs() > f32::EPSILON as f64 * 10.0
+            || (center.lng() - ctx.props().longitude).abs() > f32::EPSILON as f64 * 10.0
+        {
             self.set_marker(&ctx.props().latlng());
         }
     }

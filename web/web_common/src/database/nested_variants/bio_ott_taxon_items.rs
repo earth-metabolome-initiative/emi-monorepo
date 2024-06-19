@@ -277,15 +277,6 @@ impl NestedBioOttTaxonItem {
     {
         self.inner.get_color_id()
     }
-    /// Insert the BioOttTaxonItem into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().insert(connection).await
-    }
     /// Get the BioOttTaxonItem from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to check.
@@ -323,30 +314,6 @@ impl NestedBioOttTaxonItem {
     ) -> Result<usize, crate::api::ApiError> {
         crate::database::flat_variants::BioOttTaxonItem::delete_from_id(id, connection).await
     }
-    /// Update the struct in the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().update(connection).await
-    }
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update_or_insert<
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    >(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner
-            .as_ref()
-            .clone()
-            .update_or_insert(connection)
-            .await
-    }
     /// Get all BioOttTaxonItem from the database.
     ///
     /// * `filter` - The filter to apply to the results.
@@ -368,5 +335,65 @@ impl NestedBioOttTaxonItem {
             bio_ott_taxon_items.push(Self::from_flat(flat_variant, connection).await?);
         }
         Ok(bio_ott_taxon_items)
+    }
+    /// Update or insert the record in the database.
+    ///
+    /// * `connection` - The connection to the database.
+    pub async fn update_or_insert<
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    >(
+        &self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, crate::api::ApiError> {
+        crate::database::nested_variants::NestedBioOttRank::update_or_insert(
+            self.ott_rank.as_ref(),
+            connection,
+        )
+        .await?;
+        if let Some(domain) = self.domain.as_ref() {
+            crate::database::flat_variants::BioOttTaxonItem::update_or_insert(domain, connection)
+                .await?;
+        }
+        if let Some(kingdom) = self.kingdom.as_ref() {
+            crate::database::flat_variants::BioOttTaxonItem::update_or_insert(kingdom, connection)
+                .await?;
+        }
+        if let Some(phylum) = self.phylum.as_ref() {
+            crate::database::flat_variants::BioOttTaxonItem::update_or_insert(phylum, connection)
+                .await?;
+        }
+        if let Some(class) = self.class.as_ref() {
+            crate::database::flat_variants::BioOttTaxonItem::update_or_insert(class, connection)
+                .await?;
+        }
+        if let Some(order) = self.order.as_ref() {
+            crate::database::flat_variants::BioOttTaxonItem::update_or_insert(order, connection)
+                .await?;
+        }
+        if let Some(family) = self.family.as_ref() {
+            crate::database::flat_variants::BioOttTaxonItem::update_or_insert(family, connection)
+                .await?;
+        }
+        if let Some(genus) = self.genus.as_ref() {
+            crate::database::flat_variants::BioOttTaxonItem::update_or_insert(genus, connection)
+                .await?;
+        }
+        crate::database::flat_variants::BioOttTaxonItem::update_or_insert(
+            self.parent.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::flat_variants::FontAwesomeIcon::update_or_insert(
+            self.icon.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::flat_variants::Color::update_or_insert(self.color.as_ref(), connection)
+            .await?;
+        crate::database::flat_variants::BioOttTaxonItem::update_or_insert(
+            self.inner.as_ref(),
+            connection,
+        )
+        .await
     }
 }

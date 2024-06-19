@@ -205,15 +205,6 @@ impl NestedObservation {
     {
         self.inner.get_picture()
     }
-    /// Insert the Observation into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().insert(connection).await
-    }
     /// Get the Observation from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to check.
@@ -251,30 +242,6 @@ impl NestedObservation {
     ) -> Result<usize, crate::api::ApiError> {
         crate::database::flat_variants::Observation::delete_from_id(id, connection).await
     }
-    /// Update the struct in the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().update(connection).await
-    }
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update_or_insert<
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    >(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner
-            .as_ref()
-            .clone()
-            .update_or_insert(connection)
-            .await
-    }
     /// Get all Observation from the database.
     ///
     /// * `filter` - The filter to apply to the results.
@@ -296,5 +263,57 @@ impl NestedObservation {
             observations.push(Self::from_flat(flat_variant, connection).await?);
         }
         Ok(observations)
+    }
+    /// Update or insert the record in the database.
+    ///
+    /// * `connection` - The connection to the database.
+    pub async fn update_or_insert<
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    >(
+        &self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, crate::api::ApiError> {
+        if let Some(parent_observation) = self.parent_observation.as_ref() {
+            crate::database::flat_variants::Observation::update_or_insert(
+                parent_observation,
+                connection,
+            )
+            .await?;
+        }
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.created_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedUser::update_or_insert(
+            self.updated_by.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::nested_variants::NestedProject::update_or_insert(
+            self.project.as_ref(),
+            connection,
+        )
+        .await?;
+        if let Some(organism) = self.organism.as_ref() {
+            crate::database::nested_variants::NestedOrganism::update_or_insert(
+                organism, connection,
+            )
+            .await?;
+        }
+        if let Some(sample) = self.sample.as_ref() {
+            crate::database::nested_variants::NestedSample::update_or_insert(sample, connection)
+                .await?;
+        }
+        crate::database::nested_variants::NestedObservationSubject::update_or_insert(
+            self.subject.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::flat_variants::Observation::update_or_insert(
+            self.inner.as_ref(),
+            connection,
+        )
+        .await
     }
 }

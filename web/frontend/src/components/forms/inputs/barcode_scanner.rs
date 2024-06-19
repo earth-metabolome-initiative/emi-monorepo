@@ -72,7 +72,6 @@ pub struct Scanner {
     cameras: Vec<web_sys::MediaDeviceInfo>,
     closing: Option<Timeout>,
     interval: Option<Interval>,
-    image: Option<Vec<u8>>,
     status: ScannerStatus,
 }
 
@@ -94,7 +93,6 @@ impl Default for Scanner {
             number_of_scan_attempts: 0,
             start_scanning_time: chrono::Local::now(),
             closing: None,
-            image: None,
             number_of_identical_frames: 0,
             status: ScannerStatus::Closed,
         }
@@ -476,6 +474,7 @@ impl Component for Scanner {
                 false
             }
             ScannerMessage::SwitchCamera => {
+                self.status = ScannerStatus::SwitchingCamera;
                 let (index, _) = self.current_camera.as_ref().unwrap().clone();
                 let next_index = (index + 1) % self.cameras.len();
                 self.current_camera = Some((next_index, self.cameras[next_index].clone()));

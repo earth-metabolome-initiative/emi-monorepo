@@ -22,3 +22,28 @@ pub use update_variants::*;
 pub mod filter_variants;
 pub mod model_impls;
 pub use filter_variants::*;
+
+/// Converts into a vector of SearchableStructs.
+pub fn convert_search<B, F>(
+    query: &str,
+    backends: Vec<(B, f32)>,
+) -> Vec<(crate::database::SearchableStruct, f32)>
+where
+    F: From<B> + crate::database::Tabular,
+    crate::database::SearchableStruct: From<F>,
+{
+    // We compute the normalized Damerau-Levenshtein similarity between the query and the name of the
+    // table associated to the backend.
+    let table_name = F::TABLE.as_ref();
+    let similarity = strsim::normalized_damerau_levenshtein(query, &table_name) as f32;
+
+    backends
+        .into_iter()
+        .map(|(backend, distance)| {
+            (
+                crate::database::SearchableStruct::from(F::from(backend)),
+                (1.0 + similarity) / (1.0 + distance),
+            )
+        })
+        .collect()
+}

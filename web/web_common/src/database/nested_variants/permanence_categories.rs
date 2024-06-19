@@ -105,15 +105,6 @@ impl NestedPermanenceCategory {
     {
         self.inner.get_color_id()
     }
-    /// Insert the PermanenceCategory into the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().insert(connection).await
-    }
     /// Get the PermanenceCategory from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to check.
@@ -151,30 +142,6 @@ impl NestedPermanenceCategory {
     ) -> Result<usize, crate::api::ApiError> {
         crate::database::flat_variants::PermanenceCategory::delete_from_id(id, connection).await
     }
-    /// Update the struct in the database.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner.as_ref().clone().update(connection).await
-    }
-    /// Update the struct in the database if it exists, otherwise insert it.
-    ///
-    /// * `connection` - The connection to the database.
-    pub async fn update_or_insert<
-        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
-    >(
-        self,
-        connection: &mut gluesql::prelude::Glue<C>,
-    ) -> Result<usize, crate::api::ApiError> {
-        self.inner
-            .as_ref()
-            .clone()
-            .update_or_insert(connection)
-            .await
-    }
     /// Get all PermanenceCategory from the database.
     ///
     /// * `filter` - The filter to apply to the results.
@@ -197,5 +164,27 @@ impl NestedPermanenceCategory {
             permanence_categories.push(Self::from_flat(flat_variant, connection).await?);
         }
         Ok(permanence_categories)
+    }
+    /// Update or insert the record in the database.
+    ///
+    /// * `connection` - The connection to the database.
+    pub async fn update_or_insert<
+        C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
+    >(
+        &self,
+        connection: &mut gluesql::prelude::Glue<C>,
+    ) -> Result<usize, crate::api::ApiError> {
+        crate::database::flat_variants::FontAwesomeIcon::update_or_insert(
+            self.icon.as_ref(),
+            connection,
+        )
+        .await?;
+        crate::database::flat_variants::Color::update_or_insert(self.color.as_ref(), connection)
+            .await?;
+        crate::database::flat_variants::PermanenceCategory::update_or_insert(
+            self.inner.as_ref(),
+            connection,
+        )
+        .await
     }
 }

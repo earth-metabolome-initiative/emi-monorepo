@@ -137,24 +137,31 @@ class TableStructMetadata:
         return self.flat_variant
 
     def flat_variant_name(self) -> str:
+        """Returns the name of the flat variant of the table."""
         return self.flat_variant.name
 
     def new_flat_variant_name(self) -> str:
+        """Returns the name of the new flat variant of the table."""
         return self.get_new_flat_variant().name
 
     def update_flat_variant_name(self) -> str:
+        """Returns the name of the update flat variant of the table."""
         return self.get_update_flat_variant().name
 
     def richest_struct_name(self) -> str:
+        """Returns the name of the richest struct of the table."""
         return self.richest_struct.name
 
     def camel_cased(self) -> str:
+        """Returns the camel-cased name of the table."""
         return "".join(word.capitalize() for word in self.name.split("_"))
 
     def has_updated_at_column(self) -> bool:
+        """Returns whether the table has an updated_at column."""
         return self.flat_variant.is_updatable()
 
     def get_primary_keys(self) -> List[AttributeMetadata]:
+        """Returns the primary keys of the table."""
         return self.flat_variant.get_primary_keys()
 
     def is_junktion_table(self) -> bool:

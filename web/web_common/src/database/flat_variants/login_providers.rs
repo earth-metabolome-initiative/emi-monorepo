@@ -124,7 +124,7 @@ impl LoginProvider {
     /// Insert the LoginProvider into the database.
     ///
     /// * `connection` - The connection to the database.
-    pub async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
+    async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
@@ -200,7 +200,7 @@ impl LoginProvider {
     /// Update the struct in the database.
     ///
     /// * `connection` - The connection to the database.
-    pub async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
+    async fn update<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
         self,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
@@ -239,12 +239,12 @@ impl LoginProvider {
     pub async fn update_or_insert<
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     >(
-        self,
+        &self,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         let number_of_rows = self.clone().update(connection).await?;
         if number_of_rows == 0 {
-            self.insert(connection).await
+            self.clone().insert(connection).await
         } else {
             Ok(number_of_rows)
         }
