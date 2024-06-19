@@ -55,7 +55,6 @@ def write_backend_table_names_enumeration(
     # We start with the necessary imports.
     imports = [
         "use crate::database::*;",
-        "use web_common::database::PrimaryKey;",
         "use diesel::r2d2::PooledConnection;",
         "use diesel::r2d2::ConnectionManager;",
     ]
