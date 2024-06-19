@@ -395,7 +395,7 @@ class AttributeMetadata:
         assert isinstance(self._data_type, str)
         if self._data_type == "i32":
             return "INTEGER"
-        if self._data_type == "Uuid":
+        if self._data_type == "uuid::Uuid":
             return "UUID"
 
         raise ValueError(

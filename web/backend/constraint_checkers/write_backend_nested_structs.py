@@ -7,6 +7,7 @@ from constraint_checkers.struct_metadata import StructMetadata
 from constraint_checkers.is_file_changed import is_file_changed
 from constraint_checkers.migrations_changed import are_migrations_changed
 
+
 def write_backend_nested_structs(nested_structs: List[StructMetadata]):
     """Write the nested structs to the backend crate."""
     assert isinstance(nested_structs, list), "The nested structs must be a list."
@@ -18,8 +19,16 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
     ), "All the nested structs must be nested. "
     assert len(nested_structs) > 0, "No nested structs to write."
 
-    if not (are_migrations_changed() or is_file_changed(__file__)):
-        print("No change in migrations or file. Skipping writing backend nested variants.")
+    if not (
+        are_migrations_changed()
+        or is_file_changed(__file__)
+        or is_file_changed(
+            "./constraint_checkers/write_backend_table_names_enumeration.py"
+        )
+    ):
+        print(
+            "No change in migrations or file. Skipping writing backend nested variants."
+        )
         return
 
     # We open the file to write the nested structs
@@ -51,7 +60,11 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
         unit="nested struct",
         leave=False,
     ):
-        document = open(f"./src/database/nested_variants/{nested_struct.table_name}.rs", "w", encoding="utf8")
+        document = open(
+            f"./src/database/nested_variants/{nested_struct.table_name}.rs",
+            "w",
+            encoding="utf8",
+        )
         module_document.write(
             f"mod {nested_struct.table_name};\n"
             f"pub use {nested_struct.table_name}::*;\n"
@@ -76,12 +89,12 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
             "    /// * `flat_variant` - The flat struct.\n"
         )
 
-        contains_struct_that_may_be_hidden = nested_struct.has_attribute_that_may_be_hidden()
-        
+        contains_struct_that_may_be_hidden = (
+            nested_struct.has_attribute_that_may_be_hidden()
+        )
+
         if contains_struct_that_may_be_hidden:
-            document.write(
-            "    /// * `author_user_id` - The author user id.\n"
-            )
+            document.write("    /// * `author_user_id` - The author user id.\n")
         document.write(
             "    /// * `connection` - The database connection.\n"
             "    pub(crate) fn from_flat(\n"
@@ -89,9 +102,7 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
         )
 
         if contains_struct_that_may_be_hidden:
-            document.write(
-                "        author_user_id: Option<i32>,\n"
-            )
+            document.write("        author_user_id: Option<i32>,\n")
         document.write(
             "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::prelude::PgConnection>>,\n"
             "    ) -> Result<Self, web_common::api::ApiError> {\n"
@@ -149,28 +160,37 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
                 else:
                     this_author_user_id_argument = f"Some({author_user_id.name}), "
 
-            if return_type.format_data_type(route='backend') == "Result<Vec<Self>, web_common::api::ApiError>":
+            if (
+                return_type.format_data_type(route="backend")
+                == "Result<Vec<Self>, web_common::api::ApiError>"
+            ):
                 method.write_header_to(document)
                 document.write(
                     "{\n"
                     f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)})?.into_iter().map(|flat_variant| Self::from_flat(flat_variant, {this_author_user_id_argument}connection)).collect()\n"
                     "}\n"
                 )
-            elif return_type.format_data_type(route='backend') == "Result<Self, web_common::api::ApiError>":
+            elif (
+                return_type.format_data_type(route="backend")
+                == "Result<Self, web_common::api::ApiError>"
+            ):
                 method.write_header_to(document)
                 document.write(
                     "{\n"
                     f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)}).and_then(|flat_variant| Self::from_flat(flat_variant, {this_author_user_id_argument}connection))\n"
                     "}\n"
                 )
-            elif return_type.format_data_type(route='backend') == "Result<Vec<(Self, f32)>, web_common::api::ApiError>":
+            elif (
+                return_type.format_data_type(route="backend")
+                == "Result<Vec<(Self, f32)>, web_common::api::ApiError>"
+            ):
                 method.write_header_to(document)
                 document.write(
                     "{\n"
                     f"        {flat_variant.name}::{method.name}({', '.join(arg.name for arg in method.arguments)})?.into_iter().map(|(flat_variant, score)| Ok((Self::from_flat(flat_variant, {this_author_user_id_argument}connection)?, score))).collect()\n"
                     "}\n"
                 )
-            elif "Self" in return_type.format_data_type(route='backend'):
+            elif "Self" in return_type.format_data_type(route="backend"):
                 raise NotImplementedError(
                     "All cases returning a Self must be handled. "
                     f"The method {method.name} returns {return_type.format_data_type(route='backend')}. "
@@ -196,7 +216,6 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
                 )
 
         document.write("}\n")
-    
 
         # We implement the bidirectional From methods for the nested struct
         # present in the web_common crate, which does not use Diesel or its
@@ -237,7 +256,7 @@ def write_backend_nested_structs(nested_structs: List[StructMetadata]):
                 rc_variant = ""
                 if not attribute.implements_copy():
                     rc_variant = ".map(Rc::from)"
-                    
+
                 document.write(
                     f"            {attribute.name}: item.{attribute.name}.map({attribute.data_type(route='frontend')}::from){rc_variant},\n"
                 )

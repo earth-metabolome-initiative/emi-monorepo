@@ -1,7 +1,7 @@
-use crate::components::forms::FormBuildable;
 use crate::search::search_all;
 
 use super::database_type::*;
+use crate::search_dispatch::SearchableTable;
 use futures::{SinkExt, StreamExt};
 use gloo::timers::callback::Timeout;
 use gloo_net::websocket::futures::WebSocket;
@@ -20,7 +20,6 @@ use web_common::database::*;
 use yew::platform::spawn_local;
 use yew_agent::worker::HandlerId;
 use yew_agent::worker::Worker;
-use crate::search_dispatch::SearchableTable;
 
 const NOMINAL_CLOSURE_CODE: u16 = 1000;
 
@@ -46,14 +45,14 @@ pub enum ComponentMessage {
 }
 
 impl ComponentMessage {
-    pub(crate) fn insert<R: Serialize + FormBuildable>(row: &R) -> Self {
+    pub(crate) fn insert<R: Serialize + Tabular>(row: &R) -> Self {
         Self::Operation(Operation::Insert(
             R::TABLE.to_string(),
             bincode::serialize(row).unwrap(),
         ))
     }
 
-    pub(crate) fn update<R: Serialize + FormBuildable>(row: &R) -> Self {
+    pub(crate) fn update<R: Serialize + Tabular>(row: &R) -> Self {
         Self::Operation(Operation::Update(
             R::TABLE.to_string(),
             bincode::serialize(row).unwrap(),
@@ -131,7 +130,7 @@ impl WebsocketWorker {
                     Operation::Delete(table_name, primary_key) => {
                         let table: Table = table_name.try_into().unwrap();
                         match table.delete_from_id(primary_key, &mut database).await {
-                            Ok(row) => BackendMessage::Completed(task_id, None),
+                            Ok(_number_of_affected_rows) => BackendMessage::Completed(task_id, None),
                             Err(err) => BackendMessage::Error(task_id, ApiError::from(err)),
                         }
                     }
@@ -175,11 +174,17 @@ impl WebsocketWorker {
                         } => {
                             let table: Table = table_name.try_into().unwrap();
                             let lowercase_query = query.to_lowercase();
-                            match table.search(&lowercase_query, filter, Some(limit), Some(offset), &mut database).await {
-                                Ok(rows) => BackendMessage::SearchTable(
-                                    task_id,
-                                    rows
-                                ),
+                            match table
+                                .search(
+                                    &lowercase_query,
+                                    filter,
+                                    Some(limit),
+                                    Some(offset),
+                                    &mut database,
+                                )
+                                .await
+                            {
+                                Ok(rows) => BackendMessage::SearchTable(task_id, rows),
                                 Err(err) => BackendMessage::Error(task_id, err),
                             }
                         }

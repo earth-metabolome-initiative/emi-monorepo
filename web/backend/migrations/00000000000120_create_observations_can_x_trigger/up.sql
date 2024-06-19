@@ -14,14 +14,14 @@ DECLARE
     this_created_by INTEGER;
     this_updated_by INTEGER;
 BEGIN
+-- If the author_user_id is NULL, we return FALSE.
+    IF author_user_id IS NULL THEN
+        RAISE EXCEPTION 'The author_user_id cannot be NULL.';
+    END IF;
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
     SELECT project_id, organism_id, sample_id, created_by, updated_by, 1 INTO this_project_id, this_organism_id, this_sample_id, this_created_by, this_updated_by, canary FROM observations WHERE observations.id = this_observations_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
-        RETURN TRUE;
-    END IF;
--- If the author_user_id is NULL, we return FALSE.
-    IF author_user_id IS NULL THEN
         RETURN FALSE;
     END IF;
 -- We check whether the user is the created_by of the row.
@@ -47,10 +47,10 @@ BEGIN
             RETURN FALSE;
         END IF;
     END IF;
-    RETURN TRUE;
+    RETURN FALSE;
 END;
 $$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql PARALLEL SAFE;
 
 -- The function `can_update_observations_trigger` is a trigger function that checks whether the user can update the row.
 CREATE FUNCTION can_update_observations_trigger()
@@ -82,7 +82,7 @@ BEGIN
     RETURN NEW;
 END;
 $$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql PARALLEL SAFE;
 
 -- We create a trigger that calls the `can_update_observations` function before each INSERT or UPDATE.
 CREATE TRIGGER can_update_observations
@@ -92,7 +92,7 @@ EXECUTE FUNCTION can_update_observations_trigger();
 -- The function `can_admin_observations` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
 -- may depend on the parent column, this function retrieves the value of the parent column from the row
--- and calls the parent column's can_admin function if the parent column is not NULL. Otherwise, the function
+-- and calls the parent column's can_delete function if the parent column is not NULL. Otherwise, the function
 -- checks if the row was created by the user or if the user is found in either the observations_users_roles table or
 -- the observations_teams_users table with an appropriate role id.
 CREATE FUNCTION can_admin_observations(author_user_id INTEGER, this_observations_id UUID)
@@ -105,14 +105,14 @@ DECLARE
     this_created_by INTEGER;
     this_updated_by INTEGER;
 BEGIN
+-- If the author_user_id is NULL, we return FALSE.
+    IF author_user_id IS NULL THEN
+        RAISE EXCEPTION 'The author_user_id cannot be NULL.';
+    END IF;
 -- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).
     SELECT project_id, organism_id, sample_id, created_by, updated_by, 1 INTO this_project_id, this_organism_id, this_sample_id, this_created_by, this_updated_by, canary FROM observations WHERE observations.id = this_observations_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
-        RETURN TRUE;
-    END IF;
--- If the author_user_id is NULL, we return FALSE.
-    IF author_user_id IS NULL THEN
         RETURN FALSE;
     END IF;
 -- We check whether the user is the created_by of the row.
@@ -123,25 +123,25 @@ BEGIN
     IF author_user_id = this_updated_by THEN
         RETURN TRUE;
     END IF;
-        IF NOT can_admin_projects(author_user_id, this_project_id) THEN
+        IF NOT can_delete_projects(author_user_id, this_project_id) THEN
             RETURN FALSE;
         END IF;
--- If the parent column is not NULL, we call the can_admin function of the parent column to determine whether the user can edit the row.
+-- If the parent column is not NULL, we call the can_delete function of the parent column to determine whether the user can edit the row.
     IF this_organism_id IS NOT NULL THEN
-        IF NOT can_admin_organisms(author_user_id, this_organism_id) THEN
+        IF NOT can_delete_organisms(author_user_id, this_organism_id) THEN
             RETURN FALSE;
         END IF;
     END IF;
--- If the parent column is not NULL, we call the can_admin function of the parent column to determine whether the user can edit the row.
+-- If the parent column is not NULL, we call the can_delete function of the parent column to determine whether the user can edit the row.
     IF this_sample_id IS NOT NULL THEN
-        IF NOT can_admin_samples(author_user_id, this_sample_id) THEN
+        IF NOT can_delete_samples(author_user_id, this_sample_id) THEN
             RETURN FALSE;
         END IF;
     END IF;
-    RETURN TRUE;
+    RETURN FALSE;
 END;
 $$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql PARALLEL SAFE;
 
 -- The function `can_view_observations` takes a user ID (INTEGER) and the primary keys
 -- and returns a BOOLEAN indicating whether the user can {operation} the row. Since this table's editability
@@ -163,7 +163,7 @@ BEGIN
     SELECT project_id, organism_id, sample_id, created_by, updated_by, 1 INTO this_project_id, this_organism_id, this_sample_id, this_created_by, this_updated_by, canary FROM observations WHERE observations.id = this_observations_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
-        RETURN TRUE;
+        RETURN FALSE;
     END IF;
 -- We check whether the user is the created_by of the row.
     IF author_user_id = this_created_by THEN
@@ -191,5 +191,5 @@ BEGIN
     RETURN TRUE;
 END;
 $$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql PARALLEL SAFE;
 

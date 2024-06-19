@@ -6,7 +6,6 @@ from typing import List
 
 from constraint_checkers import (
     StructMetadata,
-    TableStructMetadata,
     check_for_common_typos_in_migrations,
     check_parent_circularity_trigger,
     create_filter_variants,
@@ -50,6 +49,8 @@ from constraint_checkers import (
     write_web_common_search_trait_implementations,
     write_web_common_table_names_enumeration,
     write_web_common_update_variants,
+    derive_tables_enumeration,
+    derive_web_common_table_methods
 )
 from constraint_checkers.regroup_tables import regroup_tables
 from constraint_checkers.write_frontend_database_schema import (
@@ -124,6 +125,19 @@ if __name__ == "__main__":
     update_model_structs = derive_webcommon_update_variants(flat_variants)
     print(f"Derived {len(update_model_structs)} structs for the Update versions")
 
+    (table_enum_struct, tables) = derive_tables_enumeration(
+        flat_variants + nested_structs,
+        new_model_structs,
+        update_model_structs,
+    )
+
+    ensure_updatable_tables_have_roles_tables(tables, StructMetadata.table_metadata)
+    ensure_can_x_function_existance(tables)
+    ensure_tables_have_creation_notification_trigger(
+        tables, StructMetadata.table_metadata
+    )
+    print("Generated table names enumeration for web_common.")
+
     write_diesel_sql_function_bindings(StructMetadata.table_metadata)
     write_diesel_sql_operator_bindings(StructMetadata.table_metadata)
     write_diesel_sql_types_bindings()
@@ -158,22 +172,16 @@ if __name__ == "__main__":
     write_web_common_search_trait_implementations(nested_structs + flat_variants)
     print("Generated search trait implementations for web_common.")
 
-    tables: List[TableStructMetadata] = write_web_common_table_names_enumeration(
-        flat_variants + nested_structs,
-        new_model_structs,
-        update_model_structs,
+    derive_web_common_table_methods(
+        table_enum_struct=table_enum_struct,
+        tables=tables,
     )
-    assert len(tables) > 0, (
-        "No table structs were written. This is likely due some error in the "
-        "generation process. Please rerun the generation script."
-    )
-    ensure_updatable_tables_have_roles_tables(tables, StructMetadata.table_metadata)
-    ensure_can_x_function_existance(tables)
-    ensure_tables_have_creation_notification_trigger(
-        tables, StructMetadata.table_metadata
-    )
-    print("Generated table names enumeration for web_common.")
 
+    write_web_common_table_names_enumeration(
+        tables,
+        table_enum_struct,
+    )
+    
     write_backend_table_names_enumeration(tables)
     print("Generated table names enumeration for diesel.")
 

@@ -4,4 +4,4 @@ ALTER TABLE
 ALTER COLUMN
     geolocation
 SET
-    DATA TYPE POINT USING (geolocation).value;
+    DATA TYPE POINT USING geolocation::POINT;

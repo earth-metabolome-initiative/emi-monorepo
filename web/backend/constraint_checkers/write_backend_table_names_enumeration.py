@@ -68,7 +68,9 @@ def write_backend_table_names_enumeration(
     # richest structs, and we implement them for the Table enum.
     method_counts: Dict[MethodDefinition, Tuple[MethodDefinition, int]] = {}
     for table in tables:
-        for method in table.get_richest_struct().backend_methods():
+        backend_methods = table.get_richest_struct().backend_methods()
+        assert len(backend_methods) > 0, "No backend methods found."
+        for method in backend_methods:
             if method.has_self_reference():
                 continue
             if method.name.startswith("from_"):
@@ -146,6 +148,7 @@ def write_backend_table_names_enumeration(
         table_methods.append(table_method)
 
     # We write the trait that provides the backend implementations for the Table enumeration.
+    assert len(table_methods) > 0, "No table methods found."
 
     document.write(
         "/// Trait providing the backend implementations for the Table enumeration\n"

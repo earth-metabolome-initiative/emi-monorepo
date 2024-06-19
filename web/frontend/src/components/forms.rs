@@ -1,9 +1,5 @@
 mod basic_form;
 pub mod inputs;
-// pub mod profile;
-// pub mod project;
-// pub mod sample;
-// pub mod team;
-pub use basic_form::*;
+pub(self) use basic_form::*;
 pub use inputs::*;
 pub mod automatic_forms;

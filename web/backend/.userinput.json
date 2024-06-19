@@ -100,7 +100,7 @@
     "delete_00000000000068_create_notifications_table": "yes",
     "delete_00000000000039_create_teams_table": "yes",
     "create_sample_containers_can_x_trigger": "yes",
-    "create_projects_teams_role_invitations_can_x_trigger": "no",
+    "create_projects_teams_role_invitations_can_x_trigger": "yes",
     "create_projects_teams_role_requests_can_x_trigger": "yes",
     "create_projects_teams_roles_can_x_trigger": "yes",
     "create_projects_users_role_invitations_can_x_trigger": "yes",
@@ -120,5 +120,7 @@
     "delete_migration_00000000000100_create_nameplates_sequential_index": "no",
     "create_nameplates_can_x_trigger": "yes",
     "delete_migration_00000000000003_enable_postgis_extension": "no",
-    "Table projects_users_role_invitations is unexpected. Do you want to drop it? (yes/no)": "no"
+    "Table projects_users_role_invitations is unexpected. Do you want to drop it? (yes/no)": "no",
+    "create_organism_bio_ott_taxon_items_can_x_trigger": "yes",
+    "create_organisms_can_x_trigger": "yes"
 }

@@ -56,7 +56,7 @@ pub(super) trait FormBuilder:
 }
 
 /// Trait defining something that can be built by a form.
-pub trait FormBuildable:
+pub(super) trait FormBuildable:
     Clone + PartialEq + Serialize + 'static + From<<Self as FormBuildable>::Builder> + Tabular + Debug
 {
     type Builder: FormBuilder;
@@ -81,7 +81,7 @@ pub trait FormBuildable:
 }
 
 #[derive(Clone, PartialEq, Properties)]
-pub struct BasicFormProp<Data>
+pub(super) struct BasicFormProp<Data>
 where
     Data: FormBuildable,
 {
@@ -92,7 +92,7 @@ where
     pub method: FormMethod,
 }
 
-pub struct BasicForm<Data> {
+pub(super) struct BasicForm<Data> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     waiting_for_reply: bool,
     validate_timeout: Option<Timeout>,
@@ -103,7 +103,7 @@ pub struct BasicForm<Data> {
     _phantom: std::marker::PhantomData<Data>,
 }
 
-pub enum FormMessage {
+pub(super) enum FormMessage {
     Submit,
     Frontend(ComponentMessage),
     Backend(WebsocketMessage),

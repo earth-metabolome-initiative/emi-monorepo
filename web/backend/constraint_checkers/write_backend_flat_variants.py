@@ -24,6 +24,9 @@ def write_backend_flat_variants(
         or is_file_changed(
             os.path.abspath("./constraint_checkers/write_backend_nested_structs.py")
         )
+        or is_file_changed(
+            os.path.abspath("./constraint_checkers/write_backend_table_names_enumeration.py")
+        )
     ):
         print(
             "No change in migrations or file. Skipping writing backend flat variants."

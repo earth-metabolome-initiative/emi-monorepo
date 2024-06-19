@@ -17,7 +17,17 @@ def handle_missing_can_x_function(
 ):
     """Creates the can_update function if it does not exist."""
     assert isinstance(table, TableStructMetadata)
-    operations = ("update", "delete", "view")
+    operations = []
+
+    if table.may_be_hidden():
+        operations.append("view")
+
+    if table.is_insertable():
+        operations.append("delete")
+
+    if table.is_updatable():
+        operations.append("update")
+
     user_column_names = ["created_by", "updated_by"]
 
     if table.name == "users":
@@ -53,7 +63,7 @@ def handle_missing_can_x_function(
     trigger_desinence_name = f"create_{table.name}_can_x_trigger"
 
     print(
-        f"The table {table.name} is insertable or updatable, but it does not have a can_update/can_admin/can_view function or trigger. "
+        f"The table {table.name} is viewable, insertable or updatable, but it does not have a function or trigger for the following operations: {operations}. "
         "This function is used to determine whether a user can perform the operation on a row. "
         "We can create the trigger for you."
     )
@@ -144,23 +154,25 @@ def handle_missing_can_x_function(
 
         up_index_migration.write(
             "BEGIN\n"
-            f"-- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).\n"
-            f"    SELECT {', '.join(columns_to_query + ['1'])} INTO {', '.join([f'this_{column_to_query}' for column_to_query in columns_to_query] + ['canary'])} FROM {table.name} WHERE {primary_key_where_clause};\n"
-            "-- If the row does not exist, we return FALSE.\n"
-            "    IF canary IS NULL THEN\n"
-            "        RETURN TRUE;\n"
-            "    END IF;\n"
         )
-
         # If the operation if either an edit or a delete, we check that the provided
-        # author_user_id is not NULL.
+        # author_user_id is not NULL. If it is, this is most likely a bug in the code and
+        # we should raise an exception.
         if operation in ("update", "delete"):
             up_index_migration.write(
                 "-- If the author_user_id is NULL, we return FALSE.\n"
                 "    IF author_user_id IS NULL THEN\n"
-                "        RETURN FALSE;\n"
+                "        RAISE EXCEPTION 'The author_user_id cannot be NULL.';\n"
                 "    END IF;\n"
             )
+        up_index_migration.write(
+            f"-- We retrieve the value of the parent column from the row, as identified by the provided primary key(s).\n"
+            f"    SELECT {', '.join(columns_to_query + ['1'])} INTO {', '.join([f'this_{column_to_query}' for column_to_query in columns_to_query] + ['canary'])} FROM {table.name} WHERE {primary_key_where_clause};\n"
+            "-- If the row does not exist, we return FALSE.\n"
+            "    IF canary IS NULL THEN\n"
+            "        RETURN FALSE;\n"
+            "    END IF;\n"
+        )
 
         for user_column_name in user_column_names:
             if table.has_column(user_column_name):
@@ -243,13 +255,13 @@ def handle_missing_can_x_function(
                 if parent_column.optional:
                     up_index_migration.write("    END IF;\n")
 
-        if len(parent_columns) > 0 and not is_role_table(table.name):
+        if len(parent_columns) > 0 and not is_role_table(table.name) and operation == "view":
             up_index_migration.write("    RETURN TRUE;\n")
         else:
             up_index_migration.write("    RETURN FALSE;\n")
 
         # Otherwise, we return FALSE.
-        up_index_migration.write("END;\n$$\nLANGUAGE plpgsql;\n\n")
+        up_index_migration.write("END;\n$$\nLANGUAGE plpgsql PARALLEL SAFE;\n\n")
 
         if operation == "update":
             # We then implement the trigger function, which does not receive any arguments as trigger functions
@@ -290,7 +302,7 @@ def handle_missing_can_x_function(
                         "    END IF;\n"
                     )
                 up_index_migration.write(
-                    "    RETURN NEW;\nEND;\n$$\nLANGUAGE plpgsql;\n\n"
+                    "    RETURN NEW;\nEND;\n$$\nLANGUAGE plpgsql PARALLEL SAFE;\n\n"
                 )
 
         # We then create the trigger that calls the trigger function.
@@ -365,7 +377,7 @@ def ensure_can_x_function_existance(tables: List[TableStructMetadata]):
                 )
 
             raise RuntimeError(
-                f"The table {table.name} is insertable or updatable, but it has a can_view function. "
+                f"The table {table.name} cannot be hidden, but it has a can_view function. "
                 f"This function is not needed for tables that are not hidden.{visibility_message}"
             )
 

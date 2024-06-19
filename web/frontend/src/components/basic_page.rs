@@ -18,7 +18,7 @@ use yewdux::Dispatch;
 
 use super::RowToBadge;
 
-pub trait PageLike:
+pub(crate) trait PageLike:
     RowToBadge + DeserializeOwned + Filtrable + Viewable + PartialEq + Clone + Tabular + 'static
 {
     fn section() -> String {
@@ -476,7 +476,7 @@ impl PageLike for NestedSampleContainer {
 }
 
 #[derive(Properties, Clone, PartialEq)]
-pub struct PageProps<Page>
+pub(crate) struct PageProps<Page>
 where
     Page: PageLike,
 {
@@ -487,7 +487,7 @@ where
 }
 
 #[derive(Properties, Clone, PartialEq)]
-pub struct InnerBasicPageProps<Page>
+pub(crate) struct InnerBasicPageProps<Page>
 where
     Page: PageLike,
 {
@@ -498,7 +498,7 @@ where
     _phantom: std::marker::PhantomData<Page>,
 }
 
-pub struct InnerBasicPage<Page> {
+pub(crate) struct InnerBasicPage<Page> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     page: Option<Page>,
     user_state: Rc<UserState>,
@@ -507,7 +507,7 @@ pub struct InnerBasicPage<Page> {
     can_admin: bool,
 }
 
-pub enum PageMessage {
+pub(crate) enum PageMessage {
     Backend(WebsocketMessage),
     UserState(Rc<UserState>),
 }
@@ -641,7 +641,7 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
 }
 
 #[function_component(BasicPage)]
-pub fn basic_page<Page: PageLike>(props: &PageProps<Page>) -> Html {
+pub(crate) fn basic_page<Page: PageLike>(props: &PageProps<Page>) -> Html {
     let navigator = use_navigator().unwrap();
     html! {
         <InnerBasicPage<Page> id={props.id} navigator={navigator} >

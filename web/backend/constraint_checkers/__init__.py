@@ -99,6 +99,7 @@ from constraint_checkers.write_diesel_sql_types_bindings import (
     write_diesel_sql_types_bindings
 )
 from constraint_checkers.utils import infer_route_from_document
+from constraint_checkers.derive_tables_enumeration import (derive_tables_enumeration, derive_web_common_table_methods)
 
 
 __all__ = [
@@ -132,7 +133,6 @@ __all__ = [
     "execute_migrations",
     "write_frontend_forms",
     "write_web_common_flat_variants",
-    "write_web_common_nested_structs",
     "write_backend_new_variants",
     "extract_structs",
     "derive_nested_structs",
@@ -147,5 +147,7 @@ __all__ = [
     "write_diesel_sql_function_bindings",
     "ensures_no_duplicated_migrations",
     "register_derived_search_indices",
-    "write_diesel_sql_types_bindings"
+    "write_diesel_sql_types_bindings",
+    "derive_tables_enumeration",
+    "derive_web_common_table_methods"
 ]

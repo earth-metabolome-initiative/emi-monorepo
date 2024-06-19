@@ -3,9 +3,10 @@
 //! This module is automatically generated. Do not write anything here.
 
 use crate::database::*;
-use serde::Deserialize;
-use serde::Serialize;
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, Copy)]
+
+#[derive(
+    serde::Deserialize, serde::Serialize, Clone, Debug, PartialEq, Eq, Copy, PartialOrd, Ord,
+)]
 pub enum Table {
     BioOttRanks,
     BioOttTaxonItems,

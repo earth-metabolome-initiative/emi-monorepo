@@ -14,7 +14,7 @@ BEGIN
     SELECT spectra_collection_id, 1 INTO this_spectra_collection_id, canary FROM spectra WHERE spectra.id = this_spectra_id;
 -- If the row does not exist, we return FALSE.
     IF canary IS NULL THEN
-        RETURN TRUE;
+        RETURN FALSE;
     END IF;
         IF NOT can_view_spectra_collections(author_user_id, this_spectra_collection_id) THEN
             RETURN FALSE;
@@ -22,5 +22,5 @@ BEGIN
     RETURN TRUE;
 END;
 $$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql PARALLEL SAFE;
 
