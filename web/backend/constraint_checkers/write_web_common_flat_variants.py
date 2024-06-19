@@ -217,7 +217,10 @@ def write_web_common_flat_variants(
         document.write("use super::*;\n")
 
         if struct.has_images():
-            document.write("use crate::traits::GuessImageFormat;\n")
+            document.write(
+                "#[cfg(feature = \"frontend\")]\n"
+                "use crate::traits::GuessImageFormat;\n"
+            )
 
         # We write the struct definition.
         struct.write_to(document)

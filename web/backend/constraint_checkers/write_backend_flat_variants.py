@@ -25,7 +25,7 @@ def write_backend_flat_variants(
             os.path.abspath("./constraint_checkers/write_backend_nested_structs.py")
         )
         or is_file_changed(
-            os.path.abspath("./constraint_checkers/write_backend_table_names_enumeration.py")
+            "./constraint_checkers/write_backend_table_names_enumeration.py"
         )
     ):
         print(
@@ -306,6 +306,11 @@ def write_backend_flat_variants(
                 struct_document.write(f"{{\n        Ok({rust_boolean})\n}}\n")
 
             if struct.is_immutable() and operation in ["update", "admin"]:
+                continue
+
+            if not struct.is_updatable() and operation == "update":
+                continue
+            if not struct.is_insertable() and operation == "admin":
                 continue
 
             sorted_variants = [False, True]

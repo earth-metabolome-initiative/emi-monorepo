@@ -21,6 +21,7 @@ pub enum ApiError {
     BadGateway,
     NoResults,
     BadRequest(Vec<String>),
+    Empty(String),
     InternalServerError,
     InvalidFileFormat(String),
     JPEGError(JPEGError),
@@ -104,6 +105,7 @@ impl ApiError {
             Self::InternalServerError => "bomb",
             Self::NoResults => "search",
             Self::InvalidFileFormat(_) => "file-circle-exclamation",
+            Self::Empty(_) => "puzzle-piece",
             Self::JPEGError(e) => match e {
                 JPEGError::InvalidImage => "file-image",
                 JPEGError::ImageTooSmall => "expand-arrows-alt",
@@ -200,6 +202,7 @@ impl Into<Vec<String>> for ApiError {
             ApiError::NoResults => vec!["No results".to_string()],
             ApiError::Unauthorized => vec!["Unauthorized".to_string()],
             ApiError::BadGateway => vec!["Bad Gateway".to_string()],
+            ApiError::Empty(e) => vec![format!("Field {} cannot be empty", e)],
             ApiError::InternalServerError => vec!["Internal Server Error".to_string()],
             ApiError::InvalidFileFormat(format) => vec![format!("Invalid file format: {}", format)],
             ApiError::JPEGError(e) => vec![e.to_string()],
@@ -338,6 +341,9 @@ impl From<ApiError> for actix_web::HttpResponse {
             ApiError::BadGateway => actix_web::HttpResponse::BadGateway().finish(),
             ApiError::BadRequest(errors) => actix_web::HttpResponse::BadRequest().json(errors),
             ApiError::NoResults => actix_web::HttpResponse::NotFound().finish(),
+            ApiError::Empty(e) => {
+                actix_web::HttpResponse::BadRequest().json(format!("Field {} cannot be empty", e))
+            }
             ApiError::InternalServerError => {
                 actix_web::HttpResponse::InternalServerError().finish()
             }

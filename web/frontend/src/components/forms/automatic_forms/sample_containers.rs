@@ -83,9 +83,9 @@ impl Reducer<SampleContainerBuilder> for SampleContainerActions {
                 }
                 if let Some(value) = barcode.as_ref() {
                     if value.is_empty() {
-                        state_mut.errors_barcode.push(ApiError::BadRequest(vec![
-                            "The Barcode field cannot be left empty.".to_string(),
-                        ]));
+                        state_mut
+                            .errors_barcode
+                            .push(ApiError::Empty("Barcode".to_string()));
                         state_mut.barcode = None;
                         break 'barcode;
                     }

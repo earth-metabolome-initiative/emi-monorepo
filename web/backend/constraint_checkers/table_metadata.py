@@ -90,7 +90,7 @@ class TableStructMetadata:
             )
         self.update_flat_variant = struct
 
-    def get_update_flat_variant(self) -> StructMetadata:
+    def get_update_variant(self) -> StructMetadata:
         if self.has_uuid_primary_key():
             return self.get_new_flat_variant()
         if self.update_flat_variant is None:
@@ -140,13 +140,9 @@ class TableStructMetadata:
         """Returns the name of the flat variant of the table."""
         return self.flat_variant.name
 
-    def new_flat_variant_name(self) -> str:
-        """Returns the name of the new flat variant of the table."""
-        return self.get_new_flat_variant().name
-
     def update_flat_variant_name(self) -> str:
         """Returns the name of the update flat variant of the table."""
-        return self.get_update_flat_variant().name
+        return self.get_update_variant().name
 
     def richest_struct_name(self) -> str:
         """Returns the name of the richest struct of the table."""

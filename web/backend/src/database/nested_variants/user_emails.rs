@@ -148,48 +148,6 @@ impl NestedUserEmail {
     pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
         UserEmail::can_update_by_id()
     }
-    /// Get all of the updatable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn all_updatable(
-        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
-        author_user_id: i32,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        UserEmail::all_updatable(filter, author_user_id, limit, offset, connection)?
-            .into_iter()
-            .map(|flat_variant| Self::from_flat(flat_variant, connection))
-            .collect()
-    }
-    /// Get all of the sorted updatable structs from the database.
-    ///
-    /// * `filter` - The optional filter to apply to the query.
-    /// * `author_user_id` - The ID of the user who is performing the search.
-    /// * `limit` - The maximum number of results to return.
-    /// * `offset` - The number of results to skip.
-    /// * `connection` - The connection to the database.
-    pub fn all_updatable_sorted(
-        filter: Option<&web_common::database::filter_variants::UserEmailFilter>,
-        author_user_id: i32,
-        limit: Option<i64>,
-        offset: Option<i64>,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        UserEmail::all_updatable_sorted(filter, author_user_id, limit, offset, connection)?
-            .into_iter()
-            .map(|flat_variant| Self::from_flat(flat_variant, connection))
-            .collect()
-    }
     /// Check whether the user can admin the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.

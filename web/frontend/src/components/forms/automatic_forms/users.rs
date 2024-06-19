@@ -92,9 +92,9 @@ impl Reducer<UserBuilder> for UserActions {
                 }
                 if let Some(value) = first_name.as_ref() {
                     if value.is_empty() {
-                        state_mut.errors_first_name.push(ApiError::BadRequest(vec![
-                            "The First name field cannot be left empty.".to_string(),
-                        ]));
+                        state_mut
+                            .errors_first_name
+                            .push(ApiError::Empty("First name".to_string()));
                         state_mut.first_name = None;
                         break 'first_name;
                     }
@@ -108,9 +108,9 @@ impl Reducer<UserBuilder> for UserActions {
                 state_mut.errors_middle_name.clear();
                 if let Some(value) = middle_name.as_ref() {
                     if value.is_empty() {
-                        state_mut.errors_middle_name.push(ApiError::BadRequest(vec![
-                            "The Middle name field cannot be left empty.".to_string(),
-                        ]));
+                        state_mut
+                            .errors_middle_name
+                            .push(ApiError::Empty("Middle name".to_string()));
                         state_mut.middle_name = None;
                         break 'middle_name;
                     }
@@ -131,9 +131,9 @@ impl Reducer<UserBuilder> for UserActions {
                 }
                 if let Some(value) = last_name.as_ref() {
                     if value.is_empty() {
-                        state_mut.errors_last_name.push(ApiError::BadRequest(vec![
-                            "The Last name field cannot be left empty.".to_string(),
-                        ]));
+                        state_mut
+                            .errors_last_name
+                            .push(ApiError::Empty("Last name".to_string()));
                         state_mut.last_name = None;
                         break 'last_name;
                     }
@@ -147,9 +147,9 @@ impl Reducer<UserBuilder> for UserActions {
                 state_mut.errors_description.clear();
                 if let Some(value) = description.as_ref() {
                     if value.is_empty() {
-                        state_mut.errors_description.push(ApiError::BadRequest(vec![
-                            "The Description field cannot be left empty.".to_string(),
-                        ]));
+                        state_mut
+                            .errors_description
+                            .push(ApiError::Empty("Description".to_string()));
                         state_mut.description = None;
                         break 'description;
                     }

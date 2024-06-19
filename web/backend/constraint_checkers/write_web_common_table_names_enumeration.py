@@ -34,8 +34,6 @@ def write_web_common_table_names_enumeration(
         "//! This module is automatically generated. Do not write anything here.\n\n"
     )
 
-    document.write("use crate::database::*;\n\n")
-
     document.write("#[derive(" + ", ".join([
         derive
         for derive in table_enum_struct.derives()
@@ -125,7 +123,7 @@ def write_web_common_table_names_enumeration(
 
                 awaits = ".await" if struct_method.is_async else ""
 
-                document.write(f"{table.richest_struct_name()}::{method.name}(\n")
+                document.write(f"{table.get_richest_struct().full_path('web_common')}::{method.name}(\n")
                 arguments = []
                 for argument in method.arguments:
                     if argument.name == "self":
@@ -233,15 +231,15 @@ def write_web_common_table_names_enumeration(
 
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
-            f"                let new_row: super::{table.new_flat_variant_name()} = bincode::deserialize::<super::{table.new_flat_variant_name()}>(&new_row).map_err(crate::api::ApiError::from)?;\n"
-            f"                let inserted_row: super::{table.flat_variant_name()} = new_row.insert(user_id, connection).await?;\n"
+            f"                let new_row: {table.get_new_flat_variant().full_path('web_common')} = bincode::deserialize::<{table.get_new_flat_variant().full_path('web_common')}>(&new_row).map_err(crate::api::ApiError::from)?;\n"
+            f"                let inserted_row: {table.get_flat_variant().full_path('web_common')} = new_row.insert(user_id, connection).await?;\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
         # to the richest struct using the `from_flat` method.
         if table.get_richest_struct().is_nested():
             document.write(
-                f"                let nested_row = super::{table.get_richest_struct().name}::from_flat(inserted_row, connection).await?;\n"
+                f"                let nested_row = {table.get_richest_struct().full_path('web_common')}::from_flat(inserted_row, connection).await?;\n"
                 "                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?\n"
             )
         else:
@@ -302,7 +300,7 @@ def write_web_common_table_names_enumeration(
 
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
-            f"                let update_row: super::{table.update_flat_variant_name()} = bincode::deserialize::<super::{table.update_flat_variant_name()}>(&update_row).map_err(crate::api::ApiError::from)?;\n"
+            f"                let update_row: {table.get_update_variant().full_path('web_common')} = bincode::deserialize::<{table.get_update_variant().full_path('web_common')}>(&update_row).map_err(crate::api::ApiError::from)?;\n"
             f"                let {flat_variant.get_formatted_primary_keys(include_prefix=False)} = {flat_variant.get_formatted_primary_keys(include_prefix=True, prefix='update_row')};\n"
             f"                update_row.update("
         )
@@ -313,14 +311,14 @@ def write_web_common_table_names_enumeration(
         document.write("connection).await?;\n")
 
         document.write(
-            f"                let updated_row: super::{table.flat_variant_name()} = super::{table.flat_variant_name()}::get({flat_variant.get_formatted_primary_keys(include_prefix=False)}, connection).await?.unwrap();\n"
+            f"                let updated_row: {table.get_flat_variant().full_path('web_common')} = {table.get_flat_variant().full_path('web_common')}::get({flat_variant.get_formatted_primary_keys(include_prefix=False)}, connection).await?.unwrap();\n"
         )
 
         # If the table has a richer variant than the flat one, we convert the flat struct
         # to the richest struct using the `from_flat` method.
         if table.get_richest_struct().is_nested():
             document.write(
-                f"                let nested_row = super::{table.get_richest_struct().name}::from_flat(updated_row, connection).await?;\n"
+                f"                let nested_row = {table.get_richest_struct().full_path('web_common')}::from_flat(updated_row, connection).await?;\n"
                 "                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?\n"
             )
         else:
@@ -363,7 +361,7 @@ def write_web_common_table_names_enumeration(
         document.write(
             f"            Table::{table.camel_cased()} => {{\n"
             f"                for row in rows {{\n"
-            f"                    let row: super::{table.richest_struct_name()} = bincode::deserialize::<super::{table.richest_struct_name()}>(&row).map_err(crate::api::ApiError::from)?;\n"
+            f"                    let row: {table.get_richest_struct().full_path('web_common')} = bincode::deserialize::<{table.get_richest_struct().full_path('web_common')}>(&row).map_err(crate::api::ApiError::from)?;\n"
             f"                    row.update_or_insert(connection).await?;\n"
             "                }\n"
             "            },\n"

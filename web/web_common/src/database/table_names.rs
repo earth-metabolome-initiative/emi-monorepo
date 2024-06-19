@@ -2,8 +2,6 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
-use crate::database::*;
-
 #[derive(
     serde::Deserialize, serde::Serialize, Clone, Debug, PartialEq, Eq, Copy, PartialOrd, Ord,
 )]
@@ -186,294 +184,464 @@ impl crate::database::Table {
     /// * `connection` - The connection to the database.
     pub async fn get<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
         &self,
-        primary_key: PrimaryKey,
+        primary_key: crate::database::PrimaryKey,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Vec<u8>>, crate::api::ApiError> {
         Ok(match self {
             crate::database::Table::BioOttRanks => {
-                let result = NestedBioOttRank::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedBioOttRank::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::BioOttTaxonItems => {
-                let result = NestedBioOttTaxonItem::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedBioOttTaxonItem::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Colors => {
-                let result = Color::get(primary_key.into(), connection).await?;
+                let result =
+                    crate::database::flat_variants::Color::get(primary_key.into(), connection)
+                        .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Countries => {
-                let result = Country::get(primary_key.into(), connection).await?;
+                let result =
+                    crate::database::flat_variants::Country::get(primary_key.into(), connection)
+                        .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::DerivedSamples => {
-                let result = NestedDerivedSample::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedDerivedSample::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::DocumentFormats => {
-                let result = NestedDocumentFormat::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedDocumentFormat::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::FontAwesomeIcons => {
-                let result = FontAwesomeIcon::get(primary_key.into(), connection).await?;
+                let result = crate::database::flat_variants::FontAwesomeIcon::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::LoginProviders => {
-                let result = NestedLoginProvider::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedLoginProvider::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Materials => {
-                let result = NestedMaterial::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedMaterial::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::NameplateCategories => {
-                let result = NestedNameplateCategory::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedNameplateCategory::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Nameplates => {
-                let result = NestedNameplate::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedNameplate::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Notifications => {
-                let result = NestedNotification::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedNotification::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::ObservationSubjects => {
-                let result = NestedObservationSubject::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedObservationSubject::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Observations => {
-                let result = NestedObservation::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedObservation::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::OrganismBioOttTaxonItems => {
-                let result =
-                    NestedOrganismBioOttTaxonItem::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedOrganismBioOttTaxonItem::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Organisms => {
-                let result = NestedOrganism::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedOrganism::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Organizations => {
-                let result = NestedOrganization::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedOrganization::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::PermanenceCategories => {
-                let result = NestedPermanenceCategory::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedPermanenceCategory::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::ProjectStates => {
-                let result = NestedProjectState::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedProjectState::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Projects => {
-                let result = NestedProject::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedProject::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::ProjectsTeamsRoleInvitations => {
                 let result =
-                    NestedProjectsTeamsRoleInvitation::get(primary_key.into(), connection).await?;
+                    crate::database::nested_variants::NestedProjectsTeamsRoleInvitation::get(
+                        primary_key.into(),
+                        connection,
+                    )
+                    .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::ProjectsTeamsRoleRequests => {
-                let result =
-                    NestedProjectsTeamsRoleRequest::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedProjectsTeamsRoleRequest::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::ProjectsTeamsRoles => {
-                let result = NestedProjectsTeamsRole::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedProjectsTeamsRole::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::ProjectsUsersRoleInvitations => {
                 let result =
-                    NestedProjectsUsersRoleInvitation::get(primary_key.into(), connection).await?;
+                    crate::database::nested_variants::NestedProjectsUsersRoleInvitation::get(
+                        primary_key.into(),
+                        connection,
+                    )
+                    .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::ProjectsUsersRoleRequests => {
-                let result =
-                    NestedProjectsUsersRoleRequest::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedProjectsUsersRoleRequest::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::ProjectsUsersRoles => {
-                let result = NestedProjectsUsersRole::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedProjectsUsersRole::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Roles => {
-                let result = NestedRole::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedRole::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::SampleBioOttTaxonItems => {
-                let result =
-                    NestedSampleBioOttTaxonItem::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedSampleBioOttTaxonItem::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::SampleContainerCategories => {
-                let result =
-                    NestedSampleContainerCategory::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedSampleContainerCategory::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::SampleContainers => {
-                let result = NestedSampleContainer::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedSampleContainer::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::SampleStates => {
-                let result = NestedSampleState::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedSampleState::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Samples => {
-                let result = NestedSample::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedSample::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Spectra => {
-                let result = NestedSpectra::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedSpectra::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::SpectraCollections => {
-                let result = NestedSpectraCollection::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedSpectraCollection::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::TeamStates => {
-                let result = NestedTeamState::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedTeamState::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Teams => {
-                let result = NestedTeam::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedTeam::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::TeamsTeamsRoleInvitations => {
-                let result =
-                    NestedTeamsTeamsRoleInvitation::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedTeamsTeamsRoleInvitation::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::TeamsUsersRoleInvitations => {
-                let result =
-                    NestedTeamsUsersRoleInvitation::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedTeamsUsersRoleInvitation::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::TeamsUsersRoleRequests => {
-                let result =
-                    NestedTeamsUsersRoleRequest::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedTeamsUsersRoleRequest::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::TeamsUsersRoles => {
-                let result = NestedTeamsUsersRole::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedTeamsUsersRole::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Units => {
-                let result = NestedUnit::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedUnit::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::UserEmails => {
-                let result = NestedUserEmail::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedUserEmail::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::Users => {
-                let result = NestedUser::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedUser::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::UsersUsersRoleInvitations => {
-                let result =
-                    NestedUsersUsersRoleInvitation::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedUsersUsersRoleInvitation::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::UsersUsersRoleRequests => {
-                let result =
-                    NestedUsersUsersRoleRequest::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedUsersUsersRoleRequest::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
             crate::database::Table::UsersUsersRoles => {
-                let result = NestedUsersUsersRole::get(primary_key.into(), connection).await?;
+                let result = crate::database::nested_variants::NestedUsersUsersRole::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
                 result
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
@@ -492,7 +660,7 @@ impl crate::database::Table {
     ) -> Result<usize, crate::api::ApiError> {
         Ok(match self {
             crate::database::Table::BioOttRanks => {
-                NestedBioOttRank::delete(
+                crate::database::nested_variants::NestedBioOttRank::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedBioOttRank>(
                         &row,
                     )?,
@@ -501,7 +669,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::BioOttTaxonItems => {
-                NestedBioOttTaxonItem::delete(
+                crate::database::nested_variants::NestedBioOttTaxonItem::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedBioOttTaxonItem>(
                         &row,
                     )?,
@@ -510,21 +678,21 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Colors => {
-                Color::delete(
+                crate::database::flat_variants::Color::delete(
                     bincode::deserialize::<crate::database::flat_variants::Color>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::Countries => {
-                Country::delete(
+                crate::database::flat_variants::Country::delete(
                     bincode::deserialize::<crate::database::flat_variants::Country>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::DerivedSamples => {
-                NestedDerivedSample::delete(
+                crate::database::nested_variants::NestedDerivedSample::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedDerivedSample>(
                         &row,
                     )?,
@@ -533,7 +701,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::DocumentFormats => {
-                NestedDocumentFormat::delete(
+                crate::database::nested_variants::NestedDocumentFormat::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedDocumentFormat>(
                         &row,
                     )?,
@@ -542,14 +710,14 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::FontAwesomeIcons => {
-                FontAwesomeIcon::delete(
+                crate::database::flat_variants::FontAwesomeIcon::delete(
                     bincode::deserialize::<crate::database::flat_variants::FontAwesomeIcon>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::LoginProviders => {
-                NestedLoginProvider::delete(
+                crate::database::nested_variants::NestedLoginProvider::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedLoginProvider>(
                         &row,
                     )?,
@@ -558,14 +726,14 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Materials => {
-                NestedMaterial::delete(
+                crate::database::nested_variants::NestedMaterial::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedMaterial>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::NameplateCategories => {
-                NestedNameplateCategory::delete(
+                crate::database::nested_variants::NestedNameplateCategory::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedNameplateCategory,
                     >(&row)?,
@@ -574,7 +742,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Nameplates => {
-                NestedNameplate::delete(
+                crate::database::nested_variants::NestedNameplate::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedNameplate>(
                         &row,
                     )?,
@@ -583,7 +751,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Notifications => {
-                NestedNotification::delete(
+                crate::database::nested_variants::NestedNotification::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedNotification>(
                         &row,
                     )?,
@@ -592,7 +760,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::ObservationSubjects => {
-                NestedObservationSubject::delete(
+                crate::database::nested_variants::NestedObservationSubject::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedObservationSubject,
                     >(&row)?,
@@ -601,7 +769,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Observations => {
-                NestedObservation::delete(
+                crate::database::nested_variants::NestedObservation::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedObservation>(
                         &row,
                     )?,
@@ -610,7 +778,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::OrganismBioOttTaxonItems => {
-                NestedOrganismBioOttTaxonItem::delete(
+                crate::database::nested_variants::NestedOrganismBioOttTaxonItem::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedOrganismBioOttTaxonItem,
                     >(&row)?,
@@ -619,14 +787,14 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Organisms => {
-                NestedOrganism::delete(
+                crate::database::nested_variants::NestedOrganism::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedOrganism>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::Organizations => {
-                NestedOrganization::delete(
+                crate::database::nested_variants::NestedOrganization::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedOrganization>(
                         &row,
                     )?,
@@ -635,7 +803,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::PermanenceCategories => {
-                NestedPermanenceCategory::delete(
+                crate::database::nested_variants::NestedPermanenceCategory::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedPermanenceCategory,
                     >(&row)?,
@@ -644,7 +812,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::ProjectStates => {
-                NestedProjectState::delete(
+                crate::database::nested_variants::NestedProjectState::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedProjectState>(
                         &row,
                     )?,
@@ -653,14 +821,14 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Projects => {
-                NestedProject::delete(
+                crate::database::nested_variants::NestedProject::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedProject>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::ProjectsTeamsRoleInvitations => {
-                NestedProjectsTeamsRoleInvitation::delete(
+                crate::database::nested_variants::NestedProjectsTeamsRoleInvitation::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedProjectsTeamsRoleInvitation,
                     >(&row)?,
@@ -669,7 +837,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::ProjectsTeamsRoleRequests => {
-                NestedProjectsTeamsRoleRequest::delete(
+                crate::database::nested_variants::NestedProjectsTeamsRoleRequest::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedProjectsTeamsRoleRequest,
                     >(&row)?,
@@ -678,7 +846,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::ProjectsTeamsRoles => {
-                NestedProjectsTeamsRole::delete(
+                crate::database::nested_variants::NestedProjectsTeamsRole::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedProjectsTeamsRole,
                     >(&row)?,
@@ -687,7 +855,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::ProjectsUsersRoleInvitations => {
-                NestedProjectsUsersRoleInvitation::delete(
+                crate::database::nested_variants::NestedProjectsUsersRoleInvitation::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedProjectsUsersRoleInvitation,
                     >(&row)?,
@@ -696,7 +864,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::ProjectsUsersRoleRequests => {
-                NestedProjectsUsersRoleRequest::delete(
+                crate::database::nested_variants::NestedProjectsUsersRoleRequest::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedProjectsUsersRoleRequest,
                     >(&row)?,
@@ -705,7 +873,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::ProjectsUsersRoles => {
-                NestedProjectsUsersRole::delete(
+                crate::database::nested_variants::NestedProjectsUsersRole::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedProjectsUsersRole,
                     >(&row)?,
@@ -714,14 +882,14 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Roles => {
-                NestedRole::delete(
+                crate::database::nested_variants::NestedRole::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedRole>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::SampleBioOttTaxonItems => {
-                NestedSampleBioOttTaxonItem::delete(
+                crate::database::nested_variants::NestedSampleBioOttTaxonItem::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedSampleBioOttTaxonItem,
                     >(&row)?,
@@ -730,7 +898,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::SampleContainerCategories => {
-                NestedSampleContainerCategory::delete(
+                crate::database::nested_variants::NestedSampleContainerCategory::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedSampleContainerCategory,
                     >(&row)?,
@@ -739,7 +907,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::SampleContainers => {
-                NestedSampleContainer::delete(
+                crate::database::nested_variants::NestedSampleContainer::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedSampleContainer>(
                         &row,
                     )?,
@@ -748,7 +916,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::SampleStates => {
-                NestedSampleState::delete(
+                crate::database::nested_variants::NestedSampleState::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedSampleState>(
                         &row,
                     )?,
@@ -757,21 +925,21 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Samples => {
-                NestedSample::delete(
+                crate::database::nested_variants::NestedSample::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedSample>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::Spectra => {
-                NestedSpectra::delete(
+                crate::database::nested_variants::NestedSpectra::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedSpectra>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::SpectraCollections => {
-                NestedSpectraCollection::delete(
+                crate::database::nested_variants::NestedSpectraCollection::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedSpectraCollection,
                     >(&row)?,
@@ -780,7 +948,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::TeamStates => {
-                NestedTeamState::delete(
+                crate::database::nested_variants::NestedTeamState::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedTeamState>(
                         &row,
                     )?,
@@ -789,14 +957,14 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Teams => {
-                NestedTeam::delete(
+                crate::database::nested_variants::NestedTeam::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedTeam>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::TeamsTeamsRoleInvitations => {
-                NestedTeamsTeamsRoleInvitation::delete(
+                crate::database::nested_variants::NestedTeamsTeamsRoleInvitation::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedTeamsTeamsRoleInvitation,
                     >(&row)?,
@@ -805,7 +973,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::TeamsUsersRoleInvitations => {
-                NestedTeamsUsersRoleInvitation::delete(
+                crate::database::nested_variants::NestedTeamsUsersRoleInvitation::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedTeamsUsersRoleInvitation,
                     >(&row)?,
@@ -814,7 +982,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::TeamsUsersRoleRequests => {
-                NestedTeamsUsersRoleRequest::delete(
+                crate::database::nested_variants::NestedTeamsUsersRoleRequest::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedTeamsUsersRoleRequest,
                     >(&row)?,
@@ -823,7 +991,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::TeamsUsersRoles => {
-                NestedTeamsUsersRole::delete(
+                crate::database::nested_variants::NestedTeamsUsersRole::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedTeamsUsersRole>(
                         &row,
                     )?,
@@ -832,14 +1000,14 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Units => {
-                NestedUnit::delete(
+                crate::database::nested_variants::NestedUnit::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedUnit>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::UserEmails => {
-                NestedUserEmail::delete(
+                crate::database::nested_variants::NestedUserEmail::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedUserEmail>(
                         &row,
                     )?,
@@ -848,14 +1016,14 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Users => {
-                NestedUser::delete(
+                crate::database::nested_variants::NestedUser::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedUser>(&row)?,
                     connection,
                 )
                 .await?
             }
             crate::database::Table::UsersUsersRoleInvitations => {
-                NestedUsersUsersRoleInvitation::delete(
+                crate::database::nested_variants::NestedUsersUsersRoleInvitation::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedUsersUsersRoleInvitation,
                     >(&row)?,
@@ -864,7 +1032,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::UsersUsersRoleRequests => {
-                NestedUsersUsersRoleRequest::delete(
+                crate::database::nested_variants::NestedUsersUsersRoleRequest::delete(
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedUsersUsersRoleRequest,
                     >(&row)?,
@@ -873,7 +1041,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::UsersUsersRoles => {
-                NestedUsersUsersRole::delete(
+                crate::database::nested_variants::NestedUsersUsersRole::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedUsersUsersRole>(
                         &row,
                     )?,
@@ -892,156 +1060,331 @@ impl crate::database::Table {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     >(
         &self,
-        primary_key: PrimaryKey,
+        primary_key: crate::database::PrimaryKey,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         Ok(match self {
             crate::database::Table::BioOttRanks => {
-                NestedBioOttRank::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedBioOttRank::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::BioOttTaxonItems => {
-                NestedBioOttTaxonItem::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedBioOttTaxonItem::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Colors => {
-                Color::delete_from_id(primary_key.into(), connection).await?
+                crate::database::flat_variants::Color::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Countries => {
-                Country::delete_from_id(primary_key.into(), connection).await?
+                crate::database::flat_variants::Country::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::DerivedSamples => {
-                NestedDerivedSample::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedDerivedSample::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::DocumentFormats => {
-                NestedDocumentFormat::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedDocumentFormat::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::FontAwesomeIcons => {
-                FontAwesomeIcon::delete_from_id(primary_key.into(), connection).await?
+                crate::database::flat_variants::FontAwesomeIcon::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::LoginProviders => {
-                NestedLoginProvider::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedLoginProvider::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Materials => {
-                NestedMaterial::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedMaterial::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::NameplateCategories => {
-                NestedNameplateCategory::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedNameplateCategory::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Nameplates => {
-                NestedNameplate::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedNameplate::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Notifications => {
-                NestedNotification::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedNotification::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::ObservationSubjects => {
-                NestedObservationSubject::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedObservationSubject::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Observations => {
-                NestedObservation::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedObservation::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::OrganismBioOttTaxonItems => {
-                NestedOrganismBioOttTaxonItem::delete_from_id(primary_key.into(), connection)
-                    .await?
+                crate::database::nested_variants::NestedOrganismBioOttTaxonItem::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Organisms => {
-                NestedOrganism::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedOrganism::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Organizations => {
-                NestedOrganization::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedOrganization::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::PermanenceCategories => {
-                NestedPermanenceCategory::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedPermanenceCategory::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::ProjectStates => {
-                NestedProjectState::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedProjectState::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Projects => {
-                NestedProject::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedProject::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::ProjectsTeamsRoleInvitations => {
-                NestedProjectsTeamsRoleInvitation::delete_from_id(primary_key.into(), connection)
-                    .await?
+                crate::database::nested_variants::NestedProjectsTeamsRoleInvitation::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::ProjectsTeamsRoleRequests => {
-                NestedProjectsTeamsRoleRequest::delete_from_id(primary_key.into(), connection)
-                    .await?
+                crate::database::nested_variants::NestedProjectsTeamsRoleRequest::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::ProjectsTeamsRoles => {
-                NestedProjectsTeamsRole::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedProjectsTeamsRole::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::ProjectsUsersRoleInvitations => {
-                NestedProjectsUsersRoleInvitation::delete_from_id(primary_key.into(), connection)
-                    .await?
+                crate::database::nested_variants::NestedProjectsUsersRoleInvitation::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::ProjectsUsersRoleRequests => {
-                NestedProjectsUsersRoleRequest::delete_from_id(primary_key.into(), connection)
-                    .await?
+                crate::database::nested_variants::NestedProjectsUsersRoleRequest::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::ProjectsUsersRoles => {
-                NestedProjectsUsersRole::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedProjectsUsersRole::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Roles => {
-                NestedRole::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedRole::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::SampleBioOttTaxonItems => {
-                NestedSampleBioOttTaxonItem::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedSampleBioOttTaxonItem::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::SampleContainerCategories => {
-                NestedSampleContainerCategory::delete_from_id(primary_key.into(), connection)
-                    .await?
+                crate::database::nested_variants::NestedSampleContainerCategory::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::SampleContainers => {
-                NestedSampleContainer::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedSampleContainer::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::SampleStates => {
-                NestedSampleState::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedSampleState::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Samples => {
-                NestedSample::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedSample::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Spectra => {
-                NestedSpectra::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedSpectra::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::SpectraCollections => {
-                NestedSpectraCollection::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedSpectraCollection::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::TeamStates => {
-                NestedTeamState::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedTeamState::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Teams => {
-                NestedTeam::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedTeam::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::TeamsTeamsRoleInvitations => {
-                NestedTeamsTeamsRoleInvitation::delete_from_id(primary_key.into(), connection)
-                    .await?
+                crate::database::nested_variants::NestedTeamsTeamsRoleInvitation::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::TeamsUsersRoleInvitations => {
-                NestedTeamsUsersRoleInvitation::delete_from_id(primary_key.into(), connection)
-                    .await?
+                crate::database::nested_variants::NestedTeamsUsersRoleInvitation::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::TeamsUsersRoleRequests => {
-                NestedTeamsUsersRoleRequest::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedTeamsUsersRoleRequest::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::TeamsUsersRoles => {
-                NestedTeamsUsersRole::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedTeamsUsersRole::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Units => {
-                NestedUnit::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedUnit::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::UserEmails => {
-                NestedUserEmail::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedUserEmail::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::Users => {
-                NestedUser::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedUser::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::UsersUsersRoleInvitations => {
-                NestedUsersUsersRoleInvitation::delete_from_id(primary_key.into(), connection)
-                    .await?
+                crate::database::nested_variants::NestedUsersUsersRoleInvitation::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::UsersUsersRoleRequests => {
-                NestedUsersUsersRoleRequest::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedUsersUsersRoleRequest::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
             crate::database::Table::UsersUsersRoles => {
-                NestedUsersUsersRole::delete_from_id(primary_key.into(), connection).await?
+                crate::database::nested_variants::NestedUsersUsersRole::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
             }
         })
     }
@@ -1062,7 +1405,7 @@ impl crate::database::Table {
         Ok(match self {
             crate::database::Table::BioOttRanks => {
                 let result =
-                    NestedBioOttRank::all(
+                    crate::database::nested_variants::NestedBioOttRank::all(
                         filter
                             .map(|filter| {
                                 bincode::deserialize::<
@@ -1079,7 +1422,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::BioOttTaxonItems => {
-                let result = NestedBioOttTaxonItem::all(
+                let result = crate::database::nested_variants::NestedBioOttTaxonItem::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1096,15 +1439,17 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Colors => {
-                let result = Color::all(limit, offset, connection).await?;
+                let result =
+                    crate::database::flat_variants::Color::all(limit, offset, connection).await?;
                 bincode::serialize(&result)?
             }
             crate::database::Table::Countries => {
-                let result = Country::all(limit, offset, connection).await?;
+                let result =
+                    crate::database::flat_variants::Country::all(limit, offset, connection).await?;
                 bincode::serialize(&result)?
             }
             crate::database::Table::DerivedSamples => {
-                let result = NestedDerivedSample::all(
+                let result = crate::database::nested_variants::NestedDerivedSample::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1121,7 +1466,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::DocumentFormats => {
-                let result = NestedDocumentFormat::all(
+                let result = crate::database::nested_variants::NestedDocumentFormat::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1138,11 +1483,13 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::FontAwesomeIcons => {
-                let result = FontAwesomeIcon::all(limit, offset, connection).await?;
+                let result =
+                    crate::database::flat_variants::FontAwesomeIcon::all(limit, offset, connection)
+                        .await?;
                 bincode::serialize(&result)?
             }
             crate::database::Table::LoginProviders => {
-                let result = NestedLoginProvider::all(
+                let result = crate::database::nested_variants::NestedLoginProvider::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1160,7 +1507,7 @@ impl crate::database::Table {
             }
             crate::database::Table::Materials => {
                 let result =
-                    NestedMaterial::all(
+                    crate::database::nested_variants::NestedMaterial::all(
                         filter
                             .map(|filter| {
                                 bincode::deserialize::<
@@ -1177,7 +1524,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::NameplateCategories => {
-                let result = NestedNameplateCategory::all(
+                let result = crate::database::nested_variants::NestedNameplateCategory::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1195,7 +1542,7 @@ impl crate::database::Table {
             }
             crate::database::Table::Nameplates => {
                 let result =
-                    NestedNameplate::all(
+                    crate::database::nested_variants::NestedNameplate::all(
                         filter
                             .map(|filter| {
                                 bincode::deserialize::<
@@ -1212,7 +1559,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Notifications => {
-                let result = NestedNotification::all(
+                let result = crate::database::nested_variants::NestedNotification::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1229,7 +1576,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::ObservationSubjects => {
-                let result = NestedObservationSubject::all(
+                let result = crate::database::nested_variants::NestedObservationSubject::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1246,7 +1593,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Observations => {
-                let result = NestedObservation::all(
+                let result = crate::database::nested_variants::NestedObservation::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1263,7 +1610,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::OrganismBioOttTaxonItems => {
-                let result = NestedOrganismBioOttTaxonItem::all(
+                let result = crate::database::nested_variants::NestedOrganismBioOttTaxonItem::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1281,7 +1628,7 @@ impl crate::database::Table {
             }
             crate::database::Table::Organisms => {
                 let result =
-                    NestedOrganism::all(
+                    crate::database::nested_variants::NestedOrganism::all(
                         filter
                             .map(|filter| {
                                 bincode::deserialize::<
@@ -1298,7 +1645,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Organizations => {
-                let result = NestedOrganization::all(
+                let result = crate::database::nested_variants::NestedOrganization::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1315,7 +1662,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::PermanenceCategories => {
-                let result = NestedPermanenceCategory::all(
+                let result = crate::database::nested_variants::NestedPermanenceCategory::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1332,7 +1679,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::ProjectStates => {
-                let result = NestedProjectState::all(
+                let result = crate::database::nested_variants::NestedProjectState::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1349,7 +1696,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Projects => {
-                let result = NestedProject::all(
+                let result = crate::database::nested_variants::NestedProject::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<crate::database::filter_variants::ProjectFilter>(
@@ -1366,24 +1713,15 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::ProjectsTeamsRoleInvitations => {
-                let result = NestedProjectsTeamsRoleInvitation::all(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<
-                                crate::database::filter_variants::ProjectsTeamsRoleInvitationFilter,
-                            >(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )
-                .await?;
+                let result = crate::database::nested_variants::NestedProjectsTeamsRoleInvitation::all(
+filter.map(|filter| bincode::deserialize::<crate::database::filter_variants::ProjectsTeamsRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection).await?;
                 bincode::serialize(&result)?
             }
             crate::database::Table::ProjectsTeamsRoleRequests => {
-                let result = NestedProjectsTeamsRoleRequest::all(
+                let result = crate::database::nested_variants::NestedProjectsTeamsRoleRequest::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1400,7 +1738,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::ProjectsTeamsRoles => {
-                let result = NestedProjectsTeamsRole::all(
+                let result = crate::database::nested_variants::NestedProjectsTeamsRole::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1417,24 +1755,15 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::ProjectsUsersRoleInvitations => {
-                let result = NestedProjectsUsersRoleInvitation::all(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<
-                                crate::database::filter_variants::ProjectsUsersRoleInvitationFilter,
-                            >(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )
-                .await?;
+                let result = crate::database::nested_variants::NestedProjectsUsersRoleInvitation::all(
+filter.map(|filter| bincode::deserialize::<crate::database::filter_variants::ProjectsUsersRoleInvitationFilter>(&filter)).transpose()?.as_ref(),
+limit,
+offset,
+connection).await?;
                 bincode::serialize(&result)?
             }
             crate::database::Table::ProjectsUsersRoleRequests => {
-                let result = NestedProjectsUsersRoleRequest::all(
+                let result = crate::database::nested_variants::NestedProjectsUsersRoleRequest::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1451,7 +1780,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::ProjectsUsersRoles => {
-                let result = NestedProjectsUsersRole::all(
+                let result = crate::database::nested_variants::NestedProjectsUsersRole::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1468,7 +1797,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Roles => {
-                let result = NestedRole::all(
+                let result = crate::database::nested_variants::NestedRole::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<crate::database::filter_variants::RoleFilter>(
@@ -1485,7 +1814,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::SampleBioOttTaxonItems => {
-                let result = NestedSampleBioOttTaxonItem::all(
+                let result = crate::database::nested_variants::NestedSampleBioOttTaxonItem::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1502,7 +1831,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::SampleContainerCategories => {
-                let result = NestedSampleContainerCategory::all(
+                let result = crate::database::nested_variants::NestedSampleContainerCategory::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1519,7 +1848,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::SampleContainers => {
-                let result = NestedSampleContainer::all(
+                let result = crate::database::nested_variants::NestedSampleContainer::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1536,7 +1865,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::SampleStates => {
-                let result = NestedSampleState::all(
+                let result = crate::database::nested_variants::NestedSampleState::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1553,7 +1882,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Samples => {
-                let result = NestedSample::all(
+                let result = crate::database::nested_variants::NestedSample::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<crate::database::filter_variants::SampleFilter>(
@@ -1570,7 +1899,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Spectra => {
-                let result = NestedSpectra::all(
+                let result = crate::database::nested_variants::NestedSpectra::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<crate::database::filter_variants::SpectraFilter>(
@@ -1587,7 +1916,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::SpectraCollections => {
-                let result = NestedSpectraCollection::all(
+                let result = crate::database::nested_variants::NestedSpectraCollection::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1605,7 +1934,7 @@ impl crate::database::Table {
             }
             crate::database::Table::TeamStates => {
                 let result =
-                    NestedTeamState::all(
+                    crate::database::nested_variants::NestedTeamState::all(
                         filter
                             .map(|filter| {
                                 bincode::deserialize::<
@@ -1622,7 +1951,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Teams => {
-                let result = NestedTeam::all(
+                let result = crate::database::nested_variants::NestedTeam::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<crate::database::filter_variants::TeamFilter>(
@@ -1639,7 +1968,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::TeamsTeamsRoleInvitations => {
-                let result = NestedTeamsTeamsRoleInvitation::all(
+                let result = crate::database::nested_variants::NestedTeamsTeamsRoleInvitation::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1656,7 +1985,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::TeamsUsersRoleInvitations => {
-                let result = NestedTeamsUsersRoleInvitation::all(
+                let result = crate::database::nested_variants::NestedTeamsUsersRoleInvitation::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1673,7 +2002,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::TeamsUsersRoleRequests => {
-                let result = NestedTeamsUsersRoleRequest::all(
+                let result = crate::database::nested_variants::NestedTeamsUsersRoleRequest::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1690,7 +2019,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::TeamsUsersRoles => {
-                let result = NestedTeamsUsersRole::all(
+                let result = crate::database::nested_variants::NestedTeamsUsersRole::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1707,7 +2036,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Units => {
-                let result = NestedUnit::all(
+                let result = crate::database::nested_variants::NestedUnit::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<crate::database::filter_variants::UnitFilter>(
@@ -1725,7 +2054,7 @@ impl crate::database::Table {
             }
             crate::database::Table::UserEmails => {
                 let result =
-                    NestedUserEmail::all(
+                    crate::database::nested_variants::NestedUserEmail::all(
                         filter
                             .map(|filter| {
                                 bincode::deserialize::<
@@ -1742,7 +2071,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::Users => {
-                let result = NestedUser::all(
+                let result = crate::database::nested_variants::NestedUser::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<crate::database::filter_variants::UserFilter>(
@@ -1759,7 +2088,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::UsersUsersRoleInvitations => {
-                let result = NestedUsersUsersRoleInvitation::all(
+                let result = crate::database::nested_variants::NestedUsersUsersRoleInvitation::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1776,7 +2105,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::UsersUsersRoleRequests => {
-                let result = NestedUsersUsersRoleRequest::all(
+                let result = crate::database::nested_variants::NestedUsersUsersRoleRequest::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1793,7 +2122,7 @@ impl crate::database::Table {
                 bincode::serialize(&result)?
             }
             crate::database::Table::UsersUsersRoles => {
-                let result = NestedUsersUsersRole::all(
+                let result = crate::database::nested_variants::NestedUsersUsersRole::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
@@ -1845,16 +2174,16 @@ impl crate::database::Table {
             Table::Notifications => unimplemented!("Insert not implemented for notifications."),
             Table::ObservationSubjects => unimplemented!("Insert not implemented for observation_subjects."),
             Table::Observations => {
-                let new_row: super::NewObservation = bincode::deserialize::<super::NewObservation>(&new_row).map_err(crate::api::ApiError::from)?;
-                let inserted_row: super::Observation = new_row.insert(user_id, connection).await?;
-                let nested_row = super::NestedObservation::from_flat(inserted_row, connection).await?;
+                let new_row: crate::database::new_variants::NewObservation = bincode::deserialize::<crate::database::new_variants::NewObservation>(&new_row).map_err(crate::api::ApiError::from)?;
+                let inserted_row: crate::database::flat_variants::Observation = new_row.insert(user_id, connection).await?;
+                let nested_row = crate::database::nested_variants::NestedObservation::from_flat(inserted_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::OrganismBioOttTaxonItems => unimplemented!("Insert not implemented for organism_bio_ott_taxon_items in frontend as it does not have a UUID primary key."),
             Table::Organisms => {
-                let new_row: super::NewOrganism = bincode::deserialize::<super::NewOrganism>(&new_row).map_err(crate::api::ApiError::from)?;
-                let inserted_row: super::Organism = new_row.insert(user_id, connection).await?;
-                let nested_row = super::NestedOrganism::from_flat(inserted_row, connection).await?;
+                let new_row: crate::database::new_variants::NewOrganism = bincode::deserialize::<crate::database::new_variants::NewOrganism>(&new_row).map_err(crate::api::ApiError::from)?;
+                let inserted_row: crate::database::flat_variants::Organism = new_row.insert(user_id, connection).await?;
+                let nested_row = crate::database::nested_variants::NestedOrganism::from_flat(inserted_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::Organizations => unimplemented!("Insert not implemented for organizations."),
@@ -1873,9 +2202,9 @@ impl crate::database::Table {
             Table::SampleContainers => unimplemented!("Insert not implemented for sample_containers in frontend as it does not have a UUID primary key."),
             Table::SampleStates => unimplemented!("Insert not implemented for sample_states."),
             Table::Samples => {
-                let new_row: super::NewSample = bincode::deserialize::<super::NewSample>(&new_row).map_err(crate::api::ApiError::from)?;
-                let inserted_row: super::Sample = new_row.insert(user_id, connection).await?;
-                let nested_row = super::NestedSample::from_flat(inserted_row, connection).await?;
+                let new_row: crate::database::new_variants::NewSample = bincode::deserialize::<crate::database::new_variants::NewSample>(&new_row).map_err(crate::api::ApiError::from)?;
+                let inserted_row: crate::database::flat_variants::Sample = new_row.insert(user_id, connection).await?;
+                let nested_row = crate::database::nested_variants::NestedSample::from_flat(inserted_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
             Table::Spectra => unimplemented!("Insert not implemented for spectra."),
@@ -1932,14 +2261,22 @@ impl crate::database::Table {
                 unimplemented!("Update not implemented for nameplate_categories.")
             }
             Table::Nameplates => {
-                let update_row: super::UpdateNameplate =
-                    bincode::deserialize::<super::UpdateNameplate>(&update_row)
-                        .map_err(crate::api::ApiError::from)?;
+                let update_row: crate::database::update_variants::UpdateNameplate =
+                    bincode::deserialize::<crate::database::update_variants::UpdateNameplate>(
+                        &update_row,
+                    )
+                    .map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
                 update_row.update(user_id, connection).await?;
-                let updated_row: super::Nameplate =
-                    super::Nameplate::get(id, connection).await?.unwrap();
-                let nested_row = super::NestedNameplate::from_flat(updated_row, connection).await?;
+                let updated_row: crate::database::flat_variants::Nameplate =
+                    crate::database::flat_variants::Nameplate::get(id, connection)
+                        .await?
+                        .unwrap();
+                let nested_row = crate::database::nested_variants::NestedNameplate::from_flat(
+                    updated_row,
+                    connection,
+                )
+                .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::Notifications => unimplemented!("Update not implemented for notifications."),
@@ -1947,29 +2284,42 @@ impl crate::database::Table {
                 unimplemented!("Update not implemented for observation_subjects.")
             }
             Table::Observations => {
-                let update_row: super::NewObservation =
-                    bincode::deserialize::<super::NewObservation>(&update_row)
-                        .map_err(crate::api::ApiError::from)?;
+                let update_row: crate::database::new_variants::NewObservation =
+                    bincode::deserialize::<crate::database::new_variants::NewObservation>(
+                        &update_row,
+                    )
+                    .map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
                 update_row.update(user_id, connection).await?;
-                let updated_row: super::Observation =
-                    super::Observation::get(id, connection).await?.unwrap();
-                let nested_row =
-                    super::NestedObservation::from_flat(updated_row, connection).await?;
+                let updated_row: crate::database::flat_variants::Observation =
+                    crate::database::flat_variants::Observation::get(id, connection)
+                        .await?
+                        .unwrap();
+                let nested_row = crate::database::nested_variants::NestedObservation::from_flat(
+                    updated_row,
+                    connection,
+                )
+                .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::OrganismBioOttTaxonItems => {
                 unimplemented!("Update not implemented for organism_bio_ott_taxon_items.")
             }
             Table::Organisms => {
-                let update_row: super::NewOrganism =
-                    bincode::deserialize::<super::NewOrganism>(&update_row)
+                let update_row: crate::database::new_variants::NewOrganism =
+                    bincode::deserialize::<crate::database::new_variants::NewOrganism>(&update_row)
                         .map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
                 update_row.update(user_id, connection).await?;
-                let updated_row: super::Organism =
-                    super::Organism::get(id, connection).await?.unwrap();
-                let nested_row = super::NestedOrganism::from_flat(updated_row, connection).await?;
+                let updated_row: crate::database::flat_variants::Organism =
+                    crate::database::flat_variants::Organism::get(id, connection)
+                        .await?
+                        .unwrap();
+                let nested_row = crate::database::nested_variants::NestedOrganism::from_flat(
+                    updated_row,
+                    connection,
+                )
+                .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::Organizations => unimplemented!("Update not implemented for organizations."),
@@ -1978,14 +2328,22 @@ impl crate::database::Table {
             }
             Table::ProjectStates => unimplemented!("Update not implemented for project_states."),
             Table::Projects => {
-                let update_row: super::UpdateProject =
-                    bincode::deserialize::<super::UpdateProject>(&update_row)
-                        .map_err(crate::api::ApiError::from)?;
+                let update_row: crate::database::update_variants::UpdateProject =
+                    bincode::deserialize::<crate::database::update_variants::UpdateProject>(
+                        &update_row,
+                    )
+                    .map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
                 update_row.update(user_id, connection).await?;
-                let updated_row: super::Project =
-                    super::Project::get(id, connection).await?.unwrap();
-                let nested_row = super::NestedProject::from_flat(updated_row, connection).await?;
+                let updated_row: crate::database::flat_variants::Project =
+                    crate::database::flat_variants::Project::get(id, connection)
+                        .await?
+                        .unwrap();
+                let nested_row = crate::database::nested_variants::NestedProject::from_flat(
+                    updated_row,
+                    connection,
+                )
+                .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::ProjectsTeamsRoleInvitations => {
@@ -2014,52 +2372,74 @@ impl crate::database::Table {
                 unimplemented!("Update not implemented for sample_container_categories.")
             }
             Table::SampleContainers => {
-                let update_row: super::UpdateSampleContainer =
-                    bincode::deserialize::<super::UpdateSampleContainer>(&update_row)
-                        .map_err(crate::api::ApiError::from)?;
+                let update_row: crate::database::update_variants::UpdateSampleContainer = bincode::deserialize::<crate::database::update_variants::UpdateSampleContainer>(&update_row).map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
                 update_row.update(user_id, connection).await?;
-                let updated_row: super::SampleContainer =
-                    super::SampleContainer::get(id, connection).await?.unwrap();
+                let updated_row: crate::database::flat_variants::SampleContainer =
+                    crate::database::flat_variants::SampleContainer::get(id, connection)
+                        .await?
+                        .unwrap();
                 let nested_row =
-                    super::NestedSampleContainer::from_flat(updated_row, connection).await?;
+                    crate::database::nested_variants::NestedSampleContainer::from_flat(
+                        updated_row,
+                        connection,
+                    )
+                    .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::SampleStates => unimplemented!("Update not implemented for sample_states."),
             Table::Samples => {
-                let update_row: super::NewSample =
-                    bincode::deserialize::<super::NewSample>(&update_row)
+                let update_row: crate::database::new_variants::NewSample =
+                    bincode::deserialize::<crate::database::new_variants::NewSample>(&update_row)
                         .map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
                 update_row.update(user_id, connection).await?;
-                let updated_row: super::Sample = super::Sample::get(id, connection).await?.unwrap();
-                let nested_row = super::NestedSample::from_flat(updated_row, connection).await?;
+                let updated_row: crate::database::flat_variants::Sample =
+                    crate::database::flat_variants::Sample::get(id, connection)
+                        .await?
+                        .unwrap();
+                let nested_row = crate::database::nested_variants::NestedSample::from_flat(
+                    updated_row,
+                    connection,
+                )
+                .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::Spectra => unimplemented!("Update not implemented for spectra."),
             Table::SpectraCollections => {
-                let update_row: super::UpdateSpectraCollection =
-                    bincode::deserialize::<super::UpdateSpectraCollection>(&update_row)
-                        .map_err(crate::api::ApiError::from)?;
+                let update_row: crate::database::update_variants::UpdateSpectraCollection = bincode::deserialize::<crate::database::update_variants::UpdateSpectraCollection>(&update_row).map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
                 update_row.update(user_id, connection).await?;
-                let updated_row: super::SpectraCollection =
-                    super::SpectraCollection::get(id, connection)
+                let updated_row: crate::database::flat_variants::SpectraCollection =
+                    crate::database::flat_variants::SpectraCollection::get(id, connection)
                         .await?
                         .unwrap();
                 let nested_row =
-                    super::NestedSpectraCollection::from_flat(updated_row, connection).await?;
+                    crate::database::nested_variants::NestedSpectraCollection::from_flat(
+                        updated_row,
+                        connection,
+                    )
+                    .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::TeamStates => unimplemented!("Update not implemented for team_states."),
             Table::Teams => {
-                let update_row: super::UpdateTeam =
-                    bincode::deserialize::<super::UpdateTeam>(&update_row)
-                        .map_err(crate::api::ApiError::from)?;
+                let update_row: crate::database::update_variants::UpdateTeam =
+                    bincode::deserialize::<crate::database::update_variants::UpdateTeam>(
+                        &update_row,
+                    )
+                    .map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
                 update_row.update(user_id, connection).await?;
-                let updated_row: super::Team = super::Team::get(id, connection).await?.unwrap();
-                let nested_row = super::NestedTeam::from_flat(updated_row, connection).await?;
+                let updated_row: crate::database::flat_variants::Team =
+                    crate::database::flat_variants::Team::get(id, connection)
+                        .await?
+                        .unwrap();
+                let nested_row = crate::database::nested_variants::NestedTeam::from_flat(
+                    updated_row,
+                    connection,
+                )
+                .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::TeamsTeamsRoleInvitations => {
@@ -2077,13 +2457,22 @@ impl crate::database::Table {
             Table::Units => unimplemented!("Update not implemented for units."),
             Table::UserEmails => unimplemented!("Update not implemented for user_emails."),
             Table::Users => {
-                let update_row: super::UpdateUser =
-                    bincode::deserialize::<super::UpdateUser>(&update_row)
-                        .map_err(crate::api::ApiError::from)?;
+                let update_row: crate::database::update_variants::UpdateUser =
+                    bincode::deserialize::<crate::database::update_variants::UpdateUser>(
+                        &update_row,
+                    )
+                    .map_err(crate::api::ApiError::from)?;
                 let id = update_row.id;
                 update_row.update(connection).await?;
-                let updated_row: super::User = super::User::get(id, connection).await?.unwrap();
-                let nested_row = super::NestedUser::from_flat(updated_row, connection).await?;
+                let updated_row: crate::database::flat_variants::User =
+                    crate::database::flat_variants::User::get(id, connection)
+                        .await?
+                        .unwrap();
+                let nested_row = crate::database::nested_variants::NestedUser::from_flat(
+                    updated_row,
+                    connection,
+                )
+                .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::UsersUsersRoleInvitations => {
@@ -2116,363 +2505,421 @@ impl crate::database::Table {
         match self {
             Table::BioOttRanks => {
                 for row in rows {
-                    let row: super::NestedBioOttRank =
-                        bincode::deserialize::<super::NestedBioOttRank>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedBioOttRank =
+                        bincode::deserialize::<crate::database::nested_variants::NestedBioOttRank>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::BioOttTaxonItems => {
                 for row in rows {
-                    let row: super::NestedBioOttTaxonItem =
-                        bincode::deserialize::<super::NestedBioOttTaxonItem>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedBioOttTaxonItem =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedBioOttTaxonItem,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Colors => {
                 for row in rows {
-                    let row: super::Color = bincode::deserialize::<super::Color>(&row)
-                        .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::flat_variants::Color =
+                        bincode::deserialize::<crate::database::flat_variants::Color>(&row)
+                            .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Countries => {
                 for row in rows {
-                    let row: super::Country = bincode::deserialize::<super::Country>(&row)
-                        .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::flat_variants::Country =
+                        bincode::deserialize::<crate::database::flat_variants::Country>(&row)
+                            .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::DerivedSamples => {
                 for row in rows {
-                    let row: super::NestedDerivedSample =
-                        bincode::deserialize::<super::NestedDerivedSample>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedDerivedSample = bincode::deserialize::<crate::database::nested_variants::NestedDerivedSample>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::DocumentFormats => {
                 for row in rows {
-                    let row: super::NestedDocumentFormat =
-                        bincode::deserialize::<super::NestedDocumentFormat>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedDocumentFormat =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedDocumentFormat,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::FontAwesomeIcons => {
                 for row in rows {
-                    let row: super::FontAwesomeIcon =
-                        bincode::deserialize::<super::FontAwesomeIcon>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::flat_variants::FontAwesomeIcon =
+                        bincode::deserialize::<crate::database::flat_variants::FontAwesomeIcon>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::LoginProviders => {
                 for row in rows {
-                    let row: super::NestedLoginProvider =
-                        bincode::deserialize::<super::NestedLoginProvider>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedLoginProvider = bincode::deserialize::<crate::database::nested_variants::NestedLoginProvider>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Materials => {
                 for row in rows {
-                    let row: super::NestedMaterial =
-                        bincode::deserialize::<super::NestedMaterial>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedMaterial =
+                        bincode::deserialize::<crate::database::nested_variants::NestedMaterial>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::NameplateCategories => {
                 for row in rows {
-                    let row: super::NestedNameplateCategory =
-                        bincode::deserialize::<super::NestedNameplateCategory>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedNameplateCategory =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedNameplateCategory,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Nameplates => {
                 for row in rows {
-                    let row: super::NestedNameplate =
-                        bincode::deserialize::<super::NestedNameplate>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedNameplate =
+                        bincode::deserialize::<crate::database::nested_variants::NestedNameplate>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Notifications => {
                 for row in rows {
-                    let row: super::NestedNotification =
-                        bincode::deserialize::<super::NestedNotification>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedNotification = bincode::deserialize::<crate::database::nested_variants::NestedNotification>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::ObservationSubjects => {
                 for row in rows {
-                    let row: super::NestedObservationSubject =
-                        bincode::deserialize::<super::NestedObservationSubject>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedObservationSubject =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedObservationSubject,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Observations => {
                 for row in rows {
-                    let row: super::NestedObservation =
-                        bincode::deserialize::<super::NestedObservation>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedObservation = bincode::deserialize::<crate::database::nested_variants::NestedObservation>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::OrganismBioOttTaxonItems => {
                 for row in rows {
-                    let row: super::NestedOrganismBioOttTaxonItem =
-                        bincode::deserialize::<super::NestedOrganismBioOttTaxonItem>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedOrganismBioOttTaxonItem =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedOrganismBioOttTaxonItem,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Organisms => {
                 for row in rows {
-                    let row: super::NestedOrganism =
-                        bincode::deserialize::<super::NestedOrganism>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedOrganism =
+                        bincode::deserialize::<crate::database::nested_variants::NestedOrganism>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Organizations => {
                 for row in rows {
-                    let row: super::NestedOrganization =
-                        bincode::deserialize::<super::NestedOrganization>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedOrganization = bincode::deserialize::<crate::database::nested_variants::NestedOrganization>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::PermanenceCategories => {
                 for row in rows {
-                    let row: super::NestedPermanenceCategory =
-                        bincode::deserialize::<super::NestedPermanenceCategory>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedPermanenceCategory =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedPermanenceCategory,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::ProjectStates => {
                 for row in rows {
-                    let row: super::NestedProjectState =
-                        bincode::deserialize::<super::NestedProjectState>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedProjectState = bincode::deserialize::<crate::database::nested_variants::NestedProjectState>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Projects => {
                 for row in rows {
-                    let row: super::NestedProject =
-                        bincode::deserialize::<super::NestedProject>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedProject =
+                        bincode::deserialize::<crate::database::nested_variants::NestedProject>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::ProjectsTeamsRoleInvitations => {
                 for row in rows {
-                    let row: super::NestedProjectsTeamsRoleInvitation =
-                        bincode::deserialize::<super::NestedProjectsTeamsRoleInvitation>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedProjectsTeamsRoleInvitation =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedProjectsTeamsRoleInvitation,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::ProjectsTeamsRoleRequests => {
                 for row in rows {
-                    let row: super::NestedProjectsTeamsRoleRequest =
-                        bincode::deserialize::<super::NestedProjectsTeamsRoleRequest>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedProjectsTeamsRoleRequest =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedProjectsTeamsRoleRequest,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::ProjectsTeamsRoles => {
                 for row in rows {
-                    let row: super::NestedProjectsTeamsRole =
-                        bincode::deserialize::<super::NestedProjectsTeamsRole>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedProjectsTeamsRole =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedProjectsTeamsRole,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::ProjectsUsersRoleInvitations => {
                 for row in rows {
-                    let row: super::NestedProjectsUsersRoleInvitation =
-                        bincode::deserialize::<super::NestedProjectsUsersRoleInvitation>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedProjectsUsersRoleInvitation =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedProjectsUsersRoleInvitation,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::ProjectsUsersRoleRequests => {
                 for row in rows {
-                    let row: super::NestedProjectsUsersRoleRequest =
-                        bincode::deserialize::<super::NestedProjectsUsersRoleRequest>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedProjectsUsersRoleRequest =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedProjectsUsersRoleRequest,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::ProjectsUsersRoles => {
                 for row in rows {
-                    let row: super::NestedProjectsUsersRole =
-                        bincode::deserialize::<super::NestedProjectsUsersRole>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedProjectsUsersRole =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedProjectsUsersRole,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Roles => {
                 for row in rows {
-                    let row: super::NestedRole = bincode::deserialize::<super::NestedRole>(&row)
-                        .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedRole =
+                        bincode::deserialize::<crate::database::nested_variants::NestedRole>(&row)
+                            .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::SampleBioOttTaxonItems => {
                 for row in rows {
-                    let row: super::NestedSampleBioOttTaxonItem =
-                        bincode::deserialize::<super::NestedSampleBioOttTaxonItem>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedSampleBioOttTaxonItem =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedSampleBioOttTaxonItem,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::SampleContainerCategories => {
                 for row in rows {
-                    let row: super::NestedSampleContainerCategory =
-                        bincode::deserialize::<super::NestedSampleContainerCategory>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedSampleContainerCategory =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedSampleContainerCategory,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::SampleContainers => {
                 for row in rows {
-                    let row: super::NestedSampleContainer =
-                        bincode::deserialize::<super::NestedSampleContainer>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedSampleContainer =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedSampleContainer,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::SampleStates => {
                 for row in rows {
-                    let row: super::NestedSampleState =
-                        bincode::deserialize::<super::NestedSampleState>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedSampleState = bincode::deserialize::<crate::database::nested_variants::NestedSampleState>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Samples => {
                 for row in rows {
-                    let row: super::NestedSample =
-                        bincode::deserialize::<super::NestedSample>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedSample =
+                        bincode::deserialize::<crate::database::nested_variants::NestedSample>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Spectra => {
                 for row in rows {
-                    let row: super::NestedSpectra =
-                        bincode::deserialize::<super::NestedSpectra>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedSpectra =
+                        bincode::deserialize::<crate::database::nested_variants::NestedSpectra>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::SpectraCollections => {
                 for row in rows {
-                    let row: super::NestedSpectraCollection =
-                        bincode::deserialize::<super::NestedSpectraCollection>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedSpectraCollection =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedSpectraCollection,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::TeamStates => {
                 for row in rows {
-                    let row: super::NestedTeamState =
-                        bincode::deserialize::<super::NestedTeamState>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedTeamState =
+                        bincode::deserialize::<crate::database::nested_variants::NestedTeamState>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Teams => {
                 for row in rows {
-                    let row: super::NestedTeam = bincode::deserialize::<super::NestedTeam>(&row)
-                        .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedTeam =
+                        bincode::deserialize::<crate::database::nested_variants::NestedTeam>(&row)
+                            .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::TeamsTeamsRoleInvitations => {
                 for row in rows {
-                    let row: super::NestedTeamsTeamsRoleInvitation =
-                        bincode::deserialize::<super::NestedTeamsTeamsRoleInvitation>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedTeamsTeamsRoleInvitation =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedTeamsTeamsRoleInvitation,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::TeamsUsersRoleInvitations => {
                 for row in rows {
-                    let row: super::NestedTeamsUsersRoleInvitation =
-                        bincode::deserialize::<super::NestedTeamsUsersRoleInvitation>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedTeamsUsersRoleInvitation =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedTeamsUsersRoleInvitation,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::TeamsUsersRoleRequests => {
                 for row in rows {
-                    let row: super::NestedTeamsUsersRoleRequest =
-                        bincode::deserialize::<super::NestedTeamsUsersRoleRequest>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedTeamsUsersRoleRequest =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedTeamsUsersRoleRequest,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::TeamsUsersRoles => {
                 for row in rows {
-                    let row: super::NestedTeamsUsersRole =
-                        bincode::deserialize::<super::NestedTeamsUsersRole>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedTeamsUsersRole =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedTeamsUsersRole,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Units => {
                 for row in rows {
-                    let row: super::NestedUnit = bincode::deserialize::<super::NestedUnit>(&row)
-                        .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedUnit =
+                        bincode::deserialize::<crate::database::nested_variants::NestedUnit>(&row)
+                            .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::UserEmails => {
                 for row in rows {
-                    let row: super::NestedUserEmail =
-                        bincode::deserialize::<super::NestedUserEmail>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedUserEmail =
+                        bincode::deserialize::<crate::database::nested_variants::NestedUserEmail>(
+                            &row,
+                        )
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::Users => {
                 for row in rows {
-                    let row: super::NestedUser = bincode::deserialize::<super::NestedUser>(&row)
-                        .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedUser =
+                        bincode::deserialize::<crate::database::nested_variants::NestedUser>(&row)
+                            .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::UsersUsersRoleInvitations => {
                 for row in rows {
-                    let row: super::NestedUsersUsersRoleInvitation =
-                        bincode::deserialize::<super::NestedUsersUsersRoleInvitation>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedUsersUsersRoleInvitation =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedUsersUsersRoleInvitation,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::UsersUsersRoleRequests => {
                 for row in rows {
-                    let row: super::NestedUsersUsersRoleRequest =
-                        bincode::deserialize::<super::NestedUsersUsersRoleRequest>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedUsersUsersRoleRequest =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedUsersUsersRoleRequest,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
             Table::UsersUsersRoles => {
                 for row in rows {
-                    let row: super::NestedUsersUsersRole =
-                        bincode::deserialize::<super::NestedUsersUsersRole>(&row)
-                            .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedUsersUsersRole =
+                        bincode::deserialize::<
+                            crate::database::nested_variants::NestedUsersUsersRole,
+                        >(&row)
+                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }

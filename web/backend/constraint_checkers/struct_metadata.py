@@ -119,7 +119,13 @@ def data_type_to_absolute_import_path(
     if "uuid::Uuid" in data_type:
         return data_type
 
-    if data_type in ["( i32, i32 )", "PrimaryKey"]:
+    if data_type == "PrimaryKey":
+        if route in ("backend", "frontend"):
+            return "web_common::database::PrimaryKey"
+        if route == "web_common":
+            return "crate::database::PrimaryKey"
+
+    if data_type in ["( i32, i32 )"]:
         return data_type
 
     if data_type == "NaiveDateTime" or data_type == "chrono::NaiveDateTime":

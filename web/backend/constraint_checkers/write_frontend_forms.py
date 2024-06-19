@@ -319,9 +319,7 @@ def write_frontend_builder_action_enumeration(
             document.write(
                 f"                if let Some(value) = {attribute.name}.as_ref() {{\n"
                 "                    if value.is_empty() {\n"
-                f"                        state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
-                f'                            "The {attribute.human_readable_name()} field cannot be left empty.".to_string()\n'
-                "                        ]));\n"
+                f"                        state_mut.errors_{attribute.name}.push(ApiError::Empty(\"{attribute.human_readable_name()}\".to_string()));\n"
                 f"                         state_mut.{attribute.name} = None;\n"
                 f"                          break '{attribute.name};\n"
                 "                    }\n"

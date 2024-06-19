@@ -88,9 +88,9 @@ impl Reducer<OrganismBuilder> for OrganismActions {
                 state_mut.errors_notes.clear();
                 if let Some(value) = notes.as_ref() {
                     if value.is_empty() {
-                        state_mut.errors_notes.push(ApiError::BadRequest(vec![
-                            "The Notes field cannot be left empty.".to_string(),
-                        ]));
+                        state_mut
+                            .errors_notes
+                            .push(ApiError::Empty("Notes".to_string()));
                         state_mut.notes = None;
                         break 'notes;
                     }

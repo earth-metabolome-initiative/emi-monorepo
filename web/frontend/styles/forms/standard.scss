@@ -247,7 +247,7 @@
 }
 
 ul.input-errors {
-    padding: 0;
+    padding-top: 0.5em;
     margin: 0;
     list-style: none;
     font-size: inherit;
@@ -908,10 +908,5 @@ form.standard-form {
                         transparent);
             }
         }
-    }
-
-    &>ul.input-errors {
-        margin-top: 0;
-        margin-bottom: 0.5em;
     }
 }

@@ -120,9 +120,9 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                 }
                 if let Some(value) = name.as_ref() {
                     if value.is_empty() {
-                        state_mut.errors_name.push(ApiError::BadRequest(vec![
-                            "The Name field cannot be left empty.".to_string(),
-                        ]));
+                        state_mut
+                            .errors_name
+                            .push(ApiError::Empty("Name".to_string()));
                         state_mut.name = None;
                         break 'name;
                     }
@@ -143,9 +143,9 @@ impl Reducer<ProjectBuilder> for ProjectActions {
                 }
                 if let Some(value) = description.as_ref() {
                     if value.is_empty() {
-                        state_mut.errors_description.push(ApiError::BadRequest(vec![
-                            "The Description field cannot be left empty.".to_string(),
-                        ]));
+                        state_mut
+                            .errors_description
+                            .push(ApiError::Empty("Description".to_string()));
                         state_mut.description = None;
                         break 'description;
                     }
