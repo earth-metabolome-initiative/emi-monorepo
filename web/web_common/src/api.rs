@@ -202,7 +202,7 @@ impl Into<Vec<String>> for ApiError {
             ApiError::NoResults => vec!["No results".to_string()],
             ApiError::Unauthorized => vec!["Unauthorized".to_string()],
             ApiError::BadGateway => vec!["Bad Gateway".to_string()],
-            ApiError::Empty(e) => vec![format!("Field {} cannot be empty", e)],
+            ApiError::Empty(e) => vec![format!("Field `{}` cannot be empty", e)],
             ApiError::InternalServerError => vec!["Internal Server Error".to_string()],
             ApiError::InvalidFileFormat(format) => vec![format!("Invalid file format: {}", format)],
             ApiError::JPEGError(e) => vec![e.to_string()],
@@ -342,7 +342,7 @@ impl From<ApiError> for actix_web::HttpResponse {
             ApiError::BadRequest(errors) => actix_web::HttpResponse::BadRequest().json(errors),
             ApiError::NoResults => actix_web::HttpResponse::NotFound().finish(),
             ApiError::Empty(e) => {
-                actix_web::HttpResponse::BadRequest().json(format!("Field {} cannot be empty", e))
+                actix_web::HttpResponse::BadRequest().json(format!("Field `{}` cannot be empty", e))
             }
             ApiError::InternalServerError => {
                 actix_web::HttpResponse::InternalServerError().finish()
