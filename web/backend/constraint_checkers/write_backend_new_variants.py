@@ -76,7 +76,7 @@ def write_backend_new_variants(
         "        self,\n"
         "        user_id: i32,\n"
         "        connection: &mut diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>\n"
-        "    ) -> Result<Self::Flat, web_common::api::ApiResult>;\n"
+        "    ) -> Result<Self::Flat, web_common::api::ApiError>;\n"
         "}\n\n"
     )
 

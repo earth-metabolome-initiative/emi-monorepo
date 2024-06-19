@@ -22,7 +22,7 @@ pub(crate) trait InsertRow {
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
-    ) -> Result<Self::Flat, web_common::api::ApiResult>;
+    ) -> Result<Self::Flat, web_common::api::ApiError>;
 }
 
 /// Intermediate representation of the new variant NewDerivedSample.
