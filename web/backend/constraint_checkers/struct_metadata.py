@@ -2269,6 +2269,20 @@ class StructMetadata:
         """
         return len(self.get_primary_keys()) > 1
 
+    def is_request_table(self) -> bool:
+        """Returns whether the table is an request table.
+
+        Implementation details
+        -----------------------
+        A table is an request table if it contains a field that is
+        a foreign key to the users table and a field that is a foreign key
+        to the roles table.
+        """
+        return (
+            self.table_name.endswith("requests")
+            and self.is_junktion_table()
+        )
+
     def get_editability_determinant_columns(self) -> Optional[List[AttributeMetadata]]:
         """Returns the column that determines the editability of the struct.
 

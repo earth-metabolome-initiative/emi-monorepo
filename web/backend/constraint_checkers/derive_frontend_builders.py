@@ -54,6 +54,9 @@ def derive_frontend_builders(
         if struct.table_name in deny_list_tables:
             continue
 
+        if struct.is_request_table():
+            continue
+
         if struct.is_update_variant() and not struct.is_new_variant():
             found = False
             for builder in builders:
@@ -206,6 +209,9 @@ def derive_frontend_builders(
     for struct in new_or_update_struct_metadatas:
 
         if struct.table_name in deny_list_tables:
+            continue
+
+        if struct.is_request_table():
             continue
 
         # We identify the curresponding builder by the matching table name.

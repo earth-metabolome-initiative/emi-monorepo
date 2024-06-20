@@ -23,17 +23,11 @@ pub use projects::*;
 mod projects_teams_role_invitations;
 pub use projects_teams_role_invitations::*;
 
-mod projects_teams_role_requests;
-pub use projects_teams_role_requests::*;
-
 mod projects_teams_roles;
 pub use projects_teams_roles::*;
 
 mod projects_users_role_invitations;
 pub use projects_users_role_invitations::*;
-
-mod projects_users_role_requests;
-pub use projects_users_role_requests::*;
 
 mod projects_users_roles;
 pub use projects_users_roles::*;
@@ -59,9 +53,6 @@ pub use teams_teams_role_invitations::*;
 mod teams_users_role_invitations;
 pub use teams_users_role_invitations::*;
 
-mod teams_users_role_requests;
-pub use teams_users_role_requests::*;
-
 mod teams_users_roles;
 pub use teams_users_roles::*;
 
@@ -70,9 +61,6 @@ pub use users::*;
 
 mod users_users_role_invitations;
 pub use users_users_role_invitations::*;
-
-mod users_users_role_requests;
-pub use users_users_role_requests::*;
 
 mod users_users_roles;
 pub use users_users_roles::*;

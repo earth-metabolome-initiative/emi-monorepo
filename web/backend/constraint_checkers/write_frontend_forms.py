@@ -5,10 +5,11 @@ import re
 from time import sleep
 from typing import List
 
-from constraint_checkers.struct_metadata import AttributeMetadata, StructMetadata
+import shutil
 from insert_migration import insert_migration
 from tqdm.auto import tqdm
 from userinput import userinput
+from constraint_checkers.struct_metadata import AttributeMetadata, StructMetadata
 from constraint_checkers.is_file_changed import is_file_changed
 from constraint_checkers.migrations_changed import are_migrations_changed
 
@@ -319,7 +320,7 @@ def write_frontend_builder_action_enumeration(
             document.write(
                 f"                if let Some(value) = {attribute.name}.as_ref() {{\n"
                 "                    if value.is_empty() {\n"
-                f"                        state_mut.errors_{attribute.name}.push(ApiError::Empty(\"{attribute.human_readable_name()}\".to_string()));\n"
+                f'                        state_mut.errors_{attribute.name}.push(ApiError::Empty("{attribute.human_readable_name()}".to_string()));\n'
                 f"                         state_mut.{attribute.name} = None;\n"
                 f"                          break '{attribute.name};\n"
                 "                    }\n"
@@ -335,7 +336,7 @@ def write_frontend_builder_action_enumeration(
                 f"                match {attribute.name} {{\n"
                 f'                    Some(value) => match chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%dT%H:%M") {{\n'
                 f"                        Ok({attribute.name}) => state_mut.{attribute.name} = Some({attribute.name}),\n"
-                f"                        Err(_) => match chrono::NaiveDateTime::parse_from_str(&value, \"%Y-%m-%d %H:%M:%S\") {{\n"
+                f'                        Err(_) => match chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S") {{\n'
                 f"                            Ok({attribute.name}) => state_mut.{attribute.name} = Some({attribute.name}),\n"
                 f"                            Err(_) => state_mut.errors_{attribute.name}.push(ApiError::BadRequest(vec![\n"
                 f'                                "The {attribute.human_readable_name()} field must be a valid date.".to_string()\n'
@@ -580,7 +581,10 @@ def write_frontend_form_builder_implementation(
                     rc_variant_intermediate_option = ".as_deref().cloned()"
                     rc_variant_intermediate = ".as_ref().clone()"
 
-                if attribute.raw_data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
+                if (
+                    attribute.raw_data_type() in INPUT_TYPE_MAP
+                    or attribute.is_date_type()
+                ):
                     if struct_attribute.optional:
                         document.write(
                             f"    dispatcher.apply({flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(richest_variant.inner.{attribute.name}.as_ref().map(|{attribute.name}| {attribute.name}.to_string())));\n"
@@ -1174,7 +1178,9 @@ def write_frontend_yew_form(
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: bool| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}(Some({attribute.name})));\n"
                 )
-            elif attribute.raw_data_type() in INPUT_TYPE_MAP or attribute.is_date_type():
+            elif (
+                attribute.raw_data_type() in INPUT_TYPE_MAP or attribute.is_date_type()
+            ):
                 document.write(
                     f"    let set_{attribute.name} = builder_dispatch.apply_callback(|{attribute.name}: Option<String>| {flat_variant.name}Actions::Set{attribute.capitalized_normalized_name()}({attribute.name}));\n"
                 )
@@ -1257,7 +1263,10 @@ def write_frontend_yew_form(
                         "Perhaps you still have to write that file."
                     )
                 needle = f'data-bin="{worker_name}"'
-                if not needle in open("../frontend/index.html", "r", encoding="utf8").read():
+                if (
+                    not needle
+                    in open("../frontend/index.html", "r", encoding="utf8").read()
+                ):
                     expected_metadata = f'<link data-trunk rel="rust" href="Cargo.toml" data-bin="{worker_name}" data-type="worker" data-weak-refs data-wasm-opt="z" />'
                     raise NotImplementedError(
                         f"File processor for {attribute.raw_data_type()} not found in the frontend index.html file. Expected to find the following metadata tag: {expected_metadata}. "
@@ -1265,7 +1274,7 @@ def write_frontend_yew_form(
                     )
 
                 document.write(
-                    f'  <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<{attribute.data_type("frontend")}>> path=\"/{worker_name}.js\">'
+                    f'  <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<{attribute.data_type("frontend")}>> path="/{worker_name}.js">'
                     f'        <FileInput<{attribute.data_type("frontend")}> label="{attribute.human_readable_name()}" optional={{{optional}}} errors={{builder_store.{error_attribute.name}.clone()}} builder={{set_{attribute.name}}} file={{builder_store.{attribute.name}.clone()}} />\n'
                     f"    </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<{attribute.data_type('frontend')}>>>\n"
                 )
@@ -1319,7 +1328,7 @@ def write_frontend_yew_form(
                 )
                 scannable = "true" if "barcode" in attribute.name else "false"
 
-                attribute_data_type = attribute.data_type(route='frontend')
+                attribute_data_type = attribute.data_type(route="frontend")
 
                 if attribute_struct.can_implement_copy():
                     value = f"Rc::from(builder_store.{attribute.name})"
@@ -1400,7 +1409,11 @@ def write_frontend_forms(
     # In the near future, we will also implement several
     # traits for these structs.
 
-    if not (are_migrations_changed() or is_file_changed(__file__)):
+    if not (
+        are_migrations_changed()
+        or is_file_changed(__file__)
+        or is_file_changed("./constraint_checkers/derive_frontend_builders.py")
+    ):
         print("No change in migrations or file. Skipping writing frontend forms.")
         return
 
@@ -1433,7 +1446,11 @@ def write_frontend_forms(
     ]
 
     directory_path = path[:-3]
-    os.makedirs(directory_path, exist_ok=True)
+
+    if os.path.exists(directory_path):
+        shutil.rmtree(directory_path)
+
+    os.makedirs(directory_path, exist_ok=False)
 
     for builder in tqdm(
         builder_structs,
@@ -1464,3 +1481,5 @@ def write_frontend_forms(
 
     module_document.flush()
     module_document.close()
+
+    print(f"Wrote {len(builder_structs)} frontend forms.")

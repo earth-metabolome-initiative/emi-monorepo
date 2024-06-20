@@ -58,6 +58,7 @@ class TableStructMetadata:
         return self.richest_struct.has_uuid_primary_key()
 
     def set_new_flat_variant(self, struct: StructMetadata):
+        """Sets the new flat struct of the table."""
         assert struct.table_name == self.name
         assert not struct.is_nested()
         assert struct.is_new_variant()
@@ -76,6 +77,7 @@ class TableStructMetadata:
         return self.new_flat_variant
 
     def set_update_flat_variant(self, struct: StructMetadata):
+        """Sets the update flat struct of the table."""
         assert struct.table_name == self.name
         assert not struct.is_nested()
         assert not struct.is_new_variant()
@@ -91,6 +93,7 @@ class TableStructMetadata:
         self.update_flat_variant = struct
 
     def get_update_variant(self) -> StructMetadata:
+        """Returns the update flat struct of the table."""
         if self.has_uuid_primary_key():
             return self.get_new_flat_variant()
         if self.update_flat_variant is None:
@@ -100,6 +103,7 @@ class TableStructMetadata:
         return self.update_flat_variant
 
     def set_richest_struct(self, struct: StructMetadata):
+        """Sets the richest struct of the table."""
         assert struct.table_name == self.name
         if self.richest_struct is not None:
             if self.richest_struct.is_nested() and not struct.is_nested():
@@ -114,9 +118,11 @@ class TableStructMetadata:
         self.richest_struct = struct
 
     def get_richest_struct(self) -> StructMetadata:
+        """Returns the richest struct of the table."""
         return self.richest_struct
 
     def set_flat_variant(self, struct: StructMetadata):
+        """Sets the flat struct of the table."""
         assert struct.table_name == self.name
         if struct.is_nested():
             raise ValueError(
