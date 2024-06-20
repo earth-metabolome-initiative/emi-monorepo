@@ -5,7 +5,6 @@
 use crate::database::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::PooledConnection;
-use web_common::database::PrimaryKey;
 
 /// Trait providing the backend implementations for the Table enumeration
 pub trait BackendTable {

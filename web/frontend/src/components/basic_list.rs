@@ -19,6 +19,10 @@ pub struct BasicListProps<Page: Filtrable> {
     /// The filters to apply to the list.
     #[prop_or_default]
     pub filters: Option<Page::Filter>,
+    #[prop_or(true)]
+    pub can_create: bool,
+    #[prop_or(false)]
+    pub can_truncate: bool,
 }
 
 pub struct BasicList<Page> {
@@ -73,14 +77,6 @@ impl<Page: Filtrable + Searchable<false> + PageLike + RowToBadge> Component for 
         html! {
             <div class="page">
                 <@{header_type}>
-                    if ctx.props().filters.is_some() {
-                        // If we are currently in a subsection, we add the paragraph icon to allow
-                        // the user to refer directly to this subsection.
-                        <a href={format!("#{}", Page::section())}>
-                            <i class="fas fa-paragraph"></i>
-                        </a>
-                        {'\u{00a0}'}
-                    }
                     <Link<AppRoute> to={Page::list_route()}>
                         <i class={format!("fas fa-{}", Page::icon())}></i>
                         {'\u{00a0}'}
@@ -92,7 +88,7 @@ impl<Page: Filtrable + Searchable<false> + PageLike + RowToBadge> Component for 
                     </Link<AppRoute>>
                 </@>
                 <Datalist<Page, false> label={format!("Search {}", Page::section())} filters={ctx.props().filters.clone()} always_shows_candidates={true} />
-                if self.user_state.has_user() {
+                if ctx.props().can_create && self.user_state.has_user() {
                     if let Some(create_path) = Page::create_path(ctx.props().filters.as_ref()) {
                         <Link<AppRoute> classes={"button-like create"} to={create_path}>
                             <i class={FormMethod::POST.font_awesome_icon()}></i>

@@ -12,8 +12,8 @@ use web_common::database::*;
 use yew::prelude::*;
 use yew_agent::prelude::WorkerBridgeHandle;
 use yew_agent::scope_ext::AgentScopeExt;
-use yew_router::hooks::use_navigator;
 use yew_router::prelude::Link;
+use yew_router::scope_ext::RouterScopeExt;
 use yewdux::Dispatch;
 
 use super::RowToBadge;
@@ -487,18 +487,21 @@ where
 }
 
 #[derive(Properties, Clone, PartialEq)]
-pub(crate) struct InnerBasicPageProps<Page>
+pub(crate) struct BasicPageProps<Page>
 where
     Page: PageLike,
 {
     pub id: PrimaryKey,
-    pub navigator: yew_router::navigator::Navigator,
     pub children: Html,
+    #[prop_or_default]
+    pub can_update: Callback<bool>,
+    #[prop_or_default]
+    pub can_admin: Callback<bool>,
     #[prop_or_default]
     _phantom: std::marker::PhantomData<Page>,
 }
 
-pub(crate) struct InnerBasicPage<Page> {
+pub(crate) struct BasicPage<Page> {
     websocket: WorkerBridgeHandle<WebsocketWorker>,
     page: Option<Page>,
     user_state: Rc<UserState>,
@@ -512,9 +515,9 @@ pub(crate) enum PageMessage {
     UserState(Rc<UserState>),
 }
 
-impl<Page: PageLike> Component for InnerBasicPage<Page> {
+impl<Page: PageLike> Component for BasicPage<Page> {
     type Message = PageMessage;
-    type Properties = InnerBasicPageProps<Page>;
+    type Properties = BasicPageProps<Page>;
 
     fn create(ctx: &Context<Self>) -> Self {
         let user_dispatch =
@@ -580,16 +583,18 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
                         self.websocket
                             .send(ComponentMessage::get::<Page>(ctx.props().id));
                     } else {
-                        ctx.props().navigator.push(&AppRoute::Home);
+                        ctx.link().navigator().unwrap().push(&AppRoute::Home);
                     }
                     true
                 }
                 WebsocketMessage::CanDelete(can_admin) => {
                     self.can_admin = can_admin;
+                    ctx.props().can_admin.emit(can_admin);
                     true
                 }
                 WebsocketMessage::CanUpdate(can_update) => {
                     self.can_update = can_update;
+                    ctx.props().can_update.emit(can_update);
                     true
                 }
                 _ => {
@@ -637,15 +642,5 @@ impl<Page: PageLike> Component for InnerBasicPage<Page> {
                 <div>{"Loading..."}</div>
             }
         }
-    }
-}
-
-#[function_component(BasicPage)]
-pub(crate) fn basic_page<Page: PageLike>(props: &PageProps<Page>) -> Html {
-    let navigator = use_navigator().unwrap();
-    html! {
-        <InnerBasicPage<Page> id={props.id} navigator={navigator} >
-            { props.children.clone() }
-        </InnerBasicPage<Page>>
     }
 }

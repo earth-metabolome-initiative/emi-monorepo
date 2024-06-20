@@ -119,8 +119,19 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
         document.write(
             f"#[function_component({component_name})]\n"
             f"pub fn {function_component_name}(props: &{component_name}Prop) -> Html {{\n"
+            "    let can_update = use_state(|| false);\n"
+            "    let can_admin = use_state(|| false);\n"
+            "    \n"
+            "    let can_update_callback = {\n"
+            "        let can_update = can_update.clone();\n"
+            "        Callback::from(move |value: bool| can_update.set(value))\n"
+            "    };\n"
+            "    let can_admin_callback = {\n"
+            "       let can_admin = can_admin.clone();\n"
+            "       Callback::from(move |value: bool| can_admin.set(value))\n"
+            "    };\n"
             "    html! {\n"
-            f"        <BasicPage<{richest_variant.name}> id={{PrimaryKey::from(props)}}>\n"
+            f"        <BasicPage<{richest_variant.name}> id={{PrimaryKey::from(props)}} can_update={{can_update_callback}} can_admin={{can_admin_callback}}>\n"
         )
 
         if len(primary_keys) == 1:
@@ -142,7 +153,7 @@ def write_frontend_pages(flat_variants: List[StructMetadata]):
 
                 document.write(
                     f"            // Linked with foreign key {child_struct.table_name}.{foreign_key.name}\n"
-                    f"            <BasicList<{child_struct.name}> column_name={{\"{foreign_key.name}\"}} filters={{props.filter_{child_struct.table_name}_by_{foreign_key.name}()}}/>\n"
+                    f"            <BasicList<{child_struct.name}> column_name={{\"{foreign_key.name}\"}} filters={{props.filter_{child_struct.table_name}_by_{foreign_key.name}()}} can_create={{*can_update}} can_truncate={{*can_admin}}/>\n"
                 )
 
         if not has_content:

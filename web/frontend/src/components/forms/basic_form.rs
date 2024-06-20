@@ -386,13 +386,13 @@ where
                             <i class={ctx.props().method.font_awesome_icon()}></i>
                         }
                         {'\u{00a0}'}
-                        <span>{format!("{} {}", ctx.props().method.to_crud(), Data::task_target())}</span>
+                        <span>{ctx.props().method.to_crud()}</span>
                     </button>
                     if ctx.props().method.is_post() {
                         <button onclick={clear_form} title={clear_button_title_message} class={clear_button_classes} disabled={ctx.props().builder.is_default() || self.waiting_for_reply}>
                             <i class="fas fa-hand-sparkles"></i>
                             {'\u{00a0}'}
-                            <span>{format!("Clear {}", Data::task_target())}</span>
+                            <span>{"Clear"}</span>
                         </button>
                     }
                 }

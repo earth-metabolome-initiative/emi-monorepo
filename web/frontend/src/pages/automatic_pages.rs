@@ -23,10 +23,21 @@ impl BioOttRankPageProp {
 
 #[function_component(BioOttRankPage)]
 pub fn bio_ott_rank_page(props: &BioOttRankPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedBioOttRank> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedBioOttRank> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key bio_ott_taxon_items.ott_rank_id
-            <BasicList<NestedBioOttTaxonItem> column_name={"ott_rank_id"} filters={props.filter_bio_ott_taxon_items_by_ott_rank_id()}/>
+            <BasicList<NestedBioOttTaxonItem> column_name={"ott_rank_id"} filters={props.filter_bio_ott_taxon_items_by_ott_rank_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedBioOttRank>>
     }
 }
@@ -97,28 +108,39 @@ impl BioOttTaxonItemPageProp {
 
 #[function_component(BioOttTaxonItemPage)]
 pub fn bio_ott_taxon_item_page(props: &BioOttTaxonItemPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedBioOttTaxonItem> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedBioOttTaxonItem> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key bio_ott_taxon_items.domain_id
-            <BasicList<NestedBioOttTaxonItem> column_name={"domain_id"} filters={props.filter_bio_ott_taxon_items_by_domain_id()}/>
+            <BasicList<NestedBioOttTaxonItem> column_name={"domain_id"} filters={props.filter_bio_ott_taxon_items_by_domain_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key bio_ott_taxon_items.kingdom_id
-            <BasicList<NestedBioOttTaxonItem> column_name={"kingdom_id"} filters={props.filter_bio_ott_taxon_items_by_kingdom_id()}/>
+            <BasicList<NestedBioOttTaxonItem> column_name={"kingdom_id"} filters={props.filter_bio_ott_taxon_items_by_kingdom_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key bio_ott_taxon_items.phylum_id
-            <BasicList<NestedBioOttTaxonItem> column_name={"phylum_id"} filters={props.filter_bio_ott_taxon_items_by_phylum_id()}/>
+            <BasicList<NestedBioOttTaxonItem> column_name={"phylum_id"} filters={props.filter_bio_ott_taxon_items_by_phylum_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key bio_ott_taxon_items.class_id
-            <BasicList<NestedBioOttTaxonItem> column_name={"class_id"} filters={props.filter_bio_ott_taxon_items_by_class_id()}/>
+            <BasicList<NestedBioOttTaxonItem> column_name={"class_id"} filters={props.filter_bio_ott_taxon_items_by_class_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key bio_ott_taxon_items.order_id
-            <BasicList<NestedBioOttTaxonItem> column_name={"order_id"} filters={props.filter_bio_ott_taxon_items_by_order_id()}/>
+            <BasicList<NestedBioOttTaxonItem> column_name={"order_id"} filters={props.filter_bio_ott_taxon_items_by_order_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key bio_ott_taxon_items.family_id
-            <BasicList<NestedBioOttTaxonItem> column_name={"family_id"} filters={props.filter_bio_ott_taxon_items_by_family_id()}/>
+            <BasicList<NestedBioOttTaxonItem> column_name={"family_id"} filters={props.filter_bio_ott_taxon_items_by_family_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key bio_ott_taxon_items.genus_id
-            <BasicList<NestedBioOttTaxonItem> column_name={"genus_id"} filters={props.filter_bio_ott_taxon_items_by_genus_id()}/>
+            <BasicList<NestedBioOttTaxonItem> column_name={"genus_id"} filters={props.filter_bio_ott_taxon_items_by_genus_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key bio_ott_taxon_items.parent_id
-            <BasicList<NestedBioOttTaxonItem> column_name={"parent_id"} filters={props.filter_bio_ott_taxon_items_by_parent_id()}/>
+            <BasicList<NestedBioOttTaxonItem> column_name={"parent_id"} filters={props.filter_bio_ott_taxon_items_by_parent_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key sample_bio_ott_taxon_items.taxon_id
-            <BasicList<NestedSampleBioOttTaxonItem> column_name={"taxon_id"} filters={props.filter_sample_bio_ott_taxon_items_by_taxon_id()}/>
+            <BasicList<NestedSampleBioOttTaxonItem> column_name={"taxon_id"} filters={props.filter_sample_bio_ott_taxon_items_by_taxon_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key organism_bio_ott_taxon_items.taxon_id
-            <BasicList<NestedOrganismBioOttTaxonItem> column_name={"taxon_id"} filters={props.filter_organism_bio_ott_taxon_items_by_taxon_id()}/>
+            <BasicList<NestedOrganismBioOttTaxonItem> column_name={"taxon_id"} filters={props.filter_organism_bio_ott_taxon_items_by_taxon_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedBioOttTaxonItem>>
     }
 }
@@ -144,10 +166,21 @@ impl CountryPageProp {
 
 #[function_component(CountryPage)]
 pub fn country_page(props: &CountryPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<Country> id={PrimaryKey::from(props)}>
+        <BasicPage<Country> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key organizations.country_id
-            <BasicList<NestedOrganization> column_name={"country_id"} filters={props.filter_organizations_by_country_id()}/>
+            <BasicList<NestedOrganization> column_name={"country_id"} filters={props.filter_organizations_by_country_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<Country>>
     }
 }
@@ -166,8 +199,19 @@ impl From<&DerivedSamplePageProp> for PrimaryKey {
 
 #[function_component(DerivedSamplePage)]
 pub fn derived_sample_page(props: &DerivedSamplePageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedDerivedSample> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedDerivedSample> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedDerivedSample>>
     }
@@ -194,10 +238,21 @@ impl NameplatePageProp {
 
 #[function_component(NameplatePage)]
 pub fn nameplate_page(props: &NameplatePageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedNameplate> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedNameplate> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key organisms.nameplate_id
-            <BasicList<NestedOrganism> column_name={"nameplate_id"} filters={props.filter_organisms_by_nameplate_id()}/>
+            <BasicList<NestedOrganism> column_name={"nameplate_id"} filters={props.filter_organisms_by_nameplate_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedNameplate>>
     }
 }
@@ -223,10 +278,21 @@ impl ObservationSubjectPageProp {
 
 #[function_component(ObservationSubjectPage)]
 pub fn observation_subject_page(props: &ObservationSubjectPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedObservationSubject> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedObservationSubject> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key observations.subject_id
-            <BasicList<NestedObservation> column_name={"subject_id"} filters={props.filter_observations_by_subject_id()}/>
+            <BasicList<NestedObservation> column_name={"subject_id"} filters={props.filter_observations_by_subject_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedObservationSubject>>
     }
 }
@@ -252,10 +318,21 @@ impl ObservationPageProp {
 
 #[function_component(ObservationPage)]
 pub fn observation_page(props: &ObservationPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedObservation> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedObservation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key observations.parent_observation_id
-            <BasicList<NestedObservation> column_name={"parent_observation_id"} filters={props.filter_observations_by_parent_observation_id()}/>
+            <BasicList<NestedObservation> column_name={"parent_observation_id"} filters={props.filter_observations_by_parent_observation_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedObservation>>
     }
 }
@@ -274,8 +351,19 @@ impl From<&OrganismBioOttTaxonItemPageProp> for PrimaryKey {
 
 #[function_component(OrganismBioOttTaxonItemPage)]
 pub fn organism_bio_ott_taxon_item_page(props: &OrganismBioOttTaxonItemPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedOrganismBioOttTaxonItem> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedOrganismBioOttTaxonItem> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedOrganismBioOttTaxonItem>>
     }
@@ -312,14 +400,25 @@ impl OrganismPageProp {
 
 #[function_component(OrganismPage)]
 pub fn organism_page(props: &OrganismPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedOrganism> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedOrganism> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key organisms.host_organism_id
-            <BasicList<NestedOrganism> column_name={"host_organism_id"} filters={props.filter_organisms_by_host_organism_id()}/>
+            <BasicList<NestedOrganism> column_name={"host_organism_id"} filters={props.filter_organisms_by_host_organism_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key observations.organism_id
-            <BasicList<NestedObservation> column_name={"organism_id"} filters={props.filter_observations_by_organism_id()}/>
+            <BasicList<NestedObservation> column_name={"organism_id"} filters={props.filter_observations_by_organism_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key organism_bio_ott_taxon_items.organism_id
-            <BasicList<NestedOrganismBioOttTaxonItem> column_name={"organism_id"} filters={props.filter_organism_bio_ott_taxon_items_by_organism_id()}/>
+            <BasicList<NestedOrganismBioOttTaxonItem> column_name={"organism_id"} filters={props.filter_organism_bio_ott_taxon_items_by_organism_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedOrganism>>
     }
 }
@@ -345,10 +444,21 @@ impl OrganizationPageProp {
 
 #[function_component(OrganizationPage)]
 pub fn organization_page(props: &OrganizationPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedOrganization> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedOrganization> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key users.organization_id
-            <BasicList<NestedUser> column_name={"organization_id"} filters={props.filter_users_by_organization_id()}/>
+            <BasicList<NestedUser> column_name={"organization_id"} filters={props.filter_users_by_organization_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedOrganization>>
     }
 }
@@ -433,32 +543,43 @@ impl ProjectPageProp {
 
 #[function_component(ProjectPage)]
 pub fn project_page(props: &ProjectPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedProject> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedProject> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key projects.parent_project_id
-            <BasicList<NestedProject> column_name={"parent_project_id"} filters={props.filter_projects_by_parent_project_id()}/>
+            <BasicList<NestedProject> column_name={"parent_project_id"} filters={props.filter_projects_by_parent_project_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_users_role_invitations.table_id
-            <BasicList<NestedProjectsUsersRoleInvitation> column_name={"table_id"} filters={props.filter_projects_users_role_invitations_by_table_id()}/>
+            <BasicList<NestedProjectsUsersRoleInvitation> column_name={"table_id"} filters={props.filter_projects_users_role_invitations_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_users_role_requests.table_id
-            <BasicList<NestedProjectsUsersRoleRequest> column_name={"table_id"} filters={props.filter_projects_users_role_requests_by_table_id()}/>
+            <BasicList<NestedProjectsUsersRoleRequest> column_name={"table_id"} filters={props.filter_projects_users_role_requests_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_users_roles.table_id
-            <BasicList<NestedProjectsUsersRole> column_name={"table_id"} filters={props.filter_projects_users_roles_by_table_id()}/>
+            <BasicList<NestedProjectsUsersRole> column_name={"table_id"} filters={props.filter_projects_users_roles_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key sample_containers.project_id
-            <BasicList<NestedSampleContainer> column_name={"project_id"} filters={props.filter_sample_containers_by_project_id()}/>
+            <BasicList<NestedSampleContainer> column_name={"project_id"} filters={props.filter_sample_containers_by_project_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key samples.project_id
-            <BasicList<NestedSample> column_name={"project_id"} filters={props.filter_samples_by_project_id()}/>
+            <BasicList<NestedSample> column_name={"project_id"} filters={props.filter_samples_by_project_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key nameplates.project_id
-            <BasicList<NestedNameplate> column_name={"project_id"} filters={props.filter_nameplates_by_project_id()}/>
+            <BasicList<NestedNameplate> column_name={"project_id"} filters={props.filter_nameplates_by_project_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key organisms.project_id
-            <BasicList<NestedOrganism> column_name={"project_id"} filters={props.filter_organisms_by_project_id()}/>
+            <BasicList<NestedOrganism> column_name={"project_id"} filters={props.filter_organisms_by_project_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_teams_role_invitations.table_id
-            <BasicList<NestedProjectsTeamsRoleInvitation> column_name={"table_id"} filters={props.filter_projects_teams_role_invitations_by_table_id()}/>
+            <BasicList<NestedProjectsTeamsRoleInvitation> column_name={"table_id"} filters={props.filter_projects_teams_role_invitations_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_teams_role_requests.table_id
-            <BasicList<NestedProjectsTeamsRoleRequest> column_name={"table_id"} filters={props.filter_projects_teams_role_requests_by_table_id()}/>
+            <BasicList<NestedProjectsTeamsRoleRequest> column_name={"table_id"} filters={props.filter_projects_teams_role_requests_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_teams_roles.table_id
-            <BasicList<NestedProjectsTeamsRole> column_name={"table_id"} filters={props.filter_projects_teams_roles_by_table_id()}/>
+            <BasicList<NestedProjectsTeamsRole> column_name={"table_id"} filters={props.filter_projects_teams_roles_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key observations.project_id
-            <BasicList<NestedObservation> column_name={"project_id"} filters={props.filter_observations_by_project_id()}/>
+            <BasicList<NestedObservation> column_name={"project_id"} filters={props.filter_observations_by_project_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedProject>>
     }
 }
@@ -477,8 +598,19 @@ impl From<&ProjectsTeamsRoleInvitationPageProp> for PrimaryKey {
 
 #[function_component(ProjectsTeamsRoleInvitationPage)]
 pub fn projects_teams_role_invitation_page(props: &ProjectsTeamsRoleInvitationPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedProjectsTeamsRoleInvitation> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedProjectsTeamsRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedProjectsTeamsRoleInvitation>>
     }
@@ -498,8 +630,19 @@ impl From<&ProjectsTeamsRoleRequestPageProp> for PrimaryKey {
 
 #[function_component(ProjectsTeamsRoleRequestPage)]
 pub fn projects_teams_role_request_page(props: &ProjectsTeamsRoleRequestPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedProjectsTeamsRoleRequest> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedProjectsTeamsRoleRequest> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedProjectsTeamsRoleRequest>>
     }
@@ -519,8 +662,19 @@ impl From<&ProjectsTeamsRolePageProp> for PrimaryKey {
 
 #[function_component(ProjectsTeamsRolePage)]
 pub fn projects_teams_role_page(props: &ProjectsTeamsRolePageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedProjectsTeamsRole> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedProjectsTeamsRole> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedProjectsTeamsRole>>
     }
@@ -540,8 +694,19 @@ impl From<&ProjectsUsersRoleInvitationPageProp> for PrimaryKey {
 
 #[function_component(ProjectsUsersRoleInvitationPage)]
 pub fn projects_users_role_invitation_page(props: &ProjectsUsersRoleInvitationPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedProjectsUsersRoleInvitation> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedProjectsUsersRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedProjectsUsersRoleInvitation>>
     }
@@ -561,8 +726,19 @@ impl From<&ProjectsUsersRoleRequestPageProp> for PrimaryKey {
 
 #[function_component(ProjectsUsersRoleRequestPage)]
 pub fn projects_users_role_request_page(props: &ProjectsUsersRoleRequestPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedProjectsUsersRoleRequest> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedProjectsUsersRoleRequest> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedProjectsUsersRoleRequest>>
     }
@@ -582,8 +758,19 @@ impl From<&ProjectsUsersRolePageProp> for PrimaryKey {
 
 #[function_component(ProjectsUsersRolePage)]
 pub fn projects_users_role_page(props: &ProjectsUsersRolePageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedProjectsUsersRole> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedProjectsUsersRole> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedProjectsUsersRole>>
     }
@@ -603,8 +790,19 @@ impl From<&SampleBioOttTaxonItemPageProp> for PrimaryKey {
 
 #[function_component(SampleBioOttTaxonItemPage)]
 pub fn sample_bio_ott_taxon_item_page(props: &SampleBioOttTaxonItemPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedSampleBioOttTaxonItem> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedSampleBioOttTaxonItem> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedSampleBioOttTaxonItem>>
     }
@@ -631,10 +829,21 @@ impl SampleContainerPageProp {
 
 #[function_component(SampleContainerPage)]
 pub fn sample_container_page(props: &SampleContainerPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedSampleContainer> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedSampleContainer> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key samples.container_id
-            <BasicList<NestedSample> column_name={"container_id"} filters={props.filter_samples_by_container_id()}/>
+            <BasicList<NestedSample> column_name={"container_id"} filters={props.filter_samples_by_container_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedSampleContainer>>
     }
 }
@@ -660,10 +869,21 @@ impl SampleStatePageProp {
 
 #[function_component(SampleStatePage)]
 pub fn sample_state_page(props: &SampleStatePageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedSampleState> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedSampleState> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key samples.state_id
-            <BasicList<NestedSample> column_name={"state_id"} filters={props.filter_samples_by_state_id()}/>
+            <BasicList<NestedSample> column_name={"state_id"} filters={props.filter_samples_by_state_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedSampleState>>
     }
 }
@@ -714,20 +934,31 @@ impl SamplePageProp {
 
 #[function_component(SamplePage)]
 pub fn sample_page(props: &SamplePageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedSample> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedSample> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key spectra_collections.sample_id
-            <BasicList<NestedSpectraCollection> column_name={"sample_id"} filters={props.filter_spectra_collections_by_sample_id()}/>
+            <BasicList<NestedSpectraCollection> column_name={"sample_id"} filters={props.filter_spectra_collections_by_sample_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key derived_samples.parent_sample_id
-            <BasicList<NestedDerivedSample> column_name={"parent_sample_id"} filters={props.filter_derived_samples_by_parent_sample_id()}/>
+            <BasicList<NestedDerivedSample> column_name={"parent_sample_id"} filters={props.filter_derived_samples_by_parent_sample_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key derived_samples.child_sample_id
-            <BasicList<NestedDerivedSample> column_name={"child_sample_id"} filters={props.filter_derived_samples_by_child_sample_id()}/>
+            <BasicList<NestedDerivedSample> column_name={"child_sample_id"} filters={props.filter_derived_samples_by_child_sample_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key organisms.sample_id
-            <BasicList<NestedOrganism> column_name={"sample_id"} filters={props.filter_organisms_by_sample_id()}/>
+            <BasicList<NestedOrganism> column_name={"sample_id"} filters={props.filter_organisms_by_sample_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key sample_bio_ott_taxon_items.sample_id
-            <BasicList<NestedSampleBioOttTaxonItem> column_name={"sample_id"} filters={props.filter_sample_bio_ott_taxon_items_by_sample_id()}/>
+            <BasicList<NestedSampleBioOttTaxonItem> column_name={"sample_id"} filters={props.filter_sample_bio_ott_taxon_items_by_sample_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key observations.sample_id
-            <BasicList<NestedObservation> column_name={"sample_id"} filters={props.filter_observations_by_sample_id()}/>
+            <BasicList<NestedObservation> column_name={"sample_id"} filters={props.filter_observations_by_sample_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedSample>>
     }
 }
@@ -753,8 +984,19 @@ impl SpectraCollectionPageProp {
 
 #[function_component(SpectraCollectionPage)]
 pub fn spectra_collection_page(props: &SpectraCollectionPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedSpectraCollection> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedSpectraCollection> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedSpectraCollection>>
     }
@@ -823,26 +1065,37 @@ impl TeamPageProp {
 
 #[function_component(TeamPage)]
 pub fn team_page(props: &TeamPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedTeam> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedTeam> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key teams.parent_team_id
-            <BasicList<NestedTeam> column_name={"parent_team_id"} filters={props.filter_teams_by_parent_team_id()}/>
+            <BasicList<NestedTeam> column_name={"parent_team_id"} filters={props.filter_teams_by_parent_team_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_teams_role_invitations.table_id
-            <BasicList<NestedTeamsTeamsRoleInvitation> column_name={"table_id"} filters={props.filter_teams_teams_role_invitations_by_table_id()}/>
+            <BasicList<NestedTeamsTeamsRoleInvitation> column_name={"table_id"} filters={props.filter_teams_teams_role_invitations_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_teams_role_invitations.team_id
-            <BasicList<NestedTeamsTeamsRoleInvitation> column_name={"team_id"} filters={props.filter_teams_teams_role_invitations_by_team_id()}/>
+            <BasicList<NestedTeamsTeamsRoleInvitation> column_name={"team_id"} filters={props.filter_teams_teams_role_invitations_by_team_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_users_role_invitations.table_id
-            <BasicList<NestedTeamsUsersRoleInvitation> column_name={"table_id"} filters={props.filter_teams_users_role_invitations_by_table_id()}/>
+            <BasicList<NestedTeamsUsersRoleInvitation> column_name={"table_id"} filters={props.filter_teams_users_role_invitations_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_users_role_requests.table_id
-            <BasicList<NestedTeamsUsersRoleRequest> column_name={"table_id"} filters={props.filter_teams_users_role_requests_by_table_id()}/>
+            <BasicList<NestedTeamsUsersRoleRequest> column_name={"table_id"} filters={props.filter_teams_users_role_requests_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_users_roles.table_id
-            <BasicList<NestedTeamsUsersRole> column_name={"table_id"} filters={props.filter_teams_users_roles_by_table_id()}/>
+            <BasicList<NestedTeamsUsersRole> column_name={"table_id"} filters={props.filter_teams_users_roles_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_teams_role_invitations.team_id
-            <BasicList<NestedProjectsTeamsRoleInvitation> column_name={"team_id"} filters={props.filter_projects_teams_role_invitations_by_team_id()}/>
+            <BasicList<NestedProjectsTeamsRoleInvitation> column_name={"team_id"} filters={props.filter_projects_teams_role_invitations_by_team_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_teams_role_requests.team_id
-            <BasicList<NestedProjectsTeamsRoleRequest> column_name={"team_id"} filters={props.filter_projects_teams_role_requests_by_team_id()}/>
+            <BasicList<NestedProjectsTeamsRoleRequest> column_name={"team_id"} filters={props.filter_projects_teams_role_requests_by_team_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_teams_roles.team_id
-            <BasicList<NestedProjectsTeamsRole> column_name={"team_id"} filters={props.filter_projects_teams_roles_by_team_id()}/>
+            <BasicList<NestedProjectsTeamsRole> column_name={"team_id"} filters={props.filter_projects_teams_roles_by_team_id()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedTeam>>
     }
 }
@@ -861,8 +1114,19 @@ impl From<&TeamsTeamsRoleInvitationPageProp> for PrimaryKey {
 
 #[function_component(TeamsTeamsRoleInvitationPage)]
 pub fn teams_teams_role_invitation_page(props: &TeamsTeamsRoleInvitationPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedTeamsTeamsRoleInvitation> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedTeamsTeamsRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedTeamsTeamsRoleInvitation>>
     }
@@ -882,8 +1146,19 @@ impl From<&TeamsUsersRoleInvitationPageProp> for PrimaryKey {
 
 #[function_component(TeamsUsersRoleInvitationPage)]
 pub fn teams_users_role_invitation_page(props: &TeamsUsersRoleInvitationPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedTeamsUsersRoleInvitation> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedTeamsUsersRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedTeamsUsersRoleInvitation>>
     }
@@ -903,8 +1178,19 @@ impl From<&TeamsUsersRoleRequestPageProp> for PrimaryKey {
 
 #[function_component(TeamsUsersRoleRequestPage)]
 pub fn teams_users_role_request_page(props: &TeamsUsersRoleRequestPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedTeamsUsersRoleRequest> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedTeamsUsersRoleRequest> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedTeamsUsersRoleRequest>>
     }
@@ -924,8 +1210,19 @@ impl From<&TeamsUsersRolePageProp> for PrimaryKey {
 
 #[function_component(TeamsUsersRolePage)]
 pub fn teams_users_role_page(props: &TeamsUsersRolePageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedTeamsUsersRole> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedTeamsUsersRole> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedTeamsUsersRole>>
     }
@@ -1183,100 +1480,111 @@ impl UserPageProp {
 
 #[function_component(UserPage)]
 pub fn user_page(props: &UserPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedUser> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedUser> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             // Linked with foreign key users_users_role_invitations.table_id
-            <BasicList<NestedUsersUsersRoleInvitation> column_name={"table_id"} filters={props.filter_users_users_role_invitations_by_table_id()}/>
+            <BasicList<NestedUsersUsersRoleInvitation> column_name={"table_id"} filters={props.filter_users_users_role_invitations_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key users_users_role_invitations.user_id
-            <BasicList<NestedUsersUsersRoleInvitation> column_name={"user_id"} filters={props.filter_users_users_role_invitations_by_user_id()}/>
+            <BasicList<NestedUsersUsersRoleInvitation> column_name={"user_id"} filters={props.filter_users_users_role_invitations_by_user_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key users_users_role_invitations.created_by
-            <BasicList<NestedUsersUsersRoleInvitation> column_name={"created_by"} filters={props.filter_users_users_role_invitations_by_created_by()}/>
+            <BasicList<NestedUsersUsersRoleInvitation> column_name={"created_by"} filters={props.filter_users_users_role_invitations_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key users_users_role_requests.table_id
-            <BasicList<NestedUsersUsersRoleRequest> column_name={"table_id"} filters={props.filter_users_users_role_requests_by_table_id()}/>
+            <BasicList<NestedUsersUsersRoleRequest> column_name={"table_id"} filters={props.filter_users_users_role_requests_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key users_users_role_requests.user_id
-            <BasicList<NestedUsersUsersRoleRequest> column_name={"user_id"} filters={props.filter_users_users_role_requests_by_user_id()}/>
+            <BasicList<NestedUsersUsersRoleRequest> column_name={"user_id"} filters={props.filter_users_users_role_requests_by_user_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key users_users_role_requests.created_by
-            <BasicList<NestedUsersUsersRoleRequest> column_name={"created_by"} filters={props.filter_users_users_role_requests_by_created_by()}/>
+            <BasicList<NestedUsersUsersRoleRequest> column_name={"created_by"} filters={props.filter_users_users_role_requests_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key users_users_roles.table_id
-            <BasicList<NestedUsersUsersRole> column_name={"table_id"} filters={props.filter_users_users_roles_by_table_id()}/>
+            <BasicList<NestedUsersUsersRole> column_name={"table_id"} filters={props.filter_users_users_roles_by_table_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key users_users_roles.user_id
-            <BasicList<NestedUsersUsersRole> column_name={"user_id"} filters={props.filter_users_users_roles_by_user_id()}/>
+            <BasicList<NestedUsersUsersRole> column_name={"user_id"} filters={props.filter_users_users_roles_by_user_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key users_users_roles.created_by
-            <BasicList<NestedUsersUsersRole> column_name={"created_by"} filters={props.filter_users_users_roles_by_created_by()}/>
+            <BasicList<NestedUsersUsersRole> column_name={"created_by"} filters={props.filter_users_users_roles_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects.created_by
-            <BasicList<NestedProject> column_name={"created_by"} filters={props.filter_projects_by_created_by()}/>
+            <BasicList<NestedProject> column_name={"created_by"} filters={props.filter_projects_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects.updated_by
-            <BasicList<NestedProject> column_name={"updated_by"} filters={props.filter_projects_by_updated_by()}/>
+            <BasicList<NestedProject> column_name={"updated_by"} filters={props.filter_projects_by_updated_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_users_role_invitations.user_id
-            <BasicList<NestedProjectsUsersRoleInvitation> column_name={"user_id"} filters={props.filter_projects_users_role_invitations_by_user_id()}/>
+            <BasicList<NestedProjectsUsersRoleInvitation> column_name={"user_id"} filters={props.filter_projects_users_role_invitations_by_user_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_users_role_invitations.created_by
-            <BasicList<NestedProjectsUsersRoleInvitation> column_name={"created_by"} filters={props.filter_projects_users_role_invitations_by_created_by()}/>
+            <BasicList<NestedProjectsUsersRoleInvitation> column_name={"created_by"} filters={props.filter_projects_users_role_invitations_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_users_role_requests.user_id
-            <BasicList<NestedProjectsUsersRoleRequest> column_name={"user_id"} filters={props.filter_projects_users_role_requests_by_user_id()}/>
+            <BasicList<NestedProjectsUsersRoleRequest> column_name={"user_id"} filters={props.filter_projects_users_role_requests_by_user_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_users_role_requests.created_by
-            <BasicList<NestedProjectsUsersRoleRequest> column_name={"created_by"} filters={props.filter_projects_users_role_requests_by_created_by()}/>
+            <BasicList<NestedProjectsUsersRoleRequest> column_name={"created_by"} filters={props.filter_projects_users_role_requests_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_users_roles.user_id
-            <BasicList<NestedProjectsUsersRole> column_name={"user_id"} filters={props.filter_projects_users_roles_by_user_id()}/>
+            <BasicList<NestedProjectsUsersRole> column_name={"user_id"} filters={props.filter_projects_users_roles_by_user_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_users_roles.created_by
-            <BasicList<NestedProjectsUsersRole> column_name={"created_by"} filters={props.filter_projects_users_roles_by_created_by()}/>
+            <BasicList<NestedProjectsUsersRole> column_name={"created_by"} filters={props.filter_projects_users_roles_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key sample_containers.created_by
-            <BasicList<NestedSampleContainer> column_name={"created_by"} filters={props.filter_sample_containers_by_created_by()}/>
+            <BasicList<NestedSampleContainer> column_name={"created_by"} filters={props.filter_sample_containers_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key sample_containers.updated_by
-            <BasicList<NestedSampleContainer> column_name={"updated_by"} filters={props.filter_sample_containers_by_updated_by()}/>
+            <BasicList<NestedSampleContainer> column_name={"updated_by"} filters={props.filter_sample_containers_by_updated_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key samples.created_by
-            <BasicList<NestedSample> column_name={"created_by"} filters={props.filter_samples_by_created_by()}/>
+            <BasicList<NestedSample> column_name={"created_by"} filters={props.filter_samples_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key samples.sampled_by
-            <BasicList<NestedSample> column_name={"sampled_by"} filters={props.filter_samples_by_sampled_by()}/>
+            <BasicList<NestedSample> column_name={"sampled_by"} filters={props.filter_samples_by_sampled_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key samples.updated_by
-            <BasicList<NestedSample> column_name={"updated_by"} filters={props.filter_samples_by_updated_by()}/>
+            <BasicList<NestedSample> column_name={"updated_by"} filters={props.filter_samples_by_updated_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key spectra_collections.created_by
-            <BasicList<NestedSpectraCollection> column_name={"created_by"} filters={props.filter_spectra_collections_by_created_by()}/>
+            <BasicList<NestedSpectraCollection> column_name={"created_by"} filters={props.filter_spectra_collections_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key spectra_collections.updated_by
-            <BasicList<NestedSpectraCollection> column_name={"updated_by"} filters={props.filter_spectra_collections_by_updated_by()}/>
+            <BasicList<NestedSpectraCollection> column_name={"updated_by"} filters={props.filter_spectra_collections_by_updated_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams.created_by
-            <BasicList<NestedTeam> column_name={"created_by"} filters={props.filter_teams_by_created_by()}/>
+            <BasicList<NestedTeam> column_name={"created_by"} filters={props.filter_teams_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams.updated_by
-            <BasicList<NestedTeam> column_name={"updated_by"} filters={props.filter_teams_by_updated_by()}/>
+            <BasicList<NestedTeam> column_name={"updated_by"} filters={props.filter_teams_by_updated_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_teams_role_invitations.created_by
-            <BasicList<NestedTeamsTeamsRoleInvitation> column_name={"created_by"} filters={props.filter_teams_teams_role_invitations_by_created_by()}/>
+            <BasicList<NestedTeamsTeamsRoleInvitation> column_name={"created_by"} filters={props.filter_teams_teams_role_invitations_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_users_role_invitations.user_id
-            <BasicList<NestedTeamsUsersRoleInvitation> column_name={"user_id"} filters={props.filter_teams_users_role_invitations_by_user_id()}/>
+            <BasicList<NestedTeamsUsersRoleInvitation> column_name={"user_id"} filters={props.filter_teams_users_role_invitations_by_user_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_users_role_invitations.created_by
-            <BasicList<NestedTeamsUsersRoleInvitation> column_name={"created_by"} filters={props.filter_teams_users_role_invitations_by_created_by()}/>
+            <BasicList<NestedTeamsUsersRoleInvitation> column_name={"created_by"} filters={props.filter_teams_users_role_invitations_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_users_role_requests.user_id
-            <BasicList<NestedTeamsUsersRoleRequest> column_name={"user_id"} filters={props.filter_teams_users_role_requests_by_user_id()}/>
+            <BasicList<NestedTeamsUsersRoleRequest> column_name={"user_id"} filters={props.filter_teams_users_role_requests_by_user_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_users_role_requests.created_by
-            <BasicList<NestedTeamsUsersRoleRequest> column_name={"created_by"} filters={props.filter_teams_users_role_requests_by_created_by()}/>
+            <BasicList<NestedTeamsUsersRoleRequest> column_name={"created_by"} filters={props.filter_teams_users_role_requests_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_users_roles.user_id
-            <BasicList<NestedTeamsUsersRole> column_name={"user_id"} filters={props.filter_teams_users_roles_by_user_id()}/>
+            <BasicList<NestedTeamsUsersRole> column_name={"user_id"} filters={props.filter_teams_users_roles_by_user_id()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key teams_users_roles.created_by
-            <BasicList<NestedTeamsUsersRole> column_name={"created_by"} filters={props.filter_teams_users_roles_by_created_by()}/>
+            <BasicList<NestedTeamsUsersRole> column_name={"created_by"} filters={props.filter_teams_users_roles_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key derived_samples.created_by
-            <BasicList<NestedDerivedSample> column_name={"created_by"} filters={props.filter_derived_samples_by_created_by()}/>
+            <BasicList<NestedDerivedSample> column_name={"created_by"} filters={props.filter_derived_samples_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key derived_samples.updated_by
-            <BasicList<NestedDerivedSample> column_name={"updated_by"} filters={props.filter_derived_samples_by_updated_by()}/>
+            <BasicList<NestedDerivedSample> column_name={"updated_by"} filters={props.filter_derived_samples_by_updated_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key nameplates.created_by
-            <BasicList<NestedNameplate> column_name={"created_by"} filters={props.filter_nameplates_by_created_by()}/>
+            <BasicList<NestedNameplate> column_name={"created_by"} filters={props.filter_nameplates_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key nameplates.updated_by
-            <BasicList<NestedNameplate> column_name={"updated_by"} filters={props.filter_nameplates_by_updated_by()}/>
+            <BasicList<NestedNameplate> column_name={"updated_by"} filters={props.filter_nameplates_by_updated_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key organisms.created_by
-            <BasicList<NestedOrganism> column_name={"created_by"} filters={props.filter_organisms_by_created_by()}/>
+            <BasicList<NestedOrganism> column_name={"created_by"} filters={props.filter_organisms_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key organisms.updated_by
-            <BasicList<NestedOrganism> column_name={"updated_by"} filters={props.filter_organisms_by_updated_by()}/>
+            <BasicList<NestedOrganism> column_name={"updated_by"} filters={props.filter_organisms_by_updated_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_teams_role_invitations.created_by
-            <BasicList<NestedProjectsTeamsRoleInvitation> column_name={"created_by"} filters={props.filter_projects_teams_role_invitations_by_created_by()}/>
+            <BasicList<NestedProjectsTeamsRoleInvitation> column_name={"created_by"} filters={props.filter_projects_teams_role_invitations_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_teams_role_requests.created_by
-            <BasicList<NestedProjectsTeamsRoleRequest> column_name={"created_by"} filters={props.filter_projects_teams_role_requests_by_created_by()}/>
+            <BasicList<NestedProjectsTeamsRoleRequest> column_name={"created_by"} filters={props.filter_projects_teams_role_requests_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key projects_teams_roles.created_by
-            <BasicList<NestedProjectsTeamsRole> column_name={"created_by"} filters={props.filter_projects_teams_roles_by_created_by()}/>
+            <BasicList<NestedProjectsTeamsRole> column_name={"created_by"} filters={props.filter_projects_teams_roles_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key sample_bio_ott_taxon_items.created_by
-            <BasicList<NestedSampleBioOttTaxonItem> column_name={"created_by"} filters={props.filter_sample_bio_ott_taxon_items_by_created_by()}/>
+            <BasicList<NestedSampleBioOttTaxonItem> column_name={"created_by"} filters={props.filter_sample_bio_ott_taxon_items_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key observations.created_by
-            <BasicList<NestedObservation> column_name={"created_by"} filters={props.filter_observations_by_created_by()}/>
+            <BasicList<NestedObservation> column_name={"created_by"} filters={props.filter_observations_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key observations.updated_by
-            <BasicList<NestedObservation> column_name={"updated_by"} filters={props.filter_observations_by_updated_by()}/>
+            <BasicList<NestedObservation> column_name={"updated_by"} filters={props.filter_observations_by_updated_by()} can_create={*can_update} can_truncate={*can_admin}/>
             // Linked with foreign key organism_bio_ott_taxon_items.created_by
-            <BasicList<NestedOrganismBioOttTaxonItem> column_name={"created_by"} filters={props.filter_organism_bio_ott_taxon_items_by_created_by()}/>
+            <BasicList<NestedOrganismBioOttTaxonItem> column_name={"created_by"} filters={props.filter_organism_bio_ott_taxon_items_by_created_by()} can_create={*can_update} can_truncate={*can_admin}/>
         </BasicPage<NestedUser>>
     }
 }
@@ -1295,8 +1603,19 @@ impl From<&UsersUsersRoleInvitationPageProp> for PrimaryKey {
 
 #[function_component(UsersUsersRoleInvitationPage)]
 pub fn users_users_role_invitation_page(props: &UsersUsersRoleInvitationPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedUsersUsersRoleInvitation> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedUsersUsersRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedUsersUsersRoleInvitation>>
     }
@@ -1316,8 +1635,19 @@ impl From<&UsersUsersRoleRequestPageProp> for PrimaryKey {
 
 #[function_component(UsersUsersRoleRequestPage)]
 pub fn users_users_role_request_page(props: &UsersUsersRoleRequestPageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedUsersUsersRoleRequest> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedUsersUsersRoleRequest> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedUsersUsersRoleRequest>>
     }
@@ -1337,8 +1667,19 @@ impl From<&UsersUsersRolePageProp> for PrimaryKey {
 
 #[function_component(UsersUsersRolePage)]
 pub fn users_users_role_page(props: &UsersUsersRolePageProp) -> Html {
+    let can_update = use_state(|| false);
+    let can_admin = use_state(|| false);
+
+    let can_update_callback = {
+        let can_update = can_update.clone();
+        Callback::from(move |value: bool| can_update.set(value))
+    };
+    let can_admin_callback = {
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
+    };
     html! {
-        <BasicPage<NestedUsersUsersRole> id={PrimaryKey::from(props)}>
+        <BasicPage<NestedUsersUsersRole> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
             <span>{"No content available yet."}</span>
         </BasicPage<NestedUsersUsersRole>>
     }
