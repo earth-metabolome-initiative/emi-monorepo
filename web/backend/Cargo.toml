@@ -58,7 +58,7 @@ indicatif = "0.17.8"
 # We also use the version of the ngrammatic library before the refactoring
 # to evaluate the changes in performance. The version we refer to is the 0.4.0
 # version of the library.
-ngrammatic = {git ="https://github.com/LucaCappelletti94/ngrammatic.git" }
+# ngrammatic = {git ="https://github.com/LucaCappelletti94/ngrammatic.git" }
 paste = "1.0.14"
 criterion = { version = "0.5", features = ["html_reports"] }
 flate2 = "1.0.29"
