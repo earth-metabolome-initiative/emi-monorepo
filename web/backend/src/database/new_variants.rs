@@ -156,21 +156,21 @@ impl InsertRow for web_common::database::NewObservation {
     }
 }
 
-/// Intermediate representation of the new variant NewOrganismBioOttTaxonItem.
+/// Intermediate representation of the new variant NewOrganismTaxon.
 #[derive(Insertable)]
-#[diesel(table_name = crate::database::schema::organism_bio_ott_taxon_items)]
-pub(crate) struct IntermediateNewOrganismBioOttTaxonItem {
+#[diesel(table_name = crate::database::schema::organism_taxa)]
+pub(crate) struct IntermediateNewOrganismTaxon {
     created_by: i32,
     organism_id: uuid::Uuid,
     taxon_id: i32,
 }
 
-impl InsertRow for web_common::database::NewOrganismBioOttTaxonItem {
-    type Intermediate = IntermediateNewOrganismBioOttTaxonItem;
-    type Flat = crate::database::flat_variants::OrganismBioOttTaxonItem;
+impl InsertRow for web_common::database::NewOrganismTaxon {
+    type Intermediate = IntermediateNewOrganismTaxon;
+    type Flat = crate::database::flat_variants::OrganismTaxon;
 
     fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewOrganismBioOttTaxonItem {
+        IntermediateNewOrganismTaxon {
             created_by: user_id,
             organism_id: self.organism_id,
             taxon_id: self.taxon_id,
@@ -184,12 +184,10 @@ impl InsertRow for web_common::database::NewOrganismBioOttTaxonItem {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Self::Flat, web_common::api::ApiError> {
-        use crate::database::schema::organism_bio_ott_taxon_items;
-        Ok(
-            diesel::insert_into(organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items)
-                .values(InsertRow::to_intermediate(self, user_id))
-                .get_result(connection)?,
-        )
+        use crate::database::schema::organism_taxa;
+        Ok(diesel::insert_into(organism_taxa::dsl::organism_taxa)
+            .values(InsertRow::to_intermediate(self, user_id))
+            .get_result(connection)?)
     }
 }
 
@@ -529,43 +527,6 @@ impl InsertRow for web_common::database::NewProjectsUsersRole {
     }
 }
 
-/// Intermediate representation of the new variant NewSampleBioOttTaxonItem.
-#[derive(Insertable)]
-#[diesel(table_name = crate::database::schema::sample_bio_ott_taxon_items)]
-pub(crate) struct IntermediateNewSampleBioOttTaxonItem {
-    created_by: i32,
-    sample_id: uuid::Uuid,
-    taxon_id: i32,
-}
-
-impl InsertRow for web_common::database::NewSampleBioOttTaxonItem {
-    type Intermediate = IntermediateNewSampleBioOttTaxonItem;
-    type Flat = crate::database::flat_variants::SampleBioOttTaxonItem;
-
-    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
-        IntermediateNewSampleBioOttTaxonItem {
-            created_by: user_id,
-            sample_id: self.sample_id,
-            taxon_id: self.taxon_id,
-        }
-    }
-
-    fn insert(
-        self,
-        user_id: i32,
-        connection: &mut diesel::r2d2::PooledConnection<
-            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
-        >,
-    ) -> Result<Self::Flat, web_common::api::ApiError> {
-        use crate::database::schema::sample_bio_ott_taxon_items;
-        Ok(
-            diesel::insert_into(sample_bio_ott_taxon_items::dsl::sample_bio_ott_taxon_items)
-                .values(InsertRow::to_intermediate(self, user_id))
-                .get_result(connection)?,
-        )
-    }
-}
-
 /// Intermediate representation of the new variant NewSampleContainer.
 #[derive(Insertable)]
 #[diesel(table_name = crate::database::schema::sample_containers)]
@@ -604,6 +565,41 @@ impl InsertRow for web_common::database::NewSampleContainer {
                 .values(InsertRow::to_intermediate(self, user_id))
                 .get_result(connection)?,
         )
+    }
+}
+
+/// Intermediate representation of the new variant NewSampleTaxon.
+#[derive(Insertable)]
+#[diesel(table_name = crate::database::schema::sample_taxa)]
+pub(crate) struct IntermediateNewSampleTaxon {
+    created_by: i32,
+    sample_id: uuid::Uuid,
+    taxon_id: i32,
+}
+
+impl InsertRow for web_common::database::NewSampleTaxon {
+    type Intermediate = IntermediateNewSampleTaxon;
+    type Flat = crate::database::flat_variants::SampleTaxon;
+
+    fn to_intermediate(self, user_id: i32) -> Self::Intermediate {
+        IntermediateNewSampleTaxon {
+            created_by: user_id,
+            sample_id: self.sample_id,
+            taxon_id: self.taxon_id,
+        }
+    }
+
+    fn insert(
+        self,
+        user_id: i32,
+        connection: &mut diesel::r2d2::PooledConnection<
+            diesel::r2d2::ConnectionManager<diesel::PgConnection>,
+        >,
+    ) -> Result<Self::Flat, web_common::api::ApiError> {
+        use crate::database::schema::sample_taxa;
+        Ok(diesel::insert_into(sample_taxa::dsl::sample_taxa)
+            .values(InsertRow::to_intermediate(self, user_id))
+            .get_result(connection)?)
     }
 }
 

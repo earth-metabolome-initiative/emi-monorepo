@@ -57,7 +57,7 @@ from constraint_checkers.write_frontend_database_schema import (
     write_frontend_database_schema,
 )
 from dotenv import load_dotenv
-from retrieve_taxons import retrieve_taxons
+from retrieve_taxa import retrieve_taxa
 
 if __name__ == "__main__":
     # Load dotenv file
@@ -76,8 +76,8 @@ if __name__ == "__main__":
     if os.path.exists("migrations/__pycache__"):
         shutil.rmtree("migrations/__pycache__")
 
-    if not os.path.exists("./db_data/bio_ott_taxons.csv.gz"):
-        retrieve_taxons()
+    if not os.path.exists("./db_data/bio_ott_taxa.csv.gz"):
+        retrieve_taxa()
 
     StructMetadata.init_table_metadata()
 

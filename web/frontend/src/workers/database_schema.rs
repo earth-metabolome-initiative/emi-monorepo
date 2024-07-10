@@ -37,113 +37,119 @@ pub(super) async fn create_schema(database: &mut super::database_type::Database)
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000017_create_bio_ott_ranks_table/up.sql"
+            "../backend/migrations/00000000000017_create_document_formats_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000017_create_bio_ott_ranks_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000017_create_document_formats_table/up.sql: {:?}", error);
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000021_create_bio_ott_taxon_items_table/up.sql"
+            "../backend/migrations/00000000000021_create_login_providers_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000021_create_bio_ott_taxon_items_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000021_create_login_providers_table/up.sql: {:?}", error);
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000026_create_document_formats_table/up.sql"
-        ))
-        .await
-    {
-        log::error!("Failed to create table migrations/00000000000026_create_document_formats_table/up.sql: {:?}", error);
-    }
-    if let Err(error) = database
-        .execute(load_sql!(
-            "../backend/migrations/00000000000030_create_login_providers_table/up.sql"
-        ))
-        .await
-    {
-        log::error!("Failed to create table migrations/00000000000030_create_login_providers_table/up.sql: {:?}", error);
-    }
-    if let Err(error) = database
-        .execute(load_sql!(
-            "../backend/migrations/00000000000033_create_materials_table/up.sql"
+            "../backend/migrations/00000000000024_create_materials_table/up.sql"
         ))
         .await
     {
         log::error!(
-            "Failed to create table migrations/00000000000033_create_materials_table/up.sql: {:?}",
+            "Failed to create table migrations/00000000000024_create_materials_table/up.sql: {:?}",
             error
         );
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000036_create_observation_subjects_table/up.sql"
+            "../backend/migrations/00000000000027_create_observation_subjects_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000036_create_observation_subjects_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000027_create_observation_subjects_table/up.sql: {:?}", error);
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000040_create_organizations_table/up.sql"
+            "../backend/migrations/00000000000031_create_organizations_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000040_create_organizations_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000031_create_organizations_table/up.sql: {:?}", error);
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000044_create_permanence_categories_table/up.sql"
+            "../backend/migrations/00000000000035_create_permanence_categories_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000044_create_permanence_categories_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000035_create_permanence_categories_table/up.sql: {:?}", error);
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000047_create_nameplate_categories_table/up.sql"
+            "../backend/migrations/00000000000038_create_nameplate_categories_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000047_create_nameplate_categories_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000038_create_nameplate_categories_table/up.sql: {:?}", error);
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000051_create_project_states_table/up.sql"
+            "../backend/migrations/00000000000042_create_project_states_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000051_create_project_states_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000042_create_project_states_table/up.sql: {:?}", error);
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000055_create_roles_table/up.sql"
+            "../backend/migrations/00000000000046_create_ranks_table/up.sql"
         ))
         .await
     {
         log::error!(
-            "Failed to create table migrations/00000000000055_create_roles_table/up.sql: {:?}",
+            "Failed to create table migrations/00000000000046_create_ranks_table/up.sql: {:?}",
             error
         );
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000059_create_sample_container_categories_table/up.sql"
+            "../backend/migrations/00000000000050_create_roles_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000059_create_sample_container_categories_table/up.sql: {:?}", error);
+        log::error!(
+            "Failed to create table migrations/00000000000050_create_roles_table/up.sql: {:?}",
+            error
+        );
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000063_create_sample_states_table/up.sql"
+            "../backend/migrations/00000000000054_create_sample_container_categories_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000063_create_sample_states_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000054_create_sample_container_categories_table/up.sql: {:?}", error);
+    }
+    if let Err(error) = database
+        .execute(load_sql!(
+            "../backend/migrations/00000000000058_create_sample_states_table/up.sql"
+        ))
+        .await
+    {
+        log::error!("Failed to create table migrations/00000000000058_create_sample_states_table/up.sql: {:?}", error);
+    }
+    if let Err(error) = database
+        .execute(load_sql!(
+            "../backend/migrations/00000000000062_create_taxa_table/up.sql"
+        ))
+        .await
+    {
+        log::error!(
+            "Failed to create table migrations/00000000000062_create_taxa_table/up.sql: {:?}",
+            error
+        );
     }
     if let Err(error) = database
         .execute(load_sql!(
@@ -272,19 +278,19 @@ pub(super) async fn create_schema(database: &mut super::database_type::Database)
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000121_create_organism_bio_ott_taxon_items_table/up.sql"
+            "../backend/migrations/00000000000121_create_organism_taxa_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000121_create_organism_bio_ott_taxon_items_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000121_create_organism_taxa_table/up.sql: {:?}", error);
     }
     if let Err(error) = database
         .execute(load_sql!(
-            "../backend/migrations/00000000000123_create_sample_bio_ott_taxon_items_table/up.sql"
+            "../backend/migrations/00000000000123_create_sample_taxa_table/up.sql"
         ))
         .await
     {
-        log::error!("Failed to create table migrations/00000000000123_create_sample_bio_ott_taxon_items_table/up.sql: {:?}", error);
+        log::error!("Failed to create table migrations/00000000000123_create_sample_taxa_table/up.sql: {:?}", error);
     }
     if let Err(error) = database
         .execute(load_sql!(

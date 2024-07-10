@@ -275,7 +275,7 @@ impl BioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        Ok(table("bio_ott_taxon_items")
+        Ok(table("taxa")
             .insert()
             .columns("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id")
             .values(vec![self.into_row()])
@@ -296,7 +296,7 @@ impl BioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        let select_row = table("bio_ott_taxon_items")
+        let select_row = table("taxa")
             .select()
             .filter(col("id").eq(id.to_string()))
             .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id")
@@ -332,7 +332,7 @@ impl BioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        Ok(table("bio_ott_taxon_items")
+        Ok(table("taxa")
             .delete()
             .filter(col("id").eq(id.to_string()))
             .execute(connection)
@@ -351,7 +351,7 @@ impl BioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        let mut update_row = table("bio_ott_taxon_items")
+        let mut update_row = table("taxa")
             .update()
             .set("id", gluesql::core::ast_builder::num(self.id))
             .set("name", gluesql::core::ast_builder::text(self.name))
@@ -439,7 +439,7 @@ impl BioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        let select_row = table("bio_ott_taxon_items")
+        let select_row = table("taxa")
             .select()
             .filter(filter.map_or_else(|| gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into(), |filter| filter.as_filter_expression()))
            .project("id, name, ott_id, ott_rank_id, wikidata_id, ncbi_id, gbif_id, irmng_id, worms_id, domain_id, kingdom_id, phylum_id, class_id, order_id, family_id, genus_id, parent_id, icon_id, color_id")

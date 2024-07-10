@@ -5,31 +5,31 @@
 use std::rc::Rc;
 
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-pub struct NestedSpectra {
-    pub inner: crate::database::flat_variants::Spectra,
+pub struct NestedSpectrum {
+    pub inner: crate::database::flat_variants::Spectrum,
     pub spectra_collection: Rc<crate::database::nested_variants::NestedSpectraCollection>,
 }
 
-unsafe impl Send for NestedSpectra {}
-unsafe impl Sync for NestedSpectra {}
-impl crate::database::Tabular for NestedSpectra {
+unsafe impl Send for NestedSpectrum {}
+unsafe impl Sync for NestedSpectrum {}
+impl crate::database::Tabular for NestedSpectrum {
     const TABLE: crate::database::Table = crate::database::Table::Spectra;
 }
-impl crate::database::Filtrable for NestedSpectra {
-    type Filter = crate::database::filter_variants::SpectraFilter;
+impl crate::database::Filtrable for NestedSpectrum {
+    type Filter = crate::database::filter_variants::SpectrumFilter;
 }
-impl crate::database::Describable for NestedSpectra {
+impl crate::database::Describable for NestedSpectrum {
     fn description(&self) -> Option<&str> {
         self.inner.description()
     }
 }
-impl crate::database::Colorable for NestedSpectra {
+impl crate::database::Colorable for NestedSpectrum {
     fn color(&self) -> Option<&str> {
         None
     }
 }
 #[cfg(feature = "frontend")]
-impl crate::database::AllRecords for NestedSpectra {
+impl crate::database::AllRecords for NestedSpectrum {
     fn all_records<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
         filter: Option<&<Self as crate::database::Filtrable>::Filter>,
         limit: Option<i64>,
@@ -40,14 +40,14 @@ impl crate::database::AllRecords for NestedSpectra {
     }
 }
 #[cfg(feature = "frontend")]
-impl NestedSpectra {
+impl NestedSpectrum {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub(crate) async fn from_flat(
-        flat_variant: crate::database::flat_variants::Spectra,
+        flat_variant: crate::database::flat_variants::Spectrum,
         connection: &mut gluesql::prelude::Glue<
             impl gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
         >,
@@ -78,7 +78,7 @@ impl NestedSpectra {
     {
         self.inner.get_spectra_collection_id()
     }
-    /// Get the Spectra from the database by its ID.
+    /// Get the Spectrum from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `connection` - The connection to the database.
@@ -87,14 +87,14 @@ impl NestedSpectra {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, crate::api::ApiError> {
         if let Some(flat_variant) =
-            crate::database::flat_variants::Spectra::get(id, connection).await?
+            crate::database::flat_variants::Spectrum::get(id, connection).await?
         {
             Ok(Some(Self::from_flat(flat_variant, connection).await?))
         } else {
             Ok(None)
         }
     }
-    /// Delete the Spectra from the database.
+    /// Delete the Spectrum from the database.
     ///
     /// * `connection` - The connection to the database.
     pub async fn delete<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
@@ -103,7 +103,7 @@ impl NestedSpectra {
     ) -> Result<usize, crate::api::ApiError> {
         self.inner.delete(connection).await
     }
-    /// Delete the Spectra from the database by its ID.
+    /// Delete the Spectrum from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
@@ -113,23 +113,23 @@ impl NestedSpectra {
         id: i32,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
-        crate::database::flat_variants::Spectra::delete_from_id(id, connection).await
+        crate::database::flat_variants::Spectrum::delete_from_id(id, connection).await
     }
-    /// Get all Spectra from the database.
+    /// Get all Spectrum from the database.
     ///
     /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     pub async fn all<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        filter: Option<&crate::database::filter_variants::SpectraFilter>,
+        filter: Option<&crate::database::filter_variants::SpectrumFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, crate::api::ApiError> {
         let mut spectra = Vec::new();
         for flat_variant in
-            crate::database::flat_variants::Spectra::all(filter, limit, offset, connection)
+            crate::database::flat_variants::Spectrum::all(filter, limit, offset, connection)
                 .await?
                 .into_iter()
         {
@@ -151,6 +151,6 @@ impl NestedSpectra {
             connection,
         )
         .await?;
-        crate::database::flat_variants::Spectra::update_or_insert(&self.inner, connection).await
+        crate::database::flat_variants::Spectrum::update_or_insert(&self.inner, connection).await
     }
 }

@@ -6,8 +6,6 @@
     serde::Deserialize, serde::Serialize, Clone, Debug, PartialEq, Eq, Copy, PartialOrd, Ord,
 )]
 pub enum Table {
-    BioOttRanks,
-    BioOttTaxonItems,
     Colors,
     Countries,
     DerivedSamples,
@@ -20,7 +18,7 @@ pub enum Table {
     Notifications,
     ObservationSubjects,
     Observations,
-    OrganismBioOttTaxonItems,
+    OrganismTaxa,
     Organisms,
     Organizations,
     PermanenceCategories,
@@ -32,14 +30,16 @@ pub enum Table {
     ProjectsUsersRoleInvitations,
     ProjectsUsersRoleRequests,
     ProjectsUsersRoles,
+    Ranks,
     Roles,
-    SampleBioOttTaxonItems,
     SampleContainerCategories,
     SampleContainers,
     SampleStates,
+    SampleTaxa,
     Samples,
     Spectra,
     SpectraCollections,
+    Taxa,
     TeamStates,
     Teams,
     TeamsTeamsRoleInvitations,
@@ -57,8 +57,6 @@ pub enum Table {
 impl AsRef<str> for Table {
     fn as_ref(&self) -> &str {
         match self {
-            Table::BioOttRanks => "bio_ott_ranks",
-            Table::BioOttTaxonItems => "bio_ott_taxon_items",
             Table::Colors => "colors",
             Table::Countries => "countries",
             Table::DerivedSamples => "derived_samples",
@@ -71,7 +69,7 @@ impl AsRef<str> for Table {
             Table::Notifications => "notifications",
             Table::ObservationSubjects => "observation_subjects",
             Table::Observations => "observations",
-            Table::OrganismBioOttTaxonItems => "organism_bio_ott_taxon_items",
+            Table::OrganismTaxa => "organism_taxa",
             Table::Organisms => "organisms",
             Table::Organizations => "organizations",
             Table::PermanenceCategories => "permanence_categories",
@@ -83,14 +81,16 @@ impl AsRef<str> for Table {
             Table::ProjectsUsersRoleInvitations => "projects_users_role_invitations",
             Table::ProjectsUsersRoleRequests => "projects_users_role_requests",
             Table::ProjectsUsersRoles => "projects_users_roles",
+            Table::Ranks => "ranks",
             Table::Roles => "roles",
-            Table::SampleBioOttTaxonItems => "sample_bio_ott_taxon_items",
             Table::SampleContainerCategories => "sample_container_categories",
             Table::SampleContainers => "sample_containers",
             Table::SampleStates => "sample_states",
+            Table::SampleTaxa => "sample_taxa",
             Table::Samples => "samples",
             Table::Spectra => "spectra",
             Table::SpectraCollections => "spectra_collections",
+            Table::Taxa => "taxa",
             Table::TeamStates => "team_states",
             Table::Teams => "teams",
             Table::TeamsTeamsRoleInvitations => "teams_teams_role_invitations",
@@ -120,8 +120,6 @@ impl std::convert::TryFrom<&str> for Table {
     type Error = String;
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
-            "bio_ott_ranks" => Ok(Table::BioOttRanks),
-            "bio_ott_taxon_items" => Ok(Table::BioOttTaxonItems),
             "colors" => Ok(Table::Colors),
             "countries" => Ok(Table::Countries),
             "derived_samples" => Ok(Table::DerivedSamples),
@@ -134,7 +132,7 @@ impl std::convert::TryFrom<&str> for Table {
             "notifications" => Ok(Table::Notifications),
             "observation_subjects" => Ok(Table::ObservationSubjects),
             "observations" => Ok(Table::Observations),
-            "organism_bio_ott_taxon_items" => Ok(Table::OrganismBioOttTaxonItems),
+            "organism_taxa" => Ok(Table::OrganismTaxa),
             "organisms" => Ok(Table::Organisms),
             "organizations" => Ok(Table::Organizations),
             "permanence_categories" => Ok(Table::PermanenceCategories),
@@ -146,14 +144,16 @@ impl std::convert::TryFrom<&str> for Table {
             "projects_users_role_invitations" => Ok(Table::ProjectsUsersRoleInvitations),
             "projects_users_role_requests" => Ok(Table::ProjectsUsersRoleRequests),
             "projects_users_roles" => Ok(Table::ProjectsUsersRoles),
+            "ranks" => Ok(Table::Ranks),
             "roles" => Ok(Table::Roles),
-            "sample_bio_ott_taxon_items" => Ok(Table::SampleBioOttTaxonItems),
             "sample_container_categories" => Ok(Table::SampleContainerCategories),
             "sample_containers" => Ok(Table::SampleContainers),
             "sample_states" => Ok(Table::SampleStates),
+            "sample_taxa" => Ok(Table::SampleTaxa),
             "samples" => Ok(Table::Samples),
             "spectra" => Ok(Table::Spectra),
             "spectra_collections" => Ok(Table::SpectraCollections),
+            "taxa" => Ok(Table::Taxa),
             "team_states" => Ok(Table::TeamStates),
             "teams" => Ok(Table::Teams),
             "teams_teams_role_invitations" => Ok(Table::TeamsTeamsRoleInvitations),
@@ -178,7 +178,7 @@ impl std::convert::TryFrom<String> for Table {
 }
 #[cfg(feature = "frontend")]
 impl crate::database::Table {
-    /// Get the BioOttRank from the database by its ID.
+    /// Get the Color from the database by its ID.
     ///
     /// * `primary_key` - The primary key(s) of the struct to check.
     /// * `connection` - The connection to the database.
@@ -188,26 +188,6 @@ impl crate::database::Table {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Vec<u8>>, crate::api::ApiError> {
         Ok(match self {
-            crate::database::Table::BioOttRanks => {
-                let result = crate::database::nested_variants::NestedBioOttRank::get(
-                    primary_key.into(),
-                    connection,
-                )
-                .await?;
-                result
-                    .map(|result| bincode::serialize(&result))
-                    .transpose()?
-            }
-            crate::database::Table::BioOttTaxonItems => {
-                let result = crate::database::nested_variants::NestedBioOttTaxonItem::get(
-                    primary_key.into(),
-                    connection,
-                )
-                .await?;
-                result
-                    .map(|result| bincode::serialize(&result))
-                    .transpose()?
-            }
             crate::database::Table::Colors => {
                 let result =
                     crate::database::flat_variants::Color::get(primary_key.into(), connection)
@@ -324,8 +304,8 @@ impl crate::database::Table {
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
-            crate::database::Table::OrganismBioOttTaxonItems => {
-                let result = crate::database::nested_variants::NestedOrganismBioOttTaxonItem::get(
+            crate::database::Table::OrganismTaxa => {
+                let result = crate::database::nested_variants::NestedOrganismTaxon::get(
                     primary_key.into(),
                     connection,
                 )
@@ -446,8 +426,8 @@ impl crate::database::Table {
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
-            crate::database::Table::Roles => {
-                let result = crate::database::nested_variants::NestedRole::get(
+            crate::database::Table::Ranks => {
+                let result = crate::database::nested_variants::NestedRank::get(
                     primary_key.into(),
                     connection,
                 )
@@ -456,8 +436,8 @@ impl crate::database::Table {
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
-            crate::database::Table::SampleBioOttTaxonItems => {
-                let result = crate::database::nested_variants::NestedSampleBioOttTaxonItem::get(
+            crate::database::Table::Roles => {
+                let result = crate::database::nested_variants::NestedRole::get(
                     primary_key.into(),
                     connection,
                 )
@@ -496,6 +476,16 @@ impl crate::database::Table {
                     .map(|result| bincode::serialize(&result))
                     .transpose()?
             }
+            crate::database::Table::SampleTaxa => {
+                let result = crate::database::nested_variants::NestedSampleTaxon::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
+                result
+                    .map(|result| bincode::serialize(&result))
+                    .transpose()?
+            }
             crate::database::Table::Samples => {
                 let result = crate::database::nested_variants::NestedSample::get(
                     primary_key.into(),
@@ -507,7 +497,7 @@ impl crate::database::Table {
                     .transpose()?
             }
             crate::database::Table::Spectra => {
-                let result = crate::database::nested_variants::NestedSpectra::get(
+                let result = crate::database::nested_variants::NestedSpectrum::get(
                     primary_key.into(),
                     connection,
                 )
@@ -518,6 +508,16 @@ impl crate::database::Table {
             }
             crate::database::Table::SpectraCollections => {
                 let result = crate::database::nested_variants::NestedSpectraCollection::get(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?;
+                result
+                    .map(|result| bincode::serialize(&result))
+                    .transpose()?
+            }
+            crate::database::Table::Taxa => {
+                let result = crate::database::nested_variants::NestedTaxon::get(
                     primary_key.into(),
                     connection,
                 )
@@ -649,7 +649,7 @@ impl crate::database::Table {
         })
     }
 
-    /// Delete the BioOttRank from the database.
+    /// Delete the Color from the database.
     ///
     /// * `row` - Row to be processed
     /// * `connection` - The connection to the database.
@@ -659,24 +659,6 @@ impl crate::database::Table {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         Ok(match self {
-            crate::database::Table::BioOttRanks => {
-                crate::database::nested_variants::NestedBioOttRank::delete(
-                    bincode::deserialize::<crate::database::nested_variants::NestedBioOttRank>(
-                        &row,
-                    )?,
-                    connection,
-                )
-                .await?
-            }
-            crate::database::Table::BioOttTaxonItems => {
-                crate::database::nested_variants::NestedBioOttTaxonItem::delete(
-                    bincode::deserialize::<crate::database::nested_variants::NestedBioOttTaxonItem>(
-                        &row,
-                    )?,
-                    connection,
-                )
-                .await?
-            }
             crate::database::Table::Colors => {
                 crate::database::flat_variants::Color::delete(
                     bincode::deserialize::<crate::database::flat_variants::Color>(&row)?,
@@ -777,11 +759,11 @@ impl crate::database::Table {
                 )
                 .await?
             }
-            crate::database::Table::OrganismBioOttTaxonItems => {
-                crate::database::nested_variants::NestedOrganismBioOttTaxonItem::delete(
-                    bincode::deserialize::<
-                        crate::database::nested_variants::NestedOrganismBioOttTaxonItem,
-                    >(&row)?,
+            crate::database::Table::OrganismTaxa => {
+                crate::database::nested_variants::NestedOrganismTaxon::delete(
+                    bincode::deserialize::<crate::database::nested_variants::NestedOrganismTaxon>(
+                        &row,
+                    )?,
                     connection,
                 )
                 .await?
@@ -881,18 +863,16 @@ impl crate::database::Table {
                 )
                 .await?
             }
-            crate::database::Table::Roles => {
-                crate::database::nested_variants::NestedRole::delete(
-                    bincode::deserialize::<crate::database::nested_variants::NestedRole>(&row)?,
+            crate::database::Table::Ranks => {
+                crate::database::nested_variants::NestedRank::delete(
+                    bincode::deserialize::<crate::database::nested_variants::NestedRank>(&row)?,
                     connection,
                 )
                 .await?
             }
-            crate::database::Table::SampleBioOttTaxonItems => {
-                crate::database::nested_variants::NestedSampleBioOttTaxonItem::delete(
-                    bincode::deserialize::<
-                        crate::database::nested_variants::NestedSampleBioOttTaxonItem,
-                    >(&row)?,
+            crate::database::Table::Roles => {
+                crate::database::nested_variants::NestedRole::delete(
+                    bincode::deserialize::<crate::database::nested_variants::NestedRole>(&row)?,
                     connection,
                 )
                 .await?
@@ -924,6 +904,15 @@ impl crate::database::Table {
                 )
                 .await?
             }
+            crate::database::Table::SampleTaxa => {
+                crate::database::nested_variants::NestedSampleTaxon::delete(
+                    bincode::deserialize::<crate::database::nested_variants::NestedSampleTaxon>(
+                        &row,
+                    )?,
+                    connection,
+                )
+                .await?
+            }
             crate::database::Table::Samples => {
                 crate::database::nested_variants::NestedSample::delete(
                     bincode::deserialize::<crate::database::nested_variants::NestedSample>(&row)?,
@@ -932,8 +921,8 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Spectra => {
-                crate::database::nested_variants::NestedSpectra::delete(
-                    bincode::deserialize::<crate::database::nested_variants::NestedSpectra>(&row)?,
+                crate::database::nested_variants::NestedSpectrum::delete(
+                    bincode::deserialize::<crate::database::nested_variants::NestedSpectrum>(&row)?,
                     connection,
                 )
                 .await?
@@ -943,6 +932,13 @@ impl crate::database::Table {
                     bincode::deserialize::<
                         crate::database::nested_variants::NestedSpectraCollection,
                     >(&row)?,
+                    connection,
+                )
+                .await?
+            }
+            crate::database::Table::Taxa => {
+                crate::database::nested_variants::NestedTaxon::delete(
+                    bincode::deserialize::<crate::database::nested_variants::NestedTaxon>(&row)?,
                     connection,
                 )
                 .await?
@@ -1052,7 +1048,7 @@ impl crate::database::Table {
         })
     }
 
-    /// Delete the BioOttRank from the database by its ID.
+    /// Delete the Color from the database by its ID.
     ///
     /// * `primary_key` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
@@ -1064,20 +1060,6 @@ impl crate::database::Table {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         Ok(match self {
-            crate::database::Table::BioOttRanks => {
-                crate::database::nested_variants::NestedBioOttRank::delete_from_id(
-                    primary_key.into(),
-                    connection,
-                )
-                .await?
-            }
-            crate::database::Table::BioOttTaxonItems => {
-                crate::database::nested_variants::NestedBioOttTaxonItem::delete_from_id(
-                    primary_key.into(),
-                    connection,
-                )
-                .await?
-            }
             crate::database::Table::Colors => {
                 crate::database::flat_variants::Color::delete_from_id(
                     primary_key.into(),
@@ -1162,8 +1144,8 @@ impl crate::database::Table {
                 )
                 .await?
             }
-            crate::database::Table::OrganismBioOttTaxonItems => {
-                crate::database::nested_variants::NestedOrganismBioOttTaxonItem::delete_from_id(
+            crate::database::Table::OrganismTaxa => {
+                crate::database::nested_variants::NestedOrganismTaxon::delete_from_id(
                     primary_key.into(),
                     connection,
                 )
@@ -1246,15 +1228,15 @@ impl crate::database::Table {
                 )
                 .await?
             }
-            crate::database::Table::Roles => {
-                crate::database::nested_variants::NestedRole::delete_from_id(
+            crate::database::Table::Ranks => {
+                crate::database::nested_variants::NestedRank::delete_from_id(
                     primary_key.into(),
                     connection,
                 )
                 .await?
             }
-            crate::database::Table::SampleBioOttTaxonItems => {
-                crate::database::nested_variants::NestedSampleBioOttTaxonItem::delete_from_id(
+            crate::database::Table::Roles => {
+                crate::database::nested_variants::NestedRole::delete_from_id(
                     primary_key.into(),
                     connection,
                 )
@@ -1281,6 +1263,13 @@ impl crate::database::Table {
                 )
                 .await?
             }
+            crate::database::Table::SampleTaxa => {
+                crate::database::nested_variants::NestedSampleTaxon::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
+            }
             crate::database::Table::Samples => {
                 crate::database::nested_variants::NestedSample::delete_from_id(
                     primary_key.into(),
@@ -1289,7 +1278,7 @@ impl crate::database::Table {
                 .await?
             }
             crate::database::Table::Spectra => {
-                crate::database::nested_variants::NestedSpectra::delete_from_id(
+                crate::database::nested_variants::NestedSpectrum::delete_from_id(
                     primary_key.into(),
                     connection,
                 )
@@ -1297,6 +1286,13 @@ impl crate::database::Table {
             }
             crate::database::Table::SpectraCollections => {
                 crate::database::nested_variants::NestedSpectraCollection::delete_from_id(
+                    primary_key.into(),
+                    connection,
+                )
+                .await?
+            }
+            crate::database::Table::Taxa => {
+                crate::database::nested_variants::NestedTaxon::delete_from_id(
                     primary_key.into(),
                     connection,
                 )
@@ -1389,7 +1385,7 @@ impl crate::database::Table {
         })
     }
 
-    /// Get all BioOttRank from the database.
+    /// Get all DerivedSample from the database.
     ///
     /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
@@ -1403,41 +1399,6 @@ impl crate::database::Table {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<u8>, crate::api::ApiError> {
         Ok(match self {
-            crate::database::Table::BioOttRanks => {
-                let result =
-                    crate::database::nested_variants::NestedBioOttRank::all(
-                        filter
-                            .map(|filter| {
-                                bincode::deserialize::<
-                                    crate::database::filter_variants::BioOttRankFilter,
-                                >(&filter)
-                            })
-                            .transpose()?
-                            .as_ref(),
-                        limit,
-                        offset,
-                        connection,
-                    )
-                    .await?;
-                bincode::serialize(&result)?
-            }
-            crate::database::Table::BioOttTaxonItems => {
-                let result = crate::database::nested_variants::NestedBioOttTaxonItem::all(
-                    filter
-                        .map(|filter| {
-                            bincode::deserialize::<
-                                crate::database::filter_variants::BioOttTaxonItemFilter,
-                            >(&filter)
-                        })
-                        .transpose()?
-                        .as_ref(),
-                    limit,
-                    offset,
-                    connection,
-                )
-                .await?;
-                bincode::serialize(&result)?
-            }
             crate::database::Table::Colors => {
                 let result =
                     crate::database::flat_variants::Color::all(limit, offset, connection).await?;
@@ -1609,12 +1570,12 @@ impl crate::database::Table {
                 .await?;
                 bincode::serialize(&result)?
             }
-            crate::database::Table::OrganismBioOttTaxonItems => {
-                let result = crate::database::nested_variants::NestedOrganismBioOttTaxonItem::all(
+            crate::database::Table::OrganismTaxa => {
+                let result = crate::database::nested_variants::NestedOrganismTaxon::all(
                     filter
                         .map(|filter| {
                             bincode::deserialize::<
-                                crate::database::filter_variants::OrganismBioOttTaxonItemFilter,
+                                crate::database::filter_variants::OrganismTaxonFilter,
                             >(&filter)
                         })
                         .transpose()?
@@ -1796,11 +1757,11 @@ connection).await?;
                 .await?;
                 bincode::serialize(&result)?
             }
-            crate::database::Table::Roles => {
-                let result = crate::database::nested_variants::NestedRole::all(
+            crate::database::Table::Ranks => {
+                let result = crate::database::nested_variants::NestedRank::all(
                     filter
                         .map(|filter| {
-                            bincode::deserialize::<crate::database::filter_variants::RoleFilter>(
+                            bincode::deserialize::<crate::database::filter_variants::RankFilter>(
                                 &filter,
                             )
                         })
@@ -1813,13 +1774,13 @@ connection).await?;
                 .await?;
                 bincode::serialize(&result)?
             }
-            crate::database::Table::SampleBioOttTaxonItems => {
-                let result = crate::database::nested_variants::NestedSampleBioOttTaxonItem::all(
+            crate::database::Table::Roles => {
+                let result = crate::database::nested_variants::NestedRole::all(
                     filter
                         .map(|filter| {
-                            bincode::deserialize::<
-                                crate::database::filter_variants::SampleBioOttTaxonItemFilter,
-                            >(&filter)
+                            bincode::deserialize::<crate::database::filter_variants::RoleFilter>(
+                                &filter,
+                            )
                         })
                         .transpose()?
                         .as_ref(),
@@ -1881,6 +1842,23 @@ connection).await?;
                 .await?;
                 bincode::serialize(&result)?
             }
+            crate::database::Table::SampleTaxa => {
+                let result = crate::database::nested_variants::NestedSampleTaxon::all(
+                    filter
+                        .map(|filter| {
+                            bincode::deserialize::<
+                                crate::database::filter_variants::SampleTaxonFilter,
+                            >(&filter)
+                        })
+                        .transpose()?
+                        .as_ref(),
+                    limit,
+                    offset,
+                    connection,
+                )
+                .await?;
+                bincode::serialize(&result)?
+            }
             crate::database::Table::Samples => {
                 let result = crate::database::nested_variants::NestedSample::all(
                     filter
@@ -1899,12 +1877,30 @@ connection).await?;
                 bincode::serialize(&result)?
             }
             crate::database::Table::Spectra => {
-                let result = crate::database::nested_variants::NestedSpectra::all(
+                let result =
+                    crate::database::nested_variants::NestedSpectrum::all(
+                        filter
+                            .map(|filter| {
+                                bincode::deserialize::<
+                                    crate::database::filter_variants::SpectrumFilter,
+                                >(&filter)
+                            })
+                            .transpose()?
+                            .as_ref(),
+                        limit,
+                        offset,
+                        connection,
+                    )
+                    .await?;
+                bincode::serialize(&result)?
+            }
+            crate::database::Table::SpectraCollections => {
+                let result = crate::database::nested_variants::NestedSpectraCollection::all(
                     filter
                         .map(|filter| {
-                            bincode::deserialize::<crate::database::filter_variants::SpectraFilter>(
-                                &filter,
-                            )
+                            bincode::deserialize::<
+                                crate::database::filter_variants::SpectraCollectionFilter,
+                            >(&filter)
                         })
                         .transpose()?
                         .as_ref(),
@@ -1915,13 +1911,13 @@ connection).await?;
                 .await?;
                 bincode::serialize(&result)?
             }
-            crate::database::Table::SpectraCollections => {
-                let result = crate::database::nested_variants::NestedSpectraCollection::all(
+            crate::database::Table::Taxa => {
+                let result = crate::database::nested_variants::NestedTaxon::all(
                     filter
                         .map(|filter| {
-                            bincode::deserialize::<
-                                crate::database::filter_variants::SpectraCollectionFilter,
-                            >(&filter)
+                            bincode::deserialize::<crate::database::filter_variants::TaxonFilter>(
+                                &filter,
+                            )
                         })
                         .transpose()?
                         .as_ref(),
@@ -2160,8 +2156,6 @@ connection).await?;
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         Ok(match self {
-            Table::BioOttRanks => unimplemented!("Insert not implemented for bio_ott_ranks."),
-            Table::BioOttTaxonItems => unimplemented!("Insert not implemented for bio_ott_taxon_items."),
             Table::Colors => unimplemented!("Insert not implemented for colors."),
             Table::Countries => unimplemented!("Insert not implemented for countries."),
             Table::DerivedSamples => unimplemented!("Insert not implemented for derived_samples in frontend as it does not have a UUID primary key."),
@@ -2179,7 +2173,7 @@ connection).await?;
                 let nested_row = crate::database::nested_variants::NestedObservation::from_flat(inserted_row, connection).await?;
                  bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             },
-            Table::OrganismBioOttTaxonItems => unimplemented!("Insert not implemented for organism_bio_ott_taxon_items in frontend as it does not have a UUID primary key."),
+            Table::OrganismTaxa => unimplemented!("Insert not implemented for organism_taxa in frontend as it does not have a UUID primary key."),
             Table::Organisms => {
                 let new_row: crate::database::new_variants::NewOrganism = bincode::deserialize::<crate::database::new_variants::NewOrganism>(&new_row).map_err(crate::api::ApiError::from)?;
                 let inserted_row: crate::database::flat_variants::Organism = new_row.insert(user_id, connection).await?;
@@ -2196,11 +2190,12 @@ connection).await?;
             Table::ProjectsUsersRoleInvitations => unimplemented!("Insert not implemented for projects_users_role_invitations in frontend as it does not have a UUID primary key."),
             Table::ProjectsUsersRoleRequests => unimplemented!("Insert not implemented for projects_users_role_requests in frontend as it does not have a UUID primary key."),
             Table::ProjectsUsersRoles => unimplemented!("Insert not implemented for projects_users_roles in frontend as it does not have a UUID primary key."),
+            Table::Ranks => unimplemented!("Insert not implemented for ranks."),
             Table::Roles => unimplemented!("Insert not implemented for roles."),
-            Table::SampleBioOttTaxonItems => unimplemented!("Insert not implemented for sample_bio_ott_taxon_items in frontend as it does not have a UUID primary key."),
             Table::SampleContainerCategories => unimplemented!("Insert not implemented for sample_container_categories."),
             Table::SampleContainers => unimplemented!("Insert not implemented for sample_containers in frontend as it does not have a UUID primary key."),
             Table::SampleStates => unimplemented!("Insert not implemented for sample_states."),
+            Table::SampleTaxa => unimplemented!("Insert not implemented for sample_taxa in frontend as it does not have a UUID primary key."),
             Table::Samples => {
                 let new_row: crate::database::new_variants::NewSample = bincode::deserialize::<crate::database::new_variants::NewSample>(&new_row).map_err(crate::api::ApiError::from)?;
                 let inserted_row: crate::database::flat_variants::Sample = new_row.insert(user_id, connection).await?;
@@ -2209,6 +2204,7 @@ connection).await?;
             },
             Table::Spectra => unimplemented!("Insert not implemented for spectra."),
             Table::SpectraCollections => unimplemented!("Insert not implemented for spectra_collections in frontend as it does not have a UUID primary key."),
+            Table::Taxa => unimplemented!("Insert not implemented for taxa."),
             Table::TeamStates => unimplemented!("Insert not implemented for team_states."),
             Table::Teams => unimplemented!("Insert not implemented for teams in frontend as it does not have a UUID primary key."),
             Table::TeamsTeamsRoleInvitations => unimplemented!("Insert not implemented for teams_teams_role_invitations in frontend as it does not have a UUID primary key."),
@@ -2242,10 +2238,6 @@ connection).await?;
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         Ok(match self {
-            Table::BioOttRanks => unimplemented!("Update not implemented for bio_ott_ranks."),
-            Table::BioOttTaxonItems => {
-                unimplemented!("Update not implemented for bio_ott_taxon_items.")
-            }
             Table::Colors => unimplemented!("Update not implemented for colors."),
             Table::Countries => unimplemented!("Update not implemented for countries."),
             Table::DerivedSamples => unimplemented!("Update not implemented for derived_samples."),
@@ -2302,9 +2294,7 @@ connection).await?;
                 .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
-            Table::OrganismBioOttTaxonItems => {
-                unimplemented!("Update not implemented for organism_bio_ott_taxon_items.")
-            }
+            Table::OrganismTaxa => unimplemented!("Update not implemented for organism_taxa."),
             Table::Organisms => {
                 let update_row: crate::database::new_variants::NewOrganism =
                     bincode::deserialize::<crate::database::new_variants::NewOrganism>(&update_row)
@@ -2364,10 +2354,8 @@ connection).await?;
             Table::ProjectsUsersRoles => {
                 unimplemented!("Update not implemented for projects_users_roles.")
             }
+            Table::Ranks => unimplemented!("Update not implemented for ranks."),
             Table::Roles => unimplemented!("Update not implemented for roles."),
-            Table::SampleBioOttTaxonItems => {
-                unimplemented!("Update not implemented for sample_bio_ott_taxon_items.")
-            }
             Table::SampleContainerCategories => {
                 unimplemented!("Update not implemented for sample_container_categories.")
             }
@@ -2388,6 +2376,7 @@ connection).await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
             Table::SampleStates => unimplemented!("Update not implemented for sample_states."),
+            Table::SampleTaxa => unimplemented!("Update not implemented for sample_taxa."),
             Table::Samples => {
                 let update_row: crate::database::new_variants::NewSample =
                     bincode::deserialize::<crate::database::new_variants::NewSample>(&update_row)
@@ -2422,6 +2411,7 @@ connection).await?;
                     .await?;
                 bincode::serialize(&nested_row).map_err(crate::api::ApiError::from)?
             }
+            Table::Taxa => unimplemented!("Update not implemented for taxa."),
             Table::TeamStates => unimplemented!("Update not implemented for team_states."),
             Table::Teams => {
                 let update_row: crate::database::update_variants::UpdateTeam =
@@ -2503,26 +2493,6 @@ connection).await?;
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         match self {
-            Table::BioOttRanks => {
-                for row in rows {
-                    let row: crate::database::nested_variants::NestedBioOttRank =
-                        bincode::deserialize::<crate::database::nested_variants::NestedBioOttRank>(
-                            &row,
-                        )
-                        .map_err(crate::api::ApiError::from)?;
-                    row.update_or_insert(connection).await?;
-                }
-            }
-            Table::BioOttTaxonItems => {
-                for row in rows {
-                    let row: crate::database::nested_variants::NestedBioOttTaxonItem =
-                        bincode::deserialize::<
-                            crate::database::nested_variants::NestedBioOttTaxonItem,
-                        >(&row)
-                        .map_err(crate::api::ApiError::from)?;
-                    row.update_or_insert(connection).await?;
-                }
-            }
             Table::Colors => {
                 for row in rows {
                     let row: crate::database::flat_variants::Color =
@@ -2623,13 +2593,9 @@ connection).await?;
                     row.update_or_insert(connection).await?;
                 }
             }
-            Table::OrganismBioOttTaxonItems => {
+            Table::OrganismTaxa => {
                 for row in rows {
-                    let row: crate::database::nested_variants::NestedOrganismBioOttTaxonItem =
-                        bincode::deserialize::<
-                            crate::database::nested_variants::NestedOrganismBioOttTaxonItem,
-                        >(&row)
-                        .map_err(crate::api::ApiError::from)?;
+                    let row: crate::database::nested_variants::NestedOrganismTaxon = bincode::deserialize::<crate::database::nested_variants::NestedOrganismTaxon>(&row).map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
@@ -2735,21 +2701,19 @@ connection).await?;
                     row.update_or_insert(connection).await?;
                 }
             }
+            Table::Ranks => {
+                for row in rows {
+                    let row: crate::database::nested_variants::NestedRank =
+                        bincode::deserialize::<crate::database::nested_variants::NestedRank>(&row)
+                            .map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            }
             Table::Roles => {
                 for row in rows {
                     let row: crate::database::nested_variants::NestedRole =
                         bincode::deserialize::<crate::database::nested_variants::NestedRole>(&row)
                             .map_err(crate::api::ApiError::from)?;
-                    row.update_or_insert(connection).await?;
-                }
-            }
-            Table::SampleBioOttTaxonItems => {
-                for row in rows {
-                    let row: crate::database::nested_variants::NestedSampleBioOttTaxonItem =
-                        bincode::deserialize::<
-                            crate::database::nested_variants::NestedSampleBioOttTaxonItem,
-                        >(&row)
-                        .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }
@@ -2779,6 +2743,12 @@ connection).await?;
                     row.update_or_insert(connection).await?;
                 }
             }
+            Table::SampleTaxa => {
+                for row in rows {
+                    let row: crate::database::nested_variants::NestedSampleTaxon = bincode::deserialize::<crate::database::nested_variants::NestedSampleTaxon>(&row).map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            }
             Table::Samples => {
                 for row in rows {
                     let row: crate::database::nested_variants::NestedSample =
@@ -2791,8 +2761,8 @@ connection).await?;
             }
             Table::Spectra => {
                 for row in rows {
-                    let row: crate::database::nested_variants::NestedSpectra =
-                        bincode::deserialize::<crate::database::nested_variants::NestedSpectra>(
+                    let row: crate::database::nested_variants::NestedSpectrum =
+                        bincode::deserialize::<crate::database::nested_variants::NestedSpectrum>(
                             &row,
                         )
                         .map_err(crate::api::ApiError::from)?;
@@ -2806,6 +2776,14 @@ connection).await?;
                             crate::database::nested_variants::NestedSpectraCollection,
                         >(&row)
                         .map_err(crate::api::ApiError::from)?;
+                    row.update_or_insert(connection).await?;
+                }
+            }
+            Table::Taxa => {
+                for row in rows {
+                    let row: crate::database::nested_variants::NestedTaxon =
+                        bincode::deserialize::<crate::database::nested_variants::NestedTaxon>(&row)
+                            .map_err(crate::api::ApiError::from)?;
                     row.update_or_insert(connection).await?;
                 }
             }

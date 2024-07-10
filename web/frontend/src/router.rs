@@ -8,6 +8,29 @@ use web_common::database::*;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
+/// The trait defining whether a struct has a role request struct associated with it.
+pub(crate) trait RoleRequestable {
+    /// The role request struct associated with the struct.
+    type RoleRequest: serde::Serialize + Tabular;
+    /// Returns the role request struct associated with the struct.
+    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest;
+    /// Returns the role request operation associated with the struct.
+    fn role_request_operation(&self, user_id: i32, role: i32) -> Operation {
+        Operation::Insert(
+            Self::RoleRequest::TABLE.to_string(),
+            bincode::serialize(&self.role_request(user_id, role)).unwrap(),
+        )
+    }
+    /// Returns the route associated with the struct role request page.
+    fn edit_role_request(&self, user_id: i32) -> Operation {
+        self.role_request_operation(user_id, 2)
+    }
+    /// Returns the route associated with the struct role request page.
+    fn admin_role_request(&self, user_id: i32) -> Operation {
+        self.role_request_operation(user_id, 1)
+    }
+}
+
 /// Trait defining a struct whose page is be visitable by the router.
 pub(crate) trait Viewable {
     /// Returns the route associated to the page with the overall struct list.
@@ -29,42 +52,6 @@ pub(crate) trait Insertable: Filtrable {
 pub(crate) trait Updatable {
     /// Returns the route associated with the struct update page.
     fn update_route(&self) -> AppRoute;
-}
-
-impl Viewable for BioOttRank {
-    fn list_route() -> AppRoute {
-        AppRoute::BioOttRanks {}
-    }
-    fn view_route(&self) -> AppRoute {
-        AppRoute::BioOttRanksView { id: self.id }
-    }
-}
-
-impl Viewable for NestedBioOttRank {
-    fn list_route() -> AppRoute {
-        AppRoute::BioOttRanks {}
-    }
-    fn view_route(&self) -> AppRoute {
-        AppRoute::BioOttRanksView { id: self.inner.id }
-    }
-}
-
-impl Viewable for BioOttTaxonItem {
-    fn list_route() -> AppRoute {
-        AppRoute::BioOttTaxonItems {}
-    }
-    fn view_route(&self) -> AppRoute {
-        AppRoute::BioOttTaxonItemsView { id: self.id }
-    }
-}
-
-impl Viewable for NestedBioOttTaxonItem {
-    fn list_route() -> AppRoute {
-        AppRoute::BioOttTaxonItems {}
-    }
-    fn view_route(&self) -> AppRoute {
-        AppRoute::BioOttTaxonItemsView { id: self.inner.id }
-    }
 }
 
 impl Viewable for Country {
@@ -146,6 +133,13 @@ impl Updatable for NestedDerivedSample {
     }
 }
 
+impl RoleRequestable for NestedNameplate {
+    type RoleRequest = <NestedProject as RoleRequestable>::RoleRequest;
+    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {
+        <NestedProject as RoleRequestable>::role_request(self.project.as_ref(), user_id, role)
+    }
+}
+
 impl Viewable for Nameplate {
     fn list_route() -> AppRoute {
         AppRoute::Nameplates {}
@@ -213,6 +207,13 @@ impl Viewable for NestedObservationSubject {
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::ObservationSubjectsView { id: self.inner.id }
+    }
+}
+
+impl RoleRequestable for NestedObservation {
+    type RoleRequest = <NestedProject as RoleRequestable>::RoleRequest;
+    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {
+        <NestedProject as RoleRequestable>::role_request(self.project.as_ref(), user_id, role)
     }
 }
 
@@ -290,49 +291,60 @@ impl Updatable for NestedObservation {
     }
 }
 
-impl Viewable for OrganismBioOttTaxonItem {
+impl Viewable for OrganismTaxon {
     fn list_route() -> AppRoute {
-        AppRoute::OrganismBioOttTaxonItems {}
+        AppRoute::OrganismTaxa {}
     }
     fn view_route(&self) -> AppRoute {
-        AppRoute::OrganismBioOttTaxonItemsView {
+        AppRoute::OrganismTaxaView {
             organism_id: self.organism_id,
             taxon_id: self.taxon_id,
         }
     }
 }
 
-impl Insertable for OrganismBioOttTaxonItem {
+impl Insertable for OrganismTaxon {
     fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
         if let Some(filter) = filter {
             if let Some(organism_id) = filter.organism_id {
-                return AppRoute::OrganismBioOttTaxonItemsNewWithOrganism { organism_id };
+                return AppRoute::OrganismTaxaNewWithOrganism { organism_id };
             }
         }
-        AppRoute::OrganismBioOttTaxonItemsNew
+        AppRoute::OrganismTaxaNew
     }
 }
 
-impl Viewable for NestedOrganismBioOttTaxonItem {
+impl Viewable for NestedOrganismTaxon {
     fn list_route() -> AppRoute {
-        AppRoute::OrganismBioOttTaxonItems {}
+        AppRoute::OrganismTaxa {}
     }
     fn view_route(&self) -> AppRoute {
-        AppRoute::OrganismBioOttTaxonItemsView {
+        AppRoute::OrganismTaxaView {
             organism_id: self.inner.organism_id,
             taxon_id: self.inner.taxon_id,
         }
     }
 }
 
-impl Insertable for NestedOrganismBioOttTaxonItem {
+impl Insertable for NestedOrganismTaxon {
     fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
         if let Some(filter) = filter {
             if let Some(organism_id) = filter.organism_id {
-                return AppRoute::OrganismBioOttTaxonItemsNewWithOrganism { organism_id };
+                return AppRoute::OrganismTaxaNewWithOrganism { organism_id };
             }
         }
-        AppRoute::OrganismBioOttTaxonItemsNew
+        AppRoute::OrganismTaxaNew
+    }
+}
+
+impl RoleRequestable for NestedOrganism {
+    type RoleRequest = <NestedProject as RoleRequestable>::RoleRequest;
+    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {
+        <NestedProject as RoleRequestable>::role_request(
+            self.nameplate.project.as_ref(),
+            user_id,
+            role,
+        )
     }
 }
 
@@ -421,6 +433,24 @@ impl Viewable for NestedOrganization {
     }
     fn view_route(&self) -> AppRoute {
         AppRoute::OrganizationsView { id: self.inner.id }
+    }
+}
+
+impl RoleRequestable for Project {
+    type RoleRequest = NewProjectsUsersRoleRequest;
+    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {
+        NewProjectsUsersRoleRequest {
+            table_id: self.id,
+            user_id,
+            role_id: role,
+        }
+    }
+}
+
+impl RoleRequestable for NestedProject {
+    type RoleRequest = <Project as RoleRequestable>::RoleRequest;
+    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {
+        <Project as RoleRequestable>::role_request(self.inner.as_ref(), user_id, role)
     }
 }
 
@@ -540,20 +570,6 @@ impl Viewable for ProjectsTeamsRoleRequest {
     }
 }
 
-impl Insertable for ProjectsTeamsRoleRequest {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(table_id) = filter.table_id {
-                return AppRoute::ProjectsTeamsRoleRequestsNewWithTable { table_id };
-            }
-            if let Some(team_id) = filter.team_id {
-                return AppRoute::ProjectsTeamsRoleRequestsNewWithTeam { team_id };
-            }
-        }
-        AppRoute::ProjectsTeamsRoleRequestsNew
-    }
-}
-
 impl Viewable for NestedProjectsTeamsRoleRequest {
     fn list_route() -> AppRoute {
         AppRoute::ProjectsTeamsRoleRequests {}
@@ -563,20 +579,6 @@ impl Viewable for NestedProjectsTeamsRoleRequest {
             table_id: self.inner.table_id,
             team_id: self.inner.team_id,
         }
-    }
-}
-
-impl Insertable for NestedProjectsTeamsRoleRequest {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(table_id) = filter.table_id {
-                return AppRoute::ProjectsTeamsRoleRequestsNewWithTable { table_id };
-            }
-            if let Some(team_id) = filter.team_id {
-                return AppRoute::ProjectsTeamsRoleRequestsNewWithTeam { team_id };
-            }
-        }
-        AppRoute::ProjectsTeamsRoleRequestsNew
     }
 }
 
@@ -696,20 +698,6 @@ impl Viewable for ProjectsUsersRoleRequest {
     }
 }
 
-impl Insertable for ProjectsUsersRoleRequest {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(table_id) = filter.table_id {
-                return AppRoute::ProjectsUsersRoleRequestsNewWithTable { table_id };
-            }
-            if let Some(user_id) = filter.user_id {
-                return AppRoute::ProjectsUsersRoleRequestsNewWithUser { user_id };
-            }
-        }
-        AppRoute::ProjectsUsersRoleRequestsNew
-    }
-}
-
 impl Viewable for NestedProjectsUsersRoleRequest {
     fn list_route() -> AppRoute {
         AppRoute::ProjectsUsersRoleRequests {}
@@ -719,20 +707,6 @@ impl Viewable for NestedProjectsUsersRoleRequest {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
-    }
-}
-
-impl Insertable for NestedProjectsUsersRoleRequest {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(table_id) = filter.table_id {
-                return AppRoute::ProjectsUsersRoleRequestsNewWithTable { table_id };
-            }
-            if let Some(user_id) = filter.user_id {
-                return AppRoute::ProjectsUsersRoleRequestsNewWithUser { user_id };
-            }
-        }
-        AppRoute::ProjectsUsersRoleRequestsNew
     }
 }
 
@@ -788,49 +762,28 @@ impl Insertable for NestedProjectsUsersRole {
     }
 }
 
-impl Viewable for SampleBioOttTaxonItem {
+impl Viewable for Rank {
     fn list_route() -> AppRoute {
-        AppRoute::SampleBioOttTaxonItems {}
+        AppRoute::Ranks {}
     }
     fn view_route(&self) -> AppRoute {
-        AppRoute::SampleBioOttTaxonItemsView {
-            sample_id: self.sample_id,
-            taxon_id: self.taxon_id,
-        }
+        AppRoute::RanksView { id: self.id }
     }
 }
 
-impl Insertable for SampleBioOttTaxonItem {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(sample_id) = filter.sample_id {
-                return AppRoute::SampleBioOttTaxonItemsNewWithSample { sample_id };
-            }
-        }
-        AppRoute::SampleBioOttTaxonItemsNew
-    }
-}
-
-impl Viewable for NestedSampleBioOttTaxonItem {
+impl Viewable for NestedRank {
     fn list_route() -> AppRoute {
-        AppRoute::SampleBioOttTaxonItems {}
+        AppRoute::Ranks {}
     }
     fn view_route(&self) -> AppRoute {
-        AppRoute::SampleBioOttTaxonItemsView {
-            sample_id: self.inner.sample_id,
-            taxon_id: self.inner.taxon_id,
-        }
+        AppRoute::RanksView { id: self.inner.id }
     }
 }
 
-impl Insertable for NestedSampleBioOttTaxonItem {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(sample_id) = filter.sample_id {
-                return AppRoute::SampleBioOttTaxonItemsNewWithSample { sample_id };
-            }
-        }
-        AppRoute::SampleBioOttTaxonItemsNew
+impl RoleRequestable for NestedSampleContainer {
+    type RoleRequest = <NestedProject as RoleRequestable>::RoleRequest;
+    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {
+        <NestedProject as RoleRequestable>::role_request(self.project.as_ref(), user_id, role)
     }
 }
 
@@ -904,6 +857,63 @@ impl Viewable for NestedSampleState {
     }
 }
 
+impl Viewable for SampleTaxon {
+    fn list_route() -> AppRoute {
+        AppRoute::SampleTaxa {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SampleTaxaView {
+            sample_id: self.sample_id,
+            taxon_id: self.taxon_id,
+        }
+    }
+}
+
+impl Insertable for SampleTaxon {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::SampleTaxaNewWithSample { sample_id };
+            }
+        }
+        AppRoute::SampleTaxaNew
+    }
+}
+
+impl Viewable for NestedSampleTaxon {
+    fn list_route() -> AppRoute {
+        AppRoute::SampleTaxa {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::SampleTaxaView {
+            sample_id: self.inner.sample_id,
+            taxon_id: self.inner.taxon_id,
+        }
+    }
+}
+
+impl Insertable for NestedSampleTaxon {
+    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
+        if let Some(filter) = filter {
+            if let Some(sample_id) = filter.sample_id {
+                return AppRoute::SampleTaxaNewWithSample { sample_id };
+            }
+        }
+        AppRoute::SampleTaxaNew
+    }
+}
+
+impl RoleRequestable for NestedSample {
+    type RoleRequest = <NestedProject as RoleRequestable>::RoleRequest;
+    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {
+        <NestedProject as RoleRequestable>::role_request(
+            self.container.project.as_ref(),
+            user_id,
+            role,
+        )
+    }
+}
+
 impl Viewable for Sample {
     fn list_route() -> AppRoute {
         AppRoute::Samples {}
@@ -968,6 +978,17 @@ impl Updatable for NestedSample {
     }
 }
 
+impl RoleRequestable for NestedSpectraCollection {
+    type RoleRequest = <NestedProject as RoleRequestable>::RoleRequest;
+    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {
+        <NestedProject as RoleRequestable>::role_request(
+            self.sample.container.project.as_ref(),
+            user_id,
+            role,
+        )
+    }
+}
+
 impl Viewable for SpectraCollection {
     fn list_route() -> AppRoute {
         AppRoute::SpectraCollections {}
@@ -1017,6 +1038,24 @@ impl Insertable for NestedSpectraCollection {
 impl Updatable for NestedSpectraCollection {
     fn update_route(&self) -> AppRoute {
         AppRoute::SpectraCollectionsUpdate { id: self.inner.id }
+    }
+}
+
+impl Viewable for Taxon {
+    fn list_route() -> AppRoute {
+        AppRoute::Taxa {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TaxaView { id: self.id }
+    }
+}
+
+impl Viewable for NestedTaxon {
+    fn list_route() -> AppRoute {
+        AppRoute::Taxa {}
+    }
+    fn view_route(&self) -> AppRoute {
+        AppRoute::TaxaView { id: self.inner.id }
     }
 }
 
@@ -1188,20 +1227,6 @@ impl Viewable for TeamsUsersRoleRequest {
     }
 }
 
-impl Insertable for TeamsUsersRoleRequest {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(table_id) = filter.table_id {
-                return AppRoute::TeamsUsersRoleRequestsNewWithTable { table_id };
-            }
-            if let Some(user_id) = filter.user_id {
-                return AppRoute::TeamsUsersRoleRequestsNewWithUser { user_id };
-            }
-        }
-        AppRoute::TeamsUsersRoleRequestsNew
-    }
-}
-
 impl Viewable for NestedTeamsUsersRoleRequest {
     fn list_route() -> AppRoute {
         AppRoute::TeamsUsersRoleRequests {}
@@ -1211,20 +1236,6 @@ impl Viewable for NestedTeamsUsersRoleRequest {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
-    }
-}
-
-impl Insertable for NestedTeamsUsersRoleRequest {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(table_id) = filter.table_id {
-                return AppRoute::TeamsUsersRoleRequestsNewWithTable { table_id };
-            }
-            if let Some(user_id) = filter.user_id {
-                return AppRoute::TeamsUsersRoleRequestsNewWithUser { user_id };
-            }
-        }
-        AppRoute::TeamsUsersRoleRequestsNew
     }
 }
 
@@ -1374,20 +1385,6 @@ impl Viewable for UsersUsersRoleRequest {
     }
 }
 
-impl Insertable for UsersUsersRoleRequest {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(table_id) = filter.table_id {
-                return AppRoute::UsersUsersRoleRequestsNewWithTable { table_id };
-            }
-            if let Some(user_id) = filter.user_id {
-                return AppRoute::UsersUsersRoleRequestsNewWithUser { user_id };
-            }
-        }
-        AppRoute::UsersUsersRoleRequestsNew
-    }
-}
-
 impl Viewable for NestedUsersUsersRoleRequest {
     fn list_route() -> AppRoute {
         AppRoute::UsersUsersRoleRequests {}
@@ -1397,20 +1394,6 @@ impl Viewable for NestedUsersUsersRoleRequest {
             table_id: self.inner.table_id,
             user_id: self.inner.user_id,
         }
-    }
-}
-
-impl Insertable for NestedUsersUsersRoleRequest {
-    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {
-        if let Some(filter) = filter {
-            if let Some(table_id) = filter.table_id {
-                return AppRoute::UsersUsersRoleRequestsNewWithTable { table_id };
-            }
-            if let Some(user_id) = filter.user_id {
-                return AppRoute::UsersUsersRoleRequestsNewWithUser { user_id };
-            }
-        }
-        AppRoute::UsersUsersRoleRequestsNew
     }
 }
 
@@ -1468,14 +1451,6 @@ impl Insertable for NestedUsersUsersRole {
 
 #[derive(Debug, Clone, Copy, PartialEq, Routable)]
 pub enum AppRoute {
-    #[at("/bio_ott_ranks")]
-    BioOttRanks,
-    #[at("/bio_ott_ranks/:id")]
-    BioOttRanksView { id: i32 },
-    #[at("/bio_ott_taxon_items")]
-    BioOttTaxonItems,
-    #[at("/bio_ott_taxon_items/:id")]
-    BioOttTaxonItemsView { id: i32 },
     #[at("/countries")]
     Countries,
     #[at("/countries/:id")]
@@ -1528,17 +1503,17 @@ pub enum AppRoute {
     ObservationsNewWithSample { sample_id: uuid::Uuid },
     #[at("/observations/:id/update")]
     ObservationsUpdate { id: uuid::Uuid },
-    #[at("/organism_bio_ott_taxon_items")]
-    OrganismBioOttTaxonItems,
-    #[at("/organism_bio_ott_taxon_items/:organism_id/:taxon_id")]
-    OrganismBioOttTaxonItemsView {
+    #[at("/organism_taxa")]
+    OrganismTaxa,
+    #[at("/organism_taxa/:organism_id/:taxon_id")]
+    OrganismTaxaView {
         organism_id: uuid::Uuid,
         taxon_id: i32,
     },
-    #[at("/organism_bio_ott_taxon_items/new")]
-    OrganismBioOttTaxonItemsNew,
-    #[at("/organism_bio_ott_taxon_items/new/organism/:organism_id")]
-    OrganismBioOttTaxonItemsNewWithOrganism { organism_id: uuid::Uuid },
+    #[at("/organism_taxa/new")]
+    OrganismTaxaNew,
+    #[at("/organism_taxa/new/organism/:organism_id")]
+    OrganismTaxaNewWithOrganism { organism_id: uuid::Uuid },
     #[at("/organisms")]
     Organisms,
     #[at("/organisms/:id")]
@@ -1583,12 +1558,6 @@ pub enum AppRoute {
     ProjectsTeamsRoleRequests,
     #[at("/projects_teams_role_requests/:table_id/:team_id")]
     ProjectsTeamsRoleRequestsView { table_id: i32, team_id: i32 },
-    #[at("/projects_teams_role_requests/new")]
-    ProjectsTeamsRoleRequestsNew,
-    #[at("/projects_teams_role_requests/new/table/:table_id")]
-    ProjectsTeamsRoleRequestsNewWithTable { table_id: i32 },
-    #[at("/projects_teams_role_requests/new/team/:team_id")]
-    ProjectsTeamsRoleRequestsNewWithTeam { team_id: i32 },
     #[at("/projects_teams_roles")]
     ProjectsTeamsRoles,
     #[at("/projects_teams_roles/:table_id/:team_id")]
@@ -1613,12 +1582,6 @@ pub enum AppRoute {
     ProjectsUsersRoleRequests,
     #[at("/projects_users_role_requests/:table_id/:user_id")]
     ProjectsUsersRoleRequestsView { table_id: i32, user_id: i32 },
-    #[at("/projects_users_role_requests/new")]
-    ProjectsUsersRoleRequestsNew,
-    #[at("/projects_users_role_requests/new/table/:table_id")]
-    ProjectsUsersRoleRequestsNewWithTable { table_id: i32 },
-    #[at("/projects_users_role_requests/new/user/:user_id")]
-    ProjectsUsersRoleRequestsNewWithUser { user_id: i32 },
     #[at("/projects_users_roles")]
     ProjectsUsersRoles,
     #[at("/projects_users_roles/:table_id/:user_id")]
@@ -1629,17 +1592,10 @@ pub enum AppRoute {
     ProjectsUsersRolesNewWithTable { table_id: i32 },
     #[at("/projects_users_roles/new/user/:user_id")]
     ProjectsUsersRolesNewWithUser { user_id: i32 },
-    #[at("/sample_bio_ott_taxon_items")]
-    SampleBioOttTaxonItems,
-    #[at("/sample_bio_ott_taxon_items/:sample_id/:taxon_id")]
-    SampleBioOttTaxonItemsView {
-        sample_id: uuid::Uuid,
-        taxon_id: i32,
-    },
-    #[at("/sample_bio_ott_taxon_items/new")]
-    SampleBioOttTaxonItemsNew,
-    #[at("/sample_bio_ott_taxon_items/new/sample/:sample_id")]
-    SampleBioOttTaxonItemsNewWithSample { sample_id: uuid::Uuid },
+    #[at("/ranks")]
+    Ranks,
+    #[at("/ranks/:id")]
+    RanksView { id: i32 },
     #[at("/sample_containers")]
     SampleContainers,
     #[at("/sample_containers/:id")]
@@ -1654,6 +1610,17 @@ pub enum AppRoute {
     SampleStates,
     #[at("/sample_states/:id")]
     SampleStatesView { id: i32 },
+    #[at("/sample_taxa")]
+    SampleTaxa,
+    #[at("/sample_taxa/:sample_id/:taxon_id")]
+    SampleTaxaView {
+        sample_id: uuid::Uuid,
+        taxon_id: i32,
+    },
+    #[at("/sample_taxa/new")]
+    SampleTaxaNew,
+    #[at("/sample_taxa/new/sample/:sample_id")]
+    SampleTaxaNewWithSample { sample_id: uuid::Uuid },
     #[at("/samples")]
     Samples,
     #[at("/samples/:id")]
@@ -1678,6 +1645,10 @@ pub enum AppRoute {
     SpectraCollectionsNewWithSample { sample_id: uuid::Uuid },
     #[at("/spectra_collections/:id/update")]
     SpectraCollectionsUpdate { id: i32 },
+    #[at("/taxa")]
+    Taxa,
+    #[at("/taxa/:id")]
+    TaxaView { id: i32 },
     #[at("/teams")]
     Teams,
     #[at("/teams/:id")]
@@ -1712,12 +1683,6 @@ pub enum AppRoute {
     TeamsUsersRoleRequests,
     #[at("/teams_users_role_requests/:table_id/:user_id")]
     TeamsUsersRoleRequestsView { table_id: i32, user_id: i32 },
-    #[at("/teams_users_role_requests/new")]
-    TeamsUsersRoleRequestsNew,
-    #[at("/teams_users_role_requests/new/table/:table_id")]
-    TeamsUsersRoleRequestsNewWithTable { table_id: i32 },
-    #[at("/teams_users_role_requests/new/user/:user_id")]
-    TeamsUsersRoleRequestsNewWithUser { user_id: i32 },
     #[at("/teams_users_roles")]
     TeamsUsersRoles,
     #[at("/teams_users_roles/:table_id/:user_id")]
@@ -1748,12 +1713,6 @@ pub enum AppRoute {
     UsersUsersRoleRequests,
     #[at("/users_users_role_requests/:table_id/:user_id")]
     UsersUsersRoleRequestsView { table_id: i32, user_id: i32 },
-    #[at("/users_users_role_requests/new")]
-    UsersUsersRoleRequestsNew,
-    #[at("/users_users_role_requests/new/table/:table_id")]
-    UsersUsersRoleRequestsNewWithTable { table_id: i32 },
-    #[at("/users_users_role_requests/new/user/:user_id")]
-    UsersUsersRoleRequestsNewWithUser { user_id: i32 },
     #[at("/users_users_roles")]
     UsersUsersRoles,
     #[at("/users_users_roles/:table_id/:user_id")]
@@ -1779,18 +1738,6 @@ pub enum AppRoute {
 /// * `route` - The route to map.
 pub fn switch(route: AppRoute) -> Html {
     match route {
-        AppRoute::BioOttRanks => {
-            html! { <BasicList<NestedBioOttRank> /> }
-        }
-        AppRoute::BioOttRanksView { id } => {
-            html! { <BioOttRankPage id = {id} /> }
-        }
-        AppRoute::BioOttTaxonItems => {
-            html! { <BasicList<NestedBioOttTaxonItem> /> }
-        }
-        AppRoute::BioOttTaxonItemsView { id } => {
-            html! { <BioOttTaxonItemPage id = {id} /> }
-        }
         AppRoute::Countries => {
             html! { <BasicList<Country> /> }
         }
@@ -1868,20 +1815,20 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::ObservationsUpdate { id } => {
             html! { <UpdateObservationForm id={id} /> }
         }
-        AppRoute::OrganismBioOttTaxonItems => {
-            html! { <BasicList<NestedOrganismBioOttTaxonItem> /> }
+        AppRoute::OrganismTaxa => {
+            html! { <BasicList<NestedOrganismTaxon> /> }
         }
-        AppRoute::OrganismBioOttTaxonItemsView {
+        AppRoute::OrganismTaxaView {
             organism_id,
             taxon_id,
         } => {
-            html! { <OrganismBioOttTaxonItemPage organism_id = {organism_id} taxon_id = {taxon_id} /> }
+            html! { <OrganismTaxonPage organism_id = {organism_id} taxon_id = {taxon_id} /> }
         }
-        AppRoute::OrganismBioOttTaxonItemsNew => {
-            html! { <CreateOrganismBioOttTaxonItemForm /> }
+        AppRoute::OrganismTaxaNew => {
+            html! { <CreateOrganismTaxonForm /> }
         }
-        AppRoute::OrganismBioOttTaxonItemsNewWithOrganism { organism_id } => {
-            html! { <CreateOrganismBioOttTaxonItemForm organism_id={organism_id} /> }
+        AppRoute::OrganismTaxaNewWithOrganism { organism_id } => {
+            html! { <CreateOrganismTaxonForm organism_id={organism_id} /> }
         }
         AppRoute::Organisms => {
             html! { <BasicList<NestedOrganism> /> }
@@ -1949,15 +1896,6 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::ProjectsTeamsRoleRequestsView { table_id, team_id } => {
             html! { <ProjectsTeamsRoleRequestPage table_id = {table_id} team_id = {team_id} /> }
         }
-        AppRoute::ProjectsTeamsRoleRequestsNew => {
-            html! { <CreateProjectsTeamsRoleRequestForm /> }
-        }
-        AppRoute::ProjectsTeamsRoleRequestsNewWithTable { table_id } => {
-            html! { <CreateProjectsTeamsRoleRequestForm table_id={table_id} /> }
-        }
-        AppRoute::ProjectsTeamsRoleRequestsNewWithTeam { team_id } => {
-            html! { <CreateProjectsTeamsRoleRequestForm team_id={team_id} /> }
-        }
         AppRoute::ProjectsTeamsRoles => {
             html! { <BasicList<NestedProjectsTeamsRole> /> }
         }
@@ -1994,15 +1932,6 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::ProjectsUsersRoleRequestsView { table_id, user_id } => {
             html! { <ProjectsUsersRoleRequestPage table_id = {table_id} user_id = {user_id} /> }
         }
-        AppRoute::ProjectsUsersRoleRequestsNew => {
-            html! { <CreateProjectsUsersRoleRequestForm /> }
-        }
-        AppRoute::ProjectsUsersRoleRequestsNewWithTable { table_id } => {
-            html! { <CreateProjectsUsersRoleRequestForm table_id={table_id} /> }
-        }
-        AppRoute::ProjectsUsersRoleRequestsNewWithUser { user_id } => {
-            html! { <CreateProjectsUsersRoleRequestForm user_id={user_id} /> }
-        }
         AppRoute::ProjectsUsersRoles => {
             html! { <BasicList<NestedProjectsUsersRole> /> }
         }
@@ -2018,20 +1947,11 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::ProjectsUsersRolesNewWithUser { user_id } => {
             html! { <CreateProjectsUsersRoleForm user_id={user_id} /> }
         }
-        AppRoute::SampleBioOttTaxonItems => {
-            html! { <BasicList<NestedSampleBioOttTaxonItem> /> }
+        AppRoute::Ranks => {
+            html! { <BasicList<NestedRank> /> }
         }
-        AppRoute::SampleBioOttTaxonItemsView {
-            sample_id,
-            taxon_id,
-        } => {
-            html! { <SampleBioOttTaxonItemPage sample_id = {sample_id} taxon_id = {taxon_id} /> }
-        }
-        AppRoute::SampleBioOttTaxonItemsNew => {
-            html! { <CreateSampleBioOttTaxonItemForm /> }
-        }
-        AppRoute::SampleBioOttTaxonItemsNewWithSample { sample_id } => {
-            html! { <CreateSampleBioOttTaxonItemForm sample_id={sample_id} /> }
+        AppRoute::RanksView { id } => {
+            html! { <RankPage id = {id} /> }
         }
         AppRoute::SampleContainers => {
             html! { <BasicList<NestedSampleContainer> /> }
@@ -2053,6 +1973,21 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::SampleStatesView { id } => {
             html! { <SampleStatePage id = {id} /> }
+        }
+        AppRoute::SampleTaxa => {
+            html! { <BasicList<NestedSampleTaxon> /> }
+        }
+        AppRoute::SampleTaxaView {
+            sample_id,
+            taxon_id,
+        } => {
+            html! { <SampleTaxonPage sample_id = {sample_id} taxon_id = {taxon_id} /> }
+        }
+        AppRoute::SampleTaxaNew => {
+            html! { <CreateSampleTaxonForm /> }
+        }
+        AppRoute::SampleTaxaNewWithSample { sample_id } => {
+            html! { <CreateSampleTaxonForm sample_id={sample_id} /> }
         }
         AppRoute::Samples => {
             html! { <BasicList<NestedSample> /> }
@@ -2089,6 +2024,12 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::SpectraCollectionsUpdate { id } => {
             html! { <UpdateSpectraCollectionForm id={id} /> }
+        }
+        AppRoute::Taxa => {
+            html! { <BasicList<NestedTaxon> /> }
+        }
+        AppRoute::TaxaView { id } => {
+            html! { <TaxonPage id = {id} /> }
         }
         AppRoute::Teams => {
             html! { <BasicList<NestedTeam> /> }
@@ -2141,15 +2082,6 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::TeamsUsersRoleRequestsView { table_id, user_id } => {
             html! { <TeamsUsersRoleRequestPage table_id = {table_id} user_id = {user_id} /> }
         }
-        AppRoute::TeamsUsersRoleRequestsNew => {
-            html! { <CreateTeamsUsersRoleRequestForm /> }
-        }
-        AppRoute::TeamsUsersRoleRequestsNewWithTable { table_id } => {
-            html! { <CreateTeamsUsersRoleRequestForm table_id={table_id} /> }
-        }
-        AppRoute::TeamsUsersRoleRequestsNewWithUser { user_id } => {
-            html! { <CreateTeamsUsersRoleRequestForm user_id={user_id} /> }
-        }
         AppRoute::TeamsUsersRoles => {
             html! { <BasicList<NestedTeamsUsersRole> /> }
         }
@@ -2194,15 +2126,6 @@ pub fn switch(route: AppRoute) -> Html {
         }
         AppRoute::UsersUsersRoleRequestsView { table_id, user_id } => {
             html! { <UsersUsersRoleRequestPage table_id = {table_id} user_id = {user_id} /> }
-        }
-        AppRoute::UsersUsersRoleRequestsNew => {
-            html! { <CreateUsersUsersRoleRequestForm /> }
-        }
-        AppRoute::UsersUsersRoleRequestsNewWithTable { table_id } => {
-            html! { <CreateUsersUsersRoleRequestForm table_id={table_id} /> }
-        }
-        AppRoute::UsersUsersRoleRequestsNewWithUser { user_id } => {
-            html! { <CreateUsersUsersRoleRequestForm user_id={user_id} /> }
         }
         AppRoute::UsersUsersRoles => {
             html! { <BasicList<NestedUsersUsersRole> /> }

@@ -30,36 +30,6 @@ impl SearchableTable for Table {
         C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut,
     {
         Ok(match self {
-            Table::BioOttRanks => {
-                let filter = filter
-                    .map(|filter| bincode::deserialize(&filter))
-                    .transpose()?;
-                bincode::serialize(
-                    &search::<C, web_common::database::nested_variants::NestedBioOttRank>(
-                        lowercase_query,
-                        filter.as_ref(),
-                        limit,
-                        offset,
-                        connection,
-                    )
-                    .await?,
-                )?
-            }
-            Table::BioOttTaxonItems => {
-                let filter = filter
-                    .map(|filter| bincode::deserialize(&filter))
-                    .transpose()?;
-                bincode::serialize(
-                    &search::<C, web_common::database::nested_variants::NestedBioOttTaxonItem>(
-                        lowercase_query,
-                        filter.as_ref(),
-                        limit,
-                        offset,
-                        connection,
-                    )
-                    .await?,
-                )?
-            }
             Table::Colors => {
                 let filter = filter
                     .map(|filter| bincode::deserialize(&filter))
@@ -240,16 +210,17 @@ impl SearchableTable for Table {
                     .await?,
                 )?
             }
-            Table::OrganismBioOttTaxonItems => {
+            Table::OrganismTaxa => {
                 let filter = filter
                     .map(|filter| bincode::deserialize(&filter))
                     .transpose()?;
                 bincode::serialize(
-                    &search::<
-                        C,
-                        web_common::database::nested_variants::NestedOrganismBioOttTaxonItem,
-                    >(
-                        lowercase_query, filter.as_ref(), limit, offset, connection
+                    &search::<C, web_common::database::nested_variants::NestedOrganismTaxon>(
+                        lowercase_query,
+                        filter.as_ref(),
+                        limit,
+                        offset,
+                        connection,
                     )
                     .await?,
                 )?
@@ -415,6 +386,21 @@ impl SearchableTable for Table {
                     .await?,
                 )?
             }
+            Table::Ranks => {
+                let filter = filter
+                    .map(|filter| bincode::deserialize(&filter))
+                    .transpose()?;
+                bincode::serialize(
+                    &search::<C, web_common::database::nested_variants::NestedRank>(
+                        lowercase_query,
+                        filter.as_ref(),
+                        limit,
+                        offset,
+                        connection,
+                    )
+                    .await?,
+                )?
+            }
             Table::Roles => {
                 let filter = filter
                     .map(|filter| bincode::deserialize(&filter))
@@ -429,18 +415,6 @@ impl SearchableTable for Table {
                     )
                     .await?,
                 )?
-            }
-            Table::SampleBioOttTaxonItems => {
-                let filter = filter
-                    .map(|filter| bincode::deserialize(&filter))
-                    .transpose()?;
-                bincode::serialize(&search::<C, web_common::database::nested_variants::NestedSampleBioOttTaxonItem>(
-         lowercase_query,
-         filter.as_ref(),
-         limit,
-         offset,
-         connection
-     ).await?)?
             }
             Table::SampleContainerCategories => {
                 let filter = filter
@@ -486,6 +460,21 @@ impl SearchableTable for Table {
                     .await?,
                 )?
             }
+            Table::SampleTaxa => {
+                let filter = filter
+                    .map(|filter| bincode::deserialize(&filter))
+                    .transpose()?;
+                bincode::serialize(
+                    &search::<C, web_common::database::nested_variants::NestedSampleTaxon>(
+                        lowercase_query,
+                        filter.as_ref(),
+                        limit,
+                        offset,
+                        connection,
+                    )
+                    .await?,
+                )?
+            }
             Table::Samples => {
                 let filter = filter
                     .map(|filter| bincode::deserialize(&filter))
@@ -506,7 +495,7 @@ impl SearchableTable for Table {
                     .map(|filter| bincode::deserialize(&filter))
                     .transpose()?;
                 bincode::serialize(
-                    &search::<C, web_common::database::nested_variants::NestedSpectra>(
+                    &search::<C, web_common::database::nested_variants::NestedSpectrum>(
                         lowercase_query,
                         filter.as_ref(),
                         limit,
@@ -522,6 +511,21 @@ impl SearchableTable for Table {
                     .transpose()?;
                 bincode::serialize(
                     &search::<C, web_common::database::nested_variants::NestedSpectraCollection>(
+                        lowercase_query,
+                        filter.as_ref(),
+                        limit,
+                        offset,
+                        connection,
+                    )
+                    .await?,
+                )?
+            }
+            Table::Taxa => {
+                let filter = filter
+                    .map(|filter| bincode::deserialize(&filter))
+                    .transpose()?;
+                bincode::serialize(
+                    &search::<C, web_common::database::nested_variants::NestedTaxon>(
                         lowercase_query,
                         filter.as_ref(),
                         limit,

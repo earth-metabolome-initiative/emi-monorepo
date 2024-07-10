@@ -1,7 +1,9 @@
 """This module contains the implementation of the derive_frontend_builders function."""
+
 from typing import List
 from tqdm.auto import tqdm
 from constraint_checkers.struct_metadata import StructMetadata, AttributeMetadata
+
 
 def derive_frontend_builders(
     new_or_update_struct_metadatas: List[StructMetadata],
@@ -31,16 +33,9 @@ def derive_frontend_builders(
         struct.is_new_variant() or struct.is_update_variant()
         for struct in new_or_update_struct_metadatas
     )
-    assert all(
-        struct.has_flat_variant()
-        for struct in new_or_update_struct_metadatas
-    )
+    assert all(struct.has_flat_variant() for struct in new_or_update_struct_metadatas)
 
     builders = []
-
-    deny_list_tables = [
-        "user_emails",
-    ]
 
     for struct in tqdm(
         new_or_update_struct_metadatas,
@@ -51,10 +46,7 @@ def derive_frontend_builders(
         assert not struct.is_nested()
         assert struct.is_new_variant() or struct.is_update_variant()
 
-        if struct.table_name in deny_list_tables:
-            continue
-
-        if struct.is_request_table():
+        if not struct.has_frontend_form():
             continue
 
         if struct.is_update_variant() and not struct.is_new_variant():
@@ -86,7 +78,7 @@ def derive_frontend_builders(
             builder.set_update_variant(struct)
 
         builder.add_derive("Store")
-        builder.add_decorator("store(storage = \"local\", storage_tab_sync)")
+        builder.add_decorator('store(storage = "local", storage_tab_sync)')
 
         for derive in richest_variant.derives():
             builder.add_derive(derive)
@@ -96,9 +88,7 @@ def derive_frontend_builders(
 
         for primary_key in primary_keys:
             if primary_key not in foreign_keys:
-                builder.add_attribute(
-                    primary_key.as_option()
-                )
+                builder.add_attribute(primary_key.as_option())
 
         for attribute in flat_variant.attributes:
             if attribute in foreign_keys or attribute in primary_keys:
@@ -131,7 +121,7 @@ def derive_frontend_builders(
                             name=attribute.name,
                             data_type=richest_variant,
                             optional=True,
-                            rc=True
+                            rc=True,
                         )
                     )
                     continue
@@ -208,10 +198,7 @@ def derive_frontend_builders(
     # builders have been correctly derived.
     for struct in new_or_update_struct_metadatas:
 
-        if struct.table_name in deny_list_tables:
-            continue
-
-        if struct.is_request_table():
+        if not struct.has_frontend_form():
             continue
 
         # We identify the curresponding builder by the matching table name.

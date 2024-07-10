@@ -2,22 +2,22 @@ use crate::database::*;
 use std::rc::Rc;
 
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-pub struct NestedBioOttRank {
-    pub inner: crate::database::flat_variants::BioOttRank,
+pub struct NestedRank {
+    pub inner: crate::database::flat_variants::Rank,
     pub icon: crate::database::flat_variants::FontAwesomeIcon,
     pub color: crate::database::flat_variants::Color,
 }
 
-unsafe impl Send for NestedBioOttRank {}
-unsafe impl Sync for NestedBioOttRank {}
-impl NestedBioOttRank {
+unsafe impl Send for NestedRank {}
+unsafe impl Sync for NestedRank {}
+impl NestedRank {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
     /// * `flat_variant` - The flat struct.
     /// * `connection` - The database connection.
     pub(crate) fn from_flat(
-        flat_variant: BioOttRank,
+        flat_variant: Rank,
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::prelude::PgConnection>,
         >,
@@ -37,7 +37,7 @@ impl NestedBioOttRank {
     }
     /// Check whether the user can view the struct associated to the provided ids.
     pub fn can_view_by_id() -> Result<bool, web_common::api::ApiError> {
-        BioOttRank::can_view_by_id()
+        Rank::can_view_by_id()
     }
     /// Get all of the viewable structs from the database.
     ///
@@ -46,14 +46,14 @@ impl NestedBioOttRank {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&web_common::database::filter_variants::BioOttRankFilter>,
+        filter: Option<&web_common::database::filter_variants::RankFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        BioOttRank::all_viewable(filter, limit, offset, connection)?
+        Rank::all_viewable(filter, limit, offset, connection)?
             .into_iter()
             .map(|flat_variant| Self::from_flat(flat_variant, connection))
             .collect()
@@ -65,14 +65,14 @@ impl NestedBioOttRank {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&web_common::database::filter_variants::BioOttRankFilter>,
+        filter: Option<&web_common::database::filter_variants::RankFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        BioOttRank::all_viewable_sorted(filter, limit, offset, connection)?
+        Rank::all_viewable_sorted(filter, limit, offset, connection)?
             .into_iter()
             .map(|flat_variant| Self::from_flat(flat_variant, connection))
             .collect()
@@ -87,7 +87,7 @@ impl NestedBioOttRank {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Self, web_common::api::ApiError> {
-        BioOttRank::get(id, connection)
+        Rank::get(id, connection)
             .and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
     /// Get the struct from the database by its name.
@@ -100,7 +100,7 @@ impl NestedBioOttRank {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Self, web_common::api::ApiError> {
-        BioOttRank::from_name(name, connection)
+        Rank::from_name(name, connection)
             .and_then(|flat_variant| Self::from_flat(flat_variant, connection))
     }
     /// Search for the viewable structs by a given string by Postgres's `strict_word_similarity`.
@@ -111,7 +111,7 @@ impl NestedBioOttRank {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn strict_word_similarity_search_viewable(
-        filter: Option<&web_common::database::filter_variants::BioOttRankFilter>,
+        filter: Option<&web_common::database::filter_variants::RankFilter>,
         query: &str,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -119,7 +119,7 @@ impl NestedBioOttRank {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        BioOttRank::strict_word_similarity_search_viewable(
+        Rank::strict_word_similarity_search_viewable(
             filter, query, limit, offset, connection,
         )?
         .into_iter()
@@ -140,7 +140,7 @@ impl NestedBioOttRank {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<(Self, f32)>, web_common::api::ApiError> {
-        BioOttRank::strict_word_similarity_search_with_score_viewable(
+        Rank::strict_word_similarity_search_with_score_viewable(
             query, limit, offset, connection,
         )?
         .into_iter()
@@ -153,7 +153,7 @@ impl NestedBioOttRank {
     }
     /// Check whether the user can update the struct associated to the provided ids.
     pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
-        BioOttRank::can_update_by_id()
+        Rank::can_update_by_id()
     }
     /// Check whether the user can admin the struct.
     pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
@@ -161,26 +161,26 @@ impl NestedBioOttRank {
     }
     /// Check whether the user can admin the struct associated to the provided ids.
     pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
-        BioOttRank::can_admin_by_id()
+        Rank::can_admin_by_id()
     }
 }
-impl From<web_common::database::nested_variants::NestedBioOttRank>
-    for crate::database::nested_variants::NestedBioOttRank
+impl From<web_common::database::nested_variants::NestedRank>
+    for crate::database::nested_variants::NestedRank
 {
-    fn from(item: web_common::database::nested_variants::NestedBioOttRank) -> Self {
+    fn from(item: web_common::database::nested_variants::NestedRank) -> Self {
         Self {
-            inner: crate::database::flat_variants::BioOttRank::from(item.inner.as_ref().clone()),
+            inner: crate::database::flat_variants::Rank::from(item.inner.as_ref().clone()),
             icon: crate::database::flat_variants::FontAwesomeIcon::from(item.icon.as_ref().clone()),
             color: crate::database::flat_variants::Color::from(item.color.as_ref().clone()),
         }
     }
 }
-impl From<crate::database::nested_variants::NestedBioOttRank>
-    for web_common::database::nested_variants::NestedBioOttRank
+impl From<crate::database::nested_variants::NestedRank>
+    for web_common::database::nested_variants::NestedRank
 {
-    fn from(item: crate::database::nested_variants::NestedBioOttRank) -> Self {
+    fn from(item: crate::database::nested_variants::NestedRank) -> Self {
         Self {
-            inner: Rc::from(web_common::database::flat_variants::BioOttRank::from(
+            inner: Rc::from(web_common::database::flat_variants::Rank::from(
                 item.inner,
             )),
             icon: Rc::from(web_common::database::flat_variants::FontAwesomeIcon::from(

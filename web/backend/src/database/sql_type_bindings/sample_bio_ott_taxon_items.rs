@@ -4,5 +4,5 @@
 //! This file contains the bindings for the SQL types in the database.
 
 #[derive(diesel::query_builder::QueryId, diesel::sql_types::SqlType)]
-#[diesel(postgres_type(name = "sample_bio_ott_taxon_items"))]
+#[diesel(postgres_type(name = "sample_taxa"))]
 pub struct SampleBioOttTaxonItems;

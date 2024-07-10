@@ -15,6 +15,34 @@ pub enum PrimaryKey {
     Mixed2(Uuid, i32, i32),
 }
 
+impl PrimaryKey {
+    /// Returns the extended version of the primary key with the provided UUID.
+    ///
+    /// # Arguments
+    /// * `uuid` - The UUID to extend the primary key with.
+    pub fn extend_uuid(self, uuid: Uuid) -> PrimaryKey {
+        match self {
+            PrimaryKey::Uuid(uuid1) => PrimaryKey::Uuid2(uuid1, uuid),
+            PrimaryKey::Uuid2(uuid1, uuid2) => PrimaryKey::Uuid3(uuid1, uuid2, uuid),
+            _ => unreachable!("Cannot extend PrimaryKey with Uuid: {:?}", self),
+        }
+    }
+
+    /// Returns the extended version of the primary key with the provided integer.
+    ///
+    /// # Arguments
+    /// * `int` - The integer to extend the primary key with.
+    pub fn extend_int(self, int: i32) -> PrimaryKey {
+        match self {
+            PrimaryKey::Int(int1) => PrimaryKey::Int2(int1, int),
+            PrimaryKey::Int2(int1, int2) => PrimaryKey::Int3(int1, int2, int),
+            PrimaryKey::Uuid(uuid) => PrimaryKey::Mixed(uuid, int),
+            PrimaryKey::Mixed(uuid, int1) => PrimaryKey::Mixed2(uuid, int1, int),
+            _ => unreachable!("Cannot extend PrimaryKey with i32: {:?}", self),
+        }
+    }
+}
+
 impl From<PrimaryKey> for Uuid {
     fn from(pk: PrimaryKey) -> Self {
         match pk {

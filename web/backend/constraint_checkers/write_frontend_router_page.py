@@ -184,6 +184,25 @@ def write_frontend_router_page(
     # having to manually define the URLs for each struct.
 
     document.write(
+        "/// The trait defining whether a struct has a role request struct associated with it.\n"
+        "pub(crate) trait RoleRequestable {\n"
+        "    /// The role request struct associated with the struct.\n"
+        "    type RoleRequest: serde::Serialize + Tabular;\n"
+        "    /// Returns the role request struct associated with the struct.\n"
+        "    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest;\n"
+        "    /// Returns the role request operation associated with the struct.\n"
+        "    fn role_request_operation(&self, user_id: i32, role: i32) -> Operation {\n"
+        "        Operation::Insert(Self::RoleRequest::TABLE.to_string(), bincode::serialize(&self.role_request(user_id, role)).unwrap())\n"
+        "    }\n"
+        "    /// Returns the route associated with the struct role request page.\n"
+        "    fn edit_role_request(&self, user_id: i32) -> Operation{\n"
+        "        self.role_request_operation(user_id, 2)\n"
+        "    }\n"
+        "    /// Returns the route associated with the struct role request page.\n"
+        "    fn admin_role_request(&self, user_id: i32) -> Operation{\n"
+        "        self.role_request_operation(user_id, 1)\n"
+        "    }\n"
+        "}\n\n"
         "/// Trait defining a struct whose page is be visitable by the router.\n"
         "pub(crate) trait Viewable {\n"
         "    /// Returns the route associated to the page with the overall struct list.\n"
@@ -221,6 +240,34 @@ def write_frontend_router_page(
         richest_variant = flat_variant.get_richest_variant()
         primary_keys = flat_variant.get_primary_keys()
 
+        if flat_variant.table_name == "projects":
+            document.write(
+                f"impl RoleRequestable for {flat_variant.name} {{\n"
+                "    type RoleRequest = NewProjectsUsersRoleRequest;\n"
+                "    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {\n"
+                f"        NewProjectsUsersRoleRequest {{ table_id: self.id, user_id, role_id: role }}\n"
+                "    }\n"
+                "}\n\n"
+                f"impl RoleRequestable for {richest_variant.name} {{\n"
+                f"    type RoleRequest = <{flat_variant.name} as RoleRequestable>::RoleRequest;\n"
+                "    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {\n"
+                f"        <{flat_variant.name} as RoleRequestable>::role_request(self.inner.as_ref(), user_id, role)\n"
+                "    }\n"
+                "}\n\n"
+            )
+        elif richest_variant.has_project_attribute() and not richest_variant.is_junktion_table():
+            project_attributes: List[AttributeMetadata] = richest_variant.get_project_attribute()
+            attributes_path = ".".join(attribute.name for attribute in project_attributes)
+            last_struct = project_attributes[-1].raw_data_type()
+            document.write(
+                f"impl RoleRequestable for {richest_variant.name} {{\n"
+                f"    type RoleRequest = <{last_struct.name} as RoleRequestable>::RoleRequest;\n"
+                "    fn role_request(&self, user_id: i32, role: i32) -> Self::RoleRequest {\n"
+                f"        <{last_struct.name} as RoleRequestable>::role_request(self.{attributes_path}.as_ref(), user_id, role)\n"
+                "    }\n"
+                "}\n\n"
+            )
+
         viewable_variant_names = [flat_variant]
 
         if richest_variant.is_nested():
@@ -241,7 +288,7 @@ def write_frontend_router_page(
 
             document.write("}\n    }\n}\n\n")
 
-            if flat_variant.is_insertable() and flat_variant.table_name != "users":
+            if flat_variant.is_insertable() and flat_variant.table_name != "users" and flat_variant.has_frontend_form():
                 document.write(
                     f"impl Insertable for {variant.name} {{\n"
                     "    fn new_route(filter: Option<&Self::Filter>) -> AppRoute {\n"
@@ -281,7 +328,7 @@ def write_frontend_router_page(
                     "}\n\n"
                 )
 
-            if flat_variant.is_updatable():
+            if flat_variant.is_updatable() and flat_variant.has_frontend_form():
                 document.write(
                     f"impl Updatable for {variant.name} {{\n"
                     "    fn update_route(&self) -> AppRoute {\n"
@@ -335,7 +382,7 @@ def write_frontend_router_page(
             f"{flat_variant.get_capitalized_table_name()}View",
         ])
 
-        if flat_variant.is_insertable()  and flat_variant.table_name != "users":
+        if flat_variant.is_insertable()  and flat_variant.table_name != "users" and flat_variant.has_frontend_form():
             # We also add the /new sub-route
             document.write(
                 f'    #[at("/{flat_variant.table_name}/new")]\n'
@@ -372,7 +419,7 @@ def write_frontend_router_page(
 
                 enum_variants.append(enum_variant_name)
 
-        if flat_variant.is_updatable():
+        if flat_variant.is_updatable() and flat_variant.has_frontend_form():
             # We also add the /update sub-route
             document.write(
                 f'    #[at("/{flat_variant.table_name}{ids_url}/update")]\n'
@@ -434,7 +481,7 @@ def write_frontend_router_page(
             f"{flat_variant.get_capitalized_table_name()}View",
         ])
 
-        if flat_variant.is_insertable() and flat_variant.table_name != "users":
+        if flat_variant.is_insertable() and flat_variant.table_name != "users" and flat_variant.has_frontend_form():
             document.write(
                 f"        AppRoute::{flat_variant.get_capitalized_table_name()}New => {{\n"
                 f"            html! {{ <Create{flat_variant.name}Form /> }}\n"
@@ -472,7 +519,7 @@ def write_frontend_router_page(
 
                 covered_variants.append(enum_variant_name)
 
-        if flat_variant.is_updatable():
+        if flat_variant.is_updatable() and flat_variant.has_frontend_form():
             form_primary_key_properties = " ".join(
                 f"{primary_key.name}={{{primary_key.name}}}"
                 for primary_key in primary_keys

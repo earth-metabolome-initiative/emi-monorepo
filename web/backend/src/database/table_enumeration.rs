@@ -262,10 +262,6 @@ impl BackendTable for web_common::database::Table {
         >,
     ) -> Result<bool, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => NestedBioOttRank::can_view_by_id()?,
-            web_common::database::Table::BioOttTaxonItems => {
-                NestedBioOttTaxonItem::can_view_by_id()?
-            }
             web_common::database::Table::Colors => Color::can_view_by_id()?,
             web_common::database::Table::Countries => Country::can_view_by_id()?,
             web_common::database::Table::DerivedSamples => {
@@ -288,12 +284,8 @@ impl BackendTable for web_common::database::Table {
             web_common::database::Table::Observations => {
                 NestedObservation::can_view_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-                NestedOrganismBioOttTaxonItem::can_view_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+            web_common::database::Table::OrganismTaxa => {
+                NestedOrganismTaxon::can_view_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::Organisms => {
                 NestedOrganism::can_view_by_id(primary_key.into(), author_user_id, connection)?
@@ -348,14 +340,8 @@ impl BackendTable for web_common::database::Table {
                     connection,
                 )?
             }
+            web_common::database::Table::Ranks => NestedRank::can_view_by_id()?,
             web_common::database::Table::Roles => NestedRole::can_view_by_id()?,
-            web_common::database::Table::SampleBioOttTaxonItems => {
-                NestedSampleBioOttTaxonItem::can_view_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
             web_common::database::Table::SampleContainerCategories => {
                 NestedSampleContainerCategory::can_view_by_id()?
             }
@@ -365,11 +351,14 @@ impl BackendTable for web_common::database::Table {
                 connection,
             )?,
             web_common::database::Table::SampleStates => NestedSampleState::can_view_by_id()?,
+            web_common::database::Table::SampleTaxa => {
+                NestedSampleTaxon::can_view_by_id(primary_key.into(), author_user_id, connection)?
+            }
             web_common::database::Table::Samples => {
                 NestedSample::can_view_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::Spectra => {
-                NestedSpectra::can_view_by_id(primary_key.into(), author_user_id, connection)?
+                NestedSpectrum::can_view_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::SpectraCollections => {
                 NestedSpectraCollection::can_view_by_id(
@@ -378,6 +367,7 @@ impl BackendTable for web_common::database::Table {
                     connection,
                 )?
             }
+            web_common::database::Table::Taxa => NestedTaxon::can_view_by_id()?,
             web_common::database::Table::TeamStates => NestedTeamState::can_view_by_id()?,
             web_common::database::Table::Teams => NestedTeam::can_view_by_id()?,
             web_common::database::Table::TeamsTeamsRoleInvitations => {
@@ -443,20 +433,6 @@ impl BackendTable for web_common::database::Table {
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-bincode::serialize(&NestedBioOttRank::all_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttRankFilter>(&filter)).transpose()?.as_ref(),
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::BioOttTaxonItems => {
-bincode::serialize(&NestedBioOttTaxonItem::all_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-limit,
-offset,
-connection)?)?
-            },
             web_common::database::Table::Colors => {
 bincode::serialize(&Color::all_viewable(
 limit,
@@ -541,9 +517,9 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-bincode::serialize(&NestedOrganismBioOttTaxonItem::all_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+            web_common::database::Table::OrganismTaxa => {
+bincode::serialize(&NestedOrganismTaxon::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismTaxonFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -634,17 +610,16 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Roles => {
-bincode::serialize(&NestedRole::all_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RoleFilter>(&filter)).transpose()?.as_ref(),
+            web_common::database::Table::Ranks => {
+bincode::serialize(&NestedRank::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RankFilter>(&filter)).transpose()?.as_ref(),
 limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::SampleBioOttTaxonItems => {
-bincode::serialize(&NestedSampleBioOttTaxonItem::all_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
+            web_common::database::Table::Roles => {
+bincode::serialize(&NestedRole::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RoleFilter>(&filter)).transpose()?.as_ref(),
 limit,
 offset,
 connection)?)?
@@ -671,6 +646,14 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::SampleTaxa => {
+bincode::serialize(&NestedSampleTaxon::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleTaxonFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::all_viewable(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
@@ -680,8 +663,8 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Spectra => {
-bincode::serialize(&NestedSpectra::all_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraFilter>(&filter)).transpose()?.as_ref(),
+bincode::serialize(&NestedSpectrum::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectrumFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -691,6 +674,13 @@ connection)?)?
 bincode::serialize(&NestedSpectraCollection::all_viewable(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Taxa => {
+bincode::serialize(&NestedTaxon::all_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TaxonFilter>(&filter)).transpose()?.as_ref(),
 limit,
 offset,
 connection)?)?
@@ -806,20 +796,6 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-bincode::serialize(&NestedBioOttRank::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttRankFilter>(&filter)).transpose()?.as_ref(),
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::BioOttTaxonItems => {
-bincode::serialize(&NestedBioOttTaxonItem::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-limit,
-offset,
-connection)?)?
-            },
             web_common::database::Table::Colors => {
 bincode::serialize(&Color::all_viewable_sorted(
 limit,
@@ -904,9 +880,9 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-bincode::serialize(&NestedOrganismBioOttTaxonItem::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+            web_common::database::Table::OrganismTaxa => {
+bincode::serialize(&NestedOrganismTaxon::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismTaxonFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -997,17 +973,16 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Roles => {
-bincode::serialize(&NestedRole::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RoleFilter>(&filter)).transpose()?.as_ref(),
+            web_common::database::Table::Ranks => {
+bincode::serialize(&NestedRank::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RankFilter>(&filter)).transpose()?.as_ref(),
 limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::SampleBioOttTaxonItems => {
-bincode::serialize(&NestedSampleBioOttTaxonItem::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
+            web_common::database::Table::Roles => {
+bincode::serialize(&NestedRole::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RoleFilter>(&filter)).transpose()?.as_ref(),
 limit,
 offset,
 connection)?)?
@@ -1034,6 +1009,14 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::SampleTaxa => {
+bincode::serialize(&NestedSampleTaxon::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleTaxonFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::all_viewable_sorted(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
@@ -1043,8 +1026,8 @@ offset,
 connection)?)?
             },
             web_common::database::Table::Spectra => {
-bincode::serialize(&NestedSpectra::all_viewable_sorted(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraFilter>(&filter)).transpose()?.as_ref(),
+bincode::serialize(&NestedSpectrum::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectrumFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -1054,6 +1037,13 @@ connection)?)?
 bincode::serialize(&NestedSpectraCollection::all_viewable_sorted(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Taxa => {
+bincode::serialize(&NestedTaxon::all_viewable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TaxonFilter>(&filter)).transpose()?.as_ref(),
 limit,
 offset,
 connection)?)?
@@ -1165,12 +1155,6 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-                bincode::serialize(&NestedBioOttRank::get(primary_key.into(), connection)?)?
-            }
-            web_common::database::Table::BioOttTaxonItems => {
-                bincode::serialize(&NestedBioOttTaxonItem::get(primary_key.into(), connection)?)?
-            }
             web_common::database::Table::Colors => {
                 bincode::serialize(&Color::get(primary_key.into(), connection)?)?
             }
@@ -1209,13 +1193,9 @@ connection)?)?
             web_common::database::Table::Observations => bincode::serialize(
                 &NestedObservation::get(primary_key.into(), author_user_id, connection)?,
             )?,
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-                bincode::serialize(&NestedOrganismBioOttTaxonItem::get(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?)?
-            }
+            web_common::database::Table::OrganismTaxa => bincode::serialize(
+                &NestedOrganismTaxon::get(primary_key.into(), author_user_id, connection)?,
+            )?,
             web_common::database::Table::Organisms => bincode::serialize(&NestedOrganism::get(
                 primary_key.into(),
                 author_user_id,
@@ -1269,12 +1249,12 @@ connection)?)?
             web_common::database::Table::ProjectsUsersRoles => bincode::serialize(
                 &NestedProjectsUsersRole::get(primary_key.into(), author_user_id, connection)?,
             )?,
+            web_common::database::Table::Ranks => {
+                bincode::serialize(&NestedRank::get(primary_key.into(), connection)?)?
+            }
             web_common::database::Table::Roles => {
                 bincode::serialize(&NestedRole::get(primary_key.into(), connection)?)?
             }
-            web_common::database::Table::SampleBioOttTaxonItems => bincode::serialize(
-                &NestedSampleBioOttTaxonItem::get(primary_key.into(), author_user_id, connection)?,
-            )?,
             web_common::database::Table::SampleContainerCategories => bincode::serialize(
                 &NestedSampleContainerCategory::get(primary_key.into(), connection)?,
             )?,
@@ -1284,12 +1264,15 @@ connection)?)?
             web_common::database::Table::SampleStates => {
                 bincode::serialize(&NestedSampleState::get(primary_key.into(), connection)?)?
             }
+            web_common::database::Table::SampleTaxa => bincode::serialize(
+                &NestedSampleTaxon::get(primary_key.into(), author_user_id, connection)?,
+            )?,
             web_common::database::Table::Samples => bincode::serialize(&NestedSample::get(
                 primary_key.into(),
                 author_user_id,
                 connection,
             )?)?,
-            web_common::database::Table::Spectra => bincode::serialize(&NestedSpectra::get(
+            web_common::database::Table::Spectra => bincode::serialize(&NestedSpectrum::get(
                 primary_key.into(),
                 author_user_id,
                 connection,
@@ -1297,6 +1280,9 @@ connection)?)?
             web_common::database::Table::SpectraCollections => bincode::serialize(
                 &NestedSpectraCollection::get(primary_key.into(), author_user_id, connection)?,
             )?,
+            web_common::database::Table::Taxa => {
+                bincode::serialize(&NestedTaxon::get(primary_key.into(), connection)?)?
+            }
             web_common::database::Table::TeamStates => {
                 bincode::serialize(&NestedTeamState::get(primary_key.into(), connection)?)?
             }
@@ -1370,22 +1356,6 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-bincode::serialize(&NestedBioOttRank::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttRankFilter>(&filter)).transpose()?.as_ref(),
-query,
-limit,
-offset,
-connection)?)?
-            },
-            web_common::database::Table::BioOttTaxonItems => {
-bincode::serialize(&NestedBioOttTaxonItem::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::BioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-query,
-limit,
-offset,
-connection)?)?
-            },
             web_common::database::Table::Colors => {
 bincode::serialize(&Color::strict_word_similarity_search_viewable(
 query,
@@ -1461,9 +1431,9 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-bincode::serialize(&NestedOrganismBioOttTaxonItem::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+            web_common::database::Table::OrganismTaxa => {
+bincode::serialize(&NestedOrganismTaxon::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismTaxonFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -1559,18 +1529,17 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::Roles => {
-bincode::serialize(&NestedRole::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RoleFilter>(&filter)).transpose()?.as_ref(),
+            web_common::database::Table::Ranks => {
+bincode::serialize(&NestedRank::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RankFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::SampleBioOttTaxonItems => {
-bincode::serialize(&NestedSampleBioOttTaxonItem::strict_word_similarity_search_viewable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
+            web_common::database::Table::Roles => {
+bincode::serialize(&NestedRole::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::RoleFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1601,6 +1570,15 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::SampleTaxa => {
+bincode::serialize(&NestedSampleTaxon::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleTaxonFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::strict_word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
@@ -1615,6 +1593,14 @@ connection)?)?
 bincode::serialize(&NestedSpectraCollection::strict_word_similarity_search_viewable(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SpectraCollectionFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
+            web_common::database::Table::Taxa => {
+bincode::serialize(&NestedTaxon::strict_word_similarity_search_viewable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::TaxonFilter>(&filter)).transpose()?.as_ref(),
 query,
 limit,
 offset,
@@ -1731,10 +1717,6 @@ connection)?)?
         >,
     ) -> Result<bool, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => NestedBioOttRank::can_update_by_id()?,
-            web_common::database::Table::BioOttTaxonItems => {
-                NestedBioOttTaxonItem::can_update_by_id()?
-            }
             web_common::database::Table::Colors => Color::can_update_by_id()?,
             web_common::database::Table::Countries => Country::can_update_by_id()?,
             web_common::database::Table::DerivedSamples => NestedDerivedSample::can_update_by_id(
@@ -1761,9 +1743,7 @@ connection)?)?
             web_common::database::Table::Observations => {
                 NestedObservation::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-                NestedOrganismBioOttTaxonItem::can_update_by_id()?
-            }
+            web_common::database::Table::OrganismTaxa => NestedOrganismTaxon::can_update_by_id()?,
             web_common::database::Table::Organisms => {
                 NestedOrganism::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -1793,10 +1773,8 @@ connection)?)?
             web_common::database::Table::ProjectsUsersRoles => {
                 NestedProjectsUsersRole::can_update_by_id()?
             }
+            web_common::database::Table::Ranks => NestedRank::can_update_by_id()?,
             web_common::database::Table::Roles => NestedRole::can_update_by_id()?,
-            web_common::database::Table::SampleBioOttTaxonItems => {
-                NestedSampleBioOttTaxonItem::can_update_by_id()?
-            }
             web_common::database::Table::SampleContainerCategories => {
                 NestedSampleContainerCategory::can_update_by_id()?
             }
@@ -1808,10 +1786,11 @@ connection)?)?
                 )?
             }
             web_common::database::Table::SampleStates => NestedSampleState::can_update_by_id()?,
+            web_common::database::Table::SampleTaxa => NestedSampleTaxon::can_update_by_id()?,
             web_common::database::Table::Samples => {
                 NestedSample::can_update_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::Spectra => NestedSpectra::can_update_by_id()?,
+            web_common::database::Table::Spectra => NestedSpectrum::can_update_by_id()?,
             web_common::database::Table::SpectraCollections => {
                 NestedSpectraCollection::can_update_by_id(
                     primary_key.into(),
@@ -1819,6 +1798,7 @@ connection)?)?
                     connection,
                 )?
             }
+            web_common::database::Table::Taxa => NestedTaxon::can_update_by_id()?,
             web_common::database::Table::TeamStates => NestedTeamState::can_update_by_id()?,
             web_common::database::Table::Teams => {
                 NestedTeam::can_update_by_id(primary_key.into(), author_user_id, connection)?
@@ -1866,10 +1846,6 @@ connection)?)?
         >,
     ) -> Result<bool, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => NestedBioOttRank::can_admin_by_id()?,
-            web_common::database::Table::BioOttTaxonItems => {
-                NestedBioOttTaxonItem::can_admin_by_id()?
-            }
             web_common::database::Table::Colors => Color::can_admin_by_id()?,
             web_common::database::Table::Countries => Country::can_admin_by_id()?,
             web_common::database::Table::DerivedSamples => NestedDerivedSample::can_admin_by_id(
@@ -1896,13 +1872,11 @@ connection)?)?
             web_common::database::Table::Observations => {
                 NestedObservation::can_admin_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-                NestedOrganismBioOttTaxonItem::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
+            web_common::database::Table::OrganismTaxa => NestedOrganismTaxon::can_admin_by_id(
+                primary_key.into(),
+                author_user_id,
+                connection,
+            )?,
             web_common::database::Table::Organisms => {
                 NestedOrganism::can_admin_by_id(primary_key.into(), author_user_id, connection)?
             }
@@ -1956,14 +1930,8 @@ connection)?)?
                     connection,
                 )?
             }
+            web_common::database::Table::Ranks => NestedRank::can_admin_by_id()?,
             web_common::database::Table::Roles => NestedRole::can_admin_by_id()?,
-            web_common::database::Table::SampleBioOttTaxonItems => {
-                NestedSampleBioOttTaxonItem::can_admin_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
-            }
             web_common::database::Table::SampleContainerCategories => {
                 NestedSampleContainerCategory::can_admin_by_id()?
             }
@@ -1975,10 +1943,13 @@ connection)?)?
                 )?
             }
             web_common::database::Table::SampleStates => NestedSampleState::can_admin_by_id()?,
+            web_common::database::Table::SampleTaxa => {
+                NestedSampleTaxon::can_admin_by_id(primary_key.into(), author_user_id, connection)?
+            }
             web_common::database::Table::Samples => {
                 NestedSample::can_admin_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::Spectra => NestedSpectra::can_admin_by_id()?,
+            web_common::database::Table::Spectra => NestedSpectrum::can_admin_by_id()?,
             web_common::database::Table::SpectraCollections => {
                 NestedSpectraCollection::can_admin_by_id(
                     primary_key.into(),
@@ -1986,6 +1957,7 @@ connection)?)?
                     connection,
                 )?
             }
+            web_common::database::Table::Taxa => NestedTaxon::can_admin_by_id()?,
             web_common::database::Table::TeamStates => NestedTeamState::can_admin_by_id()?,
             web_common::database::Table::Teams => {
                 NestedTeam::can_admin_by_id(primary_key.into(), author_user_id, connection)?
@@ -2063,12 +2035,6 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-                unimplemented!("Method all_updatable not implemented for table bio_ott_ranks.")
-            }
-            web_common::database::Table::BioOttTaxonItems => unimplemented!(
-                "Method all_updatable not implemented for table bio_ott_taxon_items."
-            ),
             web_common::database::Table::Colors => {
                 unimplemented!("Method all_updatable not implemented for table colors.")
             }
@@ -2144,9 +2110,9 @@ connection)?)?
                     connection,
                 )?)?
             }
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!(
-                "Method all_updatable not implemented for table organism_bio_ott_taxon_items."
-            ),
+            web_common::database::Table::OrganismTaxa => {
+                unimplemented!("Method all_updatable not implemented for table organism_taxa.")
+            }
             web_common::database::Table::Organisms => {
                 bincode::serialize(&NestedOrganism::all_updatable(
                     filter
@@ -2206,12 +2172,12 @@ connection)?)?
             web_common::database::Table::ProjectsUsersRoles => unimplemented!(
                 "Method all_updatable not implemented for table projects_users_roles."
             ),
+            web_common::database::Table::Ranks => {
+                unimplemented!("Method all_updatable not implemented for table ranks.")
+            }
             web_common::database::Table::Roles => {
                 unimplemented!("Method all_updatable not implemented for table roles.")
             }
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!(
-                "Method all_updatable not implemented for table sample_bio_ott_taxon_items."
-            ),
             web_common::database::Table::SampleContainerCategories => unimplemented!(
                 "Method all_updatable not implemented for table sample_container_categories."
             ),
@@ -2233,6 +2199,9 @@ connection)?)?
             }
             web_common::database::Table::SampleStates => {
                 unimplemented!("Method all_updatable not implemented for table sample_states.")
+            }
+            web_common::database::Table::SampleTaxa => {
+                unimplemented!("Method all_updatable not implemented for table sample_taxa.")
             }
             web_common::database::Table::Samples => {
                 bincode::serialize(&NestedSample::all_updatable(
@@ -2268,6 +2237,9 @@ connection)?)?
                     offset,
                     connection,
                 )?)?
+            }
+            web_common::database::Table::Taxa => {
+                unimplemented!("Method all_updatable not implemented for table taxa.")
             }
             web_common::database::Table::TeamStates => {
                 unimplemented!("Method all_updatable not implemented for table team_states.")
@@ -2348,8 +2320,6 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method all_updatable_sorted not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_updatable_sorted not implemented for table bio_ott_taxon_items."),
             web_common::database::Table::Colors => unimplemented!("Method all_updatable_sorted not implemented for table colors."),
             web_common::database::Table::Countries => unimplemented!("Method all_updatable_sorted not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
@@ -2383,7 +2353,7 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method all_updatable_sorted not implemented for table organism_bio_ott_taxon_items."),
+            web_common::database::Table::OrganismTaxa => unimplemented!("Method all_updatable_sorted not implemented for table organism_taxa."),
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::all_updatable_sorted(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
@@ -2409,8 +2379,8 @@ connection)?)?
             web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method all_updatable_sorted not implemented for table projects_users_role_invitations."),
             web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method all_updatable_sorted not implemented for table projects_users_role_requests."),
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method all_updatable_sorted not implemented for table projects_users_roles."),
+            web_common::database::Table::Ranks => unimplemented!("Method all_updatable_sorted not implemented for table ranks."),
             web_common::database::Table::Roles => unimplemented!("Method all_updatable_sorted not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method all_updatable_sorted not implemented for table sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_updatable_sorted not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::all_updatable_sorted(
@@ -2421,6 +2391,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::SampleStates => unimplemented!("Method all_updatable_sorted not implemented for table sample_states."),
+            web_common::database::Table::SampleTaxa => unimplemented!("Method all_updatable_sorted not implemented for table sample_taxa."),
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::all_updatable_sorted(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
@@ -2438,6 +2409,7 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::Taxa => unimplemented!("Method all_updatable_sorted not implemented for table taxa."),
             web_common::database::Table::TeamStates => unimplemented!("Method all_updatable_sorted not implemented for table team_states."),
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::all_updatable_sorted(
@@ -2487,8 +2459,6 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table bio_ott_taxon_items."),
             web_common::database::Table::Colors => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table colors."),
             web_common::database::Table::Countries => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
@@ -2525,7 +2495,7 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table organism_bio_ott_taxon_items."),
+            web_common::database::Table::OrganismTaxa => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table organism_taxa."),
             web_common::database::Table::Organisms => {
 bincode::serialize(&NestedOrganism::strict_word_similarity_search_updatable(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismFilter>(&filter)).transpose()?.as_ref(),
@@ -2553,8 +2523,8 @@ connection)?)?
             web_common::database::Table::ProjectsUsersRoleInvitations => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table projects_users_role_invitations."),
             web_common::database::Table::ProjectsUsersRoleRequests => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table projects_users_role_requests."),
             web_common::database::Table::ProjectsUsersRoles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table projects_users_roles."),
+            web_common::database::Table::Ranks => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table ranks."),
             web_common::database::Table::Roles => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_bio_ott_taxon_items."),
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_updatable(
@@ -2566,6 +2536,7 @@ offset,
 connection)?)?
             },
             web_common::database::Table::SampleStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_states."),
+            web_common::database::Table::SampleTaxa => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table sample_taxa."),
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::strict_word_similarity_search_updatable(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
@@ -2585,6 +2556,7 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::Taxa => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table taxa."),
             web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_updatable not implemented for table team_states."),
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::strict_word_similarity_search_updatable(
@@ -2634,8 +2606,6 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method all_administrable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_administrable not implemented for table bio_ott_taxon_items."),
             web_common::database::Table::Colors => unimplemented!("Method all_administrable not implemented for table colors."),
             web_common::database::Table::Countries => unimplemented!("Method all_administrable not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
@@ -2669,9 +2639,9 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-bincode::serialize(&NestedOrganismBioOttTaxonItem::all_administrable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+            web_common::database::Table::OrganismTaxa => {
+bincode::serialize(&NestedOrganismTaxon::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismTaxonFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2744,15 +2714,8 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::Ranks => unimplemented!("Method all_administrable not implemented for table ranks."),
             web_common::database::Table::Roles => unimplemented!("Method all_administrable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => {
-bincode::serialize(&NestedSampleBioOttTaxonItem::all_administrable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_administrable not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::all_administrable(
@@ -2763,6 +2726,14 @@ offset,
 connection)?)?
             },
             web_common::database::Table::SampleStates => unimplemented!("Method all_administrable not implemented for table sample_states."),
+            web_common::database::Table::SampleTaxa => {
+bincode::serialize(&NestedSampleTaxon::all_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleTaxonFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::all_administrable(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
@@ -2780,6 +2751,7 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::Taxa => unimplemented!("Method all_administrable not implemented for table taxa."),
             web_common::database::Table::TeamStates => unimplemented!("Method all_administrable not implemented for table team_states."),
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::all_administrable(
@@ -2883,8 +2855,6 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method all_administrable_sorted not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method all_administrable_sorted not implemented for table bio_ott_taxon_items."),
             web_common::database::Table::Colors => unimplemented!("Method all_administrable_sorted not implemented for table colors."),
             web_common::database::Table::Countries => unimplemented!("Method all_administrable_sorted not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
@@ -2918,9 +2888,9 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-bincode::serialize(&NestedOrganismBioOttTaxonItem::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+            web_common::database::Table::OrganismTaxa => {
+bincode::serialize(&NestedOrganismTaxon::all_administrable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismTaxonFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 limit,
 offset,
@@ -2993,15 +2963,8 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::Ranks => unimplemented!("Method all_administrable_sorted not implemented for table ranks."),
             web_common::database::Table::Roles => unimplemented!("Method all_administrable_sorted not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => {
-bincode::serialize(&NestedSampleBioOttTaxonItem::all_administrable_sorted(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-limit,
-offset,
-connection)?)?
-            },
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method all_administrable_sorted not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::all_administrable_sorted(
@@ -3012,6 +2975,14 @@ offset,
 connection)?)?
             },
             web_common::database::Table::SampleStates => unimplemented!("Method all_administrable_sorted not implemented for table sample_states."),
+            web_common::database::Table::SampleTaxa => {
+bincode::serialize(&NestedSampleTaxon::all_administrable_sorted(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleTaxonFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::all_administrable_sorted(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
@@ -3029,6 +3000,7 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::Taxa => unimplemented!("Method all_administrable_sorted not implemented for table taxa."),
             web_common::database::Table::TeamStates => unimplemented!("Method all_administrable_sorted not implemented for table team_states."),
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::all_administrable_sorted(
@@ -3134,8 +3106,6 @@ connection)?)?
         >,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table bio_ott_ranks."),
-            web_common::database::Table::BioOttTaxonItems => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table bio_ott_taxon_items."),
             web_common::database::Table::Colors => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table colors."),
             web_common::database::Table::Countries => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table countries."),
             web_common::database::Table::DerivedSamples => {
@@ -3172,9 +3142,9 @@ limit,
 offset,
 connection)?)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-bincode::serialize(&NestedOrganismBioOttTaxonItem::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
+            web_common::database::Table::OrganismTaxa => {
+bincode::serialize(&NestedOrganismTaxon::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::OrganismTaxonFilter>(&filter)).transpose()?.as_ref(),
 author_user_id,
 query,
 limit,
@@ -3256,16 +3226,8 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::Ranks => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table ranks."),
             web_common::database::Table::Roles => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table roles."),
-            web_common::database::Table::SampleBioOttTaxonItems => {
-bincode::serialize(&NestedSampleBioOttTaxonItem::strict_word_similarity_search_administrable(
-filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleBioOttTaxonItemFilter>(&filter)).transpose()?.as_ref(),
-author_user_id,
-query,
-limit,
-offset,
-connection)?)?
-            },
             web_common::database::Table::SampleContainerCategories => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table sample_container_categories."),
             web_common::database::Table::SampleContainers => {
 bincode::serialize(&NestedSampleContainer::strict_word_similarity_search_administrable(
@@ -3277,6 +3239,15 @@ offset,
 connection)?)?
             },
             web_common::database::Table::SampleStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table sample_states."),
+            web_common::database::Table::SampleTaxa => {
+bincode::serialize(&NestedSampleTaxon::strict_word_similarity_search_administrable(
+filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleTaxonFilter>(&filter)).transpose()?.as_ref(),
+author_user_id,
+query,
+limit,
+offset,
+connection)?)?
+            },
             web_common::database::Table::Samples => {
 bincode::serialize(&NestedSample::strict_word_similarity_search_administrable(
 filter.map(|filter| bincode::deserialize::<web_common::database::filter_variants::SampleFilter>(&filter)).transpose()?.as_ref(),
@@ -3296,6 +3267,7 @@ limit,
 offset,
 connection)?)?
             },
+            web_common::database::Table::Taxa => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table taxa."),
             web_common::database::Table::TeamStates => unimplemented!("Method strict_word_similarity_search_administrable not implemented for table team_states."),
             web_common::database::Table::Teams => {
 bincode::serialize(&NestedTeam::strict_word_similarity_search_administrable(
@@ -3397,12 +3369,6 @@ connection)?)?
         >,
     ) -> Result<usize, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-                unimplemented!("Method delete_by_id not implemented for table bio_ott_ranks.")
-            }
-            web_common::database::Table::BioOttTaxonItems => {
-                unimplemented!("Method delete_by_id not implemented for table bio_ott_taxon_items.")
-            }
             web_common::database::Table::Colors => {
                 unimplemented!("Method delete_by_id not implemented for table colors.")
             }
@@ -3439,12 +3405,8 @@ connection)?)?
             web_common::database::Table::Observations => {
                 NestedObservation::delete_by_id(primary_key.into(), author_user_id, connection)?
             }
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-                NestedOrganismBioOttTaxonItem::delete_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
+            web_common::database::Table::OrganismTaxa => {
+                NestedOrganismTaxon::delete_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::Organisms => {
                 NestedOrganism::delete_by_id(primary_key.into(), author_user_id, connection)?
@@ -3503,15 +3465,11 @@ connection)?)?
                     connection,
                 )?
             }
+            web_common::database::Table::Ranks => {
+                unimplemented!("Method delete_by_id not implemented for table ranks.")
+            }
             web_common::database::Table::Roles => {
                 unimplemented!("Method delete_by_id not implemented for table roles.")
-            }
-            web_common::database::Table::SampleBioOttTaxonItems => {
-                NestedSampleBioOttTaxonItem::delete_by_id(
-                    primary_key.into(),
-                    author_user_id,
-                    connection,
-                )?
             }
             web_common::database::Table::SampleContainerCategories => unimplemented!(
                 "Method delete_by_id not implemented for table sample_container_categories."
@@ -3521,6 +3479,9 @@ connection)?)?
             }
             web_common::database::Table::SampleStates => {
                 unimplemented!("Method delete_by_id not implemented for table sample_states.")
+            }
+            web_common::database::Table::SampleTaxa => {
+                NestedSampleTaxon::delete_by_id(primary_key.into(), author_user_id, connection)?
             }
             web_common::database::Table::Samples => {
                 NestedSample::delete_by_id(primary_key.into(), author_user_id, connection)?
@@ -3534,6 +3495,9 @@ connection)?)?
                     author_user_id,
                     connection,
                 )?
+            }
+            web_common::database::Table::Taxa => {
+                unimplemented!("Method delete_by_id not implemented for table taxa.")
             }
             web_common::database::Table::TeamStates => {
                 unimplemented!("Method delete_by_id not implemented for table team_states.")
@@ -3622,8 +3586,6 @@ impl InsertableTable for web_common::database::Table {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => unreachable!("Table `bio_ott_ranks` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::BioOttTaxonItems => unreachable!("Table `bio_ott_taxon_items` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Colors => unreachable!("Table `colors` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Countries => unreachable!("Table `countries` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::DerivedSamples => {
@@ -3651,10 +3613,10 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::database::nested_variants::NestedObservation::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-                let row: web_common::database::new_variants::NewOrganismBioOttTaxonItem = bincode::deserialize::<web_common::database::new_variants::NewOrganismBioOttTaxonItem>(&row)?;
-                let inserted_row: crate::database::flat_variants::OrganismBioOttTaxonItem = <web_common::database::new_variants::NewOrganismBioOttTaxonItem as InsertRow>::insert(row, user_id, connection)?;
-                let nested_row = crate::database::nested_variants::NestedOrganismBioOttTaxonItem::from_flat(inserted_row, Some(user_id), connection)?;
+            web_common::database::Table::OrganismTaxa => {
+                let row: web_common::database::new_variants::NewOrganismTaxon = bincode::deserialize::<web_common::database::new_variants::NewOrganismTaxon>(&row)?;
+                let inserted_row: crate::database::flat_variants::OrganismTaxon = <web_common::database::new_variants::NewOrganismTaxon as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::database::nested_variants::NestedOrganismTaxon::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::Organisms => {
@@ -3708,13 +3670,8 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::database::nested_variants::NestedProjectsUsersRole::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
+            web_common::database::Table::Ranks => unreachable!("Table `ranks` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Roles => unreachable!("Table `roles` is not insertable as it does not have a known column associated to a creator user id."),
-            web_common::database::Table::SampleBioOttTaxonItems => {
-                let row: web_common::database::new_variants::NewSampleBioOttTaxonItem = bincode::deserialize::<web_common::database::new_variants::NewSampleBioOttTaxonItem>(&row)?;
-                let inserted_row: crate::database::flat_variants::SampleBioOttTaxonItem = <web_common::database::new_variants::NewSampleBioOttTaxonItem as InsertRow>::insert(row, user_id, connection)?;
-                let nested_row = crate::database::nested_variants::NestedSampleBioOttTaxonItem::from_flat(inserted_row, Some(user_id), connection)?;
-                 bincode::serialize(&nested_row)?
-            },
             web_common::database::Table::SampleContainerCategories => unreachable!("Table `sample_container_categories` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::SampleContainers => {
                 let row: web_common::database::new_variants::NewSampleContainer = bincode::deserialize::<web_common::database::new_variants::NewSampleContainer>(&row)?;
@@ -3723,6 +3680,12 @@ impl InsertableTable for web_common::database::Table {
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not insertable as it does not have a known column associated to a creator user id."),
+            web_common::database::Table::SampleTaxa => {
+                let row: web_common::database::new_variants::NewSampleTaxon = bincode::deserialize::<web_common::database::new_variants::NewSampleTaxon>(&row)?;
+                let inserted_row: crate::database::flat_variants::SampleTaxon = <web_common::database::new_variants::NewSampleTaxon as InsertRow>::insert(row, user_id, connection)?;
+                let nested_row = crate::database::nested_variants::NestedSampleTaxon::from_flat(inserted_row, Some(user_id), connection)?;
+                 bincode::serialize(&nested_row)?
+            },
             web_common::database::Table::Samples => {
                 let row: web_common::database::new_variants::NewSample = bincode::deserialize::<web_common::database::new_variants::NewSample>(&row)?;
                 let inserted_row: crate::database::flat_variants::Sample = <web_common::database::new_variants::NewSample as InsertRow>::insert(row, user_id, connection)?;
@@ -3736,6 +3699,7 @@ impl InsertableTable for web_common::database::Table {
                 let nested_row = crate::database::nested_variants::NestedSpectraCollection::from_flat(inserted_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
+            web_common::database::Table::Taxa => unreachable!("Table `taxa` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::TeamStates => unreachable!("Table `team_states` is not insertable as it does not have a known column associated to a creator user id."),
             web_common::database::Table::Teams => {
                 let row: web_common::database::new_variants::NewTeam = bincode::deserialize::<web_common::database::new_variants::NewTeam>(&row)?;
@@ -3828,8 +3792,6 @@ impl UpdatableTable for web_common::database::Table {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => unreachable!("Table `bio_ott_ranks` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::BioOttTaxonItems => unreachable!("Table `bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Colors => unreachable!("Table `colors` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Countries => unreachable!("Table `countries` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::DerivedSamples => {
@@ -3857,7 +3819,7 @@ impl UpdatableTable for web_common::database::Table {
                 let nested_row = crate::database::nested_variants::NestedObservation::from_flat(updated_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
-            web_common::database::Table::OrganismBioOttTaxonItems => unreachable!("Table `organism_bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::OrganismTaxa => unreachable!("Table `organism_taxa` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Organisms => {
                 let row: web_common::database::NewOrganism = bincode::deserialize::<web_common::database::NewOrganism>(&row)?;
                 let updated_row: crate::database::flat_variants::Organism = <web_common::database::NewOrganism as UpdateRow>::update(row, user_id, connection)?;
@@ -3879,8 +3841,8 @@ impl UpdatableTable for web_common::database::Table {
             web_common::database::Table::ProjectsUsersRoleInvitations => unreachable!("Table `projects_users_role_invitations` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::ProjectsUsersRoleRequests => unreachable!("Table `projects_users_role_requests` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::ProjectsUsersRoles => unreachable!("Table `projects_users_roles` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::Ranks => unreachable!("Table `ranks` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Roles => unreachable!("Table `roles` is not updatable as it does not have a known column associated to an updater user id."),
-            web_common::database::Table::SampleBioOttTaxonItems => unreachable!("Table `sample_bio_ott_taxon_items` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampleContainerCategories => unreachable!("Table `sample_container_categories` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::SampleContainers => {
                 let row: web_common::database::UpdateSampleContainer = bincode::deserialize::<web_common::database::UpdateSampleContainer>(&row)?;
@@ -3889,6 +3851,7 @@ impl UpdatableTable for web_common::database::Table {
                  bincode::serialize(&nested_row)?
             },
             web_common::database::Table::SampleStates => unreachable!("Table `sample_states` is not updatable as it does not have a known column associated to an updater user id."),
+            web_common::database::Table::SampleTaxa => unreachable!("Table `sample_taxa` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Samples => {
                 let row: web_common::database::NewSample = bincode::deserialize::<web_common::database::NewSample>(&row)?;
                 let updated_row: crate::database::flat_variants::Sample = <web_common::database::NewSample as UpdateRow>::update(row, user_id, connection)?;
@@ -3902,6 +3865,7 @@ impl UpdatableTable for web_common::database::Table {
                 let nested_row = crate::database::nested_variants::NestedSpectraCollection::from_flat(updated_row, Some(user_id), connection)?;
                  bincode::serialize(&nested_row)?
             },
+            web_common::database::Table::Taxa => unreachable!("Table `taxa` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::TeamStates => unreachable!("Table `team_states` is not updatable as it does not have a known column associated to an updater user id."),
             web_common::database::Table::Teams => {
                 let row: web_common::database::UpdateTeam = bincode::deserialize::<web_common::database::UpdateTeam>(&row)?;
@@ -3954,23 +3918,6 @@ impl FromFlatStrTable for web_common::database::Table {
         connection: &mut PooledConnection<ConnectionManager<diesel::prelude::PgConnection>>,
     ) -> Result<Vec<u8>, web_common::api::ApiError> {
         Ok(match self {
-            web_common::database::Table::BioOttRanks => {
-                let flat_row: crate::database::flat_variants::BioOttRank =
-                    serde_json::from_str::<crate::database::flat_variants::BioOttRank>(row)?;
-                let richest_row = crate::database::nested_variants::NestedBioOttRank::from_flat(
-                    flat_row, connection,
-                )?;
-                bincode::serialize(&richest_row)?
-            }
-            web_common::database::Table::BioOttTaxonItems => {
-                let flat_row: crate::database::flat_variants::BioOttTaxonItem =
-                    serde_json::from_str::<crate::database::flat_variants::BioOttTaxonItem>(row)?;
-                let richest_row =
-                    crate::database::nested_variants::NestedBioOttTaxonItem::from_flat(
-                        flat_row, connection,
-                    )?;
-                bincode::serialize(&richest_row)?
-            }
             web_common::database::Table::Colors => bincode::serialize(&serde_json::from_str::<
                 crate::database::flat_variants::Color,
             >(row)?)?,
@@ -4059,15 +4006,12 @@ impl FromFlatStrTable for web_common::database::Table {
                 )?;
                 bincode::serialize(&richest_row)?
             }
-            web_common::database::Table::OrganismBioOttTaxonItems => {
-                let flat_row: crate::database::flat_variants::OrganismBioOttTaxonItem =
-                    serde_json::from_str::<crate::database::flat_variants::OrganismBioOttTaxonItem>(
-                        row,
-                    )?;
-                let richest_row =
-                    crate::database::nested_variants::NestedOrganismBioOttTaxonItem::from_flat(
-                        flat_row, user_id, connection,
-                    )?;
+            web_common::database::Table::OrganismTaxa => {
+                let flat_row: crate::database::flat_variants::OrganismTaxon =
+                    serde_json::from_str::<crate::database::flat_variants::OrganismTaxon>(row)?;
+                let richest_row = crate::database::nested_variants::NestedOrganismTaxon::from_flat(
+                    flat_row, user_id, connection,
+                )?;
                 bincode::serialize(&richest_row)?
             }
             web_common::database::Table::Organisms => {
@@ -4175,22 +4119,18 @@ impl FromFlatStrTable for web_common::database::Table {
                     )?;
                 bincode::serialize(&richest_row)?
             }
+            web_common::database::Table::Ranks => {
+                let flat_row: crate::database::flat_variants::Rank =
+                    serde_json::from_str::<crate::database::flat_variants::Rank>(row)?;
+                let richest_row =
+                    crate::database::nested_variants::NestedRank::from_flat(flat_row, connection)?;
+                bincode::serialize(&richest_row)?
+            }
             web_common::database::Table::Roles => {
                 let flat_row: crate::database::flat_variants::Role =
                     serde_json::from_str::<crate::database::flat_variants::Role>(row)?;
                 let richest_row =
                     crate::database::nested_variants::NestedRole::from_flat(flat_row, connection)?;
-                bincode::serialize(&richest_row)?
-            }
-            web_common::database::Table::SampleBioOttTaxonItems => {
-                let flat_row: crate::database::flat_variants::SampleBioOttTaxonItem =
-                    serde_json::from_str::<crate::database::flat_variants::SampleBioOttTaxonItem>(
-                        row,
-                    )?;
-                let richest_row =
-                    crate::database::nested_variants::NestedSampleBioOttTaxonItem::from_flat(
-                        flat_row, user_id, connection,
-                    )?;
                 bincode::serialize(&richest_row)?
             }
             web_common::database::Table::SampleContainerCategories => {
@@ -4221,6 +4161,14 @@ impl FromFlatStrTable for web_common::database::Table {
                 )?;
                 bincode::serialize(&richest_row)?
             }
+            web_common::database::Table::SampleTaxa => {
+                let flat_row: crate::database::flat_variants::SampleTaxon =
+                    serde_json::from_str::<crate::database::flat_variants::SampleTaxon>(row)?;
+                let richest_row = crate::database::nested_variants::NestedSampleTaxon::from_flat(
+                    flat_row, user_id, connection,
+                )?;
+                bincode::serialize(&richest_row)?
+            }
             web_common::database::Table::Samples => {
                 let flat_row: crate::database::flat_variants::Sample =
                     serde_json::from_str::<crate::database::flat_variants::Sample>(row)?;
@@ -4230,9 +4178,9 @@ impl FromFlatStrTable for web_common::database::Table {
                 bincode::serialize(&richest_row)?
             }
             web_common::database::Table::Spectra => {
-                let flat_row: crate::database::flat_variants::Spectra =
-                    serde_json::from_str::<crate::database::flat_variants::Spectra>(row)?;
-                let richest_row = crate::database::nested_variants::NestedSpectra::from_flat(
+                let flat_row: crate::database::flat_variants::Spectrum =
+                    serde_json::from_str::<crate::database::flat_variants::Spectrum>(row)?;
+                let richest_row = crate::database::nested_variants::NestedSpectrum::from_flat(
                     flat_row, user_id, connection,
                 )?;
                 bincode::serialize(&richest_row)?
@@ -4244,6 +4192,13 @@ impl FromFlatStrTable for web_common::database::Table {
                     crate::database::nested_variants::NestedSpectraCollection::from_flat(
                         flat_row, user_id, connection,
                     )?;
+                bincode::serialize(&richest_row)?
+            }
+            web_common::database::Table::Taxa => {
+                let flat_row: crate::database::flat_variants::Taxon =
+                    serde_json::from_str::<crate::database::flat_variants::Taxon>(row)?;
+                let richest_row =
+                    crate::database::nested_variants::NestedTaxon::from_flat(flat_row, connection)?;
                 bincode::serialize(&richest_row)?
             }
             web_common::database::Table::TeamStates => {

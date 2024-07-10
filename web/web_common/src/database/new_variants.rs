@@ -166,15 +166,15 @@ impl NewObservation {
     }
 }
 #[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
-pub struct NewOrganismBioOttTaxonItem {
+pub struct NewOrganismTaxon {
     pub organism_id: uuid::Uuid,
     pub taxon_id: i32,
 }
 
-unsafe impl Send for NewOrganismBioOttTaxonItem {}
-unsafe impl Sync for NewOrganismBioOttTaxonItem {}
-impl Tabular for NewOrganismBioOttTaxonItem {
-    const TABLE: Table = Table::OrganismBioOttTaxonItems;
+unsafe impl Send for NewOrganismTaxon {}
+unsafe impl Sync for NewOrganismTaxon {}
+impl Tabular for NewOrganismTaxon {
+    const TABLE: Table = Table::OrganismTaxa;
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewOrganism {
@@ -458,17 +458,6 @@ unsafe impl Sync for NewProjectsUsersRole {}
 impl Tabular for NewProjectsUsersRole {
     const TABLE: Table = Table::ProjectsUsersRoles;
 }
-#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
-pub struct NewSampleBioOttTaxonItem {
-    pub sample_id: uuid::Uuid,
-    pub taxon_id: i32,
-}
-
-unsafe impl Send for NewSampleBioOttTaxonItem {}
-unsafe impl Sync for NewSampleBioOttTaxonItem {}
-impl Tabular for NewSampleBioOttTaxonItem {
-    const TABLE: Table = Table::SampleBioOttTaxonItems;
-}
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSampleContainer {
     pub barcode: String,
@@ -480,6 +469,17 @@ unsafe impl Send for NewSampleContainer {}
 unsafe impl Sync for NewSampleContainer {}
 impl Tabular for NewSampleContainer {
     const TABLE: Table = Table::SampleContainers;
+}
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+pub struct NewSampleTaxon {
+    pub sample_id: uuid::Uuid,
+    pub taxon_id: i32,
+}
+
+unsafe impl Send for NewSampleTaxon {}
+unsafe impl Sync for NewSampleTaxon {}
+impl Tabular for NewSampleTaxon {
+    const TABLE: Table = Table::SampleTaxa;
 }
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct NewSample {

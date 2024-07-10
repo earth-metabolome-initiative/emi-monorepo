@@ -38,10 +38,10 @@ diesel::define_sql_function! {
 }
 
 diesel::define_sql_function! {
-   fn can_admin_organism_bio_ott_taxon_items(
+   fn can_admin_organism_taxa(
         author_user_id: diesel::sql_types::Integer,
-        this_organism_bio_ott_taxon_items_organism_id: diesel::sql_types::Uuid,
-        this_organism_bio_ott_taxon_items_taxon_id: diesel::sql_types::Integer,
+        this_organism_taxa_organism_id: diesel::sql_types::Uuid,
+        this_organism_taxa_taxon_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
@@ -108,17 +108,17 @@ diesel::define_sql_function! {
 }
 
 diesel::define_sql_function! {
-   fn can_admin_sample_bio_ott_taxon_items(
+   fn can_admin_sample_containers(
         author_user_id: diesel::sql_types::Integer,
-        this_sample_bio_ott_taxon_items_sample_id: diesel::sql_types::Uuid,
-        this_sample_bio_ott_taxon_items_taxon_id: diesel::sql_types::Integer,
+        this_sample_containers_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
 diesel::define_sql_function! {
-   fn can_admin_sample_containers(
+   fn can_admin_sample_taxa(
         author_user_id: diesel::sql_types::Integer,
-        this_sample_containers_id: diesel::sql_types::Integer,
+        this_sample_taxa_sample_id: diesel::sql_types::Uuid,
+        this_sample_taxa_taxon_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
@@ -307,10 +307,10 @@ diesel::define_sql_function! {
 }
 
 diesel::define_sql_function! {
-   fn can_view_organism_bio_ott_taxon_items(
+   fn can_view_organism_taxa(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        this_organism_bio_ott_taxon_items_organism_id: diesel::sql_types::Uuid,
-        this_organism_bio_ott_taxon_items_taxon_id: diesel::sql_types::Integer,
+        this_organism_taxa_organism_id: diesel::sql_types::Uuid,
+        this_organism_taxa_taxon_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
@@ -377,17 +377,17 @@ diesel::define_sql_function! {
 }
 
 diesel::define_sql_function! {
-   fn can_view_sample_bio_ott_taxon_items(
+   fn can_view_sample_containers(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        this_sample_bio_ott_taxon_items_sample_id: diesel::sql_types::Uuid,
-        this_sample_bio_ott_taxon_items_taxon_id: diesel::sql_types::Integer,
+        this_sample_containers_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
 diesel::define_sql_function! {
-   fn can_view_sample_containers(
+   fn can_view_sample_taxa(
         author_user_id: diesel::sql_types::Nullable<diesel::sql_types::Integer>,
-        this_sample_containers_id: diesel::sql_types::Integer,
+        this_sample_taxa_sample_id: diesel::sql_types::Uuid,
+        this_sample_taxa_taxon_id: diesel::sql_types::Integer,
     ) -> diesel::sql_types::Bool;
 }
 
@@ -460,13 +460,6 @@ diesel::define_sql_function! {
 }
 
 diesel::define_sql_function! {
-   fn concat_bio_ott_ranks_name_description(
-        name: diesel::sql_types::Text,
-        description: diesel::sql_types::Text,
-    ) -> diesel::sql_types::Text;
-}
-
-diesel::define_sql_function! {
    fn concat_colors_name(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
@@ -510,6 +503,13 @@ diesel::define_sql_function! {
 
 diesel::define_sql_function! {
    fn concat_projects_name_description(
+        name: diesel::sql_types::Text,
+        description: diesel::sql_types::Text,
+    ) -> diesel::sql_types::Text;
+}
+
+diesel::define_sql_function! {
+   fn concat_ranks_name_description(
         name: diesel::sql_types::Text,
         description: diesel::sql_types::Text,
     ) -> diesel::sql_types::Text;

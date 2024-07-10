@@ -89,7 +89,7 @@ impl OrganismBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        Ok(table("organism_bio_ott_taxon_items")
+        Ok(table("organism_taxa")
             .insert()
             .columns("created_by, created_at, organism_id, taxon_id")
             .values(vec![self.into_row()])
@@ -112,7 +112,7 @@ impl OrganismBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        let select_row = table("organism_bio_ott_taxon_items")
+        let select_row = table("organism_taxa")
             .select()
             .filter(col("organism_id").eq(organism_id.to_string()))
             .filter(col("taxon_id").eq(taxon_id.to_string()))
@@ -149,7 +149,7 @@ impl OrganismBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        Ok(table("organism_bio_ott_taxon_items")
+        Ok(table("organism_taxa")
             .delete()
             .filter(col("organism_id").eq(organism_id.to_string()))
             .filter(col("taxon_id").eq(taxon_id.to_string()))
@@ -169,7 +169,7 @@ impl OrganismBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        table("organism_bio_ott_taxon_items")
+        table("organism_taxa")
             .update()
             .set(
                 "created_by",
@@ -222,7 +222,7 @@ impl OrganismBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        let select_row = table("organism_bio_ott_taxon_items")
+        let select_row = table("organism_taxa")
             .select()
             .filter(filter.map_or_else(
                 || {

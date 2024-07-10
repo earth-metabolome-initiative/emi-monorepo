@@ -9,7 +9,7 @@ pub struct NestedSampleBioOttTaxonItem {
     pub inner: crate::database::flat_variants::SampleBioOttTaxonItem,
     pub created_by: Rc<crate::database::nested_variants::NestedUser>,
     pub sample: Rc<crate::database::nested_variants::NestedSample>,
-    pub taxon: Rc<crate::database::nested_variants::NestedBioOttTaxonItem>,
+    pub taxon: Rc<crate::database::nested_variants::NestedTaxon>,
 }
 
 unsafe impl Send for NestedSampleBioOttTaxonItem {}
@@ -72,7 +72,7 @@ impl NestedSampleBioOttTaxonItem {
                 .unwrap(),
             ),
             taxon: Rc::from(
-                crate::database::nested_variants::NestedBioOttTaxonItem::get(
+                crate::database::nested_variants::NestedTaxon::get(
                     flat_variant.taxon_id,
                     connection,
                 )
@@ -166,16 +166,16 @@ impl NestedSampleBioOttTaxonItem {
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, crate::api::ApiError> {
-        let mut sample_bio_ott_taxon_items = Vec::new();
+        let mut sample_taxa = Vec::new();
         for flat_variant in crate::database::flat_variants::SampleBioOttTaxonItem::all(
             filter, limit, offset, connection,
         )
         .await?
         .into_iter()
         {
-            sample_bio_ott_taxon_items.push(Self::from_flat(flat_variant, connection).await?);
+            sample_taxa.push(Self::from_flat(flat_variant, connection).await?);
         }
-        Ok(sample_bio_ott_taxon_items)
+        Ok(sample_taxa)
     }
     /// Update or insert the record in the database.
     ///
@@ -196,7 +196,7 @@ impl NestedSampleBioOttTaxonItem {
             connection,
         )
         .await?;
-        crate::database::nested_variants::NestedBioOttTaxonItem::update_or_insert(
+        crate::database::nested_variants::NestedTaxon::update_or_insert(
             self.taxon.as_ref(),
             connection,
         )

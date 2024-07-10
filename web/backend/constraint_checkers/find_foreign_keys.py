@@ -1248,10 +1248,40 @@ class TableMetadata:
         This method returns whether there exists a table in the database
         names `{table_name}_{referece}_roles`.
         """
-        return any(
-            self.is_table(f"{table_name}_{reference}_roles")
-            for reference in ("users", "teams")
+        return (
+            self.has_associated_users_roles(table_name) or
+            self.has_associated_teams_roles(table_name)
         )
+
+    def has_associated_users_roles(self, table_name: str) -> bool:
+        """Returns whether the table has associated users roles.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether there exists a table in the database
+        named `{table_name}_users_roles`.
+        """
+        return self.is_table(f"{table_name}_users_roles")
+
+    def has_associated_teams_roles(self, table_name: str) -> bool:
+        """Returns whether the table has associated teams roles.
+
+        Parameters
+        ----------
+        table_name : str
+            The name of the table.
+
+        Implementation details
+        ----------------------
+        This method returns whether there exists a table in the database
+        named `{table_name}_teams_roles`.
+        """
+        return self.is_table(f"{table_name}_teams_roles")
 
     def _register_flat_variant_associated_with_function(
         self, sql_function: SQLFunction

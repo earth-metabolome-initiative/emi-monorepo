@@ -209,8 +209,8 @@ where
         web_common::database::NestedNameplate,
         web_common::database::NestedSampleContainer,
         web_common::database::NestedTeam,
-        web_common::database::NestedBioOttRank,
-        web_common::database::NestedBioOttTaxonItem
+        web_common::database::NestedRank,
+        web_common::database::NestedTaxon
     );
 
     // We extract the records from the heap and return them as a sorted list.

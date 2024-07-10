@@ -14,6 +14,7 @@ from constraint_checkers.indices import (
     PGIndex,
     DerivedPGIndex,
 )
+from constraint_checkers.regroup_tables import SUPPORT_TABLE_NAMES
 from constraint_checkers.utils import infer_route_from_document
 from constraint_checkers.gluesql_types_mapping import (
     GLUESQL_TYPES_MAPPING,
@@ -1655,6 +1656,10 @@ class StructMetadata:
             and self.name.startswith("New")
         )
 
+    def has_new_variant(self) -> bool:
+        """Returns whether the struct has a new variant."""
+        return self._new_variant is not None
+
     def is_update_variant(self) -> bool:
         """Returns whether the struct is an update variant."""
         return self.is_updatable() and (
@@ -1663,6 +1668,10 @@ class StructMetadata:
             and self.name.startswith("Update")
             or (self.has_uuid_primary_key() and self.is_new_variant())
         )
+
+    def has_update_variant(self) -> bool:
+        """Returns whether the struct has an update variant."""
+        return self._update_variant is not None
 
     def set_flat_variant(self, struct: "StructMetadata"):
         """Sets the flat variant of the struct."""
@@ -2282,6 +2291,10 @@ class StructMetadata:
             self.table_name.endswith("requests")
             and self.is_junktion_table()
         )
+    
+    def has_frontend_form(self) -> bool:
+        """Returns whether the struct has a frontend form."""
+        return (self.has_new_variant() or self.is_new_variant() or self.has_update_variant() or self.is_update_variant()) and not (self.is_request_table() or self.table_name in SUPPORT_TABLE_NAMES)
 
     def get_editability_determinant_columns(self) -> Optional[List[AttributeMetadata]]:
         """Returns the column that determines the editability of the struct.
@@ -2415,6 +2428,14 @@ class StructMetadata:
     def has_associated_roles(self) -> bool:
         """Returns whether there is a roles table associated with the struct."""
         return StructMetadata.table_metadata.has_associated_roles(self.table_name)
+
+    def has_associated_users_roles(self) -> bool:
+        """Returns whether there is a users_roles table associated with the struct."""
+        return StructMetadata.table_metadata.has_associated_users_roles(self.table_name)
+
+    def has_associated_teams_roles(self) -> bool:
+        """Returns whether there is a teams table associated with the struct."""
+        return StructMetadata.table_metadata.has_associated_teams_roles(self.table_name)
 
     def has_public_column(self) -> bool:
         """Returns whether the struct has a public column."""
@@ -2601,6 +2622,40 @@ class StructMetadata:
             attribute.implements_as_ref_str() or attribute.has_struct_data_type() and attribute.raw_data_type().is_searchable()
             for attribute in self.attributes
         )
+
+    def get_project_attribute(self) -> Optional[List[AttributeMetadata]]:
+        """Returns the project attribute of the struct.
+        
+        Implementation details
+        -----------------------
+        In case of a deply nested struct whose project attribute is nested
+        down several layers, we return the path to the project attribute.
+        """
+        assert self.is_nested(), (
+            "Non-nested structs do not have project attributes. "
+            f"The struct {self.name} associated with the table {self.table_name} is not nested."
+        )
+
+        for attribute in self.attributes:
+            if not attribute.has_struct_data_type():
+                continue
+            if attribute.optional:
+                continue
+            foreign_struct = attribute.raw_data_type()
+            if foreign_struct.table_name == "projects":
+                return [attribute]
+            if foreign_struct.is_nested():
+                project_attribute = foreign_struct.get_project_attribute()
+                if project_attribute is not None:
+                    return [attribute] + project_attribute
+
+        return None
+
+    def has_project_attribute(self) -> bool:
+        """Returns whether the struct has a project attribute."""
+        if not self.is_nested():
+            return False
+        return self.get_project_attribute() is not None
 
     def get_can_update_function_name(self) -> str:
         """Returns the name of the can_update function."""

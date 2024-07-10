@@ -1254,7 +1254,6 @@ def write_frontend_yew_form(
                 continue
 
             if attribute.is_file():
-                # TODO! CHECK THAT THE APPROPRIATE FILE PROCESSOR EXISTS!
                 worker_name = f"{attribute.raw_data_type().lower()}_file_processor"
                 expected_path = f"../frontend/src/bin/{worker_name}.rs"
                 if not os.path.exists(expected_path):
@@ -1481,5 +1480,7 @@ def write_frontend_forms(
 
     module_document.flush()
     module_document.close()
+
+    assert len(builder_structs) > 0
 
     print(f"Wrote {len(builder_structs)} frontend forms.")

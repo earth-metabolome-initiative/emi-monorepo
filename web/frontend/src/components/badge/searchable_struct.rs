@@ -10,15 +10,13 @@ use yew::prelude::*;
 impl RowToBadge for SearchableStruct {
     fn badge_title(&self) -> String {
         match self {
-            SearchableStruct::NestedBioOttRank(value) => value.badge_title(),
-            SearchableStruct::NestedBioOttTaxonItem(value) => value.badge_title(),
             SearchableStruct::NestedDerivedSample(value) => value.badge_title(),
             SearchableStruct::NestedDocumentFormat(value) => value.badge_title(),
             SearchableStruct::NestedNameplateCategory(value) => value.badge_title(),
             SearchableStruct::NestedNameplate(value) => value.badge_title(),
             SearchableStruct::NestedObservationSubject(value) => value.badge_title(),
             SearchableStruct::NestedObservation(value) => value.badge_title(),
-            SearchableStruct::NestedOrganismBioOttTaxonItem(value) => value.badge_title(),
+            SearchableStruct::NestedOrganismTaxon(value) => value.badge_title(),
             SearchableStruct::NestedOrganism(value) => value.badge_title(),
             SearchableStruct::NestedOrganization(value) => value.badge_title(),
             SearchableStruct::NestedProjectState(value) => value.badge_title(),
@@ -29,13 +27,15 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedProjectsUsersRoleInvitation(value) => value.badge_title(),
             SearchableStruct::NestedProjectsUsersRoleRequest(value) => value.badge_title(),
             SearchableStruct::NestedProjectsUsersRole(value) => value.badge_title(),
+            SearchableStruct::NestedRank(value) => value.badge_title(),
             SearchableStruct::NestedRole(value) => value.badge_title(),
-            SearchableStruct::NestedSampleBioOttTaxonItem(value) => value.badge_title(),
             SearchableStruct::NestedSampleContainerCategory(value) => value.badge_title(),
             SearchableStruct::NestedSampleContainer(value) => value.badge_title(),
             SearchableStruct::NestedSampleState(value) => value.badge_title(),
+            SearchableStruct::NestedSampleTaxon(value) => value.badge_title(),
             SearchableStruct::NestedSample(value) => value.badge_title(),
             SearchableStruct::NestedSpectraCollection(value) => value.badge_title(),
+            SearchableStruct::NestedTaxon(value) => value.badge_title(),
             SearchableStruct::NestedTeamState(value) => value.badge_title(),
             SearchableStruct::NestedTeam(value) => value.badge_title(),
             SearchableStruct::NestedTeamsTeamsRoleInvitation(value) => value.badge_title(),
@@ -55,15 +55,13 @@ impl RowToBadge for SearchableStruct {
 
     fn path(&self) -> Option<AppRoute> {
         match self {
-            SearchableStruct::NestedBioOttRank(value) => value.path(),
-            SearchableStruct::NestedBioOttTaxonItem(value) => value.path(),
             SearchableStruct::NestedDerivedSample(value) => value.path(),
             SearchableStruct::NestedDocumentFormat(value) => value.path(),
             SearchableStruct::NestedNameplateCategory(value) => value.path(),
             SearchableStruct::NestedNameplate(value) => value.path(),
             SearchableStruct::NestedObservationSubject(value) => value.path(),
             SearchableStruct::NestedObservation(value) => value.path(),
-            SearchableStruct::NestedOrganismBioOttTaxonItem(value) => value.path(),
+            SearchableStruct::NestedOrganismTaxon(value) => value.path(),
             SearchableStruct::NestedOrganism(value) => value.path(),
             SearchableStruct::NestedOrganization(value) => value.path(),
             SearchableStruct::NestedProjectState(value) => value.path(),
@@ -74,13 +72,15 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedProjectsUsersRoleInvitation(value) => value.path(),
             SearchableStruct::NestedProjectsUsersRoleRequest(value) => value.path(),
             SearchableStruct::NestedProjectsUsersRole(value) => value.path(),
+            SearchableStruct::NestedRank(value) => value.path(),
             SearchableStruct::NestedRole(value) => value.path(),
-            SearchableStruct::NestedSampleBioOttTaxonItem(value) => value.path(),
             SearchableStruct::NestedSampleContainerCategory(value) => value.path(),
             SearchableStruct::NestedSampleContainer(value) => value.path(),
             SearchableStruct::NestedSampleState(value) => value.path(),
+            SearchableStruct::NestedSampleTaxon(value) => value.path(),
             SearchableStruct::NestedSample(value) => value.path(),
             SearchableStruct::NestedSpectraCollection(value) => value.path(),
+            SearchableStruct::NestedTaxon(value) => value.path(),
             SearchableStruct::NestedTeamState(value) => value.path(),
             SearchableStruct::NestedTeam(value) => value.path(),
             SearchableStruct::NestedTeamsTeamsRoleInvitation(value) => value.path(),
@@ -100,15 +100,13 @@ impl RowToBadge for SearchableStruct {
 
     fn primary_image_url(&self) -> Option<String> {
         match self {
-            SearchableStruct::NestedBioOttRank(value) => value.primary_image_url(),
-            SearchableStruct::NestedBioOttTaxonItem(value) => value.primary_image_url(),
             SearchableStruct::NestedDerivedSample(value) => value.primary_image_url(),
             SearchableStruct::NestedDocumentFormat(value) => value.primary_image_url(),
             SearchableStruct::NestedNameplateCategory(value) => value.primary_image_url(),
             SearchableStruct::NestedNameplate(value) => value.primary_image_url(),
             SearchableStruct::NestedObservationSubject(value) => value.primary_image_url(),
             SearchableStruct::NestedObservation(value) => value.primary_image_url(),
-            SearchableStruct::NestedOrganismBioOttTaxonItem(value) => value.primary_image_url(),
+            SearchableStruct::NestedOrganismTaxon(value) => value.primary_image_url(),
             SearchableStruct::NestedOrganism(value) => value.primary_image_url(),
             SearchableStruct::NestedOrganization(value) => value.primary_image_url(),
             SearchableStruct::NestedProjectState(value) => value.primary_image_url(),
@@ -119,13 +117,15 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedProjectsUsersRoleInvitation(value) => value.primary_image_url(),
             SearchableStruct::NestedProjectsUsersRoleRequest(value) => value.primary_image_url(),
             SearchableStruct::NestedProjectsUsersRole(value) => value.primary_image_url(),
+            SearchableStruct::NestedRank(value) => value.primary_image_url(),
             SearchableStruct::NestedRole(value) => value.primary_image_url(),
-            SearchableStruct::NestedSampleBioOttTaxonItem(value) => value.primary_image_url(),
             SearchableStruct::NestedSampleContainerCategory(value) => value.primary_image_url(),
             SearchableStruct::NestedSampleContainer(value) => value.primary_image_url(),
             SearchableStruct::NestedSampleState(value) => value.primary_image_url(),
+            SearchableStruct::NestedSampleTaxon(value) => value.primary_image_url(),
             SearchableStruct::NestedSample(value) => value.primary_image_url(),
             SearchableStruct::NestedSpectraCollection(value) => value.primary_image_url(),
+            SearchableStruct::NestedTaxon(value) => value.primary_image_url(),
             SearchableStruct::NestedTeamState(value) => value.primary_image_url(),
             SearchableStruct::NestedTeam(value) => value.primary_image_url(),
             SearchableStruct::NestedTeamsTeamsRoleInvitation(value) => value.primary_image_url(),
@@ -145,15 +145,13 @@ impl RowToBadge for SearchableStruct {
 
     fn font_awesome_icon(&self) -> Option<&str> {
         match self {
-            SearchableStruct::NestedBioOttRank(value) => value.font_awesome_icon(),
-            SearchableStruct::NestedBioOttTaxonItem(value) => value.font_awesome_icon(),
             SearchableStruct::NestedDerivedSample(value) => value.font_awesome_icon(),
             SearchableStruct::NestedDocumentFormat(value) => value.font_awesome_icon(),
             SearchableStruct::NestedNameplateCategory(value) => value.font_awesome_icon(),
             SearchableStruct::NestedNameplate(value) => value.font_awesome_icon(),
             SearchableStruct::NestedObservationSubject(value) => value.font_awesome_icon(),
             SearchableStruct::NestedObservation(value) => value.font_awesome_icon(),
-            SearchableStruct::NestedOrganismBioOttTaxonItem(value) => value.font_awesome_icon(),
+            SearchableStruct::NestedOrganismTaxon(value) => value.font_awesome_icon(),
             SearchableStruct::NestedOrganism(value) => value.font_awesome_icon(),
             SearchableStruct::NestedOrganization(value) => value.font_awesome_icon(),
             SearchableStruct::NestedProjectState(value) => value.font_awesome_icon(),
@@ -164,13 +162,15 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedProjectsUsersRoleInvitation(value) => value.font_awesome_icon(),
             SearchableStruct::NestedProjectsUsersRoleRequest(value) => value.font_awesome_icon(),
             SearchableStruct::NestedProjectsUsersRole(value) => value.font_awesome_icon(),
+            SearchableStruct::NestedRank(value) => value.font_awesome_icon(),
             SearchableStruct::NestedRole(value) => value.font_awesome_icon(),
-            SearchableStruct::NestedSampleBioOttTaxonItem(value) => value.font_awesome_icon(),
             SearchableStruct::NestedSampleContainerCategory(value) => value.font_awesome_icon(),
             SearchableStruct::NestedSampleContainer(value) => value.font_awesome_icon(),
             SearchableStruct::NestedSampleState(value) => value.font_awesome_icon(),
+            SearchableStruct::NestedSampleTaxon(value) => value.font_awesome_icon(),
             SearchableStruct::NestedSample(value) => value.font_awesome_icon(),
             SearchableStruct::NestedSpectraCollection(value) => value.font_awesome_icon(),
+            SearchableStruct::NestedTaxon(value) => value.font_awesome_icon(),
             SearchableStruct::NestedTeamState(value) => value.font_awesome_icon(),
             SearchableStruct::NestedTeam(value) => value.font_awesome_icon(),
             SearchableStruct::NestedTeamsTeamsRoleInvitation(value) => value.font_awesome_icon(),
@@ -190,12 +190,6 @@ impl RowToBadge for SearchableStruct {
 
     fn children(&self, props: &BadgeProps<Self>) -> Option<Html> {
         match self {
-            SearchableStruct::NestedBioOttRank(value) => {
-                value.children(&props.to_child_props(value.clone()))
-            }
-            SearchableStruct::NestedBioOttTaxonItem(value) => {
-                value.children(&props.to_child_props(value.clone()))
-            }
             SearchableStruct::NestedDerivedSample(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
@@ -214,7 +208,7 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedObservation(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
-            SearchableStruct::NestedOrganismBioOttTaxonItem(value) => {
+            SearchableStruct::NestedOrganismTaxon(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
             SearchableStruct::NestedOrganism(value) => {
@@ -247,10 +241,10 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedProjectsUsersRole(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
-            SearchableStruct::NestedRole(value) => {
+            SearchableStruct::NestedRank(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
-            SearchableStruct::NestedSampleBioOttTaxonItem(value) => {
+            SearchableStruct::NestedRole(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
             SearchableStruct::NestedSampleContainerCategory(value) => {
@@ -262,10 +256,16 @@ impl RowToBadge for SearchableStruct {
             SearchableStruct::NestedSampleState(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
+            SearchableStruct::NestedSampleTaxon(value) => {
+                value.children(&props.to_child_props(value.clone()))
+            }
             SearchableStruct::NestedSample(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
             SearchableStruct::NestedSpectraCollection(value) => {
+                value.children(&props.to_child_props(value.clone()))
+            }
+            SearchableStruct::NestedTaxon(value) => {
                 value.children(&props.to_child_props(value.clone()))
             }
             SearchableStruct::NestedTeamState(value) => {

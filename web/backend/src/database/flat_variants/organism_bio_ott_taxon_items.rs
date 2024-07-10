@@ -30,7 +30,7 @@ use diesel::Selectable;
     Selectable,
     AsChangeset,
 )]
-#[diesel(table_name = crate::database::schema::organism_bio_ott_taxon_items)]
+#[diesel(table_name = crate::database::schema::organism_taxa)]
 #[diesel(primary_key(organism_id, taxon_id))]
 pub struct OrganismBioOttTaxonItem {
     pub created_by: i32,
@@ -98,7 +98,7 @@ impl OrganismBioOttTaxonItem {
         >,
     ) -> Result<bool, web_common::api::ApiError> {
         diesel::select(
-            crate::database::sql_function_bindings::can_view_organism_bio_ott_taxon_items(
+            crate::database::sql_function_bindings::can_view_organism_taxa(
                 author_user_id,
                 organism_id,
                 taxon_id,
@@ -123,26 +123,26 @@ impl OrganismBioOttTaxonItem {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::database::schema::organism_bio_ott_taxon_items;
-        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+        use crate::database::schema::organism_taxa;
+        let query = organism_taxa::dsl::organism_taxa
             .select(OrganismBioOttTaxonItem::as_select())
             .filter(
-                crate::database::sql_function_bindings::can_view_organism_bio_ott_taxon_items(
+                crate::database::sql_function_bindings::can_view_organism_taxa(
                     author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                    organism_taxa::dsl::organism_id,
+                    organism_taxa::dsl::taxon_id,
                 ),
             )
-            .order_by(organism_bio_ott_taxon_items::dsl::organism_id);
+            .order_by(organism_taxa::dsl::organism_id);
         let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+            query = query.filter(organism_taxa::dsl::created_by.eq(created_by));
         }
         if let Some(organism_id) = filter.and_then(|f| f.organism_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::organism_id.eq(organism_id));
+            query = query.filter(organism_taxa::dsl::organism_id.eq(organism_id));
         }
         if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+            query = query.filter(organism_taxa::dsl::taxon_id.eq(taxon_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -166,26 +166,26 @@ impl OrganismBioOttTaxonItem {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::database::schema::organism_bio_ott_taxon_items;
-        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+        use crate::database::schema::organism_taxa;
+        let query = organism_taxa::dsl::organism_taxa
             .select(OrganismBioOttTaxonItem::as_select())
             .filter(
-                crate::database::sql_function_bindings::can_view_organism_bio_ott_taxon_items(
+                crate::database::sql_function_bindings::can_view_organism_taxa(
                     author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                    organism_taxa::dsl::organism_id,
+                    organism_taxa::dsl::taxon_id,
                 ),
             )
-            .order_by(organism_bio_ott_taxon_items::dsl::created_at.desc());
+            .order_by(organism_taxa::dsl::created_at.desc());
         let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+            query = query.filter(organism_taxa::dsl::created_by.eq(created_by));
         }
         if let Some(organism_id) = filter.and_then(|f| f.organism_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::organism_id.eq(organism_id));
+            query = query.filter(organism_taxa::dsl::organism_id.eq(organism_id));
         }
         if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+            query = query.filter(organism_taxa::dsl::taxon_id.eq(taxon_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -208,10 +208,10 @@ impl OrganismBioOttTaxonItem {
         if !Self::can_view_by_id((organism_id, taxon_id), author_user_id, connection)? {
             return Err(web_common::api::ApiError::Unauthorized);
         }
-        use crate::database::schema::organism_bio_ott_taxon_items;
-        organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
-            .filter(organism_bio_ott_taxon_items::dsl::organism_id.eq(organism_id))
-            .filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id))
+        use crate::database::schema::organism_taxa;
+        organism_taxa::dsl::organism_taxa
+            .filter(organism_taxa::dsl::organism_id.eq(organism_id))
+            .filter(organism_taxa::dsl::taxon_id.eq(taxon_id))
             .first::<Self>(connection)
             .map_err(web_common::api::ApiError::from)
     }
@@ -239,30 +239,30 @@ impl OrganismBioOttTaxonItem {
         if query.is_empty() {
             return Self::all_viewable(filter, author_user_id, limit, offset, connection);
         }
-        use crate::database::schema::organism_bio_ott_taxon_items;
+        use crate::database::schema::organism_taxa;
         let (organisms0, organisms1) = diesel::alias!(
             crate::database::schema::organisms as organisms0,
             crate::database::schema::organisms as organisms1
         );
-        let mut query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
-            // This operation is defined by a first order index linking organism_bio_ott_taxon_items.taxon_id to bio_ott_taxon_items.
+        let mut query = organism_taxa::dsl::organism_taxa
+            // This operation is defined by a first order index linking organism_taxa.taxon_id to taxa.
 .inner_join(
-   bio_ott_taxon_items::dsl::bio_ott_taxon_items.on(
-       organism_bio_ott_taxon_items::dsl::taxon_id.eq(
-           bio_ott_taxon_items::dsl::id
+   taxa::dsl::taxa.on(
+       organism_taxa::dsl::taxon_id.eq(
+           taxa::dsl::id
         )
     )
 )
 
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.nameplate_id to nameplates.
 .inner_join(
    organisms0.on(
-       organism_bio_ott_taxon_items::dsl::organism_id.eq(
+       organism_taxa::dsl::organism_id.eq(
            organisms0.field(organisms::dsl::id)
         )
     )
 )
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.nameplate_id to nameplates.
 .inner_join(
    nameplates::dsl::nameplates.on(
        organisms0.field(organisms::dsl::nameplate_id).eq(
@@ -271,15 +271,15 @@ impl OrganismBioOttTaxonItem {
     )
 )
 
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.project_id to projects.
 .inner_join(
    organisms1.on(
-       organism_bio_ott_taxon_items::dsl::organism_id.eq(
+       organism_taxa::dsl::organism_id.eq(
            organisms1.field(organisms::dsl::id)
         )
     )
 )
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.project_id to projects.
 .inner_join(
    projects::dsl::projects.on(
        organisms1.field(organisms::dsl::project_id).eq(
@@ -289,10 +289,10 @@ impl OrganismBioOttTaxonItem {
 )
 
             .select(OrganismBioOttTaxonItem::as_select())
-            .filter(crate::database::sql_function_bindings::can_view_organism_bio_ott_taxon_items(author_user_id, organism_bio_ott_taxon_items::dsl::organism_id, organism_bio_ott_taxon_items::dsl::taxon_id))
+            .filter(crate::database::sql_function_bindings::can_view_organism_taxa(author_user_id, organism_taxa::dsl::organism_id, organism_taxa::dsl::taxon_id))
             .filter(
-bio_ott_taxon_items::dsl::name.strict_word_similarity_commutator_op(query).or(
-    bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))
+taxa::dsl::name.strict_word_similarity_commutator_op(query).or(
+    taxa::dsl::name.ilike(format!("%{}%", query))
 )
     .or(
 nameplates::dsl::barcode.strict_word_similarity_commutator_op(query).or(
@@ -305,18 +305,18 @@ crate::database::sql_function_bindings::concat_projects_name_description(project
 )
     )
 )
-            .order(crate::database::sql_function_bindings::strict_word_similarity_dist_op(bio_ott_taxon_items::dsl::name, query)    +
+            .order(crate::database::sql_function_bindings::strict_word_similarity_dist_op(taxa::dsl::name, query)    +
 crate::database::sql_function_bindings::strict_word_similarity_dist_op(nameplates::dsl::barcode, query)    +
 crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::database::sql_function_bindings::concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
             .into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+            query = query.filter(organism_taxa::dsl::created_by.eq(created_by));
         }
         if let Some(organism_id) = filter.and_then(|f| f.organism_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::organism_id.eq(organism_id));
+            query = query.filter(organism_taxa::dsl::organism_id.eq(organism_id));
         }
         if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+            query = query.filter(organism_taxa::dsl::taxon_id.eq(taxon_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -340,30 +340,30 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<(Self, f32)>, web_common::api::ApiError> {
-        use crate::database::schema::organism_bio_ott_taxon_items;
+        use crate::database::schema::organism_taxa;
         let (organisms0, organisms1) = diesel::alias!(
             crate::database::schema::organisms as organisms0,
             crate::database::schema::organisms as organisms1
         );
-        organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
-            // This operation is defined by a first order index linking organism_bio_ott_taxon_items.taxon_id to bio_ott_taxon_items.
+        organism_taxa::dsl::organism_taxa
+            // This operation is defined by a first order index linking organism_taxa.taxon_id to taxa.
 .inner_join(
-   bio_ott_taxon_items::dsl::bio_ott_taxon_items.on(
-       organism_bio_ott_taxon_items::dsl::taxon_id.eq(
-           bio_ott_taxon_items::dsl::id
+   taxa::dsl::taxa.on(
+       organism_taxa::dsl::taxon_id.eq(
+           taxa::dsl::id
         )
     )
 )
 
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.nameplate_id to nameplates.
 .inner_join(
    organisms0.on(
-       organism_bio_ott_taxon_items::dsl::organism_id.eq(
+       organism_taxa::dsl::organism_id.eq(
            organisms0.field(organisms::dsl::id)
         )
     )
 )
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.nameplate_id to nameplates.
 .inner_join(
    nameplates::dsl::nameplates.on(
        organisms0.field(organisms::dsl::nameplate_id).eq(
@@ -372,15 +372,15 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     )
 )
 
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.project_id to projects.
 .inner_join(
    organisms1.on(
-       organism_bio_ott_taxon_items::dsl::organism_id.eq(
+       organism_taxa::dsl::organism_id.eq(
            organisms1.field(organisms::dsl::id)
         )
     )
 )
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.project_id to projects.
 .inner_join(
    projects::dsl::projects.on(
        organisms1.field(organisms::dsl::project_id).eq(
@@ -391,14 +391,14 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 
             .select((
     OrganismBioOttTaxonItem::as_select(),
-    crate::database::sql_function_bindings::strict_word_similarity_dist_op(bio_ott_taxon_items::dsl::name, query)    +
+    crate::database::sql_function_bindings::strict_word_similarity_dist_op(taxa::dsl::name, query)    +
 crate::database::sql_function_bindings::strict_word_similarity_dist_op(nameplates::dsl::barcode, query)    +
 crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::database::sql_function_bindings::concat_projects_name_description(projects::dsl::name, projects::dsl::description), query)
 ))
-            .filter(crate::database::sql_function_bindings::can_view_organism_bio_ott_taxon_items(author_user_id, organism_bio_ott_taxon_items::dsl::organism_id, organism_bio_ott_taxon_items::dsl::taxon_id))
+            .filter(crate::database::sql_function_bindings::can_view_organism_taxa(author_user_id, organism_taxa::dsl::organism_id, organism_taxa::dsl::taxon_id))
             .filter(
-bio_ott_taxon_items::dsl::name.strict_word_similarity_commutator_op(query).or(
-    bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))
+taxa::dsl::name.strict_word_similarity_commutator_op(query).or(
+    taxa::dsl::name.ilike(format!("%{}%", query))
 )
     .or(
 nameplates::dsl::barcode.strict_word_similarity_commutator_op(query).or(
@@ -411,7 +411,7 @@ crate::database::sql_function_bindings::concat_projects_name_description(project
 )
     )
 )
-            .order(crate::database::sql_function_bindings::strict_word_similarity_dist_op(bio_ott_taxon_items::dsl::name, query)    +
+            .order(crate::database::sql_function_bindings::strict_word_similarity_dist_op(taxa::dsl::name, query)    +
 crate::database::sql_function_bindings::strict_word_similarity_dist_op(nameplates::dsl::barcode, query)    +
 crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::database::sql_function_bindings::concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
             .limit(limit.unwrap_or(10))
@@ -464,7 +464,7 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
         >,
     ) -> Result<bool, web_common::api::ApiError> {
         diesel::select(
-            crate::database::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(
+            crate::database::sql_function_bindings::can_admin_organism_taxa(
                 author_user_id,
                 organism_id,
                 taxon_id,
@@ -489,26 +489,26 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::database::schema::organism_bio_ott_taxon_items;
-        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+        use crate::database::schema::organism_taxa;
+        let query = organism_taxa::dsl::organism_taxa
             .select(OrganismBioOttTaxonItem::as_select())
             .filter(
-                crate::database::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(
+                crate::database::sql_function_bindings::can_admin_organism_taxa(
                     author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                    organism_taxa::dsl::organism_id,
+                    organism_taxa::dsl::taxon_id,
                 ),
             )
-            .order_by(organism_bio_ott_taxon_items::dsl::organism_id);
+            .order_by(organism_taxa::dsl::organism_id);
         let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+            query = query.filter(organism_taxa::dsl::created_by.eq(created_by));
         }
         if let Some(organism_id) = filter.and_then(|f| f.organism_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::organism_id.eq(organism_id));
+            query = query.filter(organism_taxa::dsl::organism_id.eq(organism_id));
         }
         if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+            query = query.filter(organism_taxa::dsl::taxon_id.eq(taxon_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -532,26 +532,26 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        use crate::database::schema::organism_bio_ott_taxon_items;
-        let query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+        use crate::database::schema::organism_taxa;
+        let query = organism_taxa::dsl::organism_taxa
             .select(OrganismBioOttTaxonItem::as_select())
             .filter(
-                crate::database::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(
+                crate::database::sql_function_bindings::can_admin_organism_taxa(
                     author_user_id,
-                    organism_bio_ott_taxon_items::dsl::organism_id,
-                    organism_bio_ott_taxon_items::dsl::taxon_id,
+                    organism_taxa::dsl::organism_id,
+                    organism_taxa::dsl::taxon_id,
                 ),
             )
-            .order_by(organism_bio_ott_taxon_items::dsl::created_at.desc());
+            .order_by(organism_taxa::dsl::created_at.desc());
         let mut query = query.into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+            query = query.filter(organism_taxa::dsl::created_by.eq(created_by));
         }
         if let Some(organism_id) = filter.and_then(|f| f.organism_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::organism_id.eq(organism_id));
+            query = query.filter(organism_taxa::dsl::organism_id.eq(organism_id));
         }
         if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+            query = query.filter(organism_taxa::dsl::taxon_id.eq(taxon_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -583,30 +583,30 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
         if query.is_empty() {
             return Self::all_administrable(filter, author_user_id, limit, offset, connection);
         }
-        use crate::database::schema::organism_bio_ott_taxon_items;
+        use crate::database::schema::organism_taxa;
         let (organisms0, organisms1) = diesel::alias!(
             crate::database::schema::organisms as organisms0,
             crate::database::schema::organisms as organisms1
         );
-        let mut query = organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
-            // This operation is defined by a first order index linking organism_bio_ott_taxon_items.taxon_id to bio_ott_taxon_items.
+        let mut query = organism_taxa::dsl::organism_taxa
+            // This operation is defined by a first order index linking organism_taxa.taxon_id to taxa.
 .inner_join(
-   bio_ott_taxon_items::dsl::bio_ott_taxon_items.on(
-       organism_bio_ott_taxon_items::dsl::taxon_id.eq(
-           bio_ott_taxon_items::dsl::id
+   taxa::dsl::taxa.on(
+       organism_taxa::dsl::taxon_id.eq(
+           taxa::dsl::id
         )
     )
 )
 
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.nameplate_id to nameplates.
 .inner_join(
    organisms0.on(
-       organism_bio_ott_taxon_items::dsl::organism_id.eq(
+       organism_taxa::dsl::organism_id.eq(
            organisms0.field(organisms::dsl::id)
         )
     )
 )
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.nameplate_id to nameplates.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.nameplate_id to nameplates.
 .inner_join(
    nameplates::dsl::nameplates.on(
        organisms0.field(organisms::dsl::nameplate_id).eq(
@@ -615,15 +615,15 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
     )
 )
 
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.project_id to projects.
 .inner_join(
    organisms1.on(
-       organism_bio_ott_taxon_items::dsl::organism_id.eq(
+       organism_taxa::dsl::organism_id.eq(
            organisms1.field(organisms::dsl::id)
         )
     )
 )
-// This operation is defined by a second order index linking organism_bio_ott_taxon_items.organism_id to organisms and organisms.project_id to projects.
+// This operation is defined by a second order index linking organism_taxa.organism_id to organisms and organisms.project_id to projects.
 .inner_join(
    projects::dsl::projects.on(
        organisms1.field(organisms::dsl::project_id).eq(
@@ -633,10 +633,10 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
 )
 
             .select(OrganismBioOttTaxonItem::as_select())
-            .filter(crate::database::sql_function_bindings::can_admin_organism_bio_ott_taxon_items(author_user_id, organism_bio_ott_taxon_items::dsl::organism_id, organism_bio_ott_taxon_items::dsl::taxon_id))
+            .filter(crate::database::sql_function_bindings::can_admin_organism_taxa(author_user_id, organism_taxa::dsl::organism_id, organism_taxa::dsl::taxon_id))
             .filter(
-bio_ott_taxon_items::dsl::name.strict_word_similarity_commutator_op(query).or(
-    bio_ott_taxon_items::dsl::name.ilike(format!("%{}%", query))
+taxa::dsl::name.strict_word_similarity_commutator_op(query).or(
+    taxa::dsl::name.ilike(format!("%{}%", query))
 )
     .or(
 nameplates::dsl::barcode.strict_word_similarity_commutator_op(query).or(
@@ -649,18 +649,18 @@ crate::database::sql_function_bindings::concat_projects_name_description(project
 )
     )
 )
-            .order(crate::database::sql_function_bindings::strict_word_similarity_dist_op(bio_ott_taxon_items::dsl::name, query)    +
+            .order(crate::database::sql_function_bindings::strict_word_similarity_dist_op(taxa::dsl::name, query)    +
 crate::database::sql_function_bindings::strict_word_similarity_dist_op(nameplates::dsl::barcode, query)    +
 crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::database::sql_function_bindings::concat_projects_name_description(projects::dsl::name, projects::dsl::description), query))
             .into_boxed();
         if let Some(created_by) = filter.and_then(|f| f.created_by) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::created_by.eq(created_by));
+            query = query.filter(organism_taxa::dsl::created_by.eq(created_by));
         }
         if let Some(organism_id) = filter.and_then(|f| f.organism_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::organism_id.eq(organism_id));
+            query = query.filter(organism_taxa::dsl::organism_id.eq(organism_id));
         }
         if let Some(taxon_id) = filter.and_then(|f| f.taxon_id) {
-            query = query.filter(organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id));
+            query = query.filter(organism_taxa::dsl::taxon_id.eq(taxon_id));
         }
         query
             .limit(limit.unwrap_or(10))
@@ -701,11 +701,11 @@ crate::database::sql_function_bindings::strict_word_similarity_dist_op(crate::da
             return Err(web_common::api::ApiError::Unauthorized);
         }
         diesel::delete(
-            crate::database::organism_bio_ott_taxon_items::dsl::organism_bio_ott_taxon_items
+            crate::database::organism_taxa::dsl::organism_taxa
                 .filter(
-                    crate::database::organism_bio_ott_taxon_items::dsl::organism_id.eq(organism_id),
+                    crate::database::organism_taxa::dsl::organism_id.eq(organism_id),
                 )
-                .filter(crate::database::organism_bio_ott_taxon_items::dsl::taxon_id.eq(taxon_id)),
+                .filter(crate::database::organism_taxa::dsl::taxon_id.eq(taxon_id)),
         )
         .execute(connection)
         .map_err(web_common::api::ApiError::from)

@@ -6,7 +6,7 @@ pub struct NestedOrganismBioOttTaxonItem {
     pub inner: crate::database::flat_variants::OrganismBioOttTaxonItem,
     pub created_by: crate::database::nested_variants::NestedUser,
     pub organism: crate::database::nested_variants::NestedOrganism,
-    pub taxon: crate::database::nested_variants::NestedBioOttTaxonItem,
+    pub taxon: crate::database::nested_variants::NestedTaxon,
 }
 
 unsafe impl Send for NestedOrganismBioOttTaxonItem {}
@@ -35,7 +35,7 @@ impl NestedOrganismBioOttTaxonItem {
                 author_user_id,
                 connection,
             )?,
-            taxon: crate::database::nested_variants::NestedBioOttTaxonItem::get(
+            taxon: crate::database::nested_variants::NestedTaxon::get(
                 flat_variant.taxon_id,
                 connection,
             )?,
@@ -357,7 +357,7 @@ impl From<web_common::database::nested_variants::NestedOrganismBioOttTaxonItem>
             organism: crate::database::nested_variants::NestedOrganism::from(
                 item.organism.as_ref().clone(),
             ),
-            taxon: crate::database::nested_variants::NestedBioOttTaxonItem::from(
+            taxon: crate::database::nested_variants::NestedTaxon::from(
                 item.taxon.as_ref().clone(),
             ),
         }
@@ -376,7 +376,7 @@ impl From<crate::database::nested_variants::NestedOrganismBioOttTaxonItem>
                 item.organism,
             )),
             taxon: Rc::from(
-                web_common::database::nested_variants::NestedBioOttTaxonItem::from(item.taxon),
+                web_common::database::nested_variants::NestedTaxon::from(item.taxon),
             ),
         }
     }

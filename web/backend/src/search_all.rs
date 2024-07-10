@@ -239,11 +239,11 @@ pub(crate) fn search_all(
     }
 
     results.extend(convert_search::<
-        NestedBioOttRank,
-        web_common::database::NestedBioOttRank,
+        NestedRank,
+        web_common::database::NestedRank,
     >(
         query,
-        NestedBioOttRank::strict_word_similarity_search_with_score_viewable(
+        NestedRank::strict_word_similarity_search_with_score_viewable(
             query,
             Some(limit),
             None,
@@ -262,11 +262,11 @@ pub(crate) fn search_all(
     }
 
     results.extend(convert_search::<
-        NestedBioOttTaxonItem,
-        web_common::database::NestedBioOttTaxonItem,
+        NestedTaxon,
+        web_common::database::NestedTaxon,
     >(
         query,
-        NestedBioOttTaxonItem::strict_word_similarity_search_with_score_viewable(
+        NestedTaxon::strict_word_similarity_search_with_score_viewable(
             query,
             Some(limit),
             None,

@@ -47,7 +47,7 @@ pub(crate) trait PageLike:
     fn icon() -> &'static str;
 }
 
-impl PageLike for NestedBioOttRank {
+impl PageLike for NestedRank {
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -75,7 +75,7 @@ impl PageLike for NestedDerivedSample {
     }
 }
 
-impl PageLike for NestedBioOttTaxonItem {
+impl PageLike for NestedTaxon {
     fn id(&self) -> PrimaryKey {
         self.inner.id.into()
     }
@@ -85,7 +85,7 @@ impl PageLike for NestedBioOttTaxonItem {
     }
 }
 
-impl PageLike for NestedOrganismBioOttTaxonItem {
+impl PageLike for NestedOrganismTaxon {
     fn id(&self) -> PrimaryKey {
         (self.inner.organism_id, self.inner.taxon_id).into()
     }
@@ -99,7 +99,7 @@ impl PageLike for NestedOrganismBioOttTaxonItem {
     }
 }
 
-impl PageLike for NestedSampleBioOttTaxonItem {
+impl PageLike for NestedSampleTaxon {
     fn id(&self) -> PrimaryKey {
         (self.inner.sample_id, self.inner.taxon_id).into()
     }
@@ -123,7 +123,8 @@ impl PageLike for NestedTeamsUsersRoleRequest {
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
+        // Some(Self::new_route(filter))
+        None
     }
 }
 
@@ -177,7 +178,8 @@ impl PageLike for NestedUsersUsersRoleRequest {
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
+        // Some(Self::new_route(filter))
+        None
     }
 }
 
@@ -233,7 +235,8 @@ impl PageLike for NestedProjectsUsersRoleRequest {
     }
 
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
+        // Some(Self::new_route(filter))
+        None
     }
 }
 
@@ -270,7 +273,8 @@ impl PageLike for NestedProjectsTeamsRoleRequest {
         NestedProject::icon()
     }
     fn create_path(filter: Option<&Self::Filter>) -> Option<AppRoute> {
-        Some(Self::new_route(filter))
+        // Some(Self::new_route(filter))
+        None
     }
 }
 

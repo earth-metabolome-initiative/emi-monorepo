@@ -56,8 +56,8 @@ def check_foreign_key_constraints(migration: str, up_content: str) -> None:
         if "references" in line and not "foreign key" in line:
             raise RuntimeError(
                 f"Migration `{migration}` at line :\n{line}\n\nContains a reference to another table, but it is not written as 'FOREIGN KEY'.\n"
-                "For example the line `domain_id INTEGER REFERENCES bio_ott_taxon_items(id) ON DELETE CASCADE,`\nshould be writtent as :\n"
-                "domain_id INTEGER, FOREIGN KEY (domain_id) REFERENCES bio_ott_taxon_items(id) ON DELETE CASCADE \n"
+                "For example the line `domain_id INTEGER REFERENCES taxa(id) ON DELETE CASCADE,`\nshould be writtent as :\n"
+                "domain_id INTEGER, FOREIGN KEY (domain_id) REFERENCES taxa(id) ON DELETE CASCADE \n"
                 "This is required by GlueSQL according to this : "
                 "https://docs.rs/gluesql/0.15.0/gluesql/core/sqlparser/ast/enum.TableConstraint.html#variant.ForeignKey.field.referred_columns"
             )

@@ -9,7 +9,7 @@ pub struct NestedOrganismBioOttTaxonItem {
     pub inner: crate::database::flat_variants::OrganismBioOttTaxonItem,
     pub created_by: Rc<crate::database::nested_variants::NestedUser>,
     pub organism: Rc<crate::database::nested_variants::NestedOrganism>,
-    pub taxon: Rc<crate::database::nested_variants::NestedBioOttTaxonItem>,
+    pub taxon: Rc<crate::database::nested_variants::NestedTaxon>,
 }
 
 unsafe impl Send for NestedOrganismBioOttTaxonItem {}
@@ -72,7 +72,7 @@ impl NestedOrganismBioOttTaxonItem {
                 .unwrap(),
             ),
             taxon: Rc::from(
-                crate::database::nested_variants::NestedBioOttTaxonItem::get(
+                crate::database::nested_variants::NestedTaxon::get(
                     flat_variant.taxon_id,
                     connection,
                 )
@@ -166,16 +166,16 @@ impl NestedOrganismBioOttTaxonItem {
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, crate::api::ApiError> {
-        let mut organism_bio_ott_taxon_items = Vec::new();
+        let mut organism_taxa = Vec::new();
         for flat_variant in crate::database::flat_variants::OrganismBioOttTaxonItem::all(
             filter, limit, offset, connection,
         )
         .await?
         .into_iter()
         {
-            organism_bio_ott_taxon_items.push(Self::from_flat(flat_variant, connection).await?);
+            organism_taxa.push(Self::from_flat(flat_variant, connection).await?);
         }
-        Ok(organism_bio_ott_taxon_items)
+        Ok(organism_taxa)
     }
     /// Update or insert the record in the database.
     ///
@@ -196,7 +196,7 @@ impl NestedOrganismBioOttTaxonItem {
             connection,
         )
         .await?;
-        crate::database::nested_variants::NestedBioOttTaxonItem::update_or_insert(
+        crate::database::nested_variants::NestedTaxon::update_or_insert(
             self.taxon.as_ref(),
             connection,
         )

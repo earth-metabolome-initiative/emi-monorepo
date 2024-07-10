@@ -89,7 +89,7 @@ impl SampleBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        Ok(table("sample_bio_ott_taxon_items")
+        Ok(table("sample_taxa")
             .insert()
             .columns("created_by, created_at, sample_id, taxon_id")
             .values(vec![self.into_row()])
@@ -112,7 +112,7 @@ impl SampleBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Option<Self>, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        let select_row = table("sample_bio_ott_taxon_items")
+        let select_row = table("sample_taxa")
             .select()
             .filter(col("sample_id").eq(sample_id.to_string()))
             .filter(col("taxon_id").eq(taxon_id.to_string()))
@@ -149,7 +149,7 @@ impl SampleBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        Ok(table("sample_bio_ott_taxon_items")
+        Ok(table("sample_taxa")
             .delete()
             .filter(col("sample_id").eq(sample_id.to_string()))
             .filter(col("taxon_id").eq(taxon_id.to_string()))
@@ -169,7 +169,7 @@ impl SampleBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        table("sample_bio_ott_taxon_items")
+        table("sample_taxa")
             .update()
             .set(
                 "created_by",
@@ -222,7 +222,7 @@ impl SampleBioOttTaxonItem {
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, crate::api::ApiError> {
         use gluesql::core::ast_builder::*;
-        let select_row = table("sample_bio_ott_taxon_items")
+        let select_row = table("sample_taxa")
             .select()
             .filter(filter.map_or_else(
                 || {

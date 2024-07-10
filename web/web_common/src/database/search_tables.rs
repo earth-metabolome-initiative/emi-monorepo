@@ -29,84 +29,6 @@ pub trait SimilarityScore {
     fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64;
 }
 
-impl SimilarityScore for NestedBioOttRank {
-    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
-        let mut number_of_attributes = 0;
-        let mut total_similarity_score = 0.0;
-        number_of_attributes += 1;
-        total_similarity_score += self.inner.similarity_score(lowercase_query.as_ref());
-        number_of_attributes += 1;
-        total_similarity_score += self.icon.similarity_score(lowercase_query.as_ref());
-        number_of_attributes += 1;
-        total_similarity_score += self.color.similarity_score(lowercase_query.as_ref());
-        total_similarity_score / number_of_attributes as f64
-    }
-}
-impl Searchable<false> for NestedBioOttRank {
-    fn search_task(
-        filter: Option<&Self::Filter>,
-        query: String,
-        limit: i64,
-        offset: i64,
-    ) -> super::Select {
-        super::Select::search(Table::BioOttRanks, filter, query, limit, offset)
-    }
-}
-impl SimilarityScore for NestedBioOttTaxonItem {
-    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
-        let mut number_of_attributes = 0;
-        let mut total_similarity_score = 0.0;
-        number_of_attributes += 1;
-        total_similarity_score += self.inner.similarity_score(lowercase_query.as_ref());
-        number_of_attributes += 1;
-        total_similarity_score += self.ott_rank.similarity_score(lowercase_query.as_ref());
-        if let Some(domain) = &self.domain {
-            number_of_attributes += 1;
-            total_similarity_score += domain.similarity_score(lowercase_query.as_ref());
-        }
-        if let Some(kingdom) = &self.kingdom {
-            number_of_attributes += 1;
-            total_similarity_score += kingdom.similarity_score(lowercase_query.as_ref());
-        }
-        if let Some(phylum) = &self.phylum {
-            number_of_attributes += 1;
-            total_similarity_score += phylum.similarity_score(lowercase_query.as_ref());
-        }
-        if let Some(class) = &self.class {
-            number_of_attributes += 1;
-            total_similarity_score += class.similarity_score(lowercase_query.as_ref());
-        }
-        if let Some(order) = &self.order {
-            number_of_attributes += 1;
-            total_similarity_score += order.similarity_score(lowercase_query.as_ref());
-        }
-        if let Some(family) = &self.family {
-            number_of_attributes += 1;
-            total_similarity_score += family.similarity_score(lowercase_query.as_ref());
-        }
-        if let Some(genus) = &self.genus {
-            number_of_attributes += 1;
-            total_similarity_score += genus.similarity_score(lowercase_query.as_ref());
-        }
-        number_of_attributes += 1;
-        total_similarity_score += self.parent.similarity_score(lowercase_query.as_ref());
-        number_of_attributes += 1;
-        total_similarity_score += self.icon.similarity_score(lowercase_query.as_ref());
-        number_of_attributes += 1;
-        total_similarity_score += self.color.similarity_score(lowercase_query.as_ref());
-        total_similarity_score / number_of_attributes as f64
-    }
-}
-impl Searchable<false> for NestedBioOttTaxonItem {
-    fn search_task(
-        filter: Option<&Self::Filter>,
-        query: String,
-        limit: i64,
-        offset: i64,
-    ) -> super::Select {
-        super::Select::search(Table::BioOttTaxonItems, filter, query, limit, offset)
-    }
-}
 impl SimilarityScore for NestedDerivedSample {
     fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
         let mut number_of_attributes = 0;
@@ -342,7 +264,7 @@ impl Searchable<true> for NestedObservation {
         super::Select::search_updatables(Table::Observations, filter, query, limit, offset)
     }
 }
-impl SimilarityScore for NestedOrganismBioOttTaxonItem {
+impl SimilarityScore for NestedOrganismTaxon {
     fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
         let mut number_of_attributes = 0;
         let mut total_similarity_score = 0.0;
@@ -355,20 +277,14 @@ impl SimilarityScore for NestedOrganismBioOttTaxonItem {
         total_similarity_score / number_of_attributes as f64
     }
 }
-impl Searchable<false> for NestedOrganismBioOttTaxonItem {
+impl Searchable<false> for NestedOrganismTaxon {
     fn search_task(
         filter: Option<&Self::Filter>,
         query: String,
         limit: i64,
         offset: i64,
     ) -> super::Select {
-        super::Select::search(
-            Table::OrganismBioOttTaxonItems,
-            filter,
-            query,
-            limit,
-            offset,
-        )
+        super::Select::search(Table::OrganismTaxa, filter, query, limit, offset)
     }
 }
 impl SimilarityScore for NestedOrganism {
@@ -690,6 +606,29 @@ impl Searchable<false> for NestedProjectsUsersRole {
         super::Select::search(Table::ProjectsUsersRoles, filter, query, limit, offset)
     }
 }
+impl SimilarityScore for NestedRank {
+    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
+        let mut number_of_attributes = 0;
+        let mut total_similarity_score = 0.0;
+        number_of_attributes += 1;
+        total_similarity_score += self.inner.similarity_score(lowercase_query.as_ref());
+        number_of_attributes += 1;
+        total_similarity_score += self.icon.similarity_score(lowercase_query.as_ref());
+        number_of_attributes += 1;
+        total_similarity_score += self.color.similarity_score(lowercase_query.as_ref());
+        total_similarity_score / number_of_attributes as f64
+    }
+}
+impl Searchable<false> for NestedRank {
+    fn search_task(
+        filter: Option<&Self::Filter>,
+        query: String,
+        limit: i64,
+        offset: i64,
+    ) -> super::Select {
+        super::Select::search(Table::Ranks, filter, query, limit, offset)
+    }
+}
 impl SimilarityScore for NestedRole {
     fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
         let mut number_of_attributes = 0;
@@ -711,29 +650,6 @@ impl Searchable<false> for NestedRole {
         offset: i64,
     ) -> super::Select {
         super::Select::search(Table::Roles, filter, query, limit, offset)
-    }
-}
-impl SimilarityScore for NestedSampleBioOttTaxonItem {
-    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
-        let mut number_of_attributes = 0;
-        let mut total_similarity_score = 0.0;
-        number_of_attributes += 1;
-        total_similarity_score += self.created_by.similarity_score(lowercase_query.as_ref());
-        number_of_attributes += 1;
-        total_similarity_score += self.sample.similarity_score(lowercase_query.as_ref());
-        number_of_attributes += 1;
-        total_similarity_score += self.taxon.similarity_score(lowercase_query.as_ref());
-        total_similarity_score / number_of_attributes as f64
-    }
-}
-impl Searchable<false> for NestedSampleBioOttTaxonItem {
-    fn search_task(
-        filter: Option<&Self::Filter>,
-        query: String,
-        limit: i64,
-        offset: i64,
-    ) -> super::Select {
-        super::Select::search(Table::SampleBioOttTaxonItems, filter, query, limit, offset)
     }
 }
 impl SimilarityScore for NestedSampleContainerCategory {
@@ -827,6 +743,29 @@ impl Searchable<false> for NestedSampleState {
         super::Select::search(Table::SampleStates, filter, query, limit, offset)
     }
 }
+impl SimilarityScore for NestedSampleTaxon {
+    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
+        let mut number_of_attributes = 0;
+        let mut total_similarity_score = 0.0;
+        number_of_attributes += 1;
+        total_similarity_score += self.created_by.similarity_score(lowercase_query.as_ref());
+        number_of_attributes += 1;
+        total_similarity_score += self.sample.similarity_score(lowercase_query.as_ref());
+        number_of_attributes += 1;
+        total_similarity_score += self.taxon.similarity_score(lowercase_query.as_ref());
+        total_similarity_score / number_of_attributes as f64
+    }
+}
+impl Searchable<false> for NestedSampleTaxon {
+    fn search_task(
+        filter: Option<&Self::Filter>,
+        query: String,
+        limit: i64,
+        offset: i64,
+    ) -> super::Select {
+        super::Select::search(Table::SampleTaxa, filter, query, limit, offset)
+    }
+}
 impl SimilarityScore for NestedSample {
     fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
         let mut number_of_attributes = 0;
@@ -868,7 +807,7 @@ impl Searchable<true> for NestedSample {
         super::Select::search_updatables(Table::Samples, filter, query, limit, offset)
     }
 }
-impl SimilarityScore for NestedSpectra {
+impl SimilarityScore for NestedSpectrum {
     fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
         let mut number_of_attributes = 0;
         let mut total_similarity_score = 0.0;
@@ -912,6 +851,61 @@ impl Searchable<true> for NestedSpectraCollection {
         offset: i64,
     ) -> super::Select {
         super::Select::search_updatables(Table::SpectraCollections, filter, query, limit, offset)
+    }
+}
+impl SimilarityScore for NestedTaxon {
+    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
+        let mut number_of_attributes = 0;
+        let mut total_similarity_score = 0.0;
+        number_of_attributes += 1;
+        total_similarity_score += self.inner.similarity_score(lowercase_query.as_ref());
+        number_of_attributes += 1;
+        total_similarity_score += self.ott_rank.similarity_score(lowercase_query.as_ref());
+        if let Some(domain) = &self.domain {
+            number_of_attributes += 1;
+            total_similarity_score += domain.similarity_score(lowercase_query.as_ref());
+        }
+        if let Some(kingdom) = &self.kingdom {
+            number_of_attributes += 1;
+            total_similarity_score += kingdom.similarity_score(lowercase_query.as_ref());
+        }
+        if let Some(phylum) = &self.phylum {
+            number_of_attributes += 1;
+            total_similarity_score += phylum.similarity_score(lowercase_query.as_ref());
+        }
+        if let Some(class) = &self.class {
+            number_of_attributes += 1;
+            total_similarity_score += class.similarity_score(lowercase_query.as_ref());
+        }
+        if let Some(order) = &self.order {
+            number_of_attributes += 1;
+            total_similarity_score += order.similarity_score(lowercase_query.as_ref());
+        }
+        if let Some(family) = &self.family {
+            number_of_attributes += 1;
+            total_similarity_score += family.similarity_score(lowercase_query.as_ref());
+        }
+        if let Some(genus) = &self.genus {
+            number_of_attributes += 1;
+            total_similarity_score += genus.similarity_score(lowercase_query.as_ref());
+        }
+        number_of_attributes += 1;
+        total_similarity_score += self.parent.similarity_score(lowercase_query.as_ref());
+        number_of_attributes += 1;
+        total_similarity_score += self.icon.similarity_score(lowercase_query.as_ref());
+        number_of_attributes += 1;
+        total_similarity_score += self.color.similarity_score(lowercase_query.as_ref());
+        total_similarity_score / number_of_attributes as f64
+    }
+}
+impl Searchable<false> for NestedTaxon {
+    fn search_task(
+        filter: Option<&Self::Filter>,
+        query: String,
+        limit: i64,
+        offset: i64,
+    ) -> super::Select {
+        super::Select::search(Table::Taxa, filter, query, limit, offset)
     }
 }
 impl SimilarityScore for NestedTeamState {
@@ -1242,54 +1236,6 @@ impl Searchable<false> for NestedUsersUsersRole {
         offset: i64,
     ) -> super::Select {
         super::Select::search(Table::UsersUsersRoles, filter, query, limit, offset)
-    }
-}
-impl SimilarityScore for BioOttRank {
-    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
-        let mut number_of_attributes = 0;
-        let mut total_similarity_score = 0.0;
-        number_of_attributes += 1;
-        let name: &str = self.name.as_ref();
-        total_similarity_score +=
-            strsim::normalized_damerau_levenshtein(&name.to_lowercase(), lowercase_query.as_ref());
-        number_of_attributes += 1;
-        let description: &str = self.description.as_ref();
-        total_similarity_score += strsim::normalized_damerau_levenshtein(
-            &description.to_lowercase(),
-            lowercase_query.as_ref(),
-        );
-        total_similarity_score / number_of_attributes as f64
-    }
-}
-impl Searchable<false> for BioOttRank {
-    fn search_task(
-        filter: Option<&Self::Filter>,
-        query: String,
-        limit: i64,
-        offset: i64,
-    ) -> super::Select {
-        super::Select::search(Table::BioOttRanks, filter, query, limit, offset)
-    }
-}
-impl SimilarityScore for BioOttTaxonItem {
-    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
-        let mut number_of_attributes = 0;
-        let mut total_similarity_score = 0.0;
-        number_of_attributes += 1;
-        let name: &str = self.name.as_ref();
-        total_similarity_score +=
-            strsim::normalized_damerau_levenshtein(&name.to_lowercase(), lowercase_query.as_ref());
-        total_similarity_score / number_of_attributes as f64
-    }
-}
-impl Searchable<false> for BioOttTaxonItem {
-    fn search_task(
-        filter: Option<&Self::Filter>,
-        query: String,
-        limit: i64,
-        offset: i64,
-    ) -> super::Select {
-        super::Select::search(Table::BioOttTaxonItems, filter, query, limit, offset)
     }
 }
 impl SimilarityScore for Color {
@@ -1639,20 +1585,14 @@ impl Searchable<true> for Observation {
         super::Select::search_updatables(Table::Observations, filter, query, limit, offset)
     }
 }
-impl Searchable<false> for OrganismBioOttTaxonItem {
+impl Searchable<false> for OrganismTaxon {
     fn search_task(
         filter: Option<&Self::Filter>,
         query: String,
         limit: i64,
         offset: i64,
     ) -> super::Select {
-        super::Select::search(
-            Table::OrganismBioOttTaxonItems,
-            filter,
-            query,
-            limit,
-            offset,
-        )
+        super::Select::search(Table::OrganismTaxa, filter, query, limit, offset)
     }
 }
 impl SimilarityScore for Organism {
@@ -1894,6 +1834,33 @@ impl Searchable<false> for ProjectsUsersRole {
         super::Select::search(Table::ProjectsUsersRoles, filter, query, limit, offset)
     }
 }
+impl SimilarityScore for Rank {
+    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
+        let mut number_of_attributes = 0;
+        let mut total_similarity_score = 0.0;
+        number_of_attributes += 1;
+        let name: &str = self.name.as_ref();
+        total_similarity_score +=
+            strsim::normalized_damerau_levenshtein(&name.to_lowercase(), lowercase_query.as_ref());
+        number_of_attributes += 1;
+        let description: &str = self.description.as_ref();
+        total_similarity_score += strsim::normalized_damerau_levenshtein(
+            &description.to_lowercase(),
+            lowercase_query.as_ref(),
+        );
+        total_similarity_score / number_of_attributes as f64
+    }
+}
+impl Searchable<false> for Rank {
+    fn search_task(
+        filter: Option<&Self::Filter>,
+        query: String,
+        limit: i64,
+        offset: i64,
+    ) -> super::Select {
+        super::Select::search(Table::Ranks, filter, query, limit, offset)
+    }
+}
 impl SimilarityScore for Role {
     fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
         let mut number_of_attributes = 0;
@@ -1919,16 +1886,6 @@ impl Searchable<false> for Role {
         offset: i64,
     ) -> super::Select {
         super::Select::search(Table::Roles, filter, query, limit, offset)
-    }
-}
-impl Searchable<false> for SampleBioOttTaxonItem {
-    fn search_task(
-        filter: Option<&Self::Filter>,
-        query: String,
-        limit: i64,
-        offset: i64,
-    ) -> super::Select {
-        super::Select::search(Table::SampleBioOttTaxonItems, filter, query, limit, offset)
     }
 }
 impl SimilarityScore for SampleContainerCategory {
@@ -2028,6 +1985,16 @@ impl Searchable<false> for SampleState {
         super::Select::search(Table::SampleStates, filter, query, limit, offset)
     }
 }
+impl Searchable<false> for SampleTaxon {
+    fn search_task(
+        filter: Option<&Self::Filter>,
+        query: String,
+        limit: i64,
+        offset: i64,
+    ) -> super::Select {
+        super::Select::search(Table::SampleTaxa, filter, query, limit, offset)
+    }
+}
 impl SimilarityScore for Sample {
     fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
         let mut number_of_attributes = 0;
@@ -2096,6 +2063,27 @@ impl Searchable<true> for SpectraCollection {
         offset: i64,
     ) -> super::Select {
         super::Select::search_updatables(Table::SpectraCollections, filter, query, limit, offset)
+    }
+}
+impl SimilarityScore for Taxon {
+    fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
+        let mut number_of_attributes = 0;
+        let mut total_similarity_score = 0.0;
+        number_of_attributes += 1;
+        let name: &str = self.name.as_ref();
+        total_similarity_score +=
+            strsim::normalized_damerau_levenshtein(&name.to_lowercase(), lowercase_query.as_ref());
+        total_similarity_score / number_of_attributes as f64
+    }
+}
+impl Searchable<false> for Taxon {
+    fn search_task(
+        filter: Option<&Self::Filter>,
+        query: String,
+        limit: i64,
+        offset: i64,
+    ) -> super::Select {
+        super::Select::search(Table::Taxa, filter, query, limit, offset)
     }
 }
 impl SimilarityScore for TeamState {
@@ -2343,15 +2331,13 @@ impl Searchable<false> for UsersUsersRole {
 }
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum SearchableStruct {
-    NestedBioOttRank(Rc<NestedBioOttRank>),
-    NestedBioOttTaxonItem(Rc<NestedBioOttTaxonItem>),
     NestedDerivedSample(Rc<NestedDerivedSample>),
     NestedDocumentFormat(Rc<NestedDocumentFormat>),
     NestedNameplateCategory(Rc<NestedNameplateCategory>),
     NestedNameplate(Rc<NestedNameplate>),
     NestedObservationSubject(Rc<NestedObservationSubject>),
     NestedObservation(Rc<NestedObservation>),
-    NestedOrganismBioOttTaxonItem(Rc<NestedOrganismBioOttTaxonItem>),
+    NestedOrganismTaxon(Rc<NestedOrganismTaxon>),
     NestedOrganism(Rc<NestedOrganism>),
     NestedOrganization(Rc<NestedOrganization>),
     NestedProjectState(Rc<NestedProjectState>),
@@ -2362,13 +2348,15 @@ pub enum SearchableStruct {
     NestedProjectsUsersRoleInvitation(Rc<NestedProjectsUsersRoleInvitation>),
     NestedProjectsUsersRoleRequest(Rc<NestedProjectsUsersRoleRequest>),
     NestedProjectsUsersRole(Rc<NestedProjectsUsersRole>),
+    NestedRank(Rc<NestedRank>),
     NestedRole(Rc<NestedRole>),
-    NestedSampleBioOttTaxonItem(Rc<NestedSampleBioOttTaxonItem>),
     NestedSampleContainerCategory(Rc<NestedSampleContainerCategory>),
     NestedSampleContainer(Rc<NestedSampleContainer>),
     NestedSampleState(Rc<NestedSampleState>),
+    NestedSampleTaxon(Rc<NestedSampleTaxon>),
     NestedSample(Rc<NestedSample>),
     NestedSpectraCollection(Rc<NestedSpectraCollection>),
+    NestedTaxon(Rc<NestedTaxon>),
     NestedTeamState(Rc<NestedTeamState>),
     NestedTeam(Rc<NestedTeam>),
     NestedTeamsTeamsRoleInvitation(Rc<NestedTeamsTeamsRoleInvitation>),
@@ -2396,16 +2384,6 @@ impl Searchable<false> for SearchableStruct {
         _offset: i64,
     ) -> super::Select {
         super::Select::search_all(query, limit)
-    }
-}
-impl From<NestedBioOttRank> for SearchableStruct {
-    fn from(value: NestedBioOttRank) -> Self {
-        SearchableStruct::NestedBioOttRank(Rc::from(value))
-    }
-}
-impl From<NestedBioOttTaxonItem> for SearchableStruct {
-    fn from(value: NestedBioOttTaxonItem) -> Self {
-        SearchableStruct::NestedBioOttTaxonItem(Rc::from(value))
     }
 }
 impl From<NestedDerivedSample> for SearchableStruct {
@@ -2438,9 +2416,9 @@ impl From<NestedObservation> for SearchableStruct {
         SearchableStruct::NestedObservation(Rc::from(value))
     }
 }
-impl From<NestedOrganismBioOttTaxonItem> for SearchableStruct {
-    fn from(value: NestedOrganismBioOttTaxonItem) -> Self {
-        SearchableStruct::NestedOrganismBioOttTaxonItem(Rc::from(value))
+impl From<NestedOrganismTaxon> for SearchableStruct {
+    fn from(value: NestedOrganismTaxon) -> Self {
+        SearchableStruct::NestedOrganismTaxon(Rc::from(value))
     }
 }
 impl From<NestedOrganism> for SearchableStruct {
@@ -2493,14 +2471,14 @@ impl From<NestedProjectsUsersRole> for SearchableStruct {
         SearchableStruct::NestedProjectsUsersRole(Rc::from(value))
     }
 }
+impl From<NestedRank> for SearchableStruct {
+    fn from(value: NestedRank) -> Self {
+        SearchableStruct::NestedRank(Rc::from(value))
+    }
+}
 impl From<NestedRole> for SearchableStruct {
     fn from(value: NestedRole) -> Self {
         SearchableStruct::NestedRole(Rc::from(value))
-    }
-}
-impl From<NestedSampleBioOttTaxonItem> for SearchableStruct {
-    fn from(value: NestedSampleBioOttTaxonItem) -> Self {
-        SearchableStruct::NestedSampleBioOttTaxonItem(Rc::from(value))
     }
 }
 impl From<NestedSampleContainerCategory> for SearchableStruct {
@@ -2518,6 +2496,11 @@ impl From<NestedSampleState> for SearchableStruct {
         SearchableStruct::NestedSampleState(Rc::from(value))
     }
 }
+impl From<NestedSampleTaxon> for SearchableStruct {
+    fn from(value: NestedSampleTaxon) -> Self {
+        SearchableStruct::NestedSampleTaxon(Rc::from(value))
+    }
+}
 impl From<NestedSample> for SearchableStruct {
     fn from(value: NestedSample) -> Self {
         SearchableStruct::NestedSample(Rc::from(value))
@@ -2526,6 +2509,11 @@ impl From<NestedSample> for SearchableStruct {
 impl From<NestedSpectraCollection> for SearchableStruct {
     fn from(value: NestedSpectraCollection) -> Self {
         SearchableStruct::NestedSpectraCollection(Rc::from(value))
+    }
+}
+impl From<NestedTaxon> for SearchableStruct {
+    fn from(value: NestedTaxon) -> Self {
+        SearchableStruct::NestedTaxon(Rc::from(value))
     }
 }
 impl From<NestedTeamState> for SearchableStruct {
@@ -2601,15 +2589,13 @@ impl From<FontAwesomeIcon> for SearchableStruct {
 impl Describable for SearchableStruct {
     fn description(&self) -> Option<&str> {
         match self {
-            SearchableStruct::NestedBioOttRank(value) => value.description(),
-            SearchableStruct::NestedBioOttTaxonItem(value) => value.description(),
             SearchableStruct::NestedDerivedSample(value) => value.description(),
             SearchableStruct::NestedDocumentFormat(value) => value.description(),
             SearchableStruct::NestedNameplateCategory(value) => value.description(),
             SearchableStruct::NestedNameplate(value) => value.description(),
             SearchableStruct::NestedObservationSubject(value) => value.description(),
             SearchableStruct::NestedObservation(value) => value.description(),
-            SearchableStruct::NestedOrganismBioOttTaxonItem(value) => value.description(),
+            SearchableStruct::NestedOrganismTaxon(value) => value.description(),
             SearchableStruct::NestedOrganism(value) => value.description(),
             SearchableStruct::NestedOrganization(value) => value.description(),
             SearchableStruct::NestedProjectState(value) => value.description(),
@@ -2620,13 +2606,15 @@ impl Describable for SearchableStruct {
             SearchableStruct::NestedProjectsUsersRoleInvitation(value) => value.description(),
             SearchableStruct::NestedProjectsUsersRoleRequest(value) => value.description(),
             SearchableStruct::NestedProjectsUsersRole(value) => value.description(),
+            SearchableStruct::NestedRank(value) => value.description(),
             SearchableStruct::NestedRole(value) => value.description(),
-            SearchableStruct::NestedSampleBioOttTaxonItem(value) => value.description(),
             SearchableStruct::NestedSampleContainerCategory(value) => value.description(),
             SearchableStruct::NestedSampleContainer(value) => value.description(),
             SearchableStruct::NestedSampleState(value) => value.description(),
+            SearchableStruct::NestedSampleTaxon(value) => value.description(),
             SearchableStruct::NestedSample(value) => value.description(),
             SearchableStruct::NestedSpectraCollection(value) => value.description(),
+            SearchableStruct::NestedTaxon(value) => value.description(),
             SearchableStruct::NestedTeamState(value) => value.description(),
             SearchableStruct::NestedTeam(value) => value.description(),
             SearchableStruct::NestedTeamsTeamsRoleInvitation(value) => value.description(),
@@ -2647,15 +2635,13 @@ impl Describable for SearchableStruct {
 impl Colorable for SearchableStruct {
     fn color(&self) -> Option<&str> {
         match self {
-            SearchableStruct::NestedBioOttRank(value) => value.color(),
-            SearchableStruct::NestedBioOttTaxonItem(value) => value.color(),
             SearchableStruct::NestedDerivedSample(value) => value.color(),
             SearchableStruct::NestedDocumentFormat(value) => value.color(),
             SearchableStruct::NestedNameplateCategory(value) => value.color(),
             SearchableStruct::NestedNameplate(value) => value.color(),
             SearchableStruct::NestedObservationSubject(value) => value.color(),
             SearchableStruct::NestedObservation(value) => value.color(),
-            SearchableStruct::NestedOrganismBioOttTaxonItem(value) => value.color(),
+            SearchableStruct::NestedOrganismTaxon(value) => value.color(),
             SearchableStruct::NestedOrganism(value) => value.color(),
             SearchableStruct::NestedOrganization(value) => value.color(),
             SearchableStruct::NestedProjectState(value) => value.color(),
@@ -2666,13 +2652,15 @@ impl Colorable for SearchableStruct {
             SearchableStruct::NestedProjectsUsersRoleInvitation(value) => value.color(),
             SearchableStruct::NestedProjectsUsersRoleRequest(value) => value.color(),
             SearchableStruct::NestedProjectsUsersRole(value) => value.color(),
+            SearchableStruct::NestedRank(value) => value.color(),
             SearchableStruct::NestedRole(value) => value.color(),
-            SearchableStruct::NestedSampleBioOttTaxonItem(value) => value.color(),
             SearchableStruct::NestedSampleContainerCategory(value) => value.color(),
             SearchableStruct::NestedSampleContainer(value) => value.color(),
             SearchableStruct::NestedSampleState(value) => value.color(),
+            SearchableStruct::NestedSampleTaxon(value) => value.color(),
             SearchableStruct::NestedSample(value) => value.color(),
             SearchableStruct::NestedSpectraCollection(value) => value.color(),
+            SearchableStruct::NestedTaxon(value) => value.color(),
             SearchableStruct::NestedTeamState(value) => value.color(),
             SearchableStruct::NestedTeam(value) => value.color(),
             SearchableStruct::NestedTeamsTeamsRoleInvitation(value) => value.color(),
@@ -2693,10 +2681,6 @@ impl Colorable for SearchableStruct {
 impl SimilarityScore for SearchableStruct {
     fn similarity_score<S: AsRef<str>>(&self, lowercase_query: S) -> f64 {
         match self {
-            SearchableStruct::NestedBioOttRank(value) => value.similarity_score(lowercase_query),
-            SearchableStruct::NestedBioOttTaxonItem(value) => {
-                value.similarity_score(lowercase_query)
-            }
             SearchableStruct::NestedDerivedSample(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedDocumentFormat(value) => {
                 value.similarity_score(lowercase_query)
@@ -2709,9 +2693,7 @@ impl SimilarityScore for SearchableStruct {
                 value.similarity_score(lowercase_query)
             }
             SearchableStruct::NestedObservation(value) => value.similarity_score(lowercase_query),
-            SearchableStruct::NestedOrganismBioOttTaxonItem(value) => {
-                value.similarity_score(lowercase_query)
-            }
+            SearchableStruct::NestedOrganismTaxon(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedOrganism(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedOrganization(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedProjectState(value) => value.similarity_score(lowercase_query),
@@ -2734,10 +2716,8 @@ impl SimilarityScore for SearchableStruct {
             SearchableStruct::NestedProjectsUsersRole(value) => {
                 value.similarity_score(lowercase_query)
             }
+            SearchableStruct::NestedRank(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedRole(value) => value.similarity_score(lowercase_query),
-            SearchableStruct::NestedSampleBioOttTaxonItem(value) => {
-                value.similarity_score(lowercase_query)
-            }
             SearchableStruct::NestedSampleContainerCategory(value) => {
                 value.similarity_score(lowercase_query)
             }
@@ -2745,10 +2725,12 @@ impl SimilarityScore for SearchableStruct {
                 value.similarity_score(lowercase_query)
             }
             SearchableStruct::NestedSampleState(value) => value.similarity_score(lowercase_query),
+            SearchableStruct::NestedSampleTaxon(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedSample(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedSpectraCollection(value) => {
                 value.similarity_score(lowercase_query)
             }
+            SearchableStruct::NestedTaxon(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedTeamState(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedTeam(value) => value.similarity_score(lowercase_query),
             SearchableStruct::NestedTeamsTeamsRoleInvitation(value) => {

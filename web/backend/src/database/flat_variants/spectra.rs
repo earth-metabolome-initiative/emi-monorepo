@@ -33,17 +33,17 @@ use diesel::Selectable;
 )]
 #[diesel(table_name = crate::database::schema::spectra)]
 #[diesel(primary_key(id))]
-pub struct Spectra {
+pub struct Spectrum {
     pub id: i32,
     pub spectra_collection_id: i32,
 }
 
-unsafe impl Send for Spectra {}
-unsafe impl Sync for Spectra {}
-impl From<web_common::database::flat_variants::Spectra>
-    for crate::database::flat_variants::Spectra
+unsafe impl Send for Spectrum {}
+unsafe impl Sync for Spectrum {}
+impl From<web_common::database::flat_variants::Spectrum>
+    for crate::database::flat_variants::Spectrum
 {
-    fn from(item: web_common::database::flat_variants::Spectra) -> Self {
+    fn from(item: web_common::database::flat_variants::Spectrum) -> Self {
         Self {
             id: item.id,
             spectra_collection_id: item.spectra_collection_id,
@@ -51,10 +51,10 @@ impl From<web_common::database::flat_variants::Spectra>
     }
 }
 
-impl From<crate::database::flat_variants::Spectra>
-    for web_common::database::flat_variants::Spectra
+impl From<crate::database::flat_variants::Spectrum>
+    for web_common::database::flat_variants::Spectrum
 {
-    fn from(item: crate::database::flat_variants::Spectra) -> Self {
+    fn from(item: crate::database::flat_variants::Spectrum) -> Self {
         Self {
             id: item.id,
             spectra_collection_id: item.spectra_collection_id,
@@ -62,7 +62,7 @@ impl From<crate::database::flat_variants::Spectra>
     }
 }
 
-impl Spectra {
+impl Spectrum {
     /// Check whether the user can view the struct.
     ///
     /// * `author_user_id` - The ID of the user to check.
@@ -103,7 +103,7 @@ impl Spectra {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&web_common::database::filter_variants::SpectraFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectrumFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -113,7 +113,7 @@ impl Spectra {
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
         use crate::database::schema::spectra;
         let query = spectra::dsl::spectra
-            .select(Spectra::as_select())
+            .select(Spectrum::as_select())
             .filter(crate::database::sql_function_bindings::can_view_spectra(
                 author_user_id,
                 spectra::dsl::id,
@@ -137,7 +137,7 @@ impl Spectra {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&web_common::database::filter_variants::SpectraFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectrumFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,

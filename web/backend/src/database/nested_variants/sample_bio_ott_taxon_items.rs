@@ -6,7 +6,7 @@ pub struct NestedSampleBioOttTaxonItem {
     pub inner: crate::database::flat_variants::SampleBioOttTaxonItem,
     pub created_by: crate::database::nested_variants::NestedUser,
     pub sample: crate::database::nested_variants::NestedSample,
-    pub taxon: crate::database::nested_variants::NestedBioOttTaxonItem,
+    pub taxon: crate::database::nested_variants::NestedTaxon,
 }
 
 unsafe impl Send for NestedSampleBioOttTaxonItem {}
@@ -35,7 +35,7 @@ impl NestedSampleBioOttTaxonItem {
                 author_user_id,
                 connection,
             )?,
-            taxon: crate::database::nested_variants::NestedBioOttTaxonItem::get(
+            taxon: crate::database::nested_variants::NestedTaxon::get(
                 flat_variant.taxon_id,
                 connection,
             )?,
@@ -347,7 +347,7 @@ impl From<web_common::database::nested_variants::NestedSampleBioOttTaxonItem>
             sample: crate::database::nested_variants::NestedSample::from(
                 item.sample.as_ref().clone(),
             ),
-            taxon: crate::database::nested_variants::NestedBioOttTaxonItem::from(
+            taxon: crate::database::nested_variants::NestedTaxon::from(
                 item.taxon.as_ref().clone(),
             ),
         }
@@ -366,7 +366,7 @@ impl From<crate::database::nested_variants::NestedSampleBioOttTaxonItem>
                 item.sample,
             )),
             taxon: Rc::from(
-                web_common::database::nested_variants::NestedBioOttTaxonItem::from(item.taxon),
+                web_common::database::nested_variants::NestedTaxon::from(item.taxon),
             ),
         }
     }

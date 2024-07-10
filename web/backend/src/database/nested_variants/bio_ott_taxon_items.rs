@@ -2,9 +2,9 @@ use crate::database::*;
 use std::rc::Rc;
 
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-pub struct NestedBioOttTaxonItem {
+pub struct NestedTaxon {
     pub inner: crate::database::flat_variants::BioOttTaxonItem,
-    pub ott_rank: crate::database::nested_variants::NestedBioOttRank,
+    pub ott_rank: crate::database::nested_variants::NestedRank,
     pub domain: Option<crate::database::flat_variants::BioOttTaxonItem>,
     pub kingdom: Option<crate::database::flat_variants::BioOttTaxonItem>,
     pub phylum: Option<crate::database::flat_variants::BioOttTaxonItem>,
@@ -17,9 +17,9 @@ pub struct NestedBioOttTaxonItem {
     pub color: crate::database::flat_variants::Color,
 }
 
-unsafe impl Send for NestedBioOttTaxonItem {}
-unsafe impl Sync for NestedBioOttTaxonItem {}
-impl NestedBioOttTaxonItem {
+unsafe impl Send for NestedTaxon {}
+unsafe impl Sync for NestedTaxon {}
+impl NestedTaxon {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
@@ -32,7 +32,7 @@ impl NestedBioOttTaxonItem {
         >,
     ) -> Result<Self, web_common::api::ApiError> {
         Ok(Self {
-            ott_rank: crate::database::nested_variants::NestedBioOttRank::get(
+            ott_rank: crate::database::nested_variants::NestedRank::get(
                 flat_variant.ott_rank_id,
                 connection,
             )?,
@@ -223,15 +223,15 @@ impl NestedBioOttTaxonItem {
         BioOttTaxonItem::can_admin_by_id()
     }
 }
-impl From<web_common::database::nested_variants::NestedBioOttTaxonItem>
-    for crate::database::nested_variants::NestedBioOttTaxonItem
+impl From<web_common::database::nested_variants::NestedTaxon>
+    for crate::database::nested_variants::NestedTaxon
 {
-    fn from(item: web_common::database::nested_variants::NestedBioOttTaxonItem) -> Self {
+    fn from(item: web_common::database::nested_variants::NestedTaxon) -> Self {
         Self {
             inner: crate::database::flat_variants::BioOttTaxonItem::from(
                 item.inner.as_ref().clone(),
             ),
-            ott_rank: crate::database::nested_variants::NestedBioOttRank::from(
+            ott_rank: crate::database::nested_variants::NestedRank::from(
                 item.ott_rank.as_ref().clone(),
             ),
             domain: item
@@ -277,16 +277,16 @@ impl From<web_common::database::nested_variants::NestedBioOttTaxonItem>
         }
     }
 }
-impl From<crate::database::nested_variants::NestedBioOttTaxonItem>
-    for web_common::database::nested_variants::NestedBioOttTaxonItem
+impl From<crate::database::nested_variants::NestedTaxon>
+    for web_common::database::nested_variants::NestedTaxon
 {
-    fn from(item: crate::database::nested_variants::NestedBioOttTaxonItem) -> Self {
+    fn from(item: crate::database::nested_variants::NestedTaxon) -> Self {
         Self {
             inner: Rc::from(web_common::database::flat_variants::BioOttTaxonItem::from(
                 item.inner,
             )),
             ott_rank: Rc::from(
-                web_common::database::nested_variants::NestedBioOttRank::from(item.ott_rank),
+                web_common::database::nested_variants::NestedRank::from(item.ott_rank),
             ),
             domain: item
                 .domain

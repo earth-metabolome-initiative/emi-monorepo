@@ -1,4 +1,0 @@
--- Drop the `bio_ott_taxon_items_parent_circularity_trigger` trigger on the bio_ott_taxon_items table.
-
-DROP TRIGGER bio_ott_taxon_items_parent_circularity_trigger ON bio_ott_taxon_items;
-DROP FUNCTION bio_ott_taxon_items_parent_circularity_trigger;

@@ -5,9 +5,9 @@
 use std::rc::Rc;
 
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-pub struct NestedBioOttTaxonItem {
+pub struct NestedTaxon {
     pub inner: Rc<crate::database::flat_variants::BioOttTaxonItem>,
-    pub ott_rank: Rc<crate::database::nested_variants::NestedBioOttRank>,
+    pub ott_rank: Rc<crate::database::nested_variants::NestedRank>,
     pub domain: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
     pub kingdom: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
     pub phylum: Option<Rc<crate::database::flat_variants::BioOttTaxonItem>>,
@@ -20,26 +20,26 @@ pub struct NestedBioOttTaxonItem {
     pub color: Rc<crate::database::flat_variants::Color>,
 }
 
-unsafe impl Send for NestedBioOttTaxonItem {}
-unsafe impl Sync for NestedBioOttTaxonItem {}
-impl crate::database::Tabular for NestedBioOttTaxonItem {
+unsafe impl Send for NestedTaxon {}
+unsafe impl Sync for NestedTaxon {}
+impl crate::database::Tabular for NestedTaxon {
     const TABLE: crate::database::Table = crate::database::Table::BioOttTaxonItems;
 }
-impl crate::database::Filtrable for NestedBioOttTaxonItem {
+impl crate::database::Filtrable for NestedTaxon {
     type Filter = crate::database::filter_variants::BioOttTaxonItemFilter;
 }
-impl crate::database::Describable for NestedBioOttTaxonItem {
+impl crate::database::Describable for NestedTaxon {
     fn description(&self) -> Option<&str> {
         self.inner.description()
     }
 }
-impl crate::database::Colorable for NestedBioOttTaxonItem {
+impl crate::database::Colorable for NestedTaxon {
     fn color(&self) -> Option<&str> {
         Some(self.color.name.as_str())
     }
 }
 #[cfg(feature = "frontend")]
-impl crate::database::AllRecords for NestedBioOttTaxonItem {
+impl crate::database::AllRecords for NestedTaxon {
     fn all_records<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
         filter: Option<&<Self as crate::database::Filtrable>::Filter>,
         limit: Option<i64>,
@@ -50,7 +50,7 @@ impl crate::database::AllRecords for NestedBioOttTaxonItem {
     }
 }
 #[cfg(feature = "frontend")]
-impl NestedBioOttTaxonItem {
+impl NestedTaxon {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
@@ -64,7 +64,7 @@ impl NestedBioOttTaxonItem {
     ) -> Result<Self, crate::api::ApiError> {
         Ok(Self {
             ott_rank: Rc::from(
-                crate::database::nested_variants::NestedBioOttRank::get(
+                crate::database::nested_variants::NestedRank::get(
                     flat_variant.ott_rank_id,
                     connection,
                 )
@@ -326,15 +326,15 @@ impl NestedBioOttTaxonItem {
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<Vec<Self>, crate::api::ApiError> {
-        let mut bio_ott_taxon_items = Vec::new();
+        let mut taxa = Vec::new();
         for flat_variant in
             crate::database::flat_variants::BioOttTaxonItem::all(filter, limit, offset, connection)
                 .await?
                 .into_iter()
         {
-            bio_ott_taxon_items.push(Self::from_flat(flat_variant, connection).await?);
+            taxa.push(Self::from_flat(flat_variant, connection).await?);
         }
-        Ok(bio_ott_taxon_items)
+        Ok(taxa)
     }
     /// Update or insert the record in the database.
     ///
@@ -345,7 +345,7 @@ impl NestedBioOttTaxonItem {
         &self,
         connection: &mut gluesql::prelude::Glue<C>,
     ) -> Result<usize, crate::api::ApiError> {
-        crate::database::nested_variants::NestedBioOttRank::update_or_insert(
+        crate::database::nested_variants::NestedRank::update_or_insert(
             self.ott_rank.as_ref(),
             connection,
         )

@@ -12,32 +12,32 @@ use super::*;
     serde::Deserialize,
     Default,
 )]
-pub struct Spectra {
+pub struct Spectrum {
     pub id: i32,
     pub spectra_collection_id: i32,
 }
 
-unsafe impl Send for Spectra {}
-unsafe impl Sync for Spectra {}
-impl Tabular for Spectra {
+unsafe impl Send for Spectrum {}
+unsafe impl Sync for Spectrum {}
+impl Tabular for Spectrum {
     const TABLE: crate::database::Table = crate::database::Table::Spectra;
 }
-impl Describable for Spectra {
+impl Describable for Spectrum {
     fn description(&self) -> Option<&str> {
         None
     }
 }
-impl Colorable for Spectra {
+impl Colorable for Spectrum {
     fn color(&self) -> Option<&str> {
         None
     }
 }
 
-impl Filtrable for crate::database::flat_variants::Spectra {
-    type Filter = crate::database::filter_variants::SpectraFilter;
+impl Filtrable for crate::database::flat_variants::Spectrum {
+    type Filter = crate::database::filter_variants::SpectrumFilter;
 }
 #[cfg(feature = "frontend")]
-impl AllRecords for Spectra {
+impl AllRecords for Spectrum {
     fn all_records<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
         filter: Option<&<Self as Filtrable>::Filter>,
         limit: Option<i64>,
@@ -48,7 +48,7 @@ impl AllRecords for Spectra {
     }
 }
 #[cfg(feature = "frontend")]
-impl Spectra {
+impl Spectrum {
     /// Get the id attribute.
     pub fn get_id<E>(&self) -> &E
     where
@@ -72,7 +72,7 @@ impl Spectra {
         ]
     }
 
-    /// Insert the Spectra into the database.
+    /// Insert the Spectrum into the database.
     ///
     /// * `connection` - The connection to the database.
     async fn insert<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
@@ -94,7 +94,7 @@ impl Spectra {
             })?)
     }
 
-    /// Get the Spectra from the database by its ID.
+    /// Get the Spectrum from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to check.
     /// * `connection` - The connection to the database.
@@ -118,7 +118,7 @@ impl Spectra {
             .pop())
     }
 
-    /// Delete the Spectra from the database.
+    /// Delete the Spectrum from the database.
     ///
     /// * `connection` - The connection to the database.
     pub async fn delete<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
@@ -128,7 +128,7 @@ impl Spectra {
         Self::delete_from_id(self.id, connection).await
     }
 
-    /// Delete the Spectra from the database by its ID.
+    /// Delete the Spectrum from the database by its ID.
     ///
     /// * `id` - The primary key(s) of the struct to delete.
     /// * `connection` - The connection to the database.
@@ -190,14 +190,14 @@ impl Spectra {
             Ok(number_of_rows)
         }
     }
-    /// Get all Spectra from the database.
+    /// Get all Spectrum from the database.
     ///
     /// * `filter` - The filter to apply to the results.
     /// * `limit` - The maximum number of results, by default `10`.
     /// * `offset` - The offset of the results, by default `0`.
     /// * `connection` - The connection to the database.
     pub async fn all<C: gluesql::core::store::GStore + gluesql::core::store::GStoreMut>(
-        filter: Option<&crate::database::filter_variants::SpectraFilter>,
+        filter: Option<&crate::database::filter_variants::SpectrumFilter>,
         limit: Option<i64>,
         offset: Option<i64>,
         connection: &mut gluesql::prelude::Glue<C>,

@@ -3,162 +3,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 pub struct EmptyFilter;
 
-#[derive(
-    PartialEq,
-    Debug,
-    Clone,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-    Eq,
-    PartialOrd,
-    Copy,
-    Ord,
-)]
-pub struct BioOttRankFilter {
-    pub icon_id: Option<i32>,
-    pub color_id: Option<i32>,
-}
-
-unsafe impl Send for BioOttRankFilter {}
-unsafe impl Sync for BioOttRankFilter {}
-
-#[cfg(feature = "frontend")]
-impl BioOttRankFilter {
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> =
-            gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(icon_id) = &self.icon_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_ranks.icon_id").eq(icon_id.to_string()),
-            );
-        }
-
-        if let Some(color_id) = &self.color_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_ranks.color_id").eq(color_id.to_string()),
-            );
-        }
-
-        filter
-    }
-}
-
-#[derive(
-    PartialEq,
-    Debug,
-    Clone,
-    serde::Serialize,
-    serde::Deserialize,
-    Default,
-    Eq,
-    PartialOrd,
-    Copy,
-    Ord,
-)]
-pub struct BioOttTaxonItemFilter {
-    pub ott_rank_id: Option<i32>,
-    pub domain_id: Option<i32>,
-    pub kingdom_id: Option<i32>,
-    pub phylum_id: Option<i32>,
-    pub class_id: Option<i32>,
-    pub order_id: Option<i32>,
-    pub family_id: Option<i32>,
-    pub genus_id: Option<i32>,
-    pub parent_id: Option<i32>,
-    pub icon_id: Option<i32>,
-    pub color_id: Option<i32>,
-}
-
-unsafe impl Send for BioOttTaxonItemFilter {}
-unsafe impl Sync for BioOttTaxonItemFilter {}
-
-#[cfg(feature = "frontend")]
-impl BioOttTaxonItemFilter {
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> =
-            gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(ott_rank_id) = &self.ott_rank_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.ott_rank_id")
-                    .eq(ott_rank_id.to_string()),
-            );
-        }
-
-        if let Some(domain_id) = &self.domain_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.domain_id")
-                    .eq(domain_id.to_string()),
-            );
-        }
-
-        if let Some(kingdom_id) = &self.kingdom_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.kingdom_id")
-                    .eq(kingdom_id.to_string()),
-            );
-        }
-
-        if let Some(phylum_id) = &self.phylum_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.phylum_id")
-                    .eq(phylum_id.to_string()),
-            );
-        }
-
-        if let Some(class_id) = &self.class_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.class_id")
-                    .eq(class_id.to_string()),
-            );
-        }
-
-        if let Some(order_id) = &self.order_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.order_id")
-                    .eq(order_id.to_string()),
-            );
-        }
-
-        if let Some(family_id) = &self.family_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.family_id")
-                    .eq(family_id.to_string()),
-            );
-        }
-
-        if let Some(genus_id) = &self.genus_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.genus_id")
-                    .eq(genus_id.to_string()),
-            );
-        }
-
-        if let Some(parent_id) = &self.parent_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.parent_id")
-                    .eq(parent_id.to_string()),
-            );
-        }
-
-        if let Some(icon_id) = &self.icon_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.icon_id")
-                    .eq(icon_id.to_string()),
-            );
-        }
-
-        if let Some(color_id) = &self.color_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("bio_ott_taxon_items.color_id")
-                    .eq(color_id.to_string()),
-            );
-        }
-
-        filter
-    }
-}
-
 #[derive(PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default, Eq)]
 pub struct DerivedSampleFilter {
     pub created_by: Option<i32>,
@@ -602,38 +446,37 @@ impl ObservationFilter {
 }
 
 #[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
-pub struct OrganismBioOttTaxonItemFilter {
+pub struct OrganismTaxonFilter {
     pub created_by: Option<i32>,
     pub organism_id: Option<uuid::Uuid>,
     pub taxon_id: Option<i32>,
 }
 
-unsafe impl Send for OrganismBioOttTaxonItemFilter {}
-unsafe impl Sync for OrganismBioOttTaxonItemFilter {}
+unsafe impl Send for OrganismTaxonFilter {}
+unsafe impl Sync for OrganismTaxonFilter {}
 
 #[cfg(feature = "frontend")]
-impl OrganismBioOttTaxonItemFilter {
+impl OrganismTaxonFilter {
     pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> =
             gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
         if let Some(created_by) = &self.created_by {
             filter = filter.and(
-                gluesql::core::ast_builder::col("organism_bio_ott_taxon_items.created_by")
+                gluesql::core::ast_builder::col("organism_taxa.created_by")
                     .eq(created_by.to_string()),
             );
         }
 
         if let Some(organism_id) = &self.organism_id {
             filter = filter.and(
-                gluesql::core::ast_builder::col("organism_bio_ott_taxon_items.organism_id")
+                gluesql::core::ast_builder::col("organism_taxa.organism_id")
                     .eq(organism_id.to_string()),
             );
         }
 
         if let Some(taxon_id) = &self.taxon_id {
             filter = filter.and(
-                gluesql::core::ast_builder::col("organism_bio_ott_taxon_items.taxon_id")
-                    .eq(taxon_id.to_string()),
+                gluesql::core::ast_builder::col("organism_taxa.taxon_id").eq(taxon_id.to_string()),
             );
         }
 
@@ -1253,6 +1096,45 @@ impl ProjectsUsersRoleFilter {
     Copy,
     Ord,
 )]
+pub struct RankFilter {
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+unsafe impl Send for RankFilter {}
+unsafe impl Sync for RankFilter {}
+
+#[cfg(feature = "frontend")]
+impl RankFilter {
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> =
+            gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(icon_id) = &self.icon_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("ranks.icon_id").eq(icon_id.to_string()));
+        }
+
+        if let Some(color_id) = &self.color_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("ranks.color_id").eq(color_id.to_string()));
+        }
+
+        filter
+    }
+}
+
+#[derive(
+    PartialEq,
+    Debug,
+    Clone,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Eq,
+    PartialOrd,
+    Copy,
+    Ord,
+)]
 pub struct RoleFilter {
     pub icon_id: Option<i32>,
     pub color_id: Option<i32>,
@@ -1274,46 +1156,6 @@ impl RoleFilter {
         if let Some(color_id) = &self.color_id {
             filter = filter
                 .and(gluesql::core::ast_builder::col("roles.color_id").eq(color_id.to_string()));
-        }
-
-        filter
-    }
-}
-
-#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
-pub struct SampleBioOttTaxonItemFilter {
-    pub created_by: Option<i32>,
-    pub sample_id: Option<uuid::Uuid>,
-    pub taxon_id: Option<i32>,
-}
-
-unsafe impl Send for SampleBioOttTaxonItemFilter {}
-unsafe impl Sync for SampleBioOttTaxonItemFilter {}
-
-#[cfg(feature = "frontend")]
-impl SampleBioOttTaxonItemFilter {
-    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
-        let mut filter: gluesql::core::ast_builder::ExprNode<'_> =
-            gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
-        if let Some(created_by) = &self.created_by {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("sample_bio_ott_taxon_items.created_by")
-                    .eq(created_by.to_string()),
-            );
-        }
-
-        if let Some(sample_id) = &self.sample_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("sample_bio_ott_taxon_items.sample_id")
-                    .eq(sample_id.to_string()),
-            );
-        }
-
-        if let Some(taxon_id) = &self.taxon_id {
-            filter = filter.and(
-                gluesql::core::ast_builder::col("sample_bio_ott_taxon_items.taxon_id")
-                    .eq(taxon_id.to_string()),
-            );
         }
 
         filter
@@ -1471,6 +1313,44 @@ impl SampleStateFilter {
     }
 }
 
+#[derive(Eq, PartialEq, Debug, Clone, Copy, serde::Serialize, serde::Deserialize, Default)]
+pub struct SampleTaxonFilter {
+    pub created_by: Option<i32>,
+    pub sample_id: Option<uuid::Uuid>,
+    pub taxon_id: Option<i32>,
+}
+
+unsafe impl Send for SampleTaxonFilter {}
+unsafe impl Sync for SampleTaxonFilter {}
+
+#[cfg(feature = "frontend")]
+impl SampleTaxonFilter {
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> =
+            gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(created_by) = &self.created_by {
+            filter = filter.and(
+                gluesql::core::ast_builder::col("sample_taxa.created_by")
+                    .eq(created_by.to_string()),
+            );
+        }
+
+        if let Some(sample_id) = &self.sample_id {
+            filter = filter.and(
+                gluesql::core::ast_builder::col("sample_taxa.sample_id").eq(sample_id.to_string()),
+            );
+        }
+
+        if let Some(taxon_id) = &self.taxon_id {
+            filter = filter.and(
+                gluesql::core::ast_builder::col("sample_taxa.taxon_id").eq(taxon_id.to_string()),
+            );
+        }
+
+        filter
+    }
+}
+
 #[derive(
     PartialEq,
     Debug,
@@ -1552,15 +1432,15 @@ impl SampleFilter {
     serde::Deserialize,
     Default,
 )]
-pub struct SpectraFilter {
+pub struct SpectrumFilter {
     pub spectra_collection_id: Option<i32>,
 }
 
-unsafe impl Send for SpectraFilter {}
-unsafe impl Sync for SpectraFilter {}
+unsafe impl Send for SpectrumFilter {}
+unsafe impl Sync for SpectrumFilter {}
 
 #[cfg(feature = "frontend")]
-impl SpectraFilter {
+impl SpectrumFilter {
     pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
         let mut filter: gluesql::core::ast_builder::ExprNode<'_> =
             gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
@@ -1609,6 +1489,100 @@ impl SpectraCollectionFilter {
                 gluesql::core::ast_builder::col("spectra_collections.updated_by")
                     .eq(updated_by.to_string()),
             );
+        }
+
+        filter
+    }
+}
+
+#[derive(
+    PartialEq,
+    Debug,
+    Clone,
+    serde::Serialize,
+    serde::Deserialize,
+    Default,
+    Eq,
+    PartialOrd,
+    Copy,
+    Ord,
+)]
+pub struct TaxonFilter {
+    pub ott_rank_id: Option<i32>,
+    pub domain_id: Option<i32>,
+    pub kingdom_id: Option<i32>,
+    pub phylum_id: Option<i32>,
+    pub class_id: Option<i32>,
+    pub order_id: Option<i32>,
+    pub family_id: Option<i32>,
+    pub genus_id: Option<i32>,
+    pub parent_id: Option<i32>,
+    pub icon_id: Option<i32>,
+    pub color_id: Option<i32>,
+}
+
+unsafe impl Send for TaxonFilter {}
+unsafe impl Sync for TaxonFilter {}
+
+#[cfg(feature = "frontend")]
+impl TaxonFilter {
+    pub fn as_filter_expression(&self) -> gluesql::core::ast_builder::ExprNode<'_> {
+        let mut filter: gluesql::core::ast_builder::ExprNode<'_> =
+            gluesql::core::ast::Expr::Literal(gluesql::core::ast::AstLiteral::Boolean(true)).into();
+        if let Some(ott_rank_id) = &self.ott_rank_id {
+            filter = filter.and(
+                gluesql::core::ast_builder::col("taxa.ott_rank_id").eq(ott_rank_id.to_string()),
+            );
+        }
+
+        if let Some(domain_id) = &self.domain_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("taxa.domain_id").eq(domain_id.to_string()));
+        }
+
+        if let Some(kingdom_id) = &self.kingdom_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("taxa.kingdom_id").eq(kingdom_id.to_string()));
+        }
+
+        if let Some(phylum_id) = &self.phylum_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("taxa.phylum_id").eq(phylum_id.to_string()));
+        }
+
+        if let Some(class_id) = &self.class_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("taxa.class_id").eq(class_id.to_string()));
+        }
+
+        if let Some(order_id) = &self.order_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("taxa.order_id").eq(order_id.to_string()));
+        }
+
+        if let Some(family_id) = &self.family_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("taxa.family_id").eq(family_id.to_string()));
+        }
+
+        if let Some(genus_id) = &self.genus_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("taxa.genus_id").eq(genus_id.to_string()));
+        }
+
+        if let Some(parent_id) = &self.parent_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("taxa.parent_id").eq(parent_id.to_string()));
+        }
+
+        if let Some(icon_id) = &self.icon_id {
+            filter =
+                filter.and(gluesql::core::ast_builder::col("taxa.icon_id").eq(icon_id.to_string()));
+        }
+
+        if let Some(color_id) = &self.color_id {
+            filter = filter
+                .and(gluesql::core::ast_builder::col("taxa.color_id").eq(color_id.to_string()));
         }
 
         filter

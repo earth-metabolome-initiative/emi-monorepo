@@ -9,12 +9,12 @@ use ngrammatic::prelude::*;
 use rayon::slice::ParallelSliceMut;
 use std::fmt::Debug;
 
-/// Returns an iterator over the taxons in the corpus.
-fn iter_taxons() -> impl Iterator<Item = String> {
+/// Returns an iterator over the taxa in the corpus.
+fn iter_taxa() -> impl Iterator<Item = String> {
     use std::fs::File;
     use std::io::{BufRead, BufReader};
 
-    let file = File::open("./db_data/bio_ott_taxons.csv.gz").unwrap();
+    let file = File::open("./db_data/bio_ott_taxa.csv.gz").unwrap();
     let reader = BufReader::new(flate2::read::GzDecoder::new(file));
     reader
         .lines()
@@ -22,16 +22,16 @@ fn iter_taxons() -> impl Iterator<Item = String> {
 }
 
 fn build_vec() -> Vec<String> {
-    iter_taxons().collect()
+    iter_taxa().collect()
 }
 
 /// Returns the built RCL
 fn build_rcl() -> RearCodedList {
-    let mut taxons: Vec<String> = build_vec();
-    taxons.par_sort_unstable();
+    let mut taxa: Vec<String> = build_vec();
+    taxa.par_sort_unstable();
 
     let mut rcl_builder = RearCodedListBuilder::new(8);
-    for taxon in taxons {
+    for taxon in taxa {
         rcl_builder.push(&taxon);
     }
     rcl_builder.build()

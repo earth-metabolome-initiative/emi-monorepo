@@ -11,8 +11,8 @@ pub use nameplates::*;
 mod observations;
 pub use observations::*;
 
-mod organism_bio_ott_taxon_items;
-pub use organism_bio_ott_taxon_items::*;
+mod organism_taxa;
+pub use organism_taxa::*;
 
 mod organisms;
 pub use organisms::*;
@@ -32,11 +32,11 @@ pub use projects_users_role_invitations::*;
 mod projects_users_roles;
 pub use projects_users_roles::*;
 
-mod sample_bio_ott_taxon_items;
-pub use sample_bio_ott_taxon_items::*;
-
 mod sample_containers;
 pub use sample_containers::*;
+
+mod sample_taxa;
+pub use sample_taxa::*;
 
 mod samples;
 pub use samples::*;

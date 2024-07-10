@@ -2,14 +2,14 @@ use crate::database::*;
 use std::rc::Rc;
 
 #[derive(PartialEq, Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-pub struct NestedSpectra {
-    pub inner: crate::database::flat_variants::Spectra,
+pub struct NestedSpectrum {
+    pub inner: crate::database::flat_variants::Spectrum,
     pub spectra_collection: crate::database::nested_variants::NestedSpectraCollection,
 }
 
-unsafe impl Send for NestedSpectra {}
-unsafe impl Sync for NestedSpectra {}
-impl NestedSpectra {
+unsafe impl Send for NestedSpectrum {}
+unsafe impl Sync for NestedSpectrum {}
+impl NestedSpectrum {
     /// Convert the flat struct to the nested struct.
     ///
     /// # Arguments
@@ -17,7 +17,7 @@ impl NestedSpectra {
     /// * `author_user_id` - The author user id.
     /// * `connection` - The database connection.
     pub(crate) fn from_flat(
-        flat_variant: Spectra,
+        flat_variant: Spectrum,
         author_user_id: Option<i32>,
         connection: &mut diesel::r2d2::PooledConnection<
             diesel::r2d2::ConnectionManager<diesel::prelude::PgConnection>,
@@ -57,7 +57,7 @@ impl NestedSpectra {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<bool, web_common::api::ApiError> {
-        Spectra::can_view_by_id(id, author_user_id, connection)
+        Spectrum::can_view_by_id(id, author_user_id, connection)
     }
     /// Get all of the viewable structs from the database.
     ///
@@ -67,7 +67,7 @@ impl NestedSpectra {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable(
-        filter: Option<&web_common::database::filter_variants::SpectraFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectrumFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -75,7 +75,7 @@ impl NestedSpectra {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        Spectra::all_viewable(filter, author_user_id, limit, offset, connection)?
+        Spectrum::all_viewable(filter, author_user_id, limit, offset, connection)?
             .into_iter()
             .map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
             .collect()
@@ -88,7 +88,7 @@ impl NestedSpectra {
     /// * `offset` - The number of results to skip.
     /// * `connection` - The connection to the database.
     pub fn all_viewable_sorted(
-        filter: Option<&web_common::database::filter_variants::SpectraFilter>,
+        filter: Option<&web_common::database::filter_variants::SpectrumFilter>,
         author_user_id: Option<i32>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -96,7 +96,7 @@ impl NestedSpectra {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Vec<Self>, web_common::api::ApiError> {
-        Spectra::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?
+        Spectrum::all_viewable_sorted(filter, author_user_id, limit, offset, connection)?
             .into_iter()
             .map(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
             .collect()
@@ -113,7 +113,7 @@ impl NestedSpectra {
             diesel::r2d2::ConnectionManager<diesel::PgConnection>,
         >,
     ) -> Result<Self, web_common::api::ApiError> {
-        Spectra::get(id, author_user_id, connection)
+        Spectrum::get(id, author_user_id, connection)
             .and_then(|flat_variant| Self::from_flat(flat_variant, author_user_id, connection))
     }
     /// Check whether the user can update the struct.
@@ -122,7 +122,7 @@ impl NestedSpectra {
     }
     /// Check whether the user can update the struct associated to the provided ids.
     pub fn can_update_by_id() -> Result<bool, web_common::api::ApiError> {
-        Spectra::can_update_by_id()
+        Spectrum::can_update_by_id()
     }
     /// Check whether the user can admin the struct.
     pub fn can_admin(&self) -> Result<bool, web_common::api::ApiError> {
@@ -130,27 +130,27 @@ impl NestedSpectra {
     }
     /// Check whether the user can admin the struct associated to the provided ids.
     pub fn can_admin_by_id() -> Result<bool, web_common::api::ApiError> {
-        Spectra::can_admin_by_id()
+        Spectrum::can_admin_by_id()
     }
 }
-impl From<web_common::database::nested_variants::NestedSpectra>
-    for crate::database::nested_variants::NestedSpectra
+impl From<web_common::database::nested_variants::NestedSpectrum>
+    for crate::database::nested_variants::NestedSpectrum
 {
-    fn from(item: web_common::database::nested_variants::NestedSpectra) -> Self {
+    fn from(item: web_common::database::nested_variants::NestedSpectrum) -> Self {
         Self {
-            inner: crate::database::flat_variants::Spectra::from(item.inner),
+            inner: crate::database::flat_variants::Spectrum::from(item.inner),
             spectra_collection: crate::database::nested_variants::NestedSpectraCollection::from(
                 item.spectra_collection.as_ref().clone(),
             ),
         }
     }
 }
-impl From<crate::database::nested_variants::NestedSpectra>
-    for web_common::database::nested_variants::NestedSpectra
+impl From<crate::database::nested_variants::NestedSpectrum>
+    for web_common::database::nested_variants::NestedSpectrum
 {
-    fn from(item: crate::database::nested_variants::NestedSpectra) -> Self {
+    fn from(item: crate::database::nested_variants::NestedSpectrum) -> Self {
         Self {
-            inner: web_common::database::flat_variants::Spectra::from(item.inner),
+            inner: web_common::database::flat_variants::Spectrum::from(item.inner),
             spectra_collection: Rc::from(
                 web_common::database::nested_variants::NestedSpectraCollection::from(
                     item.spectra_collection,

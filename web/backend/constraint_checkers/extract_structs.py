@@ -15,7 +15,16 @@ IGNORED_TABLES = [
 def struct_name_from_table_name(table_name: str) -> str:
     """Convert a table name to a struct name."""
     last_term = table_name.split("_")[-1]
-    singularized_last_term = inflect_engine.singular_noun(last_term) or last_term
+    singularized_last_term = inflect_engine.singular_noun(last_term)
+
+    if last_term == "taxa":
+        singularized_last_term = "taxon"
+    if last_term == "spectra":
+        singularized_last_term = "spectrum"
+
+    if not singularized_last_term:
+        raise ValueError(f"Could not singularize the last term of the table name: {table_name}")
+    
     return "".join(
         [
             term.capitalize()

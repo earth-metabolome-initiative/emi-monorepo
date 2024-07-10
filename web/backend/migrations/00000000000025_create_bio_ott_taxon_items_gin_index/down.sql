@@ -1,2 +1,0 @@
--- Down version of bio_ott_taxon_items_name_description_trgm_idx
-DROP INDEX IF EXISTS bio_ott_taxon_items_name_trgm_idx;
