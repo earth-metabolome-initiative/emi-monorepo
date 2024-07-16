@@ -28,6 +28,6 @@ COPY taxa(
     color_id,
     ott_rank_id
 )
-FROM PROGRAM 'gzip -dc /app/bio_ott_taxa.csv.gz'  DELIMITER ',' CSV HEADER;
+FROM PROGRAM 'gzip -dc /app/taxa.csv.gz'  DELIMITER ',' CSV HEADER;
 
 ALTER TABLE taxa ENABLE TRIGGER ALL;
