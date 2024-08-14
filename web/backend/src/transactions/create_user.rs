@@ -40,7 +40,7 @@ pub(crate) fn create_user(
     let mut jpeg_buffer = Cursor::new(Vec::new());
 
     dynamic_image
-        .write_to(&mut jpeg_buffer, image::ImageOutputFormat::Jpeg(80))
+        .write_to(&mut jpeg_buffer, image::ImageFormat::Jpeg)
         .unwrap();
 
     let jpeg_buffer = jpeg_buffer.into_inner();
