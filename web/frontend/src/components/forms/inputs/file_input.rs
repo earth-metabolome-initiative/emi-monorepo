@@ -182,6 +182,7 @@ where
             MultiFileInputMessage::FileProcessed(data) => {
                 self.number_of_files_currently_processing -= 1;
                 ctx.props().append_file.emit(Rc::new(data));
+                ctx.link().send_message(MultiFileInputMessage::HideDropBox);
                 false
             }
             MultiFileInputMessage::Files(files) => {
