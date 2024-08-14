@@ -1449,7 +1449,7 @@ impl Insertable for NestedUsersUsersRole {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Routable)]
+#[derive(Debug, Clone, PartialEq, Routable, Eq)]
 pub enum AppRoute {
     #[at("/countries")]
     Countries,
@@ -1725,11 +1725,21 @@ pub enum AppRoute {
     UsersUsersRolesNewWithUser { user_id: i32 },
     #[at("/")]
     Home,
+    #[at("/collect")]
+    Collect,
+    #[at("/project-selection/:source_page")]
+    ProjectSelection { source_page: String },
     #[at("/login")]
     Login,
     #[not_found]
     #[at("/404")]
     NotFound,
+}
+
+impl AppRoute {
+    pub fn is_project_selection(&self) -> bool {
+        matches!(self, AppRoute::ProjectSelection { .. })
+    }
 }
 
 /// The switch to map each instance of the AppRoute to the corresponding page.
@@ -2145,6 +2155,12 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::Home => {
             html! { <Home /> }
         }
+        AppRoute::Collect => {
+            html! { <Collect /> }
+        }
+        AppRoute::ProjectSelection { source_page } => {
+            html! { <ProjectSelection source_page={AppRoute::try_from(source_page).unwrap_or(AppRoute::Home)} /> }
+        }
         AppRoute::Login => {
             html! { <Login /> }
         }
@@ -2153,3 +2169,4 @@ pub fn switch(route: AppRoute) -> Html {
         }
     }
 }
+

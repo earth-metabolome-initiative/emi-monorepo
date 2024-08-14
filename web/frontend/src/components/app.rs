@@ -10,7 +10,7 @@ pub fn App() -> Html {
     html! {
         <WorkerProvider<WebsocketWorker> path="/web_socket_worker.js">
             <BrowserRouter>
-                <crate::components::NavigatorWrapper />
+                <crate::components::Navigator />
                 <div class="app">
                     <div class="page-container">
                         <Switch<AppRoute> render={switch} />

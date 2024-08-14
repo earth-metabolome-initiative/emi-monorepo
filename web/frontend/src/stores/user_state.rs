@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
-use web_common::database::NestedUser;
+use web_common::database::{NestedProject, NestedUser};
 use yewdux::prelude::*;
 
 use super::app_state::AppState;
@@ -10,6 +10,8 @@ use super::app_state::AppState;
 #[store(storage = "session", storage_tab_sync)]
 pub struct UserState {
     user: Option<Rc<NestedUser>>,
+    // The primary project to be currently considered by the user.
+    project: Option<Rc<NestedProject>>,
 }
 
 impl UserState {
@@ -17,8 +19,23 @@ impl UserState {
         self.user.is_some()
     }
 
+    pub fn has_project(&self) -> bool {
+        self.project.is_some()
+    }
+
+    pub fn has_complete_profile(&self) -> bool {
+        self.user
+            .as_ref()
+            .map(|user| user.inner.has_complete_profile())
+            .unwrap_or(false)
+    }
+
     pub fn user(&self) -> Option<Rc<NestedUser>> {
         self.user.clone()
+    }
+
+    pub fn project(&self) -> Option<Rc<NestedProject>> {
+        self.project.clone()
     }
 
     pub fn id(&self) -> Option<i32> {
@@ -30,6 +47,17 @@ impl UserState {
         let maybe_user = Some(user);
         if self.user != maybe_user {
             self.user = maybe_user;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Set the project to the provided value and returns whether any changes were made.
+    pub fn set_project(&mut self, project: Rc<NestedProject>) -> bool {
+        let maybe_project = Some(project);
+        if self.project != maybe_project {
+            self.project = maybe_project;
             true
         } else {
             false

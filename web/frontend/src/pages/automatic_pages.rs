@@ -1,6 +1,6 @@
-use yew::prelude::*;
-use web_common::database::*;
 use crate::components::*;
+use web_common::database::*;
+use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct CountryPageProp {
@@ -25,14 +25,14 @@ impl CountryPageProp {
 pub fn country_page(props: &CountryPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<Country> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -50,7 +50,7 @@ pub struct DerivedSamplePageProp {
 
 impl From<&DerivedSamplePageProp> for PrimaryKey {
     fn from(prop: &DerivedSamplePageProp) -> Self {
-        ( prop.parent_sample_id, prop.child_sample_id ).into()
+        (prop.parent_sample_id, prop.child_sample_id).into()
     }
 }
 
@@ -58,14 +58,14 @@ impl From<&DerivedSamplePageProp> for PrimaryKey {
 pub fn derived_sample_page(props: &DerivedSamplePageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedDerivedSample> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -97,14 +97,14 @@ impl NameplatePageProp {
 pub fn nameplate_page(props: &NameplatePageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedNameplate> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -137,14 +137,14 @@ impl ObservationSubjectPageProp {
 pub fn observation_subject_page(props: &ObservationSubjectPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedObservationSubject> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -177,14 +177,14 @@ impl ObservationPageProp {
 pub fn observation_page(props: &ObservationPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedObservation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -202,7 +202,7 @@ pub struct OrganismTaxonPageProp {
 
 impl From<&OrganismTaxonPageProp> for PrimaryKey {
     fn from(prop: &OrganismTaxonPageProp) -> Self {
-        ( prop.organism_id, prop.taxon_id ).into()
+        (prop.organism_id, prop.taxon_id).into()
     }
 }
 
@@ -210,14 +210,14 @@ impl From<&OrganismTaxonPageProp> for PrimaryKey {
 pub fn organism_taxon_page(props: &OrganismTaxonPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedOrganismTaxon> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -259,14 +259,14 @@ impl OrganismPageProp {
 pub fn organism_page(props: &OrganismPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedOrganism> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -303,14 +303,14 @@ impl OrganizationPageProp {
 pub fn organization_page(props: &OrganizationPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedOrganization> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -337,7 +337,9 @@ impl ProjectPageProp {
         filter.parent_project_id = Some(self.id);
         filter
     }
-    fn filter_projects_users_role_invitations_by_table_id(&self) -> ProjectsUsersRoleInvitationFilter {
+    fn filter_projects_users_role_invitations_by_table_id(
+        &self,
+    ) -> ProjectsUsersRoleInvitationFilter {
         let mut filter = ProjectsUsersRoleInvitationFilter::default();
         filter.table_id = Some(self.id);
         filter
@@ -372,7 +374,9 @@ impl ProjectPageProp {
         filter.project_id = Some(self.id);
         filter
     }
-    fn filter_projects_teams_role_invitations_by_table_id(&self) -> ProjectsTeamsRoleInvitationFilter {
+    fn filter_projects_teams_role_invitations_by_table_id(
+        &self,
+    ) -> ProjectsTeamsRoleInvitationFilter {
         let mut filter = ProjectsTeamsRoleInvitationFilter::default();
         filter.table_id = Some(self.id);
         filter
@@ -398,14 +402,14 @@ impl ProjectPageProp {
 pub fn project_page(props: &ProjectPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedProject> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -445,7 +449,7 @@ pub struct ProjectsTeamsRoleInvitationPageProp {
 
 impl From<&ProjectsTeamsRoleInvitationPageProp> for PrimaryKey {
     fn from(prop: &ProjectsTeamsRoleInvitationPageProp) -> Self {
-        ( prop.table_id, prop.team_id ).into()
+        (prop.table_id, prop.team_id).into()
     }
 }
 
@@ -453,14 +457,14 @@ impl From<&ProjectsTeamsRoleInvitationPageProp> for PrimaryKey {
 pub fn projects_teams_role_invitation_page(props: &ProjectsTeamsRoleInvitationPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedProjectsTeamsRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -477,7 +481,7 @@ pub struct ProjectsTeamsRoleRequestPageProp {
 
 impl From<&ProjectsTeamsRoleRequestPageProp> for PrimaryKey {
     fn from(prop: &ProjectsTeamsRoleRequestPageProp) -> Self {
-        ( prop.table_id, prop.team_id ).into()
+        (prop.table_id, prop.team_id).into()
     }
 }
 
@@ -485,14 +489,14 @@ impl From<&ProjectsTeamsRoleRequestPageProp> for PrimaryKey {
 pub fn projects_teams_role_request_page(props: &ProjectsTeamsRoleRequestPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedProjectsTeamsRoleRequest> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -509,7 +513,7 @@ pub struct ProjectsTeamsRolePageProp {
 
 impl From<&ProjectsTeamsRolePageProp> for PrimaryKey {
     fn from(prop: &ProjectsTeamsRolePageProp) -> Self {
-        ( prop.table_id, prop.team_id ).into()
+        (prop.table_id, prop.team_id).into()
     }
 }
 
@@ -517,14 +521,14 @@ impl From<&ProjectsTeamsRolePageProp> for PrimaryKey {
 pub fn projects_teams_role_page(props: &ProjectsTeamsRolePageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedProjectsTeamsRole> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -541,7 +545,7 @@ pub struct ProjectsUsersRoleInvitationPageProp {
 
 impl From<&ProjectsUsersRoleInvitationPageProp> for PrimaryKey {
     fn from(prop: &ProjectsUsersRoleInvitationPageProp) -> Self {
-        ( prop.table_id, prop.user_id ).into()
+        (prop.table_id, prop.user_id).into()
     }
 }
 
@@ -549,14 +553,14 @@ impl From<&ProjectsUsersRoleInvitationPageProp> for PrimaryKey {
 pub fn projects_users_role_invitation_page(props: &ProjectsUsersRoleInvitationPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedProjectsUsersRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -573,7 +577,7 @@ pub struct ProjectsUsersRoleRequestPageProp {
 
 impl From<&ProjectsUsersRoleRequestPageProp> for PrimaryKey {
     fn from(prop: &ProjectsUsersRoleRequestPageProp) -> Self {
-        ( prop.table_id, prop.user_id ).into()
+        (prop.table_id, prop.user_id).into()
     }
 }
 
@@ -581,14 +585,14 @@ impl From<&ProjectsUsersRoleRequestPageProp> for PrimaryKey {
 pub fn projects_users_role_request_page(props: &ProjectsUsersRoleRequestPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedProjectsUsersRoleRequest> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -605,7 +609,7 @@ pub struct ProjectsUsersRolePageProp {
 
 impl From<&ProjectsUsersRolePageProp> for PrimaryKey {
     fn from(prop: &ProjectsUsersRolePageProp) -> Self {
-        ( prop.table_id, prop.user_id ).into()
+        (prop.table_id, prop.user_id).into()
     }
 }
 
@@ -613,14 +617,14 @@ impl From<&ProjectsUsersRolePageProp> for PrimaryKey {
 pub fn projects_users_role_page(props: &ProjectsUsersRolePageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedProjectsUsersRole> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -652,14 +656,14 @@ impl RankPageProp {
 pub fn rank_page(props: &RankPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedRank> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -692,14 +696,14 @@ impl SampleContainerPageProp {
 pub fn sample_container_page(props: &SampleContainerPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedSampleContainer> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -732,14 +736,14 @@ impl SampleStatePageProp {
 pub fn sample_state_page(props: &SampleStatePageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedSampleState> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -757,7 +761,7 @@ pub struct SampleTaxonPageProp {
 
 impl From<&SampleTaxonPageProp> for PrimaryKey {
     fn from(prop: &SampleTaxonPageProp) -> Self {
-        ( prop.sample_id, prop.taxon_id ).into()
+        (prop.sample_id, prop.taxon_id).into()
     }
 }
 
@@ -765,14 +769,14 @@ impl From<&SampleTaxonPageProp> for PrimaryKey {
 pub fn sample_taxon_page(props: &SampleTaxonPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedSampleTaxon> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -829,14 +833,14 @@ impl SamplePageProp {
 pub fn sample_page(props: &SamplePageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedSample> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -879,14 +883,14 @@ impl SpectraCollectionPageProp {
 pub fn spectra_collection_page(props: &SpectraCollectionPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedSpectraCollection> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -963,14 +967,14 @@ impl TaxonPageProp {
 pub fn taxon_page(props: &TaxonPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedTaxon> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1040,7 +1044,9 @@ impl TeamPageProp {
         filter.table_id = Some(self.id);
         filter
     }
-    fn filter_projects_teams_role_invitations_by_team_id(&self) -> ProjectsTeamsRoleInvitationFilter {
+    fn filter_projects_teams_role_invitations_by_team_id(
+        &self,
+    ) -> ProjectsTeamsRoleInvitationFilter {
         let mut filter = ProjectsTeamsRoleInvitationFilter::default();
         filter.team_id = Some(self.id);
         filter
@@ -1061,14 +1067,14 @@ impl TeamPageProp {
 pub fn team_page(props: &TeamPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedTeam> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1102,7 +1108,7 @@ pub struct TeamsTeamsRoleInvitationPageProp {
 
 impl From<&TeamsTeamsRoleInvitationPageProp> for PrimaryKey {
     fn from(prop: &TeamsTeamsRoleInvitationPageProp) -> Self {
-        ( prop.table_id, prop.team_id ).into()
+        (prop.table_id, prop.team_id).into()
     }
 }
 
@@ -1110,14 +1116,14 @@ impl From<&TeamsTeamsRoleInvitationPageProp> for PrimaryKey {
 pub fn teams_teams_role_invitation_page(props: &TeamsTeamsRoleInvitationPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedTeamsTeamsRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1134,7 +1140,7 @@ pub struct TeamsUsersRoleInvitationPageProp {
 
 impl From<&TeamsUsersRoleInvitationPageProp> for PrimaryKey {
     fn from(prop: &TeamsUsersRoleInvitationPageProp) -> Self {
-        ( prop.table_id, prop.user_id ).into()
+        (prop.table_id, prop.user_id).into()
     }
 }
 
@@ -1142,14 +1148,14 @@ impl From<&TeamsUsersRoleInvitationPageProp> for PrimaryKey {
 pub fn teams_users_role_invitation_page(props: &TeamsUsersRoleInvitationPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedTeamsUsersRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1166,7 +1172,7 @@ pub struct TeamsUsersRoleRequestPageProp {
 
 impl From<&TeamsUsersRoleRequestPageProp> for PrimaryKey {
     fn from(prop: &TeamsUsersRoleRequestPageProp) -> Self {
-        ( prop.table_id, prop.user_id ).into()
+        (prop.table_id, prop.user_id).into()
     }
 }
 
@@ -1174,14 +1180,14 @@ impl From<&TeamsUsersRoleRequestPageProp> for PrimaryKey {
 pub fn teams_users_role_request_page(props: &TeamsUsersRoleRequestPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedTeamsUsersRoleRequest> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1198,7 +1204,7 @@ pub struct TeamsUsersRolePageProp {
 
 impl From<&TeamsUsersRolePageProp> for PrimaryKey {
     fn from(prop: &TeamsUsersRolePageProp) -> Self {
-        ( prop.table_id, prop.user_id ).into()
+        (prop.table_id, prop.user_id).into()
     }
 }
 
@@ -1206,14 +1212,14 @@ impl From<&TeamsUsersRolePageProp> for PrimaryKey {
 pub fn teams_users_role_page(props: &TeamsUsersRolePageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedTeamsUsersRole> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1289,12 +1295,16 @@ impl UserPageProp {
         filter.updated_by = Some(self.id);
         filter
     }
-    fn filter_projects_users_role_invitations_by_user_id(&self) -> ProjectsUsersRoleInvitationFilter {
+    fn filter_projects_users_role_invitations_by_user_id(
+        &self,
+    ) -> ProjectsUsersRoleInvitationFilter {
         let mut filter = ProjectsUsersRoleInvitationFilter::default();
         filter.user_id = Some(self.id);
         filter
     }
-    fn filter_projects_users_role_invitations_by_created_by(&self) -> ProjectsUsersRoleInvitationFilter {
+    fn filter_projects_users_role_invitations_by_created_by(
+        &self,
+    ) -> ProjectsUsersRoleInvitationFilter {
         let mut filter = ProjectsUsersRoleInvitationFilter::default();
         filter.created_by = Some(self.id);
         filter
@@ -1429,7 +1439,9 @@ impl UserPageProp {
         filter.updated_by = Some(self.id);
         filter
     }
-    fn filter_projects_teams_role_invitations_by_created_by(&self) -> ProjectsTeamsRoleInvitationFilter {
+    fn filter_projects_teams_role_invitations_by_created_by(
+        &self,
+    ) -> ProjectsTeamsRoleInvitationFilter {
         let mut filter = ProjectsTeamsRoleInvitationFilter::default();
         filter.created_by = Some(self.id);
         filter
@@ -1470,14 +1482,14 @@ impl UserPageProp {
 pub fn user_page(props: &UserPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedUser> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1585,7 +1597,7 @@ pub struct UsersUsersRoleInvitationPageProp {
 
 impl From<&UsersUsersRoleInvitationPageProp> for PrimaryKey {
     fn from(prop: &UsersUsersRoleInvitationPageProp) -> Self {
-        ( prop.table_id, prop.user_id ).into()
+        (prop.table_id, prop.user_id).into()
     }
 }
 
@@ -1593,14 +1605,14 @@ impl From<&UsersUsersRoleInvitationPageProp> for PrimaryKey {
 pub fn users_users_role_invitation_page(props: &UsersUsersRoleInvitationPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedUsersUsersRoleInvitation> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1617,7 +1629,7 @@ pub struct UsersUsersRoleRequestPageProp {
 
 impl From<&UsersUsersRoleRequestPageProp> for PrimaryKey {
     fn from(prop: &UsersUsersRoleRequestPageProp) -> Self {
-        ( prop.table_id, prop.user_id ).into()
+        (prop.table_id, prop.user_id).into()
     }
 }
 
@@ -1625,14 +1637,14 @@ impl From<&UsersUsersRoleRequestPageProp> for PrimaryKey {
 pub fn users_users_role_request_page(props: &UsersUsersRoleRequestPageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedUsersUsersRoleRequest> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1649,7 +1661,7 @@ pub struct UsersUsersRolePageProp {
 
 impl From<&UsersUsersRolePageProp> for PrimaryKey {
     fn from(prop: &UsersUsersRolePageProp) -> Self {
-        ( prop.table_id, prop.user_id ).into()
+        (prop.table_id, prop.user_id).into()
     }
 }
 
@@ -1657,14 +1669,14 @@ impl From<&UsersUsersRolePageProp> for PrimaryKey {
 pub fn users_users_role_page(props: &UsersUsersRolePageProp) -> Html {
     let can_update = use_state(|| false);
     let can_admin = use_state(|| false);
-    
+
     let can_update_callback = {
         let can_update = can_update.clone();
         Callback::from(move |value: bool| can_update.set(value))
     };
     let can_admin_callback = {
-       let can_admin = can_admin.clone();
-       Callback::from(move |value: bool| can_admin.set(value))
+        let can_admin = can_admin.clone();
+        Callback::from(move |value: bool| can_admin.set(value))
     };
     html! {
         <BasicPage<NestedUsersUsersRole> id={PrimaryKey::from(props)} can_update={can_update_callback} can_admin={can_admin_callback}>
@@ -1672,4 +1684,3 @@ pub fn users_users_role_page(props: &UsersUsersRolePageProp) -> Html {
         </BasicPage<NestedUsersUsersRole>>
     }
 }
-

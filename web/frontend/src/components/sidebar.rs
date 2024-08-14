@@ -46,6 +46,29 @@ pub fn sidebar(props: &SidebarProps) -> Html {
         <div ref={node} class={sidebar_class}>
             <div class="sidebar-content">
                 <ul>
+                    <li class={if route == AppRoute::Home {{ "active" }} else {{ "" }}} onclick={&on_click_close}>
+                        <Link<AppRoute> to={AppRoute::Home}>
+                            <i class="fas fa-home"></i>
+                             {'\u{00a0}'}
+                            <span>{"Home"}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    if user.has_user() {
+                    <li class={if route == AppRoute::Collect {{ "active" }} else {{ "" }}} onclick={&on_click_close}>
+                        <Link<AppRoute> to={AppRoute::Collect}>
+                            <i class="fas fa-boxes-packing"></i>
+                             {'\u{00a0}'}
+                            <span>{"Collect"}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    <li class={if route.is_project_selection() {{ "active" }} else {{ "" }}} onclick={&on_click_close}>
+                        <Link<AppRoute> to={AppRoute::ProjectSelection{source_page: route.to_path()}}>
+                            <i class="fas fa-project-diagram"></i>
+                             {'\u{00a0}'}
+                            <span>{"Project Selection"}</span>
+                        </Link<AppRoute>>
+                    </li>
+                    }
                     <li class={if route == AppRoute::Countries { "active" } else { "" }} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::Countries}>
                             <i class={format!("fas fa-{}", Country::icon())}></i>

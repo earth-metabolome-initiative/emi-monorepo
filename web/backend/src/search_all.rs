@@ -238,18 +238,17 @@ pub(crate) fn search_all(
         set_threshold(results.last().unwrap().1, connection)?;
     }
 
-    results.extend(convert_search::<
-        NestedRank,
-        web_common::database::NestedRank,
-    >(
-        query,
-        NestedRank::strict_word_similarity_search_with_score_viewable(
+    results.extend(
+        convert_search::<NestedRank, web_common::database::NestedRank>(
             query,
-            Some(limit),
-            None,
-            connection,
-        )?,
-    ));
+            NestedRank::strict_word_similarity_search_with_score_viewable(
+                query,
+                Some(limit),
+                None,
+                connection,
+            )?,
+        ),
+    );
 
     if results.len() as i64 >= limit {
         // We sort the results by relevance and take the last one to set the threshold.

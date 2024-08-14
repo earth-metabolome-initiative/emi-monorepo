@@ -69,9 +69,7 @@ pub enum NavigatorMessage {
 }
 
 #[derive(Clone, Properties, PartialEq)]
-pub struct NavigatorProps {
-    pub navigator: yew_router::navigator::Navigator,
-}
+pub struct NavigatorProps {}
 
 impl Component for Navigator {
     type Message = NavigatorMessage;
@@ -196,13 +194,5 @@ impl Component for Navigator {
                 <Sidebar visible={self.sidebar_open()} onclose={toggle} />
             </>
         }
-    }
-}
-
-#[function_component(NavigatorWrapper)]
-pub fn navigator_wrapper() -> Html {
-    let navigator = use_navigator().unwrap();
-    html! {
-        <Navigator navigator={navigator} />
     }
 }

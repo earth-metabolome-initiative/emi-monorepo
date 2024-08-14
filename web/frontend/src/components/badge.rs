@@ -145,8 +145,8 @@ pub fn badge<B: RowToBadge>(props: &BadgeProps<B>) -> Html {
             e.stop_immediate_propagation();
             if let Some(onclick) = onclick.as_ref() {
                 onclick.emit(e);
-            } else if let Some(path) = path {
-                navigator.push(&path);
+            } else if let Some(path) = path.as_ref() {
+                navigator.push(path);
             }
         })
     };

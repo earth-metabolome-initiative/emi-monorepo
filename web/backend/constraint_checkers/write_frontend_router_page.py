@@ -84,6 +84,29 @@ def write_frontend_sidebar(flat_variants: List[StructMetadata]):
         "        <div ref={node} class={sidebar_class}>\n"
         '            <div class="sidebar-content">\n'
         "                <ul>\n"
+        '                    <li class={if route == AppRoute::Home {{ "active" }} else {{ "" }}} onclick={&on_click_close}>\n'
+        "                        <Link<AppRoute> to={AppRoute::Home}>\n"
+        '                            <i class="fas fa-home"></i>\n'
+        "                             {'\\u{00a0}'}\n"
+        '                            <span>{"Home"}</span>\n'
+        "                        </Link<AppRoute>>\n"
+        "                    </li>\n"
+        "                    if user.has_user() {\n"
+        '                    <li class={if route == AppRoute::Collect {{ "active" }} else {{ "" }}} onclick={&on_click_close}>\n'
+        "                        <Link<AppRoute> to={AppRoute::Collect}>\n"
+        '                            <i class="fas fa-boxes-packing"></i>\n'
+        "                             {'\\u{00a0}'}\n"
+        '                            <span>{"Collect"}</span>\n'
+        "                        </Link<AppRoute>>\n"
+        "                    </li>\n"
+        '                    <li class={if route.is_project_selection() {{ "active" }} else {{ "" }}} onclick={&on_click_close}>\n'
+        "                        <Link<AppRoute> to={AppRoute::ProjectSelection{source_page: route.to_path()}}>\n"
+        '                            <i class="fas fa-project-diagram"></i>\n'
+        "                             {'\\u{00a0}'}\n"
+        '                            <span>{"Project Selection"}</span>\n'
+        "                        </Link<AppRoute>>\n"
+        "                    </li>\n"
+        "                    }\n"
     )
 
     for flat_variant in tqdm(
@@ -342,7 +365,7 @@ def write_frontend_router_page(
 
 
     document.write(
-        "#[derive(Debug, Clone, Copy, PartialEq, Routable)]\npub enum AppRoute {\n"
+        "#[derive(Debug, Clone, Copy, PartialEq, Routable, Eq)]\npub enum AppRoute {\n"
     )
 
     enum_variants = []
@@ -432,11 +455,20 @@ def write_frontend_router_page(
     document.write(
         '    #[at("/")]\n'
         "    Home,\n"
+        '    #[at("/collect")]\n'
+        "    Collect,\n"
+        '    #[at("/project-selection/:source_page")]\n'
+        "    ProjectSelection{source_page: Option<String>},\n"
         '    #[at("/login")]\n'
         "    Login,\n"
         "    #[not_found]\n"
         '    #[at("/404")]\n'
         "    NotFound,\n"
+        "}\n\n"
+        "impl AppRoute {\n"
+        "    pub fn is_project_selection(&self) -> bool {\n"
+        "        matches!(self, AppRoute::ProjectSelection {..})\n"
+        "    }\n"
         "}\n\n"
     )
 
@@ -542,6 +574,12 @@ def write_frontend_router_page(
     document.write(
         "        AppRoute::Home => {\n"
         "            html! { <Home /> }\n"
+        "        }\n"
+        "        AppRoute::Collect => {\n"
+        "            html! { <Collect /> }\n"
+        "        }\n"
+        "        AppRoute::ProjectSelection{source_page} => {\n"
+        "            html! { <ProjectSelection source_page={source_page} /> }\n"
         "        }\n"
         "        AppRoute::Login => {\n"
         "            html! { <Login /> }\n"
