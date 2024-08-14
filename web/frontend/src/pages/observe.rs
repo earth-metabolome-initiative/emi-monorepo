@@ -1,11 +1,11 @@
-//! Page for the collection of a sample.
+//! Page for the observation action sequence.
 
 use crate::components::badge::BadgeSize;
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
-
+use crate::components::forms::MultiFileInput;
 use crate::components::Badge;
 use gloo::timers::callback::Timeout;
 use gloo::utils::window;
@@ -19,33 +19,36 @@ use crate::workers::WebsocketWorker;
 use std::rc::Rc;
 use yew_agent::prelude::WorkerBridgeHandle;
 
-pub struct Collect {
+pub struct Observe {
     user_state: Rc<UserState>,
     user_dispatch: Dispatch<UserState>,
     websocket: WorkerBridgeHandle<WebsocketWorker>,
+    pictures: Vec<Rc<web_common::types::JPEG>>,
 }
 
-pub enum CollectMessage {
+pub enum ObserveMessage {
     Backend(WebsocketMessage),
     UserState(Rc<UserState>),
+    AddPicture(Rc<web_common::types::JPEG>),
+    RemovePicture(usize),
 }
 
 #[derive(Clone, Properties, PartialEq)]
-pub struct CollectProps {}
+pub struct ObserveProps {}
 
-impl Component for Collect {
-    type Message = CollectMessage;
-    type Properties = CollectProps;
+impl Component for Observe {
+    type Message = ObserveMessage;
+    type Properties = ObserveProps;
 
     fn create(ctx: &Context<Self>) -> Self {
         let user_dispatch = Dispatch::<UserState>::global()
-            .subscribe(ctx.link().callback(CollectMessage::UserState));
+            .subscribe(ctx.link().callback(ObserveMessage::UserState));
         let user_state = user_dispatch.get();
 
         let websocket = ctx.link().bridge_worker(Callback::from({
             let link = ctx.link().clone();
             move |message: WebsocketMessage| {
-                link.send_message(CollectMessage::Backend(message));
+                link.send_message(ObserveMessage::Backend(message));
             }
         }));
 
@@ -58,23 +61,32 @@ impl Component for Collect {
             websocket,
             user_state,
             user_dispatch,
+            pictures: vec![],
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            CollectMessage::UserState(user_state) => {
+            ObserveMessage::UserState(user_state) => {
                 if self.user_state == user_state {
                     return false;
                 }
                 self.user_state = user_state;
                 true
             }
-            CollectMessage::Backend(WebsocketMessage::Notification(notification)) => {
+            ObserveMessage::Backend(WebsocketMessage::Notification(notification)) => {
                 log::info!("Received notification: {:?}", notification);
                 false
             }
-            CollectMessage::Backend(_) => false,
+            ObserveMessage::Backend(_) => false,
+            ObserveMessage::AddPicture(picture) => {
+                self.pictures.push(picture);
+                true
+            }
+            ObserveMessage::RemovePicture(index) => {
+                self.pictures.remove(index);
+                true
+            }
         }
     }
 
@@ -103,12 +115,28 @@ impl Component for Collect {
                 .navigator()
                 .unwrap()
                 .push(&AppRoute::ProjectSelection {
-                    source_page: AppRoute::Collect.to_path(),
+                    source_page: AppRoute::Observe.to_path(),
                 });
         }
 
-        // If all of the above conditions are met, we display and start the QR code scanner.
+        // If all of the above conditions are met, we display the input field for multiple pictures.
 
-        Html::default()
+        // We create a callback for when a picture is added.
+        let add_picture = ctx.link().callback(ObserveMessage::AddPicture);
+
+        // We create a callback for when a picture is removed.
+        let remove_picture = ctx.link().callback(ObserveMessage::RemovePicture);
+
+        html!{
+            <div class="fullscreen_center_app">
+                <div class="observe">
+                    <h2>{"New observation"}</h2>
+                    <p>{"Add pictures of the environment."}</p>
+                    <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>> path="/jpeg_file_processor.js">
+                        <MultiFileInput<web_common::types::JPEG> label="Environment Pictures" optional={false} append_file={add_picture} remove_file={remove_picture} maximum_number_of_expected_files={10} errors={vec![]} files={Rc::new(self.pictures.clone())} />
+                    </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>>>
+                </div>
+            </div>
+        }
     }
 }

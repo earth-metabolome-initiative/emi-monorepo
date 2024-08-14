@@ -1727,6 +1727,8 @@ pub enum AppRoute {
     Home,
     #[at("/collect")]
     Collect,
+    #[at("/observe")]
+    Observe,
     #[at("/project-selection/:source_page")]
     ProjectSelection { source_page: String },
     #[at("/login")]
@@ -2158,6 +2160,9 @@ pub fn switch(route: AppRoute) -> Html {
         AppRoute::Collect => {
             html! { <Collect /> }
         }
+        AppRoute::Observe => {
+            html! { <Observe /> }
+        }
         AppRoute::ProjectSelection { source_page } => {
             html! { <ProjectSelection source_page={AppRoute::try_from(source_page).unwrap_or(AppRoute::Home)} /> }
         }
@@ -2169,4 +2174,3 @@ pub fn switch(route: AppRoute) -> Html {
         }
     }
 }
-

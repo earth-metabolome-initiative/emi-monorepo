@@ -1,0 +1,15 @@
+.fullscreen_center_app {
+    div.observe {
+        width: 400px;
+        max-width: 100%;
+        h2 {
+            font-weight: 400;
+            font-size: 1.2em;
+        }
+        p {
+            color: $near_black;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+        }
+    }
+}

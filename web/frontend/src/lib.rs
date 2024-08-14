@@ -20,6 +20,12 @@ impl core::str::FromStr for AppRoute {
         if s == AppRoute::Collect.to_path() {
             return Ok(AppRoute::Collect);
         }
+        if s == AppRoute::Observe.to_path() {
+            return Ok(AppRoute::Observe);
+        }
+        if s == AppRoute::Home.to_path() {
+            return Ok(AppRoute::Home);
+        }
         Err(format!("Could not parse route: {}", s))
     }
 }

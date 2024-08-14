@@ -61,6 +61,13 @@ pub fn sidebar(props: &SidebarProps) -> Html {
                             <span>{"Collect"}</span>
                         </Link<AppRoute>>
                     </li>
+                    <li class={if route == AppRoute::Observe {{ "active" }} else {{ "" }}} onclick={&on_click_close}>
+                        <Link<AppRoute> to={AppRoute::Observe}>
+                            <i class="fas fa-eye"></i>
+                             {'\u{00a0}'}
+                            <span>{"Observe"}</span>
+                        </Link<AppRoute>>
+                    </li>
                     <li class={if route.is_project_selection() {{ "active" }} else {{ "" }}} onclick={&on_click_close}>
                         <Link<AppRoute> to={AppRoute::ProjectSelection{source_page: route.to_path()}}>
                             <i class="fas fa-project-diagram"></i>

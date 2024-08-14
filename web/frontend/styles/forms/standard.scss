@@ -207,6 +207,359 @@
             }
         }
     }
+
+    &.input-group-invalid {
+
+        input[type="text"],
+        input[type="search"],
+        input[type="datetime-local"],
+        textarea,
+        input[type="number"] {
+            border-color: $error;
+            border-style: dashed;
+            animation: small-shake 0.2s;
+        }
+    }
+
+    &.datalist {
+        ul.selected-datalist-badges {
+            display: inline-block;
+            flex-wrap: wrap;
+            margin-top: 0.5em;
+            border: none;
+
+            li.datalist-add {
+                display: inline-block;
+                margin-left: 0.5em;
+                box-sizing: border-box;
+                border-radius: 2em;
+                cursor: pointer;
+                transition: border-color 0.2s;
+                animation: pop-in 0.2s;
+
+                &.deleting {
+                    animation: pop-out 0.2s;
+                }
+
+                button {
+                    padding: 0;
+                    height: 2em;
+                    width: 2em;
+                    background-color: transparent;
+                    cursor: pointer;
+                    border-radius: 100%;
+                    transition: border-color 0.2s;
+                    line-height: 1em;
+                    text-align: center;
+                    border: 1px solid $light_grey;
+                    box-sizing: border-box;
+
+                    i {
+                        font-size: 1.2em;
+                        color: $light_grey;
+                        transition: color 0.2s;
+                    }
+
+                    &:hover {
+                        border-color: $blue;
+
+                        i {
+                            color: $blue;
+                        }
+                    }
+                }
+            }
+
+            li.selected-datalist-badge {
+                display: inline-block;
+                padding: 0.5em 2em 0.5em 0.5em;
+                box-sizing: border-box;
+                border-radius: 2em;
+                margin-right: 0.5em;
+                margin-bottom: 0.5em;
+                font-size: 0.8em;
+                cursor: pointer;
+                position: relative;
+                border: 1px solid $light_grey;
+                transition: border-color 0.2s;
+                animation: pop-in 0.2s;
+
+                &.deleting {
+                    animation: pop-out 0.2s;
+                }
+
+                button {
+                    padding: 0;
+                    position: absolute;
+                    right: 0.4em;
+                    top: 50%;
+                    margin-top: -0.6em;
+                    height: 1.2em;
+                    width: 1.2em;
+                    background-color: transparent;
+                    cursor: pointer;
+                    border-radius: 100%;
+                    transition: border-color 0.2s;
+                    text-align: center;
+                    border: 1px solid $light_grey;
+                    box-sizing: border-box;
+
+                    i {
+                        font-size: 1em;
+                        color: $light_grey;
+                        transition: color 0.2s, font-size 0.2s;
+                    }
+
+                    &:hover {
+                        border-color: $red;
+
+                        i {
+                            color: $red;
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    &.file {
+        min-height: 100px;
+
+        &.processing {
+            position: relative;
+            &:before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                border-radius: 0.5em;
+                z-index: 1;
+                animation: fade-in 0.3s;
+            
+            }
+            &:after {
+                content: "\f110";
+                animation: fa-spin 1s infinite linear;
+                font-family: "Font Awesome 5 Free";
+                font-style: normal;
+                font-variant: normal;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+                font-weight: 900;
+                font-size: 3em;
+                color: white;
+                position: absolute;
+                z-index: 2;
+                width: 100%;
+                text-align: center;
+                top: 50%;
+                left: 0;
+                margin-top: -0.5em;
+            }
+        }
+
+        .droparea {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            margin-top: 0.5em;
+            min-height: 100px;
+            border-radius: 0.5em;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            animation: pop-in 0.2s;
+            background: linear-gradient(90deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(90deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($grey, 0.8) 50%, transparent 50%);
+            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+            background-size: 15px 1px, 15px 1px, 1px 15px, 1px 15px;
+            background-position: top left, bottom left, top left, top right;
+
+            &.hiding {
+                animation: pop-out 0.2s;
+            }
+
+            p,
+            i {
+                font-size: 1.25em;
+                color: $grey;
+                transition: font-size 0.3s ease-in-out, color 0.3s ease-in-out;
+                animation: fade-in-up 0.3s;
+            }
+
+            &:hover,
+            &.dragging {
+                border-color: $primary;
+                background: linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%);
+                background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+                background-size: 15px 1px, 15px 1px, 1px 15px, 1px 15px;
+                background-position: top left, bottom left, top left, top right;
+                animation: pop-in 0.2s, border-dance 10s infinite linear;
+
+                i,
+                p {
+                    color: $primary;
+                }
+
+                i {
+                    font-size: 2em;
+                    // When the user hovers the drop area, we make the icon
+                    // make small jumps in loop, with delay between each jump
+                    animation: fade-in-up 0.3s, small-jump 1.5s infinite;
+                }
+            }
+        }
+
+        ul.file-preview-list {
+            list-style: none;
+        }
+
+        /* File Preview Container */
+        .file-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            animation: pop-in 0.2s;
+
+            &.hiding {
+                animation: pop-out 0.2s;
+            }
+        }
+
+        div.file-preview-item,
+        ul.file-preview-list {
+            margin-top: 0.5em;
+            width: 100%;
+        }
+
+        ul.file-preview-list {
+            >li {
+                width: 150px;
+            }
+
+            &.two-files {
+                >li {
+                    width: calc(50% - 0.5em);
+                }
+            }
+
+            &.three-files {
+                >li {
+                    width: calc(33.3333% - 1em / 3);
+                }
+            }
+        }
+
+        /* File Preview Item */
+        .file-preview-item {
+            border-radius: 0.5em;
+            animation: pop-in 0.2s;
+            max-width: 100%;
+            min-width: 150px;
+            height: 150px;
+            overflow: hidden;
+            position: relative;
+            display: inline-block;
+
+            &:only-child {
+                width: 100%;
+            }
+
+            &:not(:last-child) {
+                margin-right: 0.5em;
+            }
+
+            .metadata {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                color: white;
+                padding: 0.5em;
+                background-color: rgba(0, 0, 0, 0.5);
+                animation: slide-in-from-bottom 0.3s;
+            }
+
+            .delete {
+                position: absolute;
+                top: 0.25em;
+                right: 0.25em;
+                font-size: 1em;
+                text-shadow: 0 0 1px rgba(0, 0, 0, 0.9);
+                cursor: pointer;
+                border: none;
+                border-radius: 100%;
+                background-color: transparent;
+                color: transparentize($color: white, $amount: 0.1);
+                animation: slide-in-from-right 0.3s;
+
+                i {
+                    transition: color 0.2s ease-in-out;
+                }
+
+                &:hover {
+                    color: white;
+                }
+            }
+
+            &.hiding {
+                animation: pop-out 0.2s;
+            }
+
+            .preview {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+        }
+    }
+
+    // We style inputs of type checkbox in such
+    // a way that they look like switches.
+    input[type="checkbox"] {
+        display: none;
+    }
+
+    label.checkbox {
+        display: inline-block;
+        vertical-align: middle;
+        width: 30px;
+        height: 16px;
+        background-color: $light_grey;
+        border-radius: 1em;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+        &::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 8px;
+            margin-left: -8px;
+            background-color: #fff;
+            border-radius: 100%;
+            border: 1px solid $light_grey;
+            box-sizing: border-box;
+            transition: left 0.3s, border-color 0.3s;
+        }
+    }
+
+    input[type="checkbox"]:checked+label.checkbox::after {
+        left: 22px;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
 }
 
 .gps-input {
@@ -393,361 +746,6 @@ form.standard-form {
                     margin-bottom: 0.5em;
                 }
             }
-        }
-    }
-
-    .input-group {
-        &.input-group-invalid {
-
-            input[type="text"],
-            input[type="search"],
-            input[type="datetime-local"],
-            textarea,
-            input[type="number"] {
-                border-color: $error;
-                border-style: dashed;
-                animation: small-shake 0.2s;
-            }
-        }
-
-        &.datalist {
-            ul.selected-datalist-badges {
-                display: inline-block;
-                flex-wrap: wrap;
-                margin-top: 0.5em;
-                border: none;
-
-                li.datalist-add {
-                    display: inline-block;
-                    margin-left: 0.5em;
-                    box-sizing: border-box;
-                    border-radius: 2em;
-                    cursor: pointer;
-                    transition: border-color 0.2s;
-                    animation: pop-in 0.2s;
-
-                    &.deleting {
-                        animation: pop-out 0.2s;
-                    }
-
-                    button {
-                        padding: 0;
-                        height: 2em;
-                        width: 2em;
-                        background-color: transparent;
-                        cursor: pointer;
-                        border-radius: 100%;
-                        transition: border-color 0.2s;
-                        line-height: 1em;
-                        text-align: center;
-                        border: 1px solid $light_grey;
-                        box-sizing: border-box;
-
-                        i {
-                            font-size: 1.2em;
-                            color: $light_grey;
-                            transition: color 0.2s;
-                        }
-
-                        &:hover {
-                            border-color: $blue;
-
-                            i {
-                                color: $blue;
-                            }
-                        }
-                    }
-                }
-
-                li.selected-datalist-badge {
-                    display: inline-block;
-                    padding: 0.5em 2em 0.5em 0.5em;
-                    box-sizing: border-box;
-                    border-radius: 2em;
-                    margin-right: 0.5em;
-                    margin-bottom: 0.5em;
-                    font-size: 0.8em;
-                    cursor: pointer;
-                    position: relative;
-                    border: 1px solid $light_grey;
-                    transition: border-color 0.2s;
-                    animation: pop-in 0.2s;
-
-                    &.deleting {
-                        animation: pop-out 0.2s;
-                    }
-
-                    button {
-                        padding: 0;
-                        position: absolute;
-                        right: 0.4em;
-                        top: 50%;
-                        margin-top: -0.6em;
-                        height: 1.2em;
-                        width: 1.2em;
-                        background-color: transparent;
-                        cursor: pointer;
-                        border-radius: 100%;
-                        transition: border-color 0.2s;
-                        text-align: center;
-                        border: 1px solid $light_grey;
-                        box-sizing: border-box;
-
-                        i {
-                            font-size: 1em;
-                            color: $light_grey;
-                            transition: color 0.2s, font-size 0.2s;
-                        }
-
-                        &:hover {
-                            border-color: $red;
-
-                            i {
-                                color: $red;
-                            }
-                        }
-                    }
-
-                }
-            }
-        }
-
-        &.file {
-            min-height: 100px;
-
-            &.processing {
-                position: relative;
-                &:before {
-                    content: "";
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    border-radius: 0.5em;
-                    z-index: 1;
-                    animation: fade-in 0.3s;
-                
-                }
-                &:after {
-                    content: "\f110";
-                    animation: fa-spin 1s infinite linear;
-                    font-family: "Font Awesome 5 Free";
-                    font-style: normal;
-                    font-variant: normal;
-                    text-rendering: auto;
-                    -webkit-font-smoothing: antialiased;
-                    font-weight: 900;
-                    font-size: 3em;
-                    color: white;
-                    position: absolute;
-                    z-index: 2;
-                    width: 100%;
-                    text-align: center;
-                    top: 50%;
-                    left: 0;
-                    margin-top: -0.5em;
-                }
-            }
-
-            .droparea {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                height: 100%;
-                margin-top: 0.5em;
-                min-height: 100px;
-                border-radius: 0.5em;
-                transition: background-color 0.3s;
-                cursor: pointer;
-                animation: pop-in 0.2s;
-                background: linear-gradient(90deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(90deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($grey, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($grey, 0.8) 50%, transparent 50%);
-                background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-                background-size: 15px 1px, 15px 1px, 1px 15px, 1px 15px;
-                background-position: top left, bottom left, top left, top right;
-
-                &.hiding {
-                    animation: pop-out 0.2s;
-                }
-
-                p,
-                i {
-                    font-size: 1.25em;
-                    color: $grey;
-                    transition: font-size 0.3s ease-in-out, color 0.3s ease-in-out;
-                    animation: fade-in-up 0.3s;
-                }
-
-                &:hover,
-                &.dragging {
-                    border-color: $primary;
-                    background: linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(90deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%), linear-gradient(0deg, rgba($primary, 0.8) 50%, transparent 50%);
-                    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-                    background-size: 15px 1px, 15px 1px, 1px 15px, 1px 15px;
-                    background-position: top left, bottom left, top left, top right;
-                    animation: pop-in 0.2s, border-dance 10s infinite linear;
-
-                    i,
-                    p {
-                        color: $primary;
-                    }
-
-                    i {
-                        font-size: 2em;
-                        // When the user hovers the drop area, we make the icon
-                        // make small jumps in loop, with delay between each jump
-                        animation: fade-in-up 0.3s, small-jump 1.5s infinite;
-                    }
-                }
-            }
-
-            ul.file-preview-list {
-                list-style: none;
-            }
-
-            /* File Preview Container */
-            .file-preview-container {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 20px;
-                animation: pop-in 0.2s;
-
-                &.hiding {
-                    animation: pop-out 0.2s;
-                }
-            }
-
-            div.file-preview-item,
-            ul.file-preview-list {
-                margin-top: 0.5em;
-                width: 100%;
-            }
-
-            ul.file-preview-list {
-                >li {
-                    width: 150px;
-                }
-
-                &.two-files {
-                    >li {
-                        width: calc(50% - 0.5em);
-                    }
-                }
-
-                &.three-files {
-                    >li {
-                        width: calc(33.3333% - 1em / 3);
-                    }
-                }
-            }
-
-            /* File Preview Item */
-            .file-preview-item {
-                border-radius: 0.5em;
-                animation: pop-in 0.2s;
-                max-width: 100%;
-                min-width: 150px;
-                height: 150px;
-                overflow: hidden;
-                position: relative;
-                display: inline-block;
-
-                &:only-child {
-                    width: 100%;
-                }
-
-                &:not(:last-child) {
-                    margin-right: 0.5em;
-                }
-
-                .metadata {
-                    position: absolute;
-                    bottom: 0;
-                    width: 100%;
-                    color: white;
-                    padding: 0.5em;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    animation: slide-in-from-bottom 0.3s;
-                }
-
-                .delete {
-                    position: absolute;
-                    top: 0.25em;
-                    right: 0.25em;
-                    font-size: 1em;
-                    text-shadow: 0 0 1px rgba(0, 0, 0, 0.9);
-                    cursor: pointer;
-                    border: none;
-                    border-radius: 100%;
-                    background-color: transparent;
-                    color: transparentize($color: white, $amount: 0.1);
-                    animation: slide-in-from-right 0.3s;
-
-                    i {
-                        transition: color 0.2s ease-in-out;
-                    }
-
-                    &:hover {
-                        color: white;
-                    }
-                }
-
-                &.hiding {
-                    animation: pop-out 0.2s;
-                }
-
-                .preview {
-                    width: 100%;
-                    height: 150px;
-                    object-fit: cover;
-                    border: none;
-                    padding: 0;
-                    margin: 0;
-                }
-            }
-        }
-
-        // We style inputs of type checkbox in such
-        // a way that they look like switches.
-        input[type="checkbox"] {
-            display: none;
-        }
-
-        label.checkbox {
-            display: inline-block;
-            vertical-align: middle;
-            width: 30px;
-            height: 16px;
-            background-color: $light_grey;
-            border-radius: 1em;
-            position: relative;
-            cursor: pointer;
-            transition: background-color 0.3s;
-
-            &::after {
-                content: '';
-                position: absolute;
-                width: 16px;
-                height: 16px;
-                top: 0;
-                left: 8px;
-                margin-left: -8px;
-                background-color: #fff;
-                border-radius: 100%;
-                border: 1px solid $light_grey;
-                box-sizing: border-box;
-                transition: left 0.3s, border-color 0.3s;
-            }
-        }
-
-        input[type="checkbox"]:checked+label.checkbox::after {
-            left: 22px;
-        }
-
-        input[type="file"] {
-            display: none;
         }
     }
 
