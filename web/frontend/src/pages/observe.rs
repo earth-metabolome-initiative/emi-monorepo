@@ -127,6 +127,12 @@ impl Component for Observe {
         // We create a callback for when a picture is removed.
         let remove_picture = ctx.link().callback(ObserveMessage::RemovePicture);
 
+        // We prepare the classes for the next button, which brings the user to the next step.
+        let next_button_classes = format!(
+            "next-button{}",
+            if !self.pictures.is_empty() { " enabled" } else { "" }
+        );
+
         html!{
             <div class="fullscreen_center_app">
                 <div class="observe">
@@ -135,6 +141,11 @@ impl Component for Observe {
                     <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>> path="/jpeg_file_processor.js">
                         <MultiFileInput<web_common::types::JPEG> label="Environment Pictures" optional={false} append_file={add_picture} remove_file={remove_picture} maximum_number_of_expected_files={10} errors={vec![]} files={Rc::new(self.pictures.clone())} />
                     </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>>>
+                    <button title={"Next step"} class={next_button_classes} disabled={self.pictures.is_empty()}>
+                        <i class="fas fa-arrow-right"></i>
+                        {'\u{00a0}'}
+                        <span>{"Next"}</span>
+                    </button>
                 </div>
             </div>
         }
