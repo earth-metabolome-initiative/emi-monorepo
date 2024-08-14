@@ -131,7 +131,7 @@ impl Component for Observe {
             <div class="fullscreen_center_app">
                 <div class="observe">
                     <h2>{"New observation"}</h2>
-                    <p>{"Add pictures of the environment."}</p>
+                    <p>{"Add one or more pictures capturing the environment."}</p>
                     <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>> path="/jpeg_file_processor.js">
                         <MultiFileInput<web_common::types::JPEG> label="Environment Pictures" optional={false} append_file={add_picture} remove_file={remove_picture} maximum_number_of_expected_files={10} errors={vec![]} files={Rc::new(self.pictures.clone())} />
                     </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>>>

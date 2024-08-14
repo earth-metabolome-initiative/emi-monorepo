@@ -51,29 +51,24 @@ where
 #[function_component(FilePreview)]
 /// A component to display a preview of the file that have been selected.
 pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
-    let hiding = use_state(|| false);
 
-    // let on_click = {
-    //     let hiding = hiding.clone();
-    //     let on_delete = props.delete.clone();
-    //     Callback::from(move |click: MouseEvent| {
-    //         click.stop_immediate_propagation();
-    //         click.prevent_default();
-    //         hiding.set(true);
-    //         // We start a timeout after which the file will be deleted.
-    //         // This is to give the CSS animation time to play.
-    //         let timeout = gloo::timers::callback::Timeout::new(200, move || {
-    //             on_delete.emit(());
-    //         });
-    //         timeout.forget();
-    //     })
-    // };
+    let on_click = {
+        let on_delete = props.delete.clone();
+        Callback::from(move |click: MouseEvent| {
+            click.stop_immediate_propagation();
+            click.prevent_default();
+            on_delete.emit(());
+        })
+    };
 
-    let class = format!("file-preview-item{}", if *hiding { " hiding" } else { "" });
+    let class = format!("file-preview-item");
 
     html! {
         <div class={class}>
             {props.file.preview()}
+            <div class="delete">
+                <i class="fas fa-times" onclick={on_click}></i>
+            </div>
         </div>
     }
 }
