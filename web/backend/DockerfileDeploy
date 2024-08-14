@@ -1,5 +1,5 @@
 # Use a lightweight image as a base
-FROM rust:1.78
+FROM rust:1.79
 
 ARG ACTIX_PORT
 
