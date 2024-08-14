@@ -281,7 +281,9 @@ impl From<diesel::result::Error> for ApiError {
                     },
                 }
             }
-            diesel::result::Error::NotFound => Self::BadRequest(vec!["Not found".to_string()]),
+            diesel::result::Error::NotFound => {
+                Self::BadRequest(vec!["Diesel error: Not found".to_string()])
+            }
             e => {
                 log::error!("Database error: {:?}", e);
                 Self::InternalServerError

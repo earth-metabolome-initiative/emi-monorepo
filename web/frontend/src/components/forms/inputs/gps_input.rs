@@ -22,6 +22,7 @@ use super::MapInput;
 pub struct GPSInputProps {
     pub label: String,
     pub builder: Callback<Option<web_common::types::Point>>,
+    #[prop_or_default]
     pub errors: Vec<ApiError>,
     #[prop_or_default]
     pub coordinates: Option<web_common::types::Point>,

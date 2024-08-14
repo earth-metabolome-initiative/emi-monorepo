@@ -51,7 +51,6 @@ where
 #[function_component(FilePreview)]
 /// A component to display a preview of the file that have been selected.
 pub fn file_preview<Data: FileLike>(props: &FilePreviewProp<Data>) -> Html {
-
     let on_click = {
         let on_delete = props.delete.clone();
         Callback::from(move |click: MouseEvent| {

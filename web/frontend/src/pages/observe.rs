@@ -1,15 +1,17 @@
 //! Page for the observation action sequence.
 
 use crate::components::badge::BadgeSize;
+use crate::components::forms::Datalist;
+use crate::components::forms::GPSInput;
+use crate::components::forms::MultiFileInput;
+use crate::components::Badge;
 use crate::router::AppRoute;
 use crate::stores::app_state::AppState;
 use crate::stores::user_state::UserState;
 use crate::workers::ws_worker::{ComponentMessage, WebsocketMessage};
-use crate::components::forms::MultiFileInput;
-use crate::components::Badge;
 use gloo::timers::callback::Timeout;
 use gloo::utils::window;
-use web_common::database::NestedUser;
+use web_common::database::{NestedTaxon, NestedUser};
 use yew::prelude::*;
 use yew_agent::scope_ext::AgentScopeExt;
 use yew_router::prelude::*;
@@ -19,18 +21,36 @@ use crate::workers::WebsocketWorker;
 use std::rc::Rc;
 use yew_agent::prelude::WorkerBridgeHandle;
 
+#[derive(Debug, Copy, Eq, PartialEq, Clone)]
+enum PageSection {
+    Environment,
+    Details,
+    Location,
+    Taxa,
+    Summary,
+}
+
 pub struct Observe {
     user_state: Rc<UserState>,
     user_dispatch: Dispatch<UserState>,
+    section: PageSection,
     websocket: WorkerBridgeHandle<WebsocketWorker>,
-    pictures: Vec<Rc<web_common::types::JPEG>>,
+    environment_pictures: Vec<Rc<web_common::types::JPEG>>,
+    details_pictures: Vec<Rc<web_common::types::JPEG>>,
+    location: Option<web_common::types::Point>,
+    taxon: Option<Rc<NestedTaxon>>,
 }
 
 pub enum ObserveMessage {
     Backend(WebsocketMessage),
     UserState(Rc<UserState>),
-    AddPicture(Rc<web_common::types::JPEG>),
-    RemovePicture(usize),
+    AddEnvironmentPicture(Rc<web_common::types::JPEG>),
+    AddDetailsPicture(Rc<web_common::types::JPEG>),
+    RemoveEnvironmentPicture(usize),
+    RemoveDetailsPicture(usize),
+    GeoLocation(Option<web_common::types::Point>),
+    SelectedTaxon(Option<Rc<NestedTaxon>>),
+    SetSection(PageSection),
 }
 
 #[derive(Clone, Properties, PartialEq)]
@@ -59,9 +79,13 @@ impl Component for Observe {
 
         Self {
             websocket,
+            section: PageSection::Environment,
             user_state,
             user_dispatch,
-            pictures: vec![],
+            environment_pictures: vec![],
+            details_pictures: vec![],
+            location: None,
+            taxon: None,
         }
     }
 
@@ -79,13 +103,34 @@ impl Component for Observe {
                 false
             }
             ObserveMessage::Backend(_) => false,
-            ObserveMessage::AddPicture(picture) => {
-                self.pictures.push(picture);
+            ObserveMessage::AddEnvironmentPicture(picture) => {
+                self.environment_pictures.push(picture);
                 true
             }
-            ObserveMessage::RemovePicture(index) => {
-                self.pictures.remove(index);
+            ObserveMessage::AddDetailsPicture(picture) => {
+                self.details_pictures.push(picture);
                 true
+            }
+            ObserveMessage::RemoveEnvironmentPicture(index) => {
+                self.environment_pictures.remove(index);
+                true
+            }
+            ObserveMessage::RemoveDetailsPicture(index) => {
+                self.details_pictures.remove(index);
+                true
+            }
+            ObserveMessage::SelectedTaxon(taxon) => {
+                self.taxon = taxon;
+                true
+            }
+            ObserveMessage::GeoLocation(location) => {
+                self.location = location;
+                true
+            }
+            ObserveMessage::SetSection(section) => {
+                let changed_section = self.section != section;
+                self.section = section;
+                changed_section
             }
         }
     }
@@ -119,33 +164,187 @@ impl Component for Observe {
                 });
         }
 
-        // If all of the above conditions are met, we display the input field for multiple pictures.
+        // If all of the above conditions are met, we display the input field for multiple environment_pictures.
 
-        // We create a callback for when a picture is added.
-        let add_picture = ctx.link().callback(ObserveMessage::AddPicture);
+        let section = match self.section {
+            PageSection::Environment => {
+                // We create a callback for when a picture is added.
+                let add_picture = ctx.link().callback(ObserveMessage::AddEnvironmentPicture);
 
-        // We create a callback for when a picture is removed.
-        let remove_picture = ctx.link().callback(ObserveMessage::RemovePicture);
+                // We create a callback for when a picture is removed.
+                let remove_picture = ctx
+                    .link()
+                    .callback(ObserveMessage::RemoveEnvironmentPicture);
 
-        // We prepare the classes for the next button, which brings the user to the next step.
-        let next_button_classes = format!(
-            "next-button{}",
-            if !self.pictures.is_empty() { " enabled" } else { "" }
-        );
+                // We prepare the classes for the next button, which brings the user to the next step.
+                let next_button_classes = format!(
+                    "next-button{}",
+                    if !self.environment_pictures.is_empty() {
+                        " enabled"
+                    } else {
+                        ""
+                    }
+                );
 
-        html!{
+                let on_click_next = ctx
+                    .link()
+                    .callback(|_| ObserveMessage::SetSection(PageSection::Details));
+
+                html! {
+                    <>
+                        <p>{"Add one or more pictures capturing the environment."}</p>
+                        <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>> path="/jpeg_file_processor.js">
+                            <MultiFileInput<web_common::types::JPEG> label="Environment Pictures" optional={false} append_file={add_picture} remove_file={remove_picture} maximum_number_of_expected_files={10} errors={vec![]} files={Rc::new(self.environment_pictures.clone())} />
+                        </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>>>
+                        <button title={"Next step"} onclick={on_click_next} class={next_button_classes} disabled={self.environment_pictures.is_empty()}>
+                            <i class="fas fa-arrow-right"></i>
+                            {'\u{00a0}'}
+                            <span>{"Next"}</span>
+                        </button>
+                    </>
+                }
+            }
+            PageSection::Details => {
+                // We create a callback for when a picture is added.
+                let add_picture = ctx.link().callback(ObserveMessage::AddDetailsPicture);
+
+                // We create a callback for when a picture is removed.
+                let remove_picture = ctx.link().callback(ObserveMessage::RemoveDetailsPicture);
+
+                // We prepare the classes for the next button, which brings the user to the next step.
+                let next_button_classes = format!(
+                    "next-button{}",
+                    if !self.details_pictures.is_empty() {
+                        " enabled"
+                    } else {
+                        ""
+                    }
+                );
+
+                let on_click_back = ctx
+                    .link()
+                    .callback(|_| ObserveMessage::SetSection(PageSection::Environment));
+
+                let on_click_next = ctx
+                    .link()
+                    .callback(|_| ObserveMessage::SetSection(PageSection::Location));
+
+                html! {
+                    <>
+                        <p>{"Add one or more pictures capturing details of the observation."}</p>
+                        <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>> path="/jpeg_file_processor.js">
+                            <MultiFileInput<web_common::types::JPEG> label="Detail Pictures" optional={false} append_file={add_picture} remove_file={remove_picture} maximum_number_of_expected_files={10} errors={vec![]} files={Rc::new(self.details_pictures.clone())} />
+                        </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>>>
+                        <button title={"Next step"} onclick={on_click_next} class={next_button_classes} disabled={self.details_pictures.is_empty()}>
+                            <i class="fas fa-arrow-right"></i>
+                            {'\u{00a0}'}
+                            <span>{"Next"}</span>
+                        </button>
+                        <button title={"Last step"} onclick={on_click_back} class={"next-button"}>
+                            <i class="fas fa-arrow-left"></i>
+                            {'\u{00a0}'}
+                            <span>{"Previous"}</span>
+                        </button>
+                    </>
+                }
+            }
+            PageSection::Location => {
+                let set_geolocation = ctx.link().callback(ObserveMessage::GeoLocation);
+
+                let next_button_classes = format!(
+                    "next-button{}",
+                    if self.location.is_some() {
+                        " enabled"
+                    } else {
+                        ""
+                    }
+                );
+
+                let on_click_back = ctx
+                    .link()
+                    .callback(|_| ObserveMessage::SetSection(PageSection::Details));
+
+                let on_click_next = ctx
+                    .link()
+                    .callback(|_| ObserveMessage::SetSection(PageSection::Taxa));
+
+                html! {
+                    <>
+                        <p>{"Add the location of the observation."}</p>
+                        <GPSInput label="Geolocation" optional={false} builder={set_geolocation} coordinates={self.location.clone()} />
+                        <button title={"Next step"} onclick={on_click_next} class={next_button_classes} disabled={self.location.is_none()}>
+                            <i class="fas fa-arrow-right"></i>
+                            {'\u{00a0}'}
+                            <span>{"Next"}</span>
+                        </button>
+                        <button title={"Last step"} onclick={on_click_back} class={"next-button"}>
+                            <i class="fas fa-arrow-left"></i>
+                            {'\u{00a0}'}
+                            <span>{"Previous"}</span>
+                        </button>
+                    </>
+                }
+            }
+            PageSection::Taxa => {
+                let selected_taxon =
+                    ctx.link()
+                        .callback(move |project: Option<Rc<NestedTaxon>>| {
+                            ObserveMessage::SelectedTaxon(project)
+                        });
+
+                let on_click_back = ctx
+                    .link()
+                    .callback(|_| ObserveMessage::SetSection(PageSection::Location));
+
+                let on_click_next = ctx
+                    .link()
+                    .callback(|_| ObserveMessage::SetSection(PageSection::Summary));
+
+                html! {
+                    <>
+                        <p>{"Select the primary taxon associated with this observation."}</p>
+                        <Datalist<web_common::database::nested_variants::NestedTaxon, false> builder={selected_taxon} optional={false} value={self.taxon.clone()} label="Select taxon" scanner={false} />
+                        <button title={"Next step"} onclick={on_click_next} class={"next-button enabled"}>
+                            <i class="fas fa-arrow-right"></i>
+                            {'\u{00a0}'}
+                            <span>{"Next"}</span>
+                        </button>
+                        <button title={"Last step"} onclick={on_click_back} class={"next-button"}>
+                            <i class="fas fa-arrow-left"></i>
+                            {'\u{00a0}'}
+                            <span>{"Previous"}</span>
+                        </button>
+                    </>
+                }
+            }
+            PageSection::Summary => {
+                let on_click_back = ctx
+                    .link()
+                    .callback(|_| ObserveMessage::SetSection(PageSection::Taxa));
+
+                html! {
+                    <>
+                        <p>{"Review the observation before submitting."}</p>
+                        <button title={"Submit observation"} class={"next-button enabled"}>
+                            <i class="fas fa-check"></i>
+                            {'\u{00a0}'}
+                            <span>{"Submit"}</span>
+                        </button>
+                        <button title={"Last step"} onclick={on_click_back} class={"next-button"}>
+                            <i class="fas fa-arrow-left"></i>
+                            {'\u{00a0}'}
+                            <span>{"Previous"}</span>
+                        </button>
+                    </>
+                }
+            }
+        };
+
+        html! {
             <div class="fullscreen_center_app">
                 <div class="observe">
                     <h2>{"New observation"}</h2>
-                    <p>{"Add one or more pictures capturing the environment."}</p>
-                    <yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>> path="/jpeg_file_processor.js">
-                        <MultiFileInput<web_common::types::JPEG> label="Environment Pictures" optional={false} append_file={add_picture} remove_file={remove_picture} maximum_number_of_expected_files={10} errors={vec![]} files={Rc::new(self.pictures.clone())} />
-                    </yew_agent::oneshot::OneshotProvider<crate::workers::FileProcessor<web_common::types::JPEG>>>
-                    <button title={"Next step"} class={next_button_classes} disabled={self.pictures.is_empty()}>
-                        <i class="fas fa-arrow-right"></i>
-                        {'\u{00a0}'}
-                        <span>{"Next"}</span>
-                    </button>
+                    {section}
                 </div>
             </div>
         }
