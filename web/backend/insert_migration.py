@@ -79,11 +79,11 @@ def insert_migration(counter: int, name: str):
         if re.match(r"\d{14}_", directory) and int(directory.split("_")[0]) >= counter
     )
 
-    status = os.system(f"diesel migration --migration-dir migrations revert --number {number_of_migrations_to_revert}")
+    # status = os.system(f"diesel migration --migration-dir migrations revert --number {number_of_migrations_to_revert}")
 
-    if status != 0:
-        print("Reverting migrations failed")
-        sys.exit(1)
+    # if status != 0:
+    #     print("Reverting migrations failed")
+    #     sys.exit(1)
 
     # We increase the counter of all migrations with a counter greater than or
     # equal to the specified counter.
