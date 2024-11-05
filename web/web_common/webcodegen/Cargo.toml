@@ -1,0 +1,11 @@
+[package]
+name = "webcodegen"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diesel = { version = "2.2.4", features = ["postgres"] }
+
+
+[dev-dependencies]
+diesel_migrations = "2.2.0"

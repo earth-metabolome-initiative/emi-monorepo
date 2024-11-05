@@ -89,4 +89,4 @@ backend = [ "actix-web", "actix-web-actors", "bytes", "actix", "diesel", "r2d2" 
 
 # The `frontend` feature is used to enable the implementation of the From trait
 # for types defined in third party crates in the frontend.
-frontend = ["gloo-net", "web-sys", "wasm-bindgen-futures", "wasm-bindgen", "gluesql", "yew"]
+frontend = ["gloo-net", "web-sys", "wasm-bindgen-futures", "wasm-bindgen", "yew"]

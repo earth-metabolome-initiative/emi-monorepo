@@ -15,6 +15,7 @@ linking with `cc` failed: exit code: 1
 Depending on your OS, you can install it with the following commands:
 
 #### MacOS
+
 On MacOS, you can install Postgres with Homebrew:
 
 ```bash
@@ -22,6 +23,7 @@ brew install postgresql
 ```
 
 #### Ubuntu
+
 On Ubuntu, you can install Postgres with the following commands:
 
 ```bash
@@ -29,6 +31,7 @@ sudo apt-get update && sudo apt-get install -y libpq-dev
 ```
 
 ### Install Diesel
+
 You can install Diesel with the following command:
 
 ```bash
