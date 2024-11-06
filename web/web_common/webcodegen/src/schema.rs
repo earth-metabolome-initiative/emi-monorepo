@@ -1,4 +1,4 @@
-use diesel::prelude::{allow_tables_to_appear_in_same_query, table};
+use diesel::prelude::table;
 
 table! {
     information_schema.tables (table_catalog, table_schema, table_name) {
@@ -14,5 +14,55 @@ table! {
         is_insertable_into -> Text,
         is_typed -> Text,
         commit_action -> Nullable<Text>,
+    }
+}
+
+table! {
+    information_schema.columns (table_catalog, table_schema, table_name, column_name) {
+        table_catalog -> Text,
+        table_schema -> Text,
+        table_name -> Text,
+        column_name -> Text,
+        ordinal_position -> Integer,
+        column_default -> Nullable<Text>,
+        #[sql_name = "is_nullable"]
+        __is_nullable -> Text,
+        data_type -> Text,
+        character_maximum_length -> Nullable<Integer>,
+        character_octet_length -> Nullable<Integer>,
+        numeric_precision -> Nullable<Integer>,
+        numeric_precision_radix -> Nullable<Integer>,
+        numeric_scale -> Nullable<Integer>,
+        datetime_precision -> Nullable<Integer>,
+        interval_type -> Nullable<Text>,
+        interval_precision -> Nullable<Integer>,
+        character_set_catalog -> Nullable<Text>,
+        character_set_schema -> Nullable<Text>,
+        character_set_name -> Nullable<Text>,
+        collation_catalog -> Nullable<Text>,
+        collation_schema -> Nullable<Text>,
+        collation_name -> Nullable<Text>,
+        domain_catalog -> Nullable<Text>,
+        domain_schema -> Nullable<Text>,
+        domain_name -> Nullable<Text>,
+        udt_catalog -> Nullable<Text>,
+        udt_schema -> Nullable<Text>,
+        udt_name -> Nullable<Text>,
+        scope_catalog -> Nullable<Text>,
+        scope_schema -> Nullable<Text>,
+        scope_name -> Nullable<Text>,
+        maximum_cardinality -> Nullable<Integer>,
+        dtd_identifier -> Nullable<Text>,
+        is_self_referencing -> Nullable<Text>,
+        is_identity -> Nullable<Text>,
+        identity_generation -> Nullable<Text>,
+        identity_start -> Nullable<Text>,
+        identity_increment -> Nullable<Text>,
+        identity_maximum -> Nullable<Text>,
+        identity_minimum -> Nullable<Text>,
+        identity_cycle -> Nullable<Text>,
+        is_generated -> Text,
+        generation_expression -> Nullable<Text>,
+        is_updatable -> Text,
     }
 }

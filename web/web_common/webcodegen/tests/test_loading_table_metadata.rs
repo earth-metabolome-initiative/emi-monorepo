@@ -6,6 +6,7 @@ use testcontainers::{
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
+use std::error::Error;
 use webcodegen::Table;
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
@@ -66,14 +67,20 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
 }
 
 #[tokio::test]
-async fn test_example() {
+async fn test_user_table() {
     let container = setup_postgres().await;
 
     let mut conn = establish_connection_to_postres();
     conn.run_pending_migrations(MIGRATIONS).unwrap();
 
-    let tables: Vec<Table> = Table::load_all_tables(&mut conn);
-    println!("{:?}", tables);
+    let users = Table::load(&mut conn, "users", None, DATABASE_NAME);
+    
+    let columns = users.unwrap().columns(&mut conn);
 
+    if let Err(e) = columns {
+        eprintln!("Failed to load columns: {:?}", e.to_string());
+    } else {
+        println!("{:?}", columns);
+    }
     container.stop().await.unwrap();
 }
