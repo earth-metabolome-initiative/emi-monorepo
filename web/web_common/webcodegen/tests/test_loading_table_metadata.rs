@@ -6,6 +6,7 @@ use testcontainers::{
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
+use webcodegen::Table;
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
 const DATABASE_NAME: &str = "test_db";
@@ -68,13 +69,11 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
 async fn test_example() {
     let container = setup_postgres().await;
 
-    println!("Container ID: {}", container.id());
-    println!("Container Port: {:?}", container.ports().await);
-
     let mut conn = establish_connection_to_postres();
     conn.run_pending_migrations(MIGRATIONS).unwrap();
 
-    // Run your tests with `conn`
+    let tables: Vec<Table> = Table::load_all_tables(&mut conn);
+    println!("{:?}", tables);
 
-    teardown_test_database(&mut conn);
+    container.stop().await.unwrap();
 }

@@ -9,5 +9,6 @@
 #![warn(clippy::pedantic)]
 
 mod table_metadata;
+mod schema;
 
 pub use table_metadata::Table;
