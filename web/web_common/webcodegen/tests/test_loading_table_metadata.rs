@@ -98,5 +98,19 @@ async fn test_user_table() {
     let primary_key_columns = primary_key_columns.unwrap();
     assert_eq!(primary_key_columns.len(), 1);
 
+    let composite_users = Table::load(&mut conn, "composite_users", None, DATABASE_NAME).unwrap();
+
+    let columns: Result<Vec<Column>, diesel::result::Error> = composite_users.columns(&mut conn);
+    let primary_key_columns: Result<Vec<Column>, diesel::result::Error> =
+        composite_users.primary_key_columns(&mut conn);
+
+    assert!(columns.is_ok());
+    let columns = columns.unwrap();
+    assert_eq!(columns.len(), 5);
+
+    assert!(primary_key_columns.is_ok());
+    let primary_key_columns = primary_key_columns.unwrap();
+    assert_eq!(primary_key_columns.len(), 2);
+
     container.stop().await.unwrap();
 }
