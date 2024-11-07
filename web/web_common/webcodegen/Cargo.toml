@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 diesel = { version = "2.2.4", features = ["postgres", "64-column-tables"] }
+serde = { version = "1.0.214", features = ["derive"] }
 testcontainers-modules = "0.11.3"
 
 

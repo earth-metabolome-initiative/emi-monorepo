@@ -1,4 +1,4 @@
-use diesel::prelude::table;
+use diesel::prelude::{allow_tables_to_appear_in_same_query, table};
 
 table! {
     information_schema.tables (table_catalog, table_schema, table_name) {
@@ -144,3 +144,14 @@ table! {
         initially_deferred -> Text,
     }
 }
+
+allow_tables_to_appear_in_same_query!(
+    columns,
+    key_column_usage,
+    table_constraints,
+    referential_constraints,
+    constraint_column_usage,
+    check_constraints,
+    domain_constraints,
+    tables,
+);

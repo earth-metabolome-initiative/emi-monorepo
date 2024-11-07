@@ -1,12 +1,12 @@
 use diesel::pg::PgConnection;
-use diesel::{RunQueryDsl, Connection};
+use diesel::{Connection, RunQueryDsl};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use std::error::Error;
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
-use std::error::Error;
 use webcodegen::*;
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
@@ -35,7 +35,6 @@ fn establish_connection_to_postres() -> PgConnection {
     PgConnection::establish(&database_url).unwrap()
 }
 
-
 fn teardown_test_database(conn: &mut PgConnection) {
     diesel::sql_query(format!("DROP DATABASE IF EXISTS {}", DATABASE_NAME))
         .execute(conn)
@@ -59,8 +58,6 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
     if let Err(e) = container {
         eprintln!("Failed to start container: {:?}", e);
         std::process::exit(1);
-    } else {
-        println!("Started container");
     }
 
     container.unwrap()
@@ -80,19 +77,26 @@ async fn test_user_table() {
     let all_columns = Column::load_all_columns(&mut conn);
     let all_table_constraints = TableConstraint::load_all_table_constraints(&mut conn);
     let all_key_column_usage = KeyColumnUsage::load_all_key_column_usages(&mut conn);
-    let all_referential_constraints = ReferentialConstraint::load_all_referential_constraints(&mut conn);
-    let all_constraint_column_usage = ConstraintColumnUsage::load_all_constraint_column_usages(&mut conn);
+    let all_referential_constraints =
+        ReferentialConstraint::load_all_referential_constraints(&mut conn);
+    let all_constraint_column_usage =
+        ConstraintColumnUsage::load_all_constraint_column_usages(&mut conn);
     let all_check_constraint = CheckConstraint::load_all_check_constraints(&mut conn);
     let all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
 
-    let users = Table::load(&mut conn, "users", None, DATABASE_NAME);
-    
-    let columns = users.unwrap().columns(&mut conn);
+    let users = Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap();
 
-    if let Err(e) = columns {
-        eprintln!("Failed to load columns: {:?}", e.to_string());
-    } else {
-        println!("{:?}", columns);
-    }
+    let columns: Result<Vec<Column>, diesel::result::Error> = users.columns(&mut conn);
+    let primary_key_columns: Result<Vec<Column>, diesel::result::Error> =
+        users.primary_key_columns(&mut conn);
+
+    assert!(columns.is_ok());
+    let columns = columns.unwrap();
+    assert_eq!(columns.len(), 4);
+
+    assert!(primary_key_columns.is_ok());
+    let primary_key_columns = primary_key_columns.unwrap();
+    assert_eq!(primary_key_columns.len(), 1);
+
     container.stop().await.unwrap();
 }
