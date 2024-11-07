@@ -11,4 +11,13 @@
 mod table_metadata;
 mod schema;
 
-pub use table_metadata::Table;
+pub use table_metadata::{
+    Table,
+    Column,
+    KeyColumnUsage,
+    ReferentialConstraint,
+    ConstraintColumnUsage,
+    CheckConstraint,
+    DomainConstraint,
+    TableConstraint
+};

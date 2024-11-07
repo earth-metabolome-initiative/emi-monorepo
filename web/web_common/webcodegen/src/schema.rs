@@ -66,3 +66,81 @@ table! {
         is_updatable -> Text,
     }
 }
+
+table! {
+    information_schema.key_column_usage (table_catalog, table_schema, table_name, column_name) {
+        constraint_catalog -> Text,
+        constraint_schema -> Text,
+        constraint_name -> Text,
+        table_catalog -> Text,
+        table_schema -> Text,
+        table_name -> Text,
+        column_name -> Text,
+        ordinal_position -> Integer,
+        position_in_unique_constraint -> Nullable<Integer>,
+    }
+}
+
+table! {
+    information_schema.table_constraints (table_catalog, table_schema, table_name, constraint_name) {
+        constraint_catalog -> Text,
+        constraint_schema -> Text,
+        constraint_name -> Text,
+        table_catalog -> Text,
+        table_schema -> Text,
+        table_name -> Text,
+        constraint_type -> Text,
+        is_deferrable -> Text,
+        initially_deferred -> Text,
+        enforced -> Text,
+        nulls_distinct -> Nullable<Text>,
+    }
+}
+
+table! {
+    information_schema.referential_constraints (constraint_catalog, constraint_schema, constraint_name) {
+        constraint_catalog -> Text,
+        constraint_schema -> Text,
+        constraint_name -> Text,
+        unique_constraint_catalog -> Nullable<Text>,
+        unique_constraint_schema -> Nullable<Text>,
+        unique_constraint_name -> Nullable<Text>,
+        match_option -> Text,
+        update_rule -> Text,
+        delete_rule -> Text,
+    }
+}
+
+table! {
+    information_schema.constraint_column_usage (table_catalog, table_schema, table_name, column_name) {
+        constraint_catalog -> Text,
+        constraint_schema -> Text,
+        constraint_name -> Text,
+        table_catalog -> Text,
+        table_schema -> Text,
+        table_name -> Text,
+        column_name -> Text,
+    }
+}
+
+table! {
+    information_schema.check_constraints (constraint_catalog, constraint_schema, constraint_name) {
+        constraint_catalog -> Text,
+        constraint_schema -> Text,
+        constraint_name -> Text,
+        check_clause -> Text,
+    }
+}
+
+table! {
+    information_schema.domain_constraints (constraint_catalog, constraint_schema, constraint_name) {
+        constraint_catalog -> Text,
+        constraint_schema -> Text,
+        constraint_name -> Text,
+        domain_catalog -> Nullable<Text>,
+        domain_schema -> Nullable<Text>,
+        domain_name -> Nullable<Text>,
+        is_deferrable -> Text,
+        initially_deferred -> Text,
+    }
+}

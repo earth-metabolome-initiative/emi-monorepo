@@ -1,5 +1,5 @@
 use diesel::pg::PgConnection;
-use diesel::prelude::*;
+use diesel::{RunQueryDsl, Connection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
@@ -7,7 +7,7 @@ use testcontainers::{
     ContainerAsync, GenericImage, ImageExt,
 };
 use std::error::Error;
-use webcodegen::Table;
+use webcodegen::*;
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
 const DATABASE_NAME: &str = "test_db";
@@ -43,7 +43,7 @@ fn teardown_test_database(conn: &mut PgConnection) {
 }
 
 async fn setup_postgres() -> ContainerAsync<GenericImage> {
-    let container = GenericImage::new("postgres", "13-alpine")
+    let container = GenericImage::new("postgres", "17-alpine")
         .with_wait_for(WaitFor::message_on_stderr(
             "database system is ready to accept connections",
         ))
@@ -72,6 +72,18 @@ async fn test_user_table() {
 
     let mut conn = establish_connection_to_postres();
     conn.run_pending_migrations(MIGRATIONS).unwrap();
+
+    // We try to load all elements of each type, so to ensure
+    // that the structs are actually compatible with the schema
+    // of PostgreSQL
+    let all_tables = Table::load_all_tables(&mut conn);
+    let all_columns = Column::load_all_columns(&mut conn);
+    let all_table_constraints = TableConstraint::load_all_table_constraints(&mut conn);
+    let all_key_column_usage = KeyColumnUsage::load_all_key_column_usages(&mut conn);
+    let all_referential_constraints = ReferentialConstraint::load_all_referential_constraints(&mut conn);
+    let all_constraint_column_usage = ConstraintColumnUsage::load_all_constraint_column_usages(&mut conn);
+    let all_check_constraint = CheckConstraint::load_all_check_constraints(&mut conn);
+    let all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
 
     let users = Table::load(&mut conn, "users", None, DATABASE_NAME);
     
