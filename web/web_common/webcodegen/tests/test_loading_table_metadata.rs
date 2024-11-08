@@ -1,7 +1,6 @@
 use diesel::pg::PgConnection;
 use diesel::{Connection, RunQueryDsl};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use std::error::Error;
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
@@ -87,16 +86,33 @@ async fn test_user_table() {
     let users = Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap();
 
     let columns: Result<Vec<Column>, diesel::result::Error> = users.columns(&mut conn);
-    let primary_key_columns: Result<Vec<Column>, diesel::result::Error> =
-        users.primary_key_columns(&mut conn);
 
     assert!(columns.is_ok());
     let columns = columns.unwrap();
     assert_eq!(columns.len(), 4);
 
+    let primary_key_columns: Result<Vec<Column>, diesel::result::Error> =
+        users.primary_key_columns(&mut conn);
+
     assert!(primary_key_columns.is_ok());
     let primary_key_columns = primary_key_columns.unwrap();
     assert_eq!(primary_key_columns.len(), 1);
+
+    let unique_columns: Result<Vec<Vec<Column>>, diesel::result::Error> =
+        users.unique_columns(&mut conn);
+
+    assert!(unique_columns.is_ok());
+    let unique_columns = unique_columns.unwrap();
+
+    let unique_column_names = unique_columns
+        .iter()
+        .map(|columns| columns.iter().map(|column| column.column_name.clone()).collect())
+        .collect::<Vec<Vec<String>>>();
+
+    assert_eq!(unique_columns.len(), 3);
+    assert_eq!(unique_columns[0].len(), 1);
+    assert_eq!(unique_columns[1].len(), 2);
+    assert_eq!(unique_columns[2].len(), 1);
 
     let composite_users = Table::load(&mut conn, "composite_users", None, DATABASE_NAME).unwrap();
 

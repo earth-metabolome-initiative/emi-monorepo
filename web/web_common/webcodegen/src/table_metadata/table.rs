@@ -1,13 +1,13 @@
 use diesel::pg::PgConnection;
-use diesel::query_dsl::InternalJoinDsl;
 use diesel::result::Error as DieselError;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, QueryDsl,
     Queryable, QueryableByName, RunQueryDsl, SelectableHelper,
 };
+use itertools::Itertools;
 
-use crate::table_metadata::table_constraint::ConstraintType;
 use crate::Column;
+use crate::TableConstraint;
 
 /// Struct defining the `information_schema.tables` table.
 #[derive(Queryable, QueryableByName, Debug)]
@@ -56,6 +56,84 @@ impl Table {
             .filter(columns::dsl::table_schema.eq(&self.table_schema))
             .filter(columns::dsl::table_catalog.eq(&self.table_catalog))
             .load::<Column>(conn)
+    }
+
+    pub fn unique_columns(&self, conn: &mut PgConnection) -> Result<Vec<Vec<Column>>, DieselError> {
+        use crate::schema::columns;
+        use crate::schema::key_column_usage;
+        use crate::schema::table_constraints;
+        key_column_usage::dsl::key_column_usage
+            .inner_join(
+                columns::dsl::columns.on(key_column_usage::dsl::table_name
+                    .nullable()
+                    .eq(columns::dsl::table_name.nullable())
+                    .and(
+                        key_column_usage::dsl::table_schema
+                            .nullable()
+                            .eq(columns::dsl::table_schema.nullable()),
+                    )
+                    .and(
+                        key_column_usage::dsl::table_catalog
+                            .nullable()
+                            .eq(columns::dsl::table_catalog.nullable()),
+                    )
+                    .and(
+                        key_column_usage::dsl::column_name
+                            .nullable()
+                            .eq(columns::dsl::column_name.nullable()),
+                    )),
+            )
+            .inner_join(
+                table_constraints::dsl::table_constraints.on(
+                    key_column_usage::dsl::constraint_name
+                        .nullable()
+                        .eq(table_constraints::dsl::constraint_name.nullable())
+                        .and(
+                            key_column_usage::dsl::constraint_schema
+                                .nullable()
+                                .eq(table_constraints::dsl::constraint_schema.nullable()),
+                        )
+                        .and(
+                            key_column_usage::dsl::constraint_catalog
+                                .nullable()
+                                .eq(table_constraints::dsl::constraint_catalog.nullable()),
+                        )
+                        .and(
+                            key_column_usage::dsl::table_name
+                                .nullable()
+                                .eq(table_constraints::dsl::table_name.nullable()),
+                        )
+                        .and(
+                            key_column_usage::dsl::table_schema
+                                .nullable()
+                                .eq(table_constraints::dsl::table_schema.nullable()),
+                        )
+                        .and(
+                            key_column_usage::dsl::table_catalog
+                                .nullable()
+                                .eq(table_constraints::dsl::table_catalog.nullable()),
+                        ),
+                ),
+            )
+            .filter(key_column_usage::dsl::table_name.eq(&self.table_name))
+            .filter(key_column_usage::dsl::table_schema.eq(&self.table_schema))
+            .filter(key_column_usage::dsl::table_catalog.eq(&self.table_catalog))
+            .filter(table_constraints::dsl::constraint_type.eq("UNIQUE"))
+            .order_by(table_constraints::dsl::constraint_name)
+            .select((TableConstraint::as_select(), Column::as_select()))
+            .load::<(TableConstraint, Column)>(conn)
+            .map(|rows| {
+                rows.into_iter()
+                    .chunk_by(|(constraint, _)| constraint.constraint_name.clone())
+                    .into_iter()
+                    .map(|(_, group)| {
+                        group
+                            .into_iter()
+                            .map(|(_, column)| column)
+                            .collect::<Vec<Column>>()
+                    })
+                    .collect()
+            })
     }
 
     pub fn primary_key_columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, DieselError> {

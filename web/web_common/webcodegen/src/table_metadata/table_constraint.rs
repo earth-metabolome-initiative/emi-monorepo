@@ -7,11 +7,11 @@ use diesel::{
 };
 use diesel::serialize::IsNull;
 use std::io::Write;
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, Queryable, Selectable, QueryableByName, RunQueryDsl};
 use serde::{Deserialize, Serialize};
 
 
-#[derive(Queryable, QueryableByName, Debug)]
+#[derive(Queryable, QueryableByName, Selectable, PartialEq, Debug)]
 #[diesel(table_name = crate::schema::table_constraints)]
 pub struct TableConstraint {
     pub constraint_catalog: String,

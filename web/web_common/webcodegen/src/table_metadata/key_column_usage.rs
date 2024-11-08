@@ -1,9 +1,5 @@
-use diesel::helper_types::{And, Eq};
 use diesel::pg::PgConnection;
-use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, JoinTo, QueryDsl, Queryable,
-    QueryableByName, RunQueryDsl,
-};
+use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
 
 #[derive(Queryable, QueryableByName, Debug)]
 #[diesel(table_name = crate::schema::key_column_usage)]

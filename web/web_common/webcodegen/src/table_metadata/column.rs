@@ -1,5 +1,5 @@
 use diesel::pg::PgConnection;
-use diesel::{Queryable, QueryableByName, RunQueryDsl, Selectable, JoinTo};
+use diesel::{Queryable, QueryableByName, RunQueryDsl, Selectable};
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(Queryable, QueryableByName, Selectable, Debug)]
