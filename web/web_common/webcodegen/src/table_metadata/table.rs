@@ -2,11 +2,12 @@ use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, QueryDsl,
-    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
+    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper, TextExpressionMethods,
 };
 use itertools::Itertools;
 
 use crate::Column;
+use crate::Index;
 use crate::TableConstraint;
 
 /// Struct defining the `information_schema.tables` table.
@@ -29,18 +30,41 @@ pub struct Table {
 
 impl Table {
     pub fn unique_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
-        Index::load_all_unique(conn, Some(&self.table_schema))
+        use crate::schema::pg_indexes;
+        pg_indexes::dsl::pg_indexes
+            .filter(pg_indexes::dsl::schemaname.eq(&self.table_schema))
+            .filter(pg_indexes::dsl::tablename.eq(&self.table_name))
+            .filter(pg_indexes::dsl::indexdef.like("%UNIQUE%"))
+            .load::<Index>(conn)
+    }
+
+    pub fn gin_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
+        use crate::schema::pg_indexes;
+        pg_indexes::dsl::pg_indexes
+            .filter(pg_indexes::dsl::schemaname.eq(&self.table_schema))
+            .filter(pg_indexes::dsl::tablename.eq(&self.table_name))
+            .filter(pg_indexes::dsl::indexdef.like("%USING gin%"))
+            .load::<Index>(conn)
+    }
+
+    pub fn gist_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
+        use crate::schema::pg_indexes;
+        pg_indexes::dsl::pg_indexes
+            .filter(pg_indexes::dsl::schemaname.eq(&self.table_schema))
+            .filter(pg_indexes::dsl::tablename.eq(&self.table_name))
+            .filter(pg_indexes::dsl::indexdef.like("%USING gist%"))
+            .load::<Index>(conn)
     }
 
     pub fn load_all_tables(
-        conn: &mut PgConnection, 
+        conn: &mut PgConnection,
         table_catalog: &str,
-        table_schema: Option<&str>
+        table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {
         use crate::schema::tables;
         tables::dsl::tables
-        .filter(tables::dsl::table_catalog.eq(table_catalog))
-        .filter(tables::dsl::table_schema.eq(table_schema.unwrap_or("public")))
+            .filter(tables::dsl::table_catalog.eq(table_catalog))
+            .filter(tables::dsl::table_schema.eq(table_schema.unwrap_or("public")))
             .load::<Table>(conn)
     }
 

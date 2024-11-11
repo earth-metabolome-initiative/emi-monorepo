@@ -73,32 +73,51 @@ async fn test_user_table() {
     // that the structs are actually compatible with the schema
     // of PostgreSQL
     let all_tables = Table::load_all_tables(&mut conn, DATABASE_NAME, None).unwrap();
-    assert_eq!(all_tables.len(), 3, "Expected 3 tables, got {:?}", all_tables);
+    assert_eq!(
+        all_tables.len(),
+        3,
+        "Expected 3 tables, got {:?}",
+        all_tables
+    );
     let all_columns = Column::load_all_columns(&mut conn);
 
     let all_unique_indexes = Index::load_all_unique(&mut conn, None).unwrap();
-    assert_eq!(all_unique_indexes.len(), 6, "Expected 6 indexes, got {:?}", all_unique_indexes);
+    assert_eq!(
+        all_unique_indexes.len(),
+        6,
+        "Expected 6 indexes, got {:?}",
+        all_unique_indexes
+    );
 
     all_unique_indexes.iter().for_each(|index| {
         assert!(index.is_unique());
     });
 
-    let mut all_gin_indexes = Index::load_all_gin(&mut conn, None).unwrap();
-    assert_eq!(all_gin_indexes.len(), 1, "Expected 1 index, got {:?}", all_gin_indexes);
+    let all_gin_indexes = Index::load_all_gin(&mut conn, None).unwrap();
+    assert_eq!(
+        all_gin_indexes.len(),
+        1,
+        "Expected 1 index, got {:?}",
+        all_gin_indexes
+    );
 
     all_gin_indexes.iter().for_each(|index| {
         assert!(index.is_gin());
     });
 
-    let gin_index = all_gin_indexes.pop().unwrap();
+    let gin_index = all_gin_indexes.first().unwrap();
 
     assert_eq!(gin_index.schemaname, "public");
     assert_eq!(gin_index.tablename, "users");
     assert_eq!(gin_index.indexname, "users_gin");
 
-
     let all_gist_indexes = Index::load_all_gist(&mut conn, None).unwrap();
-    assert_eq!(all_gist_indexes.len(), 1, "Expected 1 index, got {:?}", all_gist_indexes);
+    assert_eq!(
+        all_gist_indexes.len(),
+        1,
+        "Expected 1 index, got {:?}",
+        all_gist_indexes
+    );
 
     all_gist_indexes.iter().for_each(|index| {
         assert!(index.is_gist());
@@ -110,8 +129,6 @@ async fn test_user_table() {
     assert_eq!(gist_index.tablename, "composite_users");
     assert_eq!(gist_index.indexname, "composite_users_gist");
 
-
-
     let all_table_constraints = TableConstraint::load_all_table_constraints(&mut conn);
     let all_key_column_usage = KeyColumnUsage::load_all_key_column_usages(&mut conn);
     let all_referential_constraints =
@@ -122,6 +139,16 @@ async fn test_user_table() {
     let all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
 
     let users = Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap();
+
+    let users_gin_indexes = users.gin_indexes(&mut conn).unwrap();
+
+    assert_eq!(
+        all_gin_indexes, users_gin_indexes,
+        "Expected {:?}, got {:?}",
+        all_gin_indexes, users_gin_indexes
+    );
+
+    assert!(users.gist_indexes(&mut conn).unwrap().is_empty());
 
     let original_user_id_column = users.column_by_name(&mut conn, "id").unwrap();
 
@@ -151,6 +178,16 @@ async fn test_user_table() {
 
     let composite_users = Table::load(&mut conn, "composite_users", None, DATABASE_NAME).unwrap();
 
+    let composite_users_gist_indexes = composite_users.gist_indexes(&mut conn).unwrap();
+
+    assert_eq!(
+        all_gist_indexes, composite_users_gist_indexes,
+        "Expected {:?}, got {:?}",
+        all_gist_indexes, composite_users_gist_indexes
+    );
+
+    assert!(composite_users.gin_indexes(&mut conn).unwrap().is_empty());
+
     let columns: Result<Vec<Column>, diesel::result::Error> = composite_users.columns(&mut conn);
     let primary_key_columns: Result<Vec<Column>, diesel::result::Error> =
         composite_users.primary_key_columns(&mut conn);
@@ -169,7 +206,8 @@ async fn test_user_table() {
     assert_eq!(primary_id_column.column_name, "primary_id");
     assert!(primary_id_column.is_foreign_key(&mut conn));
 
-    let (foreign_table, user_id_column) = primary_id_column.foreign_table(&mut conn).unwrap().unwrap();
+    let (foreign_table, user_id_column) =
+        primary_id_column.foreign_table(&mut conn).unwrap().unwrap();
     assert_eq!(foreign_table, users);
     assert_eq!(user_id_column, original_user_id_column);
 

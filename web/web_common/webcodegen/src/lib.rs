@@ -12,6 +12,6 @@ mod schema;
 mod table_metadata;
 
 pub use table_metadata::{
-    CheckConstraint, Column, ConstraintColumnUsage, DomainConstraint, KeyColumnUsage,
-    ReferentialConstraint, Table, TableConstraint, Index,
+    CheckConstraint, Column, ConstraintColumnUsage, DomainConstraint, Index, KeyColumnUsage,
+    ReferentialConstraint, Table, TableConstraint,
 };

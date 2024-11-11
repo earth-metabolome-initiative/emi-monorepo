@@ -116,8 +116,7 @@ impl Column {
                         table_constraints::dsl::constraint_catalog
                             .eq(key_column_usage::dsl::constraint_catalog),
                     )
-                    .and(table_constraints::dsl::table_name
-                        .eq(key_column_usage::dsl::table_name))
+                    .and(table_constraints::dsl::table_name.eq(key_column_usage::dsl::table_name))
                     .and(
                         table_constraints::dsl::table_schema
                             .eq(key_column_usage::dsl::table_schema),

@@ -1,13 +1,12 @@
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{
-    ExpressionMethods, QueryDsl, Queryable, QueryableByName, 
-    RunQueryDsl, Selectable, SelectableHelper, TextExpressionMethods,
+    ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
+    SelectableHelper, TextExpressionMethods,
 };
 
-
 /// Represents a row in the pg_indexes view
-#[derive(Queryable, QueryableByName, Selectable, Debug)]
+#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::pg_indexes)]
 pub struct Index {
     pub schemaname: String,
@@ -18,34 +17,37 @@ pub struct Index {
 }
 
 impl Index {
-    pub fn load_all_unique(conn: &mut PgConnection,
+    pub fn load_all_unique(
+        conn: &mut PgConnection,
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {
         use crate::schema::pg_indexes;
         pg_indexes::dsl::pg_indexes
-        .filter(pg_indexes::dsl::schemaname.eq(table_schema.unwrap_or("public")))
-        .filter(pg_indexes::dsl::indexdef.like("%UNIQUE%"))
-        .load::<Self>(conn)
+            .filter(pg_indexes::dsl::schemaname.eq(table_schema.unwrap_or("public")))
+            .filter(pg_indexes::dsl::indexdef.like("%UNIQUE%"))
+            .load::<Self>(conn)
     }
 
-    pub fn load_all_gin(conn: &mut PgConnection,
+    pub fn load_all_gin(
+        conn: &mut PgConnection,
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {
         use crate::schema::pg_indexes;
         pg_indexes::dsl::pg_indexes
-        .filter(pg_indexes::dsl::schemaname.eq(table_schema.unwrap_or("public")))
-        .filter(pg_indexes::dsl::indexdef.like("%USING gin%"))
-        .load::<Self>(conn)
+            .filter(pg_indexes::dsl::schemaname.eq(table_schema.unwrap_or("public")))
+            .filter(pg_indexes::dsl::indexdef.like("%USING gin%"))
+            .load::<Self>(conn)
     }
 
-    pub fn load_all_gist(conn: &mut PgConnection,
+    pub fn load_all_gist(
+        conn: &mut PgConnection,
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {
         use crate::schema::pg_indexes;
         pg_indexes::dsl::pg_indexes
-        .filter(pg_indexes::dsl::schemaname.eq(table_schema.unwrap_or("public")))
-        .filter(pg_indexes::dsl::indexdef.like("%USING gist%"))
-        .load::<Self>(conn)
+            .filter(pg_indexes::dsl::schemaname.eq(table_schema.unwrap_or("public")))
+            .filter(pg_indexes::dsl::indexdef.like("%USING gist%"))
+            .load::<Self>(conn)
     }
 
     pub fn is_unique(&self) -> bool {
