@@ -15,5 +15,7 @@ CREATE TABLE composite_users (
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (primary_id, secondary_id)
+    PRIMARY KEY (primary_id, secondary_id),
+    FOREIGN KEY (primary_id) REFERENCES users(id),
+    FOREIGN KEY (secondary_id) REFERENCES users(id)
 );

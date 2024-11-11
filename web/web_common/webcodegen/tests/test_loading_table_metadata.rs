@@ -106,7 +106,12 @@ async fn test_user_table() {
 
     let unique_column_names = unique_columns
         .iter()
-        .map(|columns| columns.iter().map(|column| column.column_name.clone()).collect())
+        .map(|columns| {
+            columns
+                .iter()
+                .map(|column| column.column_name.clone())
+                .collect()
+        })
         .collect::<Vec<Vec<String>>>();
 
     assert_eq!(unique_columns.len(), 3);
@@ -127,6 +132,24 @@ async fn test_user_table() {
     assert!(primary_key_columns.is_ok());
     let primary_key_columns = primary_key_columns.unwrap();
     assert_eq!(primary_key_columns.len(), 2);
+
+    let primary_id_column = composite_users
+        .column_by_name(&mut conn, "primary_id")
+        .unwrap();
+    assert_eq!(primary_id_column.column_name, "primary_id");
+    assert!(primary_id_column.is_foreign_key(&mut conn));
+
+    let secondary_id_column = composite_users
+        .column_by_name(&mut conn, "secondary_id")
+        .unwrap();
+    assert_eq!(secondary_id_column.column_name, "secondary_id");
+    assert!(secondary_id_column.is_foreign_key(&mut conn));
+
+    let username_column = composite_users
+        .column_by_name(&mut conn, "username")
+        .unwrap();
+    assert_eq!(username_column.column_name, "username");
+    assert!(!username_column.is_foreign_key(&mut conn));
 
     container.stop().await.unwrap();
 }

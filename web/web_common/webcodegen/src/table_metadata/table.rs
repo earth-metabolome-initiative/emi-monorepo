@@ -58,6 +58,20 @@ impl Table {
             .load::<Column>(conn)
     }
 
+    pub fn column_by_name(
+        &self,
+        conn: &mut PgConnection,
+        column_name: &str,
+    ) -> Result<Column, DieselError> {
+        use crate::schema::columns;
+        columns::dsl::columns
+            .filter(columns::dsl::table_name.eq(&self.table_name))
+            .filter(columns::dsl::table_schema.eq(&self.table_schema))
+            .filter(columns::dsl::table_catalog.eq(&self.table_catalog))
+            .filter(columns::dsl::column_name.eq(column_name))
+            .first::<Column>(conn)
+    }
+
     pub fn unique_columns(&self, conn: &mut PgConnection) -> Result<Vec<Vec<Column>>, DieselError> {
         use crate::schema::columns;
         use crate::schema::key_column_usage;
@@ -200,4 +214,6 @@ impl Table {
             .select(Column::as_select())
             .load::<Column>(conn)
     }
+
+    
 }

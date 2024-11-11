@@ -1,5 +1,10 @@
 use diesel::pg::PgConnection;
-use diesel::{Queryable, QueryableByName, RunQueryDsl, Selectable};
+use diesel::{
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
+    RunQueryDsl, Selectable, SelectableHelper,
+};
+
+use crate::KeyColumnUsage;
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(Queryable, QueryableByName, Selectable, Debug)]
@@ -55,5 +60,33 @@ impl Column {
     pub fn load_all_columns(conn: &mut PgConnection) -> Vec<Self> {
         use crate::schema::columns::dsl::*;
         columns.load::<Column>(conn).expect("Error loading columns")
+    }
+
+    pub fn is_foreign_key(&self, conn: &mut PgConnection) -> bool {
+        use crate::schema::columns;
+        use crate::schema::key_column_usage;
+        use crate::schema::referential_constraints;
+        key_column_usage::dsl::key_column_usage
+            .inner_join(
+                referential_constraints::dsl::referential_constraints.on(
+                    key_column_usage::dsl::constraint_name
+                        .eq(referential_constraints::dsl::constraint_name)
+                        .and(
+                            key_column_usage::dsl::constraint_schema
+                                .eq(referential_constraints::dsl::constraint_schema),
+                        )
+                        .and(
+                            key_column_usage::dsl::constraint_catalog
+                                .eq(referential_constraints::dsl::constraint_catalog),
+                        ),
+                ),
+            )
+            .filter(key_column_usage::dsl::column_name.eq(&self.column_name))
+            .filter(key_column_usage::dsl::table_name.eq(&self.table_name))
+            .filter(key_column_usage::dsl::table_schema.eq(&self.table_schema))
+            .filter(key_column_usage::dsl::table_catalog.eq(&self.table_catalog))
+            .select(KeyColumnUsage::as_select())
+            .first::<KeyColumnUsage>(conn)
+            .is_ok()
     }
 }
