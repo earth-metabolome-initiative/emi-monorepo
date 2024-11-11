@@ -8,16 +8,10 @@
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
 
-mod table_metadata;
 mod schema;
+mod table_metadata;
 
 pub use table_metadata::{
-    Table,
-    Column,
-    KeyColumnUsage,
-    ReferentialConstraint,
-    ConstraintColumnUsage,
-    CheckConstraint,
-    DomainConstraint,
-    TableConstraint
+    CheckConstraint, Column, ConstraintColumnUsage, DomainConstraint, KeyColumnUsage,
+    ReferentialConstraint, Table, TableConstraint,
 };

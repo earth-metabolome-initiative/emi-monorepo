@@ -1,7 +1,7 @@
 use diesel::pg::PgConnection;
-use diesel::{ExpressionMethods, QueryDsl, Queryable, Selectable, QueryableByName, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
 
-#[derive(Queryable, QueryableByName,Selectable, Debug)]
+#[derive(Queryable, QueryableByName, Selectable, Debug)]
 #[diesel(table_name = crate::schema::key_column_usage)]
 pub struct KeyColumnUsage {
     pub constraint_catalog: String,

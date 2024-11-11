@@ -2,7 +2,7 @@ use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, QueryDsl,
-    Queryable, QueryableByName, RunQueryDsl, SelectableHelper,
+    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper,
 };
 use itertools::Itertools;
 
@@ -10,7 +10,7 @@ use crate::Column;
 use crate::TableConstraint;
 
 /// Struct defining the `information_schema.tables` table.
-#[derive(Queryable, QueryableByName, Debug)]
+#[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug)]
 #[diesel(table_name = crate::schema::tables)]
 pub struct Table {
     pub table_catalog: String,
@@ -214,6 +214,4 @@ impl Table {
             .select(Column::as_select())
             .load::<Column>(conn)
     }
-
-    
 }

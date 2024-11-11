@@ -1,7 +1,6 @@
 use diesel::pg::PgConnection;
 use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
 
-
 #[derive(Queryable, QueryableByName, Debug)]
 #[diesel(table_name = crate::schema::referential_constraints)]
 pub struct ReferentialConstraint {

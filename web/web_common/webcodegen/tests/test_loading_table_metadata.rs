@@ -85,6 +85,8 @@ async fn test_user_table() {
 
     let users = Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap();
 
+    let original_user_id_column = users.column_by_name(&mut conn, "id").unwrap();
+
     let columns: Result<Vec<Column>, diesel::result::Error> = users.columns(&mut conn);
 
     assert!(columns.is_ok());
@@ -103,16 +105,6 @@ async fn test_user_table() {
 
     assert!(unique_columns.is_ok());
     let unique_columns = unique_columns.unwrap();
-
-    let unique_column_names = unique_columns
-        .iter()
-        .map(|columns| {
-            columns
-                .iter()
-                .map(|column| column.column_name.clone())
-                .collect()
-        })
-        .collect::<Vec<Vec<String>>>();
 
     assert_eq!(unique_columns.len(), 3);
     assert_eq!(unique_columns[0].len(), 1);
@@ -139,17 +131,30 @@ async fn test_user_table() {
     assert_eq!(primary_id_column.column_name, "primary_id");
     assert!(primary_id_column.is_foreign_key(&mut conn));
 
+    let (foreign_table, user_id_column) = primary_id_column.foreign_table(&mut conn).unwrap().unwrap();
+    assert_eq!(foreign_table, users);
+    assert_eq!(user_id_column, original_user_id_column);
+
     let secondary_id_column = composite_users
         .column_by_name(&mut conn, "secondary_id")
         .unwrap();
     assert_eq!(secondary_id_column.column_name, "secondary_id");
     assert!(secondary_id_column.is_foreign_key(&mut conn));
 
+    let (foreign_table, user_id_column) = secondary_id_column
+        .foreign_table(&mut conn)
+        .unwrap()
+        .unwrap();
+    assert_eq!(foreign_table, users);
+    assert_eq!(user_id_column, original_user_id_column);
+
     let username_column = composite_users
         .column_by_name(&mut conn, "username")
         .unwrap();
     assert_eq!(username_column.column_name, "username");
     assert!(!username_column.is_foreign_key(&mut conn));
+
+    assert!(username_column.foreign_table(&mut conn).unwrap().is_none());
 
     container.stop().await.unwrap();
 }

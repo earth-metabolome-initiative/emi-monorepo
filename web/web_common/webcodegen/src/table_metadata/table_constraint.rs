@@ -1,15 +1,14 @@
 use diesel::pg::PgConnection;
+use diesel::serialize::IsNull;
 use diesel::serialize::{Output, ToSql};
 use diesel::{
     backend::Backend,
     deserialize::{FromSql, FromSqlRow},
     expression::AsExpression,
 };
-use diesel::serialize::IsNull;
-use std::io::Write;
-use diesel::{ExpressionMethods, QueryDsl, Queryable, Selectable, QueryableByName, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
 use serde::{Deserialize, Serialize};
-
+use std::io::Write;
 
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Debug)]
 #[diesel(table_name = crate::schema::table_constraints)]

@@ -1,4 +1,6 @@
+use crate::Table;
 use diesel::pg::PgConnection;
+use diesel::result::Error as DieselError;
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
     RunQueryDsl, Selectable, SelectableHelper,
@@ -7,7 +9,7 @@ use diesel::{
 use crate::KeyColumnUsage;
 
 /// Struct defining the `information_schema.columns` table.
-#[derive(Queryable, QueryableByName, Selectable, Debug)]
+#[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug)]
 #[diesel(table_name = crate::schema::columns)]
 pub struct Column {
     pub table_catalog: String,
@@ -63,7 +65,6 @@ impl Column {
     }
 
     pub fn is_foreign_key(&self, conn: &mut PgConnection) -> bool {
-        use crate::schema::columns;
         use crate::schema::key_column_usage;
         use crate::schema::referential_constraints;
         key_column_usage::dsl::key_column_usage
@@ -88,5 +89,78 @@ impl Column {
             .select(KeyColumnUsage::as_select())
             .first::<KeyColumnUsage>(conn)
             .is_ok()
+    }
+
+    /// Returns the foreign table of the column if it is a foreign key.
+    /// If the column is not a foreign key, returns `None`.
+    pub fn foreign_table(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<(Table, Column)>, DieselError> {
+        use crate::schema::columns;
+        use crate::schema::constraint_column_usage;
+        use crate::schema::key_column_usage;
+        use crate::schema::table_constraints;
+        use crate::schema::tables;
+        table_constraints::dsl::table_constraints
+            .inner_join(
+                key_column_usage::dsl::key_column_usage.on(table_constraints::dsl::constraint_name
+                    .eq(key_column_usage::dsl::constraint_name)
+                    .and(
+                        table_constraints::dsl::constraint_schema
+                            .eq(key_column_usage::dsl::constraint_schema),
+                    )
+                    .and(
+                        table_constraints::dsl::constraint_catalog
+                            .eq(key_column_usage::dsl::constraint_catalog),
+                    )
+                    .and(table_constraints::dsl::table_name
+                        .eq(key_column_usage::dsl::table_name))
+                    .and(
+                        table_constraints::dsl::table_schema
+                            .eq(key_column_usage::dsl::table_schema),
+                    )
+                    .and(
+                        table_constraints::dsl::table_catalog
+                            .eq(key_column_usage::dsl::table_catalog),
+                    )),
+            )
+            .inner_join(
+                constraint_column_usage::dsl::constraint_column_usage
+                    .on(constraint_column_usage::dsl::constraint_name
+                        .eq(table_constraints::dsl::constraint_name)),
+            )
+            .inner_join(
+                tables::dsl::tables.on(tables::dsl::table_name
+                    .eq(constraint_column_usage::dsl::table_name)
+                    .and(tables::dsl::table_schema.eq(constraint_column_usage::dsl::table_schema))
+                    .and(
+                        tables::dsl::table_catalog.eq(constraint_column_usage::dsl::table_catalog),
+                    )),
+            )
+            .inner_join(
+                columns::dsl::columns.on(columns::dsl::table_name
+                    .eq(constraint_column_usage::dsl::table_name)
+                    .and(columns::dsl::table_schema.eq(constraint_column_usage::dsl::table_schema))
+                    .and(
+                        columns::dsl::table_catalog.eq(constraint_column_usage::dsl::table_catalog),
+                    )
+                    .and(columns::dsl::column_name.eq(constraint_column_usage::dsl::column_name))),
+            )
+            .filter(table_constraints::dsl::constraint_type.eq("FOREIGN KEY"))
+            .filter(table_constraints::dsl::table_name.eq(&self.table_name))
+            .filter(table_constraints::dsl::table_schema.eq(&self.table_schema))
+            .filter(table_constraints::dsl::table_catalog.eq(&self.table_catalog))
+            .filter(key_column_usage::dsl::column_name.eq(&self.column_name))
+            .select((Table::as_select(), Column::as_select()))
+            .first::<(Table, Column)>(conn)
+            .map(Some)
+            .or_else(|e| {
+                if e == DieselError::NotFound {
+                    Ok(None)
+                } else {
+                    Err(e)
+                }
+            })
     }
 }
