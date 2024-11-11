@@ -28,6 +28,10 @@ pub struct Table {
 }
 
 impl Table {
+    pub fn unique_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
+        Index::load_all_unique(conn, Some(&self.table_schema))
+    }
+
     pub fn load_all_tables(
         conn: &mut PgConnection, 
         table_catalog: &str,

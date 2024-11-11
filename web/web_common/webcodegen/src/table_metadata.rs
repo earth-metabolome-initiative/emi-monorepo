@@ -18,4 +18,4 @@ pub use key_column_usage::KeyColumnUsage;
 pub use referential_constraint::ReferentialConstraint;
 pub use table::Table;
 pub use table_constraint::TableConstraint;
-pub use pg_index::PgIndex;
+pub use pg_index::Index;

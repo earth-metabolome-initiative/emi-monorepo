@@ -76,14 +76,14 @@ async fn test_user_table() {
     assert_eq!(all_tables.len(), 3, "Expected 3 tables, got {:?}", all_tables);
     let all_columns = Column::load_all_columns(&mut conn);
 
-    let all_unique_indexes = PgIndex::load_all_unique(&mut conn, None).unwrap();
+    let all_unique_indexes = Index::load_all_unique(&mut conn, None).unwrap();
     assert_eq!(all_unique_indexes.len(), 6, "Expected 6 indexes, got {:?}", all_unique_indexes);
 
     all_unique_indexes.iter().for_each(|index| {
         assert!(index.is_unique());
     });
 
-    let mut all_gin_indexes = PgIndex::load_all_gin(&mut conn, None).unwrap();
+    let mut all_gin_indexes = Index::load_all_gin(&mut conn, None).unwrap();
     assert_eq!(all_gin_indexes.len(), 1, "Expected 1 index, got {:?}", all_gin_indexes);
 
     all_gin_indexes.iter().for_each(|index| {
@@ -97,7 +97,7 @@ async fn test_user_table() {
     assert_eq!(gin_index.indexname, "users_gin");
 
 
-    let all_gist_indexes = PgIndex::load_all_gist(&mut conn, None).unwrap();
+    let all_gist_indexes = Index::load_all_gist(&mut conn, None).unwrap();
     assert_eq!(all_gist_indexes.len(), 1, "Expected 1 index, got {:?}", all_gist_indexes);
 
     all_gist_indexes.iter().for_each(|index| {

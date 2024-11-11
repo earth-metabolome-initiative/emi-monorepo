@@ -9,7 +9,7 @@ use diesel::{
 /// Represents a row in the pg_indexes view
 #[derive(Queryable, QueryableByName, Selectable, Debug)]
 #[diesel(table_name = crate::schema::pg_indexes)]
-pub struct PgIndex {
+pub struct Index {
     pub schemaname: String,
     pub tablename: String,
     pub indexname: String,
@@ -17,7 +17,7 @@ pub struct PgIndex {
     pub indexdef: String,
 }
 
-impl PgIndex {
+impl Index {
     pub fn load_all_unique(conn: &mut PgConnection,
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {

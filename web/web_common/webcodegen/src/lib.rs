@@ -13,5 +13,5 @@ mod table_metadata;
 
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, DomainConstraint, KeyColumnUsage,
-    ReferentialConstraint, Table, TableConstraint, PgIndex,
+    ReferentialConstraint, Table, TableConstraint, Index,
 };
