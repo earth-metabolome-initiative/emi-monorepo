@@ -91,6 +91,8 @@ impl Column {
             .is_ok()
     }
 
+    ///
+
     /// Returns the foreign table of the column if it is a foreign key.
     /// If the column is not a foreign key, returns `None`.
     pub fn foreign_table(

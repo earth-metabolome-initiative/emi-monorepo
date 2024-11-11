@@ -145,6 +145,16 @@ table! {
     }
 }
 
+table! {
+    pg_indexes (schemaname, tablename, indexname) {
+        schemaname -> Text,
+        tablename -> Text,
+        indexname -> Text,
+        tablespace -> Nullable<Text>,
+        indexdef -> Text,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     columns,
     key_column_usage,

@@ -72,8 +72,46 @@ async fn test_user_table() {
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema
     // of PostgreSQL
-    let all_tables = Table::load_all_tables(&mut conn);
+    let all_tables = Table::load_all_tables(&mut conn, DATABASE_NAME, None).unwrap();
+    assert_eq!(all_tables.len(), 3, "Expected 3 tables, got {:?}", all_tables);
     let all_columns = Column::load_all_columns(&mut conn);
+
+    let all_unique_indexes = PgIndex::load_all_unique(&mut conn, None).unwrap();
+    assert_eq!(all_unique_indexes.len(), 6, "Expected 6 indexes, got {:?}", all_unique_indexes);
+
+    all_unique_indexes.iter().for_each(|index| {
+        assert!(index.is_unique());
+    });
+
+    let mut all_gin_indexes = PgIndex::load_all_gin(&mut conn, None).unwrap();
+    assert_eq!(all_gin_indexes.len(), 1, "Expected 1 index, got {:?}", all_gin_indexes);
+
+    all_gin_indexes.iter().for_each(|index| {
+        assert!(index.is_gin());
+    });
+
+    let gin_index = all_gin_indexes.pop().unwrap();
+
+    assert_eq!(gin_index.schemaname, "public");
+    assert_eq!(gin_index.tablename, "users");
+    assert_eq!(gin_index.indexname, "users_gin");
+
+
+    let all_gist_indexes = PgIndex::load_all_gist(&mut conn, None).unwrap();
+    assert_eq!(all_gist_indexes.len(), 1, "Expected 1 index, got {:?}", all_gist_indexes);
+
+    all_gist_indexes.iter().for_each(|index| {
+        assert!(index.is_gist());
+    });
+
+    let gist_index = all_gist_indexes.first().unwrap();
+
+    assert_eq!(gist_index.schemaname, "public");
+    assert_eq!(gist_index.tablename, "composite_users");
+    assert_eq!(gist_index.indexname, "composite_users_gist");
+
+
+
     let all_table_constraints = TableConstraint::load_all_table_constraints(&mut conn);
     let all_key_column_usage = KeyColumnUsage::load_all_key_column_usages(&mut conn);
     let all_referential_constraints =

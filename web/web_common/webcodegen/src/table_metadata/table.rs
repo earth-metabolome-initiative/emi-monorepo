@@ -28,9 +28,16 @@ pub struct Table {
 }
 
 impl Table {
-    pub fn load_all_tables(conn: &mut PgConnection) -> Vec<Self> {
-        use crate::schema::tables::dsl::*;
-        tables.load::<Table>(conn).expect("Error loading tables")
+    pub fn load_all_tables(
+        conn: &mut PgConnection, 
+        table_catalog: &str,
+        table_schema: Option<&str>
+    ) -> Result<Vec<Self>, DieselError> {
+        use crate::schema::tables;
+        tables::dsl::tables
+        .filter(tables::dsl::table_catalog.eq(table_catalog))
+        .filter(tables::dsl::table_schema.eq(table_schema.unwrap_or("public")))
+            .load::<Table>(conn)
     }
 
     pub fn load(
