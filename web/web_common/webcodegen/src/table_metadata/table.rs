@@ -5,6 +5,10 @@ use diesel::{
     Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper, TextExpressionMethods,
 };
 use itertools::Itertools;
+use prettyplease::unparse;
+use proc_macro2::TokenStream;
+use quote::{quote, ToTokens};
+use syn::{File, Ident};
 
 use crate::Column;
 use crate::Index;
@@ -29,6 +33,101 @@ pub struct Table {
 }
 
 impl Table {
+    /// Returns the name of the struct converted from the table name.
+    pub fn struct_name(&self) -> String {
+        self.singular_table_name()
+            .split('_')
+            .map(|s| {
+                let mut chars = s.chars();
+                match chars.next() {
+                    None => String::new(),
+                    Some(f) => f.to_uppercase().chain(chars).collect(),
+                }
+            })
+            .collect()
+    }
+
+    /// Returns the singular name of the table.
+    pub fn singular_table_name(&self) -> String {
+        // TODO: make singular
+        self.table_name.clone()
+    }
+
+    /// Writes the Syn TokenStream for the struct definition and associated methods to a file.
+    pub fn write_syn_to_file(&self, conn: &mut PgConnection, output_path: &str) {
+        let output = self.to_syn(conn);
+
+        // Convert the generated TokenStream to a string
+        let code_string = output.to_string();
+
+        println!("{}", code_string);
+
+        // Parse the generated code string into a syn::Item
+        let syntax_tree: File = syn::parse_str(&code_string).unwrap();
+
+        // Use prettyplease to format the syntax tree
+        let formatted_code = unparse(&syntax_tree);
+
+        // Write the formatted code to the output file
+        std::fs::write(output_path, formatted_code).unwrap();
+    }
+
+    /// Returns the Syn TokenStream for the struct definition and associated methods.
+    pub fn to_syn(&self, conn: &mut PgConnection) -> TokenStream {
+        let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+        let attributes = self.columns(conn).unwrap().into_iter().map(|column| {
+            let column_attribute: Ident =
+                Ident::new(&column.column_name, proc_macro2::Span::call_site());
+            let column_type = column.rust_type();
+            quote! {
+                pub #column_attribute: #column_type,
+            }
+        });
+
+        let foreign_key_methods = self
+            .columns(conn)
+            .unwrap()
+            .into_iter()
+            .filter_map(|column| {
+                if !column.is_foreign_key(conn) {
+                    return None;
+                }
+                let (foreign_key_table, foreign_key_column) = column.foreign_table(conn).unwrap().unwrap();
+                let foreign_key_table_name: Ident = Ident::new(&foreign_key_table.table_name, proc_macro2::Span::call_site());
+                let foreign_key_column_name: Ident = Ident::new(&foreign_key_column.column_name, proc_macro2::Span::call_site());
+                let method_name: Ident = if column.column_name.ends_with("_id") {
+                    Ident::new(&column.column_name[..column.column_name.len() - 3], proc_macro2::Span::call_site())
+                } else {
+                    Ident::new(&column.column_name, proc_macro2::Span::call_site())
+                };
+                let current_column_name: Ident = Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                let foreign_key_struct_name: Ident = Ident::new(&foreign_key_table.struct_name(), proc_macro2::Span::call_site());
+
+                Some(quote! {
+                    #[cfg(feature = "diesel")]
+                    pub fn #method_name(&self, conn: &mut PgConnection) -> Result<#foreign_key_struct_name, DieselError> {
+                        use crate::schema::#foreign_key_table_name;
+                        #foreign_key_table_name::dsl::#foreign_key_table_name
+                            .filter(#foreign_key_table_name::dsl::#foreign_key_column_name.eq(self.#current_column_name))
+                            .first::<#foreign_key_struct_name>(conn)
+                    }
+                })
+            });
+
+        quote! {
+            #[derive(Debug)]
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            #[cfg_attr(feature = "diesel", derive(diesel::Queryable, diesel::Selectable))]
+            pub struct #struct_name {
+                #(#attributes)*
+            }
+
+            impl #struct_name {
+                #(#foreign_key_methods)*
+            }
+        }
+    }
+
     pub fn unique_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
         use crate::schema::pg_indexes;
         pg_indexes::dsl::pg_indexes

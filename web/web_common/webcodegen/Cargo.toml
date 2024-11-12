@@ -7,8 +7,10 @@ edition = "2021"
 diesel = { version = "2.2.4", features = ["postgres", "64-column-tables"] }
 itertools = "0.13.0"
 serde = { version = "1.0.214", features = ["derive"] }
-testcontainers-modules = "0.11.3"
-
+syn = "2.0"
+quote = "1.0"
+proc-macro2 = "1.0"
+prettyplease = "0.2"
 
 [dev-dependencies]
 diesel_migrations = "2.2.0"
