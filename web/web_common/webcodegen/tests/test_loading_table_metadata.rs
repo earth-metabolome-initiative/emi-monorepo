@@ -71,6 +71,7 @@ async fn test_user_table() {
 
     SQLFunction::write_all(&mut conn, "sql_functions.rs");
     SQLType::write_all(&mut conn, "sql_types.rs");
+    SQLOperator::write_all(&mut conn, "sql_operators.rs");
 
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema

@@ -9,6 +9,7 @@ mod pg_index;
 mod referential_constraint;
 mod sql_function;
 mod sql_type;
+mod sql_operator;
 mod table;
 mod table_constraint;
 
@@ -23,3 +24,4 @@ pub use sql_function::SQLFunction;
 pub use table::Table;
 pub use table_constraint::TableConstraint;
 pub use sql_type::SQLType;
+pub use sql_operator::SQLOperator;

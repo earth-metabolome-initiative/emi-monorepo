@@ -232,6 +232,26 @@ table! {
     }
 }
 
+table! {
+    pg_operator (oid, oprname, oprnamespace) {
+        oid -> Oid,
+        oprname -> Text,
+        oprnamespace -> Oid,
+        oprowner -> Oid,
+        oprkind -> Char,
+        oprcanmerge -> Bool,
+        oprcanhash -> Bool,
+        oprleft -> Oid,
+        oprright -> Oid,
+        oprresult -> Oid,
+        oprcom -> Oid,
+        oprnegate -> Oid,
+        oprcode -> Oid,
+        oprrest -> Oid,
+        oprjoin -> Oid,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     columns,
     key_column_usage,
@@ -243,4 +263,4 @@ allow_tables_to_appear_in_same_query!(
     tables,
 );
 
-allow_tables_to_appear_in_same_query!(pg_proc, pg_namespace, pg_type);
+allow_tables_to_appear_in_same_query!(pg_proc, pg_namespace, pg_type, pg_operator);
