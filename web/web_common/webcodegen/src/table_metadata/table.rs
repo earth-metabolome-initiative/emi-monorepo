@@ -135,6 +135,68 @@ impl Table {
             })
     }
 
+    pub fn delete_method(&self, conn: &mut PgConnection) -> TokenStream {
+        let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+        let primary_key_columns = self.primary_key_columns(conn).unwrap();
+
+        let where_clause = primary_key_columns
+            .iter()
+            .map(|column| {
+                let column_name: Ident =
+                    Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                quote! {
+                    #struct_name::dsl::#column_name.eq(&self.#column_name)
+                }
+            })
+            .collect::<Vec<_>>();
+
+        // Join the where clauses with an and
+        let where_clause = where_clause
+            .into_iter()
+            .reduce(|a, b| quote! { #a.and(#b) })
+            .unwrap();
+
+        quote! {
+            #[cfg(feature = "diesel")]
+            pub fn delete(&self, conn: &mut PgConnection) -> Result<usize, DieselError> {
+                use crate::schema::#struct_name::dsl::#struct_name;
+                diesel::delete(#struct_name.filter(#(#where_clause).and_then(|x| Ok(x)))).execute(conn)
+            }
+        }
+    }
+
+    pub fn insert_method(&self, conn: &mut PgConnection) -> TokenStream {
+        // let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+        // let columns = self.columns(conn).unwrap();
+
+        // let column_names = columns.iter().map(|column| {
+        //     let column_name: Ident =
+        //         Ident::new(&column.column_name, proc_macro2::Span::call_site());
+        //     quote! {
+        //         #struct_name::dsl::#column_name
+        //     }
+        // });
+
+        // let column_values = columns.iter().map(|column| {
+        //     let column_name: Ident =
+        //         Ident::new(&column.column_name, proc_macro2::Span::call_site());
+        //     quote! {
+        //         self.#column_name
+        //     }
+        // });
+
+        // quote! {
+        //     #[cfg(feature = "diesel")]
+        //     pub fn insert(&self, conn: &mut PgConnection) -> Result<usize, DieselError> {
+        //         use crate::schema::#struct_name::dsl::#struct_name;
+        //         diesel::insert_into(#struct_name)
+        //             .values((#(#column_names.eq(#column_values)),*))
+        //             .execute(conn)
+        //     }
+        // }
+        unimplemented!()
+    }
+
     pub fn unique_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
         use crate::schema::pg_indexes;
         pg_indexes::dsl::pg_indexes
