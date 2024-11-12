@@ -16,6 +16,7 @@ fn singluarize() -> () {
     );
 
     let words = vec![
+        "countries",
         "Taxa",
         "elephants",
         "taxal",
@@ -33,6 +34,7 @@ fn singluarize() -> () {
     ];
 
     let expected = vec![
+        "country",
         "Taxon",
         "elephant",
         "taxal",

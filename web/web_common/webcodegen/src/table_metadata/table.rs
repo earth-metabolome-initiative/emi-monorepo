@@ -84,11 +84,31 @@ impl Table {
             }
         });
 
-        let foreign_key_methods = self
+        let foreign_key_methods = self.foreign_key_methods(conn);
+
+        quote! {
+            #[derive(Debug)]
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            #[cfg_attr(feature = "diesel", derive(diesel::Queryable, diesel::Selectable))]
+            pub struct #struct_name {
+                #(#attributes)*
+            }
+
+            impl #struct_name {
+                #(#foreign_key_methods)*
+            }
+        }
+    }
+
+    fn foreign_key_methods<'a>(
+        &'a self,
+        conn: &'a mut PgConnection,
+    ) -> impl Iterator<Item = TokenStream> + 'a {
+        self
             .columns(conn)
             .unwrap()
             .into_iter()
-            .filter_map(|column| {
+            .filter_map(move |column| {
                 if !column.is_foreign_key(conn) {
                     return None;
                 }
@@ -112,20 +132,7 @@ impl Table {
                             .first::<#foreign_key_struct_name>(conn)
                     }
                 })
-            });
-
-        quote! {
-            #[derive(Debug)]
-            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-            #[cfg_attr(feature = "diesel", derive(diesel::Queryable, diesel::Selectable))]
-            pub struct #struct_name {
-                #(#attributes)*
-            }
-
-            impl #struct_name {
-                #(#foreign_key_methods)*
-            }
-        }
+            })
     }
 
     pub fn unique_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
