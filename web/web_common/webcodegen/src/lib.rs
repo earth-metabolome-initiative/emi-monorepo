@@ -13,9 +13,10 @@ extern crate quote;
 extern crate syn;
 
 mod schema;
+mod sql_functions;
 mod table_metadata;
 
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, DomainConstraint, Index, KeyColumnUsage,
-    ReferentialConstraint, Table, TableConstraint,
+    ReferentialConstraint, SQLFunction, Table, TableConstraint, SQLType
 };
