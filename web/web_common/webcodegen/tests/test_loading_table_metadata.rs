@@ -69,6 +69,8 @@ async fn test_user_table() {
     let mut conn = establish_connection_to_postres();
     conn.run_pending_migrations(MIGRATIONS).unwrap();
 
+    SQLFunction::write_all_functions(&mut conn, "sql_functions.rs");
+
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema
     // of PostgreSQL

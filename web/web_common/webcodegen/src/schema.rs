@@ -155,6 +155,47 @@ table! {
     }
 }
 
+table! {
+    pg_catalog.pg_proc (oid, proname, pronamespace) {
+        oid -> Oid,
+        proname -> Text,
+        pronamespace -> Oid,
+        proowner -> Oid,
+        prolang -> Oid,
+        procost -> Float,
+        prorows -> Float,
+        provariadic -> Oid,
+        prosupport -> Oid,
+        prokind -> Char,
+        prosecdef -> Bool,
+        proleakproof -> Bool,
+        proisstrict -> Bool,
+        proretset -> Bool,
+        provolatile -> Char,
+        proparallel -> Char,
+        pronargs -> SmallInt,
+        pronargdefaults -> SmallInt,
+        prorettype -> Oid,
+        proargtypes -> Array<Oid>,
+        proallargtypes -> Array<Oid>,
+        proargmodes -> Nullable<Array<Char>>,
+        proargnames -> Nullable<Array<Text>>,
+        proargdefaults -> Nullable<Array<Text>>,
+        prosrc -> Text,
+        probin -> Bytea,
+        prosqlbody -> Nullable<Text>,
+        proconfig -> Array<Text>,
+    }
+}
+
+table! {
+    pg_catalog.pg_namespace (oid, nspname) {
+        oid -> Oid,
+        nspname -> Text,
+        nspowner -> Oid,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     columns,
     key_column_usage,
@@ -164,4 +205,9 @@ allow_tables_to_appear_in_same_query!(
     check_constraints,
     domain_constraints,
     tables,
+);
+
+allow_tables_to_appear_in_same_query!(
+    pg_proc,
+    pg_namespace,
 );

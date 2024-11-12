@@ -60,8 +60,6 @@ impl Table {
         // Convert the generated TokenStream to a string
         let code_string = output.to_string();
 
-        println!("{}", code_string);
-
         // Parse the generated code string into a syn::Item
         let syntax_tree: File = syn::parse_str(&code_string).unwrap();
 
