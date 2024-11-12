@@ -1,9 +1,9 @@
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, TextExpressionMethods};
+use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
-use prettyplease::unparse;
 use syn::{parse_str, File, Ident, Type};
 
 const SPACED_ARGUMENT_TYPES: &[&str] = &[
@@ -90,7 +90,7 @@ pub struct SQLFunction {
 }
 
 impl SQLFunction {
-    pub fn load_all_functions(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, DieselError> {
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, DieselError> {
         use crate::schema::pg_namespace;
         use crate::schema::pg_proc;
         use crate::sql_functions::{pg_get_function_arguments, pg_get_function_result};
@@ -180,10 +180,9 @@ impl SQLFunction {
                     format!("arg{}", i)
                 };
 
-                sql_function.arguments.push((
-                    argument_name,
-                    postgres_type_to_diesel(&argument_type),
-                ));
+                sql_function
+                    .arguments
+                    .push((argument_name, postgres_type_to_diesel(&argument_type)));
             }
 
             if found_unsupported_data_type || UNSUPPORTED_DATA_TYPES.contains(&return_type.as_str())
@@ -225,14 +224,14 @@ impl SQLFunction {
         }
     }
 
-    pub fn write_all_functions(conn: &mut PgConnection, output_path: &str) -> Result<(), DieselError> {
-        let functions = SQLFunction::load_all_functions(conn)?;
+    pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), DieselError> {
+        let functions = Self::load_all(conn)?;
 
         // We convert the functions to TokenStream
         let functions = functions.iter().map(|f| f.to_syn());
 
         // Create a new TokenStream
-        let output = quote!{
+        let output = quote! {
             #( #functions )*
         };
 

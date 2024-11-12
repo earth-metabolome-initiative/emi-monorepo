@@ -196,6 +196,42 @@ table! {
     }
 }
 
+table! {
+    pg_type (oid, typname, typnamespace) {
+        oid -> Oid,
+        typname -> Text,
+        typnamespace -> Oid,
+        typowner -> Oid,
+        typlen -> SmallInt,
+        typbyval -> Bool,
+        typtype -> Char,
+        typcategory -> Char,
+        typispreferred -> Bool,
+        typisdefined -> Bool,
+        typdelim -> Char,
+        typrelid -> Oid,
+        typsubscript -> Oid,
+        typelem -> Oid,
+        typarray -> Oid,
+        typinput -> Oid,
+        typoutput -> Oid,
+        typreceive -> Oid,
+        typsend -> Oid,
+        typmodin -> Oid,
+        typmodout -> Oid,
+        typanalyze -> Oid,
+        typalign -> Char,
+        typstorage -> Char,
+        typnotnull -> Bool,
+        typbasetype -> Oid,
+        typtypmod -> Integer,
+        typndims -> Integer,
+        typcollation -> Oid,
+        typdefaultbin -> Bytea,
+        typdefault -> Text,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     columns,
     key_column_usage,
@@ -207,7 +243,4 @@ allow_tables_to_appear_in_same_query!(
     tables,
 );
 
-allow_tables_to_appear_in_same_query!(
-    pg_proc,
-    pg_namespace,
-);
+allow_tables_to_appear_in_same_query!(pg_proc, pg_namespace, pg_type);

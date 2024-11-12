@@ -8,6 +8,7 @@ mod key_column_usage;
 mod pg_index;
 mod referential_constraint;
 mod sql_function;
+mod sql_type;
 mod table;
 mod table_constraint;
 
@@ -21,3 +22,4 @@ pub use referential_constraint::ReferentialConstraint;
 pub use sql_function::SQLFunction;
 pub use table::Table;
 pub use table_constraint::TableConstraint;
+pub use sql_type::SQLType;

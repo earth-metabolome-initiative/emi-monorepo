@@ -18,5 +18,5 @@ mod table_metadata;
 
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, DomainConstraint, Index, KeyColumnUsage,
-    ReferentialConstraint, SQLFunction, Table, TableConstraint,
+    ReferentialConstraint, SQLFunction, Table, TableConstraint, SQLType
 };
