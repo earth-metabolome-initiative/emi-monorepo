@@ -4,3 +4,4 @@
 database_tmp
 redis
 documents_tmp
+.domain
