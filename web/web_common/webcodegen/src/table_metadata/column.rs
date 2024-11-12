@@ -7,6 +7,7 @@ use diesel::{
 };
 
 use crate::KeyColumnUsage;
+use syn::Type;
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug)]
@@ -59,6 +60,49 @@ pub struct Column {
 }
 
 impl Column {
+    /// Returns the Syn rust type of the column.
+    pub fn rust_type(&self) -> Type {
+        use syn::parse_str;
+        let rust_type = match self.data_type.as_str() {
+            "integer" => "i32",
+            "character varying" => "String",
+            "text" => "String",
+            "timestamp with time zone" => "chrono::NaiveDateTime",
+            "timestamp without time zone" => "chrono::NaiveDateTime",
+            "date" => "chrono::NaiveDate",
+            "boolean" => "bool",
+            "numeric" => "f64",
+            "uuid" => "uuid::Uuid",
+            "jsonb" => "serde_json::Value",
+            "json" => "serde_json::Value",
+            "bytea" => "Vec<u8>",
+            "inet" => "std::net::IpAddr",
+            "time without time zone" => "chrono::NaiveTime",
+            "time with time zone" => "chrono::NaiveTime",
+            "interval" => "chrono::Duration",
+            "bit" => "Vec<u8>",
+            "bit varying" => "Vec<u8>",
+            "money" => "BigDecimal",
+            "xml" => "String",
+            "oid" => "u32",
+            "smallint" => "i16",
+            "bigint" => "i64",
+            "real" => "f32",
+            "double precision" => "f64",
+            "character" => "String",
+            "char" => "String",
+            "cidr" => "std::net::IpAddr",
+            "macaddr" => "std::net::MacAddr",
+            "macaddr8" => "std::net::MacAddr",
+            "point" => "Point",
+            "line" => "Line",
+            "lseg" => "LineSegment",
+            other => todo!("Unsupported data type: {}", other),
+        };
+
+        parse_str(rust_type).expect("Error parsing rust type")
+    }
+
     pub fn load_all_columns(conn: &mut PgConnection) -> Vec<Self> {
         use crate::schema::columns::dsl::*;
         columns.load::<Column>(conn).expect("Error loading columns")

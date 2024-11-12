@@ -178,6 +178,8 @@ async fn test_user_table() {
 
     let composite_users = Table::load(&mut conn, "composite_users", None, DATABASE_NAME).unwrap();
 
+    composite_users.write_syn_to_file(&mut conn, "composite_users.rs");
+
     let composite_users_gist_indexes = composite_users.gist_indexes(&mut conn).unwrap();
 
     assert_eq!(

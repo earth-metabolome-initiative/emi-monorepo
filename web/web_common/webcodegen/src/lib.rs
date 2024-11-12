@@ -7,6 +7,11 @@
 #![deny(unused_import_braces)]
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
+extern crate prettyplease;
+extern crate proc_macro2;
+extern crate quote;
+extern crate syn;
+
 
 mod schema;
 mod table_metadata;
