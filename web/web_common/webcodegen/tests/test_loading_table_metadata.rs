@@ -88,29 +88,33 @@ async fn test_user_table() {
     conn.run_pending_migrations(MIGRATIONS).unwrap();
 
     let builder = trybuild::TestCases::new();
-    SQLFunction::write_all(&mut conn, "tests/ui/sql_functions.rs");
+    SQLFunction::write_all(&mut conn, "tests/ui/sql_functions.rs").unwrap();
     add_main_to_file("tests/ui/sql_functions.rs");
     builder.pass("tests/ui/sql_functions.rs");
 
-    SQLType::write_all(&mut conn, "tests/ui/sql_types.rs");
+    SQLType::write_all(&mut conn, "tests/ui/sql_types.rs").unwrap();
     add_main_to_file("tests/ui/sql_types.rs");
     builder.pass("tests/ui/sql_types.rs");
 
-    SQLOperator::write_all(&mut conn, "tests/ui/sql_operators.rs");
+    SQLOperator::write_all(&mut conn, "tests/ui/sql_operators.rs").unwrap();
     add_main_to_file("tests/ui/sql_operators.rs");
     builder.pass("tests/ui/sql_operators.rs");
+
+    Table::write_all(&mut conn, "tests/ui/tables.rs", DATABASE_NAME, None).unwrap();
+    add_main_to_file("tests/ui/tables.rs");
+    builder.pass("tests/ui/tables.rs");
 
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema
     // of PostgreSQL
-    let all_tables = Table::load_all_tables(&mut conn, DATABASE_NAME, None).unwrap();
+    let all_tables = Table::load_all(&mut conn, DATABASE_NAME, None).unwrap();
     assert_eq!(
         all_tables.len(),
         3,
         "Expected 3 tables, got {:?}",
         all_tables
     );
-    let all_columns = Column::load_all_columns(&mut conn);
+    let all_columns = Column::load_all(&mut conn);
 
     let all_unique_indexes = Index::load_all_unique(&mut conn, None).unwrap();
     assert_eq!(
@@ -208,8 +212,6 @@ async fn test_user_table() {
     assert_eq!(unique_columns[2].len(), 1);
 
     let composite_users = Table::load(&mut conn, "composite_users", None, DATABASE_NAME).unwrap();
-
-    composite_users.write_syn_to_file(&mut conn, "composite_users.rs");
 
     let composite_users_gist_indexes = composite_users.gist_indexes(&mut conn).unwrap();
 

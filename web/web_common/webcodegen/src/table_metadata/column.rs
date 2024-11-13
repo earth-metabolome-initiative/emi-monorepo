@@ -5,9 +5,10 @@ use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
     RunQueryDsl, Selectable, SelectableHelper,
 };
-
-use crate::KeyColumnUsage;
 use syn::Type;
+
+use crate::table_metadata::sql_function::postgres_type_to_diesel;
+use crate::KeyColumnUsage;
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug)]
@@ -103,7 +104,11 @@ impl Column {
         parse_str(rust_type).expect("Error parsing rust type")
     }
 
-    pub fn load_all_columns(conn: &mut PgConnection) -> Vec<Self> {
+    pub fn diesel_type(&self) -> Type {
+        postgres_type_to_diesel(&self.data_type)
+    }   
+
+    pub fn load_all(conn: &mut PgConnection) -> Vec<Self> {
         use crate::schema::columns::dsl::*;
         columns.load::<Column>(conn).expect("Error loading columns")
     }

@@ -53,9 +53,41 @@ impl Table {
         self.table_name.clone()
     }
 
-    /// Writes the Syn TokenStream for the struct definition and associated methods to a file.
-    pub fn write_syn_to_file(&self, conn: &mut PgConnection, output_path: &str) {
-        let output = self.to_syn(conn);
+    /// Writes all the tables syn version to a file.
+    pub fn write_all(
+        conn: &mut PgConnection,
+        output_path: &str,
+        table_catalog: &str,
+        table_schema: Option<&str>,
+    ) -> Result<(), DieselError> {
+        let tables = Table::load_all(conn, table_catalog, table_schema)?;
+
+        let schema = tables
+            .iter()
+            .map(|table| table.to_schema(conn))
+            .collect::<Result<Vec<TokenStream>, DieselError>>()?;
+
+        let table_structs = tables
+            .iter()
+            .map(|table| table.to_syn(conn))
+            .collect::<Result<Vec<TokenStream>, DieselError>>()?;
+
+        let table_idents = tables
+            .iter()
+            .map(|table| Ident::new(&table.table_name, proc_macro2::Span::call_site()));
+
+        // Create a new TokenStream
+        let output = quote! {
+            #[cfg(feature = "diesel")]
+            use diesel::{QueryDsl, ExpressionMethods, RunQueryDsl, SelectableHelper};
+
+            #( #schema )*
+
+            #[cfg(feature = "diesel")]
+            diesel::allow_tables_to_appear_in_same_query!( #( #table_idents ),* );
+
+            #( #table_structs )*
+        };
 
         // Convert the generated TokenStream to a string
         let code_string = output.to_string();
@@ -68,12 +100,43 @@ impl Table {
 
         // Write the formatted code to the output file
         std::fs::write(output_path, formatted_code).unwrap();
+
+        Ok(())
+    }
+
+    /// Returns the Syn TokenStream for the diesel schema definition for the table.
+    pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
+        let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
+        let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
+        let columns = self.columns(conn)?.into_iter().map(|column| {
+            let column_name = Ident::new(&column.column_name, proc_macro2::Span::call_site());
+            let column_type = column.diesel_type();
+            quote! {
+                #column_name -> #column_type,
+            }
+        });
+        let primary_key_names = self
+            .primary_key_columns(conn)?
+            .into_iter()
+            .map(|column| {
+                Ident::new(&column.column_name, proc_macro2::Span::call_site())
+            });
+
+        Ok(quote! {
+            #[cfg(feature = "diesel")]
+            diesel::table! {
+                #table_schema.#table_name (#(#primary_key_names, )*) {
+                    #(#columns)*
+                }
+            }
+        })
     }
 
     /// Returns the Syn TokenStream for the struct definition and associated methods.
-    pub fn to_syn(&self, conn: &mut PgConnection) -> TokenStream {
+    pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
+        let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
-        let attributes = self.columns(conn).unwrap().into_iter().map(|column| {
+        let attributes = self.columns(conn)?.into_iter().map(|column| {
             let column_attribute: Ident =
                 Ident::new(&column.column_name, proc_macro2::Span::call_site());
             let column_type = column.rust_type();
@@ -84,10 +147,11 @@ impl Table {
 
         let foreign_key_methods = self.foreign_key_methods(conn);
 
-        quote! {
+        Ok(quote! {
             #[derive(Debug)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-            #[cfg_attr(feature = "diesel", derive(diesel::Queryable, diesel::Selectable))]
+            #[cfg_attr(feature = "diesel", derive(diesel::Queryable, diesel::Selectable, diesel::QueryableByName))]
+            #[diesel(table_name = #table_name)]
             pub struct #struct_name {
                 #(#attributes)*
             }
@@ -95,7 +159,7 @@ impl Table {
             impl #struct_name {
                 #(#foreign_key_methods)*
             }
-        }
+        })
     }
 
     fn foreign_key_methods<'a>(
@@ -123,10 +187,10 @@ impl Table {
 
                 Some(quote! {
                     #[cfg(feature = "diesel")]
-                    pub fn #method_name(&self, conn: &mut PgConnection) -> Result<#foreign_key_struct_name, DieselError> {
-                        use crate::schema::#foreign_key_table_name;
+                    pub fn #method_name(&self, conn: &mut diesel::pg::PgConnection) -> Result<#foreign_key_struct_name, diesel::result::Error> {
                         #foreign_key_table_name::dsl::#foreign_key_table_name
                             .filter(#foreign_key_table_name::dsl::#foreign_key_column_name.eq(self.#current_column_name))
+                            .select(#foreign_key_struct_name::as_select())
                             .first::<#foreign_key_struct_name>(conn)
                     }
                 })
@@ -156,8 +220,7 @@ impl Table {
 
         quote! {
             #[cfg(feature = "diesel")]
-            pub fn delete(&self, conn: &mut PgConnection) -> Result<usize, DieselError> {
-                use crate::schema::#struct_name::dsl::#struct_name;
+            pub fn delete(&self, conn: &mut diesel::pg::PgConnection) -> Result<usize, DieselError> {
                 diesel::delete(#struct_name.filter(#(#where_clause).and_then(|x| Ok(x)))).execute(conn)
             }
         }
@@ -186,7 +249,6 @@ impl Table {
         // quote! {
         //     #[cfg(feature = "diesel")]
         //     pub fn insert(&self, conn: &mut PgConnection) -> Result<usize, DieselError> {
-        //         use crate::schema::#struct_name::dsl::#struct_name;
         //         diesel::insert_into(#struct_name)
         //             .values((#(#column_names.eq(#column_values)),*))
         //             .execute(conn)
@@ -222,7 +284,7 @@ impl Table {
             .load::<Index>(conn)
     }
 
-    pub fn load_all_tables(
+    pub fn load_all(
         conn: &mut PgConnection,
         table_catalog: &str,
         table_schema: Option<&str>,

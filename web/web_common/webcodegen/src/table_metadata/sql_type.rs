@@ -19,7 +19,8 @@ impl SQLType {
                 pg_type::dsl::typname
                     .not_ilike("pg_%")
                     .and(pg_type::dsl::typname.not_ilike(r"\_%"))
-                    .and(pg_type::dsl::typname.not_like("any%")),
+                    .and(pg_type::dsl::typname.not_like("any%"))
+                    .and(pg_type::dsl::typtype.ne("c")),
             )
             .select(pg_type::dsl::typname)
             .load::<String>(conn)

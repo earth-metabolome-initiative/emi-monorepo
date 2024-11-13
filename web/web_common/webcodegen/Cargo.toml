@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-diesel = { version = "2.2.4", features = ["postgres", "64-column-tables"] }
+diesel = { version = "2.2.4", features = ["postgres", "chrono", "64-column-tables"] }
 itertools = "0.13.0"
 pluralizer = "0.4.0"
 regex = "1.11.1"
@@ -20,9 +20,14 @@ testcontainers = {version="0.23.1"}
 tokio = {version ="1.41.0", features = ["full"]}
 trybuild = "1.0.101"
 serde_json = "1.0.132"
-chrono = "0.4.38"
+chrono = {version="0.4.38", features = ["serde"]}
 ipnetwork = "0.20.0"
 diesel_full_text_search = "2.2.0"
 uuid = "1.11.0"
 macaddr = "1.0.1"
 postgis_diesel = "2.4.1"
+
+[features]
+default = ["diesel", "serde"]
+serde = []
+diesel = []
