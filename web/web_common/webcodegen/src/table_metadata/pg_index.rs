@@ -2,7 +2,7 @@ use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{
     ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
-    SelectableHelper, TextExpressionMethods,
+    TextExpressionMethods,
 };
 
 /// Represents a row in the pg_indexes view

@@ -7,7 +7,7 @@ use diesel::{
 use itertools::Itertools;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::quote;
 use syn::{File, Ident};
 
 use crate::Column;

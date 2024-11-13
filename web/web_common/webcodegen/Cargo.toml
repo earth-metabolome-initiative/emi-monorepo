@@ -18,3 +18,11 @@ prettyplease = "0.2"
 diesel_migrations = "2.2.0"
 testcontainers = {version="0.23.1"}
 tokio = {version ="1.41.0", features = ["full"]}
+trybuild = "1.0.101"
+serde_json = "1.0.132"
+chrono = "0.4.38"
+ipnetwork = "0.20.0"
+diesel_full_text_search = "2.2.0"
+uuid = "1.11.0"
+macaddr = "1.0.1"
+postgis_diesel = "2.4.1"

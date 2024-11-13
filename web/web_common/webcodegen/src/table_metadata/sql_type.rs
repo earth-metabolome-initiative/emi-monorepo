@@ -1,11 +1,9 @@
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
-use diesel::sql_types::Oid;
-use diesel::{Queryable, Selectable};
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
-use syn::{parse_str, File, Ident, Type};
+use quote::quote;
+use syn::{File, Ident};
 
 #[derive(Debug)]
 pub struct SQLType {
@@ -42,11 +40,11 @@ impl SQLType {
     }
 
     pub fn to_syn(&self) -> TokenStream {
-        let name = Ident::new(&self.name, proc_macro2::Span::call_site());
+        let name = self.name.clone();
         let rust_name = Ident::new(&self.rust_diesel_name(), proc_macro2::Span::call_site());
         quote! {
             #[derive(diesel::query_builder::QueryId, diesel::sql_types::SqlType)]
-            #[diesel(postgres_type(name = "#name"))]
+            #[diesel(postgres_type(name = #name))]
             pub struct #rust_name;
         }
     }

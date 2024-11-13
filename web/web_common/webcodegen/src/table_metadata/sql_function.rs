@@ -3,15 +3,8 @@ use diesel::result::Error as DieselError;
 use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, TextExpressionMethods};
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::quote;
 use syn::{parse_str, File, Ident, Type};
-
-const SPACED_ARGUMENT_TYPES: &[&str] = &[
-    "double precision",
-    "character varying",
-    "center geometry",
-    "timestamp without time zone",
-];
 
 pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "internal",
@@ -32,6 +25,9 @@ pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "anycompatiblearray",
     "-",
     "tid",
+    "xid",
+    "xid8",
+    "cid",
     "anyarray",
     "anynonarray",
     "oidvector",
@@ -49,52 +45,51 @@ pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "timetz",
     "varbit",
     "numeric",
-    "_text"
+    "_text",
 ];
 
 pub fn postgres_type_to_diesel(postgres_type: &str) -> Type {
     let rust_type_str = match postgres_type {
-        "integer" => "i32",
-        "text" => "String",
-        "timestamp without time zone" | "timestamp with time zone" => "chrono::NaiveDateTime",
-        "time without time zone" | "time with time zone" => "chrono::NaiveTime",
-        "timestamptz" => "chrono::NaiveDateTime",
-        "timestamp" => "chrono::NaiveDateTime",
-        "time" => "chrono::NaiveTime",
-        "uuid" => "uuid::Uuid",
-        "boolean" => "bool",
-        "bool" => "bool",
-        "real" => "f32",
-        "name" => "String",
-        "double precision" => "f64",
-        "character varying" => "String",
-        "char" | "character" | "bpchar" => "String",
-        "bytea" => "Vec<u8>",
-        "json" | "jsonb" => "serde_json::Value",
-        "macaddr" => "macaddr::MacAddr",
-        "inet" => "ipnetwork::IpNetwork",
-        "oid" => "u32",
-        "xid" => "u32",
-        "cid" => "u32",
-        "xid8" => "u64",
-        "int2" => "i16",
-        "int4" => "i32",
-        "int8" => "i64",
-        "float4" => "f32",
-        "float8" => "f64",
+        "integer" => "diesel::sql_types::Integer",
+        "text" => "diesel::sql_types::Text",
+        "timestamp without time zone" => "diesel::sql_types::Timestamp",
+        "timestamp with time zone" => "diesel::sql_types::Timestamptz",
+        "timestamptz" => "diesel::sql_types::Timestamptz",
+        "timestamp" => "diesel::sql_types::Timestamp",
+        "time" => "diesel::sql_types::Time",
+        "uuid" => "diesel::sql_types::Uuid",
+        "boolean" => "diesel::sql_types::Bool",
+        "bool" => "diesel::sql_types::Bool",
+        "real" => "diesel::sql_types::Float",
+        "name" => "diesel::sql_types::Text",
+        "double precision" => "diesel::sql_types::Double",
+        "character varying" => "diesel::sql_types::Text",
+        "char" => "diesel::sql_types::CChar",
+        "bpchar" => "diesel::sql_types::Bpchar",
+        "bytea" => "diesel::sql_types::Bytea",
+        "json" => "diesel::sql_types::Json",
+        "jsonb" => "diesel::sql_types::Jsonb",
+        "macaddr" => "diesel::sql_types::Macaddr",
+        "inet" => "diesel::sql_types::Inet",
+        "oid" => "diesel::sql_types::Oid",
+        "int2" => "diesel::sql_types::SmallInt",
+        "int4" => "diesel::sql_types::Integer",
+        "int8" => "diesel::sql_types::BigInt",
+        "float4" => "diesel::sql_types::Float",
+        "float8" => "diesel::sql_types::Double",
         "tsvector" => "diesel_full_text_search::TsVector",
         "tsquery" => "diesel_full_text_search::TsQuery",
         "money" => "diesel::pg::sql_types::Money",
-        "smallint" => "i16",
-        "bigint" => "i64",
-        "cstring" => "String",
-        "interval" => "chrono::Duration",
-        "date" => "chrono::NaiveDate",
-        "geometry" | "geography" => "postgis::ewkb::Geometry",
+        "smallint" => "diesel::sql_types::SmallInt",
+        "bigint" => "diesel::sql_types::BigInt",
+        "cstring" => "diesel::sql_types::Text",
+        "interval" => "diesel::sql_types::Interval",
+        "date" => "diesel::sql_types::Date",
+        "geometry" | "geography" => "postgis_diesel::sql_types::Geometry",
         "point" => "postgis_diesel::sql_types::Geometry",
         "polygon" => "postgis_diesel::sql_types::Geometry",
         "geometry(Point,4326)" => "postgis_diesel::sql_types::Geometry",
-        "line" => "postgis::ewkb::LineString",
+        "line" => "postgis_diesel::sql_types::Geometry",
         "jpeg" => "JPEG",
         _ => panic!("Unsupported data type: '{}'", postgres_type),
     };
@@ -176,7 +171,6 @@ impl SQLFunction {
             let mut found_unsupported_data_type = false;
 
             for (i, argument) in arguments.iter().enumerate() {
-                let original_argument = *argument;
                 let argument = if let Some(pos) = argument.find(" DEFAULT ") {
                     &argument[..pos]
                 } else {

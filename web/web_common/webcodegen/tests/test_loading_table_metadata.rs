@@ -1,11 +1,14 @@
 use diesel::pg::PgConnection;
 use diesel::{Connection, RunQueryDsl};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use quote::quote;
+use std::io::Write;
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
+
 use webcodegen::*;
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
@@ -62,6 +65,21 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
     container.unwrap()
 }
 
+fn add_main_to_file(file_path: &str) {
+    let mut file = std::fs::OpenOptions::new()
+        .append(true)
+        .open(file_path)
+        .unwrap();
+
+    let main = quote! {
+        fn main() {}
+    };
+
+    file.write_all(main.to_string().as_bytes()).unwrap();
+    file.flush().unwrap();
+    file.sync_all().unwrap();
+}
+
 #[tokio::test]
 async fn test_user_table() {
     let container = setup_postgres().await;
@@ -69,9 +87,18 @@ async fn test_user_table() {
     let mut conn = establish_connection_to_postres();
     conn.run_pending_migrations(MIGRATIONS).unwrap();
 
-    SQLFunction::write_all(&mut conn, "sql_functions.rs");
-    SQLType::write_all(&mut conn, "sql_types.rs");
-    SQLOperator::write_all(&mut conn, "sql_operators.rs");
+    let builder = trybuild::TestCases::new();
+    SQLFunction::write_all(&mut conn, "tests/ui/sql_functions.rs");
+    add_main_to_file("tests/ui/sql_functions.rs");
+    builder.pass("tests/ui/sql_functions.rs");
+
+    SQLType::write_all(&mut conn, "tests/ui/sql_types.rs");
+    add_main_to_file("tests/ui/sql_types.rs");
+    builder.pass("tests/ui/sql_types.rs");
+
+    SQLOperator::write_all(&mut conn, "tests/ui/sql_operators.rs");
+    add_main_to_file("tests/ui/sql_operators.rs");
+    builder.pass("tests/ui/sql_operators.rs");
 
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema
