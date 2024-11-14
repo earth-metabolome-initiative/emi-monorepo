@@ -101,15 +101,54 @@ impl Column {
             other => todo!("Unsupported data type: {}", other),
         };
 
-        parse_str(rust_type).expect("Error parsing rust type")
+        if self.is_nullable() {
+            parse_str(&format!("Option<{}>", rust_type)).unwrap()
+        } else {
+            parse_str(rust_type).unwrap()
+        }
+    }
+
+    pub fn is_nullable(&self) -> bool {
+        self.__is_nullable == "YES"
     }
 
     pub fn diesel_type(&self) -> Type {
-        postgres_type_to_diesel(&self.data_type)
+        postgres_type_to_diesel(&self.data_type, self.is_nullable())
     }
 
     pub fn is_uuid(&self) -> bool {
         self.data_type == "uuid"
+    }
+
+    pub fn is_automatically_generated(&self) -> bool {
+        self.is_generated == "ALWAYS"
+            || self
+                .column_default
+                .as_ref()
+                .map_or(false, |d| d.starts_with("nextval"))
+            || self
+                .column_default
+                .as_ref()
+                .map_or(false, |d| d.starts_with("CURRENT_TIMESTAMP"))
+            || self.is_identity.as_ref().map_or(false, |i| i == "YES")
+    }
+
+    pub fn is_session_user_generated(&self, conn: &mut PgConnection) -> bool {
+        // A column is associated to the user section if:
+        // - it is a foreign key of the users table
+        // - it is named `updated_by` or `created_by`
+
+        if self.column_name != "updated_by" && self.column_name != "created_by" {
+            return false;
+        }
+
+        if let Ok(Some((table, _))) = self.foreign_table(conn) {
+            if table.table_name == "users" {
+                return true;
+            }
+        }
+
+        false
     }
 
     pub fn load_all(conn: &mut PgConnection) -> Vec<Self> {

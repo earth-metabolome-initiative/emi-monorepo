@@ -110,8 +110,8 @@ async fn test_user_table() {
     let all_tables = Table::load_all(&mut conn, DATABASE_NAME, None).unwrap();
     assert_eq!(
         all_tables.len(),
-        3,
-        "Expected 3 tables, got {:?}",
+        4,
+        "Expected 4 tables, got {:?}",
         all_tables
     );
     let all_columns = Column::load_all(&mut conn);
@@ -119,8 +119,8 @@ async fn test_user_table() {
     let all_unique_indexes = Index::load_all_unique(&mut conn, None).unwrap();
     assert_eq!(
         all_unique_indexes.len(),
-        6,
-        "Expected 6 indexes, got {:?}",
+        9,
+        "Expected 9 indexes, got {:?}",
         all_unique_indexes
     );
 

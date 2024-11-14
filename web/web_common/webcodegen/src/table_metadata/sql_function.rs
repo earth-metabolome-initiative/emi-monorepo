@@ -48,7 +48,7 @@ pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "_text",
 ];
 
-pub fn postgres_type_to_diesel(postgres_type: &str) -> Type {
+pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
     let rust_type_str = match postgres_type {
         "integer" => "diesel::sql_types::Integer",
         "text" => "diesel::sql_types::Text",
@@ -94,7 +94,13 @@ pub fn postgres_type_to_diesel(postgres_type: &str) -> Type {
         _ => panic!("Unsupported data type: '{}'", postgres_type),
     };
 
-    parse_str::<Type>(rust_type_str)
+    let rust_type_str = if nullable {
+        format!("diesel::sql_types::Nullable<{}>", rust_type_str)
+    } else {
+        rust_type_str.to_string()
+    };
+
+    parse_str::<Type>(&rust_type_str)
         .expect(format!("Failed to parse rust type: '{}'", rust_type_str).as_str())
 }
 
@@ -196,7 +202,7 @@ impl SQLFunction {
 
                 sql_function
                     .arguments
-                    .push((argument_name, postgres_type_to_diesel(&argument_type)));
+                    .push((argument_name, postgres_type_to_diesel(&argument_type, false)));
             }
 
             if found_unsupported_data_type || UNSUPPORTED_DATA_TYPES.contains(&return_type.as_str())
@@ -205,7 +211,7 @@ impl SQLFunction {
             }
 
             if !return_type.is_empty() && return_type != "void" {
-                sql_function.return_type = Some(postgres_type_to_diesel(&return_type));
+                sql_function.return_type = Some(postgres_type_to_diesel(&return_type, false));
             }
             sql_functions.push(sql_function);
         }
