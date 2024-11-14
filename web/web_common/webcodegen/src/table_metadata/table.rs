@@ -60,13 +60,14 @@ impl Table {
                 type Error: std::error::Error;
             }
 
+            #[cfg(feature = "diesel")]
             impl Connection for diesel_async::AsyncPgConnection {
                 type Error = diesel::result::Error;
             }
         }
     }
 
-    /// Defines the HasInsertVariant trait.
+    /// Defines the insertion-related traits.
     pub fn insert_variant_trait() -> TokenStream {
         quote! {
             #[cfg(feature = "diesel")]
@@ -84,6 +85,24 @@ impl Table {
         }
     }
 
+    /// Defines the update-related traits.
+    pub fn update_variant_trait() -> TokenStream {
+        quote! {
+            #[cfg(feature = "diesel")]
+            pub trait IntoSessionUpdateVariant {
+                type SessionUpdateVariant: UpdateableVariant<diesel_async::AsyncPgConnection>;
+
+                fn into_session_update_variant(self, updated_by: i32) -> Self::SessionUpdateVariant;
+            }
+
+            pub trait UpdateableVariant<C: Connection> {
+                type Row;
+
+                async fn update(&self, conn: &mut C) -> Result<Self::Row, C::Error>;
+            }
+        }
+    }
+
     /// Defines the HasFilterVariant trait.
     pub fn filter_variant_trait() -> TokenStream {
         quote! {
@@ -97,10 +116,12 @@ impl Table {
     pub fn traits() -> TokenStream {
         let shared_traits = Self::shared_traits();
         let insert_variant_trait = Self::insert_variant_trait();
+        let update_variant_trait = Self::update_variant_trait();
         let filter_variant_trait = Self::filter_variant_trait();
         quote! {
             #shared_traits
             #insert_variant_trait
+            #update_variant_trait
             #filter_variant_trait
         }
     }
@@ -202,6 +223,10 @@ impl Table {
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+        let primary_key_columns = self
+            .primary_key_columns(conn)?
+            .into_iter()
+            .map(|column| Ident::new(&column.column_name, proc_macro2::Span::call_site()));
         let attributes = self.columns(conn)?.into_iter().map(|column| {
             let column_attribute: Ident =
                 Ident::new(&column.column_name, proc_macro2::Span::call_site());
@@ -213,8 +238,10 @@ impl Table {
 
         let mutability_impls = if self.has_session_user_generated_columns(conn) {
             let insert_trait_impls = self.insert_trait_impls(conn)?;
+            let update_trait_impls = self.update_trait_impls(conn)?;
             quote! {
                 #insert_trait_impls
+                #update_trait_impls
             }
         } else {
             TokenStream::new()
@@ -225,7 +252,8 @@ impl Table {
             #[derive(Debug)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             #[cfg_attr(feature = "diesel", derive(diesel::Queryable, diesel::Selectable, diesel::QueryableByName))]
-            #[diesel(table_name = #table_name)]
+            #[cfg_attr(feature = "diesel", diesel(table_name = #table_name))]
+            #[cfg_attr(feature = "diesel", diesel(primary_key(#(#primary_key_columns),*)))]
             pub struct #struct_name {
                 #(#attributes),*
             }
@@ -364,10 +392,10 @@ impl Table {
             #[derive(Debug)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             #[cfg_attr(feature = "diesel", derive(diesel::Insertable))]
-            #[diesel(table_name = #table_name)]
+            #[cfg_attr(feature = "diesel", diesel(table_name = #table_name))]
             pub struct #session_insert_variant_name {
                 #(#session_insert_variable_attributes)*
-            }   
+            }
 
             #[derive(Debug)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -399,6 +427,132 @@ impl Table {
                 async fn insert(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<Self::Row, diesel::result::Error> {
                     diesel::insert_into(#table_name::dsl::#table_name)
                         .values(self)
+                        .get_result(conn)
+                        .await
+                }
+            }
+        })
+    }
+
+    pub fn update_trait_impls(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
+        let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+        let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
+        let columns = self.columns(conn)?;
+        let primary_key_names = self
+            .primary_key_columns(conn)?
+            .into_iter()
+            .map(|column| column.column_name.clone())
+            .collect::<Vec<String>>();
+
+        let primary_key_identifiers = primary_key_names
+            .iter()
+            .map(|column_name| Ident::new(column_name, proc_macro2::Span::call_site()));
+
+        let session_update_columns = columns
+            .iter()
+            .filter(|column| {
+                (!column.is_automatically_generated()
+                    || primary_key_names.contains(&column.column_name))
+                    && !column.is_created_by(conn)
+            })
+            .collect::<Vec<&Column>>();
+
+        let update_columns = session_update_columns
+            .iter()
+            .filter(|column| {
+                !column.is_session_user_generated(conn)
+                    || primary_key_names.contains(&column.column_name)
+            })
+            .collect::<Vec<&&Column>>();
+
+        let session_update_variant_name = Ident::new(
+            &format!("SessionUpdate{struct_name}"),
+            proc_macro2::Span::call_site(),
+        );
+        let session_update_variable_attributes = session_update_columns.iter().map(|column| {
+            let column_name: Ident =
+                Ident::new(&column.column_name, proc_macro2::Span::call_site());
+            let column_type = column.rust_type();
+            if column.is_updated_by(conn) || primary_key_names.contains(&column.column_name) {
+                quote! {
+                    pub #column_name: #column_type,
+                }
+            } else {
+                quote! {
+                    pub #column_name: Option<#column_type>,
+                }
+            }
+        });
+
+        let update_variant_name = Ident::new(
+            &format!("Update{struct_name}"),
+            proc_macro2::Span::call_site(),
+        );
+        let updateable_variant_attributes = update_columns.iter().map(|column| {
+            let column_name: Ident =
+                Ident::new(&column.column_name, proc_macro2::Span::call_site());
+            let column_type = column.rust_type();
+
+            if primary_key_names.contains(&column.column_name) {
+                quote! {
+                    pub #column_name: #column_type,
+                }
+            } else {
+                quote! {
+                    pub #column_name: Option<#column_type>,
+                }
+            }
+        });
+
+        let into_session_update_variant_map = update_columns.iter().map(|column| {
+            let column_name: Ident =
+                Ident::new(&column.column_name, proc_macro2::Span::call_site());
+            quote! {
+                #column_name: self.#column_name,
+            }
+        });
+
+        let new_structs_implementation = quote! {
+            #[cfg(feature = "diesel")]
+            #[derive(Debug)]
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            #[cfg_attr(feature = "diesel", derive(diesel::AsChangeset, diesel::Identifiable))]
+            #[cfg_attr(feature = "diesel", diesel(primary_key(#(#primary_key_identifiers),*)))]
+            #[cfg_attr(feature = "diesel", diesel(table_name = #table_name))]
+            pub struct #session_update_variant_name {
+                #(#session_update_variable_attributes)*
+            }
+
+            #[derive(Debug)]
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            pub struct #update_variant_name {
+                #(#updateable_variant_attributes)*
+            }
+        };
+
+        Ok(quote! {
+            #new_structs_implementation
+
+            #[cfg(feature = "diesel")]
+            impl IntoSessionUpdateVariant for #update_variant_name {
+                type SessionUpdateVariant = #session_update_variant_name;
+
+                fn into_session_update_variant(self, updated_by: i32) -> Self::SessionUpdateVariant {
+                    #session_update_variant_name {
+                        #(#into_session_update_variant_map)*
+                        updated_by
+                    }
+                }
+            }
+
+            #[cfg(feature = "diesel")]
+            impl UpdateableVariant<diesel_async::AsyncPgConnection> for #session_update_variant_name {
+                type Row = #struct_name;
+
+                async fn update(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<Self::Row, diesel::result::Error> {
+                    diesel::update(#table_name::dsl::#table_name)
+                        .filter(#table_name::dsl::id.eq(self.id))
+                        .set(self)
                         .get_result(conn)
                         .await
                 }

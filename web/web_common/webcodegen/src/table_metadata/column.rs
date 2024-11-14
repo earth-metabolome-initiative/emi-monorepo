@@ -133,6 +133,14 @@ impl Column {
             || self.is_identity.as_ref().map_or(false, |i| i == "YES")
     }
 
+    pub fn is_updated_by(&self, conn: &mut PgConnection) -> bool {
+        self.column_name == "updated_by" && self.is_session_user_generated(conn)
+    }
+
+    pub fn is_created_by(&self, conn: &mut PgConnection) -> bool {
+        self.column_name == "created_by" && self.is_session_user_generated(conn)
+    }
+
     pub fn is_session_user_generated(&self, conn: &mut PgConnection) -> bool {
         // A column is associated to the user section if:
         // - it is a foreign key of the users table
