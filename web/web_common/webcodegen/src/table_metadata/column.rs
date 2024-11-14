@@ -106,7 +106,11 @@ impl Column {
 
     pub fn diesel_type(&self) -> Type {
         postgres_type_to_diesel(&self.data_type)
-    }   
+    }
+
+    pub fn is_uuid(&self) -> bool {
+        self.data_type == "uuid"
+    }
 
     pub fn load_all(conn: &mut PgConnection) -> Vec<Self> {
         use crate::schema::columns::dsl::*;

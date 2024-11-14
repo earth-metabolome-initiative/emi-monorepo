@@ -132,6 +132,16 @@ impl Table {
         })
     }
 
+    /// Returns wether a table require authorizations to be viewed
+    pub fn require_view_authorizations(&self, conn: &mut PgConnection) -> bool {
+        false
+    }
+
+    /// Returns wether a table require authorizations to be modified
+    pub fn require_modify_authorizations(&self, conn: &mut PgConnection) -> bool {
+        false
+    }
+
     /// Returns the Syn TokenStream for the struct definition and associated methods.
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
@@ -146,6 +156,7 @@ impl Table {
         });
 
         let foreign_key_methods = self.foreign_key_methods(conn);
+        let insert_method = self.insert_method(conn)?;
 
         Ok(quote! {
             #[derive(Debug)]
@@ -226,35 +237,40 @@ impl Table {
         }
     }
 
-    pub fn insert_method(&self, conn: &mut PgConnection) -> TokenStream {
-        // let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
-        // let columns = self.columns(conn).unwrap();
+    /// Returns wether a Primary Key is composed exclusively by UUIDs 
+    pub fn is_uuid_primary_key(&self, conn: &mut PgConnection) -> Result<bool, DieselError> {
+        let primary_key_columns = self.primary_key_columns(conn)?;
+        Ok(primary_key_columns.iter().all(|column| column.is_uuid()))
+    }
+    
+    pub fn insert_method(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
+        let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+        let columns = self.columns(conn)?;
 
-        // let column_names = columns.iter().map(|column| {
-        //     let column_name: Ident =
-        //         Ident::new(&column.column_name, proc_macro2::Span::call_site());
-        //     quote! {
-        //         #struct_name::dsl::#column_name
-        //     }
-        // });
+        let column_names = columns.iter().map(|column| {
+            let column_name: Ident =
+                Ident::new(&column.column_name, proc_macro2::Span::call_site());
+            quote! {
+                #struct_name::dsl::#column_name
+            }
+        });
 
-        // let column_values = columns.iter().map(|column| {
-        //     let column_name: Ident =
-        //         Ident::new(&column.column_name, proc_macro2::Span::call_site());
-        //     quote! {
-        //         self.#column_name
-        //     }
-        // });
+        let column_values = columns.iter().map(|column| {
+            let column_name: Ident =
+                Ident::new(&column.column_name, proc_macro2::Span::call_site());
+            quote! {
+                self.#column_name
+            }
+        });
 
-        // quote! {
-        //     #[cfg(feature = "diesel")]
-        //     pub fn insert(&self, conn: &mut PgConnection) -> Result<usize, DieselError> {
-        //         diesel::insert_into(#struct_name)
-        //             .values((#(#column_names.eq(#column_values)),*))
-        //             .execute(conn)
-        //     }
-        // }
-        unimplemented!()
+        Ok(quote! {
+            #[cfg(feature = "diesel")]
+            pub fn insert(&self, conn: &mut PgConnection) -> Result<usize, DieselError> {
+                diesel::insert_into(#struct_name)
+                    .values((#(#column_names.eq(#column_values)),*))
+                    .execute(conn)
+            }
+        })
     }
 
     pub fn unique_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
