@@ -113,7 +113,7 @@ impl FromSql<diesel::sql_types::Text, diesel::pg::Pg> for ConstraintType {
 }
 
 impl TableConstraint {
-    pub fn load_all_table_constraints(conn: &mut PgConnection) -> Vec<Self> {
+    pub fn load_all(conn: &mut PgConnection) -> Vec<Self> {
         use crate::schema::table_constraints::dsl::*;
         table_constraints
             .load::<TableConstraint>(conn)

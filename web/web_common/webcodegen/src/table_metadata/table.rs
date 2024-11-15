@@ -13,6 +13,7 @@ use syn::{File, Ident};
 use crate::Column;
 use crate::Index;
 use crate::TableConstraint;
+use crate::CheckConstraint;
 
 /// Struct defining the `information_schema.tables` table.
 #[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug)]
@@ -780,5 +781,31 @@ impl Table {
             .filter(table_constraints::dsl::constraint_type.eq("PRIMARY KEY"))
             .select(Column::as_select())
             .load::<Column>(conn)
+    }
+
+    pub fn check_constraints(&self, conn: &mut PgConnection) -> Result<Vec<CheckConstraint>, DieselError> {
+        use crate::schema::check_constraints;
+        use crate::schema::table_constraints;
+        
+
+        check_constraints::dsl::check_constraints.inner_join(
+            table_constraints::dsl::table_constraints.on(
+                check_constraints::dsl::constraint_name
+                    .eq(table_constraints::dsl::constraint_name)
+                    .and(
+                        check_constraints::dsl::constraint_schema
+                            .eq(table_constraints::dsl::constraint_schema),
+                    )
+                    .and(
+                        check_constraints::dsl::constraint_catalog
+                            .eq(table_constraints::dsl::constraint_catalog),
+                    ),
+            ),
+        )
+        .filter(table_constraints::dsl::table_name.eq(&self.table_name))
+        .filter(table_constraints::dsl::table_schema.eq(&self.table_schema))
+        .filter(table_constraints::dsl::table_catalog.eq(&self.table_catalog))
+        .select(CheckConstraint::as_select())
+        .load::<CheckConstraint>(conn)
     }
 }

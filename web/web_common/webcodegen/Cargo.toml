@@ -13,6 +13,9 @@ syn = "2.0"
 quote = "1.0"
 proc-macro2 = "1.0"
 prettyplease = "0.2"
+sqlparser = "0.52.0"
+pest = "2.7.14"
+pest_derive = "2.7.14"
 
 [dev-dependencies]
 diesel_migrations = "2.2.0"

@@ -2,7 +2,8 @@
 
 mod check_constraint;
 mod column;
-mod constraint_column;
+mod constraint_column_usage;
+mod constraint_table_usage;
 mod domain_constraint;
 mod key_column_usage;
 mod pg_index;
@@ -15,7 +16,8 @@ mod table_constraint;
 
 pub use check_constraint::CheckConstraint;
 pub use column::Column;
-pub use constraint_column::ConstraintColumnUsage;
+pub use constraint_column_usage::ConstraintColumnUsage;
+pub use constraint_table_usage::ConstraintTableUsage;
 pub use domain_constraint::DomainConstraint;
 pub use key_column_usage::KeyColumnUsage;
 pub use pg_index::Index;

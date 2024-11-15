@@ -6,7 +6,8 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (username),
     UNIQUE (email),
-    UNIQUE (username, email)
+    UNIQUE (username, email),
+    CHECK (username <> email)
 );
 
 CREATE TABLE composite_users (

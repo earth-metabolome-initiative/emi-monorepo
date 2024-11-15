@@ -99,13 +99,15 @@ async fn test_code_generation_methods(
 
 async fn test_check_constraints(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
     let users = Table::load(conn, "users", None, DATABASE_NAME).unwrap();
+
+    let table_check_constraint = users.check_constraints(conn)?;
+
+    assert_eq!(table_check_constraint.len(), 5, "Expected 5 check constraint, got: {:?}", table_check_constraint);
+    
     let user_name_column = users.column_by_name(conn, "username")?;
 
     assert_eq!(user_name_column.column_name, "username");
-    let username_constraits = user_name_column.check_constraints(conn)?;
-    assert_eq!(username_constraits.len(), 1);
 
-    println!("{:?}", username_constraits);
 
     Ok(())
 }
@@ -179,13 +181,14 @@ async fn test_user_table() {
     assert_eq!(gist_index.tablename, "composite_users");
     assert_eq!(gist_index.indexname, "composite_users_gist");
 
-    let all_table_constraints = TableConstraint::load_all_table_constraints(&mut conn);
+    let all_table_constraints = TableConstraint::load_all(&mut conn);
     let all_key_column_usage = KeyColumnUsage::load_all_key_column_usages(&mut conn);
     let all_referential_constraints =
         ReferentialConstraint::load_all_referential_constraints(&mut conn);
     let all_constraint_column_usage =
         ConstraintColumnUsage::load_all_constraint_column_usages(&mut conn);
     let all_check_constraint = CheckConstraint::load_all_check_constraints(&mut conn);
+    let all_constraint_table_usage = ConstraintTableUsage::load_all(&mut conn);
     let all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
 
     let users = Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap();

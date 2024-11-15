@@ -124,6 +124,17 @@ table! {
 }
 
 table! {
+    information_schema.constraint_table_usage (table_catalog, table_schema, table_name, constraint_name) {
+        constraint_catalog -> Text,
+        constraint_schema -> Text,
+        constraint_name -> Text,
+        table_catalog -> Text,
+        table_schema -> Text,
+        table_name -> Text,
+    }
+}
+
+table! {
     information_schema.check_constraints (constraint_catalog, constraint_schema, constraint_name) {
         constraint_catalog -> Text,
         constraint_schema -> Text,
@@ -351,6 +362,7 @@ allow_tables_to_appear_in_same_query!(
     table_constraints,
     referential_constraints,
     constraint_column_usage,
+    constraint_table_usage,
     check_constraints,
     domain_constraints,
     tables,
