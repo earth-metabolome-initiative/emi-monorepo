@@ -17,7 +17,7 @@ const DATABASE_PASSWORD: &str = "password";
 const DATABASE_USER: &str = "user";
 const DATABASE_PORT: u16 = 33676;
 
-fn establish_connection_to_postres() -> PgConnection {
+fn establish_connection_to_postgres() -> PgConnection {
     let database_url = format!(
         "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}",
     );
@@ -35,12 +35,6 @@ fn establish_connection_to_postres() -> PgConnection {
     }
 
     PgConnection::establish(&database_url).unwrap()
-}
-
-fn teardown_test_database(conn: &mut PgConnection) {
-    diesel::sql_query(format!("DROP DATABASE IF EXISTS {}", DATABASE_NAME))
-        .execute(conn)
-        .unwrap();
 }
 
 async fn setup_postgres() -> ContainerAsync<GenericImage> {
@@ -80,29 +74,50 @@ fn add_main_to_file(file_path: &str) {
     file.sync_all().unwrap();
 }
 
+async fn test_code_generation_methods(
+    conn: &mut PgConnection,
+) -> Result<(), diesel::result::Error> {
+    let builder = trybuild::TestCases::new();
+    SQLFunction::write_all(conn, "tests/ui/sql_functions.rs")?;
+    add_main_to_file("tests/ui/sql_functions.rs");
+    builder.pass("tests/ui/sql_functions.rs");
+
+    SQLType::write_all(conn, "tests/ui/sql_types.rs")?;
+    add_main_to_file("tests/ui/sql_types.rs");
+    builder.pass("tests/ui/sql_types.rs");
+
+    SQLOperator::write_all(conn, "tests/ui/sql_operators.rs")?;
+    add_main_to_file("tests/ui/sql_operators.rs");
+    builder.pass("tests/ui/sql_operators.rs");
+
+    Table::write_all(conn, "tests/ui/tables.rs", DATABASE_NAME, None)?;
+    add_main_to_file("tests/ui/tables.rs");
+    builder.pass("tests/ui/tables.rs");
+
+    Ok(())
+}
+
+async fn test_check_constraints(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+    let users = Table::load(conn, "users", None, DATABASE_NAME).unwrap();
+    let user_name_column = users.column_by_name(conn, "username")?;
+
+    assert_eq!(user_name_column.column_name, "username");
+    let username_constraits = user_name_column.check_constraints(conn)?;
+    assert_eq!(username_constraits.len(), 1);
+
+    println!("{:?}", username_constraits);
+
+    Ok(())
+}
+
 #[tokio::test]
 async fn test_user_table() {
     let container = setup_postgres().await;
 
-    let mut conn = establish_connection_to_postres();
+    let mut conn = establish_connection_to_postgres();
     conn.run_pending_migrations(MIGRATIONS).unwrap();
 
-    let builder = trybuild::TestCases::new();
-    SQLFunction::write_all(&mut conn, "tests/ui/sql_functions.rs").unwrap();
-    add_main_to_file("tests/ui/sql_functions.rs");
-    builder.pass("tests/ui/sql_functions.rs");
-
-    SQLType::write_all(&mut conn, "tests/ui/sql_types.rs").unwrap();
-    add_main_to_file("tests/ui/sql_types.rs");
-    builder.pass("tests/ui/sql_types.rs");
-
-    SQLOperator::write_all(&mut conn, "tests/ui/sql_operators.rs").unwrap();
-    add_main_to_file("tests/ui/sql_operators.rs");
-    builder.pass("tests/ui/sql_operators.rs");
-
-    Table::write_all(&mut conn, "tests/ui/tables.rs", DATABASE_NAME, None).unwrap();
-    add_main_to_file("tests/ui/tables.rs");
-    builder.pass("tests/ui/tables.rs");
+    test_code_generation_methods(&mut conn).await.unwrap();
 
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema
@@ -174,6 +189,8 @@ async fn test_user_table() {
     let all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
 
     let users = Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap();
+
+    test_check_constraints(&mut conn).await.unwrap();
 
     let users_gin_indexes = users.gin_indexes(&mut conn).unwrap();
 

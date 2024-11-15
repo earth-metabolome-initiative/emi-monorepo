@@ -27,7 +27,7 @@ const DEPRECATED_OPERATORS: &[(&str, &str)] = &[
     ("point_above", ">^"),
     ("point_below", "<^"),
     ("ts_match_vq", "@@@"),
-    ("ts_match_qv", "@@@")
+    ("ts_match_qv", "@@@"),
 ];
 
 impl SQLOperator {
@@ -84,10 +84,7 @@ impl SQLOperator {
                             {
                                 return None;
                             }
-                            if DEPRECATED_OPERATORS.contains(&(
-                                name.as_str(),
-                                symbol.as_str(),
-                            )) {
+                            if DEPRECATED_OPERATORS.contains(&(name.as_str(), symbol.as_str())) {
                                 return None;
                             }
 
@@ -95,7 +92,7 @@ impl SQLOperator {
                                 symbol,
                                 left_operand_type: postgres_type_to_diesel(
                                     left_operand_type.as_str(),
-                                    false
+                                    false,
                                 ),
                                 right_operand_type: postgres_type_to_diesel(
                                     right_operand_type.as_str(),

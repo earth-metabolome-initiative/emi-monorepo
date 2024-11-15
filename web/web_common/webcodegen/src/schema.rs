@@ -252,6 +252,99 @@ table! {
     }
 }
 
+table! {
+    pg_constraint (oid, conname, connamespace) {
+        oid -> Oid,
+        conname -> Text,
+        connamespace -> Oid,
+        contype -> Char,
+        condeferrable -> Bool,
+        condeferred -> Bool,
+        convalidated -> Bool,
+        conrelid -> Oid,
+        contypid -> Oid,
+        conindid -> Oid,
+        conparentid -> Oid,
+        confrelid -> Oid,
+        confupdtype -> Char,
+        confdeltype -> Char,
+        confmatchtype -> Char,
+        conislocal -> Bool,
+        coninhcount -> SmallInt,
+        connoinherit -> Bool,
+        conkey -> Array<SmallInt>,
+        confkey -> Array<SmallInt>,
+        conpfeqop -> Array<Oid>,
+        conppeqop -> Array<Oid>,
+        conffeqop -> Array<Oid>,
+        confdelsetcols -> Array<SmallInt>,
+        conexclop -> Array<Oid>,
+    }
+}
+
+table! {
+    pg_class (oid, relname, relnamespace) {
+        oid -> Oid,
+        relname -> Text,
+        relnamespace -> Oid,
+        reltype -> Oid,
+        reloftype -> Oid,
+        relowner -> Oid,
+        relam -> Oid,
+        relfilenode -> Oid,
+        reltablespace -> Oid,
+        relpages -> Integer,
+        reltuples -> Float,
+        relallvisible -> Integer,
+        reltoastrelid -> Oid,
+        relhasindex -> Bool,
+        relisshared -> Bool,
+        relpersistence -> Char,
+        relkind -> Char,
+        relnatts -> SmallInt,
+        relchecks -> SmallInt,
+        relhasrules -> Bool,
+        relhastriggers -> Bool,
+        relhassubclass -> Bool,
+        relrowsecurity -> Bool,
+        relforcerowsecurity -> Bool,
+        relispopulated -> Bool,
+        relreplident -> Char,
+        relispartition -> Bool,
+        relrewrite -> Oid,
+    }
+}
+
+table! {
+    pg_attribute (attrelid, attname, atttypid) {
+        attrelid -> Oid,
+        attname -> Text,
+        atttypid -> Oid,
+        attlen -> SmallInt,
+        attnum -> SmallInt,
+        attcacheoff -> Integer,
+        atttypmod -> Integer,
+        attndims -> SmallInt,
+        attbyval -> Bool,
+        attalign -> Char,
+        attstorage -> Char,
+        attcompression -> Char,
+        attnotnull -> Bool,
+        atthasdef -> Bool,
+        atthasmissing -> Bool,
+        attidentity -> Char,
+        attgenerated -> Char,
+        attisdropped -> Bool,
+        attislocal -> Bool,
+        attinhcount -> SmallInt,
+        attcollation -> Oid,
+        attstattarget -> SmallInt,
+        attacl -> Array<Oid>,
+        attoptions -> Array<Text>,
+        attfdwoptions -> Array<Text>,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     columns,
     key_column_usage,
@@ -261,6 +354,10 @@ allow_tables_to_appear_in_same_query!(
     check_constraints,
     domain_constraints,
     tables,
+    pg_constraint,
+    pg_class,
+    pg_attribute,
+    pg_namespace,
 );
 
 allow_tables_to_appear_in_same_query!(pg_proc, pg_namespace, pg_type, pg_operator);

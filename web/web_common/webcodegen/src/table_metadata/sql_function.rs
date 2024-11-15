@@ -200,9 +200,10 @@ impl SQLFunction {
                     format!("arg{}", i)
                 };
 
-                sql_function
-                    .arguments
-                    .push((argument_name, postgres_type_to_diesel(&argument_type, false)));
+                sql_function.arguments.push((
+                    argument_name,
+                    postgres_type_to_diesel(&argument_type, false),
+                ));
             }
 
             if found_unsupported_data_type || UNSUPPORTED_DATA_TYPES.contains(&return_type.as_str())

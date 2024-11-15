@@ -8,6 +8,7 @@ use diesel::{
 use syn::Type;
 
 use crate::table_metadata::sql_function::postgres_type_to_diesel;
+use crate::CheckConstraint;
 use crate::KeyColumnUsage;
 
 /// Struct defining the `information_schema.columns` table.
@@ -263,5 +264,53 @@ impl Column {
                     Err(e)
                 }
             })
+    }
+
+    pub fn check_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<CheckConstraint>, DieselError> {
+        use crate::schema::check_constraints;
+        use crate::schema::constraint_column_usage;
+        use crate::schema::{pg_attribute, pg_class, pg_constraint, pg_namespace};
+
+        pg_constraint::dsl::pg_constraint
+            .inner_join(
+                pg_class::dsl::pg_class.on(pg_constraint::dsl::conrelid.eq(pg_class::dsl::oid)),
+            )
+            .inner_join(
+                pg_namespace::dsl::pg_namespace.on(pg_constraint::dsl::connamespace.eq(pg_namespace::dsl::oid)),
+            )
+            .inner_join(pg_attribute::dsl::pg_attribute.on(
+                pg_attribute::dsl::attrelid.eq(pg_class::dsl::oid).and(
+                    pg_attribute::dsl::attnum.eq(diesel::dsl::any(pg_constraint::dsl::conkey)),
+                ),
+            ))
+            .inner_join(
+                constraint_column_usage::dsl::constraint_column_usage.on(
+                    constraint_column_usage::dsl::constraint_name
+                        .eq(pg_constraint::dsl::conname)
+                        .and(
+                            constraint_column_usage::dsl::constraint_schema
+                                .eq(pg_namespace::dsl::nspname),
+                        ),
+                ),
+            )
+            .inner_join(
+                check_constraints::dsl::check_constraints.on(
+                    check_constraints::dsl::constraint_name
+                        .eq(pg_constraint::dsl::conname)
+                        .and(
+                            check_constraints::dsl::constraint_schema
+                                .eq(pg_namespace::dsl::nspname),
+                        ),
+                ),
+            )
+            .filter(constraint_column_usage::dsl::table_name.eq(&self.table_name))
+            .filter(constraint_column_usage::dsl::table_schema.eq(&self.table_schema))
+            .filter(constraint_column_usage::dsl::table_catalog.eq(&self.table_catalog))
+            .filter(constraint_column_usage::dsl::column_name.eq(&self.column_name))
+            .select(CheckConstraint::as_select())
+            .load::<CheckConstraint>(conn)
     }
 }

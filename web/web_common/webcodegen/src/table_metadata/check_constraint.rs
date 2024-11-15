@@ -1,7 +1,7 @@
 use diesel::pg::PgConnection;
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
 
-#[derive(Queryable, QueryableByName, Debug)]
+#[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
 pub struct CheckConstraint {
     pub constraint_catalog: String,
