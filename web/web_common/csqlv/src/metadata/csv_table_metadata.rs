@@ -28,7 +28,9 @@ impl CSVTableMetadata {
         let mut column_names = std::collections::HashSet::new();
         for column_builder in &column_builders {
             if !column_names.insert(&column_builder.column_name) {
-                return Err(CSVSchemaError::DuplicateColumn(column_builder.column_name.clone()));
+                return Err(CSVSchemaError::DuplicateColumn(
+                    column_builder.column_name.clone(),
+                ));
             }
         }
 
@@ -41,13 +43,24 @@ impl CSVTableMetadata {
             }
         }
 
+        let mut columns = column_builders
+            .into_iter()
+            .map(CSVColumnMetadata::try_from)
+            .collect::<Result<Vec<_>, _>>()?;
+
+        // If there is no column identified as the primary key, we add a new
+        // column with the name "id".
+        if !columns
+            .iter()
+            .any(|col: &CSVColumnMetadata| col.primary_key)
+        {
+            columns.push(CSVColumnMetadata::new_primary_key());
+        }
+
         Ok(Self {
             name: name.to_string(),
             number_of_rows,
-            columns: column_builders
-                .into_iter()
-                .map(CSVColumnMetadata::try_from)
-                .collect::<Result<Vec<_>, _>>()?,
+            columns,
         })
     }
 
@@ -103,11 +116,13 @@ impl CSVTableMetadata {
             .iter()
             .filter(|column| column.foreign_table_name.is_some())
             .map(|column| {
-                if let (Some(foreign_table_name), Some(foreign_column_name)) = (&column.foreign_table_name, &column.foreign_column_name) {
+                if let (Some(foreign_table_name), Some(foreign_column_name)) =
+                    (&column.foreign_table_name, &column.foreign_column_name)
+                {
                     let foreign_table = tables
                         .iter()
                         .find(|table| table.name == *foreign_table_name)
-                        .ok_or(CSVSchemaError::UnknownForeignKey{
+                        .ok_or(CSVSchemaError::UnknownForeignKey {
                             table_name: self.name.clone(),
                             column_name: column.name.clone(),
                             foreign_table_name: foreign_table_name.clone(),
@@ -115,7 +130,7 @@ impl CSVTableMetadata {
                         })?;
 
                     if !foreign_table.has_column(foreign_column_name) {
-                        return Err(CSVSchemaError::UnknownForeignKey{
+                        return Err(CSVSchemaError::UnknownForeignKey {
                             table_name: self.name.clone(),
                             column_name: column.name.clone(),
                             foreign_table_name: foreign_table_name.clone(),

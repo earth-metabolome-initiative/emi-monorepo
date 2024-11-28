@@ -2,8 +2,12 @@ use csqlv::{CSVSchema, CSVSchemaBuilder};
 
 #[test]
 fn test_schema() {
-    let schema = CSVSchemaBuilder::default()
+    let schema: CSVSchema = CSVSchemaBuilder::default()
         .from_dir("../../backend/csvs")
         .unwrap();
     assert_eq!(schema.number_of_tables(), 18);
+
+    for table in schema.tables() {
+        println!("{}", table.into_postgres());
+    }
 }

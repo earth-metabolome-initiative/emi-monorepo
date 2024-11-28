@@ -15,6 +15,20 @@ pub struct CSVColumnMetadata {
     pub(crate) unique: bool,
 }
 
+impl CSVColumnMetadata {
+    pub(crate) fn new_primary_key() -> Self {
+        Self {
+            name: "id".to_string(),
+            foreign_table_name: None,
+            foreign_column_name: None,
+            data_type: DataType::Serial,
+            nullable: false,
+            primary_key: true,
+            unique: true,
+        }
+    }
+}
+
 impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
     type Error = CSVSchemaError;
 

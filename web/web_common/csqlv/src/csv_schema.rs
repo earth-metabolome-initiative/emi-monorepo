@@ -2,19 +2,30 @@
 //! processes it into a complete SQL database schema.
 use indicatif::ProgressIterator;
 
-use crate::metadata::CSVTableMetadata;
-
+use crate::csv_table::CSVTable;
 use crate::errors::CSVSchemaError;
+use crate::metadata::CSVTableMetadata;
 
 /// Struct representing a CSV schema.
 pub struct CSVSchema {
-    tables: Vec<CSVTableMetadata>,
+    table_metadatas: Vec<CSVTableMetadata>,
 }
 
 impl CSVSchema {
     /// Returns the number of tables in the schema.
     pub fn number_of_tables(&self) -> usize {
-        self.tables.len()
+        self.table_metadatas.len()
+    }
+
+    /// Returns the tables in the schema.
+    pub fn tables(&self) -> Vec<CSVTable<'_>> {
+        self.table_metadatas
+            .iter()
+            .map(|table_metadata| CSVTable {
+                schema: self,
+                table_metadata,
+            })
+            .collect()
     }
 }
 
@@ -54,7 +65,7 @@ impl CSVSchemaBuilder {
 
         // Next, we iterate in parallel over the list of files to process
         // each file in a separate thread.
-        let tables = paths
+        let table_metadatas = paths
             .iter()
             .progress_with(progress_bar)
             .filter_map(|path| {
@@ -69,12 +80,12 @@ impl CSVSchemaBuilder {
             .collect::<Result<Vec<_>, CSVSchemaError>>()?;
 
         // We check that the tables have unique names.
-        let unique_names = tables
+        let unique_names = table_metadatas
             .iter()
             .map(|table| table.name.clone())
             .collect::<std::collections::HashSet<_>>();
 
-        if unique_names.len() != tables.len() {
+        if unique_names.len() != table_metadatas.len() {
             return Err(CSVSchemaError::DuplicateTable(
                 "Duplicate table name".to_string(),
             ));
@@ -82,11 +93,11 @@ impl CSVSchemaBuilder {
 
         // We check that all of the foreign tables are valid and that the foreign
         // columns actually exist in the foreign tables.
-        tables
+        table_metadatas
             .iter()
-            .map(|table| table.validate_schema_compatibility(&tables))
+            .map(|table| table.validate_schema_compatibility(&table_metadatas))
             .collect::<Result<(), _>>()?;
 
-        Ok(CSVSchema { tables })
+        Ok(CSVSchema { table_metadatas })
     }
 }
