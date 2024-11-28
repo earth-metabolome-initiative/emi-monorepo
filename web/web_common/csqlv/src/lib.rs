@@ -1,14 +1,18 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+#![doc = include_str!("../README.md")]
+#![deny(missing_docs)]
+#![deny(unsafe_code)]
+#![deny(unused_macro_rules)]
+#![deny(unconditional_recursion)]
+#![deny(unreachable_patterns)]
+#![deny(unused_import_braces)]
+#![warn(clippy::all)]
+#![warn(clippy::pedantic)]
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod csv_table;
+mod csv_columns;
+mod csv_schema;
+mod data_types;
+mod errors;
+mod metadata;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use csv_schema::{CSVSchema, CSVSchemaBuilder};
