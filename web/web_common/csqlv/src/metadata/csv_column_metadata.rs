@@ -11,6 +11,7 @@ pub struct CSVColumnMetadata {
     pub(crate) foreign_column_name: Option<String>,
     pub(crate) data_type: DataType,
     pub(crate) nullable: bool,
+    pub(crate) artificial: bool,
     pub(crate) primary_key: bool,
     pub(crate) unique: bool,
 }
@@ -23,6 +24,7 @@ impl CSVColumnMetadata {
             foreign_column_name: None,
             data_type: DataType::Serial,
             nullable: false,
+            artificial: true,
             primary_key: true,
             unique: true,
         }
@@ -53,6 +55,7 @@ impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
             foreign_table_name: builder.foreign_table_name,
             foreign_column_name: builder.foreign_column_name,
             data_type,
+            artificial: false,
             nullable: builder.nullable,
             primary_key: builder.primary_key,
             unique: builder.unique,

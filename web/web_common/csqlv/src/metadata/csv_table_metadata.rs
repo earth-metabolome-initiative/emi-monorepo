@@ -8,13 +8,14 @@ use super::csv_column_metadata::{CSVColumnMetadata, CSVColumnMetadataBuilder};
 /// Struct representing a CSV table.
 pub struct CSVTableMetadata {
     pub(crate) name: String,
+    pub(crate) path: String,
     pub(crate) number_of_rows: u64,
     pub(crate) columns: Vec<CSVColumnMetadata>,
 }
 
 impl CSVTableMetadata {
     /// Create a new CSVTableMetadataBuilder.
-    fn parse_rows<R>(mut rows: Reader<R>, name: &str) -> Result<Self, CSVSchemaError>
+    fn parse_rows<R>(mut rows: Reader<R>, name: &str, path: &str) -> Result<Self, CSVSchemaError>
     where
         R: std::io::Read,
     {
@@ -59,6 +60,7 @@ impl CSVTableMetadata {
 
         Ok(Self {
             name: name.to_string(),
+            path: path.to_string(),
             number_of_rows,
             columns,
         })
@@ -95,17 +97,35 @@ impl CSVTableMetadata {
         if path.ends_with(".csv") {
             let file = std::fs::File::open(path)?;
             let reader = csv::Reader::from_reader(file);
-            Self::parse_rows(reader, table_name)
+            Self::parse_rows(reader, table_name, path)
         } else {
             let file = std::fs::File::open(path)?;
             let decoder = flate2::read::GzDecoder::new(file);
             let reader = csv::Reader::from_reader(decoder);
-            Self::parse_rows(reader, table_name)
+            Self::parse_rows(reader, table_name, path)
         }
     }
 
     pub(crate) fn has_column(&self, column_name: &str) -> bool {
         self.columns.iter().any(|column| column.name == column_name)
+    }
+
+    pub(crate) fn has_foreign_keys(&self) -> bool {
+        self.columns
+            .iter()
+            .any(|column| column.foreign_table_name.is_some())
+    }
+
+    pub(crate) fn gzip(&self) -> bool {
+        self.path.ends_with(".csv.gz")
+    }
+
+    pub(crate) fn temporary_table_name(&self) -> Result<String, CSVSchemaError> {
+        if !self.has_foreign_keys() {
+            return Err(CSVSchemaError::InvalidTemporaryTableName(self.name.clone()));
+        }
+
+        Ok(format!("{}_temp", self.name))
     }
 
     pub(crate) fn validate_schema_compatibility(

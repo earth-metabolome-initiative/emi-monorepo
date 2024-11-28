@@ -19,6 +19,7 @@ pub enum CSVSchemaError {
         foreign_table_name: String,
         foreign_column_name: String,
     },
+    InvalidTemporaryTableName(String),
     EmptyColumn,
 }
 
@@ -55,6 +56,9 @@ impl std::fmt::Display for CSVSchemaError {
                 "Unknown foreign key: {}.{} -> {}.{}",
                 table_name, column_name, foreign_table_name, foreign_column_name
             ),
+            CSVSchemaError::InvalidTemporaryTableName(e) => {
+                write!(f, "Invalid temporary table name: {}", e)
+            }
             CSVSchemaError::EmptyColumn => write!(f, "Empty column"),
         }
     }
