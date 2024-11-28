@@ -2,7 +2,7 @@
 use crate::errors::CSVSchemaError;
 use uuid::Uuid;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum DataType {
     Text,
     VarChar(usize),

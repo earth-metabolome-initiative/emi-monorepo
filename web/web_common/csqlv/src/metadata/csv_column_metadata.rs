@@ -4,6 +4,7 @@ use crate::errors::CSVSchemaError;
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV column.
 pub struct CSVColumnMetadata {
     pub(crate) name: String,

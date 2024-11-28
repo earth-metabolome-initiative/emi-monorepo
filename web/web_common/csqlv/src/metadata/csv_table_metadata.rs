@@ -5,6 +5,7 @@ use crate::errors::CSVSchemaError;
 
 use super::csv_column_metadata::{CSVColumnMetadata, CSVColumnMetadataBuilder};
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV table.
 pub struct CSVTableMetadata {
     pub(crate) name: String,

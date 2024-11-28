@@ -6,6 +6,7 @@ use crate::csv_table::CSVTable;
 use crate::errors::CSVSchemaError;
 use crate::metadata::CSVTableMetadata;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV schema.
 pub struct CSVSchema {
     table_metadatas: Vec<CSVTableMetadata>,
@@ -97,6 +98,34 @@ impl CSVSchemaBuilder {
             .iter()
             .map(|table| table.validate_schema_compatibility(&table_metadatas))
             .collect::<Result<(), _>>()?;
+
+        // We check that there are no loops in the schema caused by foreign keys.
+        for table in &table_metadatas {
+            let mut visited: std::collections::HashSet<&CSVTableMetadata> =
+                std::collections::HashSet::new();
+            let mut chain: Vec<CSVTableMetadata> = Vec::new();
+            let mut stack: Vec<&CSVTableMetadata> = vec![&table];
+
+            while let Some(table) = stack.pop() {
+                if visited.contains(&table) {
+                    return Err(CSVSchemaError::Loop { chain });
+                }
+
+                visited.insert(table);
+                chain.push(table.clone());
+
+                for column in &table.columns {
+                    if let Some(foreign_table_name) = &column.foreign_table_name {
+                        let foreign_table = table_metadatas
+                            .iter()
+                            .find(|table| table.name == *foreign_table_name)
+                            .unwrap();
+
+                        stack.push(foreign_table);
+                    }
+                }
+            }
+        }
 
         Ok(CSVSchema { table_metadatas })
     }

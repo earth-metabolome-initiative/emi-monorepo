@@ -8,11 +8,12 @@
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
 
-mod csv_table;
 mod csv_columns;
 mod csv_schema;
+mod csv_table;
 mod data_types;
 mod errors;
 mod metadata;
 
 pub use csv_schema::{CSVSchema, CSVSchemaBuilder};
+pub use errors::CSVSchemaError;
