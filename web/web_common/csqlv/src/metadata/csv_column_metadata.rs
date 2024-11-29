@@ -35,7 +35,7 @@ impl CSVColumnMetadata {
 impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
     type Error = CSVSchemaError;
 
-    fn try_from(builder: CSVColumnMetadataBuilder) -> Result<Self, Self::Error> {
+    fn try_from(mut builder: CSVColumnMetadataBuilder) -> Result<Self, Self::Error> {
         if builder.data_type_counts.is_empty() {
             return Err(CSVSchemaError::EmptyColumn);
         }
@@ -49,6 +49,7 @@ impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
 
         if builder.sequential {
             data_type = data_type.into_serial()?;
+            builder.primary_key = true;
         }
 
         Ok(CSVColumnMetadata {

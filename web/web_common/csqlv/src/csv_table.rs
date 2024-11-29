@@ -1,13 +1,26 @@
+use crate::csv_columns::CSVColumn;
 use crate::errors::CSVSchemaError;
 use crate::metadata::CSVTableMetadata;
 use crate::CSVSchema;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CSVTable<'a> {
     pub(crate) schema: &'a CSVSchema,
     pub(crate) table_metadata: &'a CSVTableMetadata,
 }
 
 impl<'a> CSVTable<'a> {
+    pub fn columns(&self) -> Vec<CSVColumn<'_>> {
+        self.table_metadata
+            .columns
+            .iter()
+            .map(|column_metadata| CSVColumn {
+                table: self,
+                column_metadata,
+            })
+            .collect()
+    }
+
     pub fn into_postgres(&self) -> String {
         let mut sql = format!(
             "CREATE TABLE IF NOT EXISTS {} (\n",
@@ -56,7 +69,7 @@ impl<'a> CSVTable<'a> {
                 if column.nullable { "" } else { " NOT NULL" },
             ));
         }
-        
+
         sql.pop();
         sql.pop();
 
@@ -121,7 +134,7 @@ impl<'a> CSVTable<'a> {
             }
 
             sql.push_str("FROM\n");
-            sql.push_str(&format!("    {}\n", temporary_table_name));
+            sql.push_str(&format!("    {}", temporary_table_name));
             for column in &self.table_metadata.columns {
                 if let (Some(foreign_table_name), Some(foreign_column_name)) =
                     (&column.foreign_table_name, &column.foreign_column_name)
