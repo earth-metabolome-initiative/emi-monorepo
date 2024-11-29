@@ -16,4 +16,6 @@ mod errors;
 mod metadata;
 
 pub use csv_schema::{CSVSchema, CSVSchemaBuilder};
+pub use csv_table::CSVTable;
+pub use csv_columns::CSVColumn;
 pub use errors::CSVSchemaError;

@@ -28,6 +28,31 @@ impl CSVSchema {
             })
             .collect()
     }
+
+    /// Returns a table from the provided table name.
+    pub fn table_from_name(&self, table_name: &str) -> Result<CSVTable<'_>, CSVSchemaError> {
+        let table_metadata = self
+            .table_metadatas
+            .iter()
+            .find(|table| table.name == table_name)
+            .ok_or(CSVSchemaError::InvalidTableName(table_name.to_string()))?;
+        Ok(CSVTable {
+            schema: self,
+            table_metadata,
+        })
+    }
+
+    /// Returns the SQL to generate the schema in PostgreSQL.
+    pub fn to_postgres(&self) -> Result<String, CSVSchemaError> {
+        let mut sql = String::new();
+        for table in self.tables() {
+            sql.push_str(&table.to_postgres());
+            sql.push('\n');
+            sql.push_str(&table.populate()?);
+            sql.push('\n');
+        }
+        Ok(sql)
+    }
 }
 
 #[derive(Debug, Clone, Default)]

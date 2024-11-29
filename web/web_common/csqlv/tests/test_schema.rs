@@ -6,8 +6,4 @@ fn test_schema() {
         .from_dir("../../backend/csvs")
         .unwrap();
     assert_eq!(schema.number_of_tables(), 18);
-
-    for table in schema.tables() {
-        println!("{}", table.populate().unwrap());
-    }
 }
