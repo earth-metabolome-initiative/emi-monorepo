@@ -125,19 +125,17 @@ impl CSVSchemaBuilder {
             .collect::<Result<(), _>>()?;
 
         // We check that there are no loops in the schema caused by foreign keys.
-        for table in &table_metadatas {
+        for original_table in &table_metadatas {
             let mut visited: std::collections::HashSet<&CSVTableMetadata> =
                 std::collections::HashSet::new();
-            let mut chain: Vec<CSVTableMetadata> = Vec::new();
-            let mut stack: Vec<&CSVTableMetadata> = vec![&table];
+            let mut stack: Vec<&CSVTableMetadata> = vec![&original_table];
 
             while let Some(table) = stack.pop() {
                 if visited.contains(&table) {
-                    return Err(CSVSchemaError::Loop { chain });
+                    continue;
                 }
 
                 visited.insert(table);
-                chain.push(table.clone());
 
                 for column in &table.columns {
                     if let Some(foreign_table_name) = &column.foreign_table_name {
@@ -145,6 +143,10 @@ impl CSVSchemaBuilder {
                             .iter()
                             .find(|table| table.name == *foreign_table_name)
                             .unwrap();
+
+                        if original_table == foreign_table {
+                            return Err(CSVSchemaError::Loop(original_table.name.clone()));
+                        }
 
                         stack.push(foreign_table);
                     }

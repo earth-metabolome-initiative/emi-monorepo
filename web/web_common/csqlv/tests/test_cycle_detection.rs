@@ -5,5 +5,5 @@ use csqlv::CSVSchemaError;
 #[test]
 fn test_cycle_detection() {
     let schema = CSVSchemaBuilder::default().from_dir("./tests/csvs_with_cycle");
-    assert!(matches!(schema, Err(CSVSchemaError::Loop { .. })));
+    assert!(matches!(schema, Err(CSVSchemaError::Loop(_))));
 }

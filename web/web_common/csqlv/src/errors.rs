@@ -35,10 +35,7 @@ pub enum CSVSchemaError {
         foreign_column_name: String,
     },
     /// Error indicating a loop in the foreign key chain.
-    Loop {
-        /// The chain of tables in the loop.
-        chain: Vec<CSVTableMetadata>,
-    },
+    Loop(String),
     /// Error indicating an invalid temporary table name.
     InvalidTemporaryTableName(String),
     /// Error indicating an empty column.
@@ -78,12 +75,8 @@ impl std::fmt::Display for CSVSchemaError {
                 "Unknown foreign key: {}.{} -> {}.{}",
                 table_name, column_name, foreign_table_name, foreign_column_name
             ),
-            CSVSchemaError::Loop { chain } => {
-                write!(f, "Loop detected: ")?;
-                for table in chain {
-                    write!(f, "{} -> ", table.name)?;
-                }
-                write!(f, "{}", chain[0].name)
+            CSVSchemaError::Loop(table) => {
+                write!(f, "Loop in foreign key starting from table: {:?}", table)
             }
             CSVSchemaError::InvalidTemporaryTableName(e) => {
                 write!(f, "Invalid temporary table name: {}", e)
