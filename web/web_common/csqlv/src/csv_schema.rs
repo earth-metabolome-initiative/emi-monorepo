@@ -29,6 +29,42 @@ impl CSVSchema {
             .collect()
     }
 
+    /// Returns the tables in the schema alongside their priority score, sorted by descending priority.
+    ///
+    /// # Implementative details
+    /// The priority score is determined by the score of the dependant tables +1.
+    pub fn tables_with_priority(&self) -> Vec<(CSVTable<'_>, usize)> {
+        let mut table_priority: std::collections::HashMap<CSVTable<'_>, usize> =
+            std::collections::HashMap::new();
+        let mut changed = true;
+
+        while changed {
+            changed = false;
+            for table in self.tables() {
+                let priority = table
+                    .dependant_tables()
+                    .iter()
+                    .filter(|dependant_table| dependant_table != &&table)
+                    .map(|dependant_table| table_priority.get(dependant_table).unwrap_or(&0))
+                    .max()
+                    .unwrap_or(&0)
+                    + 1;
+
+                if let Some(previous_priority) = table_priority.insert(table, priority) {
+                    if previous_priority != priority {
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        let mut table_priority: Vec<_> = table_priority.into_iter().collect();
+
+        table_priority.sort_by_key(|(_, priority)| *priority);
+
+        table_priority
+    }
+
     /// Returns a table from the provided table name.
     pub fn table_from_name(&self, table_name: &str) -> Result<CSVTable<'_>, CSVSchemaError> {
         let table_metadata = self
@@ -45,10 +81,28 @@ impl CSVSchema {
     /// Returns the SQL to generate the schema in PostgreSQL.
     pub fn to_postgres(&self) -> Result<String, CSVSchemaError> {
         let mut sql = String::new();
-        for table in self.tables() {
+        for table in self.tables_with_priority().iter().map(|(table, _)| table) {
             sql.push_str(&table.to_postgres());
             sql.push('\n');
             sql.push_str(&table.populate()?);
+            sql.push('\n');
+        }
+        Ok(sql)
+    }
+
+    /// Returns the SQL to delete all tables in the schema in PostgreSQL.
+    ///
+    /// # Implementative details
+    /// The deletion happens following the reverse order of the foreign keys.
+    pub fn to_postgres_delete(&self) -> Result<String, CSVSchemaError> {
+        let mut sql = String::new();
+        for table in self
+            .tables_with_priority()
+            .into_iter()
+            .rev()
+            .map(|(table, _)| table)
+        {
+            sql.push_str(&table.to_postgres_delete());
             sql.push('\n');
         }
         Ok(sql)

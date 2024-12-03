@@ -70,8 +70,10 @@ async fn test_indipendent_csvs(conn: &mut PgConnection) -> Result<(), diesel::re
         .unwrap();
 
     let sql = schema.to_postgres().unwrap();
-
     conn.batch_execute(&sql).unwrap();
+
+    let delete_sql = schema.to_postgres_delete().unwrap();
+    conn.batch_execute(&delete_sql).unwrap();
 
     Ok(())
 }

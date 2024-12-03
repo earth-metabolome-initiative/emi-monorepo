@@ -28,6 +28,22 @@ impl<'a> CSVTable<'a> {
             .collect()
     }
 
+    /// Returns the dependant tables of the table.
+    pub fn dependant_tables(&self) -> Vec<CSVTable<'_>> {
+        self.schema
+            .tables()
+            .into_iter()
+            .filter(|table| {
+                table.columns().iter().any(|column| {
+                    column
+                        .foreign_table()
+                        .map(|t| t.name() == self.name())
+                        .unwrap_or(false)
+                })
+            })
+            .collect()
+    }
+
     /// Returns the primary key of the table.
     pub fn primary_key(&self) -> CSVColumn<'_> {
         self.table_metadata
@@ -92,6 +108,11 @@ impl<'a> CSVTable<'a> {
         sql.pop();
         sql.push_str("\n);");
         sql
+    }
+
+    /// Returns postgres SQL operation to delete the table.
+    pub fn to_postgres_delete(&self) -> String {
+        format!("DROP TABLE IF EXISTS {} CASCADE;", self.table_metadata.name)
     }
 
     /// Returns the SQL to generate the temporary variant of the table.
