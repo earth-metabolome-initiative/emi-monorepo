@@ -16,7 +16,7 @@ pub struct CSVTableMetadata {
 
 impl CSVTableMetadata {
     /// Create a new CSVTableMetadataBuilder.
-    fn parse_rows<R>(mut rows: Reader<R>, name: &str, path: &str) -> Result<Self, CSVSchemaError>
+    fn parse_rows<R>(mut rows: Reader<R>, name: &str, path: String) -> Result<Self, CSVSchemaError>
     where
         R: std::io::Read,
     {
@@ -61,14 +61,14 @@ impl CSVTableMetadata {
 
         Ok(Self {
             name: name.to_string(),
-            path: path.to_string(),
+            path,
             number_of_rows,
             columns,
         })
     }
 
     /// Create a new CSVTableMetadataBuilder from a CSV file.
-    pub fn from_csv(path: &str) -> Result<Self, CSVSchemaError> {
+    pub fn from_csv(root: &str, path: &str, docker_root: &str) -> Result<Self, CSVSchemaError> {
         // We check that the provided path ends with .csv or .csv.gz
         if !path.ends_with(".csv") && !path.ends_with(".csv.gz") {
             return Err(CSVSchemaError::InvalidPath(path.to_string()));
@@ -94,16 +94,20 @@ impl CSVTableMetadata {
             return Err(CSVSchemaError::InvalidTableName(table_name.to_string()));
         }
 
+        // We determine the internal path of the file, by replacing the root
+        // portion of the path with the docker root
+        let docker_path = path.replace(root, docker_root);
+
         // We open the file CSV
         if path.ends_with(".csv") {
             let file = std::fs::File::open(path)?;
             let reader = csv::Reader::from_reader(file);
-            Self::parse_rows(reader, table_name, path)
+            Self::parse_rows(reader, table_name, docker_path)
         } else {
             let file = std::fs::File::open(path)?;
             let decoder = flate2::read::GzDecoder::new(file);
             let reader = csv::Reader::from_reader(decoder);
-            Self::parse_rows(reader, table_name, path)
+            Self::parse_rows(reader, table_name, docker_path)
         }
     }
 

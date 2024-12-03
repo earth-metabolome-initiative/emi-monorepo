@@ -59,22 +59,39 @@ impl CSVSchema {
 /// Builder for the CSV schema.
 pub struct CSVSchemaBuilder {
     include_gz: bool,
+    container_directory: Option<String>,
 }
 
 impl CSVSchemaBuilder {
     /// Create a new CSV schema builder.
     pub fn new() -> Self {
-        Self { include_gz: false }
+        Self {
+            include_gz: false,
+            container_directory: None,
+        }
     }
 
     /// Include .gz files in the schema.
-    pub fn include_gz(&mut self) -> &mut Self {
+    pub fn include_gz(mut self) -> Self {
         self.include_gz = true;
+        self
+    }
+
+    /// Set the container directory.
+    pub fn container_directory<S: ToString>(mut self, container_directory: S) -> Self {
+        self.container_directory = Some(container_directory.to_string());
         self
     }
 
     /// Create a new CSV schema from a directory of CSV files.
     pub fn from_dir(self, dir: &str) -> Result<CSVSchema, CSVSchemaError> {
+        // If the container directory is set, we need to prepend it to the directory.
+        let container_directory = if let Some(container_directory) = self.container_directory {
+            container_directory
+        } else {
+            dir.to_owned()
+        };
+
         // We iterate across the files in the directory and create a list
         // of the documents we want to parse.
         let paths = std::fs::read_dir(dir)?
@@ -102,7 +119,7 @@ impl CSVSchemaBuilder {
                     None
                 }
             })
-            .map(CSVTableMetadata::from_csv)
+            .map(|path| CSVTableMetadata::from_csv(&dir, &path, &container_directory))
             .collect::<Result<Vec<_>, CSVSchemaError>>()?;
 
         // We check that the tables have unique names.

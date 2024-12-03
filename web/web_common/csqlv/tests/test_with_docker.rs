@@ -1,0 +1,87 @@
+use csqlv::CSVSchemaBuilder;
+use diesel::connection::SimpleConnection;
+use diesel::pg::PgConnection;
+use diesel::Connection;
+use testcontainers::core::Mount;
+use testcontainers::{
+    core::{IntoContainerPort, WaitFor},
+    runners::AsyncRunner,
+    ContainerAsync, GenericImage, ImageExt,
+};
+
+const DATABASE_NAME: &str = "test_db";
+const DATABASE_PASSWORD: &str = "password";
+const DATABASE_USER: &str = "user";
+const DATABASE_PORT: u16 = 33676;
+
+fn establish_connection_to_postgres() -> PgConnection {
+    let database_url = format!(
+        "postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}",
+    );
+
+    let mut number_of_attempts = 0;
+
+    while let Err(e) = PgConnection::establish(&database_url) {
+        eprintln!("Failed to establish connection: {:?}", e);
+        std::thread::sleep(std::time::Duration::from_secs(1));
+        if number_of_attempts > 10 {
+            eprintln!("Failed to establish connection after 10 attempts");
+            std::process::exit(1);
+        }
+        number_of_attempts += 1;
+    }
+
+    PgConnection::establish(&database_url).unwrap()
+}
+
+async fn setup_postgres() -> ContainerAsync<GenericImage> {
+    let local_absolute_path = std::env::current_dir().unwrap();
+    let local_absolute_path = local_absolute_path.to_str().unwrap();
+
+    let container = GenericImage::new("postgres", "17-alpine")
+        .with_wait_for(WaitFor::message_on_stderr(
+            "database system is ready to accept connections",
+        ))
+        .with_network("bridge")
+        .with_env_var("DEBUG", "1")
+        .with_env_var("POSTGRES_USER", DATABASE_USER)
+        .with_env_var("POSTGRES_PASSWORD", DATABASE_PASSWORD)
+        .with_env_var("POSTGRES_DB", DATABASE_NAME)
+        .with_mapped_port(DATABASE_PORT, 5432.tcp())
+        .with_mount(Mount::bind_mount(
+            format!("{local_absolute_path}/tests"),
+            "/app/csvs",
+        ))
+        .start()
+        .await;
+
+    if let Err(e) = container {
+        eprintln!("Failed to start container: {:?}", e);
+        std::process::exit(1);
+    }
+
+    container.unwrap()
+}
+
+async fn test_indipendent_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+    let schema = CSVSchemaBuilder::default()
+        .container_directory("/app/csvs/indipendent_csvs")
+        .from_dir("./tests/indipendent_csvs")
+        .unwrap();
+
+    let sql = schema.to_postgres().unwrap();
+
+    conn.batch_execute(&sql).unwrap();
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_user_table() {
+    let container = setup_postgres().await;
+
+    let mut conn = establish_connection_to_postgres();
+    test_indipendent_csvs(&mut conn).await.unwrap();
+
+    container.stop().await.unwrap();
+}
