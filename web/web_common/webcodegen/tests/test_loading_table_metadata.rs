@@ -108,7 +108,6 @@ async fn test_check_constraints(conn: &mut PgConnection) -> Result<(), diesel::r
 
     assert_eq!(user_name_column.column_name, "username");
 
-
     Ok(())
 }
 

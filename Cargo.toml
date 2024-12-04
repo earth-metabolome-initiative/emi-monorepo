@@ -8,4 +8,5 @@ members = [
     "web/web_common",
     "web/web_common/web_common_derive",
     "web/web_common/webcodegen",
+    "web/web_common/csqlv"
 ]
