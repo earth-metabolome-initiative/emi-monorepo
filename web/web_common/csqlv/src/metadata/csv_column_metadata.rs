@@ -4,6 +4,7 @@ use crate::errors::CSVSchemaError;
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV column.
 pub struct CSVColumnMetadata {
@@ -65,6 +66,7 @@ impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
     }
 }
 
+#[allow(clippy::struct_excessive_bools)]
 /// Struct representing a CSV column builder.
 pub struct CSVColumnMetadataBuilder {
     pub(crate) column_name: String,
@@ -80,7 +82,7 @@ pub struct CSVColumnMetadataBuilder {
 }
 
 impl CSVColumnMetadataBuilder {
-    /// Create a new CSVColumnMetadataBuilder.
+    /// Create a new `CSVColumnMetadataBuilder`.
     pub fn new(original_name: &str) -> Result<Self, CSVSchemaError> {
         if original_name.is_empty() {
             return Err(CSVSchemaError::InvalidColumnName(
@@ -144,40 +146,38 @@ impl CSVColumnMetadataBuilder {
     }
 
     /// Update the column builder with a new value.
-    pub fn update(&mut self, value: &str) -> Result<(), CSVSchemaError> {
-        for data_type in DataType::from_value(value)? {
+    pub fn update(&mut self, value: &str) {
+        for data_type in DataType::from_value(value) {
             if data_type.is_null() {
                 self.nullable = true;
             }
 
             *self.data_type_counts.entry(data_type).or_insert(0) += 1;
         }
-        if self.unique_values.is_some() {
-            if !self
+        if self.unique_values.is_some()
+            && !self
                 .unique_values
                 .as_mut()
                 .unwrap()
                 .insert(value.to_string())
-            {
-                // If we find a duplicate value, we disable the unique constraint and
-                // free the memory used to store the unique values.
-                self.unique = false;
-                self.unique_values = None;
-            }
+        {
+            // If we find a duplicate value, we disable the unique constraint and
+            // free the memory used to store the unique values.
+            self.unique = false;
+            self.unique_values = None;
         }
         if let Some(last_value) = self.last_value {
             if let Ok(value) = value.parse::<u64>() {
-                if value != last_value + 1 {
+                if value == last_value + 1 {
+                    self.last_value = Some(value);
+                } else {
                     self.sequential = false;
                     self.last_value = None;
-                } else {
-                    self.last_value = Some(value);
                 }
             } else {
                 self.sequential = false;
                 self.last_value = None;
             }
         }
-        Ok(())
     }
 }

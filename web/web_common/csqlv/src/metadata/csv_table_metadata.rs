@@ -15,7 +15,7 @@ pub struct CSVTableMetadata {
 }
 
 impl CSVTableMetadata {
-    /// Create a new CSVTableMetadataBuilder.
+    /// Create a new `CSVTableMetadata`.
     fn parse_rows<R>(mut rows: Reader<R>, name: &str, path: String) -> Result<Self, CSVSchemaError>
     where
         R: std::io::Read,
@@ -23,7 +23,7 @@ impl CSVTableMetadata {
         let mut column_builders = rows
             .headers()?
             .into_iter()
-            .map(|col| CSVColumnMetadataBuilder::new(col))
+            .map(CSVColumnMetadataBuilder::new)
             .collect::<Result<Vec<_>, _>>()?;
 
         // Check that there are no duplicate column names
@@ -41,7 +41,7 @@ impl CSVTableMetadata {
             number_of_rows += 1;
             let row = row?;
             for (col, value) in column_builders.iter_mut().zip(row.iter()) {
-                col.update(value)?;
+                col.update(value);
             }
         }
 
@@ -67,10 +67,14 @@ impl CSVTableMetadata {
         })
     }
 
-    /// Create a new CSVTableMetadataBuilder from a CSV file.
+    /// Create a new `CSVTableMetadata` from a CSV file.
     pub fn from_csv(root: &str, path: &str, docker_root: &str) -> Result<Self, CSVSchemaError> {
         // We check that the provided path ends with .csv or .csv.gz
-        if !path.ends_with(".csv") && !path.ends_with(".csv.gz") {
+        if !std::path::Path::new(path)
+            .extension()
+            .map_or(false, |ext| ext.eq_ignore_ascii_case("csv"))
+            && !path.ends_with(".csv.gz")
+        {
             return Err(CSVSchemaError::InvalidPath(path.to_string()));
         }
 
@@ -81,10 +85,10 @@ impl CSVTableMetadata {
             .to_str()
             .ok_or(CSVSchemaError::InvalidPath(path.to_string()))?;
 
-        let table_name = if file_name.ends_with(".csv") {
-            &file_name[..file_name.len() - 4]
-        } else if file_name.ends_with(".csv.gz") {
-            &file_name[..file_name.len() - 7]
+        let table_name = if let Some(stripped) = file_name.strip_suffix(".csv") {
+            stripped
+        } else if let Some(stripped) = file_name.strip_suffix(".csv.gz") {
+            stripped
         } else {
             return Err(CSVSchemaError::InvalidPath(path.to_string()));
         };
@@ -99,7 +103,10 @@ impl CSVTableMetadata {
         let docker_path = path.replace(root, docker_root);
 
         // We open the file CSV
-        if path.ends_with(".csv") {
+        if std::path::Path::new(path)
+            .extension()
+            .map_or(false, |ext| ext.eq_ignore_ascii_case("csv"))
+        {
             let file = std::fs::File::open(path)?;
             let reader = csv::Reader::from_reader(file);
             Self::parse_rows(reader, table_name, docker_path)
@@ -113,12 +120,6 @@ impl CSVTableMetadata {
 
     pub(crate) fn has_column(&self, column_name: &str) -> bool {
         self.columns.iter().any(|column| column.name == column_name)
-    }
-
-    pub(crate) fn has_foreign_keys(&self) -> bool {
-        self.columns
-            .iter()
-            .any(|column| column.foreign_table_name.is_some())
     }
 
     pub(crate) fn gzip(&self) -> bool {
@@ -136,7 +137,7 @@ impl CSVTableMetadata {
         self.columns
             .iter()
             .filter(|column| column.foreign_table_name.is_some())
-            .map(|column| {
+            .try_for_each(|column| {
                 if let (Some(foreign_table_name), Some(foreign_column_name)) =
                     (&column.foreign_table_name, &column.foreign_column_name)
                 {
@@ -161,6 +162,5 @@ impl CSVTableMetadata {
                 }
                 Ok(())
             })
-            .collect()
     }
 }

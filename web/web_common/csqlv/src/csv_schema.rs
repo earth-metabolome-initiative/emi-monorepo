@@ -13,11 +13,13 @@ pub struct CSVSchema {
 }
 
 impl CSVSchema {
+    #[must_use]
     /// Returns the number of tables in the schema.
     pub fn number_of_tables(&self) -> usize {
         self.table_metadatas.len()
     }
 
+    #[must_use]
     /// Returns the tables in the schema.
     pub fn tables(&self) -> Vec<CSVTable<'_>> {
         self.table_metadatas
@@ -29,6 +31,7 @@ impl CSVSchema {
             .collect()
     }
 
+    #[must_use]
     /// Returns the tables in the schema alongside their priority score, sorted by descending priority.
     ///
     /// # Implementative details
@@ -48,8 +51,7 @@ impl CSVSchema {
                     .map(|dependant_table| table_priority.get(dependant_table).unwrap_or(&0))
                     .max()
                     .copied()
-                    .map(|x| x + 1)
-                    .unwrap_or(0);
+                    .map_or(0, |x| x + 1);
                 if let Some(previous_priority) = table_priority.insert(table, priority) {
                     if previous_priority != priority {
                         changed = true;
@@ -70,6 +72,12 @@ impl CSVSchema {
     }
 
     /// Returns a table from the provided table name.
+    ///
+    /// # Arguments
+    /// * `table_name` - The name of the table to retrieve.
+    ///
+    /// # Errors
+    /// * If the provided table name does not exist in the schema.
     pub fn table_from_name(&self, table_name: &str) -> Result<CSVTable<'_>, CSVSchemaError> {
         let table_metadata = self
             .table_metadatas
@@ -82,8 +90,9 @@ impl CSVSchema {
         })
     }
 
-    /// Returns the SQL to generate the schema in PostgreSQL.
-    pub fn to_postgres(&self) -> Result<String, CSVSchemaError> {
+    #[must_use]
+    /// Returns the SQL to generate the schema in `PostgreSQL`.
+    pub fn to_postgres(&self) -> String {
         let mut sql = String::new();
         for table in self.tables_with_priority().iter().map(|(table, _)| table) {
             sql.push_str(&table.to_postgres());
@@ -91,14 +100,15 @@ impl CSVSchema {
             sql.push_str(&table.populate());
             sql.push('\n');
         }
-        Ok(sql)
+        sql
     }
 
-    /// Returns the SQL to delete all tables in the schema in PostgreSQL.
+    #[must_use]
+    /// Returns the SQL to delete all tables in the schema in `PostgreSQL`.
     ///
     /// # Implementative details
     /// The deletion happens following the reverse order of the foreign keys.
-    pub fn to_postgres_delete(&self) -> Result<String, CSVSchemaError> {
+    pub fn to_postgres_delete(&self) -> String {
         let mut sql = String::new();
         for table in self
             .tables_with_priority()
@@ -109,7 +119,7 @@ impl CSVSchema {
             sql.push_str(&table.to_postgres_delete());
             sql.push('\n');
         }
-        Ok(sql)
+        sql
     }
 }
 
@@ -118,30 +128,54 @@ impl CSVSchema {
 pub struct CSVSchemaBuilder {
     include_gz: bool,
     container_directory: Option<String>,
+    verbose: bool,
 }
 
 impl CSVSchemaBuilder {
+    #[must_use]
     /// Create a new CSV schema builder.
     pub fn new() -> Self {
         Self {
             include_gz: false,
             container_directory: None,
+            verbose: false,
         }
     }
 
+    #[must_use]
     /// Include .gz files in the schema.
     pub fn include_gz(mut self) -> Self {
         self.include_gz = true;
         self
     }
 
+    #[must_use]
     /// Set the container directory.
-    pub fn container_directory<S: ToString>(mut self, container_directory: S) -> Self {
+    pub fn container_directory<S: ToString>(mut self, container_directory: &S) -> Self {
         self.container_directory = Some(container_directory.to_string());
         self
     }
 
+    #[must_use]
+    /// Set the verbosity of the schema builder.
+    pub fn verbose(mut self) -> Self {
+        self.verbose = true;
+        self
+    }
+
     /// Create a new CSV schema from a directory of CSV files.
+    ///
+    /// # Arguments
+    /// * `dir` - The directory containing the CSV files.
+    ///
+    /// # Errors
+    /// * If the directory cannot be read.
+    /// * If the schema contains duplicate tables.
+    /// * If the schema contains loops in the foreign keys.
+    /// 
+    /// # Panics
+    /// * If the schema contains foreign keys that do not exist.
+    ///
     pub fn from_dir(self, dir: &str) -> Result<CSVSchema, CSVSchemaError> {
         // If the container directory is set, we need to prepend it to the directory.
         let container_directory = if let Some(container_directory) = self.container_directory {
@@ -156,13 +190,18 @@ impl CSVSchemaBuilder {
             .map(|res| res.map(|e| e.path()))
             .collect::<Result<Vec<_>, std::io::Error>>()?;
 
-        let progress_bar = indicatif::ProgressBar::new(paths.len() as u64);
-        progress_bar.set_style(
-            indicatif::ProgressStyle::default_bar()
-                .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len} {msg}")
-                .unwrap()
-                .progress_chars("##-"),
-        );
+        let progress_bar = if self.verbose {
+            let progress_bar = indicatif::ProgressBar::new(paths.len() as u64);
+            progress_bar.set_style(
+                indicatif::ProgressStyle::default_bar()
+                    .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len}")
+                    .unwrap()
+                    .progress_chars("##-"),
+            );
+            progress_bar
+        } else {
+            indicatif::ProgressBar::hidden()
+        };
 
         // Next, we iterate in parallel over the list of files to process
         // each file in a separate thread.
@@ -171,13 +210,17 @@ impl CSVSchemaBuilder {
             .progress_with(progress_bar)
             .filter_map(|path| {
                 let path = path.to_str().unwrap();
-                if path.ends_with(".csv") || path.ends_with(".csv.gz") && self.include_gz {
+                if std::path::Path::new(path)
+                    .extension()
+                    .map_or(false, |ext| ext.eq_ignore_ascii_case("csv"))
+                    || path.ends_with(".csv.gz") && self.include_gz
+                {
                     Some(path)
                 } else {
                     None
                 }
             })
-            .map(|path| CSVTableMetadata::from_csv(&dir, &path, &container_directory))
+            .map(|path| CSVTableMetadata::from_csv(dir, path, &container_directory))
             .collect::<Result<Vec<_>, CSVSchemaError>>()?;
 
         // We check that the tables have unique names.
@@ -196,8 +239,7 @@ impl CSVSchemaBuilder {
         // columns actually exist in the foreign tables.
         table_metadatas
             .iter()
-            .map(|table| table.validate_schema_compatibility(&table_metadatas))
-            .collect::<Result<(), _>>()?;
+            .try_for_each(|table| table.validate_schema_compatibility(&table_metadatas))?;
 
         // We check that there are no loops in the schema caused by foreign keys.
         for original_table in &table_metadatas {

@@ -2,8 +2,6 @@
 
 use std::error::Error;
 
-use crate::metadata::CSVTableMetadata;
-
 #[derive(Debug)]
 /// Enum representing errors that may occur during CSV schema processing.
 pub enum CSVSchemaError {
@@ -57,14 +55,14 @@ impl From<std::io::Error> for CSVSchemaError {
 impl std::fmt::Display for CSVSchemaError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            CSVSchemaError::InvalidPath(e) => write!(f, "Invalid CSV path: {}", e),
-            CSVSchemaError::InvalidTableName(e) => write!(f, "Invalid table name: {}", e),
-            CSVSchemaError::InvalidColumnName(e) => write!(f, "Invalid column name: {}", e),
-            CSVSchemaError::DuplicateColumn(e) => write!(f, "Duplicate column: {}", e),
-            CSVSchemaError::DuplicateTable(e) => write!(f, "Duplicate table: {}", e),
-            CSVSchemaError::CSVError(e) => write!(f, "CSV Error: {}", e),
-            CSVSchemaError::IOError(e) => write!(f, "IO Error: {}", e),
-            CSVSchemaError::UnknownDataType(e) => write!(f, "Unknown data type: {}", e),
+            CSVSchemaError::InvalidPath(e) => write!(f, "Invalid CSV path: {e}"),
+            CSVSchemaError::InvalidTableName(e) => write!(f, "Invalid table name: {e}"),
+            CSVSchemaError::InvalidColumnName(e) => write!(f, "Invalid column name: {e}"),
+            CSVSchemaError::DuplicateColumn(e) => write!(f, "Duplicate column: {e}"),
+            CSVSchemaError::DuplicateTable(e) => write!(f, "Duplicate table: {e}"),
+            CSVSchemaError::CSVError(e) => write!(f, "CSV Error: {e}"),
+            CSVSchemaError::IOError(e) => write!(f, "IO Error: {e}"),
+            CSVSchemaError::UnknownDataType(e) => write!(f, "Unknown data type: {e}"),
             CSVSchemaError::UnknownForeignKey {
                 table_name,
                 column_name,
@@ -72,14 +70,13 @@ impl std::fmt::Display for CSVSchemaError {
                 foreign_column_name,
             } => write!(
                 f,
-                "Unknown foreign key: {}.{} -> {}.{}",
-                table_name, column_name, foreign_table_name, foreign_column_name
+                "Unknown foreign key: {table_name}.{column_name} -> {foreign_table_name}.{foreign_column_name}",
             ),
             CSVSchemaError::Loop(table) => {
-                write!(f, "Loop in foreign key starting from table: {:?}", table)
+                write!(f, "Loop in foreign key starting from table: {table:?}")
             }
             CSVSchemaError::InvalidTemporaryTableName(e) => {
-                write!(f, "Invalid temporary table name: {}", e)
+                write!(f, "Invalid temporary table name: {e}")
             }
             CSVSchemaError::EmptyColumn => write!(f, "Empty column"),
         }
@@ -87,9 +84,3 @@ impl std::fmt::Display for CSVSchemaError {
 }
 
 impl Error for CSVSchemaError {}
-
-impl CSVSchemaError {
-    pub(crate) fn unknown_data_type(data_type: &str) -> CSVSchemaError {
-        CSVSchemaError::UnknownDataType(data_type.to_string())
-    }
-}
