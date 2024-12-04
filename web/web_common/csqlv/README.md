@@ -19,7 +19,9 @@ Given a directory containing CSV files, such as `./tests/bands`, you can create 
 use csqlv::{CSVSchemaBuilder, CSVSchema};
 
 let schema: CSVSchema = CSVSchemaBuilder::default()
+    // To show a loading bar while processing the CSVs
     .verbose()
+    // To include compressed files such as .gz
     .include_gz()
     // For supporting running the tests within
     // containers such as Docker
