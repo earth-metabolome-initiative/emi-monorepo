@@ -151,8 +151,8 @@ impl CSVSchemaBuilder {
 
     #[must_use]
     /// Set the container directory.
-    pub fn container_directory<S: ToString>(mut self, container_directory: &S) -> Self {
-        self.container_directory = Some(container_directory.to_string());
+    pub fn container_directory(mut self, container_directory: &str) -> Self {
+        self.container_directory = Some(container_directory.to_owned());
         self
     }
 

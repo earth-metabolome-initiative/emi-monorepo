@@ -69,10 +69,10 @@ async fn test_independent_csvs(conn: &mut PgConnection) -> Result<(), diesel::re
         .from_dir("./tests/independent_csvs")
         .unwrap();
 
-    let sql = schema.to_postgres().unwrap();
+    let sql = schema.to_postgres();
     conn.batch_execute(&sql).unwrap();
 
-    let delete_sql = schema.to_postgres_delete().unwrap();
+    let delete_sql = schema.to_postgres_delete();
     conn.batch_execute(&delete_sql).unwrap();
 
     Ok(())
@@ -84,10 +84,10 @@ async fn test_tree_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel:
         .from_dir("./tests/tree_dependent_csvs")
         .unwrap();
 
-    let sql = schema.to_postgres().unwrap();
+    let sql = schema.to_postgres();
     conn.batch_execute(&sql).unwrap();
 
-    let delete_sql = schema.to_postgres_delete().unwrap();
+    let delete_sql = schema.to_postgres_delete();
     conn.batch_execute(&delete_sql).unwrap();
 
     Ok(())
@@ -99,10 +99,10 @@ async fn test_dag_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel::
         .from_dir("./tests/dag_dependent_csvs")
         .unwrap();
 
-    let sql = schema.to_postgres().unwrap();
+    let sql = schema.to_postgres();
     conn.batch_execute(&sql).unwrap();
 
-    let delete_sql = schema.to_postgres_delete().unwrap();
+    let delete_sql = schema.to_postgres_delete();
     conn.batch_execute(&delete_sql).unwrap();
 
     Ok(())
