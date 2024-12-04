@@ -63,10 +63,40 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
     container.unwrap()
 }
 
-async fn test_indipendent_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+async fn test_independent_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
     let schema = CSVSchemaBuilder::default()
-        .container_directory("/app/csvs/indipendent_csvs")
-        .from_dir("./tests/indipendent_csvs")
+        .container_directory("/app/csvs/independent_csvs")
+        .from_dir("./tests/independent_csvs")
+        .unwrap();
+
+    let sql = schema.to_postgres().unwrap();
+    conn.batch_execute(&sql).unwrap();
+
+    let delete_sql = schema.to_postgres_delete().unwrap();
+    conn.batch_execute(&delete_sql).unwrap();
+
+    Ok(())
+}
+
+async fn test_tree_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+    let schema = CSVSchemaBuilder::default()
+        .container_directory("/app/csvs/tree_dependent_csvs")
+        .from_dir("./tests/tree_dependent_csvs")
+        .unwrap();
+
+    let sql = schema.to_postgres().unwrap();
+    conn.batch_execute(&sql).unwrap();
+
+    let delete_sql = schema.to_postgres_delete().unwrap();
+    conn.batch_execute(&delete_sql).unwrap();
+
+    Ok(())
+}
+
+async fn test_dag_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+    let schema = CSVSchemaBuilder::default()
+        .container_directory("/app/csvs/dag_dependent_csvs")
+        .from_dir("./tests/dag_dependent_csvs")
         .unwrap();
 
     let sql = schema.to_postgres().unwrap();
@@ -83,7 +113,9 @@ async fn test_user_table() {
     let container = setup_postgres().await;
 
     let mut conn = establish_connection_to_postgres();
-    test_indipendent_csvs(&mut conn).await.unwrap();
+    test_independent_csvs(&mut conn).await.unwrap();
+    test_tree_dependent_csvs(&mut conn).await.unwrap();
+    test_dag_dependent_csvs(&mut conn).await.unwrap();
 
     container.stop().await.unwrap();
 }

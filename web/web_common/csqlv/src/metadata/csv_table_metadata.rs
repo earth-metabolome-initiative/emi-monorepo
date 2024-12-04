@@ -125,12 +125,8 @@ impl CSVTableMetadata {
         self.path.ends_with(".csv.gz")
     }
 
-    pub(crate) fn temporary_table_name(&self) -> Result<String, CSVSchemaError> {
-        if !self.has_foreign_keys() {
-            return Err(CSVSchemaError::InvalidTemporaryTableName(self.name.clone()));
-        }
-
-        Ok(format!("{}_temp", self.name))
+    pub(crate) fn temporary_table_name(&self) -> String {
+        format!("{}_temp", self.name)
     }
 
     pub(crate) fn validate_schema_compatibility(

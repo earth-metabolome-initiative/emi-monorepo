@@ -1,9 +1,9 @@
-//! Test submodule for testing a set of indipendent CSVs
+//! Test submodule for testing a set of independent CSVs
 use csqlv::CSVSchemaBuilder;
 
 #[test]
-fn test_indipendent_csvs() {
-    let schema = CSVSchemaBuilder::default().from_dir("./tests/indipendent_csvs");
+fn test_independent_csvs() {
+    let schema = CSVSchemaBuilder::default().from_dir("./tests/independent_csvs");
     assert!(schema.is_ok());
     let schema = schema.unwrap();
     assert_eq!(schema.number_of_tables(), 2);

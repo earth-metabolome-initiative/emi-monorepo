@@ -7,14 +7,15 @@ use csqlv::CSVSchemaError;
 #[test]
 pub fn test_dependent_csvs() {
     let schema: Result<CSVSchema, CSVSchemaError> =
-        CSVSchemaBuilder::default().from_dir("./tests/tree_dependent_csvs");
+        CSVSchemaBuilder::default().from_dir("./tests/dag_dependent_csvs");
     assert!(
         schema.is_ok(),
         "Failed to build schema: {}",
         schema.err().unwrap()
     );
     let schema = schema.unwrap();
-    assert_eq!(schema.number_of_tables(), 3);
+    assert_eq!(schema.number_of_tables(), 5);
+
     let priorities = schema
         .tables_with_priority()
         .into_iter()
@@ -23,10 +24,12 @@ pub fn test_dependent_csvs() {
 
     assert_eq!(
         priorities,
-        vec![
-            ("first".to_owned(), 2),
-            ("second".to_owned(), 1),
-            ("third".to_owned(), 0),
+        [
+            ("first".to_owned(), 3),
+            ("second".to_owned(), 2),
+            ("third".to_owned(), 1),
+            ("fourth".to_owned(), 0),
+            ("fifth".to_owned(), 0)
         ]
     );
 }

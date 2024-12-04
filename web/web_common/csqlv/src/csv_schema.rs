@@ -47,20 +47,24 @@ impl CSVSchema {
                     .filter(|dependant_table| dependant_table != &&table)
                     .map(|dependant_table| table_priority.get(dependant_table).unwrap_or(&0))
                     .max()
-                    .unwrap_or(&0)
-                    + 1;
-
+                    .copied()
+                    .map(|x| x + 1)
+                    .unwrap_or(0);
                 if let Some(previous_priority) = table_priority.insert(table, priority) {
                     if previous_priority != priority {
                         changed = true;
                     }
+                } else {
+                    changed = true;
                 }
             }
         }
 
         let mut table_priority: Vec<_> = table_priority.into_iter().collect();
 
-        table_priority.sort_by_key(|(_, priority)| *priority);
+        table_priority.sort_by_key(|(table, priority)| (*priority, table.name().to_owned()));
+
+        table_priority.reverse();
 
         table_priority
     }
@@ -84,7 +88,7 @@ impl CSVSchema {
         for table in self.tables_with_priority().iter().map(|(table, _)| table) {
             sql.push_str(&table.to_postgres());
             sql.push('\n');
-            sql.push_str(&table.populate()?);
+            sql.push_str(&table.populate());
             sql.push('\n');
         }
         Ok(sql)
