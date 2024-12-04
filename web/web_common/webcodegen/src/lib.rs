@@ -17,6 +17,7 @@ mod meta_sql;
 mod schema;
 mod sql_functions;
 mod table_metadata;
+mod meta_sql;
 
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint, Index,

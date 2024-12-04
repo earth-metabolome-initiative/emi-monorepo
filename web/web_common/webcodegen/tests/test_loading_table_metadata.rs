@@ -127,7 +127,6 @@ async fn test_create_roles_tables(conn: &mut PgConnection) -> Result<(), WebCode
         query_result.is_ok(),
         "Failed to create roles tables for spectra using SQL: {spectra_roles_tables}, got error: {query_result:?}"
     );
-
     Ok(())
 }
 
