@@ -3,7 +3,7 @@ use csqlv::CSVSchemaBuilder;
 
 #[test]
 fn test_independent_csvs() {
-    let schema = CSVSchemaBuilder::default().from_dir("./tests/independent_csvs");
+    let schema = CSVSchemaBuilder::default().verbose().from_dir("./tests/independent_csvs");
     assert!(schema.is_ok());
     let schema = schema.unwrap();
     assert_eq!(schema.number_of_tables(), 2);

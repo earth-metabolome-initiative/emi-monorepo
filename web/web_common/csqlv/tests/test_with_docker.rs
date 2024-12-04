@@ -108,6 +108,22 @@ async fn test_dag_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel::
     Ok(())
 }
 
+async fn test_bands_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+    let schema = CSVSchemaBuilder::default()
+        .container_directory("/app/csvs/bands")
+        .from_dir("./tests/bands")
+        .unwrap();
+
+    let sql = schema.to_postgres();
+
+    conn.batch_execute(&sql).unwrap();
+
+    let delete_sql = schema.to_postgres_delete();
+    conn.batch_execute(&delete_sql).unwrap();
+
+    Ok(())
+}
+
 #[tokio::test]
 async fn test_user_table() {
     let container = setup_postgres().await;
@@ -116,6 +132,7 @@ async fn test_user_table() {
     test_independent_csvs(&mut conn).await.unwrap();
     test_tree_dependent_csvs(&mut conn).await.unwrap();
     test_dag_dependent_csvs(&mut conn).await.unwrap();
+    test_bands_csvs(&mut conn).await.unwrap();
 
     container.stop().await.unwrap();
 }
