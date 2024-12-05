@@ -1,11 +1,12 @@
 //! Submodule defining an error enumeration for the custom constraints.
 use std::fmt::{Display, Formatter};
 
-
+#[derive(Debug)]
 pub enum ConstraintError {
     UnexpectedNullableColumn(String),
     UnexpectedUppercaseColumn(String),
     UnexpectedUppercaseTable(String),
+    NotForeignKeyColumn(String),
 }
 
 impl Display for ConstraintError {
@@ -19,6 +20,9 @@ impl Display for ConstraintError {
             }
             ConstraintError::UnexpectedUppercaseTable(table_name) => {
                 write!(f, "Unexpected uppercase table: {}", table_name)
+            }
+            ConstraintError::NotForeignKeyColumn(column_name) => {
+                write!(f, "Column is not a foreign key: {}", column_name)
             }
         }
     }
