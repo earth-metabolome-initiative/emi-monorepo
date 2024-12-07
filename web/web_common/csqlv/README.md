@@ -1,6 +1,6 @@
 # CSQLV
 
-The CSQLV crate has to goal to easily integrate CSVs files into your PostgreSQL database.
+The CSQLV crate allows to easily integrate CSVs files into your PostgreSQL database.
 
 ## Installation
 

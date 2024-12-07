@@ -9,7 +9,8 @@ use crate::errors::WebCodeGenError;
 use crate::Table;
 
 impl Table {
-    fn requires_roles_table(&self, conn: &mut PgConnection) -> Result<bool, DieselError> {
+    /// Returns whether the table requires a roles table.
+    pub fn requires_roles_table(&self, conn: &mut PgConnection) -> Result<bool, DieselError> {
         Ok(self.columns(conn)?.iter().any(|c| c.is_created_by(conn)))
     }
 
