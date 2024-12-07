@@ -92,7 +92,11 @@ impl<'a> CSVTable<'a> {
                 "    {} {}{}{}{}{},\n",
                 column.name(),
                 if let Some(foreign_table) = &column.foreign_table() {
-                    foreign_table.primary_key().data_type().to_postgres()
+                    foreign_table
+                        .primary_key()
+                        .data_type()
+                        .into_non_serial()
+                        .to_postgres()
                 } else {
                     column.data_type().to_postgres()
                 },
@@ -186,7 +190,7 @@ impl<'a> CSVTable<'a> {
 
     #[must_use]
     /// Returns the SQL to populate the table.
-    /// 
+    ///
     /// # Panics
     /// * If the schema is in an invalid state and the foreign table does not exist.
     pub fn populate(&self) -> String {

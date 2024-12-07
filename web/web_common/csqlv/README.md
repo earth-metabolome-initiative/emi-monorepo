@@ -44,7 +44,7 @@ See below a detailed breakdown of the syntax used in the CSVs used in the exampl
 
 If I have a table called `players` with a column `name` and a table called `bands` with a column `name`, I may want to define their relationships via a third table called `band_members` as follows:
 
-So, if I have a CSV file called `players.csv` with the following content:
+So, if I have a SSV file called `players.ssv` with the following content:
 
 | name  | age |
 |-------|-----|
@@ -60,7 +60,7 @@ And a CSV file called `bands.csv` with the following content:
 | The Beatles | 1960            | Paul                    |
 | Nirvana     | 1987            | Kurt                    |
 
-I can define the relationships between the tables in the `band_members.csv` file as follows:
+I can define the relationships between the tables in the GZIP-compressed TSV file `band_members.tsv.gz` as follows:
 
 | bands.band  | players.name |
 |-------------|--------------|
@@ -82,7 +82,7 @@ CREATE TEMPORARY TABLE players_temp (
     age SMALLINT UNIQUE NOT NULL
 );
 
-COPY players_temp FROM '/app/csvs/bands/players.csv' DELIMITER ',' CSV HEADER;
+COPY players_temp FROM '/app/csvs/bands/players.ssv' DELIMITER ' ' CSV HEADER;
 
 INSERT INTO players (
     name,
@@ -98,7 +98,7 @@ DROP TABLE players_temp;
 CREATE TABLE IF NOT EXISTS bands (
     band TEXT UNIQUE NOT NULL,
     foundation_year SMALLINT UNIQUE NOT NULL,
-    founded_by SERIAL UNIQUE NOT NULL REFERENCES players(id),
+    founded_by INTEGER UNIQUE NOT NULL REFERENCES players(id),
     id SERIAL PRIMARY KEY UNIQUE NOT NULL
 );
 CREATE TEMPORARY TABLE bands_temp (
@@ -124,8 +124,8 @@ FROM
 DROP TABLE bands_temp;
 
 CREATE TABLE IF NOT EXISTS band_members (
-    bands_id SERIAL NOT NULL REFERENCES bands(id),
-    players_id SERIAL UNIQUE NOT NULL REFERENCES players(id),
+    bands_id INTEGER NOT NULL REFERENCES bands(id),
+    players_id INTEGER UNIQUE NOT NULL REFERENCES players(id),
     id SERIAL PRIMARY KEY UNIQUE NOT NULL
 );
 CREATE TEMPORARY TABLE band_members_temp (
@@ -133,7 +133,7 @@ CREATE TEMPORARY TABLE band_members_temp (
     players_name TEXT
 );
 
-COPY band_members_temp FROM '/app/csvs/bands/band_members.csv' DELIMITER ',' CSV HEADER;
+COPY band_members_temp FROM PROGRAM 'gzip -dc /app/csvs/bands/band_members.tsv.gz' DELIMITER '  ' CSV HEADER;
 
 INSERT INTO band_members (
     bands_id,

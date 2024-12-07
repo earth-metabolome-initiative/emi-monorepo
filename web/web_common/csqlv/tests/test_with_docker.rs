@@ -111,11 +111,14 @@ async fn test_dag_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel::
 
 async fn test_bands_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
     let schema = CSVSchemaBuilder::default()
+        .include_gz()
         .container_directory("/app/csvs/bands")
         .from_dir("./tests/bands")
         .unwrap();
 
     let sql = schema.to_postgres();
+
+    println!("{}", sql);
 
     conn.batch_execute(&sql).unwrap();
 

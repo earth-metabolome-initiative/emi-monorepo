@@ -124,6 +124,16 @@ impl DataType {
         }
     }
 
+    /// Returns the non-serial variant of the data type.
+    pub fn into_non_serial(self) -> DataType {
+        match self {
+            DataType::SmallSerial => DataType::SmallInt,
+            DataType::Serial => DataType::Integer,
+            DataType::BigSerial => DataType::BigInt,
+            other => other,
+        }
+    }
+
     /// Converts the data type to a string for use in SQL queries.
     pub fn to_postgres(self) -> String {
         match self {
