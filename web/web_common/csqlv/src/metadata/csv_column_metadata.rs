@@ -19,17 +19,21 @@ pub struct CSVColumnMetadata {
 }
 
 impl CSVColumnMetadata {
-    pub(crate) fn new_primary_key() -> Self {
-        Self {
+    /// Create a new primary key column.
+    /// 
+    /// # Errors
+    /// * If the data type cannot be converted to a serial data type.
+    pub(crate) fn new_primary_key(data_type: DataType) -> Result<Self, CSVSchemaError> {
+        Ok(Self {
             name: "id".to_string(),
             foreign_table_name: None,
             foreign_column_name: None,
-            data_type: DataType::Serial,
+            data_type: data_type.into_serial()?,
             nullable: false,
             artificial: true,
             primary_key: true,
             unique: true,
-        }
+        })
     }
 }
 

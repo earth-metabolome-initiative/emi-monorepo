@@ -1,7 +1,10 @@
 //! Submodule providing the CSV Table struct and associated functions.
 use super::csv_column_metadata::{CSVColumnMetadata, CSVColumnMetadataBuilder};
+use crate::data_types::DataType;
 use crate::errors::CSVSchemaError;
-use crate::extensions::{delimiter_from_path, file_name_without_extension, has_compression_extension};
+use crate::extensions::{
+    delimiter_from_path, file_name_without_extension, has_compression_extension,
+};
 use csv::Reader;
 use std::path::Path;
 
@@ -16,7 +19,7 @@ pub struct CSVTableMetadata {
 
 impl CSVTableMetadata {
     /// Returns the delimiter of the xSV file.
-    /// 
+    ///
     /// # Panics
     /// * If the delimiter cannot be determined.
     pub fn delimiter(&self) -> char {
@@ -64,7 +67,15 @@ impl CSVTableMetadata {
             .iter()
             .any(|col: &CSVColumnMetadata| col.primary_key)
         {
-            columns.push(CSVColumnMetadata::new_primary_key());
+            columns.push(CSVColumnMetadata::new_primary_key(
+                if number_of_rows < 32767 {
+                    DataType::SmallSerial
+                } else if number_of_rows < 2147483647 {
+                    DataType::Serial
+                } else {
+                    DataType::BigSerial
+                },
+            )?);
         }
 
         Ok(Self {
@@ -78,10 +89,9 @@ impl CSVTableMetadata {
     /// Create a new `CSVTableMetadata` from a CSV file.
     pub fn from_csv(root: &str, path: &Path, docker_root: &str) -> Result<Self, CSVSchemaError> {
         // We check that the provided path ends with .csv or .csv.gz
-        let (table_name, delimiter) = if let (Some(table_name), Some(delimiter)) = (
-            file_name_without_extension(path),
-            delimiter_from_path(path),
-        ) {
+        let (table_name, delimiter) = if let (Some(table_name), Some(delimiter)) =
+            (file_name_without_extension(path), delimiter_from_path(path))
+        {
             (table_name, delimiter)
         } else {
             return Err(CSVSchemaError::InvalidPath(
@@ -96,7 +106,10 @@ impl CSVTableMetadata {
 
         // We determine the internal path of the file, by replacing the root
         // portion of the path with the docker root
-        let docker_path = path.to_string_lossy().to_string().replace(root, docker_root);
+        let docker_path = path
+            .to_string_lossy()
+            .to_string()
+            .replace(root, docker_root);
 
         let mut reader_builder = csv::ReaderBuilder::new();
         reader_builder.has_headers(true);
