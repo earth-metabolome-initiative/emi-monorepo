@@ -14,6 +14,7 @@ mod csv_table;
 mod data_types;
 mod errors;
 mod metadata;
+pub mod extensions;
 
 pub use csv_schema::{CSVSchema, CSVSchemaBuilder};
 pub use csv_table::CSVTable;

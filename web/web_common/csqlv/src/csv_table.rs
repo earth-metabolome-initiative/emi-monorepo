@@ -167,14 +167,16 @@ impl<'a> CSVTable<'a> {
 
         sql.push_str("\n);\n");
 
+        let delimiter = self.table_metadata.delimiter();
+
         if self.table_metadata.gzip() {
             sql.push_str(&format!(
-                "\nCOPY {temporary_table_name} FROM PROGRAM 'gzip -dc {}' DELIMITER ',' CSV HEADER;\n",
+                "\nCOPY {temporary_table_name} FROM PROGRAM 'gzip -dc {}' DELIMITER '{delimiter}' CSV HEADER;\n",
                 self.table_metadata.path
             ));
         } else {
             sql.push_str(&format!(
-                "\nCOPY {temporary_table_name} FROM '{}' DELIMITER ',' CSV HEADER;\n",
+                "\nCOPY {temporary_table_name} FROM '{}' DELIMITER '{delimiter}' CSV HEADER;\n",
                 self.table_metadata.path
             ));
         }
