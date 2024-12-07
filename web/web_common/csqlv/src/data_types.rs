@@ -27,8 +27,8 @@ impl DataType {
             DataType::VarChar(_) => 24,
             DataType::Uuid => 16,
             DataType::SmallInt | DataType::SmallSerial => 2,
-            DataType::Integer | DataType::Real | DataType::Serial=> 4,
-            DataType::Double | DataType::BigInt |DataType::BigSerial => 8,
+            DataType::Integer | DataType::Real | DataType::Serial => 4,
+            DataType::Double | DataType::BigInt | DataType::BigSerial => 8,
             DataType::Null => 0,
             DataType::Boolean => 1,
         }
@@ -117,10 +117,22 @@ impl DataType {
             DataType::SmallInt => Ok(DataType::SmallSerial),
             DataType::Integer => Ok(DataType::Serial),
             DataType::BigInt => Ok(DataType::BigSerial),
+            DataType::Serial => Ok(DataType::Serial),
+            DataType::SmallSerial => Ok(DataType::SmallSerial),
+            DataType::BigSerial => Ok(DataType::BigSerial),
             error => Err(CSVSchemaError::UnknownDataType(format!(
                 "Unknown Serial variant for {error:?}",
-                
             ))),
+        }
+    }
+
+    /// Returns the non-serial variant of the data type.
+    pub fn into_non_serial(self) -> DataType {
+        match self {
+            DataType::SmallSerial => DataType::SmallInt,
+            DataType::Serial => DataType::Integer,
+            DataType::BigSerial => DataType::BigInt,
+            other => other,
         }
     }
 

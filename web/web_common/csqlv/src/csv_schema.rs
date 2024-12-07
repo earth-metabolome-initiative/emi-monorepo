@@ -1,9 +1,11 @@
 //! Submodule providing the CSV Schema struct, which loads a CSV directory and
 //! processes it into a complete SQL database schema.
 use indicatif::ProgressIterator;
+use std::path::Path;
 
 use crate::csv_table::CSVTable;
 use crate::errors::CSVSchemaError;
+use crate::extensions::{has_compression_extension, has_supported_extension};
 use crate::metadata::CSVTableMetadata;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -172,7 +174,7 @@ impl CSVSchemaBuilder {
     /// * If the directory cannot be read.
     /// * If the schema contains duplicate tables.
     /// * If the schema contains loops in the foreign keys.
-    /// 
+    ///
     /// # Panics
     /// * If the schema contains foreign keys that do not exist.
     ///
@@ -208,19 +210,12 @@ impl CSVSchemaBuilder {
         let table_metadatas = paths
             .iter()
             .progress_with(progress_bar)
-            .filter_map(|path| {
-                let path = path.to_str().unwrap();
-                if std::path::Path::new(path)
-                    .extension()
-                    .map_or(false, |ext| ext.eq_ignore_ascii_case("csv"))
-                    || path.ends_with(".csv.gz") && self.include_gz
-                {
-                    Some(path)
-                } else {
-                    None
-                }
+            .filter(|path| {
+                let path: &Path = path.as_ref();
+                has_supported_extension(path)
+                    && (!has_compression_extension(path) || self.include_gz)
             })
-            .map(|path| CSVTableMetadata::from_csv(dir, path, &container_directory))
+            .map(|path| CSVTableMetadata::from_csv(dir, path.as_ref(), &container_directory))
             .collect::<Result<Vec<_>, CSVSchemaError>>()?;
 
         // We check that the tables have unique names.
