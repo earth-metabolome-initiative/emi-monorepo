@@ -12,7 +12,12 @@ pub enum CSVSchemaError {
     /// Error indicating an invalid column name.
     InvalidColumnName(String),
     /// Error indicating a duplicate column.
-    DuplicateColumn(String),
+    DuplicateColumn{
+        /// The column name.
+        column_name: Option<String>,
+        /// The table name.
+        table_name: String,
+    },
     /// Error indicating a duplicate table.
     DuplicateTable(String),
     /// Error indicating a CSV error.
@@ -58,7 +63,9 @@ impl std::fmt::Display for CSVSchemaError {
             CSVSchemaError::InvalidPath(e) => write!(f, "Invalid CSV path: {e}"),
             CSVSchemaError::InvalidTableName(e) => write!(f, "Invalid table name: {e}"),
             CSVSchemaError::InvalidColumnName(e) => write!(f, "Invalid column name: {e}"),
-            CSVSchemaError::DuplicateColumn(e) => write!(f, "Duplicate column: {e}"),
+            CSVSchemaError::DuplicateColumn { column_name, table_name } => {
+                write!(f, "Duplicate column: {column_name:?} in table {table_name}")
+            }
             CSVSchemaError::DuplicateTable(e) => write!(f, "Duplicate table: {e}"),
             CSVSchemaError::CSVError(e) => write!(f, "CSV Error: {e}"),
             CSVSchemaError::IOError(e) => write!(f, "IO Error: {e}"),

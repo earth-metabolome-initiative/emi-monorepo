@@ -5,7 +5,9 @@ use crate::errors::CSVSchemaError;
 use crate::extensions::{
     delimiter_from_path, file_name_without_extension, has_compression_extension,
 };
+use crate::CSVSchema;
 use csv::Reader;
+use pluralizer::pluralize;
 use std::path::Path;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -13,6 +15,7 @@ use std::path::Path;
 pub struct CSVTableMetadata {
     pub(crate) name: String,
     pub(crate) path: String,
+    pub(crate) singularize: bool,
     pub(crate) number_of_rows: u64,
     pub(crate) columns: Vec<CSVColumnMetadata>,
 }
@@ -26,8 +29,22 @@ impl CSVTableMetadata {
         delimiter_from_path(Path::new(&self.path)).unwrap()
     }
 
+    /// Returns the name of the table to use as foreign key.
+    pub fn foreign_table_name(&self) -> String {
+        if self.singularize {
+            pluralize(&self.name, 1, false)
+        } else {
+            self.name.clone()
+        }
+    }
+
     /// Create a new `CSVTableMetadata`.
-    fn parse_rows<R>(mut rows: Reader<R>, name: &str, path: String) -> Result<Self, CSVSchemaError>
+    fn parse_rows<R>(
+        mut rows: Reader<R>,
+        name: &str,
+        path: String,
+        singularize: bool,
+    ) -> Result<Self, CSVSchemaError>
     where
         R: std::io::Read,
     {
@@ -36,16 +53,6 @@ impl CSVTableMetadata {
             .into_iter()
             .map(CSVColumnMetadataBuilder::new)
             .collect::<Result<Vec<_>, _>>()?;
-
-        // Check that there are no duplicate column names
-        let mut column_names = std::collections::HashSet::new();
-        for column_builder in &column_builders {
-            if !column_names.insert(&column_builder.column_name) {
-                return Err(CSVSchemaError::DuplicateColumn(
-                    column_builder.column_name.clone(),
-                ));
-            }
-        }
 
         let mut number_of_rows = 0;
         for row in rows.records() {
@@ -60,6 +67,17 @@ impl CSVTableMetadata {
             .into_iter()
             .map(CSVColumnMetadata::try_from)
             .collect::<Result<Vec<_>, _>>()?;
+
+        // Check that there are no duplicate column names
+        let mut unique_columns = std::collections::HashSet::new();
+        for column in &columns {
+            if !unique_columns.insert(column) {
+                return Err(CSVSchemaError::DuplicateColumn {
+                    column_name: column.name.clone(),
+                    table_name: name.to_string(),
+                });
+            }
+        }
 
         // If there is no column identified as the primary key, we add a new
         // column with the name "id".
@@ -82,12 +100,18 @@ impl CSVTableMetadata {
             name: name.to_string(),
             path,
             number_of_rows,
+            singularize,
             columns,
         })
     }
 
     /// Create a new `CSVTableMetadata` from a CSV file.
-    pub fn from_csv(root: &str, path: &Path, docker_root: &str) -> Result<Self, CSVSchemaError> {
+    pub fn from_csv(
+        root: &str,
+        path: &Path,
+        docker_root: &str,
+        singularize: bool,
+    ) -> Result<Self, CSVSchemaError> {
         // We check that the provided path ends with .csv or .csv.gz
         let (table_name, delimiter) = if let (Some(table_name), Some(delimiter)) =
             (file_name_without_extension(path), delimiter_from_path(path))
@@ -122,15 +146,11 @@ impl CSVTableMetadata {
         if has_compression_extension(path) {
             let decoder = flate2::read::GzDecoder::new(file);
             let reader = reader_builder.from_reader(decoder);
-            Self::parse_rows(reader, table_name, docker_path)
+            Self::parse_rows(reader, table_name, docker_path, singularize)
         } else {
             let reader = reader_builder.from_reader(file);
-            Self::parse_rows(reader, table_name, docker_path)
+            Self::parse_rows(reader, table_name, docker_path, singularize)
         }
-    }
-
-    pub(crate) fn has_column(&self, column_name: &str) -> bool {
-        self.columns.iter().any(|column| column.name == column_name)
     }
 
     pub(crate) fn gzip(&self) -> bool {
@@ -143,7 +163,7 @@ impl CSVTableMetadata {
 
     pub(crate) fn validate_schema_compatibility(
         &self,
-        tables: &[Self],
+        schema: &CSVSchema,
     ) -> Result<(), CSVSchemaError> {
         self.columns
             .iter()
@@ -152,12 +172,12 @@ impl CSVTableMetadata {
                 if let (Some(foreign_table_name), Some(foreign_column_name)) =
                     (&column.foreign_table_name, &column.foreign_column_name)
                 {
-                    let foreign_table = tables
-                        .iter()
-                        .find(|table| table.name == *foreign_table_name)
+                    let foreign_table = schema.tables()
+                        .into_iter()
+                        .find(|table| table.name() == *foreign_table_name)
                         .ok_or(CSVSchemaError::UnknownForeignKey {
                             table_name: self.name.clone(),
-                            column_name: column.name.clone(),
+                            column_name: column.name(schema)?,
                             foreign_table_name: foreign_table_name.clone(),
                             foreign_column_name: foreign_column_name.clone(),
                         })?;
@@ -165,7 +185,7 @@ impl CSVTableMetadata {
                     if !foreign_table.has_column(foreign_column_name) {
                         return Err(CSVSchemaError::UnknownForeignKey {
                             table_name: self.name.clone(),
-                            column_name: column.name.clone(),
+                            column_name: column.name(schema)?,
                             foreign_table_name: foreign_table_name.clone(),
                             foreign_column_name: foreign_column_name.clone(),
                         });

@@ -1,6 +1,6 @@
 //! Submodule providing the CSV Column struct.
 
-use crate::{csv_table::CSVTable, data_types::DataType, metadata::CSVColumnMetadata};
+use crate::{csv_table::CSVTable, data_types::DataType, metadata::CSVColumnMetadata, CSVSchemaError};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV column.
@@ -10,10 +10,11 @@ pub struct CSVColumn<'a> {
 }
 
 impl<'a> CSVColumn<'a> {
+    
     #[must_use]
     /// Returns the name of the column.
-    pub fn name(&self) -> &str {
-        &self.column_metadata.name
+    pub fn name(&self) -> Result<String, CSVSchemaError> {
+        self.column_metadata.name(self.table.schema)
     }
     
     #[must_use]
