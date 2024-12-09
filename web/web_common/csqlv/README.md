@@ -31,11 +31,12 @@ let schema: CSVSchema = CSVSchemaBuilder::default()
     .include_gz()
     // For supporting running the tests within
     // containers such as Docker
+    .singularize()
     .container_directory("/app/bands")
     .from_dir("./tests/bands")
     .unwrap();
 
-let sql: String = schema.to_postgres();
+let sql: String = schema.to_postgres().unwrap();
 
 println!("{}", sql);
 ```
@@ -126,8 +127,8 @@ FROM
 DROP TABLE bands_temp;
 
 CREATE TABLE IF NOT EXISTS band_members (
-    bands_id SMALLINT NOT NULL REFERENCES bands(id),
-    players_id SMALLINT UNIQUE NOT NULL REFERENCES players(id),
+    band_id SMALLINT NOT NULL REFERENCES bands(id),
+    player_id SMALLINT UNIQUE NOT NULL REFERENCES players(id),
     id SMALLSERIAL PRIMARY KEY UNIQUE NOT NULL
 );
 CREATE TEMPORARY TABLE band_members_temp (
@@ -138,8 +139,8 @@ CREATE TEMPORARY TABLE band_members_temp (
 COPY band_members_temp FROM PROGRAM 'gzip -dc /app/csvs/bands/band_members.tsv.gz' DELIMITER '  ' CSV HEADER;
 
 INSERT INTO band_members (
-    bands_id,
-    players_id
+    band_id,
+    player_id
 ) SELECT
     bands.id,
     players.id
@@ -150,5 +151,3 @@ FROM
 
 DROP TABLE band_members_temp;
 ```
-
-

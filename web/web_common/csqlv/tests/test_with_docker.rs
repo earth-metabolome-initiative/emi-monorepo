@@ -1,4 +1,4 @@
-use csqlv::CSVSchemaBuilder;
+use csqlv::{CSVSchemaBuilder, CSVSchemaError};
 use diesel::connection::SimpleConnection;
 use diesel::pg::PgConnection;
 use diesel::Connection;
@@ -63,13 +63,14 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
     container.unwrap()
 }
 
-async fn test_independent_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+async fn test_independent_csvs(conn: &mut PgConnection) -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
         .container_directory("/app/csvs/independent_csvs")
+        .singularize()
         .from_dir("./tests/independent_csvs")
         .unwrap();
 
-    let sql = schema.to_postgres();
+    let sql = schema.to_postgres()?;
     conn.batch_execute(&sql).unwrap();
 
     let delete_sql = schema.to_postgres_delete();
@@ -78,13 +79,14 @@ async fn test_independent_csvs(conn: &mut PgConnection) -> Result<(), diesel::re
     Ok(())
 }
 
-async fn test_tree_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+async fn test_tree_dependent_csvs(conn: &mut PgConnection) -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
         .container_directory("/app/csvs/tree_dependent_csvs")
+        .singularize()
         .from_dir("./tests/tree_dependent_csvs")
         .unwrap();
 
-    let sql = schema.to_postgres();
+    let sql = schema.to_postgres()?;
     conn.batch_execute(&sql).unwrap();
 
     let delete_sql = schema.to_postgres_delete();
@@ -93,14 +95,15 @@ async fn test_tree_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel:
     Ok(())
 }
 
-async fn test_dag_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+async fn test_dag_dependent_csvs(conn: &mut PgConnection) -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
         .container_directory("/app/csvs/dag_dependent_csvs")
         .include_gz()
+        .singularize()
         .from_dir("./tests/dag_dependent_csvs")
         .unwrap();
 
-    let sql = schema.to_postgres();
+    let sql = schema.to_postgres()?;
     conn.batch_execute(&sql).unwrap();
 
     let delete_sql = schema.to_postgres_delete();
@@ -109,14 +112,15 @@ async fn test_dag_dependent_csvs(conn: &mut PgConnection) -> Result<(), diesel::
     Ok(())
 }
 
-async fn test_bands_csvs(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+async fn test_bands_csvs(conn: &mut PgConnection) -> Result<(), CSVSchemaError> {
     let schema = CSVSchemaBuilder::default()
         .include_gz()
+        .singularize()
         .container_directory("/app/csvs/bands")
         .from_dir("./tests/bands")
         .unwrap();
 
-    let sql = schema.to_postgres();
+    let sql = schema.to_postgres()?;
 
     println!("{}", sql);
 

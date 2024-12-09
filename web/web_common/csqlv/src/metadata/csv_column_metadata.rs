@@ -1,6 +1,7 @@
 //! Submodule providing the CSV Columns struct and associated functions.
 use crate::data_types::DataType;
 use crate::errors::CSVSchemaError;
+use crate::CSVSchema;
 use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 
@@ -8,7 +9,7 @@ use std::collections::{HashMap, HashSet};
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a CSV column.
 pub struct CSVColumnMetadata {
-    pub(crate) name: String,
+    pub(crate) name: Option<String>,
     pub(crate) foreign_table_name: Option<String>,
     pub(crate) foreign_column_name: Option<String>,
     pub(crate) data_type: DataType,
@@ -25,7 +26,7 @@ impl CSVColumnMetadata {
     /// * If the data type cannot be converted to a serial data type.
     pub(crate) fn new_primary_key(data_type: DataType) -> Result<Self, CSVSchemaError> {
         Ok(Self {
-            name: "id".to_string(),
+            name: Some("id".to_string()),
             foreign_table_name: None,
             foreign_column_name: None,
             data_type: data_type.into_serial()?,
@@ -33,6 +34,16 @@ impl CSVColumnMetadata {
             artificial: true,
             primary_key: true,
             unique: true,
+        })
+    }
+
+    pub(crate) fn name(&self, schema: &CSVSchema) -> Result<String, CSVSchemaError> {
+        Ok(if let Some(name) = &self.name {
+            name.clone()
+        } else {
+            let foreign_table_name = self.foreign_table_name.as_ref().unwrap();
+            let foreign_table = schema.table_from_name(foreign_table_name)?;
+            format!("{}_id", foreign_table.foreign_table_name())
         })
     }
 }
@@ -73,7 +84,7 @@ impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
 #[allow(clippy::struct_excessive_bools)]
 /// Struct representing a CSV column builder.
 pub struct CSVColumnMetadataBuilder {
-    pub(crate) column_name: String,
+    pub(crate) column_name: Option<String>,
     pub(crate) foreign_table_name: Option<String>,
     pub(crate) foreign_column_name: Option<String>,
     pub(crate) data_type_counts: HashMap<DataType, u64>,
@@ -104,7 +115,7 @@ impl CSVColumnMetadataBuilder {
         // or "column_name" if there is no foreign key, or "foreign_table_name.foreign_column_name"
         // if the expected column name is '{foreign_table_name}_id'.
 
-        let mut column_name = original_name.to_owned();
+        let mut column_name = Some(original_name.to_owned());
         let mut foreign_table_name = None;
         let mut foreign_column_name = None;
         if original_name.contains(':') {
@@ -114,7 +125,7 @@ impl CSVColumnMetadataBuilder {
                     "Invalid column name syntax".to_string(),
                 ));
             }
-            column_name = parts[0].to_string();
+            column_name = Some(parts[0].to_string());
             let foreign_parts: Vec<&str> = parts[1].split('.').collect();
             if foreign_parts.len() != 2 {
                 return Err(CSVSchemaError::InvalidColumnName(
@@ -132,7 +143,7 @@ impl CSVColumnMetadataBuilder {
             }
             foreign_table_name = Some(parts[0].to_string());
             foreign_column_name = Some(parts[1].to_string());
-            column_name = format!("{}_id", parts[0]);
+            column_name = None;
         }
 
         Ok(CSVColumnMetadataBuilder {

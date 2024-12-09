@@ -1,6 +1,8 @@
 //! Submodule providing the CSV Schema struct, which loads a CSV directory and
 //! processes it into a complete SQL database schema.
 use indicatif::ProgressIterator;
+use pluralizer::add_singular_rule;
+use regex::Regex;
 use std::path::Path;
 
 use crate::csv_table::CSVTable;
@@ -94,15 +96,15 @@ impl CSVSchema {
 
     #[must_use]
     /// Returns the SQL to generate the schema in `PostgreSQL`.
-    pub fn to_postgres(&self) -> String {
+    pub fn to_postgres(&self) -> Result<String, CSVSchemaError> {
         let mut sql = String::new();
         for table in self.tables_with_priority().iter().map(|(table, _)| table) {
-            sql.push_str(&table.to_postgres());
+            sql.push_str(&table.to_postgres()?);
             sql.push('\n');
-            sql.push_str(&table.populate());
+            sql.push_str(&table.populate()?);
             sql.push('\n');
         }
-        sql
+        Ok(sql)
     }
 
     #[must_use]
@@ -130,6 +132,7 @@ impl CSVSchema {
 pub struct CSVSchemaBuilder {
     include_gz: bool,
     container_directory: Option<String>,
+    singularize: bool,
     verbose: bool,
 }
 
@@ -140,6 +143,7 @@ impl CSVSchemaBuilder {
         Self {
             include_gz: false,
             container_directory: None,
+            singularize: false,
             verbose: false,
         }
     }
@@ -162,6 +166,20 @@ impl CSVSchemaBuilder {
     /// Set the verbosity of the schema builder.
     pub fn verbose(mut self) -> Self {
         self.verbose = true;
+        self
+    }
+
+    #[must_use]
+    /// Singularize the table names.
+    pub fn singularize(mut self) -> Self {
+        self.singularize = true;
+        self
+    }
+
+    #[must_use]
+    /// Add a singular rule to the pluralizer.
+    pub fn add_singular_rule<S: ToString>(self, singular: Regex, plural: S) -> Self {
+        add_singular_rule(singular, plural.to_string());
         self
     }
 
@@ -215,7 +233,14 @@ impl CSVSchemaBuilder {
                 has_supported_extension(path)
                     && (!has_compression_extension(path) || self.include_gz)
             })
-            .map(|path| CSVTableMetadata::from_csv(dir, path.as_ref(), &container_directory))
+            .map(|path| {
+                CSVTableMetadata::from_csv(
+                    dir,
+                    path.as_ref(),
+                    &container_directory,
+                    self.singularize,
+                )
+            })
             .collect::<Result<Vec<_>, CSVSchemaError>>()?;
 
         // We check that the tables have unique names.
@@ -229,12 +254,6 @@ impl CSVSchemaBuilder {
                 "Duplicate table name".to_string(),
             ));
         }
-
-        // We check that all of the foreign tables are valid and that the foreign
-        // columns actually exist in the foreign tables.
-        table_metadatas
-            .iter()
-            .try_for_each(|table| table.validate_schema_compatibility(&table_metadatas))?;
 
         // We check that there are no loops in the schema caused by foreign keys.
         for original_table in &table_metadatas {
@@ -266,6 +285,14 @@ impl CSVSchemaBuilder {
             }
         }
 
-        Ok(CSVSchema { table_metadatas })
+        let schema = CSVSchema { table_metadatas };
+
+        // We check that all of the foreign tables are valid and that the foreign
+        // columns actually exist in the foreign tables.
+        schema.table_metadatas
+            .iter()
+            .try_for_each(|table| table.validate_schema_compatibility(&schema))?;
+
+        Ok(schema)
     }
 }

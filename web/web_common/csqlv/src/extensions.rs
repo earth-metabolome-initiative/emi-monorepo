@@ -7,6 +7,7 @@ pub const EXTENSIONS: [(&str, char); 3] = [("csv", ','), ("tsv", '\t'), ("ssv", 
 /// List of supported compression extensions.
 pub const COMPRESSION_EXTENSIONS: [&str; 1] = ["gz"];
 
+#[must_use]
 /// Returns whether the provided path has a supported extension.
 ///
 /// # Arguments
@@ -53,6 +54,7 @@ pub fn has_supported_extension(path: &Path) -> bool {
     delimiter_from_path(path).is_some()
 }
 
+#[must_use]
 /// Returns whether the path has a supported compression extension.
 ///
 /// # Arguments
@@ -82,6 +84,7 @@ pub fn has_compression_extension(path: &Path) -> bool {
     }
 }
 
+#[must_use]
 /// Returns the delimiter associated to the provided path.
 ///
 /// # Arguments
@@ -153,6 +156,7 @@ pub fn delimiter_from_path(path: &Path) -> Option<char> {
         .map(|(_, delimiter)| *delimiter)
 }
 
+#[must_use]
 /// Returns the file name without the (supported) extension.
 ///
 /// # Arguments

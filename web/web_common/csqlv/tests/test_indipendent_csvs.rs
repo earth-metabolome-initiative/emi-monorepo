@@ -13,12 +13,12 @@ fn test_independent_csvs() {
     let second_table = &tables[1];
     let columns = first_table.columns();
     assert_eq!(columns.len(), 3, "Columns: {:?}", columns);
-    assert_eq!(columns[0].name(), "id");
-    assert_eq!(columns[1].name(), "name");
-    assert_eq!(columns[2].name(), "description");
+    assert_eq!(columns[0].name().unwrap(), "id");
+    assert_eq!(columns[1].name().unwrap(), "name");
+    assert_eq!(columns[2].name().unwrap(), "description");
     let columns = second_table.columns();
     assert_eq!(columns.len(), 3);
-    assert_eq!(columns[0].name(), "id");
-    assert_eq!(columns[1].name(), "name");
-    assert_eq!(columns[2].name(), "description");
+    assert_eq!(columns[0].name().unwrap(), "id");
+    assert_eq!(columns[1].name().unwrap(), "name");
+    assert_eq!(columns[2].name().unwrap(), "description");
 }
