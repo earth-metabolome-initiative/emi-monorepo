@@ -4,6 +4,7 @@ use diesel::{Connection, RunQueryDsl};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use quote::quote;
 use std::io::Write;
+use std::path::Path;
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
@@ -78,7 +79,7 @@ fn add_main_to_file(file_path: &str) {
 
 async fn test_code_generation_methods(
     conn: &mut PgConnection,
-) -> Result<(), diesel::result::Error> {
+) -> Result<(), WebCodeGenError> {
     let builder = trybuild::TestCases::new();
     SQLFunction::write_all(conn, "tests/ui/sql_functions.rs")?;
     add_main_to_file("tests/ui/sql_functions.rs");
@@ -92,7 +93,7 @@ async fn test_code_generation_methods(
     add_main_to_file("tests/ui/sql_operators.rs");
     builder.pass("tests/ui/sql_operators.rs");
 
-    Table::write_all(conn, "tests/ui/tables.rs", DATABASE_NAME, None)?;
+    Table::write_all(conn, Path::new("tests/ui/tables.rs"), DATABASE_NAME, None)?;
     add_main_to_file("tests/ui/tables.rs");
     builder.pass("tests/ui/tables.rs");
 

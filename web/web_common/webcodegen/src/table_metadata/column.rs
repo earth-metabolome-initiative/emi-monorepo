@@ -7,8 +7,8 @@ use diesel::{
 };
 use syn::Type;
 
+use crate::errors::WebCodeGenError;
 use crate::table_metadata::sql_function::postgres_type_to_diesel;
-use crate::CheckConstraint;
 use crate::KeyColumnUsage;
 
 /// Struct defining the `information_schema.columns` table.
@@ -113,8 +113,21 @@ impl Column {
         self.__is_nullable == "YES"
     }
 
-    pub fn diesel_type(&self) -> Type {
-        postgres_type_to_diesel(&self.data_type, self.is_nullable())
+    pub fn diesel_type(&self) -> Result<Type, WebCodeGenError> {
+        postgres_type_to_diesel(&self.data_type, self.is_nullable()).map_err(|error| {
+            match error {
+                WebCodeGenError::UnknownPostgresType { type_name, .. } => {
+                    WebCodeGenError::UnknownPostgresType {
+                        type_name,
+                        context: Some(format!(
+                            "Error converting postgres type to diesel type for column {} in table {}",
+                            self.column_name,
+                            self.table_name
+                        )),
+                    }
+                },
+                _ => error,
+    }})
     }
 
     pub fn is_uuid(&self) -> bool {
@@ -265,5 +278,4 @@ impl Column {
                 }
             })
     }
-
 }

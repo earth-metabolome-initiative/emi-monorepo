@@ -1,5 +1,5 @@
+use crate::errors::WebCodeGenError;
 use diesel::pg::PgConnection;
-use diesel::result::Error as DieselError;
 use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, TextExpressionMethods};
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
@@ -48,7 +48,10 @@ pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "_text",
 ];
 
-pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
+pub fn postgres_type_to_diesel(
+    postgres_type: &str,
+    nullable: bool,
+) -> Result<Type, WebCodeGenError> {
     let rust_type_str = match postgres_type {
         "integer" => "diesel::sql_types::Integer",
         "text" => "diesel::sql_types::Text",
@@ -91,7 +94,12 @@ pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
         "geometry(Point,4326)" => "postgis_diesel::sql_types::Geometry",
         "line" => "postgis_diesel::sql_types::Geometry",
         "jpeg" => "JPEG",
-        _ => panic!("Unsupported data type: '{}'", postgres_type),
+        unknown => {
+            return Err(WebCodeGenError::UnknownPostgresType {
+                type_name: unknown.to_string(),
+                context: None,
+            });
+        }
     };
 
     let rust_type_str = if nullable {
@@ -100,8 +108,8 @@ pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
         rust_type_str.to_string()
     };
 
-    parse_str::<Type>(&rust_type_str)
-        .expect(format!("Failed to parse rust type: '{}'", rust_type_str).as_str())
+    Ok(parse_str::<Type>(&rust_type_str)
+        .expect(format!("Failed to parse rust type: '{}'", rust_type_str).as_str()))
 }
 
 pub struct SQLFunction {
@@ -111,7 +119,7 @@ pub struct SQLFunction {
 }
 
 impl SQLFunction {
-    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, DieselError> {
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, WebCodeGenError> {
         use crate::schema::pg_namespace;
         use crate::schema::pg_proc;
         use crate::sql_functions::{pg_get_function_arguments, pg_get_function_result};
@@ -202,7 +210,20 @@ impl SQLFunction {
 
                 sql_function.arguments.push((
                     argument_name,
-                    postgres_type_to_diesel(&argument_type, false),
+                    postgres_type_to_diesel(&argument_type, false).map_err(
+                        |error| match error {
+                            WebCodeGenError::UnknownPostgresType { type_name, .. } => {
+                                WebCodeGenError::UnknownPostgresType {
+                                    type_name,
+                                    context: Some(format!(
+                                        "Argument of function: {}",
+                                        function_name
+                                    )),
+                                }
+                            }
+                            _ => error,
+                        },
+                    )?,
                 ));
             }
 
@@ -212,7 +233,20 @@ impl SQLFunction {
             }
 
             if !return_type.is_empty() && return_type != "void" {
-                sql_function.return_type = Some(postgres_type_to_diesel(&return_type, false));
+                sql_function.return_type = Some(
+                    postgres_type_to_diesel(&return_type, false).map_err(|error| match error {
+                        WebCodeGenError::UnknownPostgresType { type_name, .. } => {
+                            WebCodeGenError::UnknownPostgresType {
+                                type_name,
+                                context: Some(format!(
+                                    "Return type of function: {}",
+                                    function_name
+                                )),
+                            }
+                        }
+                        _ => error,
+                    })?,
+                );
             }
             sql_functions.push(sql_function);
         }
@@ -245,7 +279,7 @@ impl SQLFunction {
         }
     }
 
-    pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), DieselError> {
+    pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), WebCodeGenError> {
         let functions = Self::load_all(conn)?;
 
         // We convert the functions to TokenStream

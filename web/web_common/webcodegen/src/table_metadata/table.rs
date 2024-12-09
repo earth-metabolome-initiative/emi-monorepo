@@ -8,12 +8,14 @@ use itertools::Itertools;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
+use std::path::Path;
 use syn::{File, Ident};
 
+use crate::errors::WebCodeGenError;
+use crate::CheckConstraint;
 use crate::Column;
 use crate::Index;
 use crate::TableConstraint;
-use crate::CheckConstraint;
 
 /// Struct defining the `information_schema.tables` table.
 #[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug)]
@@ -130,16 +132,16 @@ impl Table {
     /// Writes all the tables syn version to a file.
     pub fn write_all(
         conn: &mut PgConnection,
-        output_path: &str,
+        output_path: &Path,
         table_catalog: &str,
         table_schema: Option<&str>,
-    ) -> Result<(), DieselError> {
+    ) -> Result<(), WebCodeGenError> {
         let tables = Table::load_all(conn, table_catalog, table_schema)?;
 
         let schema = tables
             .iter()
             .map(|table| table.to_schema(conn))
-            .collect::<Result<Vec<TokenStream>, DieselError>>()?;
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
         let table_structs = tables
             .iter()
@@ -185,16 +187,16 @@ impl Table {
     }
 
     /// Returns the Syn TokenStream for the diesel schema definition for the table.
-    pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
+    pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
         let columns = self.columns(conn)?.into_iter().map(|column| {
             let column_name = Ident::new(&column.column_name, proc_macro2::Span::call_site());
-            let column_type = column.diesel_type();
-            quote! {
+            let column_type = column.diesel_type()?;
+            Ok(quote! {
                 #column_name -> #column_type
-            }
-        });
+            })
+        }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
         let primary_key_names = self
             .primary_key_columns(conn)?
             .into_iter()
@@ -783,29 +785,32 @@ impl Table {
             .load::<Column>(conn)
     }
 
-    pub fn check_constraints(&self, conn: &mut PgConnection) -> Result<Vec<CheckConstraint>, DieselError> {
+    pub fn check_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<CheckConstraint>, DieselError> {
         use crate::schema::check_constraints;
         use crate::schema::table_constraints;
-        
 
-        check_constraints::dsl::check_constraints.inner_join(
-            table_constraints::dsl::table_constraints.on(
-                check_constraints::dsl::constraint_name
-                    .eq(table_constraints::dsl::constraint_name)
-                    .and(
-                        check_constraints::dsl::constraint_schema
-                            .eq(table_constraints::dsl::constraint_schema),
-                    )
-                    .and(
-                        check_constraints::dsl::constraint_catalog
-                            .eq(table_constraints::dsl::constraint_catalog),
-                    ),
-            ),
-        )
-        .filter(table_constraints::dsl::table_name.eq(&self.table_name))
-        .filter(table_constraints::dsl::table_schema.eq(&self.table_schema))
-        .filter(table_constraints::dsl::table_catalog.eq(&self.table_catalog))
-        .select(CheckConstraint::as_select())
-        .load::<CheckConstraint>(conn)
+        check_constraints::dsl::check_constraints
+            .inner_join(
+                table_constraints::dsl::table_constraints.on(
+                    check_constraints::dsl::constraint_name
+                        .eq(table_constraints::dsl::constraint_name)
+                        .and(
+                            check_constraints::dsl::constraint_schema
+                                .eq(table_constraints::dsl::constraint_schema),
+                        )
+                        .and(
+                            check_constraints::dsl::constraint_catalog
+                                .eq(table_constraints::dsl::constraint_catalog),
+                        ),
+                ),
+            )
+            .filter(table_constraints::dsl::table_name.eq(&self.table_name))
+            .filter(table_constraints::dsl::table_schema.eq(&self.table_schema))
+            .filter(table_constraints::dsl::table_catalog.eq(&self.table_catalog))
+            .select(CheckConstraint::as_select())
+            .load::<CheckConstraint>(conn)
     }
 }

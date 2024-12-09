@@ -13,6 +13,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{File, Ident, Type};
 
+use crate::errors::WebCodeGenError;
 use crate::table_metadata::sql_function::{postgres_type_to_diesel, UNSUPPORTED_DATA_TYPES};
 
 pub struct SQLOperator {
@@ -31,7 +32,7 @@ const DEPRECATED_OPERATORS: &[(&str, &str)] = &[
 ];
 
 impl SQLOperator {
-    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::pg_operator;
         use crate::schema::pg_proc;
         use crate::schema::pg_type;
@@ -74,31 +75,70 @@ impl SQLOperator {
                 pg_proc::dsl::proname,
             ))
             .load::<(String, String, String, String, String)>(conn)
-            .map(|rows| {
+            .map_err(WebCodeGenError::from)
+            .and_then(|rows| {
                 rows.into_iter()
-                    .filter_map(
+                    .filter(
                         |(symbol, left_operand_type, right_operand_type, result_type, name)| {
                             if UNSUPPORTED_DATA_TYPES.contains(&left_operand_type.as_str())
                                 || UNSUPPORTED_DATA_TYPES.contains(&right_operand_type.as_str())
                                 || UNSUPPORTED_DATA_TYPES.contains(&result_type.as_str())
                             {
-                                return None;
+                                return false;
                             }
                             if DEPRECATED_OPERATORS.contains(&(name.as_str(), symbol.as_str())) {
-                                return None;
+                                return false;
                             }
 
-                            Some(Self {
+                            true
+                        },
+                    )
+                    .map(
+                        |(symbol, left_operand_type, right_operand_type, result_type, name)| {
+                            Ok(Self {
                                 symbol,
                                 left_operand_type: postgres_type_to_diesel(
                                     left_operand_type.as_str(),
                                     false,
-                                ),
+                                )
+                                .map_err(|error| match error {
+                                    WebCodeGenError::UnknownPostgresType { type_name, .. } => {
+                                        WebCodeGenError::UnknownPostgresType {
+                                            type_name,
+                                            context: Some(format!(
+                                                "Left operand of operator {}",
+                                                name
+                                            )),
+                                        }
+                                    }
+                                    _ => error,
+                                })?,
                                 right_operand_type: postgres_type_to_diesel(
                                     right_operand_type.as_str(),
                                     false,
-                                ),
-                                result_type: postgres_type_to_diesel(result_type.as_str(), false),
+                                )
+                                .map_err(|error| match error {
+                                    WebCodeGenError::UnknownPostgresType { type_name, .. } => {
+                                        WebCodeGenError::UnknownPostgresType {
+                                            type_name,
+                                            context: Some(format!(
+                                                "Right operand of operator {}",
+                                                name
+                                            )),
+                                        }
+                                    }
+                                    _ => error,
+                                })?,
+                                result_type: postgres_type_to_diesel(result_type.as_str(), false)
+                                    .map_err(|error| match error {
+                                    WebCodeGenError::UnknownPostgresType { type_name, .. } => {
+                                        WebCodeGenError::UnknownPostgresType {
+                                            type_name,
+                                            context: Some(format!("Result of operator {}", name)),
+                                        }
+                                    }
+                                    _ => error,
+                                })?,
                                 name,
                             })
                         },
@@ -160,10 +200,7 @@ impl SQLOperator {
         }
     }
 
-    pub fn write_all(
-        conn: &mut PgConnection,
-        output_path: &str,
-    ) -> Result<(), diesel::result::Error> {
+    pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), WebCodeGenError> {
         let operators = Self::load_all(conn)?;
 
         // We convert the types to TokenStream
