@@ -148,7 +148,7 @@ impl SQLFunction {
 
                 sql_function.arguments.push((
                     argument_name,
-                    postgres_type_to_diesel(&argument_type, false)
+                    postgres_type_to_diesel(&argument_type, false),
                 ));
             }
 
@@ -158,9 +158,7 @@ impl SQLFunction {
             }
 
             if !return_type.is_empty() && return_type != "void" {
-                sql_function.return_type = Some(
-                    postgres_type_to_diesel(&return_type, false)
-                );
+                sql_function.return_type = Some(postgres_type_to_diesel(&return_type, false));
             }
             sql_functions.push(sql_function);
         }
