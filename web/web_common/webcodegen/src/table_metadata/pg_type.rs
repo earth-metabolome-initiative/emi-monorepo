@@ -11,7 +11,7 @@ use syn::{parse_str, Type};
 
 use crate::errors::WebCodeGenError;
 
-use super::PgAttribute;
+use super::{PgAttribute, PgEnum};
 
 /// Constant listing types supporting `Copy`.
 const COPY_TYPES: [&str; 6] = ["i32", "i16", "i64", "f32", "f64", "bool"];
@@ -424,7 +424,67 @@ impl PgType {
                 }
             })
         } else if self.is_enum() {
-            todo!("Enums are not yet supported")
+            let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
+            let variants = self.variants(conn)?;
+            let mut variant_names = Vec::new();
+            let mut in_variants = Vec::new();
+            let mut out_variants = Vec::new();
+            for variant in variants.iter() {
+                let variant_name = Ident::new(&variant.enumlabel, proc_macro2::Span::call_site());
+                variant_names.push(quote! {
+                    #variant_name
+                });
+                let variant = variant.enumlabel.clone();
+                in_variants.push(quote! {
+                    #variant => Ok(#struct_name::#variant_name),
+                });
+                out_variants.push(quote! {
+                    #struct_name::#variant_name => std::io::Write::write_all(out, #variant.as_bytes())?,         
+                });
+            }
+
+            let this_typname: &str = &self.typname;
+            let postgres_enum_name =
+                Ident::new(&self.pg_binding_name(), proc_macro2::Span::call_site());
+
+            Ok(quote! {
+                #[cfg(feature = "diesel")]
+                #[derive(diesel::query_builder::QueryId, diesel::sql_types::SqlType)]
+                #[diesel(postgres_type(name = #this_typname))]
+                pub struct #postgres_enum_name;
+
+                #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+                #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+                #[cfg_attr(feature = "diesel", derive(diesel::deserialize::FromSqlRow, diesel::expression::AsExpression))]
+                #[cfg_attr(feature = "diesel", diesel(sql_type = #postgres_enum_name))]
+                pub enum #struct_name {
+                    #(#variant_names),*
+                }
+
+                #[cfg(feature = "diesel")]
+                impl diesel::serialize::ToSql<#postgres_enum_name, diesel::pg::Pg> for #struct_name {
+                    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>) -> diesel::serialize::Result {
+                        match *self {
+                            #(#out_variants)*
+                        }
+                        Ok(diesel::serialize::IsNull::No)
+                    }
+                }
+
+                #[cfg(feature = "diesel")]
+                impl diesel::deserialize::FromSql<#postgres_enum_name, diesel::pg::Pg> for #struct_name {
+                    fn from_sql(
+                        bytes: <diesel::pg::Pg as diesel::backend::Backend>::RawValue<'_>,
+                    ) -> diesel::deserialize::Result<Self> {
+                        let s: String = diesel::deserialize::FromSql::<diesel::sql_types::Text, diesel::pg::Pg>::from_sql(bytes)?;
+                        match s.as_str() {
+                            #(#in_variants)*
+                            unknown => Err(format!("Unknown variant: {}", unknown).into()),
+                        }
+                    }
+                }
+            })
+
         } else {
             panic!("Unsupported type: {:?}", self);
         }
@@ -464,5 +524,16 @@ impl PgType {
             )
             .select(PgAttribute::as_select())
             .load::<PgAttribute>(conn)?)
+    }
+
+    /// Returns the variants of the type, if it is an enum type.
+    pub fn variants(&self, conn: &mut PgConnection) -> Result<Vec<PgEnum>, WebCodeGenError> {
+        use crate::schema::pg_enum;
+
+        Ok(pg_enum::dsl::pg_enum
+            .filter(pg_enum::dsl::enumtypid.eq(self.oid))
+            .order_by(pg_enum::dsl::enumsortorder)
+            .select(PgEnum::as_select())
+            .load::<PgEnum>(conn)?)
     }
 }

@@ -22,7 +22,7 @@ mod custom_schema_constraints;
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint, Index,
     KeyColumnUsage, ReferentialConstraint, SQLFunction, SQLOperator, Table,
-    TableConstraint, PgType, PgAttribute, PGClass,
+    TableConstraint, PgType, PgAttribute, PGClass, PgEnum,
 };
 pub use custom_schema_constraints::{
     CompulsorySiblingColumnConstraint, ConstraintError, CustomColumnConstraint,

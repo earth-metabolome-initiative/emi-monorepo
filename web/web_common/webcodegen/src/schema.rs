@@ -356,6 +356,15 @@ table! {
     }
 }
 
+table! {
+    pg_enum (oid) {
+        oid -> Oid,
+        enumtypid -> Oid,
+        enumsortorder -> Float,
+        enumlabel -> Text,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     columns,
     key_column_usage,
@@ -370,6 +379,7 @@ allow_tables_to_appear_in_same_query!(
     pg_class,
     pg_proc,
     pg_type,
+    pg_enum,
     pg_operator,
     pg_attribute,
     pg_namespace
