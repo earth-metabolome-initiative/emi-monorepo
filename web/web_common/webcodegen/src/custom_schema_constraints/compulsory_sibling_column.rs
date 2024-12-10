@@ -1,16 +1,15 @@
 use crate::custom_schema_constraints::CustomTableConstraint;
 use crate::errors::WebCodeGenError;
-use crate::Column;
 use diesel::pg::PgConnection;
 
 use super::ConstraintError;
 
-pub struct CompulsorySiblingColumn {
+pub struct CompulsorySiblingColumnConstraint {
     column_name: String,
     sibling_column_name: String,
 }
 
-impl CustomTableConstraint for CompulsorySiblingColumn {
+impl CustomTableConstraint for CompulsorySiblingColumnConstraint {
     fn check_constraint(
         &self,
         conn: &mut PgConnection,

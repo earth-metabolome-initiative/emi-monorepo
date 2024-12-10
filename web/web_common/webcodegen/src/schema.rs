@@ -238,8 +238,8 @@ table! {
         typtypmod -> Integer,
         typndims -> Integer,
         typcollation -> Oid,
-        typdefaultbin -> Bytea,
-        typdefault -> Text,
+        typdefaultbin -> Nullable<Bytea>,
+        typdefault -> Nullable<Text>,
     }
 }
 
@@ -349,10 +349,10 @@ table! {
         attislocal -> Bool,
         attinhcount -> SmallInt,
         attcollation -> Oid,
-        attstattarget -> SmallInt,
-        attacl -> Array<Oid>,
-        attoptions -> Array<Text>,
-        attfdwoptions -> Array<Text>,
+        attstattarget -> Nullable<SmallInt>,
+        attacl -> Nullable<Array<Oid>>,
+        attoptions -> Nullable<Array<Text>>,
+        attfdwoptions -> Nullable<Array<Text>>,
     }
 }
 
@@ -368,8 +368,9 @@ allow_tables_to_appear_in_same_query!(
     tables,
     pg_constraint,
     pg_class,
+    pg_proc,
+    pg_type,
+    pg_operator,
     pg_attribute,
-    pg_namespace,
+    pg_namespace
 );
-
-allow_tables_to_appear_in_same_query!(pg_proc, pg_namespace, pg_type, pg_operator);

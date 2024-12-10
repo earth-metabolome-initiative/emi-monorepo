@@ -1,6 +1,6 @@
 //! Enumeration for the errors that may happen within the webcodegen crate.
+use crate::{custom_schema_constraints::ConstraintError, Column, PgType};
 use diesel::result::Error as DieselError;
-use crate::custom_schema_constraints::ConstraintError;
 
 #[derive(Debug)]
 pub enum WebCodeGenError {
@@ -9,7 +9,9 @@ pub enum WebCodeGenError {
     IllegalTable(String),
     IllegalRolesTable(String),
     ConstraintError(ConstraintError),
-
+    UnknownColumnType(Column),
+    NotUserDefinedType(String),
+    MissingBaseType(PgType),
 }
 
 impl From<DieselError> for WebCodeGenError {
