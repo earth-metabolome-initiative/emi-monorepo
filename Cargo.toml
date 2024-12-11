@@ -10,3 +10,5 @@ members = [
     "web/web_common/webcodegen",
     "web/web_common/csqlv", 
     "web/data_migration/directus_migration"]
+    "web/web_common/snake-case-sanitizer",
+]
