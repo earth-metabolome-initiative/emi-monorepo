@@ -148,7 +148,11 @@ impl SQLFunction {
 
                 sql_function.arguments.push((
                     argument_name,
+<<<<<<< HEAD
                     postgres_type_to_diesel(&argument_type, false),
+=======
+                    postgres_type_to_diesel(&argument_type, false)
+>>>>>>> 2f61d5d (Added feature flag to support several pg versions)
                 ));
             }
 
@@ -158,7 +162,13 @@ impl SQLFunction {
             }
 
             if !return_type.is_empty() && return_type != "void" {
+<<<<<<< HEAD
                 sql_function.return_type = Some(postgres_type_to_diesel(&return_type, false));
+=======
+                sql_function.return_type = Some(
+                    postgres_type_to_diesel(&return_type, false)
+                );
+>>>>>>> 2f61d5d (Added feature flag to support several pg versions)
             }
             sql_functions.push(sql_function);
         }
