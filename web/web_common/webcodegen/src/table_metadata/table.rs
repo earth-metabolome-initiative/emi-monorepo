@@ -12,6 +12,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use std::path::Path;
 use syn::{File, Ident};
+use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 
 use crate::errors::WebCodeGenError;
 use crate::CheckConstraint;
@@ -42,17 +43,9 @@ pub struct Table {
 
 impl Table {
     /// Returns the name of the struct converted from the table name.
-    pub fn struct_name(&self) -> String {
-        self.singular_table_name()
-            .split('_')
-            .map(|s| {
-                let mut chars = s.chars();
-                match chars.next() {
-                    None => String::new(),
-                    Some(f) => f.to_uppercase().chain(chars).collect(),
-                }
-            })
-            .collect()
+    pub fn struct_name(&self) -> Result<String, WebCodeGenError> {
+        let sanitizer = SnakeCaseSanizer::new().include_defaults().remove_leading_underscores().remove_trailing_underscores();
+        Ok(sanitizer.to_camel_case(&self.table_name)?)
     }
 
     /// Returns the singular name of the table.
@@ -222,15 +215,24 @@ impl Table {
     pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
+        let sanitizer = SnakeCaseSanizer::new().include_defaults().remove_leading_underscores().remove_trailing_underscores();
         let columns = self
             .columns(conn)?
             .into_iter()
             .map(|column| {
-                let column_name = Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                let original_column_name = &column.column_name;
+                let sanitized_column_name = sanitizer.to_snake_case(&column.column_name)?;
+                let column_name_ident = Ident::new(&sanitized_column_name, proc_macro2::Span::call_site());
                 let column_type = column.diesel_type(conn)?;
-                Ok(quote! {
-                    #column_name -> #column_type
-                })
+                Ok(if original_column_name == &sanitized_column_name {
+                    quote! {
+                        #[sql_name = #original_column_name]
+                        #column_name_ident -> #column_type
+                    }
+                } else {
+                    quote! {
+                    #column_name_ident -> #column_type
+                }})
             })
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
         let primary_key_names = self
@@ -260,8 +262,9 @@ impl Table {
 
     /// Returns the Syn TokenStream for the struct definition and associated methods.
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        let sanitizer = SnakeCaseSanizer::new().include_defaults().remove_leading_underscores().remove_trailing_underscores();
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
-        let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+        let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
         let primary_key_columns = self
             .primary_key_columns(conn)?
             .into_iter()
@@ -270,8 +273,9 @@ impl Table {
             .columns(conn)?
             .into_iter()
             .map(|column| {
+                let sanitized_column_name = sanitizer.to_snake_case(&column.column_name)?;
                 let column_attribute: Ident =
-                    Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                    Ident::new(&sanitized_column_name, proc_macro2::Span::call_site());
                 let column_type = column.data_type(conn)?;
                 Ok(quote! {
                     pub #column_attribute: #column_type
@@ -289,7 +293,7 @@ impl Table {
         } else {
             TokenStream::new()
         };
-        let foreign_key_methods = self.foreign_key_methods(conn);
+        let foreign_key_methods = self.foreign_key_methods(conn)?;
 
         Ok(quote! {
             #[derive(Debug)]
@@ -312,15 +316,14 @@ impl Table {
     fn foreign_key_methods<'a>(
         &'a self,
         conn: &'a mut PgConnection,
-    ) -> impl Iterator<Item = TokenStream> + 'a {
+    ) -> Result<Vec<TokenStream>, WebCodeGenError> {
         self
-            .columns(conn)
-            .unwrap()
+            .columns(conn)?
             .into_iter()
-            .filter_map(move |column| {
-                if !column.is_foreign_key(conn) {
-                    return None;
-                }
+            .filter(|column| column.is_foreign_key(conn))
+            .collect::<Vec<Column>>()
+            .into_iter()
+            .map(|column| {
                 let (foreign_key_table, foreign_key_column) = column.foreign_table(conn).unwrap().unwrap();
                 let foreign_key_table_name: Ident = Ident::new(&foreign_key_table.table_name, proc_macro2::Span::call_site());
                 let foreign_key_column_name: Ident = Ident::new(&foreign_key_column.column_name, proc_macro2::Span::call_site());
@@ -330,9 +333,9 @@ impl Table {
                     Ident::new(&column.column_name, proc_macro2::Span::call_site())
                 };
                 let current_column_name: Ident = Ident::new(&column.column_name, proc_macro2::Span::call_site());
-                let foreign_key_struct_name: Ident = Ident::new(&foreign_key_table.struct_name(), proc_macro2::Span::call_site());
+                let foreign_key_struct_name: Ident = Ident::new(&foreign_key_table.struct_name()?, proc_macro2::Span::call_site());
 
-                Some(quote! {
+                Ok(quote! {
                     #[cfg(feature = "diesel")]
                     pub async fn #method_name(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<#foreign_key_struct_name, diesel::result::Error> {
                         #foreign_key_table_name::dsl::#foreign_key_table_name
@@ -342,11 +345,11 @@ impl Table {
                             .await
                     }
                 })
-            })
+            }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()
     }
 
-    pub fn delete_method(&self, conn: &mut PgConnection) -> TokenStream {
-        let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+    pub fn delete_method(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
         let primary_key_columns = self.primary_key_columns(conn).unwrap();
 
         let where_clause = primary_key_columns
@@ -366,12 +369,12 @@ impl Table {
             .reduce(|a, b| quote! { #a.and(#b) })
             .unwrap();
 
-        quote! {
+        Ok(quote! {
             #[cfg(feature = "diesel")]
             async pub fn delete(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<usize, DieselError> {
                 diesel::delete(#struct_name.filter(#(#where_clause).and_then(|x| Ok(x)))).execute(conn).await
             }
-        }
+        })
     }
 
     pub fn has_session_user_generated_columns(&self, conn: &mut PgConnection) -> bool {
@@ -385,7 +388,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+        let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let columns = self.columns(conn)?;
 
@@ -490,7 +493,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
+        let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let columns = self.columns(conn)?;
         let primary_key_names = self

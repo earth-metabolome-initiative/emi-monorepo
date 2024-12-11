@@ -1,6 +1,7 @@
 //! Enumeration for the errors that may happen within the webcodegen crate.
 use crate::{custom_schema_constraints::ConstraintError, Column, PgType};
 use diesel::result::Error as DieselError;
+use snake_case_sanitizer::SanitizationErrors;
 
 #[derive(Debug)]
 pub enum WebCodeGenError {
@@ -12,6 +13,7 @@ pub enum WebCodeGenError {
     UnknownColumnType(Column),
     NotUserDefinedType(String),
     MissingBaseType(PgType),
+    SanitizationErrors(SanitizationErrors),
 }
 
 impl From<DieselError> for WebCodeGenError {
@@ -23,5 +25,11 @@ impl From<DieselError> for WebCodeGenError {
 impl From<ConstraintError> for WebCodeGenError {
     fn from(value: ConstraintError) -> Self {
         WebCodeGenError::ConstraintError(value)
+    }
+}
+
+impl From<SanitizationErrors> for WebCodeGenError {
+    fn from(value: SanitizationErrors) -> Self {
+        WebCodeGenError::SanitizationErrors(value)
     }
 }

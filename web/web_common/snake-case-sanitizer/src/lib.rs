@@ -1,15 +1,15 @@
 //! Crate to sanitize strings and convert them to snake_case.
 
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 /// Errors that can occur during the sanitization process.
-pub enum SanitizationErrors<'a> {
+pub enum SanitizationErrors {
     /// Errors associated with the needle.
     EmptyNeedle,
     /// Errors associated with the replacement.
     EmptyReplacement,
     /// Errors associated with the needle being duplicated.
-    DuplicatedNeedle(&'a str),
+    DuplicatedNeedle(String),
     /// Term contained only underscores.
     OnlyUnderscores,
     /// Term was empty.
@@ -66,7 +66,7 @@ impl<'a> Sanitizer<'a> {
     }
 
     /// Add a replacement to the Sanitizer.
-    pub fn add_replacement(mut self, needle: &'a str, replacement: &'a str) -> Result<Self, SanitizationErrors<'a>> {
+    pub fn add_replacement(mut self, needle: &'a str, replacement: &'a str) -> Result<Self, SanitizationErrors> {
         if needle.is_empty() {
             return Err(SanitizationErrors::EmptyNeedle);
         }
@@ -75,7 +75,7 @@ impl<'a> Sanitizer<'a> {
         }
 
         if self.replacements.iter().any(|(n, _)| n == &needle) {
-            return Err(SanitizationErrors::DuplicatedNeedle(needle));
+            return Err(SanitizationErrors::DuplicatedNeedle(needle.to_owned()));
         }
 
         self.replacements.push((needle, replacement));
@@ -118,8 +118,7 @@ impl<'a> Sanitizer<'a> {
     /// * `SanitizationErrors::EmptyTerm` - The term was empty.
     /// * `SanitizationErrors::OnlyUnderscores` - The term contained only underscores.
     /// 
-    /// use snake_case_sanitizer::Sanitizer;
-    pub fn to_snake_case<S: ToString>(&self, input: S) -> Result<String, SanitizationErrors<'a>> {
+    pub fn to_snake_case<S: ToString>(&self, input: S) -> Result<String, SanitizationErrors> {
         let mut with_replacements = self.apply_replacement(input);
 
         if with_replacements.is_empty() {
@@ -178,5 +177,16 @@ impl<'a> Sanitizer<'a> {
         }
 
         Ok(result)
+    }
+
+    /// Returns the string sanitized to CamelCase.
+    pub fn to_camel_case<S: ToString>(&self, input: S) -> Result<String, SanitizationErrors> {
+        Ok(self.to_snake_case(input)?.split('_').map(|part| {
+            let mut chars = part.chars();
+            match chars.next() {
+                None => String::new(),
+                Some(first) => first.to_ascii_uppercase().to_string() + chars.as_str(),
+            }
+        }).collect())
     }
 }
