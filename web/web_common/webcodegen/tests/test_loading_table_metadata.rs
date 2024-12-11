@@ -1,17 +1,18 @@
 use diesel::connection::SimpleConnection;
 use diesel::pg::PgConnection;
-use diesel::{Connection, RunQueryDsl};
+use diesel::Connection;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use quote::quote;
-use std::io::Write;
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
 
+mod utils;
+
 use webcodegen::errors::WebCodeGenError;
 use webcodegen::*;
+use utils::add_main_to_file;
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
 const DATABASE_NAME: &str = "test_db";
@@ -61,32 +62,11 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
     container.unwrap()
 }
 
-fn add_main_to_file(file_path: &str) {
-    let mut file = std::fs::OpenOptions::new()
-        .append(true)
-        .open(file_path)
-        .unwrap();
-
-    let main = quote! {
-        fn main() {}
-    };
-
-    file.write_all(main.to_string().as_bytes()).unwrap();
-    file.flush().unwrap();
-    file.sync_all().unwrap();
-}
-
-async fn test_code_generation_methods(
-    conn: &mut PgConnection,
-) -> Result<(), diesel::result::Error> {
+async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), WebCodeGenError> {
     let builder = trybuild::TestCases::new();
     SQLFunction::write_all(conn, "tests/ui/sql_functions.rs")?;
     add_main_to_file("tests/ui/sql_functions.rs");
     builder.pass("tests/ui/sql_functions.rs");
-
-    SQLType::write_all(conn, "tests/ui/sql_types.rs")?;
-    add_main_to_file("tests/ui/sql_types.rs");
-    builder.pass("tests/ui/sql_types.rs");
 
     SQLOperator::write_all(conn, "tests/ui/sql_operators.rs")?;
     add_main_to_file("tests/ui/sql_operators.rs");
@@ -99,7 +79,7 @@ async fn test_code_generation_methods(
     Ok(())
 }
 
-async fn test_check_constraints(conn: &mut PgConnection) -> Result<(), diesel::result::Error> {
+async fn test_check_constraints(conn: &mut PgConnection) -> Result<(), WebCodeGenError> {
     let users = Table::load(conn, "users", None, DATABASE_NAME).unwrap();
 
     let table_check_constraint = users.check_constraints(conn)?;
@@ -145,7 +125,7 @@ async fn test_user_table() {
     // of PostgreSQL
     let all_tables = Table::load_all(&mut conn, DATABASE_NAME, None).unwrap();
     assert!(!all_tables.is_empty());
-    let all_columns = Column::load_all(&mut conn);
+    let _all_columns = Column::load_all(&mut conn);
 
     let all_unique_indexes = Index::load_all_unique(&mut conn, None).unwrap();
     assert!(!all_unique_indexes.is_empty(),);
@@ -190,15 +170,15 @@ async fn test_user_table() {
     assert_eq!(gist_index.tablename, "composite_users");
     assert_eq!(gist_index.indexname, "composite_users_gist");
 
-    let all_table_constraints = TableConstraint::load_all(&mut conn);
-    let all_key_column_usage = KeyColumnUsage::load_all_key_column_usages(&mut conn);
-    let all_referential_constraints =
+    let _all_table_constraints = TableConstraint::load_all(&mut conn);
+    let _all_key_column_usage = KeyColumnUsage::load_all_key_column_usages(&mut conn);
+    let _all_referential_constraints =
         ReferentialConstraint::load_all_referential_constraints(&mut conn);
-    let all_constraint_column_usage =
+    let _all_constraint_column_usage =
         ConstraintColumnUsage::load_all_constraint_column_usages(&mut conn);
-    let all_check_constraint = CheckConstraint::load_all_check_constraints(&mut conn);
-    let all_constraint_table_usage = ConstraintTableUsage::load_all(&mut conn);
-    let all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
+    let _all_check_constraint = CheckConstraint::load_all_check_constraints(&mut conn);
+    let _all_constraint_table_usage = ConstraintTableUsage::load_all(&mut conn);
+    let _all_domain_constraint = DomainConstraint::load_all_domain_constraints(&mut conn);
 
     let users = Table::load(&mut conn, "users", None, DATABASE_NAME).unwrap();
 
@@ -216,21 +196,20 @@ async fn test_user_table() {
 
     let original_user_id_column = users.column_by_name(&mut conn, "id").unwrap();
 
-    let columns: Result<Vec<Column>, diesel::result::Error> = users.columns(&mut conn);
+    let columns: Result<Vec<Column>, WebCodeGenError> = users.columns(&mut conn);
 
     assert!(columns.is_ok());
     let columns = columns.unwrap();
     assert_eq!(columns.len(), 4);
 
-    let primary_key_columns: Result<Vec<Column>, diesel::result::Error> =
+    let primary_key_columns: Result<Vec<Column>, WebCodeGenError> =
         users.primary_key_columns(&mut conn);
 
     assert!(primary_key_columns.is_ok());
     let primary_key_columns = primary_key_columns.unwrap();
     assert_eq!(primary_key_columns.len(), 1);
 
-    let unique_columns: Result<Vec<Vec<Column>>, diesel::result::Error> =
-        users.unique_columns(&mut conn);
+    let unique_columns: Result<Vec<Vec<Column>>, WebCodeGenError> = users.unique_columns(&mut conn);
 
     assert!(unique_columns.is_ok());
     let unique_columns = unique_columns.unwrap();
@@ -252,13 +231,13 @@ async fn test_user_table() {
 
     assert!(composite_users.gin_indexes(&mut conn).unwrap().is_empty());
 
-    let columns: Result<Vec<Column>, diesel::result::Error> = composite_users.columns(&mut conn);
-    let primary_key_columns: Result<Vec<Column>, diesel::result::Error> =
+    let columns: Result<Vec<Column>, WebCodeGenError> = composite_users.columns(&mut conn);
+    let primary_key_columns: Result<Vec<Column>, WebCodeGenError> =
         composite_users.primary_key_columns(&mut conn);
 
     assert!(columns.is_ok());
     let columns = columns.unwrap();
-    assert_eq!(columns.len(), 5);
+    assert_eq!(columns.len(), 8);
 
     assert!(primary_key_columns.is_ok());
     let primary_key_columns = primary_key_columns.unwrap();

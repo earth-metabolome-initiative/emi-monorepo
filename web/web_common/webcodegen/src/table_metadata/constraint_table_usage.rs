@@ -1,5 +1,5 @@
 use diesel::pg::PgConnection;
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
+use diesel::{Queryable, QueryableByName, RunQueryDsl};
 
 #[derive(Queryable, QueryableByName, Debug)]
 #[diesel(table_name = crate::schema::constraint_table_usage)]
@@ -15,7 +15,6 @@ pub struct ConstraintTableUsage {
 impl ConstraintTableUsage {
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
         use crate::schema::constraint_table_usage::dsl::*;
-        constraint_table_usage
-            .load::<ConstraintTableUsage>(conn)
-        }
+        constraint_table_usage.load::<ConstraintTableUsage>(conn)
+    }
 }

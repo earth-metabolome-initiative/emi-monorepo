@@ -2,15 +2,13 @@
 //!
 //! Editable tables are the ones characterized by created_by and updated_by columns.
 
-use diesel::result::Error as DieselError;
 use diesel::PgConnection;
 
 use crate::errors::WebCodeGenError;
 use crate::Table;
 
 impl Table {
-    /// Returns whether the table requires a roles table.
-    pub fn requires_roles_table(&self, conn: &mut PgConnection) -> Result<bool, DieselError> {
+    fn requires_roles_table(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(self.columns(conn)?.iter().any(|c| c.is_created_by(conn)))
     }
 
@@ -52,7 +50,7 @@ impl Table {
         for primary_key_column in self.primary_key_columns(conn)? {
             create_table.push_str(&format!(
                 "{} {} NOT NULL,\n",
-                primary_key_column.column_name, primary_key_column.data_type
+                primary_key_column.column_name, primary_key_column.data_type_str()?
             ));
             primary_key_names.push(primary_key_column.column_name.clone());
         }
@@ -60,17 +58,17 @@ impl Table {
         create_table.push_str(&format!(
             "{}_id {} NOT NULL,\n",
             reference_table.singular_table_name(),
-            reference_table.primary_key_columns(conn)?[0].data_type
+            reference_table.primary_key_columns(conn)?[0].data_type_str()?
         ));
 
         create_table.push_str(&format!(
             "role_id {} NOT NULL,\n",
-            roles_table.primary_key_columns(conn)?[0].data_type
+            roles_table.primary_key_columns(conn)?[0].data_type_str()?
         ));
 
         create_table.push_str(&format!(
             "created_by {} NOT NULL,\n",
-            users.primary_key_columns(conn)?[0].data_type
+            users.primary_key_columns(conn)?[0].data_type_str()?
         ));
 
         create_table.push_str("created_at TIMESTAMP NOT NULL DEFAULT NOW(),\n");

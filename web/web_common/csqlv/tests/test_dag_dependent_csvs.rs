@@ -7,7 +7,7 @@ use csqlv::CSVSchemaError;
 #[test]
 pub fn test_dependent_csvs() {
     let schema: Result<CSVSchema, CSVSchemaError> =
-        CSVSchemaBuilder::default().from_dir("./tests/dag_dependent_csvs");
+        CSVSchemaBuilder::default().include_gz().from_dir("./tests/dag_dependent_csvs");
     assert!(
         schema.is_ok(),
         "Failed to build schema: {}",

@@ -18,6 +18,12 @@ impl<'a> CSVTable<'a> {
     }
 
     #[must_use]
+    /// Returns the foreign table name of the table.
+    pub fn foreign_table_name(&self) -> String {
+        self.table_metadata.foreign_table_name()
+    }
+
+    #[must_use]
     /// Returns representations of the columns in the table.
     pub fn columns(&self) -> Vec<CSVColumn<'_>> {
         self.table_metadata
@@ -28,6 +34,12 @@ impl<'a> CSVTable<'a> {
                 column_metadata,
             })
             .collect()
+    }
+
+    #[must_use]
+    /// Returns whether the table has a column.
+    pub fn has_column(&self, column_name: &str) -> bool {
+        self.column_from_name(column_name).is_ok()
     }
 
     #[must_use]
@@ -72,7 +84,7 @@ impl<'a> CSVTable<'a> {
             .table_metadata
             .columns
             .iter()
-            .find(|column| column.name == column_name)
+            .find(|column| &column.name(self.schema).unwrap() == column_name)
             .ok_or(CSVSchemaError::InvalidColumnName(column_name.to_string()))?;
         Ok(CSVColumn {
             table: self,
@@ -82,7 +94,7 @@ impl<'a> CSVTable<'a> {
 
     #[must_use]
     /// Returns the name of the table.
-    pub fn to_postgres(&self) -> String {
+    pub fn to_postgres(&self) -> Result<String, CSVSchemaError> {
         let mut sql = format!(
             "CREATE TABLE IF NOT EXISTS {} (\n",
             self.table_metadata.name
@@ -90,9 +102,13 @@ impl<'a> CSVTable<'a> {
         for column in &self.columns() {
             sql.push_str(&format!(
                 "    {} {}{}{}{}{},\n",
-                column.name(),
+                column.name()?,
                 if let Some(foreign_table) = &column.foreign_table() {
-                    foreign_table.primary_key().data_type().to_postgres()
+                    foreign_table
+                        .primary_key()
+                        .data_type()
+                        .into_non_serial()
+                        .to_postgres()
                 } else {
                     column.data_type().to_postgres()
                 },
@@ -111,7 +127,7 @@ impl<'a> CSVTable<'a> {
                     format!(
                         " REFERENCES {}({})",
                         foreign_table.name(),
-                        foreign_table.primary_key().name()
+                        foreign_table.primary_key().name()?
                     )
                 } else {
                     String::new()
@@ -121,7 +137,7 @@ impl<'a> CSVTable<'a> {
         sql.pop();
         sql.pop();
         sql.push_str("\n);");
-        sql
+        Ok(sql)
     }
 
     #[must_use]
@@ -131,7 +147,7 @@ impl<'a> CSVTable<'a> {
     }
 
     /// Returns the SQL to generate the temporary variant of the table.
-    fn temporary_table(&self) -> String {
+    fn temporary_table(&self) -> Result<String, CSVSchemaError> {
         let temporary_table_name = self.table_metadata.temporary_table_name();
 
         let mut sql = format!("CREATE TEMPORARY TABLE {temporary_table_name} (\n");
@@ -151,7 +167,7 @@ impl<'a> CSVTable<'a> {
 
             sql.push_str(&format!(
                 "    {} {}{}{},\n",
-                column.name(),
+                column.name()?,
                 column.data_type().to_postgres(),
                 if column.is_unique() { " UNIQUE" } else { "" },
                 if column.is_nullable() {
@@ -167,34 +183,36 @@ impl<'a> CSVTable<'a> {
 
         sql.push_str("\n);\n");
 
+        let delimiter = self.table_metadata.delimiter();
+
         if self.table_metadata.gzip() {
             sql.push_str(&format!(
-                "\nCOPY {temporary_table_name} FROM PROGRAM 'gzip -dc {}' DELIMITER ',' CSV HEADER;\n",
+                "\nCOPY {temporary_table_name} FROM PROGRAM 'gzip -dc {}' DELIMITER '{delimiter}' CSV HEADER;\n",
                 self.table_metadata.path
             ));
         } else {
             sql.push_str(&format!(
-                "\nCOPY {temporary_table_name} FROM '{}' DELIMITER ',' CSV HEADER;\n",
+                "\nCOPY {temporary_table_name} FROM '{}' DELIMITER '{delimiter}' CSV HEADER;\n",
                 self.table_metadata.path
             ));
         }
 
-        sql
+        Ok(sql)
     }
 
     #[must_use]
     /// Returns the SQL to populate the table.
-    /// 
+    ///
     /// # Panics
     /// * If the schema is in an invalid state and the foreign table does not exist.
-    pub fn populate(&self) -> String {
-        let mut sql = self.temporary_table();
+    pub fn populate(&self) -> Result<String, CSVSchemaError> {
+        let mut sql = self.temporary_table()?;
         sql.push_str(&format!("\nINSERT INTO {} (\n", self.table_metadata.name));
         for column in &self.table_metadata.columns {
             if column.artificial {
                 continue;
             }
-            sql.push_str(&format!("    {},\n", column.name));
+            sql.push_str(&format!("    {},\n", column.name(self.schema)?));
         }
 
         sql.pop();
@@ -211,13 +229,13 @@ impl<'a> CSVTable<'a> {
                 sql.push_str(&format!(
                     "    {}.{},\n",
                     foreign_table.name(),
-                    foreign_table.primary_key().name()
+                    foreign_table.primary_key().name()?
                 ));
             } else {
                 sql.push_str(&format!(
                     "    {}.{},\n",
                     temporary_table_name,
-                    column.name()
+                    column.name()?
                 ));
             }
         }
@@ -244,6 +262,6 @@ impl<'a> CSVTable<'a> {
 
         sql.push_str(&format!("\nDROP TABLE {temporary_table_name};\n",));
 
-        sql
+        Ok(sql)
     }
 }

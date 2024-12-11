@@ -1,6 +1,12 @@
 # CSQLV
 
-The CSQLV crate allows to easily integrate CSVs files into your PostgreSQL database.
+The CSQLV crate allows to easily integrate CSVs files (and also TSVs and SSVs) into your PostgreSQL database.
+
+The crate will generate the necessary SQL to create the tables and relationships between them based on the CSVs files found in a given directory, with minimal metadata in the CSVs themselves. The types and their constraints are inferred from the data in the CSVs: for instance, if all the values in a column are integers smaller than 32767, the crate will infer that the column should be of type `SMALLINT`. Similarly, if no value in a column is empty, the crate will infer that the column should be `NOT NULL`. Same thing applies to `UNIQUE` constraints: if all the values in a column are unique, the crate will infer that the column should be `UNIQUE`.
+
+Integer columns characterized by a sequence of continuos integers starting from 1 will be inferred as `SERIAL` columns, which will automatically generate a sequence and a default value for the column. The crate will automatically determine and dispatch the smallest `SERIAL` type that can hold the values in the column (e.g., `SMALLSERIAL`, `SERIAL`, `BIGSERIAL`).
+
+The documents may also be compressed with `gzip`, in which case the crate will generate the necessary SQL to decompress them before loading them into the database.
 
 ## Installation
 
@@ -25,11 +31,12 @@ let schema: CSVSchema = CSVSchemaBuilder::default()
     .include_gz()
     // For supporting running the tests within
     // containers such as Docker
+    .singularize()
     .container_directory("/app/bands")
     .from_dir("./tests/bands")
     .unwrap();
 
-let sql: String = schema.to_postgres();
+let sql: String = schema.to_postgres().unwrap();
 
 println!("{}", sql);
 ```
@@ -40,7 +47,7 @@ See below a detailed breakdown of the syntax used in the CSVs used in the exampl
 
 If I have a table called `players` with a column `name` and a table called `bands` with a column `name`, I may want to define their relationships via a third table called `band_members` as follows:
 
-So, if I have a CSV file called `players.csv` with the following content:
+So, if I have a SSV file called `players.ssv` with the following content:
 
 | name  | age |
 |-------|-----|
@@ -56,7 +63,7 @@ And a CSV file called `bands.csv` with the following content:
 | The Beatles | 1960            | Paul                    |
 | Nirvana     | 1987            | Kurt                    |
 
-I can define the relationships between the tables in the `band_members.csv` file as follows:
+I can define the relationships between the tables in the GZIP-compressed TSV file `band_members.tsv.gz` as follows:
 
 | bands.band  | players.name |
 |-------------|--------------|
@@ -71,14 +78,14 @@ This will generate SQL defining the following tables:
 CREATE TABLE IF NOT EXISTS players (
     name TEXT UNIQUE NOT NULL,
     age SMALLINT UNIQUE NOT NULL,
-    id SERIAL PRIMARY KEY UNIQUE NOT NULL
+    id SMALLSERIAL PRIMARY KEY UNIQUE NOT NULL
 );
 CREATE TEMPORARY TABLE players_temp (
     name TEXT UNIQUE NOT NULL,
     age SMALLINT UNIQUE NOT NULL
 );
 
-COPY players_temp FROM '/app/csvs/bands/players.csv' DELIMITER ',' CSV HEADER;
+COPY players_temp FROM '/app/csvs/bands/players.ssv' DELIMITER ' ' CSV HEADER;
 
 INSERT INTO players (
     name,
@@ -94,8 +101,8 @@ DROP TABLE players_temp;
 CREATE TABLE IF NOT EXISTS bands (
     band TEXT UNIQUE NOT NULL,
     foundation_year SMALLINT UNIQUE NOT NULL,
-    founded_by SERIAL UNIQUE NOT NULL REFERENCES players(id),
-    id SERIAL PRIMARY KEY UNIQUE NOT NULL
+    founded_by SMALLINT UNIQUE NOT NULL REFERENCES players(id),
+    id SMALLSERIAL PRIMARY KEY UNIQUE NOT NULL
 );
 CREATE TEMPORARY TABLE bands_temp (
     band TEXT UNIQUE NOT NULL,
@@ -120,20 +127,20 @@ FROM
 DROP TABLE bands_temp;
 
 CREATE TABLE IF NOT EXISTS band_members (
-    bands_id SERIAL NOT NULL REFERENCES bands(id),
-    players_id SERIAL UNIQUE NOT NULL REFERENCES players(id),
-    id SERIAL PRIMARY KEY UNIQUE NOT NULL
+    band_id SMALLINT NOT NULL REFERENCES bands(id),
+    player_id SMALLINT UNIQUE NOT NULL REFERENCES players(id),
+    id SMALLSERIAL PRIMARY KEY UNIQUE NOT NULL
 );
 CREATE TEMPORARY TABLE band_members_temp (
     bands_band TEXT,
     players_name TEXT
 );
 
-COPY band_members_temp FROM '/app/csvs/bands/band_members.csv' DELIMITER ',' CSV HEADER;
+COPY band_members_temp FROM PROGRAM 'gzip -dc /app/csvs/bands/band_members.tsv.gz' DELIMITER '  ' CSV HEADER;
 
 INSERT INTO band_members (
-    bands_id,
-    players_id
+    band_id,
+    player_id
 ) SELECT
     bands.id,
     players.id
@@ -144,5 +151,3 @@ FROM
 
 DROP TABLE band_members_temp;
 ```
-
-

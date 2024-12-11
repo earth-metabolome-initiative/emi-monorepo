@@ -1,10 +1,11 @@
+use crate::table_metadata::pg_type::postgres_type_to_diesel;
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, TextExpressionMethods};
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse_str, File, Ident, Type};
+use syn::{File, Ident, Type};
 
 pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "internal",
@@ -47,62 +48,6 @@ pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "numeric",
     "_text",
 ];
-
-pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
-    let rust_type_str = match postgres_type {
-        "integer" => "diesel::sql_types::Integer",
-        "text" => "diesel::sql_types::Text",
-        "timestamp without time zone" => "diesel::sql_types::Timestamp",
-        "timestamp with time zone" => "diesel::sql_types::Timestamptz",
-        "timestamptz" => "diesel::sql_types::Timestamptz",
-        "timestamp" => "diesel::sql_types::Timestamp",
-        "time" => "diesel::sql_types::Time",
-        "uuid" => "diesel::sql_types::Uuid",
-        "boolean" => "diesel::sql_types::Bool",
-        "bool" => "diesel::sql_types::Bool",
-        "real" => "diesel::sql_types::Float",
-        "name" => "diesel::sql_types::Text",
-        "double precision" => "diesel::sql_types::Double",
-        "character varying" => "diesel::sql_types::Text",
-        "char" => "diesel::sql_types::CChar",
-        "bpchar" => "diesel::sql_types::Bpchar",
-        "bytea" => "diesel::sql_types::Bytea",
-        "json" => "diesel::sql_types::Json",
-        "jsonb" => "diesel::sql_types::Jsonb",
-        "macaddr" => "diesel::sql_types::Macaddr",
-        "inet" => "diesel::sql_types::Inet",
-        "oid" => "diesel::sql_types::Oid",
-        "int2" => "diesel::sql_types::SmallInt",
-        "int4" => "diesel::sql_types::Integer",
-        "int8" => "diesel::sql_types::BigInt",
-        "float4" => "diesel::sql_types::Float",
-        "float8" => "diesel::sql_types::Double",
-        "tsvector" => "diesel_full_text_search::TsVector",
-        "tsquery" => "diesel_full_text_search::TsQuery",
-        "money" => "diesel::pg::sql_types::Money",
-        "smallint" => "diesel::sql_types::SmallInt",
-        "bigint" => "diesel::sql_types::BigInt",
-        "cstring" => "diesel::sql_types::Text",
-        "interval" => "diesel::sql_types::Interval",
-        "date" => "diesel::sql_types::Date",
-        "geometry" | "geography" => "postgis_diesel::sql_types::Geometry",
-        "point" => "postgis_diesel::sql_types::Geometry",
-        "polygon" => "postgis_diesel::sql_types::Geometry",
-        "geometry(Point,4326)" => "postgis_diesel::sql_types::Geometry",
-        "line" => "postgis_diesel::sql_types::Geometry",
-        "jpeg" => "JPEG",
-        _ => panic!("Unsupported data type: '{}'", postgres_type),
-    };
-
-    let rust_type_str = if nullable {
-        format!("diesel::sql_types::Nullable<{}>", rust_type_str)
-    } else {
-        rust_type_str.to_string()
-    };
-
-    parse_str::<Type>(&rust_type_str)
-        .expect(format!("Failed to parse rust type: '{}'", rust_type_str).as_str())
-}
 
 pub struct SQLFunction {
     name: String,

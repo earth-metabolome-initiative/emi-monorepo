@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{
@@ -10,10 +12,13 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{File, Ident};
 
+use crate::errors::WebCodeGenError;
+use crate::CheckConstraint;
 use crate::Column;
 use crate::Index;
 use crate::TableConstraint;
-use crate::CheckConstraint;
+
+use super::PgType;
 
 /// Struct defining the `information_schema.tables` table.
 #[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug)]
@@ -133,22 +138,47 @@ impl Table {
         output_path: &str,
         table_catalog: &str,
         table_schema: Option<&str>,
-    ) -> Result<(), DieselError> {
+    ) -> Result<(), WebCodeGenError> {
         let tables = Table::load_all(conn, table_catalog, table_schema)?;
 
         let schema = tables
             .iter()
             .map(|table| table.to_schema(conn))
-            .collect::<Result<Vec<TokenStream>, DieselError>>()?;
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
         let table_structs = tables
             .iter()
             .map(|table| table.to_syn(conn))
-            .collect::<Result<Vec<TokenStream>, DieselError>>()?;
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
         let table_idents = tables
             .iter()
             .map(|table| Ident::new(&table.table_name, proc_macro2::Span::call_site()));
+
+        let user_defined_types = tables
+            .iter()
+            .map(|table| {
+                let custom_types = table
+                    .columns(conn)?
+                    .into_iter()
+                    .filter(|column| column.has_custom_type())
+                    .map(|column| PgType::from_name(column.data_type_str()?, conn))
+                    .collect::<Result<HashSet<PgType>, WebCodeGenError>>()?;
+                let mut additional_custom_types = custom_types.clone();
+                for custom_type in custom_types {
+                    additional_custom_types.extend(custom_type.internal_custom_types(conn)?);
+                }
+                Ok(additional_custom_types)
+            })
+            .collect::<Result<Vec<HashSet<PgType>>, WebCodeGenError>>()?
+            .into_iter()
+            .flatten()
+            .collect::<HashSet<PgType>>();
+
+        let user_defined_types_syn = user_defined_types
+            .into_iter()
+            .map(|pg_type| pg_type.to_syn(conn))
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
         let traits = Table::traits();
 
@@ -158,6 +188,8 @@ impl Table {
             use diesel::{ExpressionMethods, QueryDsl, SelectableHelper};
             #[cfg(feature = "diesel")]
             use diesel_async::RunQueryDsl;
+
+            #(#user_defined_types_syn)*
 
             #( #schema )*
 
@@ -185,16 +217,20 @@ impl Table {
     }
 
     /// Returns the Syn TokenStream for the diesel schema definition for the table.
-    pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
+    pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
-        let columns = self.columns(conn)?.into_iter().map(|column| {
-            let column_name = Ident::new(&column.column_name, proc_macro2::Span::call_site());
-            let column_type = column.diesel_type();
-            quote! {
-                #column_name -> #column_type
-            }
-        });
+        let columns = self
+            .columns(conn)?
+            .into_iter()
+            .map(|column| {
+                let column_name = Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                let column_type = column.diesel_type(conn)?;
+                Ok(quote! {
+                    #column_name -> #column_type
+                })
+            })
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
         let primary_key_names = self
             .primary_key_columns(conn)?
             .into_iter()
@@ -211,31 +247,35 @@ impl Table {
     }
 
     /// Returns wether a table require authorizations to be viewed
-    pub fn require_view_authorizations(&self, conn: &mut PgConnection) -> bool {
+    pub fn require_view_authorizations(&self, _conn: &mut PgConnection) -> bool {
         false
     }
 
     /// Returns wether a table require authorizations to be modified
-    pub fn require_modify_authorizations(&self, conn: &mut PgConnection) -> bool {
+    pub fn require_modify_authorizations(&self, _conn: &mut PgConnection) -> bool {
         false
     }
 
     /// Returns the Syn TokenStream for the struct definition and associated methods.
-    pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
+    pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
         let primary_key_columns = self
             .primary_key_columns(conn)?
             .into_iter()
             .map(|column| Ident::new(&column.column_name, proc_macro2::Span::call_site()));
-        let attributes = self.columns(conn)?.into_iter().map(|column| {
-            let column_attribute: Ident =
-                Ident::new(&column.column_name, proc_macro2::Span::call_site());
-            let column_type = column.rust_type();
-            quote! {
-                pub #column_attribute: #column_type
-            }
-        });
+        let attributes = self
+            .columns(conn)?
+            .into_iter()
+            .map(|column| {
+                let column_attribute: Ident =
+                    Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                let column_type = column.data_type(conn)?;
+                Ok(quote! {
+                    pub #column_attribute: #column_type
+                })
+            })
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
         let mutability_impls = if self.has_session_user_generated_columns(conn) {
             let insert_trait_impls = self.insert_trait_impls(conn)?;
@@ -339,7 +379,10 @@ impl Table {
             .any(|column| column.is_session_user_generated(conn))
     }
 
-    pub fn insert_trait_impls(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
+    pub fn insert_trait_impls(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
         let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let columns = self.columns(conn)?;
@@ -358,27 +401,33 @@ impl Table {
             &format!("SessionInsert{struct_name}"),
             proc_macro2::Span::call_site(),
         );
-        let session_insert_variable_attributes = session_insert_columns.iter().map(|column| {
-            let column_name: Ident =
-                Ident::new(&column.column_name, proc_macro2::Span::call_site());
-            let column_type = column.rust_type();
-            quote! {
-                pub #column_name: #column_type,
-            }
-        });
+        let session_insert_variable_attributes = session_insert_columns
+            .iter()
+            .map(|column| {
+                let column_name: Ident =
+                    Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                let column_type = column.data_type(conn)?;
+                Ok(quote! {
+                    pub #column_name: #column_type,
+                })
+            })
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
         let insert_variant_name = Ident::new(
             &format!("Insert{struct_name}"),
             proc_macro2::Span::call_site(),
         );
-        let insertable_variant_attributes = insert_columns.iter().map(|column| {
-            let column_name: Ident =
-                Ident::new(&column.column_name, proc_macro2::Span::call_site());
-            let column_type = column.rust_type();
-            quote! {
-                pub #column_name: #column_type,
-            }
-        });
+        let insertable_variant_attributes = insert_columns
+            .iter()
+            .map(|column| {
+                let column_name: Ident =
+                    Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                let column_type = column.data_type(conn)?;
+                Ok(quote! {
+                    pub #column_name: #column_type,
+                })
+            })
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
         let into_session_insert_variant_map = insert_columns.iter().map(|column| {
             let column_name: Ident =
@@ -435,7 +484,10 @@ impl Table {
         })
     }
 
-    pub fn update_trait_impls(&self, conn: &mut PgConnection) -> Result<TokenStream, DieselError> {
+    pub fn update_trait_impls(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
         let struct_name: Ident = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
         let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let columns = self.columns(conn)?;
@@ -470,40 +522,49 @@ impl Table {
             &format!("SessionUpdate{struct_name}"),
             proc_macro2::Span::call_site(),
         );
-        let session_update_variable_attributes = session_update_columns.iter().map(|column| {
-            let column_name: Ident =
-                Ident::new(&column.column_name, proc_macro2::Span::call_site());
-            let column_type = column.rust_type();
-            if column.is_updated_by(conn) || primary_key_names.contains(&column.column_name) {
-                quote! {
-                    pub #column_name: #column_type,
-                }
-            } else {
-                quote! {
-                    pub #column_name: Option<#column_type>,
-                }
-            }
-        });
+        let session_update_variable_attributes = session_update_columns
+            .iter()
+            .map(|column| {
+                let column_name: Ident =
+                    Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                let column_type = column.data_type(conn)?;
+                Ok(
+                    if column.is_updated_by(conn) || primary_key_names.contains(&column.column_name)
+                    {
+                        quote! {
+                            pub #column_name: #column_type,
+                        }
+                    } else {
+                        quote! {
+                            pub #column_name: Option<#column_type>,
+                        }
+                    },
+                )
+            })
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
         let update_variant_name = Ident::new(
             &format!("Update{struct_name}"),
             proc_macro2::Span::call_site(),
         );
-        let updateable_variant_attributes = update_columns.iter().map(|column| {
-            let column_name: Ident =
-                Ident::new(&column.column_name, proc_macro2::Span::call_site());
-            let column_type = column.rust_type();
+        let updateable_variant_attributes = update_columns
+            .iter()
+            .map(|column| {
+                let column_name: Ident =
+                    Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                let column_type = column.data_type(conn)?;
 
-            if primary_key_names.contains(&column.column_name) {
-                quote! {
-                    pub #column_name: #column_type,
-                }
-            } else {
-                quote! {
-                    pub #column_name: Option<#column_type>,
-                }
-            }
-        });
+                Ok(if primary_key_names.contains(&column.column_name) {
+                    quote! {
+                        pub #column_name: #column_type,
+                    }
+                } else {
+                    quote! {
+                        pub #column_name: Option<#column_type>,
+                    }
+                })
+            })
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
         let into_session_update_variant_map = update_columns.iter().map(|column| {
             let column_name: Ident =
@@ -617,13 +678,13 @@ impl Table {
             .ok()
     }
 
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, DieselError> {
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::columns;
-        columns::dsl::columns
+        Ok(columns::dsl::columns
             .filter(columns::dsl::table_name.eq(&self.table_name))
             .filter(columns::dsl::table_schema.eq(&self.table_schema))
             .filter(columns::dsl::table_catalog.eq(&self.table_catalog))
-            .load::<Column>(conn)
+            .load::<Column>(conn)?)
     }
 
     pub fn column_by_name(
@@ -640,11 +701,14 @@ impl Table {
             .first::<Column>(conn)
     }
 
-    pub fn unique_columns(&self, conn: &mut PgConnection) -> Result<Vec<Vec<Column>>, DieselError> {
+    pub fn unique_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Vec<Column>>, WebCodeGenError> {
         use crate::schema::columns;
         use crate::schema::key_column_usage;
         use crate::schema::table_constraints;
-        key_column_usage::dsl::key_column_usage
+        Ok(key_column_usage::dsl::key_column_usage
             .inner_join(
                 columns::dsl::columns.on(key_column_usage::dsl::table_name
                     .nullable()
@@ -715,14 +779,17 @@ impl Table {
                             .collect::<Vec<Column>>()
                     })
                     .collect()
-            })
+            })?)
     }
 
-    pub fn primary_key_columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, DieselError> {
+    pub fn primary_key_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::columns;
         use crate::schema::key_column_usage;
         use crate::schema::table_constraints;
-        key_column_usage::dsl::key_column_usage
+        Ok(key_column_usage::dsl::key_column_usage
             .inner_join(
                 columns::dsl::columns.on(key_column_usage::dsl::table_name
                     .nullable()
@@ -780,32 +847,35 @@ impl Table {
             .filter(key_column_usage::dsl::table_catalog.eq(&self.table_catalog))
             .filter(table_constraints::dsl::constraint_type.eq("PRIMARY KEY"))
             .select(Column::as_select())
-            .load::<Column>(conn)
+            .load::<Column>(conn)?)
     }
 
-    pub fn check_constraints(&self, conn: &mut PgConnection) -> Result<Vec<CheckConstraint>, DieselError> {
+    pub fn check_constraints(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<CheckConstraint>, DieselError> {
         use crate::schema::check_constraints;
         use crate::schema::table_constraints;
-        
 
-        check_constraints::dsl::check_constraints.inner_join(
-            table_constraints::dsl::table_constraints.on(
-                check_constraints::dsl::constraint_name
-                    .eq(table_constraints::dsl::constraint_name)
-                    .and(
-                        check_constraints::dsl::constraint_schema
-                            .eq(table_constraints::dsl::constraint_schema),
-                    )
-                    .and(
-                        check_constraints::dsl::constraint_catalog
-                            .eq(table_constraints::dsl::constraint_catalog),
-                    ),
-            ),
-        )
-        .filter(table_constraints::dsl::table_name.eq(&self.table_name))
-        .filter(table_constraints::dsl::table_schema.eq(&self.table_schema))
-        .filter(table_constraints::dsl::table_catalog.eq(&self.table_catalog))
-        .select(CheckConstraint::as_select())
-        .load::<CheckConstraint>(conn)
+        check_constraints::dsl::check_constraints
+            .inner_join(
+                table_constraints::dsl::table_constraints.on(
+                    check_constraints::dsl::constraint_name
+                        .eq(table_constraints::dsl::constraint_name)
+                        .and(
+                            check_constraints::dsl::constraint_schema
+                                .eq(table_constraints::dsl::constraint_schema),
+                        )
+                        .and(
+                            check_constraints::dsl::constraint_catalog
+                                .eq(table_constraints::dsl::constraint_catalog),
+                        ),
+                ),
+            )
+            .filter(table_constraints::dsl::table_name.eq(&self.table_name))
+            .filter(table_constraints::dsl::table_schema.eq(&self.table_schema))
+            .filter(table_constraints::dsl::table_catalog.eq(&self.table_catalog))
+            .select(CheckConstraint::as_select())
+            .load::<CheckConstraint>(conn)
     }
 }
