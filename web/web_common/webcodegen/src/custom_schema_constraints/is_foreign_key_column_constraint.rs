@@ -6,13 +6,13 @@ use diesel::pg::PgConnection;
 use super::ConstraintError;
 
 #[derive(Debug)]
-pub struct IsForeignKey {
+pub struct IsForeignKeyConstraint {
     table_name: String,
     column_name: String,
 }
 
-impl IsForeignKey {
-    /// Creates a new instance of the `IsForeignKey` constraint.
+impl IsForeignKeyConstraint {
+    /// Creates a new instance of the `IsForeignKeyConstraint` constraint.
     pub fn new(table_name: String, column_name: String) -> Self {
         Self {
             table_name,
@@ -21,7 +21,7 @@ impl IsForeignKey {
     }
 }
 
-impl CustomColumnConstraint for IsForeignKey {
+impl CustomColumnConstraint for IsForeignKeyConstraint {
     fn check_constraint(
         &self,
         conn: &mut PgConnection,

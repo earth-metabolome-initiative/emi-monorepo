@@ -1,3 +1,4 @@
+use crate::errors::WebCodeGenError;
 use crate::Table;
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
@@ -7,12 +8,14 @@ use diesel::{
 };
 use syn::Type;
 
-use crate::errors::WebCodeGenError;
-use crate::table_metadata::sql_function::postgres_type_to_diesel;
+use crate::table_metadata::pg_type::postgres_type_to_diesel;
+
 use crate::KeyColumnUsage;
 
+use super::pg_type::{PgType, rust_type_str};
+
 /// Struct defining the `information_schema.columns` table.
-#[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug)]
+#[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug, Clone)]
 #[diesel(table_name = crate::schema::columns)]
 pub struct Column {
     pub table_catalog: String,
@@ -22,7 +25,7 @@ pub struct Column {
     pub ordinal_position: i32,
     pub column_default: Option<String>,
     pub __is_nullable: String,
-    pub data_type: String,
+    data_type: String,
     pub character_maximum_length: Option<i32>,
     pub character_octet_length: Option<i32>,
     pub numeric_precision: Option<i32>,
@@ -62,72 +65,60 @@ pub struct Column {
 }
 
 impl Column {
-    /// Returns the Syn rust type of the column.
-    pub fn rust_type(&self) -> Type {
-        use syn::parse_str;
-        let rust_type = match self.data_type.as_str() {
-            "integer" => "i32",
-            "character varying" => "String",
-            "text" => "String",
-            "timestamp with time zone" => "chrono::NaiveDateTime",
-            "timestamp without time zone" => "chrono::NaiveDateTime",
-            "date" => "chrono::NaiveDate",
-            "boolean" => "bool",
-            "numeric" => "f64",
-            "uuid" => "uuid::Uuid",
-            "jsonb" => "serde_json::Value",
-            "json" => "serde_json::Value",
-            "bytea" => "Vec<u8>",
-            "inet" => "std::net::IpAddr",
-            "time without time zone" => "chrono::NaiveTime",
-            "time with time zone" => "chrono::NaiveTime",
-            "interval" => "chrono::Duration",
-            "bit" => "Vec<u8>",
-            "bit varying" => "Vec<u8>",
-            "money" => "BigDecimal",
-            "xml" => "String",
-            "oid" => "u32",
-            "smallint" => "i16",
-            "bigint" => "i64",
-            "real" => "f32",
-            "double precision" => "f64",
-            "character" => "String",
-            "char" => "String",
-            "cidr" => "std::net::IpAddr",
-            "macaddr" => "std::net::MacAddr",
-            "macaddr8" => "std::net::MacAddr",
-            "point" => "Point",
-            "line" => "Line",
-            "lseg" => "LineSegment",
-            other => todo!("Unsupported data type: {}", other),
+    /// Returns the data type associated with the column as repo
+    pub fn data_type_str(&self) -> Result<&str, WebCodeGenError> {
+        Ok(if self.has_custom_type() {
+            if let Some(udt_name) = &self.udt_name {
+                &udt_name
+            } else {
+                return Err(WebCodeGenError::UnknownColumnType(self.clone()));
+            }
+        } else {
+            &self.data_type
+        })
+    }
+
+    pub fn data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
+        let rust_type = if self.has_custom_type() {
+            PgType::from_name(self.data_type_str()?, conn)?.camelcased_name()
+        } else {
+            rust_type_str(self.data_type_str()?).to_string()
         };
 
-        if self.is_nullable() {
-            parse_str(&format!("Option<{}>", rust_type)).unwrap()
+        let rust_type = if self.is_nullable() {
+            format!("Option<{}>", rust_type)
         } else {
-            parse_str(rust_type).unwrap()
-        }
+            rust_type.to_string()
+        };
+
+        Ok(syn::parse_str(&rust_type).unwrap())
+    }
+
+    pub fn has_custom_type(&self) -> bool {
+        self.data_type == "USER-DEFINED"
     }
 
     pub fn is_nullable(&self) -> bool {
         self.__is_nullable == "YES"
     }
 
-    pub fn diesel_type(&self) -> Result<Type, WebCodeGenError> {
-        postgres_type_to_diesel(&self.data_type, self.is_nullable()).map_err(|error| {
-            match error {
-                WebCodeGenError::UnknownPostgresType { type_name, .. } => {
-                    WebCodeGenError::UnknownPostgresType {
-                        type_name,
-                        context: Some(format!(
-                            "Error converting postgres type to diesel type for column {} in table {}",
-                            self.column_name,
-                            self.table_name
-                        )),
-                    }
-                },
-                _ => error,
-    }})
+    pub fn diesel_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
+        if self.has_custom_type() {
+            let name = PgType::from_name(self.data_type_str()?, conn)?
+                .camelcased_name();
+            let name = if self.is_nullable() {
+                format!("diesel::sql_types::Nullable<crate::Pg{}>", name)
+            } else {
+                format!("crate::Pg{}", name)
+            };
+
+            Ok(syn::parse_str(&name).unwrap())
+        } else {
+            Ok(postgres_type_to_diesel(
+                self.data_type_str()?,
+                self.is_nullable(),
+            ))    
+        }
     }
 
     pub fn is_uuid(&self) -> bool {

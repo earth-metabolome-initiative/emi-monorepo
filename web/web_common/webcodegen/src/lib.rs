@@ -21,6 +21,11 @@ mod table_metadata;
 
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint, Index,
-    KeyColumnUsage, ReferentialConstraint, SQLFunction, SQLOperator, SQLType, Table,
-    TableConstraint,
+    KeyColumnUsage, ReferentialConstraint, SQLFunction, SQLOperator, Table,
+    TableConstraint, PgType, PgAttribute, PGClass, PgEnum,
+};
+pub use custom_schema_constraints::{
+    CompulsorySiblingColumnConstraint, ConstraintError, CustomColumnConstraint,
+    CustomTableConstraint, IsForeignKeyConstraint, LowercaseColumnConstraint,
+    LowercaseTableConstraint, NotNullColumnConstraint, HasSpecificTypeConstraint,
 };

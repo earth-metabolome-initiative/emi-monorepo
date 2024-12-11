@@ -1,20 +1,11 @@
-// SELECT
-//     oprname AS symbol,
-//     oprleft::regtype AS left_operand_type,
-//     oprright::regtype AS right_operand_type,
-//     oprresult::regtype AS result_type,
-//     oprcode AS name
-// FROM
-//     pg_operator
-
+use crate::table_metadata::pg_type::postgres_type_to_diesel;
 use diesel::PgConnection;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{File, Ident, Type};
 
-use crate::errors::WebCodeGenError;
-use crate::table_metadata::sql_function::{postgres_type_to_diesel, UNSUPPORTED_DATA_TYPES};
+use crate::table_metadata::sql_function::UNSUPPORTED_DATA_TYPES;
 
 pub struct SQLOperator {
     pub symbol: String,

@@ -10,17 +10,6 @@ CREATE TABLE users (
     CHECK (username <> email)
 );
 
-CREATE TABLE composite_users (
-    primary_id INT,
-    secondary_id INT,
-    username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (primary_id, secondary_id),
-    FOREIGN KEY (primary_id) REFERENCES users(id),
-    FOREIGN KEY (secondary_id) REFERENCES users(id)
-);
-
 CREATE OR REPLACE FUNCTION js_jpeg(bytea_data BYTEA) RETURNS BOOLEAN AS $$
 BEGIN
     -- Check for JPEG (basic check for start of JPEG file)
@@ -35,4 +24,22 @@ CREATE DOMAIN jpeg_in AS BYTEA
 DROP TYPE IF EXISTS jpeg CASCADE;
 CREATE TYPE jpeg AS (
     value jpeg_in
+);
+
+CREATE TYPE norse_gods AS ENUM ('THOR', 'ODIN', 'LOKI');
+
+CREATE TYPE Point2d AS (x DOUBLE PRECISION,y DOUBLE PRECISION);
+
+CREATE TABLE composite_users (
+    primary_id INT,
+    secondary_id INT,
+    username VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    user_image jpeg NOT NULL,
+    position Point2d NOT NULL,
+    god norse_gods NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (primary_id, secondary_id),
+    FOREIGN KEY (primary_id) REFERENCES users(id),
+    FOREIGN KEY (secondary_id) REFERENCES users(id)
 );

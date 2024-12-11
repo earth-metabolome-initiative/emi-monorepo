@@ -1,5 +1,5 @@
 use diesel::pg::PgConnection;
-use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl};
+use diesel::{Queryable, QueryableByName, RunQueryDsl};
 
 #[derive(Queryable, QueryableByName, Debug)]
 #[diesel(table_name = crate::schema::constraint_table_usage)]
