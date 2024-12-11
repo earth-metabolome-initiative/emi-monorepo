@@ -3,8 +3,9 @@ use std::collections::HashSet;
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, QueryDsl,
-    Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper, TextExpressionMethods,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods,
+    OptionalExtension, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable,
+    SelectableHelper, TextExpressionMethods,
 };
 use itertools::Itertools;
 use prettyplease::unparse;
@@ -21,7 +22,7 @@ use crate::TableConstraint;
 use super::PgType;
 
 /// Struct defining the `information_schema.tables` table.
-#[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug)]
+#[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug, Clone)]
 #[diesel(table_name = crate::schema::tables)]
 pub struct Table {
     pub table_catalog: String,
@@ -667,7 +668,7 @@ impl Table {
         table_name: &str,
         table_schema: Option<&str>,
         table_catalog: &str,
-    ) -> Option<Self> {
+    ) -> Result<Option<Self>, WebCodeGenError> {
         use crate::schema::tables;
         let table_schema = table_schema.unwrap_or("public");
         tables::dsl::tables
@@ -675,7 +676,8 @@ impl Table {
             .filter(tables::dsl::table_schema.eq(table_schema))
             .filter(tables::dsl::table_catalog.eq(table_catalog))
             .first::<Table>(conn)
-            .ok()
+            .optional()
+            .map_err(WebCodeGenError::from)
     }
 
     pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
@@ -780,6 +782,11 @@ impl Table {
                     })
                     .collect()
             })?)
+    }
+
+    /// Returns whether the table has a composite primary key.
+    pub fn has_composite_primary_key(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        Ok(self.primary_key_columns(conn)?.len() > 1)
     }
 
     pub fn primary_key_columns(

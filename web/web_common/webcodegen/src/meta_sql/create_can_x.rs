@@ -116,19 +116,137 @@
 // $$
 // LANGUAGE plpgsql PARALLEL SAFE;
 
-
 use diesel::PgConnection;
 
 use crate::errors::WebCodeGenError;
-use crate::Table;
+use crate::{Column, ConstraintError, IsForeignKeyConstraint, Table};
 
-impl Table {
-    pub fn create_can_view(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
-        let table_name = self.name.to_lowercase();
+pub struct CanXBuilder<'a> {
+    user_table: Table,
+    parent_tables: Vec<Table>,
+    author_columns: Vec<Column>,
+    table_catalog: &'a str,
+    conn: &'a mut PgConnection,
+}
+
+impl<'a> CanXBuilder<'a> {
+    pub fn new<'b>(
+        user_table_name: &str,
+        table_schema: Option<&str>,
+        table_catalog: &'b str,
+        conn: &'b mut PgConnection,
+    ) -> Result<CanXBuilder<'b>, WebCodeGenError> {
+        let user_table =
+            if let Some(table) = Table::load(conn, user_table_name, table_schema, table_catalog)? {
+                table
+            } else {
+                return Err(WebCodeGenError::MissingTable(user_table_name.to_string()));
+            };
+
+        // Check whether the user table has a primary key composed of a single column.
+        if user_table.has_composite_primary_key(conn)? {
+            return Err(WebCodeGenError::UnexpectedCompositePrimaryKey(user_table));
+        }
+
+        Ok(CanXBuilder {
+            user_table,
+            parent_tables: Vec::new(),
+            table_catalog,
+            author_columns: Vec::new(),
+            conn,
+        })
+    }
+
+    /// Adds a parent table to the list of parent tables.
+    pub fn add_parent_table(mut self, parent_table: Table) -> Self {
+        self.parent_tables.push(parent_table);
+        self
+    }
+
+    /// Add an author column to the list of author columns.
+    ///
+    /// # Arguments
+    ///
+    /// * `author_column` - The column that will be used to determine whether the user can perform an operation on a row.
+    ///
+    /// # Errors
+    ///
+    /// * If the column is not a foreign key column that references the user table.
+    pub fn add_author_column(mut self, author_column: Column) -> Result<Self, WebCodeGenError> {
+        if !author_column
+            .foreign_table(&mut self.conn)?
+            .map_or(true, |(table, _)| &table != &self.user_table)
+        {
+            return Err(ConstraintError::NotForeignKeyColumn {
+                table: self.user_table.clone(),
+                column: author_column.clone(),
+            }
+            .into());
+        }
+        self.author_columns.push(author_column);
+        Ok(self)
+    }
+
+    /// Returns the data type of the user table's primary key.
+    fn user_primary_key_type(&mut self) -> Result<String, WebCodeGenError> {
+        Ok(self
+            .user_table
+            .primary_key_columns(&mut self.conn)?
+            .first()
+            .unwrap()
+            .data_type_str()?
+            .to_owned())
+    }
+
+    pub fn create_can_view(&mut self, table: &Table) -> Result<String, WebCodeGenError> {
+        let table_name = &table.table_name;
+        let user_primary_key_type = self.user_primary_key_type()?;
+
+        let table_primaty_keys = table
+            .primary_key_columns(&mut self.conn)?
+            .iter()
+            .map(|col| {
+                Ok(format!(
+                    "{column_name} {column_type}",
+                    column_name = col.column_name,
+                    column_type = col.data_type_str()?
+                ))
+            })
+            .collect::<Result<Vec<_>, WebCodeGenError>>()?
+            .join(",\n\t ");
+
+        // For each author column present in the table,
+        // we check whether the 'viewer_id' is the author of the row
+        // associated to the primary key(s) provided. If so, we return TRUE
+        // as the author is allowed to view the row.
+        let author_columns_in_table = table
+            .columns(&mut self.conn)?
+            .into_iter()
+            .filter(|col| {
+                self.author_columns.iter().any(|author_col| {
+                    author_col.column_name == col.column_name
+                        && col
+                            .foreign_table(&mut self.conn)
+                            .map_or(false, |maybe_table| {
+                                maybe_table.map_or(false, |(table, _)| &table == &self.user_table)
+                            })
+                })
+            })
+            .collect::<Vec<_>>();
 
         let query = format!(
-            "CREATE FUNCTION can_view_{table_name}(author_user_id INTEGER, this_{table_name}_id INTEGER)"
+            "CREATE FUNCTION can_view_{table_name}(
+                viewer_id {user_primary_key_type},
+                {table_primaty_keys}
+            )
+            RETURNS BOOLEAN AS $$
+            END;
+            $$
+            LANGUAGE plpgsql PARALLEL SAFE;
+            "
         );
+
+        Ok(query)
     }
 
     /// Returns the SQL to create the trigger that checks whether the user can update the row.
@@ -142,10 +260,9 @@ impl Table {
                         RAISE EXCEPTION 'unauthorized_update' USING DETAIL = 'Unauthorized to update this row of the `{table_name}` table.';
                     END IF;
                 END IF;
-            -- We check whether the user can update the row.
                 IF TG_OP = 'INSERT' THEN
                     IF NOT can_update_projects(NEW.created_by, NEW.project_id) THEN
-                        RAISE EXCEPTION 'unauthorized_update' USING DETAIL = 'Unauthorized to update this row of the `{table_name}` table.';
+                        RAISE EXCEPTION 'unauthorized_insert' USING DETAIL = 'Unauthorized to insert this row of the `{table_name}` table.';
                     END IF;
                 END IF;
                 RETURN NEW;

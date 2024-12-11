@@ -31,7 +31,7 @@ impl Table {
         );
 
         let roles_table = if let Some(roles_table) =
-            Table::load(conn, "roles", Some(&self.table_schema), &self.table_catalog)
+            Table::load(conn, "roles", Some(&self.table_schema), &self.table_catalog)?
         {
             roles_table
         } else {
@@ -39,7 +39,7 @@ impl Table {
         };
 
         let users = if let Some(users_table) =
-            Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog)
+            Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog)?
         {
             users_table
         } else {
@@ -119,7 +119,7 @@ impl Table {
         let role_table_types = ["roles", "role_requests", "role_invitations"];
         let mut reference_tables = Vec::new();
         if let Some(reference_table) =
-            Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog)
+            Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog)?
         {
             reference_tables.push(reference_table);
         } else {
@@ -127,7 +127,7 @@ impl Table {
         }
 
         if let Some(reference_table) =
-            Table::load(conn, "teams", Some(&self.table_schema), &self.table_catalog)
+            Table::load(conn, "teams", Some(&self.table_schema), &self.table_catalog)?
         {
             reference_tables.push(reference_table);
         } else {
