@@ -27,9 +27,10 @@ fn establish_connection_to_postgres() -> PgConnection {
     let database_password: String = settings.get("database.password").expect("Missing database.password");
     let database_user: String = settings.get("database.user").expect("Missing database.user");
     let database_port: u16 = settings.get("database.port").expect("Missing database.port");
+    let database_host: String = settings.get("database.host").expect("Missing database.host");
 
     let database_url = format!(
-        "postgres://{database_user}:{database_password}@localhost:{database_port}/{database_name}",
+        "postgres://{database_user}:{database_password}@{database_host}:{database_port}/{database_name}",
     );
 
     let mut number_of_attempts = 0;

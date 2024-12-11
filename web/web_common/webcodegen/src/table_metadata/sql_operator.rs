@@ -93,45 +93,12 @@ impl SQLOperator {
                                 left_operand_type: postgres_type_to_diesel(
                                     left_operand_type.as_str(),
                                     false,
-                                )
-                                .map_err(|error| match error {
-                                    WebCodeGenError::UnknownPostgresType { type_name, .. } => {
-                                        WebCodeGenError::UnknownPostgresType {
-                                            type_name,
-                                            context: Some(format!(
-                                                "Left operand of operator {}",
-                                                name
-                                            )),
-                                        }
-                                    }
-                                    _ => error,
-                                })?,
+                                ),
                                 right_operand_type: postgres_type_to_diesel(
                                     right_operand_type.as_str(),
                                     false,
-                                )
-                                .map_err(|error| match error {
-                                    WebCodeGenError::UnknownPostgresType { type_name, .. } => {
-                                        WebCodeGenError::UnknownPostgresType {
-                                            type_name,
-                                            context: Some(format!(
-                                                "Right operand of operator {}",
-                                                name
-                                            )),
-                                        }
-                                    }
-                                    _ => error,
-                                })?,
-                                result_type: postgres_type_to_diesel(result_type.as_str(), false)
-                                    .map_err(|error| match error {
-                                    WebCodeGenError::UnknownPostgresType { type_name, .. } => {
-                                        WebCodeGenError::UnknownPostgresType {
-                                            type_name,
-                                            context: Some(format!("Result of operator {}", name)),
-                                        }
-                                    }
-                                    _ => error,
-                                })?,
+                                ),
+                                result_type: postgres_type_to_diesel(result_type.as_str(), false),
                                 name,
                             })
                         },
