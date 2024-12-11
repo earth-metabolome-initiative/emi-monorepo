@@ -64,7 +64,15 @@ pub struct Column {
     pub is_updatable: String,
 }
 
+
+
 impl Column {
+    /// Sanitizes the column name to snake_case.
+    
+    pub fn snake_case_name(&self) -> String {
+        self.column_name.to_snake_case()
+    }
+
     /// Returns the data type associated with the column as repo
     pub fn data_type_str(&self) -> Result<&str, WebCodeGenError> {
         Ok(if self.has_custom_type() {

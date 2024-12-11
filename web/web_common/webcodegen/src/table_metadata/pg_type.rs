@@ -37,6 +37,7 @@ pub struct PgType {
     pub typisdefined: bool,
     pub typdelim: String,
     pub typrelid: u32,
+    # [cfg(feature = "postgres_17")]
     pub typsubscript: u32,
     pub typelem: u32,
     pub typarray: u32,

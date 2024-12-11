@@ -207,6 +207,43 @@ table! {
     }
 }
 
+#[cfg(not(feature = "postgres_17"))]
+table! {
+    pg_type (oid, typname, typnamespace) {
+        oid -> Oid,
+        typname -> Text,
+        typnamespace -> Oid,
+        typowner -> Oid,
+        typlen -> SmallInt,
+        typbyval -> Bool,
+        typtype -> Char,
+        typcategory -> Char,
+        typispreferred -> Bool,
+        typisdefined -> Bool,
+        typdelim -> Char,
+        typrelid -> Oid,
+        typelem -> Oid,
+        typarray -> Oid,
+        typinput -> Oid,
+        typoutput -> Oid,
+        typreceive -> Oid,
+        typsend -> Oid,
+        typmodin -> Oid,
+        typmodout -> Oid,
+        typanalyze -> Oid,
+        typalign -> Char,
+        typstorage -> Char,
+        typnotnull -> Bool,
+        typbasetype -> Oid,
+        typtypmod -> Integer,
+        typndims -> Integer,
+        typcollation -> Oid,
+        typdefaultbin -> Nullable<Bytea>,
+        typdefault -> Nullable<Text>,
+    }
+}
+
+#[cfg(feature = "postgres_17")]
 table! {
     pg_type (oid, typname, typnamespace) {
         oid -> Oid,

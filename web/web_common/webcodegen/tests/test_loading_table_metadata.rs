@@ -7,6 +7,7 @@ use testcontainers::{
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
+use std::path::Path;
 
 mod utils;
 

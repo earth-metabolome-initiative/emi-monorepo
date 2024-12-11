@@ -5,6 +5,7 @@ use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{File, Ident, Type};
+use crate::errors::WebCodeGenError;
 
 pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "internal",
@@ -147,20 +148,7 @@ impl SQLFunction {
 
                 sql_function.arguments.push((
                     argument_name,
-                    postgres_type_to_diesel(&argument_type, false).map_err(
-                        |error| match error {
-                            WebCodeGenError::UnknownPostgresType { type_name, .. } => {
-                                WebCodeGenError::UnknownPostgresType {
-                                    type_name,
-                                    context: Some(format!(
-                                        "Argument of function: {}",
-                                        function_name
-                                    )),
-                                }
-                            }
-                            _ => error,
-                        },
-                    )?,
+                    postgres_type_to_diesel(&argument_type, false)
                 ));
             }
 
@@ -171,18 +159,7 @@ impl SQLFunction {
 
             if !return_type.is_empty() && return_type != "void" {
                 sql_function.return_type = Some(
-                    postgres_type_to_diesel(&return_type, false).map_err(|error| match error {
-                        WebCodeGenError::UnknownPostgresType { type_name, .. } => {
-                            WebCodeGenError::UnknownPostgresType {
-                                type_name,
-                                context: Some(format!(
-                                    "Return type of function: {}",
-                                    function_name
-                                )),
-                            }
-                        }
-                        _ => error,
-                    })?,
+                    postgres_type_to_diesel(&return_type, false)
                 );
             }
             sql_functions.push(sql_function);
