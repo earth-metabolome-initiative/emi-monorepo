@@ -9,6 +9,7 @@ use diesel::{
 use syn::Type;
 
 use crate::table_metadata::pg_type::postgres_type_to_diesel;
+
 use crate::KeyColumnUsage;
 
 use super::pg_type::{PgType, rust_type_str};

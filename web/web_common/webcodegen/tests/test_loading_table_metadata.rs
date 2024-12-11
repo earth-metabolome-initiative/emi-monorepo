@@ -72,7 +72,7 @@ async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), Web
     add_main_to_file("tests/ui/sql_operators.rs");
     builder.pass("tests/ui/sql_operators.rs");
 
-    Table::write_all(conn, "tests/ui/tables.rs", DATABASE_NAME, None)?;
+    Table::write_all(conn, Path::new("tests/ui/tables.rs"), DATABASE_NAME, None)?;
     add_main_to_file("tests/ui/tables.rs");
     builder.pass("tests/ui/tables.rs");
 

@@ -10,6 +10,7 @@ use itertools::Itertools;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
+use std::path::Path;
 use syn::{File, Ident};
 
 use crate::errors::WebCodeGenError;
@@ -19,6 +20,7 @@ use crate::Index;
 use crate::TableConstraint;
 
 use super::PgType;
+
 
 /// Struct defining the `information_schema.tables` table.
 #[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug)]
@@ -135,7 +137,7 @@ impl Table {
     /// Writes all the tables syn version to a file.
     pub fn write_all(
         conn: &mut PgConnection,
-        output_path: &str,
+        output_path: &Path,
         table_catalog: &str,
         table_schema: Option<&str>,
     ) -> Result<(), WebCodeGenError> {

@@ -12,12 +12,12 @@ extern crate proc_macro2;
 extern crate quote;
 extern crate syn;
 
+mod custom_schema_constraints;
 pub mod errors;
 mod meta_sql;
 mod schema;
 mod sql_functions;
 mod table_metadata;
-mod custom_schema_constraints;
 
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint, Index,

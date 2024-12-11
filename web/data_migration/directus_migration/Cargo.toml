@@ -1,0 +1,13 @@
+[package]
+name = "directus_migration"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "64-column-tables"] }
+
+
+[build-dependencies]
+webcodegen = {path = "../../web_common/webcodegen"}
+diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "64-column-tables"] }
+config = "0.14.1"

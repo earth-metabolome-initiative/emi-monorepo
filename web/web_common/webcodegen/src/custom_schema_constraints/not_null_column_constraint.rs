@@ -1,9 +1,8 @@
-
-use crate::custom_schema_constraints::CustomColumnConstraint;
 use crate::custom_schema_constraints::ConstraintError;
+use crate::custom_schema_constraints::CustomColumnConstraint;
 use crate::errors::WebCodeGenError;
-use diesel::pg::PgConnection;
 use crate::Column;
+use diesel::pg::PgConnection;
 
 /// Constraint to enforce that columns with a given name must not be nullable.
 pub struct NotNullColumnConstraint {
@@ -21,7 +20,11 @@ impl NotNullColumnConstraint {
 }
 
 impl CustomColumnConstraint for NotNullColumnConstraint {
-    fn check_constraint(&self, _conn: &mut PgConnection, column: &Column) -> Result<(), WebCodeGenError> {
+    fn check_constraint(
+        &self,
+        _conn: &mut PgConnection,
+        column: &Column,
+    ) -> Result<(), WebCodeGenError> {
         if self.column_name == column.column_name && column.is_nullable() {
             return Err(ConstraintError::UnexpectedNullableColumn(self.column_name.clone()).into());
         }

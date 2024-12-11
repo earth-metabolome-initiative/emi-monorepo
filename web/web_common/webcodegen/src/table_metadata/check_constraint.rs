@@ -1,8 +1,6 @@
 use diesel::pg::PgConnection;
 use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
 
-
-
 #[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
 pub struct CheckConstraint {
@@ -13,7 +11,6 @@ pub struct CheckConstraint {
 }
 
 impl CheckConstraint {
-
     pub fn load_all_check_constraints(conn: &mut PgConnection) -> Vec<Self> {
         use crate::schema::check_constraints::dsl::*;
         check_constraints
@@ -36,7 +33,4 @@ impl CheckConstraint {
             .load::<CheckConstraint>(conn)
             .expect("Error loading check constraints")
     }
-
-
 }
-

@@ -1,6 +1,5 @@
 use crate::table_metadata::pg_type::postgres_type_to_diesel;
 use diesel::pg::PgConnection;
-use diesel::result::Error as DieselError;
 use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, TextExpressionMethods};
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
@@ -49,6 +48,7 @@ pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "_text",
 ];
 
+
 pub struct SQLFunction {
     name: String,
     return_type: Option<Type>,
@@ -56,7 +56,7 @@ pub struct SQLFunction {
 }
 
 impl SQLFunction {
-    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, DieselError> {
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, WebCodeGenError> {
         use crate::schema::pg_namespace;
         use crate::schema::pg_proc;
         use crate::sql_functions::{pg_get_function_arguments, pg_get_function_result};
@@ -147,7 +147,20 @@ impl SQLFunction {
 
                 sql_function.arguments.push((
                     argument_name,
-                    postgres_type_to_diesel(&argument_type, false),
+                    postgres_type_to_diesel(&argument_type, false).map_err(
+                        |error| match error {
+                            WebCodeGenError::UnknownPostgresType { type_name, .. } => {
+                                WebCodeGenError::UnknownPostgresType {
+                                    type_name,
+                                    context: Some(format!(
+                                        "Argument of function: {}",
+                                        function_name
+                                    )),
+                                }
+                            }
+                            _ => error,
+                        },
+                    )?,
                 ));
             }
 
@@ -157,7 +170,20 @@ impl SQLFunction {
             }
 
             if !return_type.is_empty() && return_type != "void" {
-                sql_function.return_type = Some(postgres_type_to_diesel(&return_type, false));
+                sql_function.return_type = Some(
+                    postgres_type_to_diesel(&return_type, false).map_err(|error| match error {
+                        WebCodeGenError::UnknownPostgresType { type_name, .. } => {
+                            WebCodeGenError::UnknownPostgresType {
+                                type_name,
+                                context: Some(format!(
+                                    "Return type of function: {}",
+                                    function_name
+                                )),
+                            }
+                        }
+                        _ => error,
+                    })?,
+                );
             }
             sql_functions.push(sql_function);
         }
@@ -190,7 +216,7 @@ impl SQLFunction {
         }
     }
 
-    pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), DieselError> {
+    pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), WebCodeGenError> {
         let functions = Self::load_all(conn)?;
 
         // We convert the functions to TokenStream
