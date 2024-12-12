@@ -101,48 +101,62 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> &'static str {
     }
 }
 
+/// Converts a PostgreSQL type to a Diesel type.
+///
+/// # Arguments
+///
+/// * `postgres_type` - A string slice that holds the PostgreSQL type name.
+/// * `nullable` - A boolean indicating whether the type is nullable.
+///
+/// # Returns
+///
+/// A `Type` representing the corresponding Diesel type.
 pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
     let rust_type_str = match postgres_type {
-        "integer" => "diesel::sql_types::Integer",
-        "text" => "diesel::sql_types::Text",
-        "timestamp without time zone" => "diesel::sql_types::Timestamp",
-        "timestamp with time zone" => "diesel::sql_types::Timestamptz",
-        "timestamptz" => "diesel::sql_types::Timestamptz",
-        "timestamp" => "diesel::sql_types::Timestamp",
-        "time" => "diesel::sql_types::Time",
-        "uuid" => "diesel::sql_types::Uuid",
-        "boolean" => "diesel::sql_types::Bool",
-        "bool" => "diesel::sql_types::Bool",
-        "real" => "diesel::sql_types::Float",
-        "name" => "diesel::sql_types::Text",
-        "double precision" => "diesel::sql_types::Double",
-        "character varying" => "diesel::sql_types::Text",
+        // Numeric types
+        "integer" | "int4" => "diesel::sql_types::Integer",
+        "smallint" | "int2" => "diesel::sql_types::SmallInt",
+        "bigint" | "int8" => "diesel::sql_types::BigInt",
+        "real" | "float4" => "diesel::sql_types::Float",
+        "double precision" | "float8" => "diesel::sql_types::Double",
+        "money" => "diesel::pg::sql_types::Money",
+
+        // Text types
+        "text" | "character varying" | "name" | "cstring" => "diesel::sql_types::Text",
         "char" => "diesel::sql_types::CChar",
         "bpchar" => "diesel::sql_types::Bpchar",
+
+        // Boolean types
+        "boolean" | "bool" => "diesel::sql_types::Bool",
+
+        // Temporal types
+        "timestamp without time zone" | "timestamp" => "diesel::sql_types::Timestamp",
+        "timestamp with time zone" | "timestamptz" => "diesel::sql_types::Timestamptz",
+        "time" => "diesel::sql_types::Time",
+        "date" => "diesel::sql_types::Date",
+        "interval" => "diesel::sql_types::Interval",
+
+        // Binary types
         "bytea" => "diesel::sql_types::Bytea",
+
+        // JSON types
         "json" => "diesel::sql_types::Json",
         "jsonb" => "diesel::sql_types::Jsonb",
+
+        // Network address types
         "macaddr" => "diesel::sql_types::Macaddr",
         "inet" => "diesel::sql_types::Inet",
+
+        // Object Identifier types
         "oid" => "diesel::sql_types::Oid",
-        "int2" => "diesel::sql_types::SmallInt",
-        "int4" => "diesel::sql_types::Integer",
-        "int8" => "diesel::sql_types::BigInt",
-        "float4" => "diesel::sql_types::Float",
-        "float8" => "diesel::sql_types::Double",
+
+        // Full-text search types
         "tsvector" => "diesel_full_text_search::TsVector",
         "tsquery" => "diesel_full_text_search::TsQuery",
-        "money" => "diesel::pg::sql_types::Money",
-        "smallint" => "diesel::sql_types::SmallInt",
-        "bigint" => "diesel::sql_types::BigInt",
-        "cstring" => "diesel::sql_types::Text",
-        "interval" => "diesel::sql_types::Interval",
-        "date" => "diesel::sql_types::Date",
-        "geometry" | "geography" => "postgis_diesel::sql_types::Geometry",
-        "point" => "postgis_diesel::sql_types::Geometry",
-        "polygon" => "postgis_diesel::sql_types::Geometry",
-        "geometry(Point,4326)" => "postgis_diesel::sql_types::Geometry",
-        "line" => "postgis_diesel::sql_types::Geometry",
+
+        // GIS types
+        "geometry" | "geography" | "point" | "polygon" | "geometry(Point,4326)" | "line" => "postgis_diesel::sql_types::Geometry",
+
         _ => todo!("Unsupported data type: '{}'", postgres_type),
     };
 
@@ -155,6 +169,7 @@ pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
     parse_str::<Type>(&rust_type_str)
         .expect(format!("Failed to parse rust type: '{}'", rust_type_str).as_str())
 }
+
 
 impl PgType {
     /// Returns the Syn rust type of the PgType.

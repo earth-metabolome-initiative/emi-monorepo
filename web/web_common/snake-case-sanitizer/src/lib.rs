@@ -16,6 +16,7 @@ pub enum SanitizationErrors {
     EmptyTerm,
 }
 
+#[derive(Debug, PartialEq, Clone, Default)]
 /// Structs defining the properties of the snake_case_sanitizer.
 pub struct Sanitizer<'a> {
     /// Mapping of needles and their replacements.
@@ -36,15 +37,6 @@ pub const DEFAULT_REPLACEMENTS: [(&str, &str); 5] = [
 ];
 
 impl<'a> Sanitizer<'a> {
-    /// Create a new Sanitizer.
-    pub fn new() -> Self {
-        Sanitizer {
-            replacements: Vec::new(),
-            remove_leading_underscores: false,
-            remove_trailing_underscores: false,
-        }
-    }
-
     /// Set whether to remove leading underscores.
     pub fn remove_leading_underscores(mut self) -> Self {
         self.remove_leading_underscores = true;
@@ -139,9 +131,8 @@ impl<'a> Sanitizer<'a> {
         let mut result = String::new();
         let mut last_was_underscore = false;
         let mut last_was_uppercase = false;
-        let mut characters = with_replacements.chars();
 
-        while let Some(mut character) = characters.next() {
+        for mut character in with_replacements.chars() {
             if !character.is_ascii_alphanumeric() {
                 character = '_';
             }

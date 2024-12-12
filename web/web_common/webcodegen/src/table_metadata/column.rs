@@ -102,7 +102,7 @@ impl Column {
 
     /// Returns the sanitized snake case name of the table.
     pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
-        let sanitizer = SnakeCaseSanizer::new()
+        let sanitizer = SnakeCaseSanizer::default()
             .include_defaults()
             .remove_leading_underscores()
             .remove_trailing_underscores();

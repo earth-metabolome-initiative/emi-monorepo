@@ -46,16 +46,28 @@ impl PgAttribute {
     }
 
     /// Returns whether the associated rust type supports `Copy`.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the provided database connection fails.
     pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.pg_type(conn)?.supports_copy(conn)
     }
 
     /// Returns whether the associated rust type supports `Hash`.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the provided database connection fails.
     pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.pg_type(conn)?.supports_hash(conn)
     }
 
     /// Returns whether the associated rust type supports `Eq`.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the provided database connection fails.
     pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.pg_type(conn)?.supports_eq(conn)
     }
