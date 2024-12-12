@@ -114,8 +114,8 @@ impl FromSql<diesel::sql_types::Text, diesel::pg::Pg> for ConstraintType {
 
 impl TableConstraint {
     pub fn load_all(conn: &mut PgConnection) -> Vec<Self> {
-        use crate::schema::table_constraints::dsl::*;
-        table_constraints
+        use crate::schema::table_constraints;
+        table_constraints::table
             .load::<TableConstraint>(conn)
             .expect("Error loading table constraints")
     }
@@ -128,10 +128,10 @@ impl TableConstraint {
     ) -> Vec<Self> {
         use crate::schema::table_constraints;
         let table_schema = table_schema.unwrap_or("public");
-        table_constraints::dsl::table_constraints
-            .filter(table_constraints::dsl::table_name.eq(table_name))
-            .filter(table_constraints::dsl::table_schema.eq(table_schema))
-            .filter(table_constraints::dsl::table_catalog.eq(table_catalog))
+        table_constraints::table
+            .filter(table_constraints::table_name.eq(table_name))
+            .filter(table_constraints::table_schema.eq(table_schema))
+            .filter(table_constraints::table_catalog.eq(table_catalog))
             .load::<TableConstraint>(conn)
             .expect("Error loading table constraints")
     }

@@ -16,8 +16,8 @@ pub struct DomainConstraint {
 
 impl DomainConstraint {
     pub fn load_all_domain_constraints(conn: &mut PgConnection) -> Vec<Self> {
-        use crate::schema::domain_constraints::dsl::*;
-        domain_constraints
+        use crate::schema::domain_constraints;
+        domain_constraints::table
             .load::<DomainConstraint>(conn)
             .expect("Error loading domain constraints")
     }
@@ -30,10 +30,10 @@ impl DomainConstraint {
     ) -> Vec<Self> {
         use crate::schema::domain_constraints;
         let constraint_schema = constraint_schema.unwrap_or("public");
-        domain_constraints::dsl::domain_constraints
-            .filter(domain_constraints::dsl::constraint_name.eq(constraint_name))
-            .filter(domain_constraints::dsl::constraint_schema.eq(constraint_schema))
-            .filter(domain_constraints::dsl::constraint_catalog.eq(constraint_catalog))
+        domain_constraints::table
+            .filter(domain_constraints::constraint_name.eq(constraint_name))
+            .filter(domain_constraints::constraint_schema.eq(constraint_schema))
+            .filter(domain_constraints::constraint_catalog.eq(constraint_catalog))
             .load::<DomainConstraint>(conn)
             .expect("Error loading domain constraints")
     }

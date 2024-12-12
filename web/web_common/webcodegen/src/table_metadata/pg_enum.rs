@@ -1,4 +1,4 @@
-//! Submodule providing the `PgEnum` struct, which represents a PostgreSQL enum type.
+//! Submodule providing the `PgEnum` struct, which represents a `PostgreSQL` enum type.
 use diesel::{Queryable, QueryableByName, Selectable};
 
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Clone)]

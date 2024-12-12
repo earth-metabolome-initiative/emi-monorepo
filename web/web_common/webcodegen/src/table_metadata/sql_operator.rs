@@ -37,35 +37,35 @@ impl SQLOperator {
             pg_type as return_pg_type_alias
         );
 
-        pg_operator::dsl::pg_operator
+        pg_operator::table
             .inner_join(
                 left_pg_type
-                    .on(pg_operator::dsl::oprleft.eq(left_pg_type.field(pg_type::dsl::oid))),
+                    .on(pg_operator::oprleft.eq(left_pg_type.field(pg_type::oid))),
             )
             .inner_join(
                 right_pg_type
-                    .on(pg_operator::dsl::oprright.eq(right_pg_type.field(pg_type::dsl::oid))),
+                    .on(pg_operator::oprright.eq(right_pg_type.field(pg_type::oid))),
             )
             .inner_join(
                 return_pg_type
-                    .on(pg_operator::dsl::oprresult.eq(return_pg_type.field(pg_type::dsl::oid))),
+                    .on(pg_operator::oprresult.eq(return_pg_type.field(pg_type::oid))),
             )
-            .inner_join(pg_proc::table.on(pg_operator::dsl::oprcode.eq(pg_proc::dsl::oid)))
+            .inner_join(pg_proc::table.on(pg_operator::oprcode.eq(pg_proc::oid)))
             .filter(
-                pg_proc::dsl::proname
+                pg_proc::proname
                     .not_ilike("%eq%")
-                    .and(pg_proc::dsl::proname.not_ilike("%le%"))
-                    .and(pg_proc::dsl::proname.not_ilike("%ge%"))
-                    .and(pg_proc::dsl::proname.not_ilike("%lt%"))
-                    .and(pg_proc::dsl::proname.not_ilike("%gt%"))
-                    .and(pg_proc::dsl::proname.not_ilike("%ne%")),
+                    .and(pg_proc::proname.not_ilike("%le%"))
+                    .and(pg_proc::proname.not_ilike("%ge%"))
+                    .and(pg_proc::proname.not_ilike("%lt%"))
+                    .and(pg_proc::proname.not_ilike("%gt%"))
+                    .and(pg_proc::proname.not_ilike("%ne%")),
             )
             .select((
-                pg_operator::dsl::oprname,
-                left_pg_type.field(pg_type::dsl::typname),
-                right_pg_type.field(pg_type::dsl::typname),
-                return_pg_type.field(pg_type::dsl::typname),
-                pg_proc::dsl::proname,
+                pg_operator::oprname,
+                left_pg_type.field(pg_type::typname),
+                right_pg_type.field(pg_type::typname),
+                return_pg_type.field(pg_type::typname),
+                pg_proc::proname,
             ))
             .load::<(String, String, String, String, String)>(conn)
             .map_err(WebCodeGenError::from)

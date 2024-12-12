@@ -17,8 +17,8 @@ pub struct ReferentialConstraint {
 
 impl ReferentialConstraint {
     pub fn load_all_referential_constraints(conn: &mut PgConnection) -> Vec<Self> {
-        use crate::schema::referential_constraints::dsl::*;
-        referential_constraints
+        use crate::schema::referential_constraints;
+        referential_constraints::table
             .load::<ReferentialConstraint>(conn)
             .expect("Error loading referential constraints")
     }
@@ -31,10 +31,10 @@ impl ReferentialConstraint {
     ) -> Vec<Self> {
         use crate::schema::referential_constraints;
         let constraint_schema = constraint_schema.unwrap_or("public");
-        referential_constraints::dsl::referential_constraints
-            .filter(referential_constraints::dsl::constraint_name.eq(constraint_name))
-            .filter(referential_constraints::dsl::constraint_schema.eq(constraint_schema))
-            .filter(referential_constraints::dsl::constraint_catalog.eq(constraint_catalog))
+        referential_constraints::table
+            .filter(referential_constraints::constraint_name.eq(constraint_name))
+            .filter(referential_constraints::constraint_schema.eq(constraint_schema))
+            .filter(referential_constraints::constraint_catalog.eq(constraint_catalog))
             .load::<ReferentialConstraint>(conn)
             .expect("Error loading referential constraints")
     }

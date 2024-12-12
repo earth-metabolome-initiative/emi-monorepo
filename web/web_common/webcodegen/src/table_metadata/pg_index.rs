@@ -22,9 +22,9 @@ impl Index {
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {
         use crate::schema::pg_indexes;
-        pg_indexes::dsl::pg_indexes
-            .filter(pg_indexes::dsl::schemaname.eq(table_schema.unwrap_or("public")))
-            .filter(pg_indexes::dsl::indexdef.like("%UNIQUE%"))
+        pg_indexes::table
+            .filter(pg_indexes::schemaname.eq(table_schema.unwrap_or("public")))
+            .filter(pg_indexes::indexdef.like("%UNIQUE%"))
             .load::<Self>(conn)
     }
 
@@ -33,9 +33,9 @@ impl Index {
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {
         use crate::schema::pg_indexes;
-        pg_indexes::dsl::pg_indexes
-            .filter(pg_indexes::dsl::schemaname.eq(table_schema.unwrap_or("public")))
-            .filter(pg_indexes::dsl::indexdef.like("%USING gin%"))
+        pg_indexes::table
+            .filter(pg_indexes::schemaname.eq(table_schema.unwrap_or("public")))
+            .filter(pg_indexes::indexdef.like("%USING gin%"))
             .load::<Self>(conn)
     }
 
@@ -44,9 +44,9 @@ impl Index {
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {
         use crate::schema::pg_indexes;
-        pg_indexes::dsl::pg_indexes
-            .filter(pg_indexes::dsl::schemaname.eq(table_schema.unwrap_or("public")))
-            .filter(pg_indexes::dsl::indexdef.like("%USING gist%"))
+        pg_indexes::table
+            .filter(pg_indexes::schemaname.eq(table_schema.unwrap_or("public")))
+            .filter(pg_indexes::indexdef.like("%USING gist%"))
             .load::<Self>(conn)
     }
 

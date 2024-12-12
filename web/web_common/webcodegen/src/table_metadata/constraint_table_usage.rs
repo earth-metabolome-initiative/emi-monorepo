@@ -14,7 +14,7 @@ pub struct ConstraintTableUsage {
 
 impl ConstraintTableUsage {
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::constraint_table_usage::dsl::*;
-        constraint_table_usage.load::<ConstraintTableUsage>(conn)
+        use crate::schema::constraint_table_usage;
+        constraint_table_usage::table.load::<ConstraintTableUsage>(conn)
     }
 }

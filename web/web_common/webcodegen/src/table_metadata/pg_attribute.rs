@@ -36,11 +36,11 @@ pub struct PgAttribute {
 }
 
 impl PgAttribute {
-    /// Returns the PgType associated to the PgAttribute.
+    /// Returns the `PgType` associated to the `PgAttribute`.
     pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, WebCodeGenError> {
         use crate::schema::pg_type;
-        pg_type::dsl::pg_type
-            .filter(pg_type::dsl::oid.eq(self.atttypid))
+        pg_type::table
+            .filter(pg_type::oid.eq(self.atttypid))
             .first(conn)
             .map_err(WebCodeGenError::from)
     }

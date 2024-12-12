@@ -65,16 +65,16 @@ impl SQLFunction {
         let data: Vec<(_, _, _)> = pg_proc::table
             .inner_join(pg_namespace::table.on(pg_proc::pronamespace.eq(pg_namespace::oid)))
             .filter(pg_get_function_result(pg_proc::oid).ne("trigger"))
-            .filter(pg_namespace::dsl::nspname.ne("pg_catalog"))
-            .filter(pg_namespace::dsl::nspname.ne("information_schema"))
-            .filter(pg_proc::dsl::proname.not_like("diesel_%"))
-            .filter(pg_proc::dsl::proname.not_like("uuid_%"))
-            .filter(pg_proc::dsl::proname.not_like("set_%"))
-            .filter(pg_proc::dsl::proname.not_like("show_%"))
-            .filter(pg_proc::dsl::proname.not_like("gtrgm_%"))
-            .filter(pg_proc::dsl::proname.not_like("gin_%"))
+            .filter(pg_namespace::nspname.ne("pg_catalog"))
+            .filter(pg_namespace::nspname.ne("information_schema"))
+            .filter(pg_proc::proname.not_like("diesel_%"))
+            .filter(pg_proc::proname.not_like("uuid_%"))
+            .filter(pg_proc::proname.not_like("set_%"))
+            .filter(pg_proc::proname.not_like("show_%"))
+            .filter(pg_proc::proname.not_like("gtrgm_%"))
+            .filter(pg_proc::proname.not_like("gin_%"))
             .select((
-                pg_proc::dsl::proname,
+                pg_proc::proname,
                 pg_get_function_result(pg_proc::oid),
                 pg_get_function_arguments(pg_proc::oid),
             ))

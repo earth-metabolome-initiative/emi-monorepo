@@ -197,32 +197,32 @@ impl Column {
     }
 
     pub fn load_all(conn: &mut PgConnection) -> Vec<Self> {
-        use crate::schema::columns::dsl::*;
-        columns.load::<Column>(conn).expect("Error loading columns")
+        use crate::schema::columns;
+        columns::table.load::<Column>(conn).expect("Error loading columns")
     }
 
     pub fn is_foreign_key(&self, conn: &mut PgConnection) -> bool {
         use crate::schema::key_column_usage;
         use crate::schema::referential_constraints;
-        key_column_usage::dsl::key_column_usage
+        key_column_usage::table
             .inner_join(
-                referential_constraints::dsl::referential_constraints.on(
-                    key_column_usage::dsl::constraint_name
-                        .eq(referential_constraints::dsl::constraint_name)
+                referential_constraints::table.on(
+                    key_column_usage::constraint_name
+                        .eq(referential_constraints::constraint_name)
                         .and(
-                            key_column_usage::dsl::constraint_schema
-                                .eq(referential_constraints::dsl::constraint_schema),
+                            key_column_usage::constraint_schema
+                                .eq(referential_constraints::constraint_schema),
                         )
                         .and(
-                            key_column_usage::dsl::constraint_catalog
-                                .eq(referential_constraints::dsl::constraint_catalog),
+                            key_column_usage::constraint_catalog
+                                .eq(referential_constraints::constraint_catalog),
                         ),
                 ),
             )
-            .filter(key_column_usage::dsl::column_name.eq(&self.column_name))
-            .filter(key_column_usage::dsl::table_name.eq(&self.table_name))
-            .filter(key_column_usage::dsl::table_schema.eq(&self.table_schema))
-            .filter(key_column_usage::dsl::table_catalog.eq(&self.table_catalog))
+            .filter(key_column_usage::column_name.eq(&self.column_name))
+            .filter(key_column_usage::table_name.eq(&self.table_name))
+            .filter(key_column_usage::table_schema.eq(&self.table_schema))
+            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
             .select(KeyColumnUsage::as_select())
             .first::<KeyColumnUsage>(conn)
             .is_ok()
@@ -241,55 +241,55 @@ impl Column {
         use crate::schema::key_column_usage;
         use crate::schema::table_constraints;
         use crate::schema::tables;
-        table_constraints::dsl::table_constraints
+        table_constraints::table
             .inner_join(
-                key_column_usage::dsl::key_column_usage.on(table_constraints::dsl::constraint_name
-                    .eq(key_column_usage::dsl::constraint_name)
+                key_column_usage::table.on(table_constraints::constraint_name
+                    .eq(key_column_usage::constraint_name)
                     .and(
-                        table_constraints::dsl::constraint_schema
-                            .eq(key_column_usage::dsl::constraint_schema),
+                        table_constraints::constraint_schema
+                            .eq(key_column_usage::constraint_schema),
                     )
                     .and(
-                        table_constraints::dsl::constraint_catalog
-                            .eq(key_column_usage::dsl::constraint_catalog),
+                        table_constraints::constraint_catalog
+                            .eq(key_column_usage::constraint_catalog),
                     )
-                    .and(table_constraints::dsl::table_name.eq(key_column_usage::dsl::table_name))
+                    .and(table_constraints::table_name.eq(key_column_usage::table_name))
                     .and(
-                        table_constraints::dsl::table_schema
-                            .eq(key_column_usage::dsl::table_schema),
+                        table_constraints::table_schema
+                            .eq(key_column_usage::table_schema),
                     )
                     .and(
-                        table_constraints::dsl::table_catalog
-                            .eq(key_column_usage::dsl::table_catalog),
+                        table_constraints::table_catalog
+                            .eq(key_column_usage::table_catalog),
                     )),
             )
             .inner_join(
-                constraint_column_usage::dsl::constraint_column_usage
-                    .on(constraint_column_usage::dsl::constraint_name
-                        .eq(table_constraints::dsl::constraint_name)),
+                constraint_column_usage::table
+                    .on(constraint_column_usage::constraint_name
+                        .eq(table_constraints::constraint_name)),
             )
             .inner_join(
-                tables::dsl::tables.on(tables::dsl::table_name
-                    .eq(constraint_column_usage::dsl::table_name)
-                    .and(tables::dsl::table_schema.eq(constraint_column_usage::dsl::table_schema))
+                tables::table.on(tables::table_name
+                    .eq(constraint_column_usage::table_name)
+                    .and(tables::table_schema.eq(constraint_column_usage::table_schema))
                     .and(
-                        tables::dsl::table_catalog.eq(constraint_column_usage::dsl::table_catalog),
+                        tables::table_catalog.eq(constraint_column_usage::table_catalog),
                     )),
             )
             .inner_join(
-                columns::dsl::columns.on(columns::dsl::table_name
-                    .eq(constraint_column_usage::dsl::table_name)
-                    .and(columns::dsl::table_schema.eq(constraint_column_usage::dsl::table_schema))
+                columns::table.on(columns::table_name
+                    .eq(constraint_column_usage::table_name)
+                    .and(columns::table_schema.eq(constraint_column_usage::table_schema))
                     .and(
-                        columns::dsl::table_catalog.eq(constraint_column_usage::dsl::table_catalog),
+                        columns::table_catalog.eq(constraint_column_usage::table_catalog),
                     )
-                    .and(columns::dsl::column_name.eq(constraint_column_usage::dsl::column_name))),
+                    .and(columns::column_name.eq(constraint_column_usage::column_name))),
             )
-            .filter(table_constraints::dsl::constraint_type.eq("FOREIGN KEY"))
-            .filter(table_constraints::dsl::table_name.eq(&self.table_name))
-            .filter(table_constraints::dsl::table_schema.eq(&self.table_schema))
-            .filter(table_constraints::dsl::table_catalog.eq(&self.table_catalog))
-            .filter(key_column_usage::dsl::column_name.eq(&self.column_name))
+            .filter(table_constraints::constraint_type.eq("FOREIGN KEY"))
+            .filter(table_constraints::table_name.eq(&self.table_name))
+            .filter(table_constraints::table_schema.eq(&self.table_schema))
+            .filter(table_constraints::table_catalog.eq(&self.table_catalog))
+            .filter(key_column_usage::column_name.eq(&self.column_name))
             .select((Table::as_select(), Column::as_select()))
             .first::<(Table, Column)>(conn)
             .map(Some)

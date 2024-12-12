@@ -175,7 +175,7 @@ impl PgType {
         }
     }
 
-    /// Returns the Syn postgres type of the PgType.
+    /// Returns the Syn postgres type of the `PgType`.
     pub fn diesel_type(
         &self,
         nullable: bool,
@@ -195,7 +195,7 @@ impl PgType {
         }
     }
 
-    /// Returns the internal custom types of the PgType, if any.
+    /// Returns the internal custom types of the `PgType`, if any.
     pub fn internal_custom_types(
         &self,
         conn: &mut PgConnection,
@@ -212,14 +212,14 @@ impl PgType {
         Ok(internal_custom_types)
     }
 
-    /// Returns the Type Base Type of the PgType.
+    /// Returns the Type Base Type of the `PgType`.
     pub fn base_type(&self, conn: &mut PgConnection) -> Result<Option<PgType>, WebCodeGenError> {
         if self.typbasetype == 0 {
             Ok(None)
         } else {
             use crate::schema::pg_type;
-            Ok(pg_type::dsl::pg_type
-                .filter(pg_type::dsl::oid.eq(self.typbasetype))
+            Ok(pg_type::table
+                .filter(pg_type::oid.eq(self.typbasetype))
                 .first::<PgType>(conn)
                 .ok())
         }
@@ -230,11 +230,13 @@ impl PgType {
         Ok(&self.typcategory == "U" && self.base_type(conn)?.is_some())
     }
 
+    #[must_use]
     /// Returns whether the Postgres type is a composite type.
     pub fn is_composite(&self) -> bool {
         &self.typcategory == "C"
     }
 
+    #[must_use]
     /// Returns whether the Postgres type is an enum type.
     pub fn is_enum(&self) -> bool {
         &self.typcategory == "E"
@@ -283,7 +285,8 @@ impl PgType {
         }
     }
 
-    /// Returns the CamelCased name of the PgType.
+    #[must_use]
+    /// Returns the `CamelCased` name of the `PgType`.
     pub fn camelcased_name(&self) -> String {
         self.typname
             .split('_')
@@ -297,12 +300,12 @@ impl PgType {
             .collect()
     }
 
-    /// Returns the CamelCased name of the PgType for the Postgres binding.
+    /// Returns the `CamelCased` name of the `PgType` for the Postgres binding.
     pub fn pg_binding_name(&self) -> String {
         format!("Pg{}", self.camelcased_name())
     }
 
-    /// Returns the syn of the struct or enum associated to the PgType.
+    /// Returns the syn of the struct or enum associated to the `PgType`.
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         if self.is_composite() {
             let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
@@ -312,7 +315,7 @@ impl PgType {
             let mut struct_attributes = Vec::new();
             let mut field_names = Vec::new();
             let attributes = self.attributes(conn)?;
-            for attribute in attributes.iter() {
+            for attribute in &attributes {
                 let field_name = Ident::new(&attribute.attname, proc_macro2::Span::call_site());
                 let field_pg_type = attribute.pg_type(conn)?;
                 let field_type = field_pg_type.rust_type(conn)?;
@@ -431,7 +434,7 @@ impl PgType {
             let mut variant_names = Vec::new();
             let mut in_variants = Vec::new();
             let mut out_variants = Vec::new();
-            for variant in variants.iter() {
+            for variant in &variants {
                 let variant_name = Ident::new(&variant.enumlabel, proc_macro2::Span::call_site());
                 variant_names.push(quote! {
                     #variant_name
@@ -488,11 +491,11 @@ impl PgType {
             })
 
         } else {
-            panic!("Unsupported type: {:?}", self);
+            panic!("Unsupported type: {self:?}");
         }
     }
 
-    /// Returns a new PgType struct from the given type name.
+    /// Returns a new `PgType` struct from the given type name.
     ///
     /// # Arguments
     ///
@@ -501,12 +504,12 @@ impl PgType {
     ///
     /// # Returns
     ///
-    /// A Result containing the PgType struct if the type exists, or an error if it does not.
+    /// A Result containing the `PgType` struct if the type exists, or an error if it does not.
     ///
     pub fn from_name(type_name: &str, conn: &mut PgConnection) -> Result<Self, WebCodeGenError> {
         use crate::schema::pg_type;
-        Ok(pg_type::dsl::pg_type
-            .filter(pg_type::dsl::typname.eq(type_name))
+        Ok(pg_type::table
+            .filter(pg_type::typname.eq(type_name))
             .first::<PgType>(conn)?)
     }
 
@@ -515,14 +518,14 @@ impl PgType {
         use crate::schema::pg_attribute;
         use crate::schema::pg_type;
 
-        Ok(pg_attribute::dsl::pg_attribute
+        Ok(pg_attribute::table
             .inner_join(
-                pg_type::dsl::pg_type.on(pg_attribute::dsl::attrelid.eq(pg_type::dsl::typrelid)),
+                pg_type::table.on(pg_attribute::attrelid.eq(pg_type::typrelid)),
             )
             .filter(
-                pg_type::dsl::typname
+                pg_type::typname
                     .eq(&self.typname)
-                    .and(pg_attribute::dsl::attisdropped.eq(false)),
+                    .and(pg_attribute::attisdropped.eq(false)),
             )
             .select(PgAttribute::as_select())
             .load::<PgAttribute>(conn)?)
@@ -532,9 +535,9 @@ impl PgType {
     pub fn variants(&self, conn: &mut PgConnection) -> Result<Vec<PgEnum>, WebCodeGenError> {
         use crate::schema::pg_enum;
 
-        Ok(pg_enum::dsl::pg_enum
-            .filter(pg_enum::dsl::enumtypid.eq(self.oid))
-            .order_by(pg_enum::dsl::enumsortorder)
+        Ok(pg_enum::table
+            .filter(pg_enum::enumtypid.eq(self.oid))
+            .order_by(pg_enum::enumsortorder)
             .select(PgEnum::as_select())
             .load::<PgEnum>(conn)?)
     }

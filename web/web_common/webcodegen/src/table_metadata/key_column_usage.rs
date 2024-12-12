@@ -17,8 +17,8 @@ pub struct KeyColumnUsage {
 
 impl KeyColumnUsage {
     pub fn load_all_key_column_usages(conn: &mut PgConnection) -> Vec<Self> {
-        use crate::schema::key_column_usage::dsl::*;
-        key_column_usage
+        use crate::schema::key_column_usage;
+        key_column_usage::table
             .load::<KeyColumnUsage>(conn)
             .expect("Error loading key column usages")
     }
@@ -31,10 +31,10 @@ impl KeyColumnUsage {
     ) -> Vec<Self> {
         use crate::schema::key_column_usage;
         let table_schema = table_schema.unwrap_or("public");
-        key_column_usage::dsl::key_column_usage
-            .filter(key_column_usage::dsl::table_name.eq(table_name))
-            .filter(key_column_usage::dsl::table_schema.eq(table_schema))
-            .filter(key_column_usage::dsl::table_catalog.eq(table_catalog))
+        key_column_usage::table
+            .filter(key_column_usage::table_name.eq(table_name))
+            .filter(key_column_usage::table_schema.eq(table_schema))
+            .filter(key_column_usage::table_catalog.eq(table_catalog))
             .load::<KeyColumnUsage>(conn)
             .expect("Error loading key column usages")
     }

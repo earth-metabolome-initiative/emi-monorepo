@@ -12,8 +12,8 @@ pub struct CheckConstraint {
 
 impl CheckConstraint {
     pub fn load_all_check_constraints(conn: &mut PgConnection) -> Vec<Self> {
-        use crate::schema::check_constraints::dsl::*;
-        check_constraints
+        use crate::schema::check_constraints;
+        check_constraints::table
             .load::<CheckConstraint>(conn)
             .expect("Error loading check constraints")
     }
@@ -26,10 +26,10 @@ impl CheckConstraint {
     ) -> Vec<Self> {
         use crate::schema::check_constraints;
         let constraint_schema = constraint_schema.unwrap_or("public");
-        check_constraints::dsl::check_constraints
-            .filter(check_constraints::dsl::constraint_name.eq(constraint_name))
-            .filter(check_constraints::dsl::constraint_schema.eq(constraint_schema))
-            .filter(check_constraints::dsl::constraint_catalog.eq(constraint_catalog))
+        check_constraints::table
+            .filter(check_constraints::constraint_name.eq(constraint_name))
+            .filter(check_constraints::constraint_schema.eq(constraint_schema))
+            .filter(check_constraints::constraint_catalog.eq(constraint_catalog))
             .load::<CheckConstraint>(conn)
             .expect("Error loading check constraints")
     }

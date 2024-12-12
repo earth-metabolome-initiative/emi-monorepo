@@ -15,8 +15,8 @@ pub struct ConstraintColumnUsage {
 
 impl ConstraintColumnUsage {
     pub fn load_all_constraint_column_usages(conn: &mut PgConnection) -> Vec<Self> {
-        use crate::schema::constraint_column_usage::dsl::*;
-        constraint_column_usage
+        use crate::schema::constraint_column_usage;
+        constraint_column_usage::table
             .load::<ConstraintColumnUsage>(conn)
             .expect("Error loading constraint column usages")
     }
@@ -29,10 +29,10 @@ impl ConstraintColumnUsage {
     ) -> Vec<Self> {
         use crate::schema::constraint_column_usage;
         let constraint_schema = constraint_schema.unwrap_or("public");
-        constraint_column_usage::dsl::constraint_column_usage
-            .filter(constraint_column_usage::dsl::constraint_name.eq(constraint_name))
-            .filter(constraint_column_usage::dsl::constraint_schema.eq(constraint_schema))
-            .filter(constraint_column_usage::dsl::constraint_catalog.eq(constraint_catalog))
+        constraint_column_usage::table
+            .filter(constraint_column_usage::constraint_name.eq(constraint_name))
+            .filter(constraint_column_usage::constraint_schema.eq(constraint_schema))
+            .filter(constraint_column_usage::constraint_catalog.eq(constraint_catalog))
             .load::<ConstraintColumnUsage>(conn)
             .expect("Error loading constraint column usages")
     }

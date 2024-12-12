@@ -8,7 +8,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{File, Ident};
 
-use crate::{errors::WebCodeGenError, PgType, Table};
+use crate::{errors::WebCodeGenError, Column, PgType, Table};
 use prettyplease::unparse;
 
 #[derive(Debug)]
@@ -25,12 +25,14 @@ pub struct Codegen<'a> {
 }
 
 impl<'a> Codegen<'a> {
+    #[must_use]
     /// Adds a new table to the deny list.
     pub fn add_table_to_deny_list(mut self, table: &'a Table) -> Self {
         self.tables_deny_list.push(table);
         self
     }
 
+    #[must_use]
     /// Sets the output path for the generated code.
     pub fn set_output_path(mut self, output_path: &'a Path) -> Self {
         self.output_path = Some(output_path);
@@ -66,7 +68,7 @@ impl<'a> Codegen<'a> {
 
         let all_table_idents = tables
             .iter()
-            .map(|table| table.snake_case_ident())
+            .map(Table::snake_case_ident)
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
 
         let table_idents_below_64_columns = tables
@@ -77,7 +79,7 @@ impl<'a> Codegen<'a> {
                     .map(|columns| columns.len() <= 64)
                     .unwrap_or(false)
             })
-            .map(|table| table.snake_case_ident())
+            .map(Table::snake_case_ident)
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
 
         let table_idents_below_32_columns = tables
@@ -88,7 +90,7 @@ impl<'a> Codegen<'a> {
                     .map(|columns| columns.len() <= 32)
                     .unwrap_or(false)
             })
-            .map(|table| table.snake_case_ident())
+            .map(Table::snake_case_ident)
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
 
         let table_idents_below_16_columns = tables
@@ -99,7 +101,7 @@ impl<'a> Codegen<'a> {
                     .map(|columns| columns.len() <= 16)
                     .unwrap_or(false)
             })
-            .map(|table| table.snake_case_ident())
+            .map(Table::snake_case_ident)
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
 
         let user_defined_types = tables
@@ -108,7 +110,7 @@ impl<'a> Codegen<'a> {
                 let custom_types = table
                     .columns(conn)?
                     .into_iter()
-                    .filter(|column| column.has_custom_type())
+                    .filter(Column::has_custom_type)
                     .map(|column| PgType::from_name(column.data_type_str(conn)?, conn))
                     .filter_ok(|pg_type| pg_type.is_enum() || pg_type.is_composite())
                     .collect::<Result<HashSet<PgType>, WebCodeGenError>>()?;
@@ -133,44 +135,44 @@ impl<'a> Codegen<'a> {
         // We define for each group of tables by column size the corresponding diesel macro
         // for allow_tables_to_appear_in_same_query, with negative flags to avoid multiple such
         // macros active at the same time.
-        let above_64_columns = if all_table_idents.len() != table_idents_below_64_columns.len() {
+        let above_64_columns = if all_table_idents.len() == table_idents_below_64_columns.len() {
+            TokenStream::new()
+        } else {
             quote! {
                 #[cfg(feature = "128-column-tables")]
                 diesel::allow_tables_to_appear_in_same_query!( #( #all_table_idents ),* );
             }
-        } else {
-            TokenStream::new()
         };
 
         let above_32_columns = if table_idents_below_64_columns.len()
-            != table_idents_below_32_columns.len()
+            == table_idents_below_32_columns.len()
         {
+            TokenStream::new()
+        } else {
             quote! {
                 #[cfg(all(feature = "64-column-tables", not(feature = "128-column-tables")))]
                 diesel::allow_tables_to_appear_in_same_query!( #( #table_idents_below_64_columns ),* );
             }
-        } else {
-            TokenStream::new()
         };
 
         let above_16_columns = if table_idents_below_32_columns.len()
-            != table_idents_below_16_columns.len()
+            == table_idents_below_16_columns.len()
         {
+            TokenStream::new()
+        } else {
             quote! {
                 #[cfg(all(feature = "32-column-tables", not(feature = "64-column-tables")))]
                 diesel::allow_tables_to_appear_in_same_query!( #( #table_idents_below_32_columns ),* );
             }
-        } else {
-            TokenStream::new()
         };
 
-        let below_16_columns = if table_idents_below_16_columns.len() != 0 {
+        let below_16_columns = if table_idents_below_16_columns.is_empty() {
+            TokenStream::new()
+        } else {
             quote! {
                 #[cfg(all(feature = "diesel", not(feature = "32-column-tables")))]
                 diesel::allow_tables_to_appear_in_same_query!( #( #table_idents_below_16_columns ),* );
             }
-        } else {
-            TokenStream::new()
         };
 
         // Create a new TokenStream
