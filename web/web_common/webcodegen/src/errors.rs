@@ -1,5 +1,5 @@
 //! Enumeration for the errors that may happen within the webcodegen crate.
-use crate::{custom_schema_constraints::ConstraintError, Column, PgType};
+use crate::{custom_schema_constraints::ConstraintError, Column, PgType, Table};
 use diesel::result::Error as DieselError;
 use snake_case_sanitizer::SanitizationErrors;
 
@@ -14,6 +14,7 @@ pub enum WebCodeGenError {
     NotUserDefinedType(String),
     MissingBaseType(PgType),
     SanitizationErrors(SanitizationErrors),
+    IllegalTableCodegen(String, String, Table),
 }
 
 impl From<DieselError> for WebCodeGenError {

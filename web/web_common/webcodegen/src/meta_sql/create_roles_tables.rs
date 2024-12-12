@@ -50,7 +50,7 @@ impl Table {
         for primary_key_column in self.primary_key_columns(conn)? {
             create_table.push_str(&format!(
                 "{} {} NOT NULL,\n",
-                primary_key_column.column_name, primary_key_column.data_type_str()?
+                primary_key_column.column_name, primary_key_column.data_type_str(conn)?
             ));
             primary_key_names.push(primary_key_column.column_name.clone());
         }
@@ -58,17 +58,17 @@ impl Table {
         create_table.push_str(&format!(
             "{}_id {} NOT NULL,\n",
             reference_table.singular_table_name(),
-            reference_table.primary_key_columns(conn)?[0].data_type_str()?
+            reference_table.primary_key_columns(conn)?[0].data_type_str(conn)?
         ));
 
         create_table.push_str(&format!(
             "role_id {} NOT NULL,\n",
-            roles_table.primary_key_columns(conn)?[0].data_type_str()?
+            roles_table.primary_key_columns(conn)?[0].data_type_str(conn)?
         ));
 
         create_table.push_str(&format!(
             "created_by {} NOT NULL,\n",
-            users.primary_key_columns(conn)?[0].data_type_str()?
+            users.primary_key_columns(conn)?[0].data_type_str(conn)?
         ));
 
         create_table.push_str("created_at TIMESTAMP NOT NULL DEFAULT NOW(),\n");

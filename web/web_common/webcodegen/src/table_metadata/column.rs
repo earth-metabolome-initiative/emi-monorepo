@@ -6,13 +6,14 @@ use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
     RunQueryDsl, Selectable, SelectableHelper,
 };
-use syn::Type;
-
+use syn::{Ident, Type};
+use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 use crate::table_metadata::pg_type::postgres_type_to_diesel;
 
 use crate::KeyColumnUsage;
 
 use super::pg_type::{PgType, rust_type_str};
+use super::table::RESERVED_RUST_WORDS;
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug, Clone)]
@@ -68,7 +69,7 @@ pub struct Column {
 
 impl Column {
     /// Returns the data type associated with the column as repo
-    pub fn data_type_str(&self) -> Result<&str, WebCodeGenError> {
+    pub fn data_type_str(&self, _conn: &mut PgConnection) -> Result<&str, WebCodeGenError> {
         Ok(if self.has_custom_type() {
             if let Some(udt_name) = &self.udt_name {
                 &udt_name
@@ -82,9 +83,9 @@ impl Column {
 
     pub fn data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         let rust_type = if self.has_custom_type() {
-            PgType::from_name(self.data_type_str()?, conn)?.camelcased_name()
+            PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name()
         } else {
-            rust_type_str(self.data_type_str()?).to_string()
+            rust_type_str(self.data_type_str(conn)?).to_string()
         };
 
         let rust_type = if self.is_nullable() {
@@ -94,6 +95,25 @@ impl Column {
         };
 
         Ok(syn::parse_str(&rust_type).unwrap())
+    }
+
+    /// Returns the sanitized snake case name of the table.
+    pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
+        let sanitizer = SnakeCaseSanizer::new()
+            .include_defaults()
+            .remove_leading_underscores()
+            .remove_trailing_underscores();
+        Ok(sanitizer.to_snake_case(&self.column_name)?)
+    }
+
+    /// Returns the sanitized snake case syn Ident of the table.
+    pub fn snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
+        let snake_case_name = self.snake_case_name()?;
+        if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
+            Ok(Ident::new_raw(&snake_case_name, proc_macro2::Span::call_site()))
+        } else {
+            Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
+        }
     }
 
     pub fn has_custom_type(&self) -> bool {
@@ -106,7 +126,7 @@ impl Column {
 
     pub fn diesel_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         if self.has_custom_type() {
-            let name = PgType::from_name(self.data_type_str()?, conn)?
+            let name = PgType::from_name(self.data_type_str(conn)?, conn)?
                 .camelcased_name();
             let name = if self.is_nullable() {
                 format!("diesel::sql_types::Nullable<crate::Pg{}>", name)
@@ -117,7 +137,7 @@ impl Column {
             Ok(syn::parse_str(&name).unwrap())
         } else {
             Ok(postgres_type_to_diesel(
-                self.data_type_str()?,
+                self.data_type_str(conn)?,
                 self.is_nullable(),
             ))    
         }

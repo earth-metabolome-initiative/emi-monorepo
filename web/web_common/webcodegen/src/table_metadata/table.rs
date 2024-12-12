@@ -10,9 +10,9 @@ use itertools::Itertools;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
-use std::path::Path;
-use syn::{File, Ident};
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
+use std::path::Path;
+use syn::{parse_str, File, Ident, Type};
 
 use crate::errors::WebCodeGenError;
 use crate::CheckConstraint;
@@ -22,9 +22,18 @@ use crate::TableConstraint;
 
 use super::PgType;
 
+pub const RESERVED_RUST_WORDS: [&str; 49] = [
+    "as", "break", "const", "continue", "crate", "else", "enum", "extern",
+    "false", "fn", "for", "if", "impl", "in", "let", "loop", "match",
+    "mod", "move", "mut", "pub", "ref", "return", "self", "static", "struct",
+    "super", "trait", "true", "type", "unsafe", "use", "where", "while",
+    // Future reserved keywords
+    "abstract", "async", "await", "become", "box", "do", "final", "macro",
+    "override", "priv", "try", "typeof", "unsized", "virtual", "yield",
+];
 
 /// Struct defining the `information_schema.tables` table.
-#[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug)]
+#[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug, Clone)]
 #[diesel(table_name = crate::schema::tables)]
 pub struct Table {
     pub table_catalog: String,
@@ -44,8 +53,36 @@ pub struct Table {
 impl Table {
     /// Returns the name of the struct converted from the table name.
     pub fn struct_name(&self) -> Result<String, WebCodeGenError> {
-        let sanitizer = SnakeCaseSanizer::new().include_defaults().remove_leading_underscores().remove_trailing_underscores();
+        let sanitizer = SnakeCaseSanizer::new()
+            .include_defaults()
+            .remove_leading_underscores()
+            .remove_trailing_underscores();
         Ok(sanitizer.to_camel_case(&self.table_name)?)
+    }
+
+    /// Returns the sanitized snake case name of the table.
+    pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
+        let sanitizer = SnakeCaseSanizer::new()
+            .include_defaults()
+            .remove_leading_underscores()
+            .remove_trailing_underscores();
+        Ok(sanitizer.to_snake_case(&self.table_name)?)
+    }
+
+    /// Returns whether the table has a sanitized snake case name.
+    pub fn has_snake_case_name(&self) -> Result<bool, WebCodeGenError> {
+        let snake_case_name = self.snake_case_name()?;
+        Ok(snake_case_name != self.table_name)
+    }
+
+    /// Returns the sanitized snake case syn Ident of the table.
+    pub fn snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
+        let snake_case_name = self.snake_case_name()?;
+        if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
+            Ok(Ident::new_raw(&snake_case_name, proc_macro2::Span::call_site()))
+        } else {
+            Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
+        }
     }
 
     /// Returns the singular name of the table.
@@ -148,7 +185,8 @@ impl Table {
 
         let table_idents = tables
             .iter()
-            .map(|table| Ident::new(&table.table_name, proc_macro2::Span::call_site()));
+            .map(|table| Ok(Ident::new(&table.snake_case_name()?, proc_macro2::Span::call_site())))
+            .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
 
         let user_defined_types = tables
             .iter()
@@ -157,7 +195,8 @@ impl Table {
                     .columns(conn)?
                     .into_iter()
                     .filter(|column| column.has_custom_type())
-                    .map(|column| PgType::from_name(column.data_type_str()?, conn))
+                    .map(|column| PgType::from_name(column.data_type_str(conn)?, conn))
+                    .filter_ok(|pg_type| pg_type.is_enum() || pg_type.is_composite())
                     .collect::<Result<HashSet<PgType>, WebCodeGenError>>()?;
                 let mut additional_custom_types = custom_types.clone();
                 for custom_type in custom_types {
@@ -213,38 +252,64 @@ impl Table {
 
     /// Returns the Syn TokenStream for the diesel schema definition for the table.
     pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
-        let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
         let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
-        let sanitizer = SnakeCaseSanizer::new().include_defaults().remove_leading_underscores().remove_trailing_underscores();
+        let original_table_name = &self.table_name;
+        let sanitized_table_name_ident = Ident::new(
+            &self.snake_case_name()?,
+            proc_macro2::Span::call_site(),
+        );
         let columns = self
             .columns(conn)?
             .into_iter()
             .map(|column| {
                 let original_column_name = &column.column_name;
-                let sanitized_column_name = sanitizer.to_snake_case(&column.column_name)?;
-                let column_name_ident = Ident::new(&sanitized_column_name, proc_macro2::Span::call_site());
+                let sanitized_column_name = column.snake_case_name()?;
+                let column_attribute: Ident = column.snake_case_ident()?;
                 let column_type = column.diesel_type(conn)?;
-                Ok(if original_column_name == &sanitized_column_name {
+                Ok(if original_column_name != &sanitized_column_name {
                     quote! {
                         #[sql_name = #original_column_name]
-                        #column_name_ident -> #column_type
+                        #column_attribute -> #column_type
                     }
                 } else {
                     quote! {
-                    #column_name_ident -> #column_type
-                }})
+                        #column_attribute -> #column_type
+                    }
+                })
             })
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
         let primary_key_names = self
             .primary_key_columns(conn)?
             .into_iter()
-            .map(|column| Ident::new(&column.column_name, proc_macro2::Span::call_site()));
+            .map(|column| Ident::new(&column.column_name, proc_macro2::Span::call_site()))
+            .collect::<Vec<Ident>>();
 
-        Ok(quote! {
-            #[cfg(feature = "diesel")]
-            diesel::table! {
-                #table_schema.#table_name (#(#primary_key_names, )*) {
-                    #(#columns),*
+        let primary_key_names = if primary_key_names.is_empty() {
+            TokenStream::new()
+        } else {
+            quote! {
+                (#(#primary_key_names),*)
+            }
+        };
+
+
+        Ok(if self.has_snake_case_name()? {
+            quote! {
+                #[cfg(feature = "diesel")]
+                diesel::table! {
+                    #[sql_name = #original_table_name]
+                    #table_schema.#sanitized_table_name_ident #primary_key_names {
+                        #(#columns),*
+                    }
+                }
+            }
+        } else {
+            quote! {
+                #[cfg(feature = "diesel")]
+                diesel::table! {
+                    #table_schema.#sanitized_table_name_ident #primary_key_names {
+                        #(#columns),*
+                    }
                 }
             }
         })
@@ -260,22 +325,63 @@ impl Table {
         false
     }
 
+    /// Returns the primary key identifiers for the table.
+    pub fn primary_key_identifiers(&self, conn: &mut PgConnection) -> Result<Vec<Ident>, WebCodeGenError> {
+        self.primary_key_columns(conn)?
+            .into_iter()
+            .map(|column| column.snake_case_ident())
+            .collect::<Result<Vec<Ident>, WebCodeGenError>>()
+    }
+
+    /// Returns the primary key decorator to be used for this table, if any.
+    pub fn primary_key_decorator(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        // In some cases, the table will not have a primary key. In which case, we cannot specify the primary key
+        // decorator on the struct.
+        Ok(if self.has_primary_keys(conn)? {
+            let primary_key_identifiers = self.primary_key_identifiers(conn)?;
+            quote! {
+                #[cfg_attr(feature = "diesel", diesel(primary_key(#(#primary_key_identifiers),*)))]
+            }
+        } else {
+            TokenStream::new()
+        })
+    }
+
+    /// Returns the diesel derives supported by the table.
+    pub fn diesel_derives(&self, conn: &mut PgConnection) -> Result<Vec<Type>, WebCodeGenError> {
+        let mut derives = Vec::new();
+
+        derives.push(parse_str("diesel::Selectable").unwrap());
+
+        if self.has_primary_keys(conn)? {
+            derives.push(parse_str("diesel::Queryable").unwrap());
+            derives.push(parse_str("diesel::Identifiable").unwrap());
+        }
+
+        Ok(derives)
+    }
+
+    /// Returns the diesel derives decorator for the table.
+    pub fn diesel_derives_decorator(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        let diesel_derives = self.diesel_derives(conn)?;
+        Ok(if diesel_derives.is_empty() {
+            TokenStream::new()
+        } else {
+            quote! {
+                #[cfg_attr(feature = "diesel", derive(#(#diesel_derives),*))]
+            }
+        })
+    }
+
     /// Returns the Syn TokenStream for the struct definition and associated methods.
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
-        let sanitizer = SnakeCaseSanizer::new().include_defaults().remove_leading_underscores().remove_trailing_underscores();
-        let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
+        let sanitized_table_name = self.snake_case_ident()?;
         let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
-        let primary_key_columns = self
-            .primary_key_columns(conn)?
-            .into_iter()
-            .map(|column| Ident::new(&column.column_name, proc_macro2::Span::call_site()));
         let attributes = self
             .columns(conn)?
             .into_iter()
             .map(|column| {
-                let sanitized_column_name = sanitizer.to_snake_case(&column.column_name)?;
-                let column_attribute: Ident =
-                    Ident::new(&sanitized_column_name, proc_macro2::Span::call_site());
+                let column_attribute: Ident = column.snake_case_ident()?;
                 let column_type = column.data_type(conn)?;
                 Ok(quote! {
                     pub #column_attribute: #column_type
@@ -285,7 +391,11 @@ impl Table {
 
         let mutability_impls = if self.has_session_user_generated_columns(conn) {
             let insert_trait_impls = self.insert_trait_impls(conn)?;
-            let update_trait_impls = self.update_trait_impls(conn)?;
+            let update_trait_impls = if self.has_primary_keys(conn)? {
+                self.update_trait_impls(conn)?
+            } else {
+                TokenStream::new()
+            };
             quote! {
                 #insert_trait_impls
                 #update_trait_impls
@@ -294,23 +404,44 @@ impl Table {
             TokenStream::new()
         };
         let foreign_key_methods = self.foreign_key_methods(conn)?;
-
-        Ok(quote! {
+        let delete_method = if self.has_primary_keys(conn)? {
+            self.delete_method(conn)?
+        } else {
+            TokenStream::new()
+        };
+        let primary_key_decorator = self.primary_key_decorator(conn)?;
+        let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
+        let built_table_syn = quote! {
             #[derive(Debug)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-            #[cfg_attr(feature = "diesel", derive(diesel::Queryable, diesel::Selectable, diesel::QueryableByName))]
-            #[cfg_attr(feature = "diesel", diesel(table_name = #table_name))]
-            #[cfg_attr(feature = "diesel", diesel(primary_key(#(#primary_key_columns),*)))]
+            #diesel_derives_decorator
+            #primary_key_decorator
+            #[cfg_attr(feature = "diesel", diesel(table_name = #sanitized_table_name))]
             pub struct #struct_name {
                 #(#attributes),*
             }
 
             impl #struct_name {
                 #(#foreign_key_methods)*
+                #delete_method
             }
 
             #mutability_impls
-        })
+        };
+
+        // Convert the generated TokenStream to a string
+        let code_string = built_table_syn.to_string();
+
+        // Parse the generated code string into a syn::Item
+        if let Err(error) = syn::parse_str::<File>(&code_string) {
+            return Err(WebCodeGenError::IllegalTableCodegen(
+                format!("Error building table struct: {}", error),
+                code_string,
+                self.clone(),
+            ));
+        }
+
+        Ok(built_table_syn)
     }
 
     fn foreign_key_methods<'a>(
@@ -325,31 +456,73 @@ impl Table {
             .into_iter()
             .map(|column| {
                 let (foreign_key_table, foreign_key_column) = column.foreign_table(conn).unwrap().unwrap();
-                let foreign_key_table_name: Ident = Ident::new(&foreign_key_table.table_name, proc_macro2::Span::call_site());
+                let foreign_key_table_name = Ident::new(&foreign_key_table.snake_case_name()?, proc_macro2::Span::call_site());
                 let foreign_key_column_name: Ident = Ident::new(&foreign_key_column.column_name, proc_macro2::Span::call_site());
                 let method_name: Ident = if column.column_name.ends_with("_id") {
                     Ident::new(&column.column_name[..column.column_name.len() - 3], proc_macro2::Span::call_site())
                 } else {
                     Ident::new(&column.column_name, proc_macro2::Span::call_site())
                 };
-                let current_column_name: Ident = Ident::new(&column.column_name, proc_macro2::Span::call_site());
+                let current_column_ident: Ident = column.snake_case_ident()?;
                 let foreign_key_struct_name: Ident = Ident::new(&foreign_key_table.struct_name()?, proc_macro2::Span::call_site());
+
+                // If the current column has a Nullable (Option) type, the return type of the method should be an Option
+                let return_type_ident = if column.is_nullable() {
+                    quote! { Option<#foreign_key_struct_name> }
+                } else {
+                    quote! { #foreign_key_struct_name }
+                };
+
+                // Analogously, we check before executing the query whether the current column is None. If so,
+                // we return None as well.
+                let column_value_retrieval = if column.is_nullable() {
+                    quote! {
+                        let #current_column_ident = if let Some(#current_column_ident) = self.#current_column_ident.as_ref() {
+                            #current_column_ident
+                        } else {
+                            return Ok(None);
+                        };
+                    }
+                } else {
+                    TokenStream::new()
+                };
+
+                // It follows that we need to determine whether the right term of the equality for
+                // the filter should be prefixed with 'self.' or not (if the column is nullable).
+                let filter_statement = if column.is_nullable() {
+                    quote! { #foreign_key_table_name::#foreign_key_column_name.eq(&#current_column_ident) }
+                } else {
+                    quote! { #foreign_key_table_name::#foreign_key_column_name.eq(&self.#current_column_ident) }
+                };
+
+                // Finally, when we are returning a Result<Option<TableStructType>, ...>, 
+                // we need to wrap the result of the query in a Some.
+                let map_ops = if column.is_nullable() {
+                    quote! { .map(Some) }
+                } else {
+                    TokenStream::new()
+                };
 
                 Ok(quote! {
                     #[cfg(feature = "diesel")]
-                    pub async fn #method_name(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<#foreign_key_struct_name, diesel::result::Error> {
-                        #foreign_key_table_name::dsl::#foreign_key_table_name
-                            .filter(#foreign_key_table_name::dsl::#foreign_key_column_name.eq(self.#current_column_name))
-                            .select(#foreign_key_struct_name::as_select())
+                    pub async fn #method_name(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<#return_type_ident, diesel::result::Error> {
+                        #column_value_retrieval
+                        #foreign_key_table_name::table
+                            .filter(#filter_statement)
+                            .select(<#foreign_key_struct_name as diesel::SelectableHelper<diesel::pg::Pg>>::as_select())
                             .first::<#foreign_key_struct_name>(conn)
                             .await
+                            #map_ops
                     }
                 })
             }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()
     }
 
     pub fn delete_method(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
-        let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
+        let sanitized_table_name = Ident::new(
+            &self.snake_case_name()?,
+            proc_macro2::Span::call_site(),
+        );
         let primary_key_columns = self.primary_key_columns(conn).unwrap();
 
         let where_clause = primary_key_columns
@@ -358,7 +531,7 @@ impl Table {
                 let column_name: Ident =
                     Ident::new(&column.column_name, proc_macro2::Span::call_site());
                 quote! {
-                    #struct_name::dsl::#column_name.eq(&self.#column_name)
+                    #sanitized_table_name::#column_name.eq(&self.#column_name)
                 }
             })
             .collect::<Vec<_>>();
@@ -366,13 +539,13 @@ impl Table {
         // Join the where clauses with an and
         let where_clause = where_clause
             .into_iter()
-            .reduce(|a, b| quote! { #a.and(#b) })
+            .reduce(|a, b| quote! { diesel::BoolExpressionMethods::and(#a, #b) })
             .unwrap();
 
         Ok(quote! {
             #[cfg(feature = "diesel")]
-            async pub fn delete(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<usize, DieselError> {
-                diesel::delete(#struct_name.filter(#(#where_clause).and_then(|x| Ok(x)))).execute(conn).await
+            pub async fn delete(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<usize, diesel::result::Error> {
+                diesel::delete(#sanitized_table_name::table.filter(#where_clause)).execute(conn).await
             }
         })
     }
@@ -502,10 +675,6 @@ impl Table {
             .map(|column| column.column_name.clone())
             .collect::<Vec<String>>();
 
-        let primary_key_identifiers = primary_key_names
-            .iter()
-            .map(|column_name| Ident::new(column_name, proc_macro2::Span::call_site()));
-
         let session_update_columns = columns
             .iter()
             .filter(|column| {
@@ -579,12 +748,18 @@ impl Table {
             }
         });
 
+        // In some cases, the table will not have a primary key. In which case, we cannot specify the primary key
+        // decorator on the struct.
+        let primary_key_decorator = self.primary_key_decorator(conn)?;
+        let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
+
         let new_structs_implementation = quote! {
             #[cfg(feature = "diesel")]
             #[derive(Debug)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-            #[cfg_attr(feature = "diesel", derive(diesel::AsChangeset, diesel::Identifiable))]
-            #[cfg_attr(feature = "diesel", diesel(primary_key(#(#primary_key_identifiers),*)))]
+            #[cfg_attr(feature = "diesel", derive(diesel::AsChangeset))]
+            #diesel_derives_decorator
+            #primary_key_decorator
             #[cfg_attr(feature = "diesel", diesel(table_name = #table_name))]
             pub struct #session_update_variant_name {
                 #(#session_update_variable_attributes)*
@@ -787,6 +962,13 @@ impl Table {
             })?)
     }
 
+    /// Returns whether the table has primary keys.
+    pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        self.primary_key_columns(conn)
+            .map(|columns| !columns.is_empty())
+    }
+
+    /// Returns the columns composing the primary keys.
     pub fn primary_key_columns(
         &self,
         conn: &mut PgConnection,

@@ -4,10 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "64-column-tables"] }
-
+diesel-async = {version="0.5.1", features = ["postgres", "pool"]}
+uuid = {version="1.11.0", features = ["serde", "v4"]}
+serde_json = "1.0.132"
+chrono = {version="0.4.38", features = ["serde"]}
+diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "serde_json", "64-column-tables"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
 
 [build-dependencies]
 webcodegen = {path = "../../web_common/webcodegen"}
-diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "64-column-tables"] }
 config = "0.14.1"
+diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "serde_json", "64-column-tables"] }
+
+[features]
+default = ["diesel", "serde"]
+serde = []
+diesel = []

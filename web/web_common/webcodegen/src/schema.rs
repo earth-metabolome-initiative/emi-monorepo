@@ -363,6 +363,7 @@ table! {
     }
 }
 
+#[cfg(feature = "postgres_17")]
 table! {
     pg_attribute (attrelid, attname, atttypid) {
         attrelid -> Oid,
@@ -377,6 +378,36 @@ table! {
         attalign -> Char,
         attstorage -> Char,
         attcompression -> Char,
+        attnotnull -> Bool,
+        atthasdef -> Bool,
+        atthasmissing -> Bool,
+        attidentity -> Char,
+        attgenerated -> Char,
+        attisdropped -> Bool,
+        attislocal -> Bool,
+        attinhcount -> SmallInt,
+        attcollation -> Oid,
+        attstattarget -> Nullable<SmallInt>,
+        attacl -> Nullable<Array<Oid>>,
+        attoptions -> Nullable<Array<Text>>,
+        attfdwoptions -> Nullable<Array<Text>>,
+    }
+}
+
+#[cfg(not(feature = "postgres_17"))]
+table! {
+    pg_attribute (attrelid, attname, atttypid) {
+        attrelid -> Oid,
+        attname -> Text,
+        atttypid -> Oid,
+        attlen -> SmallInt,
+        attnum -> SmallInt,
+        attcacheoff -> Integer,
+        atttypmod -> Integer,
+        attndims -> SmallInt,
+        attbyval -> Bool,
+        attalign -> Char,
+        attstorage -> Char,
         attnotnull -> Bool,
         atthasdef -> Bool,
         atthasmissing -> Bool,

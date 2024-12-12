@@ -18,6 +18,7 @@ pub struct PgAttribute {
     pub attbyval: bool,
     pub attalign: String,
     pub attstorage: String,
+    #[cfg(feature = "postgres_17")]
     pub attcompression: String,
     pub attnotnull: bool,
     pub atthasdef: bool,

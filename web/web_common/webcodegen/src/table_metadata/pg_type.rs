@@ -37,7 +37,7 @@ pub struct PgType {
     pub typisdefined: bool,
     pub typdelim: String,
     pub typrelid: u32,
-    # [cfg(feature = "postgres_17")]
+    #[cfg(feature = "postgres_17")]
     pub typsubscript: u32,
     pub typelem: u32,
     pub typarray: u32,
@@ -65,6 +65,7 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> &'static str {
         "integer" => "i32",
         "character varying" => "String",
         "text" => "String",
+        "name" => "String",
         "timestamp with time zone" => "chrono::NaiveDateTime",
         "timestamp without time zone" => "chrono::NaiveDateTime",
         "date" => "chrono::NaiveDate",
@@ -202,7 +203,7 @@ impl PgType {
         let mut internal_custom_types = Vec::new();
         for attribute in self.attributes(conn)? {
             let pg_type = attribute.pg_type(conn)?;
-            if pg_type.is_composite() {
+            if pg_type.is_composite() || pg_type.is_enum(){
                 internal_custom_types.extend(pg_type.internal_custom_types(conn)?);
                 internal_custom_types.push(pg_type);
             }
