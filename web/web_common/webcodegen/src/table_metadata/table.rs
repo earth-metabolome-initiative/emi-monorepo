@@ -541,7 +541,7 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
-        let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
+        let table_name = self.snake_case_ident()?;
         let columns = self.columns(conn)?;
 
         let session_insert_columns = columns
@@ -634,7 +634,7 @@ impl Table {
                 type Row = #struct_name;
 
                 async fn insert(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<Self::Row, diesel::result::Error> {
-                    diesel::insert_into(#table_name::dsl::#table_name)
+                    diesel::insert_into(#table_name::table)
                         .values(self)
                         .get_result(conn)
                         .await
@@ -648,7 +648,7 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
-        let table_name = Ident::new(&self.table_name, proc_macro2::Span::call_site());
+        let table_name = self.snake_case_ident()?;
         let columns = self.columns(conn)?;
         let primary_key_names = self
             .primary_key_columns(conn)?
@@ -776,8 +776,8 @@ impl Table {
                 type Row = #struct_name;
 
                 async fn update(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<Self::Row, diesel::result::Error> {
-                    diesel::update(#table_name::dsl::#table_name)
-                        .filter(#table_name::dsl::id.eq(self.id))
+                    diesel::update(#table_name::table)
+                        .filter(#table_name::id.eq(self.id))
                         .set(self)
                         .get_result(conn)
                         .await
@@ -788,28 +788,28 @@ impl Table {
 
     pub fn unique_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
         use crate::schema::pg_indexes;
-        pg_indexes::dsl::pg_indexes
-            .filter(pg_indexes::dsl::schemaname.eq(&self.table_schema))
-            .filter(pg_indexes::dsl::tablename.eq(&self.table_name))
-            .filter(pg_indexes::dsl::indexdef.like("%UNIQUE%"))
+        pg_indexes::table
+            .filter(pg_indexes::schemaname.eq(&self.table_schema))
+            .filter(pg_indexes::tablename.eq(&self.table_name))
+            .filter(pg_indexes::indexdef.like("%UNIQUE%"))
             .load::<Index>(conn)
     }
 
     pub fn gin_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
         use crate::schema::pg_indexes;
-        pg_indexes::dsl::pg_indexes
-            .filter(pg_indexes::dsl::schemaname.eq(&self.table_schema))
-            .filter(pg_indexes::dsl::tablename.eq(&self.table_name))
-            .filter(pg_indexes::dsl::indexdef.like("%USING gin%"))
+        pg_indexes::table
+            .filter(pg_indexes::schemaname.eq(&self.table_schema))
+            .filter(pg_indexes::tablename.eq(&self.table_name))
+            .filter(pg_indexes::indexdef.like("%USING gin%"))
             .load::<Index>(conn)
     }
 
     pub fn gist_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
         use crate::schema::pg_indexes;
-        pg_indexes::dsl::pg_indexes
-            .filter(pg_indexes::dsl::schemaname.eq(&self.table_schema))
-            .filter(pg_indexes::dsl::tablename.eq(&self.table_name))
-            .filter(pg_indexes::dsl::indexdef.like("%USING gist%"))
+        pg_indexes::table
+            .filter(pg_indexes::schemaname.eq(&self.table_schema))
+            .filter(pg_indexes::tablename.eq(&self.table_name))
+            .filter(pg_indexes::indexdef.like("%USING gist%"))
             .load::<Index>(conn)
     }
 
@@ -819,10 +819,10 @@ impl Table {
         table_schema: Option<&str>,
     ) -> Result<Vec<Self>, DieselError> {
         use crate::schema::tables;
-        tables::dsl::tables
-            .filter(tables::dsl::table_catalog.eq(table_catalog))
-            .filter(tables::dsl::table_schema.eq(table_schema.unwrap_or("public")))
-            .filter(tables::dsl::table_name.ne("__diesel_schema_migrations"))
+        tables::table
+            .filter(tables::table_catalog.eq(table_catalog))
+            .filter(tables::table_schema.eq(table_schema.unwrap_or("public")))
+            .filter(tables::table_name.ne("__diesel_schema_migrations"))
             .load::<Table>(conn)
     }
 
@@ -834,20 +834,20 @@ impl Table {
     ) -> Option<Self> {
         use crate::schema::tables;
         let table_schema = table_schema.unwrap_or("public");
-        tables::dsl::tables
-            .filter(tables::dsl::table_name.eq(table_name))
-            .filter(tables::dsl::table_schema.eq(table_schema))
-            .filter(tables::dsl::table_catalog.eq(table_catalog))
+        tables::table
+            .filter(tables::table_name.eq(table_name))
+            .filter(tables::table_schema.eq(table_schema))
+            .filter(tables::table_catalog.eq(table_catalog))
             .first::<Table>(conn)
             .ok()
     }
 
     pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::columns;
-        Ok(columns::dsl::columns
-            .filter(columns::dsl::table_name.eq(&self.table_name))
-            .filter(columns::dsl::table_schema.eq(&self.table_schema))
-            .filter(columns::dsl::table_catalog.eq(&self.table_catalog))
+        Ok(columns::table
+            .filter(columns::table_name.eq(&self.table_name))
+            .filter(columns::table_schema.eq(&self.table_schema))
+            .filter(columns::table_catalog.eq(&self.table_catalog))
             .load::<Column>(conn)?)
     }
 
@@ -857,11 +857,11 @@ impl Table {
         column_name: &str,
     ) -> Result<Column, DieselError> {
         use crate::schema::columns;
-        columns::dsl::columns
-            .filter(columns::dsl::table_name.eq(&self.table_name))
-            .filter(columns::dsl::table_schema.eq(&self.table_schema))
-            .filter(columns::dsl::table_catalog.eq(&self.table_catalog))
-            .filter(columns::dsl::column_name.eq(column_name))
+        columns::table
+            .filter(columns::table_name.eq(&self.table_name))
+            .filter(columns::table_schema.eq(&self.table_schema))
+            .filter(columns::table_catalog.eq(&self.table_catalog))
+            .filter(columns::column_name.eq(column_name))
             .first::<Column>(conn)
     }
 
@@ -872,64 +872,62 @@ impl Table {
         use crate::schema::columns;
         use crate::schema::key_column_usage;
         use crate::schema::table_constraints;
-        Ok(key_column_usage::dsl::key_column_usage
+        Ok(key_column_usage::table
             .inner_join(
-                columns::dsl::columns.on(key_column_usage::dsl::table_name
+                columns::table.on(key_column_usage::table_name
                     .nullable()
-                    .eq(columns::dsl::table_name.nullable())
+                    .eq(columns::table_name.nullable())
                     .and(
-                        key_column_usage::dsl::table_schema
+                        key_column_usage::table_schema
                             .nullable()
-                            .eq(columns::dsl::table_schema.nullable()),
+                            .eq(columns::table_schema.nullable()),
                     )
                     .and(
-                        key_column_usage::dsl::table_catalog
+                        key_column_usage::table_catalog
                             .nullable()
-                            .eq(columns::dsl::table_catalog.nullable()),
+                            .eq(columns::table_catalog.nullable()),
                     )
                     .and(
-                        key_column_usage::dsl::column_name
+                        key_column_usage::column_name
                             .nullable()
-                            .eq(columns::dsl::column_name.nullable()),
+                            .eq(columns::column_name.nullable()),
                     )),
             )
             .inner_join(
-                table_constraints::dsl::table_constraints.on(
-                    key_column_usage::dsl::constraint_name
-                        .nullable()
-                        .eq(table_constraints::dsl::constraint_name.nullable())
-                        .and(
-                            key_column_usage::dsl::constraint_schema
-                                .nullable()
-                                .eq(table_constraints::dsl::constraint_schema.nullable()),
-                        )
-                        .and(
-                            key_column_usage::dsl::constraint_catalog
-                                .nullable()
-                                .eq(table_constraints::dsl::constraint_catalog.nullable()),
-                        )
-                        .and(
-                            key_column_usage::dsl::table_name
-                                .nullable()
-                                .eq(table_constraints::dsl::table_name.nullable()),
-                        )
-                        .and(
-                            key_column_usage::dsl::table_schema
-                                .nullable()
-                                .eq(table_constraints::dsl::table_schema.nullable()),
-                        )
-                        .and(
-                            key_column_usage::dsl::table_catalog
-                                .nullable()
-                                .eq(table_constraints::dsl::table_catalog.nullable()),
-                        ),
-                ),
+                table_constraints::table.on(key_column_usage::constraint_name
+                    .nullable()
+                    .eq(table_constraints::constraint_name.nullable())
+                    .and(
+                        key_column_usage::constraint_schema
+                            .nullable()
+                            .eq(table_constraints::constraint_schema.nullable()),
+                    )
+                    .and(
+                        key_column_usage::constraint_catalog
+                            .nullable()
+                            .eq(table_constraints::constraint_catalog.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_name
+                            .nullable()
+                            .eq(table_constraints::table_name.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_schema
+                            .nullable()
+                            .eq(table_constraints::table_schema.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_catalog
+                            .nullable()
+                            .eq(table_constraints::table_catalog.nullable()),
+                    )),
             )
-            .filter(key_column_usage::dsl::table_name.eq(&self.table_name))
-            .filter(key_column_usage::dsl::table_schema.eq(&self.table_schema))
-            .filter(key_column_usage::dsl::table_catalog.eq(&self.table_catalog))
-            .filter(table_constraints::dsl::constraint_type.eq("UNIQUE"))
-            .order_by(table_constraints::dsl::constraint_name)
+            .filter(key_column_usage::table_name.eq(&self.table_name))
+            .filter(key_column_usage::table_schema.eq(&self.table_schema))
+            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
+            .filter(table_constraints::constraint_type.eq("UNIQUE"))
+            .order_by(table_constraints::constraint_name)
             .select((TableConstraint::as_select(), Column::as_select()))
             .load::<(TableConstraint, Column)>(conn)
             .map(|rows| {
@@ -960,63 +958,61 @@ impl Table {
         use crate::schema::columns;
         use crate::schema::key_column_usage;
         use crate::schema::table_constraints;
-        Ok(key_column_usage::dsl::key_column_usage
+        Ok(key_column_usage::table
             .inner_join(
-                columns::dsl::columns.on(key_column_usage::dsl::table_name
+                columns::table.on(key_column_usage::table_name
                     .nullable()
-                    .eq(columns::dsl::table_name.nullable())
+                    .eq(columns::table_name.nullable())
                     .and(
-                        key_column_usage::dsl::table_schema
+                        key_column_usage::table_schema
                             .nullable()
-                            .eq(columns::dsl::table_schema.nullable()),
+                            .eq(columns::table_schema.nullable()),
                     )
                     .and(
-                        key_column_usage::dsl::table_catalog
+                        key_column_usage::table_catalog
                             .nullable()
-                            .eq(columns::dsl::table_catalog.nullable()),
+                            .eq(columns::table_catalog.nullable()),
                     )
                     .and(
-                        key_column_usage::dsl::column_name
+                        key_column_usage::column_name
                             .nullable()
-                            .eq(columns::dsl::column_name.nullable()),
+                            .eq(columns::column_name.nullable()),
                     )),
             )
             .inner_join(
-                table_constraints::dsl::table_constraints.on(
-                    key_column_usage::dsl::constraint_name
-                        .nullable()
-                        .eq(table_constraints::dsl::constraint_name.nullable())
-                        .and(
-                            key_column_usage::dsl::constraint_schema
-                                .nullable()
-                                .eq(table_constraints::dsl::constraint_schema.nullable()),
-                        )
-                        .and(
-                            key_column_usage::dsl::constraint_catalog
-                                .nullable()
-                                .eq(table_constraints::dsl::constraint_catalog.nullable()),
-                        )
-                        .and(
-                            key_column_usage::dsl::table_name
-                                .nullable()
-                                .eq(table_constraints::dsl::table_name.nullable()),
-                        )
-                        .and(
-                            key_column_usage::dsl::table_schema
-                                .nullable()
-                                .eq(table_constraints::dsl::table_schema.nullable()),
-                        )
-                        .and(
-                            key_column_usage::dsl::table_catalog
-                                .nullable()
-                                .eq(table_constraints::dsl::table_catalog.nullable()),
-                        ),
-                ),
+                table_constraints::table.on(key_column_usage::constraint_name
+                    .nullable()
+                    .eq(table_constraints::constraint_name.nullable())
+                    .and(
+                        key_column_usage::constraint_schema
+                            .nullable()
+                            .eq(table_constraints::constraint_schema.nullable()),
+                    )
+                    .and(
+                        key_column_usage::constraint_catalog
+                            .nullable()
+                            .eq(table_constraints::constraint_catalog.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_name
+                            .nullable()
+                            .eq(table_constraints::table_name.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_schema
+                            .nullable()
+                            .eq(table_constraints::table_schema.nullable()),
+                    )
+                    .and(
+                        key_column_usage::table_catalog
+                            .nullable()
+                            .eq(table_constraints::table_catalog.nullable()),
+                    )),
             )
-            .filter(key_column_usage::dsl::table_name.eq(&self.table_name))
-            .filter(key_column_usage::dsl::table_schema.eq(&self.table_schema))
-            .filter(key_column_usage::dsl::table_catalog.eq(&self.table_catalog))
-            .filter(table_constraints::dsl::constraint_type.eq("PRIMARY KEY"))
+            .filter(key_column_usage::table_name.eq(&self.table_name))
+            .filter(key_column_usage::table_schema.eq(&self.table_schema))
+            .filter(key_column_usage::table_catalog.eq(&self.table_catalog))
+            .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
             .select(Column::as_select())
             .load::<Column>(conn)?)
     }
@@ -1028,24 +1024,22 @@ impl Table {
         use crate::schema::check_constraints;
         use crate::schema::table_constraints;
 
-        check_constraints::dsl::check_constraints
+        check_constraints::table
             .inner_join(
-                table_constraints::dsl::table_constraints.on(
-                    check_constraints::dsl::constraint_name
-                        .eq(table_constraints::dsl::constraint_name)
-                        .and(
-                            check_constraints::dsl::constraint_schema
-                                .eq(table_constraints::dsl::constraint_schema),
-                        )
-                        .and(
-                            check_constraints::dsl::constraint_catalog
-                                .eq(table_constraints::dsl::constraint_catalog),
-                        ),
-                ),
+                table_constraints::table.on(check_constraints::constraint_name
+                    .eq(table_constraints::constraint_name)
+                    .and(
+                        check_constraints::constraint_schema
+                            .eq(table_constraints::constraint_schema),
+                    )
+                    .and(
+                        check_constraints::constraint_catalog
+                            .eq(table_constraints::constraint_catalog),
+                    )),
             )
-            .filter(table_constraints::dsl::table_name.eq(&self.table_name))
-            .filter(table_constraints::dsl::table_schema.eq(&self.table_schema))
-            .filter(table_constraints::dsl::table_catalog.eq(&self.table_catalog))
+            .filter(table_constraints::table_name.eq(&self.table_name))
+            .filter(table_constraints::table_schema.eq(&self.table_schema))
+            .filter(table_constraints::table_catalog.eq(&self.table_catalog))
             .select(CheckConstraint::as_select())
             .load::<CheckConstraint>(conn)
     }
