@@ -5,7 +5,7 @@ use diesel::pg::PgConnection;
 use diesel::Connection;
 use std::env;
 use std::path::Path;
-use webcodegen::Table;
+use webcodegen::{Codegen, Table};
 
 use config::{Config, File};
 
@@ -64,6 +64,11 @@ pub fn main() {
     // Path to the file to create
     let path = Path::new(&out_dir).join("directus_structs.rs");
 
-    Table::write_all(&mut conn, path.as_ref(), "directus", None)
-        .expect("Failed to write the structs to the file");
+    let curation_data = Table::load(&mut conn, "Curation_Data", None, "directus").unwrap();
+
+    Codegen::default()
+        .set_output_path(path.as_ref())
+        .add_table_to_deny_list(&curation_data)
+        .generate(&mut conn, "directus", None)
+        .unwrap();
 }

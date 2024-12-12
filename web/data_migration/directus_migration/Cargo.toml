@@ -17,6 +17,9 @@ config = "0.14.1"
 diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "serde_json", "64-column-tables"] }
 
 [features]
-default = ["diesel", "serde"]
+default = ["diesel", "64-column-tables", "serde"]
 serde = []
 diesel = []
+32-column-tables = ["diesel", "diesel/32-column-tables"]
+64-column-tables = ["32-column-tables", "diesel/64-column-tables"]
+128-column-tables = ["64-column-tables", "diesel/128-column-tables"]

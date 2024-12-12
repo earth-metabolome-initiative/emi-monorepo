@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{
@@ -7,11 +5,9 @@ use diesel::{
     Queryable, QueryableByName, RunQueryDsl, Selectable, SelectableHelper, TextExpressionMethods,
 };
 use itertools::Itertools;
-use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
-use std::path::Path;
 use syn::{parse_str, File, Ident, Type};
 
 use crate::errors::WebCodeGenError;
@@ -20,17 +16,18 @@ use crate::Column;
 use crate::Index;
 use crate::TableConstraint;
 
-use super::PgType;
-
+/// Reserved Rust words that cannot be used as identifiers.
 pub const RESERVED_RUST_WORDS: [&str; 49] = [
-    "as", "break", "const", "continue", "crate", "else", "enum", "extern",
-    "false", "fn", "for", "if", "impl", "in", "let", "loop", "match",
-    "mod", "move", "mut", "pub", "ref", "return", "self", "static", "struct",
-    "super", "trait", "true", "type", "unsafe", "use", "where", "while",
-    // Future reserved keywords
-    "abstract", "async", "await", "become", "box", "do", "final", "macro",
-    "override", "priv", "try", "typeof", "unsized", "virtual", "yield",
+    "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
+    "if", "impl", "in", "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return",
+    "self", "static", "struct", "super", "trait", "true", "type", "unsafe", "use", "where",
+    "while", // Future reserved keywords
+    "abstract", "async", "await", "become", "box", "do", "final", "macro", "override", "priv",
+    "try", "typeof", "unsized", "virtual", "yield",
 ];
+
+/// Diesel collisions that need to be handled.
+pub const RESERVED_DIESEL_WORDS: [&str; 1] = ["columns"];
 
 /// Struct defining the `information_schema.tables` table.
 #[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug, Clone)]
@@ -51,6 +48,47 @@ pub struct Table {
 }
 
 impl Table {
+    /// Returns the correct diesel feature flag for the number of columns in the table.
+    pub fn diesel_feature_flag_name(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<&str, WebCodeGenError> {
+        let number_of_columns = self.columns(conn)?.len();
+        if number_of_columns > 128 {
+            Err(WebCodeGenError::ExcessiveNumberOfColumns(
+                self.clone(),
+                number_of_columns,
+            ))
+        } else if number_of_columns > 64 {
+            Ok("128-column-tables")
+        } else if number_of_columns > 32 {
+            Ok("64-column-tables")
+        } else if number_of_columns > 16 {
+            Ok("32-column-tables")
+        } else {
+            Ok("diesel")
+        }
+    }
+
+    /// Returns the correct diesel feature flag for the number of columns in the table.
+    pub fn diesel_column_feature_flag(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
+        let flag_name = self.diesel_feature_flag_name(conn)?;
+        Ok(quote! {#[cfg(feature = #flag_name)]})
+    }
+
+    /// Returns whether the table is a view.
+    pub fn is_view(&self) -> bool {
+        self.table_type == "VIEW"
+    }
+
+    /// Returns whether the table is temporary.
+    pub fn is_temporary(&self) -> bool {
+        self.table_type == "LOCAL TEMPORARY" || self.table_type == "GLOBAL TEMPORARY"
+    }
+
     /// Returns the name of the struct converted from the table name.
     pub fn struct_name(&self) -> Result<String, WebCodeGenError> {
         let sanitizer = SnakeCaseSanizer::new()
@@ -79,7 +117,10 @@ impl Table {
     pub fn snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
         if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
-            Ok(Ident::new_raw(&snake_case_name, proc_macro2::Span::call_site()))
+            Ok(Ident::new_raw(
+                &snake_case_name,
+                proc_macro2::Span::call_site(),
+            ))
         } else {
             Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
         }
@@ -118,7 +159,7 @@ impl Table {
             pub trait InsertableVariant<C: Connection> {
                 type Row;
 
-                async fn insert(&self, conn: &mut C) -> Result<Self::Row, C::Error>;
+                fn insert(&self, conn: &mut C) -> impl std::future::Future<Output = Result<Self::Row, C::Error>> + Send;
             }
         }
     }
@@ -136,7 +177,7 @@ impl Table {
             pub trait UpdateableVariant<C: Connection> {
                 type Row;
 
-                async fn update(&self, conn: &mut C) -> Result<Self::Row, C::Error>;
+                fn update(&self, conn: &mut C) -> impl std::future::Future<Output = Result<Self::Row, C::Error>> + Send;
             }
         }
     }
@@ -164,109 +205,20 @@ impl Table {
         }
     }
 
-    /// Writes all the tables syn version to a file.
-    pub fn write_all(
-        conn: &mut PgConnection,
-        output_path: &Path,
-        table_catalog: &str,
-        table_schema: Option<&str>,
-    ) -> Result<(), WebCodeGenError> {
-        let tables = Table::load_all(conn, table_catalog, table_schema)?;
-
-        let schema = tables
-            .iter()
-            .map(|table| table.to_schema(conn))
-            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-
-        let table_structs = tables
-            .iter()
-            .map(|table| table.to_syn(conn))
-            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-
-        let table_idents = tables
-            .iter()
-            .map(|table| Ok(Ident::new(&table.snake_case_name()?, proc_macro2::Span::call_site())))
-            .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
-
-        let user_defined_types = tables
-            .iter()
-            .map(|table| {
-                let custom_types = table
-                    .columns(conn)?
-                    .into_iter()
-                    .filter(|column| column.has_custom_type())
-                    .map(|column| PgType::from_name(column.data_type_str(conn)?, conn))
-                    .filter_ok(|pg_type| pg_type.is_enum() || pg_type.is_composite())
-                    .collect::<Result<HashSet<PgType>, WebCodeGenError>>()?;
-                let mut additional_custom_types = custom_types.clone();
-                for custom_type in custom_types {
-                    additional_custom_types.extend(custom_type.internal_custom_types(conn)?);
-                }
-                Ok(additional_custom_types)
-            })
-            .collect::<Result<Vec<HashSet<PgType>>, WebCodeGenError>>()?
-            .into_iter()
-            .flatten()
-            .collect::<HashSet<PgType>>();
-
-        let user_defined_types_syn = user_defined_types
-            .into_iter()
-            .map(|pg_type| pg_type.to_syn(conn))
-            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-
-        let traits = Table::traits();
-
-        // Create a new TokenStream
-        let output = quote! {
-            #[cfg(feature = "diesel")]
-            use diesel::{ExpressionMethods, QueryDsl, SelectableHelper};
-            #[cfg(feature = "diesel")]
-            use diesel_async::RunQueryDsl;
-
-            #(#user_defined_types_syn)*
-
-            #( #schema )*
-
-            #[cfg(feature = "diesel")]
-            diesel::allow_tables_to_appear_in_same_query!( #( #table_idents ),* );
-
-            #traits
-
-            #( #table_structs )*
-        };
-
-        // Convert the generated TokenStream to a string
-        let code_string = output.to_string();
-
-        // Parse the generated code string into a syn::Item
-        let syntax_tree: File = syn::parse_str(&code_string).unwrap();
-
-        // Use prettyplease to format the syntax tree
-        let formatted_code = unparse(&syntax_tree);
-
-        // Write the formatted code to the output file
-        std::fs::write(output_path, formatted_code).unwrap();
-
-        Ok(())
-    }
-
     /// Returns the Syn TokenStream for the diesel schema definition for the table.
     pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
         let original_table_name = &self.table_name;
-        let sanitized_table_name_ident = Ident::new(
-            &self.snake_case_name()?,
-            proc_macro2::Span::call_site(),
-        );
+        let sanitized_table_name_ident =
+            Ident::new(&self.snake_case_name()?, proc_macro2::Span::call_site());
         let columns = self
             .columns(conn)?
             .into_iter()
             .map(|column| {
                 let original_column_name = &column.column_name;
-                let sanitized_column_name = column.snake_case_name()?;
-                let column_attribute: Ident = column.snake_case_ident()?;
+                let column_attribute: Ident = column.sanitized_snake_case_ident()?;
                 let column_type = column.diesel_type(conn)?;
-                Ok(if original_column_name != &sanitized_column_name {
+                Ok(if original_column_name != &column_attribute.to_string() {
                     quote! {
                         #[sql_name = #original_column_name]
                         #column_attribute -> #column_type
@@ -292,10 +244,11 @@ impl Table {
             }
         };
 
+        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
 
         Ok(if self.has_snake_case_name()? {
             quote! {
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = #columns_feature_flag_name)]
                 diesel::table! {
                     #[sql_name = #original_table_name]
                     #table_schema.#sanitized_table_name_ident #primary_key_names {
@@ -305,7 +258,7 @@ impl Table {
             }
         } else {
             quote! {
-                #[cfg(feature = "diesel")]
+                #[cfg(feature = #columns_feature_flag_name)]
                 diesel::table! {
                     #table_schema.#sanitized_table_name_ident #primary_key_names {
                         #(#columns),*
@@ -326,21 +279,28 @@ impl Table {
     }
 
     /// Returns the primary key identifiers for the table.
-    pub fn primary_key_identifiers(&self, conn: &mut PgConnection) -> Result<Vec<Ident>, WebCodeGenError> {
+    pub fn primary_key_identifiers(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Ident>, WebCodeGenError> {
         self.primary_key_columns(conn)?
             .into_iter()
-            .map(|column| column.snake_case_ident())
+            .map(|column| column.sanitized_snake_case_ident())
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()
     }
 
     /// Returns the primary key decorator to be used for this table, if any.
-    pub fn primary_key_decorator(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+    pub fn primary_key_decorator(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
         // In some cases, the table will not have a primary key. In which case, we cannot specify the primary key
         // decorator on the struct.
+        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
         Ok(if self.has_primary_keys(conn)? {
             let primary_key_identifiers = self.primary_key_identifiers(conn)?;
             quote! {
-                #[cfg_attr(feature = "diesel", diesel(primary_key(#(#primary_key_identifiers),*)))]
+                #[cfg_attr(feature = #columns_feature_flag_name, diesel(primary_key(#(#primary_key_identifiers),*)))]
             }
         } else {
             TokenStream::new()
@@ -362,26 +322,37 @@ impl Table {
     }
 
     /// Returns the diesel derives decorator for the table.
-    pub fn diesel_derives_decorator(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+    pub fn diesel_derives_decorator(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
         let diesel_derives = self.diesel_derives(conn)?;
+        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
         Ok(if diesel_derives.is_empty() {
             TokenStream::new()
         } else {
             quote! {
-                #[cfg_attr(feature = "diesel", derive(#(#diesel_derives),*))]
+                #[cfg_attr(feature = #columns_feature_flag_name, derive(#(#diesel_derives),*))]
             }
         })
     }
 
     /// Returns the Syn TokenStream for the struct definition and associated methods.
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
+        if self.columns(conn)?.len() > 128 {
+            return Err(WebCodeGenError::ExcessiveNumberOfColumns(
+                self.clone(),
+                self.columns(conn)?.len(),
+            ));
+        }
+
         let sanitized_table_name = self.snake_case_ident()?;
         let struct_name: Ident = Ident::new(&self.struct_name()?, proc_macro2::Span::call_site());
         let attributes = self
             .columns(conn)?
             .into_iter()
             .map(|column| {
-                let column_attribute: Ident = column.snake_case_ident()?;
+                let column_attribute: Ident = column.sanitized_snake_case_ident()?;
                 let column_type = column.data_type(conn)?;
                 Ok(quote! {
                     pub #column_attribute: #column_type
@@ -411,12 +382,14 @@ impl Table {
         };
         let primary_key_decorator = self.primary_key_decorator(conn)?;
         let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
+        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
+
         let built_table_syn = quote! {
             #[derive(Debug)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             #diesel_derives_decorator
             #primary_key_decorator
-            #[cfg_attr(feature = "diesel", diesel(table_name = #sanitized_table_name))]
+            #[cfg_attr(feature = #columns_feature_flag_name, diesel(table_name = #sanitized_table_name))]
             pub struct #struct_name {
                 #(#attributes),*
             }
@@ -463,7 +436,7 @@ impl Table {
                 } else {
                     Ident::new(&column.column_name, proc_macro2::Span::call_site())
                 };
-                let current_column_ident: Ident = column.snake_case_ident()?;
+                let current_column_ident: Ident = column.sanitized_snake_case_ident()?;
                 let foreign_key_struct_name: Ident = Ident::new(&foreign_key_table.struct_name()?, proc_macro2::Span::call_site());
 
                 // If the current column has a Nullable (Option) type, the return type of the method should be an Option
@@ -503,8 +476,14 @@ impl Table {
                     TokenStream::new()
                 };
 
+                let stricter_flag_name = if self.columns(conn)?.len() > foreign_key_table.columns(conn)?.len() {
+                    self.diesel_feature_flag_name(conn)?
+                } else {
+                    foreign_key_table.diesel_feature_flag_name(conn)?
+                };
+
                 Ok(quote! {
-                    #[cfg(feature = "diesel")]
+                    #[cfg(feature = #stricter_flag_name)]
                     pub async fn #method_name(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<#return_type_ident, diesel::result::Error> {
                         #column_value_retrieval
                         #foreign_key_table_name::table
@@ -519,10 +498,8 @@ impl Table {
     }
 
     pub fn delete_method(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
-        let sanitized_table_name = Ident::new(
-            &self.snake_case_name()?,
-            proc_macro2::Span::call_site(),
-        );
+        let sanitized_table_name =
+            Ident::new(&self.snake_case_name()?, proc_macro2::Span::call_site());
         let primary_key_columns = self.primary_key_columns(conn).unwrap();
 
         let where_clause = primary_key_columns
@@ -542,8 +519,10 @@ impl Table {
             .reduce(|a, b| quote! { diesel::BoolExpressionMethods::and(#a, #b) })
             .unwrap();
 
+        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
+
         Ok(quote! {
-            #[cfg(feature = "diesel")]
+            #[cfg(feature = #columns_feature_flag_name)]
             pub async fn delete(&self, conn: &mut diesel_async::AsyncPgConnection) -> Result<usize, diesel::result::Error> {
                 diesel::delete(#sanitized_table_name::table.filter(#where_clause)).execute(conn).await
             }
@@ -615,12 +594,14 @@ impl Table {
             }
         });
 
+        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
+
         let new_structs_implementation = quote! {
-            #[cfg(feature = "diesel")]
+            #[cfg(feature = #columns_feature_flag_name)]
             #[derive(Debug)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-            #[cfg_attr(feature = "diesel", derive(diesel::Insertable))]
-            #[cfg_attr(feature = "diesel", diesel(table_name = #table_name))]
+            #[cfg_attr(feature = #columns_feature_flag_name, derive(diesel::Insertable))]
+            #[cfg_attr(feature = #columns_feature_flag_name, diesel(table_name = #table_name))]
             pub struct #session_insert_variant_name {
                 #(#session_insert_variable_attributes)*
             }
@@ -635,7 +616,7 @@ impl Table {
         Ok(quote! {
             #new_structs_implementation
 
-            #[cfg(feature = "diesel")]
+            #[cfg(feature = #columns_feature_flag_name)]
             impl IntoSessionInsertVariant for #insert_variant_name {
                 type SessionInsertVariant = #session_insert_variant_name;
 
@@ -648,7 +629,7 @@ impl Table {
                 }
             }
 
-            #[cfg(feature = "diesel")]
+            #[cfg(feature = #columns_feature_flag_name)]
             impl InsertableVariant<diesel_async::AsyncPgConnection> for #session_insert_variant_name {
                 type Row = #struct_name;
 
@@ -752,15 +733,16 @@ impl Table {
         // decorator on the struct.
         let primary_key_decorator = self.primary_key_decorator(conn)?;
         let diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
+        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
 
         let new_structs_implementation = quote! {
-            #[cfg(feature = "diesel")]
+            #[cfg(feature = #columns_feature_flag_name)]
             #[derive(Debug)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-            #[cfg_attr(feature = "diesel", derive(diesel::AsChangeset))]
+            #[cfg_attr(feature = #columns_feature_flag_name, derive(diesel::AsChangeset))]
             #diesel_derives_decorator
             #primary_key_decorator
-            #[cfg_attr(feature = "diesel", diesel(table_name = #table_name))]
+            #[cfg_attr(feature = #columns_feature_flag_name, diesel(table_name = #table_name))]
             pub struct #session_update_variant_name {
                 #(#session_update_variable_attributes)*
             }
@@ -772,10 +754,12 @@ impl Table {
             }
         };
 
+        let columns_feature_flag_name = self.diesel_feature_flag_name(conn)?;
+
         Ok(quote! {
             #new_structs_implementation
 
-            #[cfg(feature = "diesel")]
+            #[cfg(feature = #columns_feature_flag_name)]
             impl IntoSessionUpdateVariant for #update_variant_name {
                 type SessionUpdateVariant = #session_update_variant_name;
 
@@ -787,7 +771,7 @@ impl Table {
                 }
             }
 
-            #[cfg(feature = "diesel")]
+            #[cfg(feature = #columns_feature_flag_name)]
             impl UpdateableVariant<diesel_async::AsyncPgConnection> for #session_update_variant_name {
                 type Row = #struct_name;
 

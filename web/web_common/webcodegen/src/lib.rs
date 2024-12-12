@@ -18,6 +18,7 @@ mod meta_sql;
 mod schema;
 mod sql_functions;
 mod table_metadata;
+mod codegen;
 
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint, Index,
@@ -29,3 +30,4 @@ pub use custom_schema_constraints::{
     CustomTableConstraint, IsForeignKeyConstraint, LowercaseColumnConstraint,
     LowercaseTableConstraint, NotNullColumnConstraint, HasSpecificTypeConstraint,
 };
+pub use codegen::Codegen;

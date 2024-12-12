@@ -1,4 +1,5 @@
 use crate::errors::WebCodeGenError;
+use crate::table_metadata::pg_type::postgres_type_to_diesel;
 use crate::Table;
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
@@ -6,14 +7,13 @@ use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, Queryable, QueryableByName,
     RunQueryDsl, Selectable, SelectableHelper,
 };
-use syn::{Ident, Type};
 use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
-use crate::table_metadata::pg_type::postgres_type_to_diesel;
+use syn::{Ident, Type};
 
 use crate::KeyColumnUsage;
 
-use super::pg_type::{PgType, rust_type_str};
-use super::table::RESERVED_RUST_WORDS;
+use super::pg_type::{rust_type_str, PgType};
+use super::table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS};
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug, Clone)]
@@ -65,8 +65,6 @@ pub struct Column {
     pub is_updatable: String,
 }
 
-
-
 impl Column {
     /// Returns the data type associated with the column as repo
     pub fn data_type_str(&self, _conn: &mut PgConnection) -> Result<&str, WebCodeGenError> {
@@ -97,6 +95,11 @@ impl Column {
         Ok(syn::parse_str(&rust_type).unwrap())
     }
 
+    /// Returns whether the column name is a reserved diesel word.
+    pub fn requires_diesel_sanitization(&self) -> Result<bool, WebCodeGenError> {
+        Ok(RESERVED_DIESEL_WORDS.contains(&self.snake_case_name()?.as_str()))
+    }
+
     /// Returns the sanitized snake case name of the table.
     pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
         let sanitizer = SnakeCaseSanizer::new()
@@ -107,10 +110,18 @@ impl Column {
     }
 
     /// Returns the sanitized snake case syn Ident of the table.
-    pub fn snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
+    pub fn sanitized_snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
-        if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
-            Ok(Ident::new_raw(&snake_case_name, proc_macro2::Span::call_site()))
+        if self.requires_diesel_sanitization()? {
+            Ok(Ident::new(
+                &format!("__{}", snake_case_name),
+                proc_macro2::Span::call_site(),
+            ))
+        } else if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
+            Ok(Ident::new_raw(
+                &snake_case_name,
+                proc_macro2::Span::call_site(),
+            ))
         } else {
             Ok(Ident::new(&snake_case_name, proc_macro2::Span::call_site()))
         }
@@ -126,8 +137,7 @@ impl Column {
 
     pub fn diesel_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         if self.has_custom_type() {
-            let name = PgType::from_name(self.data_type_str(conn)?, conn)?
-                .camelcased_name();
+            let name = PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name();
             let name = if self.is_nullable() {
                 format!("diesel::sql_types::Nullable<crate::Pg{}>", name)
             } else {
@@ -139,7 +149,7 @@ impl Column {
             Ok(postgres_type_to_diesel(
                 self.data_type_str(conn)?,
                 self.is_nullable(),
-            ))    
+            ))
         }
     }
 
