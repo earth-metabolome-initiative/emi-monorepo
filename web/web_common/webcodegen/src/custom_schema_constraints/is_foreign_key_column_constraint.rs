@@ -12,6 +12,7 @@ pub struct IsForeignKeyConstraint {
 }
 
 impl IsForeignKeyConstraint {
+    #[must_use]
     /// Creates a new instance of the `IsForeignKeyConstraint` constraint.
     pub fn new(table_name: String, column_name: String) -> Self {
         Self {

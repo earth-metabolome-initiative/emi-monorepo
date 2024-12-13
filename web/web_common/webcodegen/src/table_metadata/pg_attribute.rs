@@ -6,6 +6,7 @@ use diesel::{
 
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::pg_attribute)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct PgAttribute {
     pub attrelid: u32,
     pub attname: String,
@@ -37,6 +38,10 @@ pub struct PgAttribute {
 
 impl PgAttribute {
     /// Returns the `PgType` associated to the `PgAttribute`.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the provided database connection fails.
     pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, WebCodeGenError> {
         use crate::schema::pg_type;
         pg_type::table

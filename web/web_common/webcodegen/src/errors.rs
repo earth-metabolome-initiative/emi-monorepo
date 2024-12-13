@@ -11,13 +11,13 @@ pub enum WebCodeGenError {
     IllegalTable(String),
     IllegalRolesTable(String),
     ConstraintError(ConstraintError),
-    UnknownColumnType(Column),
+    UnknownColumnType(Box<Column>),
     NotUserDefinedType(String),
-    MissingBaseType(PgType),
+    MissingBaseType(Box<PgType>),
     SanitizationErrors(SanitizationErrors),
     CodeGenerationError(CodeGenerationError),
-    IllegalTableCodegen(String, String, Table),
-    ExcessiveNumberOfColumns(Table, usize),
+    IllegalTableCodegen(String, String, Box<Table>),
+    ExcessiveNumberOfColumns(Box<Table>, usize),
 }
 
 impl From<DieselError> for WebCodeGenError {

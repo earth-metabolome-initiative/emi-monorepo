@@ -25,7 +25,7 @@ pub struct Column {
     pub column_name: String,
     pub ordinal_position: i32,
     pub column_default: Option<String>,
-    pub __is_nullable: String,
+    __is_nullable: String,
     data_type: String,
     pub character_maximum_length: Option<i32>,
     pub character_octet_length: Option<i32>,
@@ -67,18 +67,44 @@ pub struct Column {
 
 impl Column {
     /// Returns the data type associated with the column as repo
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing the data type of the column if the operation was successful,
+    /// or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while querying the database
     pub fn data_type_str(&self, _conn: &mut PgConnection) -> Result<&str, WebCodeGenError> {
         Ok(if self.has_custom_type() {
             if let Some(udt_name) = &self.udt_name {
-                &udt_name
+                udt_name
             } else {
-                return Err(WebCodeGenError::UnknownColumnType(self.clone()));
+                return Err(WebCodeGenError::UnknownColumnType(Box::new(self.clone())));
             }
         } else {
             &self.data_type
         })
     }
 
+    /// Returns the rust type of the column
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing the rust `Type` of the column if the operation
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while querying the database
     pub fn data_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         let rust_type = if self.has_custom_type() {
             PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name()
@@ -87,7 +113,7 @@ impl Column {
         };
 
         let rust_type = if self.is_nullable() {
-            format!("Option<{}>", rust_type)
+            format!("Option<{rust_type}>")
         } else {
             rust_type.to_string()
         };
@@ -96,11 +122,19 @@ impl Column {
     }
 
     /// Returns whether the column name is a reserved diesel word.
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while sanitizing the column name
     pub fn requires_diesel_sanitization(&self) -> Result<bool, WebCodeGenError> {
         Ok(RESERVED_DIESEL_WORDS.contains(&self.snake_case_name()?.as_str()))
     }
 
     /// Returns the sanitized snake case name of the table.
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while sanitizing the column name
     pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
         let sanitizer = SnakeCaseSanizer::default()
             .include_defaults()
@@ -110,11 +144,24 @@ impl Column {
     }
 
     /// Returns the sanitized snake case syn Ident of the table.
+    /// 
+    /// If the column name is a reserved diesel word, the returned ident will be prefixed with `__`.
+    /// If the column name is a reserved rust word, the returned ident will be the raw ident.
+    /// Otherwise, the returned ident will be the sanitized snake case ident.
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing the sanitized snake case `Ident` if the operation was successful,
+    /// or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while sanitizing the column name
     pub fn sanitized_snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
         if self.requires_diesel_sanitization()? {
             Ok(Ident::new(
-                &format!("__{}", snake_case_name),
+                &format!("__{snake_case_name}"),
                 proc_macro2::Span::call_site(),
             ))
         } else if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
@@ -127,21 +174,39 @@ impl Column {
         }
     }
 
+    #[must_use]
+    /// Returns whether the column has a custom type
     pub fn has_custom_type(&self) -> bool {
         self.data_type == "USER-DEFINED"
     }
 
+    #[must_use]
+    /// Returns whether the column is nullable
     pub fn is_nullable(&self) -> bool {
         self.__is_nullable == "YES"
     }
 
+    /// Returns the diesel type of the column
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing the diesel `Type` of the column if the operation
+    /// was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while querying the database
     pub fn diesel_type(&self, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
         if self.has_custom_type() {
             let name = PgType::from_name(self.data_type_str(conn)?, conn)?.camelcased_name();
             let name = if self.is_nullable() {
-                format!("diesel::sql_types::Nullable<crate::Pg{}>", name)
+                format!("diesel::sql_types::Nullable<crate::Pg{name}>")
             } else {
-                format!("crate::Pg{}", name)
+                format!("crate::Pg{name}")
             };
 
             Ok(syn::parse_str(&name).unwrap())
@@ -153,10 +218,25 @@ impl Column {
         }
     }
 
+    #[must_use]
+    /// Returns whether the column is a UUID
     pub fn is_uuid(&self) -> bool {
         self.data_type == "uuid"
     }
 
+    #[must_use]
+    /// Returns whether the column is automatically generated
+    /// 
+    /// A column is automatically generated if:
+    /// - it is marked as `ALWAYS` generated
+    /// - it has a default value that starts with `nextval`
+    /// - it has a default value that starts with `CURRENT_TIMESTAMP`
+    /// - it is an identity column
+    /// 
+    /// # Returns
+    /// 
+    /// A `bool` indicating whether the column is automatically generated
+    /// 
     pub fn is_automatically_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
             || self
@@ -228,10 +308,21 @@ impl Column {
             .is_ok()
     }
 
-    ///
-
     /// Returns the foreign table of the column if it is a foreign key.
     /// If the column is not a foreign key, returns `None`.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing an `Option` of a tuple containing the foreign table and
+    /// the foreign column if the operation was successful, or a `DieselError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while querying the database
     pub fn foreign_table(
         &self,
         conn: &mut PgConnection,

@@ -11,6 +11,7 @@ pub struct NotNullColumnConstraint {
 }
 
 impl NotNullColumnConstraint {
+    #[must_use]
     /// Create a new instance of the constraint
     pub fn new(column_name: &str) -> Self {
         Self {

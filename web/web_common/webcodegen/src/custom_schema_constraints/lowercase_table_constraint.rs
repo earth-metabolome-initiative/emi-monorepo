@@ -14,7 +14,7 @@ impl CustomTableConstraint for LowercaseTableConstraint {
         _conn: &mut PgConnection,
         table: &Table,
     ) -> Result<(), WebCodeGenError> {
-        if table.table_name.chars().any(|c| c.is_uppercase()) {
+        if table.table_name.chars().any(char::is_uppercase) {
             return Err(ConstraintError::UnexpectedUppercaseTable(table.table_name.clone()).into());
         }
         Ok(())

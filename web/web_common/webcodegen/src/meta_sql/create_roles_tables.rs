@@ -1,6 +1,6 @@
 //! Submodule providing methods to generate Roles tables for all editable tables.
 //!
-//! Editable tables are the ones characterized by created_by and updated_by columns.
+//! Editable tables are the ones characterized by `created_by` and `updated_by` columns.
 
 use diesel::PgConnection;
 
@@ -50,7 +50,8 @@ impl Table {
         for primary_key_column in self.primary_key_columns(conn)? {
             create_table.push_str(&format!(
                 "{} {} NOT NULL,\n",
-                primary_key_column.column_name, primary_key_column.data_type_str(conn)?
+                primary_key_column.column_name,
+                primary_key_column.data_type_str(conn)?
             ));
             primary_key_names.push(primary_key_column.column_name.clone());
         }
@@ -94,13 +95,9 @@ impl Table {
             reference_table.primary_key_columns(conn)?[0].column_name
         ));
 
-        create_table.push_str(&format!(
-            "FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,\n",
-        ));
+        create_table.push_str("FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,\n");
 
-        create_table.push_str(&format!(
-            "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE\n",
-        ));
+        create_table.push_str("FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE\n");
 
         create_table.push_str(");\n");
 
@@ -108,6 +105,14 @@ impl Table {
     }
 
     /// Generates the SQL code to create the roles tables for all editable tables.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while creating the roles tables
     pub fn create_roles_tables(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
         if !self.requires_roles_table(conn)? {
             return Err(WebCodeGenError::IllegalRolesTable(format!(

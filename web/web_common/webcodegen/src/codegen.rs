@@ -40,6 +40,23 @@ impl<'a> Codegen<'a> {
     }
 
     /// Writes all the tables syn version to a file.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    /// * `table_catalog` - The name of the table catalog.
+    /// * `table_schema` - The name of the table schema.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the output path is not provided.
+    /// * Returns an error if the tables cannot be loaded.
+    /// * Returns an error if the tables cannot be converted to schema.
+    /// * Returns an error if the tables cannot be converted to syn.
+    /// * Returns an error if the user defined types cannot be loaded.
+    /// * Returns an error if the user defined types cannot be converted to syn.
+    /// * Returns an error if the generated code cannot be written to the output file.
+    /// 
     pub fn generate(
         &self,
         conn: &mut PgConnection,

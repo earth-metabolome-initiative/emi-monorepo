@@ -89,11 +89,7 @@ impl SQLFunction {
                 return_type: None,
                 arguments: Vec::new(),
             };
-            let arguments: Vec<&str> = if !arguments.is_empty() {
-                arguments.split(", ").collect()
-            } else {
-                Vec::new()
-            };
+            let arguments: Vec<&str> = arguments.split(", ").collect();
 
             if overloading_functions
                 .iter()
@@ -129,7 +125,7 @@ impl SQLFunction {
                     argument
                 };
 
-                let argument_type = if let Some(pos) = argument.find(" ") {
+                let argument_type = if let Some(pos) = argument.find(' ') {
                     &argument[pos + 1..]
                 } else {
                     argument
@@ -140,15 +136,15 @@ impl SQLFunction {
                     break;
                 }
 
-                let argument_name = if let Some(pos) = argument.find(" ") {
-                    argument[..pos].replace("\"", "")
+                let argument_name = if let Some(pos) = argument.find(' ') {
+                    argument[..pos].replace('\"', "")
                 } else {
-                    format!("arg{}", i)
+                    format!("arg{i}")
                 };
 
                 sql_function.arguments.push((
                     argument_name,
-                    postgres_type_to_diesel(&argument_type, false),
+                    postgres_type_to_diesel(argument_type, false),
                 ));
             }
 
@@ -166,6 +162,8 @@ impl SQLFunction {
         Ok(sql_functions)
     }
 
+    #[must_use]
+    /// Convert the SQL function to a `TokenStream`
     pub fn to_syn(&self) -> TokenStream {
         let function_name = Ident::new(&self.name, proc_macro2::Span::call_site());
         let arguments = self.arguments.iter().map(|(name, ty)| {
@@ -191,11 +189,26 @@ impl SQLFunction {
         }
     }
 
+    /// Write all SQL functions to a file
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// * `output_path` - The path to the output file
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing `()` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// An error will be returned if an error occurs while reading the functions from the database,
+    /// or while writing the generated code to the output file
     pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), WebCodeGenError> {
         let functions = Self::load_all(conn)?;
 
         // We convert the functions to TokenStream
-        let functions = functions.iter().map(|f| f.to_syn());
+        let functions = functions.iter().map(SQLFunction::to_syn);
 
         // Create a new TokenStream
         let output = quote! {

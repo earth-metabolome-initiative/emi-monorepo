@@ -1,6 +1,8 @@
 use diesel::pg::PgConnection;
 use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
 
+use crate::errors::WebCodeGenError;
+
 #[derive(Queryable, QueryableByName, Selectable, Debug)]
 #[diesel(table_name = crate::schema::key_column_usage)]
 pub struct KeyColumnUsage {
@@ -16,11 +18,23 @@ pub struct KeyColumnUsage {
 }
 
 impl KeyColumnUsage {
-    pub fn load_all_key_column_usages(conn: &mut PgConnection) -> Vec<Self> {
+    /// Load all the key column usages from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `KeyColumnUsage` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// If an error occurs while loading the key column usages from the database
+    pub fn load_all_key_column_usages(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::key_column_usage;
         key_column_usage::table
             .load::<KeyColumnUsage>(conn)
-            .expect("Error loading key column usages")
+            .map_err(WebCodeGenError::from)
     }
 
     pub fn load_key_column_usages(

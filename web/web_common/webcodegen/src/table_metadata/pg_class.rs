@@ -4,6 +4,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq)]
 #[diesel(table_name = crate::schema::pg_class)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct PGClass {
     pub oid: u32,
     pub relname: String,

@@ -25,6 +25,19 @@ const DEPRECATED_OPERATORS: &[(&str, &str)] = &[
 ];
 
 impl SQLOperator {
+    /// Load all the SQL operators from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `SQLOperator` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the operators from the database
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::pg_operator;
         use crate::schema::pg_proc;
@@ -107,6 +120,8 @@ impl SQLOperator {
             })
     }
 
+    #[must_use]
+    /// Returns the struct name of the SQL operator
     pub fn struct_name(&self) -> String {
         self.name
             .split('_')
@@ -120,6 +135,12 @@ impl SQLOperator {
             .collect()
     }
 
+    #[must_use]
+    /// Convert the SQL operator to a `TokenStream`
+    /// 
+    /// # Returns
+    /// 
+    /// A `TokenStream` representing the SQL operator
     pub fn to_syn(&self) -> TokenStream {
         let name = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
         let symbol = self.symbol.clone();
@@ -128,7 +149,7 @@ impl SQLOperator {
         let right_type = self.right_operand_type.clone();
 
         let sanitized_name = Ident::new(
-            self.name.replace(".", "_").as_str(),
+            self.name.replace('.', "_").as_str(),
             proc_macro2::Span::call_site(),
         );
         let trait_name = Ident::new(
@@ -160,11 +181,26 @@ impl SQLOperator {
         }
     }
 
+    /// Write all the SQL operators to a file
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// * `output_path` - The path to the file where the generated code will be written
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing `()` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the operators from the database, or while writing the generated code to the output file
+    /// 
     pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), WebCodeGenError> {
         let operators = Self::load_all(conn)?;
 
         // We convert the types to TokenStream
-        let operators = operators.iter().map(|f| f.to_syn());
+        let operators = operators.iter().map(SQLOperator::to_syn);
 
         // Create a new TokenStream
         let output = quote! {

@@ -74,7 +74,7 @@ impl std::str::FromStr for ConstraintType {
             "FOREIGN KEY" => Ok(ConstraintType::ForeignKey),
             "UNIQUE" => Ok(ConstraintType::Unique),
             "CHECK" => Ok(ConstraintType::Check),
-            _ => Err(format!("Unknown constraint type: {}", s)),
+            _ => Err(format!("Unknown constraint type: {s}")),
         }
     }
 }
@@ -136,18 +136,22 @@ impl TableConstraint {
             .expect("Error loading table constraints")
     }
 
+    #[must_use]
     pub fn is_primary_key(&self) -> bool {
         self.constraint_type.is_primary_key()
     }
 
+    #[must_use]
     pub fn is_foreign_key(&self) -> bool {
         self.constraint_type.is_foreign_key()
     }
 
+    #[must_use]
     pub fn is_unique(&self) -> bool {
         self.constraint_type.is_unique()
     }
 
+    #[must_use]
     pub fn is_check(&self) -> bool {
         self.constraint_type.is_check()
     }
