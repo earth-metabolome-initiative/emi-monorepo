@@ -132,7 +132,7 @@ impl<'a> Sanitizer<'a> {
         let mut last_was_underscore = false;
         let mut last_was_uppercase = false;
 
-        for mut character in with_replacements.chars() {
+      for mut character in with_replacements.chars() {
             if !character.is_ascii_alphanumeric() {
                 character = '_';
             }
