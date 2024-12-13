@@ -111,6 +111,9 @@ pub fn rust_type_str<S: AsRef<str>>(type_name: S) -> &'static str {
         "line" => "Line",
         "lseg" => "LineSegment",
 
+        // UUID type
+        "uuid" => "uuid::Uuid",
+
         other => todo!("Unsupported data type: {}", other),
     }
 }
@@ -170,6 +173,9 @@ pub fn postgres_type_to_diesel(postgres_type: &str, nullable: bool) -> Type {
 
         // GIS types
         "geometry" | "geography" | "point" | "polygon" | "geometry(Point,4326)" | "line" => "postgis_diesel::sql_types::Geometry",
+
+        // Other
+        "uuid" => "diesel::sql_types::Uuid",
 
         _ => todo!("Unsupported data type: '{postgres_type}'"),
     };
