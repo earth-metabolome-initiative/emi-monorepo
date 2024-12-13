@@ -30,19 +30,15 @@ impl Table {
             self.table_name, reference_table.table_name, roles_table_type
         );
 
-        let roles_table = if let Some(roles_table) =
+        let Some(roles_table) =
             Table::load(conn, "roles", Some(&self.table_schema), &self.table_catalog)
-        {
-            roles_table
-        } else {
+        else {
             return Err(WebCodeGenError::MissingTable("roles".to_string()));
         };
 
-        let users = if let Some(users_table) =
+        let Some(users) =
             Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog)
-        {
-            users_table
-        } else {
+         else {
             return Err(WebCodeGenError::MissingTable("users".to_string()));
         };
         let mut primary_key_names = Vec::new();
@@ -105,13 +101,13 @@ impl Table {
     }
 
     /// Generates the SQL code to create the roles tables for all editable tables.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - A mutable reference to a `PgConnection`
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// If an error occurs while creating the roles tables
     pub fn create_roles_tables(&self, conn: &mut PgConnection) -> Result<String, WebCodeGenError> {
         if !self.requires_roles_table(conn)? {

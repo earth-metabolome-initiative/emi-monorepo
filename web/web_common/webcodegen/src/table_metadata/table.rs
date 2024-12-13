@@ -49,6 +49,18 @@ pub struct Table {
 
 impl Table {
     /// Returns the correct diesel feature flag for the number of columns in the table.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - The database connection.
+    /// 
+    /// # Returns
+    /// 
+    /// A string representing the diesel feature flag for the number of columns in the table.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the number of columns exceeds 128.
     pub fn diesel_feature_flag_name(
         &self,
         conn: &mut PgConnection,

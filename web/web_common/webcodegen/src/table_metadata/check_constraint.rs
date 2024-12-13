@@ -1,6 +1,8 @@
 use diesel::pg::PgConnection;
 use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
 
+use crate::errors::WebCodeGenError;
+
 #[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
 pub struct CheckConstraint {
@@ -11,19 +13,45 @@ pub struct CheckConstraint {
 }
 
 impl CheckConstraint {
-    pub fn load_all_check_constraints(conn: &mut PgConnection) -> Vec<Self> {
+    /// Load all the check constraints from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `CheckConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the constraints from the database
+    pub fn load_all_check_constraints(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::check_constraints;
         check_constraints::table
             .load::<CheckConstraint>(conn)
-            .expect("Error loading check constraints")
+            .map_err(WebCodeGenError::from)
     }
 
+    /// Load all the check constraints from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `CheckConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the constraints from the database
     pub fn load_check_constraints(
         conn: &mut PgConnection,
         constraint_name: &str,
         constraint_schema: Option<&str>,
         constraint_catalog: &str,
-    ) -> Vec<Self> {
+    ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::check_constraints;
         let constraint_schema = constraint_schema.unwrap_or("public");
         check_constraints::table
@@ -31,6 +59,6 @@ impl CheckConstraint {
             .filter(check_constraints::constraint_schema.eq(constraint_schema))
             .filter(check_constraints::constraint_catalog.eq(constraint_catalog))
             .load::<CheckConstraint>(conn)
-            .expect("Error loading check constraints")
+            .map_err(WebCodeGenError::from)
     }
 }

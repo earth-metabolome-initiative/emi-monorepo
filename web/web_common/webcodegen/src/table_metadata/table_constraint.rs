@@ -9,6 +9,7 @@ use diesel::{
 use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDsl, Selectable};
 use serde::{Deserialize, Serialize};
 use std::io::Write;
+use crate::errors::WebCodeGenError;
 
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Debug)]
 #[diesel(table_name = crate::schema::table_constraints)]
@@ -113,19 +114,48 @@ impl FromSql<diesel::sql_types::Text, diesel::pg::Pg> for ConstraintType {
 }
 
 impl TableConstraint {
-    pub fn load_all(conn: &mut PgConnection) -> Vec<Self> {
+    /// Load all the constraints from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `TableConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the constraints from the database
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::table_constraints;
         table_constraints::table
             .load::<TableConstraint>(conn)
-            .expect("Error loading table constraints")
+            .map_err(WebCodeGenError::from)
     }
 
+    /// Load all the constraints for a given table
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// * `table_name` - The name of the table to load the constraints for
+    /// * `table_schema` - An optional schema name to filter the constraints by
+    /// * `table_catalog` - The name of the catalog to filter the constraints by
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `TableConstraint` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the constraints from the database
     pub fn load_table_constraints(
         conn: &mut PgConnection,
         table_name: &str,
         table_schema: Option<&str>,
         table_catalog: &str,
-    ) -> Vec<Self> {
+    ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::table_constraints;
         let table_schema = table_schema.unwrap_or("public");
         table_constraints::table
@@ -133,7 +163,7 @@ impl TableConstraint {
             .filter(table_constraints::table_schema.eq(table_schema))
             .filter(table_constraints::table_catalog.eq(table_catalog))
             .load::<TableConstraint>(conn)
-            .expect("Error loading table constraints")
+            .map_err(WebCodeGenError::from)
     }
 
     #[must_use]

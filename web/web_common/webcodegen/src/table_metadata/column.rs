@@ -276,11 +276,30 @@ impl Column {
         false
     }
 
-    pub fn load_all(conn: &mut PgConnection) -> Vec<Self> {
+    /// Load all columns from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `Column` if the operation was successful,
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while querying the database
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::columns;
-        columns::table.load::<Column>(conn).expect("Error loading columns")
+        columns::table.load::<Column>(conn).map_err(WebCodeGenError::from)
     }
 
+    /// Returns whether the column is a foreign key
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
     pub fn is_foreign_key(&self, conn: &mut PgConnection) -> bool {
         use crate::schema::key_column_usage;
         use crate::schema::referential_constraints;

@@ -205,10 +205,7 @@ impl PgType {
             let struct_name = Ident::new(&self.camelcased_name(), proc_macro2::Span::call_site());
             Ok(parse_str::<Type>(&struct_name.to_string()).unwrap())
         } else if self.is_user_defined(conn)? {
-            let base_type = self.base_type(conn).unwrap();
-            let base_type = if let Some(base_type) = base_type {
-                base_type
-            } else {
+            let Some(base_type) = self.base_type(conn)? else {
                 return Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())));
             };
             base_type.rust_type(conn)

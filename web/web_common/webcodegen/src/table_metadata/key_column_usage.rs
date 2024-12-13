@@ -37,12 +37,28 @@ impl KeyColumnUsage {
             .map_err(WebCodeGenError::from)
     }
 
+    /// Load all the key column usages from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// * `table_name` - The name of the table to load the key column usages for
+    /// * `table_schema` - An optional schema name to filter the key column usages by
+    /// * `table_catalog` - The name of the catalog to filter the key column usages by
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `KeyColumnUsage` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the key column usages from the database
     pub fn load_key_column_usages(
         conn: &mut PgConnection,
         table_name: &str,
         table_schema: Option<&str>,
         table_catalog: &str,
-    ) -> Vec<Self> {
+    ) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::key_column_usage;
         let table_schema = table_schema.unwrap_or("public");
         key_column_usage::table
@@ -50,6 +66,6 @@ impl KeyColumnUsage {
             .filter(key_column_usage::table_schema.eq(table_schema))
             .filter(key_column_usage::table_catalog.eq(table_catalog))
             .load::<KeyColumnUsage>(conn)
-            .expect("Error loading key column usages")
+            .map_err(WebCodeGenError::from)
     }
 }

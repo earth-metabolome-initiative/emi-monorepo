@@ -14,7 +14,7 @@ impl CustomColumnConstraint for LowercaseColumnConstraint {
         _conn: &mut PgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
-        if column.column_name.chars().any(|c| c.is_uppercase()) {
+        if column.column_name.chars().any(char::is_uppercase) {
             return Err(
                 ConstraintError::UnexpectedUppercaseColumn(column.column_name.clone()).into(),
             );

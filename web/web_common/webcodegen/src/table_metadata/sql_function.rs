@@ -57,6 +57,19 @@ pub struct SQLFunction {
 }
 
 impl SQLFunction {
+    /// Load all the SQL functions from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `SQLFunction` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the functions from the database
     pub fn load_all(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, WebCodeGenError> {
         use crate::schema::pg_namespace;
         use crate::schema::pg_proc;
