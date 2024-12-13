@@ -1,11 +1,11 @@
 use crate::table_metadata::pg_type::postgres_type_to_diesel;
 use diesel::pg::PgConnection;
-use diesel::result::Error as DieselError;
 use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, TextExpressionMethods};
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{File, Ident, Type};
+use crate::errors::WebCodeGenError;
 
 pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "internal",
@@ -49,6 +49,7 @@ pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "_text",
 ];
 
+
 pub struct SQLFunction {
     name: String,
     return_type: Option<Type>,
@@ -56,7 +57,20 @@ pub struct SQLFunction {
 }
 
 impl SQLFunction {
-    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, DieselError> {
+    /// Load all the SQL functions from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `SQLFunction` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the functions from the database
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<SQLFunction>, WebCodeGenError> {
         use crate::schema::pg_namespace;
         use crate::schema::pg_proc;
         use crate::sql_functions::{pg_get_function_arguments, pg_get_function_result};
@@ -64,16 +78,16 @@ impl SQLFunction {
         let data: Vec<(_, _, _)> = pg_proc::table
             .inner_join(pg_namespace::table.on(pg_proc::pronamespace.eq(pg_namespace::oid)))
             .filter(pg_get_function_result(pg_proc::oid).ne("trigger"))
-            .filter(pg_namespace::dsl::nspname.ne("pg_catalog"))
-            .filter(pg_namespace::dsl::nspname.ne("information_schema"))
-            .filter(pg_proc::dsl::proname.not_like("diesel_%"))
-            .filter(pg_proc::dsl::proname.not_like("uuid_%"))
-            .filter(pg_proc::dsl::proname.not_like("set_%"))
-            .filter(pg_proc::dsl::proname.not_like("show_%"))
-            .filter(pg_proc::dsl::proname.not_like("gtrgm_%"))
-            .filter(pg_proc::dsl::proname.not_like("gin_%"))
+            .filter(pg_namespace::nspname.ne("pg_catalog"))
+            .filter(pg_namespace::nspname.ne("information_schema"))
+            .filter(pg_proc::proname.not_like("diesel_%"))
+            .filter(pg_proc::proname.not_like("uuid_%"))
+            .filter(pg_proc::proname.not_like("set_%"))
+            .filter(pg_proc::proname.not_like("show_%"))
+            .filter(pg_proc::proname.not_like("gtrgm_%"))
+            .filter(pg_proc::proname.not_like("gin_%"))
             .select((
-                pg_proc::dsl::proname,
+                pg_proc::proname,
                 pg_get_function_result(pg_proc::oid),
                 pg_get_function_arguments(pg_proc::oid),
             ))
@@ -88,11 +102,7 @@ impl SQLFunction {
                 return_type: None,
                 arguments: Vec::new(),
             };
-            let arguments: Vec<&str> = if !arguments.is_empty() {
-                arguments.split(", ").collect()
-            } else {
-                Vec::new()
-            };
+            let arguments: Vec<&str> = arguments.split(", ").collect();
 
             if overloading_functions
                 .iter()
@@ -128,7 +138,7 @@ impl SQLFunction {
                     argument
                 };
 
-                let argument_type = if let Some(pos) = argument.find(" ") {
+                let argument_type = if let Some(pos) = argument.find(' ') {
                     &argument[pos + 1..]
                 } else {
                     argument
@@ -139,15 +149,15 @@ impl SQLFunction {
                     break;
                 }
 
-                let argument_name = if let Some(pos) = argument.find(" ") {
-                    argument[..pos].replace("\"", "")
+                let argument_name = if let Some(pos) = argument.find(' ') {
+                    argument[..pos].replace('\"', "")
                 } else {
-                    format!("arg{}", i)
+                    format!("arg{i}")
                 };
 
                 sql_function.arguments.push((
                     argument_name,
-                    postgres_type_to_diesel(&argument_type, false),
+                    postgres_type_to_diesel(argument_type, false),
                 ));
             }
 
@@ -165,6 +175,8 @@ impl SQLFunction {
         Ok(sql_functions)
     }
 
+    #[must_use]
+    /// Convert the SQL function to a `TokenStream`
     pub fn to_syn(&self) -> TokenStream {
         let function_name = Ident::new(&self.name, proc_macro2::Span::call_site());
         let arguments = self.arguments.iter().map(|(name, ty)| {
@@ -190,11 +202,26 @@ impl SQLFunction {
         }
     }
 
-    pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), DieselError> {
+    /// Write all SQL functions to a file
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// * `output_path` - The path to the output file
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing `()` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// An error will be returned if an error occurs while reading the functions from the database,
+    /// or while writing the generated code to the output file
+    pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), WebCodeGenError> {
         let functions = Self::load_all(conn)?;
 
         // We convert the functions to TokenStream
-        let functions = functions.iter().map(|f| f.to_syn());
+        let functions = functions.iter().map(SQLFunction::to_syn);
 
         // Create a new TokenStream
         let output = quote! {

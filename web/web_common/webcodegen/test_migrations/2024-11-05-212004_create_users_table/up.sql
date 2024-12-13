@@ -26,6 +26,8 @@ CREATE TYPE jpeg AS (
     value jpeg_in
 );
 
+CREATE TYPE norse_gods AS ENUM ('THOR', 'ODIN', 'LOKI');
+
 CREATE TYPE Point2d AS (x DOUBLE PRECISION,y DOUBLE PRECISION);
 
 CREATE TABLE composite_users (
@@ -35,6 +37,7 @@ CREATE TABLE composite_users (
     email VARCHAR(255) NOT NULL,
     user_image jpeg NOT NULL,
     position Point2d NOT NULL,
+    god norse_gods NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (primary_id, secondary_id),
     FOREIGN KEY (primary_id) REFERENCES users(id),

@@ -207,6 +207,43 @@ table! {
     }
 }
 
+#[cfg(not(feature = "postgres_17"))]
+table! {
+    pg_type (oid, typname, typnamespace) {
+        oid -> Oid,
+        typname -> Text,
+        typnamespace -> Oid,
+        typowner -> Oid,
+        typlen -> SmallInt,
+        typbyval -> Bool,
+        typtype -> Char,
+        typcategory -> Char,
+        typispreferred -> Bool,
+        typisdefined -> Bool,
+        typdelim -> Char,
+        typrelid -> Oid,
+        typelem -> Oid,
+        typarray -> Oid,
+        typinput -> Oid,
+        typoutput -> Oid,
+        typreceive -> Oid,
+        typsend -> Oid,
+        typmodin -> Oid,
+        typmodout -> Oid,
+        typanalyze -> Oid,
+        typalign -> Char,
+        typstorage -> Char,
+        typnotnull -> Bool,
+        typbasetype -> Oid,
+        typtypmod -> Integer,
+        typndims -> Integer,
+        typcollation -> Oid,
+        typdefaultbin -> Nullable<Bytea>,
+        typdefault -> Nullable<Text>,
+    }
+}
+
+#[cfg(feature = "postgres_17")]
 table! {
     pg_type (oid, typname, typnamespace) {
         oid -> Oid,
@@ -326,6 +363,7 @@ table! {
     }
 }
 
+#[cfg(feature = "postgres_17")]
 table! {
     pg_attribute (attrelid, attname, atttypid) {
         attrelid -> Oid,
@@ -356,6 +394,45 @@ table! {
     }
 }
 
+#[cfg(not(feature = "postgres_17"))]
+table! {
+    pg_attribute (attrelid, attname, atttypid) {
+        attrelid -> Oid,
+        attname -> Text,
+        atttypid -> Oid,
+        attlen -> SmallInt,
+        attnum -> SmallInt,
+        attcacheoff -> Integer,
+        atttypmod -> Integer,
+        attndims -> SmallInt,
+        attbyval -> Bool,
+        attalign -> Char,
+        attstorage -> Char,
+        attnotnull -> Bool,
+        atthasdef -> Bool,
+        atthasmissing -> Bool,
+        attidentity -> Char,
+        attgenerated -> Char,
+        attisdropped -> Bool,
+        attislocal -> Bool,
+        attinhcount -> SmallInt,
+        attcollation -> Oid,
+        attstattarget -> Nullable<SmallInt>,
+        attacl -> Nullable<Array<Oid>>,
+        attoptions -> Nullable<Array<Text>>,
+        attfdwoptions -> Nullable<Array<Text>>,
+    }
+}
+
+table! {
+    pg_enum (oid) {
+        oid -> Oid,
+        enumtypid -> Oid,
+        enumsortorder -> Float,
+        enumlabel -> Text,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     columns,
     key_column_usage,
@@ -370,6 +447,7 @@ allow_tables_to_appear_in_same_query!(
     pg_class,
     pg_proc,
     pg_type,
+    pg_enum,
     pg_operator,
     pg_attribute,
     pg_namespace

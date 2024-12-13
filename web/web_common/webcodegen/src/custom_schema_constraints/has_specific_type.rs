@@ -13,13 +13,13 @@ pub struct HasSpecificTypeConstraint {
 impl CustomColumnConstraint for HasSpecificTypeConstraint {
     fn check_constraint(
         &self,
-        _conn: &mut PgConnection,
+        conn: &mut PgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
-        if self.column_name == column.column_name && self.column_type != column.data_type_str()? {
+        if self.column_name == column.column_name && self.column_type != column.data_type_str(conn)? {
             return Err(ConstraintError::NotOfCorrectType {
                 column_name: self.column_name.clone(),
-                column_type: column.data_type_str()?.to_owned(),
+                column_type: column.data_type_str(conn)?.to_owned(),
                 expected_column_type: self.column_type.clone(),
             }
             .into());

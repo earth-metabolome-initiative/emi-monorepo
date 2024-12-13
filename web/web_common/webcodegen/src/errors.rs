@@ -1,7 +1,8 @@
 //! Enumeration for the errors that may happen within the webcodegen crate.
-use crate::{custom_schema_constraints::ConstraintError, Column, PgType};
+use crate::{custom_schema_constraints::ConstraintError, Column, PgType, Table};
 use diesel::result::Error as DieselError;
 use snake_case_sanitizer::SanitizationErrors;
+use crate::codegen::CodeGenerationError;
 
 #[derive(Debug)]
 pub enum WebCodeGenError {
@@ -10,10 +11,13 @@ pub enum WebCodeGenError {
     IllegalTable(String),
     IllegalRolesTable(String),
     ConstraintError(ConstraintError),
-    UnknownColumnType(Column),
+    UnknownColumnType(Box<Column>),
     NotUserDefinedType(String),
-    MissingBaseType(PgType),
+    MissingBaseType(Box<PgType>),
     SanitizationErrors(SanitizationErrors),
+    CodeGenerationError(CodeGenerationError),
+    IllegalTableCodegen(String, String, Box<Table>),
+    ExcessiveNumberOfColumns(Box<Table>, usize),
 }
 
 impl From<DieselError> for WebCodeGenError {
@@ -31,5 +35,11 @@ impl From<ConstraintError> for WebCodeGenError {
 impl From<SanitizationErrors> for WebCodeGenError {
     fn from(value: SanitizationErrors) -> Self {
         WebCodeGenError::SanitizationErrors(value)
+    }
+}
+
+impl From<CodeGenerationError> for WebCodeGenError {
+    fn from(value: CodeGenerationError) -> Self {
+        WebCodeGenError::CodeGenerationError(value)
     }
 }

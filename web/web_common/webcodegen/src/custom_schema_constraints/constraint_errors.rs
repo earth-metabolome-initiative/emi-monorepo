@@ -26,13 +26,13 @@ impl Display for ConstraintError {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         match self {
             ConstraintError::UnexpectedNullableColumn(column_name) => {
-                write!(f, "Unexpected nullable column: {}", column_name)
+                write!(f, "Unexpected nullable column: {column_name}")
             }
             ConstraintError::UnexpectedUppercaseColumn(column_name) => {
-                write!(f, "Unexpected uppercase column: {}", column_name)
+                write!(f, "Unexpected uppercase column: {column_name}")
             }
             ConstraintError::UnexpectedUppercaseTable(table_name) => {
-                write!(f, "Unexpected uppercase table: {}", table_name)
+                write!(f, "Unexpected uppercase table: {table_name}")
             }
             ConstraintError::NotForeignKeyColumn {
                 table_name,
@@ -40,8 +40,7 @@ impl Display for ConstraintError {
             } => {
                 write!(
                     f,
-                    "Column {} in table {} is not a foreign key column",
-                    column_name, table_name
+                    "Column {column_name} in table {table_name} is not a foreign key column",
                 )
             }
             ConstraintError::NotOfCorrectType {
@@ -51,8 +50,7 @@ impl Display for ConstraintError {
             } => {
                 write!(
                     f,
-                    "Column {} is of type {}, expected {}",
-                    column_name, column_type, expected_column_type
+                    "Column {column_name} is of type {column_type}, expected {expected_column_type}",
                 )
             }
             ConstraintError::DoesNotHaveSiblingColumn {
@@ -62,8 +60,7 @@ impl Display for ConstraintError {
             } => {
                 write!(
                     f,
-                    "In table {}, if column {} is present, then column {} must also be present. It is currently missing.",
-                    table_name, column_name, sibling_column_name
+                    "In table {table_name}, if column {column_name} is present, then column {sibling_column_name} must also be present. It is currently missing.",
                 )
             }
         }

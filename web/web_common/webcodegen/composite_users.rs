@@ -12,13 +12,13 @@ impl CompositeUsers {
     #[cfg(feature = "diesel")]
     pub fn primary(&self, conn: &mut PgConnection) -> Result<Users, DieselError> {
         use crate::schema::users;
-        users::dsl::users.filter(users::dsl::id.eq(self.primary_id)).first::<Users>(conn)
+        users::table.filter(users::id.eq(self.primary_id)).first::<Users>(conn)
     }
     #[cfg(feature = "diesel")]
     pub fn secondary(&self, conn: &mut PgConnection) -> Result<Users, DieselError> {
         use crate::schema::users;
-        users::dsl::users
-            .filter(users::dsl::id.eq(self.secondary_id))
+        users::table
+            .filter(users::id.eq(self.secondary_id))
             .first::<Users>(conn)
     }
 }

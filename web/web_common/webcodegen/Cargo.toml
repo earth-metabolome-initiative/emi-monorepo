@@ -34,3 +34,4 @@ postgis_diesel = "2.4.1"
 default = ["diesel", "serde"]
 serde = []
 diesel = []
+postgres_17 = ["diesel"]

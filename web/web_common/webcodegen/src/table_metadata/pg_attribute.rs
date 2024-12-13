@@ -6,6 +6,7 @@ use diesel::{
 
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::pg_attribute)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct PgAttribute {
     pub attrelid: u32,
     pub attname: String,
@@ -18,6 +19,7 @@ pub struct PgAttribute {
     pub attbyval: bool,
     pub attalign: String,
     pub attstorage: String,
+    #[cfg(feature = "postgres_17")]
     pub attcompression: String,
     pub attnotnull: bool,
     pub atthasdef: bool,
@@ -35,26 +37,42 @@ pub struct PgAttribute {
 }
 
 impl PgAttribute {
-    /// Returns the PgType associated to the PgAttribute.
+    /// Returns the `PgType` associated to the `PgAttribute`.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the provided database connection fails.
     pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, WebCodeGenError> {
         use crate::schema::pg_type;
-        pg_type::dsl::pg_type
-            .filter(pg_type::dsl::oid.eq(self.atttypid))
+        pg_type::table
+            .filter(pg_type::oid.eq(self.atttypid))
             .first(conn)
             .map_err(WebCodeGenError::from)
     }
 
     /// Returns whether the associated rust type supports `Copy`.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the provided database connection fails.
     pub fn supports_copy(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.pg_type(conn)?.supports_copy(conn)
     }
 
     /// Returns whether the associated rust type supports `Hash`.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the provided database connection fails.
     pub fn supports_hash(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.pg_type(conn)?.supports_hash(conn)
     }
 
     /// Returns whether the associated rust type supports `Eq`.
+    /// 
+    /// # Errors
+    /// 
+    /// * Returns an error if the provided database connection fails.
     pub fn supports_eq(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.pg_type(conn)?.supports_eq(conn)
     }

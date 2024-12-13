@@ -7,6 +7,7 @@ use testcontainers::{
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
+use std::path::Path;
 
 mod utils;
 
@@ -72,7 +73,10 @@ async fn test_code_generation_methods(conn: &mut PgConnection) -> Result<(), Web
     add_main_to_file("tests/ui/sql_operators.rs");
     builder.pass("tests/ui/sql_operators.rs");
 
-    Table::write_all(conn, "tests/ui/tables.rs", DATABASE_NAME, None)?;
+    Codegen::default()
+        .set_output_path(Path::new("tests/ui/tables.rs"))
+        .generate(conn, DATABASE_NAME, None)?;
+
     add_main_to_file("tests/ui/tables.rs");
     builder.pass("tests/ui/tables.rs");
 
@@ -237,7 +241,7 @@ async fn test_user_table() {
 
     assert!(columns.is_ok());
     let columns = columns.unwrap();
-    assert_eq!(columns.len(), 7);
+    assert_eq!(columns.len(), 8);
 
     assert!(primary_key_columns.is_ok());
     let primary_key_columns = primary_key_columns.unwrap();

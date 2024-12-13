@@ -4,6 +4,8 @@ use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{File, Ident, Type};
+use crate::errors::WebCodeGenError;
+
 
 use crate::table_metadata::sql_function::UNSUPPORTED_DATA_TYPES;
 
@@ -23,7 +25,20 @@ const DEPRECATED_OPERATORS: &[(&str, &str)] = &[
 ];
 
 impl SQLOperator {
-    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
+    /// Load all the SQL operators from the database
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing a `Vec` of `SQLOperator` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the operators from the database
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, WebCodeGenError> {
         use crate::schema::pg_operator;
         use crate::schema::pg_proc;
         use crate::schema::pg_type;
@@ -35,52 +50,58 @@ impl SQLOperator {
             pg_type as return_pg_type_alias
         );
 
-        pg_operator::dsl::pg_operator
+        pg_operator::table
             .inner_join(
                 left_pg_type
-                    .on(pg_operator::dsl::oprleft.eq(left_pg_type.field(pg_type::dsl::oid))),
+                    .on(pg_operator::oprleft.eq(left_pg_type.field(pg_type::oid))),
             )
             .inner_join(
                 right_pg_type
-                    .on(pg_operator::dsl::oprright.eq(right_pg_type.field(pg_type::dsl::oid))),
+                    .on(pg_operator::oprright.eq(right_pg_type.field(pg_type::oid))),
             )
             .inner_join(
                 return_pg_type
-                    .on(pg_operator::dsl::oprresult.eq(return_pg_type.field(pg_type::dsl::oid))),
+                    .on(pg_operator::oprresult.eq(return_pg_type.field(pg_type::oid))),
             )
-            .inner_join(pg_proc::table.on(pg_operator::dsl::oprcode.eq(pg_proc::dsl::oid)))
+            .inner_join(pg_proc::table.on(pg_operator::oprcode.eq(pg_proc::oid)))
             .filter(
-                pg_proc::dsl::proname
+                pg_proc::proname
                     .not_ilike("%eq%")
-                    .and(pg_proc::dsl::proname.not_ilike("%le%"))
-                    .and(pg_proc::dsl::proname.not_ilike("%ge%"))
-                    .and(pg_proc::dsl::proname.not_ilike("%lt%"))
-                    .and(pg_proc::dsl::proname.not_ilike("%gt%"))
-                    .and(pg_proc::dsl::proname.not_ilike("%ne%")),
+                    .and(pg_proc::proname.not_ilike("%le%"))
+                    .and(pg_proc::proname.not_ilike("%ge%"))
+                    .and(pg_proc::proname.not_ilike("%lt%"))
+                    .and(pg_proc::proname.not_ilike("%gt%"))
+                    .and(pg_proc::proname.not_ilike("%ne%")),
             )
             .select((
-                pg_operator::dsl::oprname,
-                left_pg_type.field(pg_type::dsl::typname),
-                right_pg_type.field(pg_type::dsl::typname),
-                return_pg_type.field(pg_type::dsl::typname),
-                pg_proc::dsl::proname,
+                pg_operator::oprname,
+                left_pg_type.field(pg_type::typname),
+                right_pg_type.field(pg_type::typname),
+                return_pg_type.field(pg_type::typname),
+                pg_proc::proname,
             ))
             .load::<(String, String, String, String, String)>(conn)
-            .map(|rows| {
+            .map_err(WebCodeGenError::from)
+            .and_then(|rows| {
                 rows.into_iter()
-                    .filter_map(
+                    .filter(
                         |(symbol, left_operand_type, right_operand_type, result_type, name)| {
                             if UNSUPPORTED_DATA_TYPES.contains(&left_operand_type.as_str())
                                 || UNSUPPORTED_DATA_TYPES.contains(&right_operand_type.as_str())
                                 || UNSUPPORTED_DATA_TYPES.contains(&result_type.as_str())
                             {
-                                return None;
+                                return false;
                             }
                             if DEPRECATED_OPERATORS.contains(&(name.as_str(), symbol.as_str())) {
-                                return None;
+                                return false;
                             }
 
-                            Some(Self {
+                            true
+                        },
+                    )
+                    .map(
+                        |(symbol, left_operand_type, right_operand_type, result_type, name)| {
+                            Ok(Self {
                                 symbol,
                                 left_operand_type: postgres_type_to_diesel(
                                     left_operand_type.as_str(),
@@ -99,6 +120,8 @@ impl SQLOperator {
             })
     }
 
+    #[must_use]
+    /// Returns the struct name of the SQL operator
     pub fn struct_name(&self) -> String {
         self.name
             .split('_')
@@ -112,6 +135,12 @@ impl SQLOperator {
             .collect()
     }
 
+    #[must_use]
+    /// Convert the SQL operator to a `TokenStream`
+    /// 
+    /// # Returns
+    /// 
+    /// A `TokenStream` representing the SQL operator
     pub fn to_syn(&self) -> TokenStream {
         let name = Ident::new(&self.struct_name(), proc_macro2::Span::call_site());
         let symbol = self.symbol.clone();
@@ -120,7 +149,7 @@ impl SQLOperator {
         let right_type = self.right_operand_type.clone();
 
         let sanitized_name = Ident::new(
-            self.name.replace(".", "_").as_str(),
+            self.name.replace('.', "_").as_str(),
             proc_macro2::Span::call_site(),
         );
         let trait_name = Ident::new(
@@ -152,14 +181,26 @@ impl SQLOperator {
         }
     }
 
-    pub fn write_all(
-        conn: &mut PgConnection,
-        output_path: &str,
-    ) -> Result<(), diesel::result::Error> {
+    /// Write all the SQL operators to a file
+    /// 
+    /// # Arguments
+    /// 
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// * `output_path` - The path to the file where the generated code will be written
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing `()` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the operators from the database, or while writing the generated code to the output file
+    /// 
+    pub fn write_all(conn: &mut PgConnection, output_path: &str) -> Result<(), WebCodeGenError> {
         let operators = Self::load_all(conn)?;
 
         // We convert the types to TokenStream
-        let operators = operators.iter().map(|f| f.to_syn());
+        let operators = operators.iter().map(SQLOperator::to_syn);
 
         // Create a new TokenStream
         let output = quote! {

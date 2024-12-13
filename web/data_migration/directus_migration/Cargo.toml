@@ -1,0 +1,25 @@
+[package]
+name = "directus_migration"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diesel-async = {version="0.5.1", features = ["postgres", "pool"]}
+uuid = {version="1.11.0", features = ["serde", "v4"]}
+serde_json = "1.0.132"
+chrono = {version="0.4.38", features = ["serde"]}
+diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "serde_json", "64-column-tables"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
+
+[build-dependencies]
+webcodegen = {path = "../../web_common/webcodegen"}
+config = "0.14.1"
+diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "serde_json", "64-column-tables"] }
+
+[features]
+default = ["diesel", "64-column-tables", "serde"]
+serde = []
+diesel = []
+32-column-tables = ["diesel", "diesel/32-column-tables"]
+64-column-tables = ["32-column-tables", "diesel/64-column-tables"]
+128-column-tables = ["64-column-tables", "diesel/128-column-tables"]
