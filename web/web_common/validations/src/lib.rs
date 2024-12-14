@@ -3,8 +3,9 @@ use pgrx::prelude::*;
 ::pgrx::pg_module_magic!();
 
 #[pg_extern]
-fn hello_validations() -> &'static str {
-    "Hello, validations"
+/// Returns whether the provided string is not empty
+fn is_not_empty(s: &str) -> bool {
+    !s.is_empty()
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -13,8 +14,9 @@ mod tests {
     use pgrx::prelude::*;
 
     #[pg_test]
-    fn test_hello_validations() {
-        assert_eq!("Hello, validations", crate::hello_validations());
+    fn test_is_not_empty() {
+        assert!(crate::is_not_empty("hello"));
+        assert!(!crate::is_not_empty(""));
     }
 
 }
