@@ -47,3 +47,5 @@ cargo pgrx package
 ```
 
 This command will compile (in release mode) the extension for the current version of your `pg_config`, so **make sure you have the correct version installed**. The command will output the path to the generated `*.so`, `*.sql`, and `*.control` files. These documents should be found in the `target/release/` directory of this monorepo. For instance, at the time of writing the ouput path is `emi-monorepo/target/release/validations-pg17/usr/share/postgresql/17/extension/validations--0.0.0.sql`.
+
+Then, when you want to install the extension in your database, we will need to copy into the PostgreSQL's extension directory of the docker, which are respectively `/usr/share/postgresql/17/extension/` (for the `*.sql` and `*.control`) and `/usr/lib/postgresql/17/lib/` (for the `*.so`).

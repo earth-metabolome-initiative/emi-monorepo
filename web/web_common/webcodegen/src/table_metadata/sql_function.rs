@@ -57,6 +57,28 @@ pub struct SQLFunction {
 }
 
 impl SQLFunction {
+    /// Returns a new instance of `SQLFunction` with the provided name
+    /// 
+    /// # Arguments
+    /// 
+    /// * `name` - The name of the SQL function
+    /// * `conn` - A mutable reference to a `PgConnection`
+    /// 
+    /// # Returns
+    /// 
+    /// A `Result` containing the `SQLFunction` if the operation was successful, or a `WebCodeGenError` if an error occurred
+    /// 
+    /// # Errors
+    /// 
+    /// If an error occurs while loading the function from the database
+    /// or if the function with the provided name does not exist
+    pub fn from_name(name: &str, conn: &mut PgConnection) -> Result<Self, WebCodeGenError> {
+        Self::load_all(conn)?
+            .into_iter()
+            .find(|f| f.name == name)
+            .ok_or_else(|| WebCodeGenError::UnknownFunctionName(name.to_string()))
+    }
+
     /// Load all the SQL functions from the database
     /// 
     /// # Arguments

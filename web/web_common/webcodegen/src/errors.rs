@@ -12,6 +12,7 @@ pub enum WebCodeGenError {
     IllegalRolesTable(String),
     ConstraintError(ConstraintError),
     UnknownColumnType(Box<Column>),
+    UnknownFunctionName(String),
     NotUserDefinedType(String),
     MissingBaseType(Box<PgType>),
     SanitizationErrors(SanitizationErrors),
