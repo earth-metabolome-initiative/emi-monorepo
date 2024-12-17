@@ -20,8 +20,9 @@ Ensure you have Rust and Cargo installed.
 Clone this repository and build the project:
 
 ```bash
-git clone https://github.com/yourusername/inat-taxonomy.git
-cd inat-taxonomy
+git clone hhttps://github.com/earth-metabolome-initiative/emi-monorepo.git
+git branch inat-taxonomy
+cd data-retrieval/inat-taxonomy
 cargo build --release
 ```
 
