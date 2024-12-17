@@ -1,0 +1,14 @@
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT (COUNT(DISTINCT ?taxon) AS ?taxon_count) WHERE {
+  {
+    SELECT DISTINCT ?chemical_compound ?taxon WHERE { 
+      VALUES ?chemical_classes { wd:Q11173 wd:Q59199015 wd:Q113145171 } 
+      ?chemical_compound wdt:P31|wdt:P279/wdt:P31|wdt:P279 ?chemical_classes. 
+      ?chemical_compound wdt:P703 ?taxon.  # Chemical found in taxon
+	  ?taxon wdt:P225 ?taxon_name.
+    } ORDER BY ?taxon
+  }
+}

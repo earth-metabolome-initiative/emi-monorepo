@@ -18,15 +18,13 @@ PREFIX wd: <http://www.wikidata.org/entity/>
 SELECT ?item WHERE { ?item wdt:P31 wd:Q5. } LIMIT 10
 ```
 
-2. Run the Client:
-Update the endpoint, query file, and output file directly in your Rust program:
+2. Run the Client with CLI
+Use the CLI to specify the endpoint, query file, and output file:
 
-```rust
-let endpoint = "https://qlever.cs.uni-freiburg.de/api/wikidata";
-let query_file = "query.rq";
-let output_file = "output.csv";
-
-run_sparql_query(endpoint, query_file, output_file).expect("Query failed");
+```bash
+cargo run -- --endpoint "https://qlever.cs.uni-freiburg.de/api/wikidata" \
+            --query-file "query.rq" \
+            --output-file "output.csv"
 ```
 
 3. Output:
