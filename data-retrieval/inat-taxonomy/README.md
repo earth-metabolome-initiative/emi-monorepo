@@ -26,6 +26,14 @@ cd data-retrieval/inat-taxonomy
 cargo build --release
 ```
 
+## Testing
+
+Run the tests using the following command:
+
+```bash
+cargo test
+```
+
 ## Usage
 
 Run the program using the following commands:
