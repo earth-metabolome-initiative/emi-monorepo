@@ -1,4 +1,4 @@
-extension,mime_type,description,font_awesome_icon,color
+extension,mime_type,description,font_awesome_icons.name,colors.name
 pdf,application/pdf,"A file format used to present documents independently of software, hardware, or operating systems.",file-pdf,red
 jpg,image/jpeg,"A commonly used method of lossy compression for digital images.",file-image,blue
 png,image/png,"A raster-graphics file format that supports lossless data compression.",file-image,orange

@@ -248,6 +248,7 @@ def load_dataframe():
     ).to_pandas()
 
     df = df.drop(columns=["flags", "silva", "uniqname"])
+    df["name"] = df["name"].str.strip()
 
     return df.set_index("uid", drop=True)
 
@@ -305,27 +306,12 @@ def propagate_down(
 
 
 @Cache(use_approximated_hash=True)
-def enrich_ranks(df: pd.DataFrame):
-    """Enrich the dataframe with the ranks of the species"""
-    ranks = ["kingdom", "phylum", "class", "order", "family", "genus", "domain"]
-
-    for rank in ranks:
-        df[rank] = 0.0
-
-    for _index, row in tqdm(
-        df.iterrows(), total=df.shape[0], desc="Propagating ranks", leave=False
-    ):
-        get_rank(df, row, ranks)
-    return df
-
-
-@Cache(use_approximated_hash=True)
 def populate_font_awesome_icons(df: pd.DataFrame):
     """Populate the font awesome icons"""
-    otol_to_inat = pd.read_csv("./db_data/otol_to_inat.csv").set_index("identifier")
+    otol_to_inat = pd.read_csv("./csvs/otol_to_inat.csv").set_index("identifier")
 
-    colors = pd.read_csv("./db_data/colors.csv").set_index("name")
-    icons = pd.read_csv("./db_data/font_awesome_icons.csv").set_index("name")
+    colors = pd.read_csv("./csvs/colors.csv").set_index("name")
+    icons = pd.read_csv("./csvs/font_awesome_icons.csv").set_index("name")
 
     column_name = "icon_id"
     color_column_name = "color_id"
@@ -336,7 +322,9 @@ def populate_font_awesome_icons(df: pd.DataFrame):
     df.set_index("uid", inplace=True, drop=True)
 
     for inat_identifier in tqdm(
-        EXTENDED_FONT_AWESOME_ICONS.keys(), desc="Populating icons", leave=False
+        EXTENDED_FONT_AWESOME_ICONS.keys(),
+        desc="Populating icons",
+        leave=False
     ):
         # We lookup the OTT_ID identifier
         try:
@@ -429,7 +417,6 @@ def add_wikidata_id(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-@Cache(use_approximated_hash=True)
 def retrieve_taxa():
     """Main function"""
     print("Downloading the taxonomy document")
@@ -448,8 +435,6 @@ def retrieve_taxa():
     df = df.drop(columns=["parent_uid"])
     df = df.reset_index()
 
-    print("Enriching the ranks")
-    df = enrich_ranks(df)
     print("Add wikidata identifier")
     df = add_wikidata_id(df)
     print("Populating the font awesome icons")
@@ -457,29 +442,11 @@ def retrieve_taxa():
 
     # We replace the rank column with the index curresponding to the
     # line in the dataframe 'ranks' that contains the rank
-    ranks = pd.read_csv("./db_data/ranks.csv").set_index("name")
+    ranks = pd.read_csv("./csvs/ranks.csv").set_index("name")
     df["ott_rank_id"] = df["rank"].map(lambda x: ranks.index.get_loc(x))
 
     # We drop the rank column
     df = df.drop(columns=["rank"])
-
-    # Since in SQL the Serial ids do not start from zero but from one,
-    # and we populated the ids in the dataframe starting from zero, we
-    # need to add one to all the ids.
-    for column in [
-        "parent_id",
-        "color_id",
-        "ott_rank_id",
-        "icon_id",
-        "kingdom",
-        "phylum",
-        "class",
-        "order",
-        "family",
-        "genus",
-        "domain",
-    ]:
-        df[column] += 1
 
     # We handle the corner case represented by the "Allocotidus"
     # entry from the irmng dataset. For some reason, while it has
@@ -487,50 +454,12 @@ def retrieve_taxa():
     # which is a string. We convert it to NaN.
     df.loc[df.irmng == "Allocotidus", "irmng"] = np.nan
 
-    # We enforce the use of integers even when the column may
-    # contain NaN values by switching to object dtype and casting
-    # the column to int.
-    for column in [
-        "ncbi",
-        "gbif",
-        "irmng",
-        "worms",
-        "parent_id",
-        "wikidata_id",
-        "kingdom",
-        "phylum",
-        "class",
-        "order",
-        "family",
-        "genus",
-        "domain",
-    ]:
-        df[column] = df[column].astype("Int64")
-
-    # In order to avoid collision with SQL terminology, we rename the columns
-    # referring to ranks from {rank} to bio_{rank}
-    ranks = [
-        "kingdom",
-        "phylum",
-        "class",
-        "order",
-        "family",
-        "genus",
-        "domain",
-        "worms",
-        "irmng",
-        "ncbi",
-        "gbif",
-    ]
-
-    df = df.rename(columns={rank: f"{rank}_id" for rank in ranks})
-
     # We rename the 'uid' column to 'ott_id'
     df = df.rename(columns={"uid": "ott_id"})
 
-    path = "db_data/bio_ott_taxa.csv.gz"
+    path = "csvs/taxa.csv"
     print(f"Saving the dataframe to {path}")
-    df.to_csv(path, index=False, compression="gzip")
+    df.head().to_csv(path, index=False)
 
 
 if __name__ == "__main__":

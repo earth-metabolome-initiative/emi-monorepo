@@ -1,4 +1,4 @@
-name,description,font_awesome_icon,icon_color
+name,description,font_awesome_icons.name,colors.name
 Active,The sample is currently active.,check,green
 Cancelled,The sample has been cancelled.,ban,red
 Completed,The sample has been completed.,circle-check,blue

@@ -1,4 +1,4 @@
-name,volume,unit,material,description,icon,color
+name,volume,units.unit,materials.name,description,font_awesome_icons.name,colors.name
 Falcon,50,mL,polypropylene (PP),"A plastic laboratory container, typically 15 or 50 mL in volume, with a conical bottom and screw cap for secure sealing. It is used for storing and centrifuging biological samples.",prescription-bottle,red
 Eppendorf,2,mL,polypropylene (PP),"An small plastic laboratory container, usually 0.5 to 2 mL in volume, with a conical bottom and a snap cap. It is used for storing and centrifuging small volumes of biological samples.",vial,orange
 Ziplock (large),3000,mL,plastic,"A large plastic bag with a ziplock seal, used for storing and transporting biological samples.",bag-shopping,green

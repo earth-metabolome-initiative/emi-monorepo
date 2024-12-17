@@ -1,4 +1,4 @@
-name,font_awesome_icon,color,description
+name,font_awesome_icons.name,colors.name,description
 no rank,question-circle,grey,"Taxonomic level without a specified rank"
 species,leaf,green,"A species is a group of individuals able to interbreed"
 no rank - terminal,question-circle,light_grey,"Lowest level in classification with no further subdivisions"
