@@ -1,0 +1,12 @@
+[package]
+name = "inat-taxonomy"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reqwest = { version = "0.11", features = ["blocking", "stream"] }
+tokio = { version = "1", features = ["full"] }
+zip = "0.6"
+tempfile = "3"
+openssl = { version = "0.10", features = ["vendored"] }
+csv = "1.2"
