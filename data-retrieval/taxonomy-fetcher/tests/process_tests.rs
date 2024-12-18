@@ -1,4 +1,4 @@
-use inat_taxonomy::process_taxa_csv;
+use taxonomy_fetcher::process_taxa_csv;
 use std::path::Path;
 use tempfile::tempdir;
 

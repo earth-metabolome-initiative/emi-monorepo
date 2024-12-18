@@ -7,7 +7,7 @@ use csv::{ReaderBuilder, WriterBuilder};
 
 // Download and extract function
 pub fn download_and_extract(output_dir: &Path, url: &str) -> io::Result<()> {
-    let zip_path = output_dir.join("inat_taxonomy.zip");
+    let zip_path = output_dir.join("taxonomy_fetcher.zip");
 
     let response = get(url).expect("Failed to fetch the file");
     let bytes = response.bytes().expect("Failed to read response bytes");

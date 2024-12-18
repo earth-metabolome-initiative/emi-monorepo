@@ -1,6 +1,6 @@
 use std::env;
 use std::path::PathBuf;
-use inat_taxonomy::{download_and_extract, process_taxa_csv};
+use taxonomy_fetcher::{download_and_extract, process_taxa_csv};
 
 fn main() {
     let args: Vec<String> = env::args().collect();

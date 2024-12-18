@@ -1,5 +1,5 @@
 [package]
-name = "inat-taxonomy"
+name = "taxonomy-fetcher"
 version = "0.1.0"
 edition = "2021"
 

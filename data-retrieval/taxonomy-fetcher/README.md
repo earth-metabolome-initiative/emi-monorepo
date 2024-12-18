@@ -1,11 +1,11 @@
-# inat-taxonomy
+# taxonomy-fetcher
 
-inat-taxonomy is a Rust CLI tool that downloads, extracts, and processes the iNaturalist taxonomy dataset. It focuses on producing a simplified CSV containing taxonomic relationships.
+taxonomy-fetcher is a Rust CLI tool that downloads, extracts, and processes the iNaturalist taxonomy dataset. It focuses on producing a simplified CSV containing taxonomic relationships.
 
 ## Features
 
 1. Download and Extract
-Fetches the iNaturalist taxonomy archive (inat-taxonomy.dwca.zip) and extracts its contents.
+Fetches the iNaturalist taxonomy archive (taxonomy-fetcher.dwca.zip) and extracts its contents.
 
 2. Process taxa.csv
 Generates a simplified CSV file with the following columns:
@@ -21,8 +21,8 @@ Clone this repository and build the project:
 
 ```bash
 git clone hhttps://github.com/earth-metabolome-initiative/emi-monorepo.git
-git branch inat-taxonomy
-cd data-retrieval/inat-taxonomy
+git branch taxonomy-fetcher
+cd data-retrieval/taxonomy-fetcher
 cargo build --release
 ```
 
@@ -44,7 +44,7 @@ Run the program using the following commands:
 cargo run -- download
 ```
 
-The dataset will be saved and extracted to the inat-taxonomy-output/ directory.
+The dataset will be saved and extracted to the taxonomy-fetcher-output/ directory.
 
 2. Process taxa.csv:
 
@@ -52,7 +52,7 @@ The dataset will be saved and extracted to the inat-taxonomy-output/ directory.
 cargo run -- process
 ```
 
-This generates extracted_taxa.csv in the inat-taxonomy-output/ directory.
+This generates extracted_taxa.csv in the taxonomy-fetcher-output/ directory.
 
 ## Output
 

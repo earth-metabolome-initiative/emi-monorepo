@@ -1,4 +1,4 @@
-use inat_taxonomy::download_and_extract;
+use taxonomy_fetcher::download_and_extract;
 use std::path::Path;
 use tempfile::tempdir;
 
@@ -9,5 +9,5 @@ fn test_download_and_extract() {
 
     let result = download_and_extract(temp_dir.path(), url);
     assert!(result.is_ok());
-    assert!(temp_dir.path().join("inat_taxonomy.zip").exists());
+    assert!(temp_dir.path().join("taxonomy_fetcher.zip").exists());
 }
