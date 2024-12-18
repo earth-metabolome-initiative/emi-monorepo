@@ -64,3 +64,31 @@ id|parent_id|taxon_name
 1|48460|Animalia
 2|1|Chordata
 
+## Notes for further development
+
+At the moment we have such tables :
+
+id|parent_id|taxon_name
+---|---|---
+1|48460|Animalia
+2|1|Chordata
+
+If insert as such in the DB this is an issue. Indeed parent_id beeing a foreign key to id, we can't have a parent_id that is not in the id column.
+One solution would be to decouple the table in two tables :
+
+id|taxon_name
+---|---
+1|Animalia
+2|Chordata
+
+and
+
+id|parent_id
+---|---
+1|48460
+2|1
+
+However, this is not optimal from the performance point of view.
+We will thus need to make sure that the table is topologically sorted before inserting it in the DB.
+In this case it woul dmean having Life at the very first row etc.
+
