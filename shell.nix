@@ -43,8 +43,8 @@ pkgs.mkShell {
     libxslt
     rustup
     cargo
-    cargo-pgrx
 
+    glibc
     glibc.dev
     clang
   ];
@@ -53,5 +53,7 @@ pkgs.mkShell {
   shellHook = ''
     export PGDATA="$PWD/data"
     export PGHOST="$PWD/run"
+    export C_INCLUDE_PATH=${pkgs.glibc.dev}/include
+    export LIBCLANG_PATH=${pkgs.llvmPackages.libclang.lib}/lib
   '';
 }

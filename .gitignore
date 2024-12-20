@@ -33,3 +33,4 @@ rustc-ice-*.txt
 certbot
 logs
 database_deploy
+env.env

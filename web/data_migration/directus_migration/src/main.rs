@@ -1,3 +1,4 @@
+#[cfg(feature = "commons")]
 include!(concat!(env!("OUT_DIR"), "/directus_structs.rs"));
 
 fn main() {

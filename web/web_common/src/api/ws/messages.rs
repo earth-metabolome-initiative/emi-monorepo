@@ -20,6 +20,17 @@ impl CloseReason {
     }
 }
 
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum  Operation {
+    RefreshUser,
+    SearchTable,
+    GetTable,
+    CanView,
+    CanUpdate,
+    CanDelete,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FrontendMessage {
     Close(Option<CloseReason>),
@@ -29,8 +40,6 @@ pub enum FrontendMessage {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum BackendMessage {
     Close(Option<CloseReason>),
-    RefreshUser(NestedUser),
-    Notification(NotificationMessage),
     SearchTable(uuid::Uuid, Vec<u8>),
     GetTable(uuid::Uuid, Option<String>, Vec<u8>),
     Completed(uuid::Uuid, Option<Vec<u8>>),
