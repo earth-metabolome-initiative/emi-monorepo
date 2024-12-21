@@ -1,5 +1,4 @@
 use taxonomy_fetcher::download_and_extract;
-use std::path::Path;
 use tempfile::tempdir;
 
 #[test]
