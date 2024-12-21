@@ -2,8 +2,6 @@
 //!
 //! This module is automatically generated. Do not write anything here.
 
-use sql_minifier::macros::load_sql;
-
 pub(super) async fn create_schema(database: &mut super::database_type::Database) {
     if let Err(error) = database
         .execute(load_sql!(
