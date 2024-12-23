@@ -36,7 +36,7 @@ where
         self.entry().parent_id()
     }
 
-    /// Returns the name of the taxon.
+    /// Returns the underlying taxon entry.
     fn entry(&self) -> &'a <Self::Taxonomy as super::Taxonomy>::TaxonEntry;
 
     /// Returns a reference to the underlying taxonomy.
@@ -49,5 +49,9 @@ where
     }
 
     /// Returns an iterator over the children of the taxon.
-    fn children(&self) -> impl Iterator<Item = Self>;
+    fn children(&self) -> impl Iterator<Item = Self> {
+        self.taxonomy()
+            .taxons()
+            .filter(move |taxon| taxon.parent_id() == Some(self.id()))
+    }
 }

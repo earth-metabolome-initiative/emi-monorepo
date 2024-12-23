@@ -33,6 +33,9 @@ pub trait Taxonomy {
         id: &<Self::TaxonEntry as super::TaxonEntry>::Id,
     ) -> Result<Self::Taxon<'_>, TaxonomyError<<Self::TaxonEntry as super::TaxonEntry>::Id>>;
 
+    /// Iterates the taxon entries.
+    fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_;
+
     /// Returns the root of the taxonomy.
     fn root(&self) -> Self::Taxon<'_>;
 }

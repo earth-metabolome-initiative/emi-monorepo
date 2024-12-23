@@ -195,6 +195,11 @@ impl OpenTreeOfLifeVersion {
             OpenTreeOfLifeVersion::V3_7 => "ott3.7/synonyms.tsv",
         }
     }
+
+    /// Returns the latest version of the Open Tree of Life taxonomy.
+    pub fn latest() -> OpenTreeOfLifeVersion {
+        OpenTreeOfLifeVersion::V3_7
+    }
 }
 
 impl Ord for OpenTreeOfLifeVersion {
@@ -210,7 +215,3 @@ impl PartialOrd for OpenTreeOfLifeVersion {
 }
 
 impl TaxonVersion for OpenTreeOfLifeVersion {}
-
-// uid	|	parent_uid	|	name	|	rank	|	sourceinfo	|	uniqname	|
-// uid	|	parent_uid	|	name	|	rank	|	sourceinfo	|	uniqname	|	flags	|
-// uid	|	parent_uid	|	name	|	rank	|	sourceinfo	|	uniqname	|	flags	|

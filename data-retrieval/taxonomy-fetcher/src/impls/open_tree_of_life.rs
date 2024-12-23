@@ -5,3 +5,5 @@ pub mod taxon_entry;
 pub mod taxonomy;
 pub mod rank;
 pub mod version;
+pub mod taxon;
+pub mod taxon_entry_builder;
