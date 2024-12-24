@@ -12,4 +12,9 @@ members = [
     "web/data_migration/directus_migration",
     "web/web_common/snake-case-sanitizer", 
     "data-retrieval/taxonomy-fetcher",
+    "data-retrieval/downloader",
 ]
+
+[workspace.dependencies]
+rayon = "1.10.0"
+url = "2.5.4"

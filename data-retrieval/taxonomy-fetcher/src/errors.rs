@@ -12,6 +12,8 @@ pub enum TaxonomyError<TaxonId: TaxonIdentifier> {
 pub enum TaxonomyBuilderError<TaxonId: TaxonIdentifier> {
     /// Whether a taxonomy is disconnected.
     MultipleRootsError(Vec<TaxonId>),
+    /// Whether the version was not specified.
+    MissingVersion,
 }
 
 /// Enum defining the errors that can occur when building a taxon.

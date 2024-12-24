@@ -14,7 +14,7 @@ pub struct OpenTreeOfLifeTaxonomyBuilder {
     /// Set the directory where the taxonomy is stored.
     directory: Option<std::path::PathBuf>,
     /// Root of the taxonomy.
-    root_id: Option<u32>,
+    root_position: Option<usize>,
     /// Taxon entries.
     taxon_entries: Vec<OpenTreeOfLifeTaxonEntry>,
     /// Hashmap from taxon name to position in taxon entries.
@@ -65,6 +65,10 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
         Self::Taxonomy,
         crate::errors::TaxonomyBuilderError<<Self::TaxonEntry as crate::traits::TaxonEntry>::Id>,
     > {
+        let version = self.version.ok_or(crate::errors::TaxonomyBuilderError::MissingVersion)?;
+        
+        
+
         unimplemented!("OpenTreeOfLifeTaxonomyBuilder::build")
     }
 }

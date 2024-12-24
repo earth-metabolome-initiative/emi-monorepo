@@ -1,13 +1,19 @@
 //! Submodule defining a trait for building a taxonomy.
+use crate::traits::taxon_version::TaxonVersion;
 
 /// Trait defining a taxonomy builder.
-pub trait TaxonomyBuilder: Sized {
+pub trait TaxonomyBuilder: Sized + Default {
     /// The type of TaxonEntry to build.
     type TaxonEntry: super::TaxonEntry;
     /// Type of the taxonomy to build.
     type Taxonomy: super::Taxonomy<TaxonEntry = Self::TaxonEntry>;
     /// Type of the taxon builder to use.
     type TaxonEntryBuilder: super::TaxonEntryBuilder<TaxonEntry = Self::TaxonEntry>;
+
+    /// Creates a new taxonomy builder with the latest version.
+    fn latest() -> Self {
+        Self::default().version(<Self::Taxonomy as super::Taxonomy>::Version::latest())
+    }
 
     /// Sets the version of the taxonomy to build.
     fn version(self, version: <Self::Taxonomy as super::Taxonomy>::Version) -> Self;
@@ -16,10 +22,7 @@ pub trait TaxonomyBuilder: Sized {
     fn directory(self, directory: std::path::PathBuf) -> Self;
 
     /// Returns whether a provided Id is already in use.
-    fn is_id_in_use(
-        &self,
-        id: &<Self::TaxonEntry as super::TaxonEntry>::Id,
-    ) -> bool;
+    fn is_id_in_use(&self, id: &<Self::TaxonEntry as super::TaxonEntry>::Id) -> bool;
 
     /// Returns whether a provided name is already in use.
     fn is_name_in_use(&self, name: &str) -> bool;
@@ -35,8 +38,6 @@ pub trait TaxonomyBuilder: Sized {
         self,
     ) -> Result<
         Self::Taxonomy,
-        crate::errors::TaxonomyBuilderError<
-            <Self::TaxonEntry as super::TaxonEntry>::Id,
-        >,
+        crate::errors::TaxonomyBuilderError<<Self::TaxonEntry as super::TaxonEntry>::Id>,
     >;
 }
