@@ -9,7 +9,11 @@
 #![warn(clippy::pedantic)]
 
 pub mod errors;
+pub mod downloader;
+pub mod compression_extension;
 pub mod task;
 
-pub use errors::{TaskError, TaskConfig};
+pub use errors::{DownloaderError, DownloaderConfig};
+pub use downloader::Downloader;
+pub use compression_extension::CompressionExtension;
 pub use task::Task;

@@ -1,171 +1,122 @@
-//! Submodule defining a download task.
+//! Submodule defining a struct with a download task.
 
-use std::fmt::Debug;
 use url::Url;
 
-use crate::errors::{TaskConfig, TaskError};
+use crate::{compression_extension::CompressionExtension, DownloaderConfig, DownloaderError};
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Download task.
-#[derive(Debug, Clone)]
 pub struct Task {
-    /// Whether to delete the partially downloaded file upon CTRL+C or failure.
-    pub delete_on_cancel: bool,
-    /// Whether to show a loading bar.
-    pub show_loading_bar: bool,
-    /// The URLs to download.
-    pub urls: Vec<Url>,
-    /// The maximal number of workers to use.
-    pub max_workers: usize,
-}
-
-impl Default for Task {
-    fn default() -> Self {
-        Self {
-            delete_on_cancel: true,
-            urls: Vec::new(),
-            max_workers: 1,
-            show_loading_bar: true,
-        }
-    }
+    /// The url from which to download the file.
+    pub url: Url,
+    /// The target path to save the downloaded file.
+    pub target_path: String,
+    /// The expected compressed file extension, if any.
+    pub extension: Option<CompressionExtension>,
 }
 
 impl Task {
-    /// Set whether to delete the partially downloaded file upon CTRL+C or failure.
+    /// Set the expected compressed file extension.
     ///
     /// # Arguments
     ///
-    /// * `delete_on_cancel`: Whether to delete the partially downloaded file upon CTRL+C or failure.
+    /// * `extension` - The expected compressed file extension.
     ///
     /// # Returns
     ///
-    /// * Self, with the delete_on_cancel flag set.
+    /// * Self, with the extension set.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use downloader::Task;
+    /// use downloader::CompressionExtension;
+    ///
+    /// let task: Task = Task::try_from("https://example.com/file.zip").unwrap().extension(CompressionExtension::Zip);
+    ///
+    /// assert_eq!(task.extension, Some(CompressionExtension::Zip));
+    ///
+    /// let task: Task = Task::try_from("https://example.com/file.zip").unwrap();
+    ///
+    /// assert_eq!(task.extension, None);
+    ///
+    /// ```
+    ///
+    pub fn extension(mut self, extension: CompressionExtension) -> Self {
+        self.extension = Some(extension);
+        self
+    }
+
+    /// Set the target path to save the downloaded file.
+    ///
+    /// # Arguments
+    ///
+    /// * `target_path` - The target path to save the downloaded file.
+    ///
+    /// # Returns
+    ///
+    /// * Self, with the target path set.
     ///
     /// # Examples
     ///
     /// ```rust
     /// use downloader::Task;
     ///
-    /// let task: Task = Task::default().delete_on_cancel(false);
+    /// let task: Task = Task::try_from("https://example.com/file.zip").unwrap().target_path("file.zip");
     ///
-    /// assert_eq!(task.delete_on_cancel, false);
+    /// assert_eq!(task.target_path, "file.zip");
     ///
-    /// let task: Task = Task::default().delete_on_cancel(true);
+    /// let task: Task = Task::try_from("https://example.com/file.zip").unwrap();
     ///
-    /// assert_eq!(task.delete_on_cancel, true);
+    /// assert_eq!(task.target_path, "file.zip");
+    ///
     /// ```
-    ///
-    pub fn delete_on_cancel(mut self, delete_on_cancel: bool) -> Self {
-        self.delete_on_cancel = delete_on_cancel;
+    pub fn target_path<S: ToString>(mut self, target_path: S) -> Self {
+        self.target_path = target_path.to_string();
         self
     }
+}
 
-    /// Set the number of workers to use.
-    ///
-    /// # Arguments
-    ///
-    /// * `max_workers`: The maximal number of workers to use.
-    ///
-    /// # Returns
-    ///
-    /// * Self, with the maximal number of workers set.
-    ///
-    /// # Errors
-    ///
-    /// * [`TaskConfig::ZeroWorkers`] if `max_workers` is 0.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use downloader::{Task, TaskError};
-    ///
-    /// let task: Task = Task::default().max_workers(4).unwrap();
-    ///
-    /// assert_eq!(task.max_workers, 4);
-    ///
-    /// let task: Result<Task, TaskError> = Task::default().max_workers(0);
-    ///
-    /// assert!(task.is_err());
-    /// ```
-    pub fn max_workers(mut self, max_workers: usize) -> Result<Self, TaskError> {
-        if max_workers == 0 {
-            return Err(TaskConfig::ZeroWorkers.into());
-        }
-        self.max_workers = max_workers;
-        Ok(self)
+impl TryFrom<Url> for Task {
+    type Error = DownloaderError;
+
+    fn try_from(value: Url) -> Result<Self, Self::Error> {
+        let Some(target_path) = value
+            .path_segments()
+            .and_then(|segments| segments.last())
+            .map(|name| name.to_string())
+        else {
+            return Err(DownloaderConfig::NoInferrablePath(value).into());
+        };
+
+        Ok(Self {
+            url: value,
+            target_path,
+            extension: None,
+        })
     }
+}
 
-    /// Whether to show a loading bar.
-    pub fn show_loading_bar(mut self) -> Self {
-        self.show_loading_bar = true;
-        self
+impl<'a> TryFrom<&'a str> for Task {
+    type Error = DownloaderError;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        Url::parse(value)?.try_into()
     }
+}
 
-    /// Add a URL to the list of URLs to download.
-    ///
-    /// # Arguments
-    ///
-    /// * `url`: URL to add to the list of URLs to download.
-    ///
-    /// # Returns
-    ///
-    /// * Self, with the URL added to the list of URLs to download.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use downloader::{Task, TaskError, TaskConfig};
-    ///
-    /// let mut task: Task = Task::default().url("https://example.com").unwrap();
-    ///
-    /// assert_eq!(task.urls[0].as_str(), "https://example.com/");
-    ///
-    /// task = task.url("https://example.org").unwrap();
-    ///
-    /// assert_eq!(task.urls.len(), 2);
-    /// assert_eq!(task.urls[0].as_str(), "https://example.com/");
-    ///
-    /// let error = task.url("invalid url").unwrap_err();
-    ///
-    /// assert!(matches!(error, TaskError::TaskConfig(TaskConfig::InvalidUrl(_))));
-    /// ```
-    ///
-    pub fn url<S: AsRef<str>>(mut self, url: S) -> Result<Self, TaskError> {
-        let url = Url::parse(url.as_ref()).map_err(TaskConfig::InvalidUrl)?;
-        if !self.urls.contains(&url) {
-            self.urls.push(url);
-        }
-        Ok(self)
+impl<'a> TryFrom<&&'a str> for Task {
+    type Error = DownloaderError;
+
+    fn try_from(value: &&'a str) -> Result<Self, Self::Error> {
+        Url::parse(value)?.try_into()
     }
+}
 
-    /// Add multiple URLs to the list of URLs to download.
-    ///
-    /// # Arguments
-    ///
-    /// * `urls`: URLs to add to the list of URLs to download.
-    ///
-    /// # Returns
-    ///
-    /// * Self, with the URLs added to the list of URLs to download.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use downloader::{Task, TaskError};
-    ///
-    /// let mut task: Task = Task::default().urls(&["https://example.com", "https://example.org"]).unwrap();
-    ///
-    /// assert_eq!(task.urls.len(), 2);
-    /// assert_eq!(task.urls[0].as_str(), "https://example.com/");
-    /// assert_eq!(task.urls[1].as_str(), "https://example.org/");
-    /// ```
-    pub fn urls<I, S>(mut self, urls: I) -> Result<Self, TaskError>
-    where
-        I: IntoIterator<Item = S>,
-        S: AsRef<str>,
-    {
-        for url in urls {
-            self = self.url(url)?;
-        }
-        Ok(self)
+impl TryFrom<String> for Task {
+    type Error = DownloaderError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        value.as_str().try_into()
     }
 }
