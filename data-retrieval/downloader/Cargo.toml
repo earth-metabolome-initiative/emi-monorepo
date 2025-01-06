@@ -7,3 +7,6 @@ edition = "2021"
 ctrlc = "3.4.5"
 rayon.workspace = true
 url.workspace = true
+indicatif.workspace = true
+reqwest.workspace = true
+futures-util.workspace = true

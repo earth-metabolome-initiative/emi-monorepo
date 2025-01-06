@@ -1,11 +1,12 @@
 //! Submodule defining a download task.
 
-use std::fmt::Debug;
+use futures_util::StreamExt;
+use indicatif::{MultiProgress, ProgressBar, ProgressIterator};
+use reqwest::{Client, Response};
+use std::io::Write;
+use std::{fmt::Debug, fs::File};
 
-use crate::{
-    errors::{DownloaderConfig, DownloaderError},
-    Task,
-};
+use crate::{errors::DownloaderError, Task};
 
 /// Download task.
 #[derive(Debug, Clone)]
@@ -16,8 +17,6 @@ pub struct Downloader {
     pub show_loading_bar: bool,
     /// The tasks to download.
     pub tasks: Vec<Task>,
-    /// The maximal number of workers to use.
-    pub max_workers: usize,
     /// Whether to cache the downloaded files, i.e. not download them again if they already exist.
     pub cache: bool,
     /// Whether to automatically extract the documents
@@ -29,7 +28,6 @@ impl Default for Downloader {
         Self {
             delete_on_cancel: false,
             tasks: Vec::new(),
-            max_workers: 1,
             show_loading_bar: false,
             cache: false,
             extract: false,
@@ -112,41 +110,6 @@ impl Downloader {
         self
     }
 
-    /// Set the number of workers to use.
-    ///
-    /// # Arguments
-    ///
-    /// * `max_workers`: The maximal number of workers to use.
-    ///
-    /// # Returns
-    ///
-    /// * Self, with the maximal number of workers set.
-    ///
-    /// # Errors
-    ///
-    /// * [`DownloaderConfig::ZeroWorkers`] if `max_workers` is 0.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use downloader::{Downloader, DownloaderError};
-    ///
-    /// let task: Downloader = Downloader::default().max_workers(4).unwrap();
-    ///
-    /// assert_eq!(task.max_workers, 4);
-    ///
-    /// let task: Result<Downloader, DownloaderError> = Downloader::default().max_workers(0);
-    ///
-    /// assert!(task.is_err());
-    /// ```
-    pub fn max_workers(mut self, max_workers: usize) -> Result<Self, DownloaderError> {
-        if max_workers == 0 {
-            return Err(DownloaderConfig::ZeroWorkers.into());
-        }
-        self.max_workers = max_workers;
-        Ok(self)
-    }
-
     /// Whether to show a loading bar.
     pub fn show_loading_bar(mut self) -> Self {
         self.show_loading_bar = true;
@@ -193,6 +156,29 @@ impl Downloader {
         Ok(self)
     }
 
+    /// Returns the number of tasks to download.
+    ///
+    /// # Returns
+    ///
+    /// * The number of tasks to download.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use downloader::Downloader;
+    ///
+    /// let mut task: Downloader = Downloader::default().task("https://example.com").unwrap();
+    ///
+    /// assert_eq!(task.len(), 1);
+    ///
+    /// task = task.task("https://example.org").unwrap();
+    ///
+    /// assert_eq!(task.len(), 2);
+    /// ```
+    pub fn len(&self) -> usize {
+        self.tasks.len()
+    }
+
     /// Add multiple URLs to the list of URLs to download.
     ///
     /// # Arguments
@@ -226,7 +212,48 @@ impl Downloader {
     }
 
     /// Execute the download task.
-    pub fn execute(&self) -> Result<(), DownloaderError> {
+    pub async fn execute(self) -> Result<(), DownloaderError> {
+        // We build the composite progress bar.
+        let composite: MultiProgress = MultiProgress::new();
+
+        // We add a progress bar for the primary task.
+        let primary: ProgressBar = composite.add(ProgressBar::new(self.len() as u64));
+        primary.set_style(
+            indicatif::ProgressStyle::default_bar()
+                .template(
+                    "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} ({eta})",
+                )
+                .unwrap()
+                .progress_chars("#>-"),
+        );
+
+        for task in self.tasks.into_iter().progress_with(primary) {
+            // We obtain a client.
+            let client: Client = Client::new();
+            let response: Response = client.get(task.url).send().await?;
+            let total_size = response.content_length().unwrap_or(0);
+            let internal_loading_bar = composite.add(ProgressBar::new(total_size));
+            internal_loading_bar.set_style(
+                indicatif::ProgressStyle::default_bar()
+                    .template(
+                        "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes}/{total_bytes} ({eta})",
+                    )
+                    .unwrap()
+                    .progress_chars("#>-"),
+            );
+            // Open the output file for writing
+            let mut file = File::create(&task.target_path)?;
+            let mut downloaded = 0;
+
+            let mut stream = response.bytes_stream();
+            while let Some(chunk) = stream.next().await {
+                let chunk = chunk?;
+                file.write_all(&chunk)?;
+                downloaded += chunk.len() as u64;
+                internal_loading_bar.set_position(downloaded);
+            }
+        }
+
         Ok(())
     }
 }

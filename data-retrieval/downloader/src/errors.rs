@@ -1,12 +1,18 @@
 //! Submodule defining the possible errors encountered during a download task.
+use reqwest::Error as ReqwestError;
 use std::fmt::Debug;
 use url::{ParseError, Url};
+use std::io::Error as IoError;
 
 #[derive(Debug)]
 /// Possible errors encountered during a download task.
 pub enum DownloaderError {
     /// Subset of errors relative to a download task configuration.
     DownloaderConfig(DownloaderConfig),
+    /// When there is an error with the request.
+    RequestError(ReqwestError),
+    /// When there is an error with the request.
+    IoError(IoError),
 }
 
 impl From<DownloaderConfig> for DownloaderError {
@@ -37,5 +43,17 @@ impl From<ParseError> for DownloaderConfig {
 impl From<ParseError> for DownloaderError {
     fn from(error: ParseError) -> Self {
         DownloaderError::DownloaderConfig(DownloaderConfig::InvalidUrl(error))
+    }
+}
+
+impl From<ReqwestError> for DownloaderError {
+    fn from(error: ReqwestError) -> Self {
+        Self::RequestError(error)
+    }
+}
+
+impl From<IoError> for DownloaderError {
+    fn from(error: IoError) -> Self {
+        Self::IoError(error)
     }
 }
