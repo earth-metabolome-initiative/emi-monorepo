@@ -30,7 +30,7 @@ impl Task {
     /// ```rust
     /// use downloader::Task;
     ///
-    /// let task: Task = Task::try_from("https://example.com/file.zip").unwrap().target_path("file.zip");
+    /// let task: Task = Task::try_from("https://example.com/file.zip").unwrap().target_path(&"file.zip");
     ///
     /// assert_eq!(task.target_path, "file.zip");
     ///

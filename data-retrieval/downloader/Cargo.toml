@@ -12,3 +12,4 @@ reqwest.workspace = true
 futures-util.workspace = true
 tokio.workspace = true
 flate2.workspace = true
+tar.workspace = true

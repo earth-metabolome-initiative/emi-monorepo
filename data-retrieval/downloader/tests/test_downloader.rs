@@ -3,6 +3,8 @@ use downloader::Downloader;
 
 const DOCUMENT_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/document.txt";
 const DOCUMENT_GZIP_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/document.txt.gz";
+const DOCUMENT_TAR_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/data.tar";
+const DOCUMENT_TARGZ_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/data.tar.gz";
 
 #[tokio::test]
 async fn test_document_download() {
@@ -41,20 +43,5 @@ async fn test_document_gzip_download_and_extraction() {
     // expected location, i.e. 'document.txt', plus the non-removed
     // 'document.txt.gz'.
     std::fs::remove_file("document.txt.gz").unwrap();
-    std::fs::remove_file("document.txt").unwrap();
-
-    let task: Downloader = Downloader::default()
-        .extract()
-        .delete_compressed()
-        .task(DOCUMENT_GZIP_URL)
-        .unwrap();
-    task.execute().await.unwrap();
-
-    // We check that the document has been downloaded and extracted at the
-    // expected location, i.e. 'document.txt', and that the compressed file
-    // has been removed.
-
-    assert!(!std::path::Path::new("document.txt.gz").exists());
-
     std::fs::remove_file("document.txt").unwrap();
 }

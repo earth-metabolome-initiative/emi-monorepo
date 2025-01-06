@@ -7,7 +7,7 @@ use std::{
     io::{BufReader, BufWriter, Read, Write},
     path::Path,
 };
-
+use tar::Archive;
 use crate::{reports::ExtractionReport, DownloaderError};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -15,6 +15,8 @@ use crate::{reports::ExtractionReport, DownloaderError};
 pub enum CompressionExtension {
     /// The extension for a tarball file.
     Tar,
+    /// The extension for a gzip-compressed tarball file.
+    TarGz,
     /// The extension for a zip file.
     Zip,
     /// The extension for a gzip file.
@@ -40,6 +42,8 @@ impl<'a> TryFrom<&'a Path> for CompressionExtension {
         file.read_exact(&mut magic_number)?;
 
         match magic_number {
+            [0xFD, 0x37, 0x7A, 0x58] => Ok(CompressionExtension::Xz),
+            [0x1F, 0x9D, _, _] => Ok(CompressionExtension::TarGz),
             [0x1F, 0x8B, _, _] => Ok(CompressionExtension::Gzip),
             [0x42, 0x5A, 0x68, _] => Ok(CompressionExtension::Bzip2),
             [0x50, 0x4B, 0x03, 0x04] => Ok(CompressionExtension::Zip),
@@ -55,7 +59,34 @@ impl CompressionExtension {
     pub fn extract_name(&self, source: &Path) -> String {
         match self {
             CompressionExtension::Tar => {
-                todo!()
+                if source.extension().map_or(false, |ext| ext == "tar") {
+                    source.with_extension("").to_string_lossy().to_string()
+                } else {
+                    // We add the '.extracted' extension to the file.
+                    source
+                        .with_extension("extracted")
+                        .to_string_lossy()
+                        .to_string()
+                }
+            }
+            CompressionExtension::TarGz => {
+                if source.extension().map_or(false, |ext| ext == "tgz") {
+                    source.with_extension("").to_string_lossy().to_string()
+                } else if source.extension().map_or(false, |ext| ext == "gz")
+                    && source
+                        .file_stem()
+                        .map_or(false, |stem| stem.to_string_lossy().ends_with(".tar"))
+                {
+                    let path_string = source.file_stem().unwrap().to_string_lossy().to_string();
+                    let path = Path::new(&path_string);
+                    path.with_extension("").to_string_lossy().to_string()
+                } else {
+                    // We add the '.extracted' extension to the file.
+                    source
+                        .with_extension("extracted")
+                        .to_string_lossy()
+                        .to_string()
+                }
             }
             CompressionExtension::Zip => {
                 todo!()
@@ -95,10 +126,14 @@ impl CompressionExtension {
         let destination = extension.extract_name(source);
         let output_path = Path::new(&destination);
         let input_file = File::open(source)?;
+        // Open the gzipped file and output file.
+        let output_file = File::create(output_path)?;
+        // Wrap the input file with BufReader and GzDecoder.
 
         // Get the size of the gzipped file for progress tracking.
         let input_metadata = input_file.metadata()?;
         let total_size = input_metadata.len();
+        let reader = BufReader::new(input_file);
 
         // Initialize the progress bar.
         let progress_bar = if verbose {
@@ -115,19 +150,19 @@ impl CompressionExtension {
 
         match extension {
             CompressionExtension::Tar => {
-                todo!()
+                let mut tar = Archive::new(reader);
+                tar.unpack(output_path)?;
             }
             CompressionExtension::Zip => {
                 todo!()
             }
+            CompressionExtension::TarGz => {
+                let decoder = GzDecoder::new(reader);
+                let mut tar = Archive::new(decoder);
+                tar.unpack(output_path)?;
+            }
             CompressionExtension::Gzip => {
-                // Open the gzipped file and output file.
-                let output_file = File::create(output_path)?;
-
-                // Wrap the input file with BufReader and GzDecoder.
-                let reader = BufReader::new(input_file);
                 let mut decoder = GzDecoder::new(reader);
-
                 // Wrap the output file with BufWriter.
                 let mut writer = BufWriter::new(output_file);
 
