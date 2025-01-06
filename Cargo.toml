@@ -21,3 +21,5 @@ url = "2.5.4"
 indicatif = "0.17.9"
 reqwest = {version="0.12.12", features=["stream"]}
 futures-util = "0.3.31"
+tokio = {version ="1.41.0", features = ["full"]}
+flate2 = "1.0.35"

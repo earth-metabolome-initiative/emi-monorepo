@@ -4,12 +4,17 @@ use futures_util::StreamExt;
 use indicatif::{MultiProgress, ProgressBar, ProgressIterator};
 use reqwest::{Client, Response};
 use std::io::Write;
+use std::path::Path;
 use std::{fmt::Debug, fs::File};
 
+use crate::reports::TaskReport;
+use crate::utils::set_bar_style;
+use crate::CompressionExtension;
 use crate::{errors::DownloaderError, Task};
 
 /// Download task.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct Downloader {
     /// Whether to delete the partially downloaded file upon CTRL+C or failure.
     pub delete_on_cancel: bool,
@@ -21,26 +26,17 @@ pub struct Downloader {
     pub cache: bool,
     /// Whether to automatically extract the documents
     pub extract: bool,
-}
-
-impl Default for Downloader {
-    fn default() -> Self {
-        Self {
-            delete_on_cancel: false,
-            tasks: Vec::new(),
-            show_loading_bar: false,
-            cache: false,
-            extract: false,
-        }
-    }
+    /// Whether to delete the compressed file after extraction.
+    pub delete_compressed: bool,
 }
 
 impl Downloader {
+    #[must_use]
     /// Set whether to delete the partially downloaded file upon CTRL+C or failure.
     ///
     /// # Returns
     ///
-    /// * Self, with the delete_on_cancel flag set.
+    /// * Self, with the `delete_on_cancel` flag set.
     ///
     /// # Examples
     ///
@@ -61,6 +57,7 @@ impl Downloader {
         self
     }
 
+    #[must_use]
     /// Set whether to cache the downloaded files.
     ///
     /// # Returns
@@ -86,6 +83,7 @@ impl Downloader {
         self
     }
 
+    #[must_use]
     /// Set whether to automatically extract the downloaded files.
     ///
     /// # Returns
@@ -110,6 +108,33 @@ impl Downloader {
         self
     }
 
+    #[must_use]
+    /// Set whether to delete the compressed file after extraction.
+    ///
+    /// # Returns
+    ///
+    /// * Self, with the `delete_compressed` flag set.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use downloader::Downloader;
+    ///
+    /// let task: Downloader = Downloader::default().delete_compressed();
+    ///
+    /// assert_eq!(task.delete_compressed, true);
+    ///
+    /// let task: Downloader = Downloader::default();
+    ///
+    /// assert_eq!(task.delete_compressed, false);
+    ///
+    /// ```
+    pub fn delete_compressed(mut self) -> Self {
+        self.delete_compressed = true;
+        self
+    }
+
+    #[must_use]
     /// Whether to show a loading bar.
     pub fn show_loading_bar(mut self) -> Self {
         self.show_loading_bar = true;
@@ -145,6 +170,10 @@ impl Downloader {
     /// assert!(matches!(error, DownloaderError::DownloaderConfig(DownloaderConfig::InvalidUrl(_))));
     /// ```
     ///
+    /// # Errors
+    ///
+    /// * If the URL is invalid.
+    ///
     pub fn task<T: TryInto<Task, Error = DownloaderError>>(
         mut self,
         task: T,
@@ -156,6 +185,7 @@ impl Downloader {
         Ok(self)
     }
 
+    #[must_use]
     /// Returns the number of tasks to download.
     ///
     /// # Returns
@@ -179,6 +209,31 @@ impl Downloader {
         self.tasks.len()
     }
 
+    #[must_use]
+    /// Returns whether there are no tasks to download.
+    ///
+    /// # Returns
+    ///
+    /// * Whether there are no tasks to download.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use downloader::Downloader;
+    ///
+    /// let mut task: Downloader = Downloader::default();
+    ///
+    /// assert!(task.is_empty());
+    ///
+    /// task = task.task("https://example.com").unwrap();
+    ///
+    /// assert!(!task.is_empty());
+    ///
+    /// ```
+    pub fn is_empty(&self) -> bool {
+        self.tasks.is_empty()
+    }
+
     /// Add multiple URLs to the list of URLs to download.
     ///
     /// # Arguments
@@ -200,6 +255,11 @@ impl Downloader {
     /// assert_eq!(task.tasks[0].url.as_str(), "https://example.com/");
     /// assert_eq!(task.tasks[1].url.as_str(), "https://example.org/");
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// * If any of the URLs are invalid.
+    ///
     pub fn tasks<I, T>(mut self, tasks: I) -> Result<Self, DownloaderError>
     where
         I: IntoIterator<Item = T>,
@@ -212,37 +272,51 @@ impl Downloader {
     }
 
     /// Execute the download task.
-    pub async fn execute(self) -> Result<(), DownloaderError> {
+    ///
+    /// # Errors
+    ///
+    /// * If the download fails.
+    ///
+    /// # Returns
+    ///
+    /// * A vector of reports for each task.
+    ///
+    pub async fn execute(self) -> Result<Vec<TaskReport>, DownloaderError> {
         // We build the composite progress bar.
         let composite: MultiProgress = MultiProgress::new();
 
         // We add a progress bar for the primary task.
-        let primary: ProgressBar = composite.add(ProgressBar::new(self.len() as u64));
-        primary.set_style(
-            indicatif::ProgressStyle::default_bar()
-                .template(
-                    "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} ({eta})",
-                )
-                .unwrap()
-                .progress_chars("#>-"),
-        );
+        let primary: ProgressBar = set_bar_style(composite.add(if self.show_loading_bar {
+            ProgressBar::new(self.tasks.len() as u64)
+        } else {
+            ProgressBar::hidden()
+        }));
+
+        let mut reports = Vec::with_capacity(self.len());
+        // We obtain a client.
+        let client: Client = Client::new();
 
         for task in self.tasks.into_iter().progress_with(primary) {
-            // We obtain a client.
-            let client: Client = Client::new();
-            let response: Response = client.get(task.url).send().await?;
+            if self.cache && Path::new(&task.target_path).exists() {
+                reports.push(TaskReport {
+                    task,
+                    time: 0.0,
+                    cached: true,
+                    extraction_report: None,
+                });
+                continue;
+            }
+            let task_start = std::time::Instant::now();
+            let response: Response = client.get(task.url.clone()).send().await?;
             let total_size = response.content_length().unwrap_or(0);
-            let internal_loading_bar = composite.add(ProgressBar::new(total_size));
-            internal_loading_bar.set_style(
-                indicatif::ProgressStyle::default_bar()
-                    .template(
-                        "{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes}/{total_bytes} ({eta})",
-                    )
-                    .unwrap()
-                    .progress_chars("#>-"),
-            );
+            let internal_loading_bar = set_bar_style(composite.add(if self.show_loading_bar {
+                ProgressBar::new(total_size)
+            } else {
+                ProgressBar::hidden()
+            }));
             // Open the output file for writing
-            let mut file = File::create(&task.target_path)?;
+            let path = Path::new(&task.target_path);
+            let mut file = File::create(path)?;
             let mut downloaded = 0;
 
             let mut stream = response.bytes_stream();
@@ -252,8 +326,34 @@ impl Downloader {
                 downloaded += chunk.len() as u64;
                 internal_loading_bar.set_position(downloaded);
             }
+
+            // We finish the progress bar.
+            internal_loading_bar.finish();
+
+            let download_finish = task_start.elapsed().as_secs_f64();
+
+            // We check if the file should be extracted.
+            let mut extraction_report = None;
+
+            if self.extract {
+                extraction_report = Some(CompressionExtension::extract(
+                    path,
+                    &composite,
+                    self.show_loading_bar,
+                )?);
+                if self.delete_compressed {
+                    std::fs::remove_file(path)?;
+                }
+            }
+
+            reports.push(TaskReport {
+                task,
+                time: download_finish,
+                cached: false,
+                extraction_report,
+            });
         }
 
-        Ok(())
+        Ok(reports)
     }
 }

@@ -10,3 +10,5 @@ url.workspace = true
 indicatif.workspace = true
 reqwest.workspace = true
 futures-util.workspace = true
+tokio.workspace = true
+flate2.workspace = true

@@ -12,9 +12,11 @@ pub mod errors;
 pub mod downloader;
 pub mod compression_extension;
 pub mod task;
-pub mod report;
+pub mod reports;
+pub mod utils;
 
 pub use errors::{DownloaderError, DownloaderConfig};
 pub use downloader::Downloader;
 pub use compression_extension::CompressionExtension;
 pub use task::Task;
+pub use reports::{TaskReport, ExtractionReport};

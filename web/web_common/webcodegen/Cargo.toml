@@ -19,7 +19,7 @@ snake-case-sanitizer = {path = "../snake-case-sanitizer"}
 [dev-dependencies]
 diesel_migrations = "2.2.0"
 testcontainers = {version="0.23.1"}
-tokio = {version ="1.41.0", features = ["full"]}
+tokio.workspace = true
 trybuild = "1.0.101"
 serde_json = "1.0.132"
 chrono = {version="0.4.38", features = ["serde"]}
