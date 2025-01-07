@@ -1,5 +1,6 @@
 //! Submodule defining the set of extensions for the extraction of compressed files.
 
+use crate::{reports::ExtractionReport, DownloaderError};
 use flate2::bufread::GzDecoder;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use std::{
@@ -8,7 +9,6 @@ use std::{
     path::Path,
 };
 use tar::Archive;
-use crate::{reports::ExtractionReport, DownloaderError};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Enum defining the set of extensions for the extraction of compressed files.
@@ -21,33 +21,43 @@ pub enum CompressionExtension {
     Zip,
     /// The extension for a gzip file.
     Gzip,
-    /// The extension for a bzip2 file.
-    Bzip2,
     /// The extension for a xz file.
     Xz,
     /// An unknown extension.
     Unknown,
 }
 
+impl<'a> TryFrom<&'a str> for CompressionExtension {
+    type Error = DownloaderError;
+
+    fn try_from(path: &'a str) -> Result<Self, Self::Error> {
+        Path::new(path).try_into()
+    }
+}
+
 impl<'a> TryFrom<&'a Path> for CompressionExtension {
     type Error = DownloaderError;
 
     fn try_from(path: &'a Path) -> Result<Self, Self::Error> {
-        // We use the magic number to determine the file type.
-
-        let mut magic_number: [u8; 4] = [0; 4];
-
-        let mut file = File::open(path)?;
-
-        file.read_exact(&mut magic_number)?;
-
-        match magic_number {
-            [0xFD, 0x37, 0x7A, 0x58] => Ok(CompressionExtension::Xz),
-            [0x1F, 0x9D, _, _] => Ok(CompressionExtension::TarGz),
-            [0x1F, 0x8B, _, _] => Ok(CompressionExtension::Gzip),
-            [0x42, 0x5A, 0x68, _] => Ok(CompressionExtension::Bzip2),
-            [0x50, 0x4B, 0x03, 0x04] => Ok(CompressionExtension::Zip),
-            [0x75, 0x73, 0x74, 0x61] => Ok(CompressionExtension::Tar),
+        let Some(inferred) = infer::get_from_path(path)? else {
+            return Ok(CompressionExtension::Unknown);
+        };
+        match inferred.mime_type() {
+            "application/x-tar" => Ok(CompressionExtension::Tar),
+            "application/gzip" => {
+                // We load into a buffer the first 512 bytes of the
+                // decompressed file in order to determine whether it is a tarball.
+                let mut buffer = [0u8; 512];
+                let mut decoder = GzDecoder::new(BufReader::new(File::open(path)?));
+                decoder.read_exact(&mut buffer)?;
+                if infer::archive::is_tar(&buffer) {
+                    Ok(CompressionExtension::TarGz)
+                } else {
+                    Ok(CompressionExtension::Gzip)
+                }
+            }
+            "application/zip" => Ok(CompressionExtension::Zip),
+            "application/x-xz" => Ok(CompressionExtension::Xz),
             _ => Ok(CompressionExtension::Unknown),
         }
     }
@@ -105,9 +115,6 @@ impl CompressionExtension {
                         .to_string()
                 }
             }
-            CompressionExtension::Bzip2 => {
-                todo!()
-            }
             CompressionExtension::Xz => {
                 todo!()
             }
@@ -157,6 +164,7 @@ impl CompressionExtension {
                 todo!()
             }
             CompressionExtension::TarGz => {
+                println!("Extracting tarball into {:?}", output_path);
                 let decoder = GzDecoder::new(reader);
                 let mut tar = Archive::new(decoder);
                 tar.unpack(output_path)?;
@@ -179,9 +187,6 @@ impl CompressionExtension {
                     total_read += bytes_read as u64;
                     progress_bar.set_position(total_read);
                 }
-            }
-            CompressionExtension::Bzip2 => {
-                todo!()
             }
             CompressionExtension::Xz => {
                 todo!()

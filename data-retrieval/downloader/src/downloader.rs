@@ -174,10 +174,11 @@ impl Downloader {
     ///
     /// * If the URL is invalid.
     ///
-    pub fn task<T: TryInto<Task, Error = DownloaderError>>(
-        mut self,
-        task: T,
-    ) -> Result<Self, DownloaderError> {
+    pub fn task<T>(mut self, task: T) -> Result<Self, DownloaderError>
+    where
+        T: TryInto<Task>,
+        DownloaderError: From<<T as TryInto<Task>>::Error>,
+    {
         let url = <T as TryInto<Task>>::try_into(task)?;
         if !self.tasks.contains(&url) {
             self.tasks.push(url);
@@ -263,7 +264,8 @@ impl Downloader {
     pub fn tasks<I, T>(mut self, tasks: I) -> Result<Self, DownloaderError>
     where
         I: IntoIterator<Item = T>,
-        T: TryInto<Task, Error = DownloaderError>,
+        DownloaderError: From<<T as TryInto<Task>>::Error>,
+        T: TryInto<Task>,
     {
         for task in tasks {
             self = self.task(task)?;

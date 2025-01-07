@@ -1,6 +1,6 @@
 //! Submodule defining the possible errors encountered during a download task.
 use reqwest::Error as ReqwestError;
-use std::fmt::Debug;
+use std::{convert::Infallible, fmt::Debug};
 use url::{ParseError, Url};
 use std::io::Error as IoError;
 
@@ -55,5 +55,11 @@ impl From<ReqwestError> for DownloaderError {
 impl From<IoError> for DownloaderError {
     fn from(error: IoError) -> Self {
         Self::IoError(error)
+    }
+}
+
+impl From<Infallible> for DownloaderError {
+    fn from(_: Infallible) -> Self {
+        unreachable!()
     }
 }

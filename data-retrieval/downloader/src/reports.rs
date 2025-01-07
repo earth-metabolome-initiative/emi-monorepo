@@ -2,6 +2,7 @@
 
 use crate::{CompressionExtension, Task};
 
+#[derive(Clone)]
 /// Report for a download task.
 pub struct TaskReport {
 	/// The task that the report is for.
@@ -14,6 +15,7 @@ pub struct TaskReport {
 	pub extraction_report : Option<ExtractionReport>,
 }
 
+#[derive(Clone)]
 /// Report on the extraction of a compressed file.
 pub struct ExtractionReport {
 	/// The path to the compressed file.
