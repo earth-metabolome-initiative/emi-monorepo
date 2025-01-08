@@ -288,7 +288,7 @@ impl Downloader {
         let composite: MultiProgress = MultiProgress::new();
 
         // We add a progress bar for the primary task.
-        let primary: ProgressBar = set_bar_style(composite.add(if self.show_loading_bar {
+        let primary: ProgressBar = set_bar_style(composite.add(if self.show_loading_bar && self.len() > 1 {
             ProgressBar::new(self.tasks.len() as u64)
         } else {
             ProgressBar::hidden()

@@ -36,8 +36,8 @@ pub trait TaxonomyBuilder: Sized + Default {
     /// Builds a taxonomy from the given CSV file.
     fn build(
         self,
-    ) -> Result<
+    ) -> impl std::future::Future<Output = Result<
         Self::Taxonomy,
-        crate::errors::TaxonomyBuilderError<<Self::TaxonEntry as super::TaxonEntry>::Id>,
-    >;
+        crate::errors::TaxonomyBuilderError<Self::TaxonEntry>,
+    >> + Send;
 }

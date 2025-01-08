@@ -16,6 +16,18 @@ pub struct GenericTaxonEntryBuilder<Id: TaxonIdentifier, R: Rank> {
     parent_id: Option<Id>,
 }
 
+/// Implementation of the Default trait for GenericTaxonEntryBuilder
+impl<Id: TaxonIdentifier, R: Rank> Default for GenericTaxonEntryBuilder<Id, R> {
+    fn default() -> Self {
+        Self {
+            id: None,
+            name: None,
+            rank: None,
+            parent_id: None,
+        }
+    }
+}
+
 impl<Id: TaxonIdentifier, R: Rank> TaxonEntryBuilder for GenericTaxonEntryBuilder<Id, R> {
     type TaxonEntry = GenericTaxonEntry<Id, R>;
 

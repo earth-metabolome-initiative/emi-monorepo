@@ -166,7 +166,7 @@ impl OpenTreeOfLifeVersion {
             OpenTreeOfLifeVersion::V3_4 => "ott3.4/taxonomy.tsv",
             OpenTreeOfLifeVersion::V3_5 => "ott3.5/taxonomy.tsv",
             OpenTreeOfLifeVersion::V3_6 => "ott3.6/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V3_7 => "ott3.7/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V3_7 => "ott3.7/ott3.7/taxonomy.tsv",
         }
     }
 
@@ -192,7 +192,7 @@ impl OpenTreeOfLifeVersion {
             OpenTreeOfLifeVersion::V3_4 => "ott3.4/synonyms.tsv",
             OpenTreeOfLifeVersion::V3_5 => "ott3.5/synonyms.tsv",
             OpenTreeOfLifeVersion::V3_6 => "ott3.6/synonyms.tsv",
-            OpenTreeOfLifeVersion::V3_7 => "ott3.7/synonyms.tsv",
+            OpenTreeOfLifeVersion::V3_7 => "ott3.7/ott3.7/synonyms.tsv",
         }
     }
 }
