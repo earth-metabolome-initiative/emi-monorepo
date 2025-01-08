@@ -5,7 +5,7 @@ use downloader::CompressionExtension;
 #[test]
 fn test_is_tar() {
     assert_eq!(
-        CompressionExtension::try_from("data/data.tar").unwrap(),
+        CompressionExtension::try_from("data/tarball.tar").unwrap(),
         CompressionExtension::Tar
     );
 }
@@ -13,7 +13,7 @@ fn test_is_tar() {
 #[test]
 fn test_is_tar_gz() {
     assert_eq!(
-        CompressionExtension::try_from("data/data.tar.gz").unwrap(),
+        CompressionExtension::try_from("data/tarball.tar.gz").unwrap(),
         CompressionExtension::TarGz
     );
 }

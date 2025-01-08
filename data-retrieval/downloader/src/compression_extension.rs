@@ -133,8 +133,6 @@ impl CompressionExtension {
         let destination = extension.extract_name(source);
         let output_path = Path::new(&destination);
         let input_file = File::open(source)?;
-        // Open the gzipped file and output file.
-        let output_file = File::create(output_path)?;
         // Wrap the input file with BufReader and GzDecoder.
 
         // Get the size of the gzipped file for progress tracking.
@@ -164,12 +162,14 @@ impl CompressionExtension {
                 todo!()
             }
             CompressionExtension::TarGz => {
-                println!("Extracting tarball into {:?}", output_path);
                 let decoder = GzDecoder::new(reader);
                 let mut tar = Archive::new(decoder);
                 tar.unpack(output_path)?;
             }
             CompressionExtension::Gzip => {
+                // Open the gzipped file and output file.
+                let output_file = File::create(output_path)?;
+
                 let mut decoder = GzDecoder::new(reader);
                 // Wrap the output file with BufWriter.
                 let mut writer = BufWriter::new(output_file);
