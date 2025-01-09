@@ -86,11 +86,11 @@ impl<Id: TaxonIdentifier, R: Rank> TaxonEntryBuilder for GenericTaxonEntryBuilde
             return Err(crate::errors::TaxonEntryBuilderError::DuplicateIdentifierError(id));
         }
 
-        if taxonomy_builder.is_name_in_use(&name) {
-            return Err(crate::errors::TaxonEntryBuilderError::DuplicateNameError(
-                name,
-            ));
-        }
+        // if taxonomy_builder.is_name_in_use(&name) {
+        //     return Err(crate::errors::TaxonEntryBuilderError::DuplicateNameError(
+        //         name,
+        //     ));
+        // }
 
         Ok(GenericTaxonEntry {
             id,

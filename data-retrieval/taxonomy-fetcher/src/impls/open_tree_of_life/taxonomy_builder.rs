@@ -30,6 +30,147 @@ pub struct OpenTreeOfLifeTaxonomyBuilder {
     id_to_position: std::collections::HashMap<u32, u32>,
 }
 
+#[derive(Debug, PartialEq, Eq)]
+/// Enum defining the source information of a taxon.
+
+enum SourceInfo {
+    Silva(String),
+    NCBI(u32),
+    Worms(u32),
+    GBIF(u32),
+    IRMNG(u32),
+    Additions(u32, u32, u32),
+    Study713(u32)
+}
+
+impl<'de> Deserialize<'de> for SourceInfo {
+    fn deserialize<D>(deserializer: D) -> Result<SourceInfo, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s: String = Deserialize::deserialize(deserializer)?;
+        let mut parts = s.split(':');
+        let source = parts.next().unwrap();
+        let id = parts.next().unwrap();
+
+        if source.starts_with("additions") {
+            let mut parts = source.split('-');
+            let _source = parts.next().unwrap();
+            let primary_id = u32::from_str_radix(&parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
+            let secondary_id = u32::from_str_radix(&parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
+            let tertiary_id = u32::from_str_radix(id, 10).map_err(serde::de::Error::custom)?;
+            return Ok(SourceInfo::Additions(primary_id, secondary_id, tertiary_id));
+        }
+
+        match source {
+            "silva" => Ok(SourceInfo::Silva(id.to_owned())),
+            "ncbi" | "worms" | "gbif" | "irmng" | "study713" => {
+                let numeric_id: u32 =
+                    u32::from_str_radix(&id, 10).map_err(serde::de::Error::custom)?;
+                match source {
+                    "ncbi" => Ok(SourceInfo::NCBI(numeric_id)),
+                    "worms" => Ok(SourceInfo::Worms(numeric_id)),
+                    "gbif" => Ok(SourceInfo::GBIF(numeric_id)),
+                    "irmng" => Ok(SourceInfo::IRMNG(numeric_id)),
+                    "study713" => Ok(SourceInfo::Study713(numeric_id)),
+                    _ => unreachable!(),
+                }
+            }
+            unknown => Err(serde::de::Error::custom(format!(
+                "Unknown source: {}",
+                unknown
+            ))),
+        }
+    }
+}
+
+/// Returns a vector of source information from a comma-separated sources.
+fn deserialize_comma_separated_sources<'de, D>(deserializer: D) -> Result<Vec<SourceInfo>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s: String = Deserialize::deserialize(deserializer)?;
+    s.split(',')
+        .map(|source| Deserialize::deserialize(serde::de::value::StrDeserializer::new(source)))
+        .collect()
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum OTOLFlag {
+    SiblingHigher,
+    Infraspecific,
+    WasContainer,
+    NotOTU,
+    IncertaeSedis,
+    IncertaeSedisInherited,
+    Environmental,
+    EnvironmentalInherited,
+    Barren,
+    Merged,
+    Extinct,
+    ExtinctInherited,
+    Hidden,
+    HiddenInherited,
+    Hybrid,
+    Inconsistent,
+    MajorRankConflict,
+    MajorRankConflictInherited,
+    Unclassified,
+    UnclassifiedInherited,
+    Unplaced,
+    UnplacedInherited,
+    Viral,
+}
+
+impl<'de> Deserialize<'de> for OTOLFlag {
+    fn deserialize<D>(deserializer: D) -> Result<OTOLFlag, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s: String = Deserialize::deserialize(deserializer)?;
+        match s.as_str() {
+            "sibling_higher" => Ok(OTOLFlag::SiblingHigher),
+            "infraspecific" => Ok(OTOLFlag::Infraspecific),
+            "was_container" => Ok(OTOLFlag::WasContainer),
+            "not_otu" => Ok(OTOLFlag::NotOTU),
+            "incertae_sedis" => Ok(OTOLFlag::IncertaeSedis),
+            "incertae_sedis_inherited" => Ok(OTOLFlag::IncertaeSedisInherited),
+            "environmental" => Ok(OTOLFlag::Environmental),
+            "environmental_inherited" => Ok(OTOLFlag::EnvironmentalInherited),
+            "barren" => Ok(OTOLFlag::Barren),
+            "merged" => Ok(OTOLFlag::Merged),
+            "extinct" => Ok(OTOLFlag::Extinct),
+            "extinct_inherited" => Ok(OTOLFlag::ExtinctInherited),
+            "hidden" => Ok(OTOLFlag::Hidden),
+            "hidden_inherited" => Ok(OTOLFlag::HiddenInherited),
+            "hybrid" => Ok(OTOLFlag::Hybrid),
+            "inconsistent" => Ok(OTOLFlag::Inconsistent),
+            "major_rank_conflict" => Ok(OTOLFlag::MajorRankConflict),
+            "major_rank_conflict_inherited" => Ok(OTOLFlag::MajorRankConflictInherited),
+            "unclassified" => Ok(OTOLFlag::Unclassified),
+            "unclassified_inherited" => Ok(OTOLFlag::UnclassifiedInherited),
+            "unplaced" => Ok(OTOLFlag::Unplaced),
+            "unplaced_inherited" => Ok(OTOLFlag::UnplacedInherited),
+            "viral" => Ok(OTOLFlag::Viral),
+            _ => Err(serde::de::Error::custom(format!("Unknown flag: '{}'", s))),
+        }
+    }
+}
+
+/// Returns a vector of flags from a comma-separated flags.
+fn deserialize_comma_separated_flags<'de, D>(deserializer: D) -> Result<Vec<OTOLFlag>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s: String = Deserialize::deserialize(deserializer)?;
+    if s.is_empty() {
+        return Ok(Vec::new());
+    }
+    s.split(',')
+        .map(|flag| Deserialize::deserialize(serde::de::value::StrDeserializer::new(flag)))
+        .collect()
+}
+
 #[derive(Debug, Deserialize, Eq, PartialEq)]
 /// Row in the Open Tree of Life taxonomy.
 struct TaxonomyRow {
@@ -42,11 +183,13 @@ struct TaxonomyRow {
     /// Rank of the taxon.
     rank: OpenTreeOfLifeRank,
     /// Source information.
-    sourceinfo: String,
+    #[serde(deserialize_with = "deserialize_comma_separated_sources")]
+    sourceinfo: Vec<SourceInfo>,
     /// Unique name of the taxon.
     uniqname: String,
     /// Flags.
-    flags: String,
+    #[serde(deserialize_with = "deserialize_comma_separated_flags")]
+    flags: Vec<OTOLFlag>,
 }
 
 impl TaxonomyRow {
@@ -55,9 +198,66 @@ impl TaxonomyRow {
         self.rank.is_no_rank_terminal()
     }
 
-    /// Returns true if the taxon is uncultured.
+    /// Returns whether this taxonomical entry has undesired flags.
+    ///
+    /// These flags include those defined [here](https://files.opentreeoflife.org/synthesis/opentree9.1/output/index.html).
+    ///
+    /// * barren
+    /// * environmental
+    /// * environmental_inherited
+    /// * extinct
+    /// * extinct_inherited
+    /// * hidden
+    /// * hidden_inherited
+    /// * hybrid
+    /// * incertae_sedis
+    /// * incertae_sedis_inherited
+    /// * inconsistent
+    /// * major_rank_conflict
+    /// * major_rank_conflict_inherited
+    /// * merged
+    /// * not_otu
+    /// * unclassified
+    /// * unclassified_inherited
+    /// * unplaced
+    /// * unplaced_inherited
+    /// * viral
+    /// * was_container
+    fn has_undesired_flags(&self) -> bool {
+        [
+            OTOLFlag::Barren,
+            OTOLFlag::IncertaeSedis,
+            OTOLFlag::Merged,
+            OTOLFlag::NotOTU,
+            OTOLFlag::WasContainer,
+            OTOLFlag::Extinct,
+            OTOLFlag::ExtinctInherited,
+            OTOLFlag::Hidden,
+            OTOLFlag::HiddenInherited,
+            OTOLFlag::Hybrid,
+            OTOLFlag::Inconsistent,
+            OTOLFlag::MajorRankConflict,
+            OTOLFlag::MajorRankConflictInherited,
+            OTOLFlag::Unclassified,
+            OTOLFlag::UnclassifiedInherited,
+            OTOLFlag::Unplaced,
+            OTOLFlag::UnplacedInherited,
+            OTOLFlag::Viral,
+            OTOLFlag::Environmental,
+            OTOLFlag::EnvironmentalInherited,
+        ]
+        .iter()
+        .any(|flag| self.flags.contains(flag))
+    }
+
+    /// Returns whether the taxa is uncoltured
     fn is_uncultured(&self) -> bool {
         self.name == "uncultured"
+    }
+
+    /// Returns whether the current taxon should be skipped.
+    fn should_skip(&self) -> bool {
+        self.is_no_rank_terminal() || self.has_undesired_flags() || self.is_uncultured()
     }
 }
 
@@ -130,7 +330,7 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
         for record in csv_reader.deserialize() {
             let record: TaxonomyRow = record?;
 
-            if record.is_no_rank_terminal() || record.is_uncultured() {
+            if record.should_skip() {
                 continue;
             }
 
@@ -158,9 +358,10 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
         for taxon_entry in &self.taxon_entries {
             if let Some(parent_id) = taxon_entry.parent_id {
                 if !self.id_to_position.contains_key(&parent_id) {
-                    return Err(
-                        crate::errors::TaxonEntryBuilderError::ParentNotFound(taxon_entry.clone()).into(),
-                    );
+                    return Err(crate::errors::TaxonEntryBuilderError::ParentNotFound(
+                        taxon_entry.clone(),
+                    )
+                    .into());
                 }
             }
 
