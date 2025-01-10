@@ -19,6 +19,8 @@ pub enum OpenTreeOfLifeRank {
     Domain,
     /// Kingdom rank.
     Kingdom,
+    /// Super kingdom rank.
+    SuperKingdom,
     /// Sub kingdom rank.
     SubKingdom,
     /// Infrakingdom rank.
@@ -63,6 +65,8 @@ pub enum OpenTreeOfLifeRank {
     Subgenus,
     /// Forma
     Forma,
+    /// SubForm
+    SubForm,
     /// Species group rank.
     SpeciesGroup,
     /// Species sub group rank.
@@ -75,6 +79,8 @@ pub enum OpenTreeOfLifeRank {
     InfraSpecifiNname,
     /// Varietas
     Varietas,
+    /// SubVarietas
+    SubVarietas,
     /// Tribe
     Tribe,
     /// SuperTribe
@@ -90,7 +96,11 @@ pub enum OpenTreeOfLifeRank {
     /// Cohort rank.
     Cohort,
     /// SubCohort rank.
-    SubCohort
+    SubCohort,
+    /// Samples
+    Samples,
+    /// Natio
+    Natio,
 }
 
 impl OpenTreeOfLifeRank {
@@ -118,6 +128,7 @@ impl FromStr for OpenTreeOfLifeRank {
             "no rank - terminal" => Ok(OpenTreeOfLifeRank::NoRankTerminal),
             "domain" => Ok(OpenTreeOfLifeRank::Domain),
             "kingdom" => Ok(OpenTreeOfLifeRank::Kingdom),
+            "superkingdom" => Ok(OpenTreeOfLifeRank::SuperKingdom),
             "subkingdom" => Ok(OpenTreeOfLifeRank::SubKingdom),
             "infrakingdom" => Ok(OpenTreeOfLifeRank::Infrakingdom),
             "phylum" => Ok(OpenTreeOfLifeRank::Phylum),
@@ -139,6 +150,7 @@ impl FromStr for OpenTreeOfLifeRank {
             "subfamily" => Ok(OpenTreeOfLifeRank::Subfamily),
             "genus" => Ok(OpenTreeOfLifeRank::Genus),
             "forma" => Ok(OpenTreeOfLifeRank::Forma),
+            "subform" => Ok(OpenTreeOfLifeRank::SubForm),
             "subgenus" => Ok(OpenTreeOfLifeRank::Subgenus),
             "species group" => Ok(OpenTreeOfLifeRank::SpeciesGroup),
             "species subgroup" => Ok(OpenTreeOfLifeRank::SpeciesSubGroup),
@@ -146,6 +158,7 @@ impl FromStr for OpenTreeOfLifeRank {
             "subspecies" => Ok(OpenTreeOfLifeRank::Subspecies),
             "infraspecificname" => Ok(OpenTreeOfLifeRank::InfraSpecifiNname),
             "varietas" | "variety" => Ok(OpenTreeOfLifeRank::Varietas),
+            "subvarietas" | "subvariety" => Ok(OpenTreeOfLifeRank::SubVarietas),
             "tribe" => Ok(OpenTreeOfLifeRank::Tribe),
             "supertribe" => Ok(OpenTreeOfLifeRank::SuperTribe),
             "subtribe" => Ok(OpenTreeOfLifeRank::SubTribe),
@@ -154,6 +167,8 @@ impl FromStr for OpenTreeOfLifeRank {
             "subsection" => Ok(OpenTreeOfLifeRank::SubSection),
             "cohort" => Ok(OpenTreeOfLifeRank::Cohort),
             "subcohort" => Ok(OpenTreeOfLifeRank::SubCohort),
+            "samples" => Ok(OpenTreeOfLifeRank::Samples),
+            "natio" => Ok(OpenTreeOfLifeRank::Natio),
             _ => Err(TaxonEntryBuilderError::UnknownRank(s.to_string())),
         }
     }

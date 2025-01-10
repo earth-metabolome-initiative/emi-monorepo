@@ -1,18 +1,13 @@
 //! Submodule defining the versions of the Open Tree of Life taxonomy.
 
 use chrono::NaiveDateTime;
-
+use strum_macros::EnumIter;
+use strum::IntoEnumIterator;
 use crate::traits::TaxonVersion;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
 /// Enum representing the versions of the Open Tree of Life taxonomy.
 pub enum OpenTreeOfLifeVersion {
-    /// The version 1.0 of the Open Tree of Life taxonomy.
-    V1_0,
-    /// The version 2.0 of the Open Tree of Life taxonomy.
-    V2_0,
-    /// The version 2.1 of the Open Tree of Life taxonomy.
-    V2_1,
     /// The version 2.2 of the Open Tree of Life taxonomy.
     V2_2,
     /// The version 2.3 of the Open Tree of Life taxonomy.
@@ -53,15 +48,6 @@ impl OpenTreeOfLifeVersion {
     /// Returns the release date of the version.
     pub fn release_date(&self) -> NaiveDateTime {
         match self {
-            OpenTreeOfLifeVersion::V1_0 => {
-                NaiveDateTime::parse_from_str("2013-04-16 21:07", "%Y-%m-%d %H:%M").unwrap()
-            }
-            OpenTreeOfLifeVersion::V2_0 => {
-                NaiveDateTime::parse_from_str("2013-04-26 14:46", "%Y-%m-%d %H:%M").unwrap()
-            }
-            OpenTreeOfLifeVersion::V2_1 => {
-                NaiveDateTime::parse_from_str("2013-07-16 18:18", "%Y-%m-%d %H:%M").unwrap()
-            }
             OpenTreeOfLifeVersion::V2_2 => {
                 NaiveDateTime::parse_from_str("2013-09-16 04:10", "%Y-%m-%d %H:%M").unwrap()
             }
@@ -119,9 +105,6 @@ impl OpenTreeOfLifeVersion {
     /// Returns the URL associated with the version.
     pub fn url(&self) -> &str {
         match self {
-            OpenTreeOfLifeVersion::V1_0 => "https://files.opentreeoflife.org/ott/ott1.0/ott1.0.tgz",
-            OpenTreeOfLifeVersion::V2_0 => "https://files.opentreeoflife.org/ott/ott2.0/ott2.0.tgz",
-            OpenTreeOfLifeVersion::V2_1 => "https://files.opentreeoflife.org/ott/ott2.1/ott2.1.tgz",
             OpenTreeOfLifeVersion::V2_2 => "https://files.opentreeoflife.org/ott/ott2.2/ott2.2.tgz",
             OpenTreeOfLifeVersion::V2_3 => "https://files.opentreeoflife.org/ott/ott2.3/ott2.3.tgz",
             OpenTreeOfLifeVersion::V2_4 => "https://files.opentreeoflife.org/ott/ott2.4/ott2.4.tgz",
@@ -147,25 +130,22 @@ impl OpenTreeOfLifeVersion {
     /// Returns the path to the taxonomy file in the archive.
     pub fn taxonomy_file(&self) -> &str {
         match self {
-            OpenTreeOfLifeVersion::V1_0 => "ott1.0/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V2_0 => "ott2.0/taxonomy",
-            OpenTreeOfLifeVersion::V2_1 => "ott2.1/taxonomy",
-            OpenTreeOfLifeVersion::V2_2 => "ott2.2/taxonomy",
-            OpenTreeOfLifeVersion::V2_3 => "ott/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V2_4 => "ott/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V2_5 => "ott/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V2_6 => "ott/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V2_7 => "ott/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V2_8 => "ott2.8/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V2_9 => "ott/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V2_10 => "ott/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V3_0 => "ott3.0/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V3_1 => "ott3.1/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V3_2 => "ott3.2/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V3_3 => "ott3.3/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V3_4 => "ott3.4/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V3_5 => "ott3.5/taxonomy.tsv",
-            OpenTreeOfLifeVersion::V3_6 => "ott3.6/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V2_2 => "ott2.2/ott2.2/taxonomy",
+            OpenTreeOfLifeVersion::V2_3 => "ott2.3/ott/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V2_4 => "ott2.4/ott/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V2_5 => "ott2.5/ott/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V2_6 => "ott2.6/ott/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V2_7 => "ott2.7/ott/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V2_8 => "ott2.8/ott2.8/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V2_9 => "ott2.9/ott/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V2_10 => "ott2.10/ott/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V3_0 => "ott3.0/ott/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V3_1 => "ott3.1/ott3.1/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V3_2 => "ott3.2/ott3.2/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V3_3 => "ott3.3/ott3.3/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V3_4 => "ott3.4/ott3.4/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V3_5 => "ott3.5/ott3.5/taxonomy.tsv",
+            OpenTreeOfLifeVersion::V3_6 => "ott3.6/ott3.6/taxonomy.tsv",
             OpenTreeOfLifeVersion::V3_7 => "ott3.7/ott3.7/taxonomy.tsv",
         }
     }
@@ -173,25 +153,22 @@ impl OpenTreeOfLifeVersion {
     /// Returns the path to the synonyms file in the archive.
     pub fn synonyms_file(&self) -> &str {
         match self {
-            OpenTreeOfLifeVersion::V1_0 => "ott1.0/synonyms.tsv",
-            OpenTreeOfLifeVersion::V2_0 => "ott2.0/synonyms",
-            OpenTreeOfLifeVersion::V2_1 => "ott2.1/synonyms",
-            OpenTreeOfLifeVersion::V2_2 => "ott2.2/synonyms",
-            OpenTreeOfLifeVersion::V2_3 => "ott/synonyms.tsv",
-            OpenTreeOfLifeVersion::V2_4 => "ott/synonyms.tsv",
-            OpenTreeOfLifeVersion::V2_5 => "ott/synonyms.tsv",
-            OpenTreeOfLifeVersion::V2_6 => "ott/synonyms.tsv",
-            OpenTreeOfLifeVersion::V2_7 => "ott/synonyms.tsv",
-            OpenTreeOfLifeVersion::V2_8 => "ott2.8/synonyms.tsv",
-            OpenTreeOfLifeVersion::V2_9 => "ott/synonyms.tsv",
-            OpenTreeOfLifeVersion::V2_10 => "ott/synonyms.tsv",
-            OpenTreeOfLifeVersion::V3_0 => "ott3.0/synonyms.tsv",
-            OpenTreeOfLifeVersion::V3_1 => "ott3.1/synonyms.tsv",
-            OpenTreeOfLifeVersion::V3_2 => "ott3.2/synonyms.tsv",
-            OpenTreeOfLifeVersion::V3_3 => "ott3.3/synonyms.tsv",
-            OpenTreeOfLifeVersion::V3_4 => "ott3.4/synonyms.tsv",
-            OpenTreeOfLifeVersion::V3_5 => "ott3.5/synonyms.tsv",
-            OpenTreeOfLifeVersion::V3_6 => "ott3.6/synonyms.tsv",
+            OpenTreeOfLifeVersion::V2_2 => "ott2.2/ott2.2/synonyms",
+            OpenTreeOfLifeVersion::V2_3 => "ott2.3/ott/synonyms.tsv",
+            OpenTreeOfLifeVersion::V2_4 => "ott2.4/ott/synonyms.tsv",
+            OpenTreeOfLifeVersion::V2_5 => "ott2.5/ott/synonyms.tsv",
+            OpenTreeOfLifeVersion::V2_6 => "ott2.6/ott/synonyms.tsv",
+            OpenTreeOfLifeVersion::V2_7 => "ott2.7/ott/synonyms.tsv",
+            OpenTreeOfLifeVersion::V2_8 => "ott2.8/ott2.8/synonyms.tsv",
+            OpenTreeOfLifeVersion::V2_9 => "ott2.9/ott/synonyms.tsv",
+            OpenTreeOfLifeVersion::V2_10 => "ott2.10/ott/synonyms.tsv",
+            OpenTreeOfLifeVersion::V3_0 => "ott3.0/ott/synonyms.tsv",
+            OpenTreeOfLifeVersion::V3_1 => "ott3.1/ott3.1/synonyms.tsv",
+            OpenTreeOfLifeVersion::V3_2 => "ott3.2/ott3.2/synonyms.tsv",
+            OpenTreeOfLifeVersion::V3_3 => "ott3.3/ott3.3/synonyms.tsv",
+            OpenTreeOfLifeVersion::V3_4 => "ott3.4/ott3.4/synonyms.tsv",
+            OpenTreeOfLifeVersion::V3_5 => "ott3.5/ott3.5/synonyms.tsv",
+            OpenTreeOfLifeVersion::V3_6 => "ott3.6/ott3.6/synonyms.tsv",
             OpenTreeOfLifeVersion::V3_7 => "ott3.7/ott3.7/synonyms.tsv",
         }
     }
@@ -212,6 +189,6 @@ impl PartialOrd for OpenTreeOfLifeVersion {
 impl TaxonVersion for OpenTreeOfLifeVersion {
     /// Returns the latest version of the Open Tree of Life taxonomy.
     fn latest() -> OpenTreeOfLifeVersion {
-        OpenTreeOfLifeVersion::V3_7
+        OpenTreeOfLifeVersion::iter().max().unwrap()
     }
 }

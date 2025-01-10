@@ -1,5 +1,6 @@
 downloads
 outputs
 *.tgz
-ott3.6
-ott3.7
+ott3.*
+ott2.*
+ott1.*

@@ -58,6 +58,13 @@ impl<'de> Deserialize<'de> for SourceInfo {
             return Ok(SourceInfo::URL(url));
         }
 
+        if !s.contains(':') {
+            return Err(serde::de::Error::custom(format!(
+                "Invalid source information: '{}'",
+                s
+            )));
+        }
+
         let mut parts = s.split(':');
         let source = parts.next().unwrap();
         let id = parts.next().unwrap();
@@ -103,6 +110,11 @@ where
     D: serde::Deserializer<'de>,
 {
     let s: String = Deserialize::deserialize(deserializer)?;
+
+    if s == "null" {
+        return Ok(Vec::new());
+    }
+
     s.split(',')
         .map(|source| Deserialize::deserialize(serde::de::value::StrDeserializer::new(source)))
         .collect()
@@ -111,28 +123,38 @@ where
 #[derive(Debug, PartialEq, Eq)]
 enum OTOLFlag {
     SiblingHigher,
+    SiblingLower,
     Infraspecific,
     WasContainer,
     NotOTU,
     IncertaeSedis,
     IncertaeSedisInherited,
+    IncertaeSedisDirect,
     Environmental,
     EnvironmentalInherited,
     Barren,
     Merged,
     Extinct,
     ExtinctInherited,
+    ExtinctDirect,
     Hidden,
     HiddenInherited,
     Hybrid,
     Inconsistent,
     MajorRankConflict,
     MajorRankConflictInherited,
+    MajorRankConflictDirect,
     Unclassified,
     UnclassifiedInherited,
+    UnclassifiedDirect,
     Unplaced,
     UnplacedInherited,
     Viral,
+    Tattered,
+    TatteredInherited,
+    Edited,
+    Flagged,
+    ForcedVisible,
 }
 
 impl<'de> Deserialize<'de> for OTOLFlag {
@@ -142,18 +164,22 @@ impl<'de> Deserialize<'de> for OTOLFlag {
     {
         let s: String = Deserialize::deserialize(deserializer)?;
         match s.as_str() {
+            "major_rank_conflict_direct" => Ok(OTOLFlag::MajorRankConflictDirect),
             "sibling_higher" => Ok(OTOLFlag::SiblingHigher),
+            "sibling_lower" => Ok(OTOLFlag::SiblingLower),
             "infraspecific" => Ok(OTOLFlag::Infraspecific),
             "was_container" => Ok(OTOLFlag::WasContainer),
             "not_otu" => Ok(OTOLFlag::NotOTU),
             "incertae_sedis" => Ok(OTOLFlag::IncertaeSedis),
             "incertae_sedis_inherited" => Ok(OTOLFlag::IncertaeSedisInherited),
+            "incertae_sedis_direct" => Ok(OTOLFlag::IncertaeSedisDirect),
             "environmental" => Ok(OTOLFlag::Environmental),
             "environmental_inherited" => Ok(OTOLFlag::EnvironmentalInherited),
             "barren" => Ok(OTOLFlag::Barren),
             "merged" => Ok(OTOLFlag::Merged),
             "extinct" => Ok(OTOLFlag::Extinct),
             "extinct_inherited" => Ok(OTOLFlag::ExtinctInherited),
+            "extinct_direct" => Ok(OTOLFlag::ExtinctDirect),
             "hidden" => Ok(OTOLFlag::Hidden),
             "hidden_inherited" => Ok(OTOLFlag::HiddenInherited),
             "hybrid" => Ok(OTOLFlag::Hybrid),
@@ -162,9 +188,15 @@ impl<'de> Deserialize<'de> for OTOLFlag {
             "major_rank_conflict_inherited" => Ok(OTOLFlag::MajorRankConflictInherited),
             "unclassified" => Ok(OTOLFlag::Unclassified),
             "unclassified_inherited" => Ok(OTOLFlag::UnclassifiedInherited),
+            "unclassified_direct" => Ok(OTOLFlag::UnclassifiedDirect),
             "unplaced" => Ok(OTOLFlag::Unplaced),
             "unplaced_inherited" => Ok(OTOLFlag::UnplacedInherited),
             "viral" => Ok(OTOLFlag::Viral),
+            "tattered" => Ok(OTOLFlag::Tattered),
+            "tattered_inherited" => Ok(OTOLFlag::TatteredInherited),
+            "edited" => Ok(OTOLFlag::Edited),
+            "flagged" => Ok(OTOLFlag::Flagged),
+            "forced_visible" => Ok(OTOLFlag::ForcedVisible),
             _ => Err(serde::de::Error::custom(format!("Unknown flag: '{}'", s))),
         }
     }
@@ -206,10 +238,6 @@ struct TaxonomyRow {
 }
 
 impl TaxonomyRow {
-    /// Returns true if the rank is a no-rank terminal.
-    fn is_no_rank_terminal(&self) -> bool {
-        self.rank.is_no_rank_terminal()
-    }
 
     /// Returns whether this taxonomical entry has undesired flags.
     ///

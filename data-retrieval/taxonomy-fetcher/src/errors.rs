@@ -71,7 +71,7 @@ impl<TE: TaxonEntry> std::fmt::Display for TaxonEntryBuilderError<TE> {
             Self::CircularReferenceError(taxon) => {
                 write!(f, "Circular reference: {}", taxon)
             }
-            Self::UnknownRank(rank) => write!(f, "Unknown rank: {}", rank),
+            Self::UnknownRank(rank) => write!(f, "Unknown rank: '{}'", rank),
             Self::MissingRank => write!(f, "Missing rank"),
             Self::MissingName => write!(f, "Missing name"),
             Self::MissingId => write!(f, "Missing identifier"),
