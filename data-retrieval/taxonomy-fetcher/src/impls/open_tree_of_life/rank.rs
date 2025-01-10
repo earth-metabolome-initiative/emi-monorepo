@@ -25,6 +25,8 @@ pub enum OpenTreeOfLifeRank {
     Infrakingdom,
     /// Phylum rank.
     Phylum,
+    /// Superphylum rank.
+    SuperPhylum,
     /// Infraphylum rank.
     Infraphylum,
     /// SubPhylum rank.
@@ -35,10 +37,16 @@ pub enum OpenTreeOfLifeRank {
     SuperClass,
     /// Subclass rank.
     SubClass,
+    /// Subterclass rank.
+    SubterClass,
+    /// Infraclass rank.
+    InfraClass,
     /// Order rank.
     Order,
     /// Infraorder rank.
     InfraOrder,
+    /// Parvorder rank.
+    ParvOrder,
     /// Superorder rank.
     SuperOrder,
     /// Suborder rank.
@@ -69,6 +77,8 @@ pub enum OpenTreeOfLifeRank {
     Varietas,
     /// Tribe
     Tribe,
+    /// SuperTribe
+    SuperTribe,
     /// SubTribe
     SubTribe,
     /// SubDivision rank
@@ -77,6 +87,10 @@ pub enum OpenTreeOfLifeRank {
     Section,
     /// Subsection rank.
     SubSection,
+    /// Cohort rank.
+    Cohort,
+    /// SubCohort rank.
+    SubCohort
 }
 
 impl OpenTreeOfLifeRank {
@@ -107,13 +121,17 @@ impl FromStr for OpenTreeOfLifeRank {
             "subkingdom" => Ok(OpenTreeOfLifeRank::SubKingdom),
             "infrakingdom" => Ok(OpenTreeOfLifeRank::Infrakingdom),
             "phylum" => Ok(OpenTreeOfLifeRank::Phylum),
+            "superphylum" => Ok(OpenTreeOfLifeRank::SuperPhylum),
             "infraphylum" => Ok(OpenTreeOfLifeRank::Infraphylum),
             "subphylum" => Ok(OpenTreeOfLifeRank::SubPhylum),
             "class" => Ok(OpenTreeOfLifeRank::Class),
             "superclass" => Ok(OpenTreeOfLifeRank::SuperClass),
             "subclass" => Ok(OpenTreeOfLifeRank::SubClass),
+            "subterclass" => Ok(OpenTreeOfLifeRank::SubterClass),
+            "infraclass" => Ok(OpenTreeOfLifeRank::InfraClass),
             "order" => Ok(OpenTreeOfLifeRank::Order),
             "infraorder" => Ok(OpenTreeOfLifeRank::InfraOrder),
+            "parvorder" => Ok(OpenTreeOfLifeRank::ParvOrder),
             "superorder" => Ok(OpenTreeOfLifeRank::SuperOrder),
             "suborder" => Ok(OpenTreeOfLifeRank::SubOrder),
             "family" => Ok(OpenTreeOfLifeRank::Family),
@@ -129,10 +147,13 @@ impl FromStr for OpenTreeOfLifeRank {
             "infraspecificname" => Ok(OpenTreeOfLifeRank::InfraSpecifiNname),
             "varietas" | "variety" => Ok(OpenTreeOfLifeRank::Varietas),
             "tribe" => Ok(OpenTreeOfLifeRank::Tribe),
+            "supertribe" => Ok(OpenTreeOfLifeRank::SuperTribe),
             "subtribe" => Ok(OpenTreeOfLifeRank::SubTribe),
             "subdivision" => Ok(OpenTreeOfLifeRank::SubDivision),
             "section" => Ok(OpenTreeOfLifeRank::Section),
             "subsection" => Ok(OpenTreeOfLifeRank::SubSection),
+            "cohort" => Ok(OpenTreeOfLifeRank::Cohort),
+            "subcohort" => Ok(OpenTreeOfLifeRank::SubCohort),
             _ => Err(TaxonEntryBuilderError::UnknownRank(s.to_string())),
         }
     }

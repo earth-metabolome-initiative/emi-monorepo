@@ -10,11 +10,11 @@ use super::{
 /// Version of the Open Tree of Life taxonomy.
 pub struct OpenTreeOfLifeTaxonomy {
     /// Version of the Open Tree of Life taxonomy.
-    version: OpenTreeOfLifeVersion,
+    pub version: OpenTreeOfLifeVersion,
     /// Root of the taxonomy.
-    root_position: u32,
+    pub root_position: u32,
     /// Taxon entries.
-    taxon_entries: Vec<OpenTreeOfLifeTaxonEntry>,
+    pub taxon_entries: Vec<OpenTreeOfLifeTaxonEntry>,
 }
 
 impl Taxonomy for OpenTreeOfLifeTaxonomy {

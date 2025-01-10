@@ -10,6 +10,7 @@ use crate::utils::separator_fixed_reader::SeparatorFixedReader;
 use crate::TaxonEntryBuilder;
 use csv::ReaderBuilder;
 use downloader::Downloader;
+use reqwest::Url;
 use serde::Deserialize;
 use std::io::BufReader;
 
@@ -21,7 +22,7 @@ pub struct OpenTreeOfLifeTaxonomyBuilder {
     /// Set the directory where the taxonomy is stored.
     directory: Option<std::path::PathBuf>,
     /// Root of the taxonomy.
-    root_position: Option<usize>,
+    root_position: Option<u32>,
     /// Taxon entries.
     taxon_entries: Vec<OpenTreeOfLifeTaxonEntry>,
     /// Hashmap from taxon name to position in taxon entries.
@@ -40,7 +41,10 @@ enum SourceInfo {
     GBIF(u32),
     IRMNG(u32),
     Additions(u32, u32, u32),
-    Study713(u32)
+    Study713(u32),
+    H2007,
+    IF(u32),
+    URL(Url),
 }
 
 impl<'de> Deserialize<'de> for SourceInfo {
@@ -49,6 +53,11 @@ impl<'de> Deserialize<'de> for SourceInfo {
         D: serde::Deserializer<'de>,
     {
         let s: String = Deserialize::deserialize(deserializer)?;
+
+        if let Ok(url) = Url::parse(&s) {
+            return Ok(SourceInfo::URL(url));
+        }
+
         let mut parts = s.split(':');
         let source = parts.next().unwrap();
         let id = parts.next().unwrap();
@@ -56,15 +65,18 @@ impl<'de> Deserialize<'de> for SourceInfo {
         if source.starts_with("additions") {
             let mut parts = source.split('-');
             let _source = parts.next().unwrap();
-            let primary_id = u32::from_str_radix(&parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
-            let secondary_id = u32::from_str_radix(&parts.next().unwrap(), 10).map_err(serde::de::Error::custom)?;
+            let primary_id = u32::from_str_radix(&parts.next().unwrap(), 10)
+                .map_err(serde::de::Error::custom)?;
+            let secondary_id = u32::from_str_radix(&parts.next().unwrap(), 10)
+                .map_err(serde::de::Error::custom)?;
             let tertiary_id = u32::from_str_radix(id, 10).map_err(serde::de::Error::custom)?;
             return Ok(SourceInfo::Additions(primary_id, secondary_id, tertiary_id));
         }
 
         match source {
             "silva" => Ok(SourceInfo::Silva(id.to_owned())),
-            "ncbi" | "worms" | "gbif" | "irmng" | "study713" => {
+            "h2007" => Ok(SourceInfo::H2007),
+            "ncbi" | "worms" | "gbif" | "irmng" | "study713" | "if" => {
                 let numeric_id: u32 =
                     u32::from_str_radix(&id, 10).map_err(serde::de::Error::custom)?;
                 match source {
@@ -73,11 +85,12 @@ impl<'de> Deserialize<'de> for SourceInfo {
                     "gbif" => Ok(SourceInfo::GBIF(numeric_id)),
                     "irmng" => Ok(SourceInfo::IRMNG(numeric_id)),
                     "study713" => Ok(SourceInfo::Study713(numeric_id)),
+                    "if" => Ok(SourceInfo::IF(numeric_id)),
                     _ => unreachable!(),
                 }
             }
             unknown => Err(serde::de::Error::custom(format!(
-                "Unknown source: {}",
+                "Unknown source: '{}'",
                 unknown
             ))),
         }
@@ -250,14 +263,9 @@ impl TaxonomyRow {
         .any(|flag| self.flags.contains(flag))
     }
 
-    /// Returns whether the taxa is uncoltured
-    fn is_uncultured(&self) -> bool {
-        self.name == "uncultured"
-    }
-
     /// Returns whether the current taxon should be skipped.
     fn should_skip(&self) -> bool {
-        self.is_no_rank_terminal() || self.has_undesired_flags() || self.is_uncultured()
+        false
     }
 }
 
@@ -349,9 +357,14 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
                 if self.root_position.is_some() {
                     return Err(crate::errors::TaxonomyBuilderError::MultipleRoots);
                 }
-                self.root_position = Some(self.taxon_entries.len());
+                self.root_position = Some(self.taxon_entries.len() as u32);
             }
             self.taxon_entries.push(taxon_entry);
+        }
+
+        // We check that the root position has been set.
+        if self.root_position.is_none() {
+            return Err(crate::errors::TaxonomyBuilderError::NoRoot);
         }
 
         // We check for each taxon entry that has a parent that the parent exists.
@@ -368,6 +381,10 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
             // TODO! Check that parent has a compatible rank!
         }
 
-        unimplemented!("OpenTreeOfLifeTaxonomyBuilder::build")
+        Ok(OpenTreeOfLifeTaxonomy {
+            version,
+            root_position: self.root_position.unwrap(),
+            taxon_entries: self.taxon_entries,
+        })
     }
 }

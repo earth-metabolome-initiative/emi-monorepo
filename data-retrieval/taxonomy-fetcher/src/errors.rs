@@ -15,6 +15,8 @@ pub enum TaxonomyError<TaxonId: TaxonIdentifier> {
 #[derive(Debug)]
 /// Enum defining the errors that can occur when building a taxonomy.
 pub enum TaxonomyBuilderError<TE: TaxonEntry> {
+    /// Whether no root was found.
+    NoRoot,
     /// Whether a taxonomy is disconnected.
     MultipleRoots,
     /// Whether the version was not specified.
