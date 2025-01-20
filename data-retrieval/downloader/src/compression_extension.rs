@@ -99,7 +99,15 @@ impl CompressionExtension {
                 }
             }
             CompressionExtension::Zip => {
-                todo!()
+                if source.extension().map_or(false, |ext| ext == "zip") {
+                    source.with_extension("").to_string_lossy().to_string()
+                } else {
+                    // We add the '.extracted' extension to the file.
+                    source
+                        .with_extension("extracted")
+                        .to_string_lossy()
+                        .to_string()
+                }
             }
             CompressionExtension::Gzip => {
                 if source
@@ -116,7 +124,15 @@ impl CompressionExtension {
                 }
             }
             CompressionExtension::Xz => {
-                todo!()
+                if source.extension().map_or(false, |ext| ext == "xz") {
+                    source.with_extension("").to_string_lossy().to_string()
+                } else {
+                    // We add the '.extracted' extension to the file.
+                    source
+                        .with_extension("extracted")
+                        .to_string_lossy()
+                        .to_string()
+                }
             }
             CompressionExtension::Unknown => source.to_string_lossy().to_string(),
         }
@@ -159,7 +175,20 @@ impl CompressionExtension {
                 tar.unpack(output_path)?;
             }
             CompressionExtension::Zip => {
-                todo!()
+                let mut zip = zip::ZipArchive::new(reader)?;
+                for i in 0..zip.len() {
+                    let mut file = zip.by_index(i)?;
+                    let output_path = output_path.join(file.name());
+                    if file.is_dir() {
+                        std::fs::create_dir_all(output_path)?;
+                    } else {
+                        if let Some(parent) = output_path.parent() {
+                            std::fs::create_dir_all(parent)?;
+                        }
+                        let mut output_file = File::create(output_path)?;
+                        std::io::copy(&mut file, &mut output_file)?;
+                    }
+                }
             }
             CompressionExtension::TarGz => {
                 let decoder = GzDecoder::new(reader);

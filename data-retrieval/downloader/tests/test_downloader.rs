@@ -5,6 +5,7 @@ const DOCUMENT_URL: &'static str = "https://raw.githubusercontent.com/earth-meta
 const DOCUMENT_GZIP_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/document.txt.gz";
 const DOCUMENT_TAR_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/tarball.tar";
 const DOCUMENT_TARGZ_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/tarball.tar.gz";
+const DOCUMENT_ZIP_URL: &'static str = "https://raw.githubusercontent.com/earth-metabolome-initiative/emi-monorepo/refs/heads/inat-taxonomy/data-retrieval/downloader/data/zipped.zip";
 
 #[tokio::test]
 async fn test_document_download() {
@@ -103,4 +104,33 @@ async fn test_document_targz_download() {
 
     // We delete the data_tar directory and its content.
     std::fs::remove_dir_all("data_tar_gzipped").unwrap();
+}
+
+
+#[tokio::test]
+async fn test_document_zip_download() {
+    let task: Downloader = Downloader::default()
+        .show_loading_bar()
+        .extract()
+        .task(
+            Task::try_from(DOCUMENT_ZIP_URL)
+                .unwrap()
+                .target_path(&"zipped.zip"),
+        )
+        .unwrap();
+    let reports = task.execute().await.unwrap();
+
+    let first_report = reports.first().unwrap().clone();
+    assert_eq!(
+        first_report.extraction_report.unwrap().extension,
+        CompressionExtension::Zip
+    );
+
+    // We check that the document has been downloaded and extracted at the
+    // expected location.
+
+    std::fs::remove_file("zipped.zip").unwrap();
+
+    // We delete the zipped directory and its content.
+    std::fs::remove_dir_all("zipped").unwrap();
 }

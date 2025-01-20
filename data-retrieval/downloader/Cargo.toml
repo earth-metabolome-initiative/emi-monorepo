@@ -14,3 +14,4 @@ tokio.workspace = true
 flate2.workspace = true
 tar.workspace = true
 infer.workspace = true
+zip.workspace = true

@@ -3,6 +3,7 @@ use reqwest::Error as ReqwestError;
 use std::{convert::Infallible, fmt::Debug};
 use url::{ParseError, Url};
 use std::io::Error as IoError;
+use zip::result::ZipError;
 
 #[derive(Debug)]
 /// Possible errors encountered during a download task.
@@ -13,6 +14,8 @@ pub enum DownloaderError {
     RequestError(ReqwestError),
     /// When there is an error with the request.
     IoError(IoError),
+    /// When there is an error with the request.
+    ZipError(ZipError),
 }
 
 impl From<DownloaderConfig> for DownloaderError {
@@ -61,5 +64,11 @@ impl From<IoError> for DownloaderError {
 impl From<Infallible> for DownloaderError {
     fn from(_: Infallible) -> Self {
         unreachable!()
+    }
+}
+
+impl From<ZipError> for DownloaderError {
+    fn from(error: ZipError) -> Self {
+        Self::ZipError(error)
     }
 }

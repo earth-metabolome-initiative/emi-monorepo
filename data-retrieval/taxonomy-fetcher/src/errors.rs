@@ -51,6 +51,8 @@ pub enum TaxonEntryBuilderError<TE: TaxonEntry> {
     CircularReferenceError(TE),
     /// When a provided string cannot be converted to a rank.
     UnknownRank(String),
+    /// When a provided string cannot be converted to a taxonomical status.
+    UnknownTaxonomicalStatus(String),
     /// When a build is attempted while the taxon is missing the rank.
     MissingRank,
     /// When a build is attempted while the taxon is missing the name.
@@ -72,6 +74,9 @@ impl<TE: TaxonEntry> std::fmt::Display for TaxonEntryBuilderError<TE> {
                 write!(f, "Circular reference: {}", taxon)
             }
             Self::UnknownRank(rank) => write!(f, "Unknown rank: '{}'", rank),
+            Self::UnknownTaxonomicalStatus(status) => {
+                write!(f, "Unknown taxonomical status: '{}'", status)
+            }
             Self::MissingRank => write!(f, "Missing rank"),
             Self::MissingName => write!(f, "Missing name"),
             Self::MissingId => write!(f, "Missing identifier"),

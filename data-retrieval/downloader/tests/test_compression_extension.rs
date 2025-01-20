@@ -33,3 +33,11 @@ fn test_is_unknown() {
         CompressionExtension::Unknown
     );
 }
+
+#[test]
+fn test_is_zip() {
+    assert_eq!(
+        CompressionExtension::try_from("data/zipped.zip").unwrap(),
+        CompressionExtension::Zip
+    );
+}
