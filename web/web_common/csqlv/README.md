@@ -4,7 +4,7 @@ The CSQLV crate allows to easily integrate CSVs files (and also TSVs and SSVs) i
 
 The crate will generate the necessary SQL to create the tables and relationships between them based on the CSVs files found in a given directory, with minimal metadata in the CSVs themselves. The types and their constraints are inferred from the data in the CSVs: for instance, if all the values in a column are integers smaller than 32767, the crate will infer that the column should be of type `SMALLINT`. Similarly, if no value in a column is empty, the crate will infer that the column should be `NOT NULL`. Same thing applies to `UNIQUE` constraints: if all the values in a column are unique, the crate will infer that the column should be `UNIQUE`.
 
-Integer columns characterized by a sequence of continuos integers starting from 1 will be inferred as `SERIAL` columns, which will automatically generate a sequence and a default value for the column. The crate will automatically determine and dispatch the smallest `SERIAL` type that can hold the values in the column (e.g., `SMALLSERIAL`, `SERIAL`, `BIGSERIAL`).
+Integer columns characterized by a sequence of continous integers starting from 1 will be inferred as `SERIAL` columns, which will automatically generate a sequence and a default value for the column. The crate will automatically determine and dispatch the smallest `SERIAL` type that can hold the values in the column (e.g., `SMALLSERIAL`, `SERIAL`, `BIGSERIAL`).
 
 The documents may also be compressed with `gzip`, in which case the crate will generate the necessary SQL to decompress them before loading them into the database.
 

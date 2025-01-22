@@ -183,7 +183,6 @@ EXTENDED_FONT_AWESOME_ICONS = {
     131236: FontAwesomeIcon('fa-solid', 'fa-virus', 'red'),
 }
 
-
 def download_taxon_document():
     """Download the taxonomy document from the Open Tree of Life project"""
     url = "https://files.opentreeoflife.org/ott/ott3.6/ott3.6.tgz"
