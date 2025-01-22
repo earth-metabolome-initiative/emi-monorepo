@@ -346,21 +346,12 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
             .show_loading_bar()
             .execute()
             .await?;
-
-        // We create a reader where we replace the odd delimiter
-        // that is used in the Open Tree of Life taxonomy, i.e. '\t|\t',
-        // by a comma, in stream mode.
-        let reader = SeparatorFixedReader::new(
-            BufReader::new(std::fs::File::open(version.taxonomy_file())?),
-            "\t",
-            "\t|\t",
-        );
-
+        
         // We read the taxonomy file.
         let mut csv_reader = ReaderBuilder::new()
             .delimiter(b'\t')
             .has_headers(true)
-            .from_reader(reader);
+            .from_reader(BufReader::new(std::fs::File::open(version.taxonomy_file())?));
 
         // We iterate over the records.
         for record in csv_reader.deserialize() {

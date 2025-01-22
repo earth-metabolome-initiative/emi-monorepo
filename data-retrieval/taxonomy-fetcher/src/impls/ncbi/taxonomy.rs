@@ -1,30 +1,29 @@
-//! Submodule providing the implementation of the taxonomy trait for the Open Tree of Life.
+//! Submodule providing the implementation of the taxonomy trait for the NCBI.
 
 use crate::traits::Taxonomy;
 
 use super::{
-    taxon::CatalogOfLifeTaxon, taxon_entry::CatalogOfLifeTaxonEntry,
-    version::CatalogOfLifeVersion,
+    taxon::NCBITaxon, taxon_entry::NCBITaxonEntry,
+    version::NCBIVersion,
 };
 
-#[derive(Debug)]
-/// Version of the Open Tree of Life taxonomy.
-pub struct CatalogOfLifeTaxonomy {
-    /// Version of the Open Tree of Life taxonomy.
-    pub version: CatalogOfLifeVersion,
+/// Version of the NCBI taxonomy.
+pub struct NCBITaxonomy {
+    /// Version of the NCBI taxonomy.
+    pub version: NCBIVersion,
     /// Root of the taxonomy.
     pub root_position: u32,
     /// Taxon entries.
-    pub taxon_entries: Vec<CatalogOfLifeTaxonEntry>,
+    pub taxon_entries: Vec<NCBITaxonEntry>,
 }
 
-impl Taxonomy for CatalogOfLifeTaxonomy {
-    type TaxonEntry = CatalogOfLifeTaxonEntry;
-    type Version = CatalogOfLifeVersion;
-    type Taxon<'a> = CatalogOfLifeTaxon<'a>;
+impl Taxonomy for NCBITaxonomy {
+    type TaxonEntry = NCBITaxonEntry;
+    type Version = NCBIVersion;
+    type Taxon<'a> = NCBITaxon<'a>;
 
     fn name(&self) -> &str {
-        "Open Tree of Life"
+        "NCBI"
     }
 
     fn version(&self) -> Self::Version {
@@ -41,7 +40,7 @@ impl Taxonomy for CatalogOfLifeTaxonomy {
         self.taxon_entries
             .iter()
             .find(|entry| &entry.id == id)
-            .map(|entry| CatalogOfLifeTaxon {
+            .map(|entry| NCBITaxon {
                 taxon_entry: entry,
                 taxonomy: self,
             })
@@ -49,7 +48,7 @@ impl Taxonomy for CatalogOfLifeTaxonomy {
     }
 
     fn root(&self) -> Self::Taxon<'_> {
-        CatalogOfLifeTaxon {
+        NCBITaxon {
             taxon_entry: &self.taxon_entries[self.root_position as usize],
             taxonomy: self,
         }
@@ -58,7 +57,7 @@ impl Taxonomy for CatalogOfLifeTaxonomy {
     fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_ {
         self.taxon_entries
             .iter()
-            .map(move |entry| CatalogOfLifeTaxon {
+            .map(move |entry| NCBITaxon {
                 taxon_entry: entry,
                 taxonomy: self,
             })

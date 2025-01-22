@@ -31,14 +31,40 @@ impl<'a, R: BufRead> Read for SeparatorFixedReader<'a, R> {
             return Ok(0); // EOF
         }
 
-
         let replaced = buffer.replace(&self.needle, &self.separator);
 
         let bytes = replaced.as_bytes();
-        let copy_len = bytes.len().min(buf.len());
+        let len = bytes.len();
+        let to_copy = std::cmp::min(len, buf.len());
 
-        buf[..copy_len].copy_from_slice(&bytes[..copy_len]);
+        buf[..to_copy].copy_from_slice(&bytes[..to_copy]);
 
-        Ok(copy_len)
+        Ok(to_copy)
+    }
+}
+
+/// Implements BufRead for `SeparatorFixedReader`.
+impl<'a, R: BufRead> BufRead for SeparatorFixedReader<'a, R> {
+    fn fill_buf(&mut self) -> std::io::Result<&[u8]> {
+        self.reader.fill_buf()
+    }
+
+    fn consume(&mut self, amt: usize) {
+        self.reader.consume(amt)
+    }
+
+    fn read_line(&mut self, buf: &mut String) -> std::io::Result<usize> {
+        let mut buffer = String::new();
+        let bytes_read = self.reader.read_line(&mut buffer)?;
+
+        if bytes_read == 0 {
+            return Ok(0); // EOF
+        }
+
+        let replaced = buffer.replace(&self.needle, &self.separator);
+
+        buf.push_str(&replaced);
+
+        Ok(replaced.len())
     }
 }

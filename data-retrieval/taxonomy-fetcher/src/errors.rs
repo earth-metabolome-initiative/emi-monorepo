@@ -31,6 +31,13 @@ pub enum TaxonomyBuilderError<TE: TaxonEntry> {
     TaxonEntryBuilderError(TaxonEntryBuilderError<TE>),
 }
 
+impl<TE: TaxonEntry> TaxonomyBuilderError<TE> {
+    /// Returns whether the error is a missing version error.
+    pub fn is_multiple_roots(&self) -> bool {
+        matches!(self, Self::MultipleRoots)
+    }
+}
+
 #[derive(Debug)]
 /// Enum defining the errors that can occur when building a taxon.
 pub enum TaxonEntryBuilderError<TE: TaxonEntry> {
@@ -53,6 +60,8 @@ pub enum TaxonEntryBuilderError<TE: TaxonEntry> {
     UnknownRank(String),
     /// When a provided string cannot be converted to a taxonomical status.
     UnknownTaxonomicalStatus(String),
+    /// When a provided string cannot be converted to a taxonomical name class.
+    UnknownTaxonomicalNameClass(String),
     /// When a build is attempted while the taxon is missing the rank.
     MissingRank,
     /// When a build is attempted while the taxon is missing the name.
@@ -76,6 +85,9 @@ impl<TE: TaxonEntry> std::fmt::Display for TaxonEntryBuilderError<TE> {
             Self::UnknownRank(rank) => write!(f, "Unknown rank: '{}'", rank),
             Self::UnknownTaxonomicalStatus(status) => {
                 write!(f, "Unknown taxonomical status: '{}'", status)
+            }
+            Self::UnknownTaxonomicalNameClass(name_class) => {
+                write!(f, "Unknown taxonomical name class: '{}'", name_class)
             }
             Self::MissingRank => write!(f, "Missing rank"),
             Self::MissingName => write!(f, "Missing name"),
