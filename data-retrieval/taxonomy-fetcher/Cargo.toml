@@ -8,8 +8,8 @@ zip = "0.6"
 tempfile = "3"
 openssl = { version = "0.10", features = ["vendored"] }
 tar = "0.4"
-chrono = "0.4.39"
 downloader = {path = "../downloader"}
+chrono.workspace = true
 tokio.workspace = true
 reqwest.workspace = true
 serde.workspace = true

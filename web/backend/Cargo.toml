@@ -13,7 +13,7 @@ description = "Backend for the Earth Metabolome Initiative"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = { version = "0.4.31", features = ["serde"] }
+chrono.workspace = true
 diesel.workspace = true
 serde = { version = "1.0.195", features = ["derive"] }
 sqlx = { version = "0.7.3", features = ["runtime-async-std-native-tls", "postgres", "chrono", "uuid"] }

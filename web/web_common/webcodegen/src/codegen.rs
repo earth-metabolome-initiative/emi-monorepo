@@ -185,6 +185,11 @@ impl<'a> Codegen<'a> {
 
         let below_16_columns = if table_idents_below_16_columns.is_empty() {
             TokenStream::new()
+        } else if table_idents_below_16_columns.len() == table_idents_below_32_columns.len() {
+            quote! {
+                #[cfg(feature = "diesel")]
+                diesel::allow_tables_to_appear_in_same_query!( #( #table_idents_below_16_columns ),* );
+            }
         } else {
             quote! {
                 #[cfg(all(feature = "diesel", not(feature = "32-column-tables")))]

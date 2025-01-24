@@ -103,9 +103,6 @@ pub async fn main() {
     // And obtain a connection to the database
     let mut conn = establish_connection_to_postgres();
 
-    // We write the SQL to a file so we can debug it
-    std::fs::write("sql.sql", &sql).unwrap();
-
     // We execute the SQL
     conn.batch_execute(&sql).unwrap();
 
