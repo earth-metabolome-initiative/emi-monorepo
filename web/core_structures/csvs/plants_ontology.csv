@@ -1,8 +1,0 @@
-name,description,ontology_id
-root,"Roots function in the absorption of water and inorganic nutrients, anchoring the plant body to the substrate and supporting it, storage of food and nutrients, and vegetative reproduction.",PO:0009005
-leaf,"Leaves are the main photosynthetic organs of the plant. They are the primary sites of photosynthesis, the process by which plants synthesize food.",PO:0025034
-stem,"Stems are the main structural axes of the plant body. They are the primary organs of the shoot system, and they provide structural support, conduct water, minerals, and food, and store food.",PO:0009047
-flower,"The flower is the reproductive unit of the plant. It is the site where the reproductive organs are located.",PO:0009046
-fruit,"The fruit is the mature ovary of a flowering plant. It usually contains seeds, which are the plant's means of reproduction.",PO:0009001
-seed,"A seed is a plant embryo and food reserve enclosed in a protective outer covering called a seed coat.",PO:0009010
-whole organism,"The whole organism is the complete individual plant, including all of its parts.",PO:0000003

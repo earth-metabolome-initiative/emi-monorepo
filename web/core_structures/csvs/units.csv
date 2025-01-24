@@ -1,4 +1,4 @@
-name,unit,icon,color
+name,unit,icons.name,colors.name
 Kilogram,kg,scale-balanced,blue
 Gram,g,scale-balanced,blue
 Milligram,mg,scale-balanced,blue

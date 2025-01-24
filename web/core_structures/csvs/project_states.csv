@@ -1,4 +1,4 @@
-name,description,font_awesome_icon,icon_color
+name,description,icons.name,colors.name
 Active,The project is currently active.,check,green
 Cancelled,The project has been cancelled.,ban,red
 Completed,The project has been completed.,circle-check,blue

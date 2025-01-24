@@ -25,7 +25,8 @@ tokio = {version ="1.41.0", features = ["full"]}
 flate2 = "1.0.35"
 tar = "0.4.43"
 infer = "0.16.0"
-csv = "1.2"
+csv = "1.3.1"
+diesel = { version = "2.2.5", features = ["serde_json", "postgres", "r2d2", "chrono", "uuid", "extras"] } # uuidv07
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 strum = {version="0.26.3", features=["derive"]}
@@ -34,3 +35,5 @@ zip = "2.2.2"
 taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
 csqlv = { path = "web/web_common/csqlv" }
 font_awesome = {path = "utils/font_awesome"}
+testcontainers = {version="0.23.1"}
+webcodegen = { path = "web/web_common/webcodegen", features = ["postgres_17"] }
