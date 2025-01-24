@@ -1,0 +1,23 @@
+[package]
+name = "core_structures"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diesel.workspace = true
+diesel-async.workspace = true
+serde.workspace = true
+
+[build-dependencies]
+taxonomy-fetcher.workspace = true
+csqlv.workspace = true
+tokio.workspace = true
+font_awesome.workspace = true
+diesel.workspace = true
+testcontainers.workspace = true
+webcodegen.workspace = true
+
+[features]
+default = ["diesel", "serde"]
+serde = []
+diesel = []

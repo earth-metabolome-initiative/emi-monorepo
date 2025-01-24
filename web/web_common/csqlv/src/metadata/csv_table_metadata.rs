@@ -86,9 +86,9 @@ impl CSVTableMetadata {
             .any(|col: &CSVColumnMetadata| col.primary_key)
         {
             columns.push(CSVColumnMetadata::new_primary_key(
-                if number_of_rows < 32767 {
+                if number_of_rows < i16::MAX as u64 {
                     DataType::SmallSerial
-                } else if number_of_rows < 2147483647 {
+                } else if number_of_rows < i32::MAX as u64 {
                     DataType::Serial
                 } else {
                     DataType::BigSerial

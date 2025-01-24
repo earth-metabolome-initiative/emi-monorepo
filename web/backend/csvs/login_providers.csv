@@ -1,2 +1,0 @@
-name,font_awesome_icon,color,client_id_var_name,redirect_uri_var_name,oauth_url,scope
-GitHub,github,black,GITHUB_CLIENT_ID,GITHUB_REDIRECT_URI,https://github.com/login/oauth/authorize,user:email

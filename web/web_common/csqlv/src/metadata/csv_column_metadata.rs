@@ -56,15 +56,19 @@ impl TryFrom<CSVColumnMetadataBuilder> for CSVColumnMetadata {
             return Err(CSVSchemaError::EmptyColumn);
         }
 
-        let mut data_type = builder
+        let Some(mut data_type) = builder
             .data_type_counts
             .into_iter()
+            .filter(|(data_type, _)| !data_type.is_null())
             .max_by_key(|(data_type, count)| (*count, Reverse(data_type.min_dimension())))
-            .map(|(data_type, _)| data_type)
-            .unwrap();
+            .map(|(data_type, _)| data_type) else {
+                return Err(CSVSchemaError::EmptyColumn);
+            };
 
         if builder.sequential {
             data_type = data_type.into_serial()?;
+            builder.primary_key = true;
+        } else if builder.unique && !builder.nullable && data_type.is_key_like() {
             builder.primary_key = true;
         }
 

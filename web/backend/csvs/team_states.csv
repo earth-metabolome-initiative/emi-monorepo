@@ -1,4 +1,0 @@
-name,description,font_awesome_icon,icon_color
-Active,The team is currently active.,check,green
-Dissolved,The team has been dissolved,ban,red
-Paused,The team is currently paused.,box-archive,yellow

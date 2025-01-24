@@ -1,6 +1,0 @@
-name,description,font_awesome_icon,icon_color
-Active,The project is currently active.,check,green
-Cancelled,The project has been cancelled.,ban,red
-Completed,The project has been completed.,circle-check,blue
-Paused,The project is currently paused.,box-archive,yellow
-Postponed,The project has been postponed.,clock,orange

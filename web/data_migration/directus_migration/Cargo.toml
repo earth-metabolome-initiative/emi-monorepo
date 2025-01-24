@@ -7,7 +7,7 @@ edition = "2021"
 diesel-async = {version="0.5.1", features = ["postgres", "pool"]}
 uuid = {version="1.11.0", features = ["serde", "v4"]}
 serde_json = "1.0.132"
-chrono = {version="0.4.38", features = ["serde"]}
+chrono.workspace = true
 diesel = { version = "2.2.4", features = ["postgres", "chrono", "uuid", "serde_json", "64-column-tables"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 

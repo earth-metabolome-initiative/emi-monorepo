@@ -154,4 +154,12 @@ impl DataType {
             DataType::Boolean => "BOOLEAN".to_owned(),
         }
     }
+
+    /// Returns whether the data type may be used as a primary key.
+    pub fn is_key_like(&self) -> bool {
+        matches!(
+            self,
+            DataType::SmallInt | DataType::Integer | DataType::BigInt | DataType::Uuid
+        )
+    }
 }
