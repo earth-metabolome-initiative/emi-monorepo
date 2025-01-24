@@ -1,6 +1,19 @@
 //! Submodule providing a trait defining a taxonomy.
 
+use serde::Serialize;
+
+use super::TaxonEntry;
 use crate::errors::TaxonomyError;
+use crate::traits::taxon::Taxon;
+
+#[derive(Debug, Serialize)]
+struct CSVTaxonEntry<TE: TaxonEntry> {
+    id: TE::Id,
+    name: String,
+    parent_id: Option<TE::Id>,
+    #[serde(rename = "ranks.name")]
+    rank: TE::Rank,
+}
 
 /// Trait defining a taxonomy.
 pub trait Taxonomy {
@@ -35,6 +48,26 @@ pub trait Taxonomy {
 
     /// Iterates the taxon entries.
     fn taxons(&self) -> impl Iterator<Item = Self::Taxon<'_>> + '_;
+
+    /// Writes the taxonomy to a CSV file.
+    fn to_csv(
+        &self,
+        path: &str,
+    ) -> Result<(), TaxonomyError<<Self::TaxonEntry as super::TaxonEntry>::Id>> {
+        let mut writer = csv::Writer::from_path(path)?;
+
+        for taxon in self.taxons() {
+            let taxon_entry: CSVTaxonEntry<Self::TaxonEntry> = CSVTaxonEntry {
+                id: *taxon.id(),
+                name: taxon.name().to_string(),
+                parent_id: taxon.parent_id().map(|id| *id),
+                rank: taxon.rank().clone(),
+            };
+            writer.serialize(taxon_entry)?;
+        }
+
+        Ok(())
+    }
 
     /// Returns the root of the taxonomy.
     fn root(&self) -> Self::Taxon<'_>;

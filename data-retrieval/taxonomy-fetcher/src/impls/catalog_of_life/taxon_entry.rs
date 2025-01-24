@@ -2,6 +2,8 @@
 
 use std::{fmt::Display, str::FromStr};
 
+use serde::Serialize;
+
 use crate::{impls::generic::taxon_entry::GenericTaxonEntry, TaxonIdentifier};
 
 use super::rank::CatalogOfLifeRank;
@@ -77,6 +79,15 @@ impl<'de> serde::Deserialize<'de> for COLId {
         let s = String::deserialize(deserializer)?;
 		COLId::from_str(&s).map_err(serde::de::Error::custom)
     }
+}
+
+impl Serialize for COLId {
+	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+	where
+		S: serde::Serializer,
+	{
+		serializer.serialize_str(&self.to_string())
+	}
 }
 
 /// A taxon entry for the Catalog of Life taxonomy.

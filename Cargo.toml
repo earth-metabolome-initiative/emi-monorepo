@@ -12,7 +12,7 @@ members = [
     "web/data_migration/directus_migration",
     "web/web_common/snake-case-sanitizer", 
     "data-retrieval/taxonomy-fetcher",
-    "data-retrieval/downloader",
+    "data-retrieval/downloader", "web/core_structures", "utils/font_awesome",
 ]
 
 [workspace.dependencies]
@@ -25,8 +25,12 @@ tokio = {version ="1.41.0", features = ["full"]}
 flate2 = "1.0.35"
 tar = "0.4.43"
 infer = "0.16.0"
+csv = "1.2"
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 strum = {version="0.26.3", features=["derive"]}
 strum_macros = "0.26.4"
 zip = "2.2.2"
+taxonomy-fetcher = { path = "data-retrieval/taxonomy-fetcher" }
+csqlv = { path = "web/web_common/csqlv" }
+font_awesome = {path = "utils/font_awesome"}

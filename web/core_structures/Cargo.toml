@@ -1,0 +1,11 @@
+[package]
+name = "core_structures"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[build-dependencies]
+taxonomy-fetcher.workspace = true
+csqlv.workspace = true
+tokio.workspace = true

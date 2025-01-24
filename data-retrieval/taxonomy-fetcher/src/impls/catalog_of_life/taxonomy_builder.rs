@@ -7,11 +7,9 @@ use super::{
     taxonomy::CatalogOfLifeTaxonomy, version::CatalogOfLifeVersion,
 };
 use crate::traits::TaxonomyBuilder;
-use crate::utils::separator_fixed_reader::SeparatorFixedReader;
 use crate::TaxonEntryBuilder;
 use csv::ReaderBuilder;
 use downloader::Downloader;
-use reqwest::Url;
 use serde::Deserialize;
 use std::io::BufReader;
 use std::str::FromStr;

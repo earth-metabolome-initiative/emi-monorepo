@@ -6,7 +6,18 @@
 #![deny(unused_import_braces)]
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
+use strum::IntoEnumIterator;
 
+#[derive(Debug, serde::Serialize)]
+/// Struct representing a row in the icon CSV.
+struct IconRow<'a> {
+    /// Name of the icon.
+    name: &'a str,
+    /// Description of the icon.
+    description: &'a str,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, strum::EnumIter)]
 /// Struct representing a Font Awesome icon.
 pub enum Icon {
     Zero,
@@ -4417,5 +4428,20 @@ impl Icon {
             Icon::Youtube => "The logo of YouTube, a video-sharing platform.",
             Icon::Z => "A capital letter 'Z', representing the letter or sleep.",
         }
+    }
+
+    /// Writes the Font Awesome icons set to a csv.
+    pub fn to_csv(path: &str) -> Result<(), std::io::Error> {
+        let mut writer = csv::Writer::from_path(path)?;
+
+        for icon in Icon::iter() {
+            let row = IconRow {
+                name: icon.class(),
+                description: icon.description(),
+            };
+            writer.serialize(row)?;
+        }
+
+        writer.flush()
     }
 }

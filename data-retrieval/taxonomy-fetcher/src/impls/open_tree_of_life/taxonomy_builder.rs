@@ -6,7 +6,6 @@ use super::{
     taxonomy::OpenTreeOfLifeTaxonomy, version::OpenTreeOfLifeVersion,
 };
 use crate::traits::TaxonomyBuilder;
-use crate::utils::separator_fixed_reader::SeparatorFixedReader;
 use crate::TaxonEntryBuilder;
 use csv::ReaderBuilder;
 use downloader::Downloader;
@@ -238,59 +237,6 @@ struct TaxonomyRow {
 }
 
 impl TaxonomyRow {
-
-    /// Returns whether this taxonomical entry has undesired flags.
-    ///
-    /// These flags include those defined [here](https://files.opentreeoflife.org/synthesis/opentree9.1/output/index.html).
-    ///
-    /// * barren
-    /// * environmental
-    /// * environmental_inherited
-    /// * extinct
-    /// * extinct_inherited
-    /// * hidden
-    /// * hidden_inherited
-    /// * hybrid
-    /// * incertae_sedis
-    /// * incertae_sedis_inherited
-    /// * inconsistent
-    /// * major_rank_conflict
-    /// * major_rank_conflict_inherited
-    /// * merged
-    /// * not_otu
-    /// * unclassified
-    /// * unclassified_inherited
-    /// * unplaced
-    /// * unplaced_inherited
-    /// * viral
-    /// * was_container
-    fn has_undesired_flags(&self) -> bool {
-        [
-            OTOLFlag::Barren,
-            OTOLFlag::IncertaeSedis,
-            OTOLFlag::Merged,
-            OTOLFlag::NotOTU,
-            OTOLFlag::WasContainer,
-            OTOLFlag::Extinct,
-            OTOLFlag::ExtinctInherited,
-            OTOLFlag::Hidden,
-            OTOLFlag::HiddenInherited,
-            OTOLFlag::Hybrid,
-            OTOLFlag::Inconsistent,
-            OTOLFlag::MajorRankConflict,
-            OTOLFlag::MajorRankConflictInherited,
-            OTOLFlag::Unclassified,
-            OTOLFlag::UnclassifiedInherited,
-            OTOLFlag::Unplaced,
-            OTOLFlag::UnplacedInherited,
-            OTOLFlag::Viral,
-            OTOLFlag::Environmental,
-            OTOLFlag::EnvironmentalInherited,
-        ]
-        .iter()
-        .any(|flag| self.flags.contains(flag))
-    }
-
     /// Returns whether the current taxon should be skipped.
     fn should_skip(&self) -> bool {
         false

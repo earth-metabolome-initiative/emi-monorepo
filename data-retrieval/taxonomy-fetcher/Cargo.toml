@@ -7,8 +7,6 @@ edition = "2021"
 zip = "0.6"
 tempfile = "3"
 openssl = { version = "0.10", features = ["vendored"] }
-csv = "1.2"
-flate2 = "1.0"
 tar = "0.4"
 chrono = "0.4.39"
 downloader = {path = "../downloader"}
@@ -18,3 +16,6 @@ serde.workspace = true
 strum.workspace = true
 strum_macros.workspace = true
 indicatif.workspace = true
+font_awesome.workspace = true
+csv.workspace = true
+flate2.workspace = true

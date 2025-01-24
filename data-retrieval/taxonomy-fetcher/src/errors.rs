@@ -10,6 +10,8 @@ use std::io::Error as IoError;
 pub enum TaxonomyError<TaxonId: TaxonIdentifier> {
     /// When the taxonomy identifier is not found.
     TaxonNotFound(TaxonId),
+    /// Whether errors have occurred while reading a CSV/TSV file.
+    CsvError(CsvError),
 }
 
 #[derive(Debug)]
@@ -111,6 +113,12 @@ impl<TE: TaxonEntry> From<CsvError> for TaxonomyBuilderError<TE> {
 impl<TE: TaxonEntry> From<IoError> for TaxonomyBuilderError<TE> {
     fn from(error: IoError) -> Self {
         Self::IoError(error)
+    }
+}
+
+impl<TaxonId: TaxonIdentifier> From<CsvError> for TaxonomyError<TaxonId> {
+    fn from(error: CsvError) -> Self {
+        Self::CsvError(error)
     }
 }
 
