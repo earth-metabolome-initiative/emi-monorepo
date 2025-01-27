@@ -425,6 +425,29 @@ table! {
 }
 
 table! {
+    pg_trigger (oid) {
+        oid -> Oid,
+        tgrelid -> Oid,
+        tgparentid -> Oid,
+        tgname -> Text,
+        tgfoid -> Oid,
+        tgtype -> SmallInt,
+        tgenabled -> Char,
+        tgisinternal -> Bool,
+        tgconstrrelid -> Oid,
+        tgconstrindid -> Oid,
+        tgconstraint -> Oid,
+        tgdeferrable -> Bool,
+        tginitdeferred -> Bool,
+        tgnargs -> SmallInt,
+        tgattr -> Array<SmallInt>,
+        tgargs -> Bytea,
+        tgoldtable -> Nullable<Text>,
+        tgnewtable -> Nullable<Text>,
+    }
+}
+
+table! {
     pg_enum (oid) {
         oid -> Oid,
         enumtypid -> Oid,
@@ -448,6 +471,7 @@ allow_tables_to_appear_in_same_query!(
     pg_proc,
     pg_type,
     pg_enum,
+    pg_trigger,
     pg_operator,
     pg_attribute,
     pg_namespace

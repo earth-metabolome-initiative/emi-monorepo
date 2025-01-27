@@ -16,6 +16,8 @@ use crate::Column;
 use crate::Index;
 use crate::TableConstraint;
 
+use super::PgTrigger;
+
 /// Reserved Rust words that cannot be used as identifiers.
 pub const RESERVED_RUST_WORDS: [&str; 49] = [
     "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
@@ -49,17 +51,17 @@ pub struct Table {
 
 impl Table {
     /// Returns the correct diesel feature flag for the number of columns in the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A string representing the diesel feature flag for the number of columns in the table.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the number of columns exceeds 128.
     pub fn diesel_feature_flag_name(
         &self,
@@ -83,17 +85,17 @@ impl Table {
     }
 
     /// Returns the correct diesel feature flag for the number of columns in the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `TokenStream` representing the diesel feature flag for the number of columns in the table.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the diesel feature flag name cannot be generated.
     pub fn diesel_column_feature_flag(
         &self,
@@ -116,13 +118,13 @@ impl Table {
     }
 
     /// Returns the name of the struct converted from the table name.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the camel case name cannot be generated.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A string representing the name of the struct converted from the table name.
     pub fn struct_name(&self) -> Result<String, WebCodeGenError> {
         let sanitizer = SnakeCaseSanizer::default()
@@ -133,15 +135,15 @@ impl Table {
     }
 
     /// Returns the sanitized snake case name of the table.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the snake case name cannot be generated.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A string representing the sanitized snake case name of the table.
-    /// 
+    ///
     pub fn snake_case_name(&self) -> Result<String, WebCodeGenError> {
         let sanitizer = SnakeCaseSanizer::default()
             .include_defaults()
@@ -151,38 +153,38 @@ impl Table {
     }
 
     /// Returns whether the table has a sanitized snake case name.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the snake case name cannot be generated.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A boolean indicating whether the table has a sanitized snake case name.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the snake case name cannot be generated.
-    /// 
+    ///
     pub fn has_snake_case_name(&self) -> Result<bool, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
         Ok(snake_case_name != self.table_name)
     }
 
     /// Returns the sanitized snake case syn Ident of the table.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the snake case name cannot be generated.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `Ident` representing the sanitized snake case name of the table.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the snake case name cannot be generated.
-    /// 
+    ///
     pub fn snake_case_ident(&self) -> Result<Ident, WebCodeGenError> {
         let snake_case_name = self.snake_case_name()?;
         if RESERVED_RUST_WORDS.contains(&snake_case_name.as_str()) {
@@ -281,23 +283,23 @@ impl Table {
     }
 
     /// Returns the Syn `TokenStream` for the diesel schema definition for the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `TokenStream` representing the diesel schema definition for the table.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the snake case name cannot be generated.
     /// * If the columns cannot be loaded from the database.
     /// * If the diesel type for a column cannot be loaded.
     /// * If the primary key columns cannot be loaded from the database.
     /// * If the diesel feature flag name cannot be generated.
-    /// 
+    ///
     pub fn to_schema(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let table_schema = Ident::new(&self.table_schema, proc_macro2::Span::call_site());
         let original_table_name = &self.table_name;
@@ -371,19 +373,19 @@ impl Table {
     }
 
     /// Returns the primary key identifiers for the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of `Ident` representing the primary key identifiers.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the primary key columns cannot be loaded from the database.
-    /// 
+    ///
     pub fn primary_key_identifiers(
         &self,
         conn: &mut PgConnection,
@@ -395,19 +397,19 @@ impl Table {
     }
 
     /// Returns the primary key decorator to be used for this table, if any.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `TokenStream` representing the primary key decorator.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the primary key columns cannot be loaded from the database.
-    /// 
+    ///
     pub fn primary_key_decorator(
         &self,
         conn: &mut PgConnection,
@@ -426,17 +428,17 @@ impl Table {
     }
 
     /// Returns the diesel derives supported by the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of `Type` representing the diesel derives.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the primary key columns cannot be loaded from the database.
     pub fn diesel_derives(&self, conn: &mut PgConnection) -> Result<Vec<Type>, WebCodeGenError> {
         let mut derives = Vec::new();
@@ -452,17 +454,17 @@ impl Table {
     }
 
     /// Returns the diesel derives decorator for the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `TokenStream` representing the diesel derives decorator.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the diesel derives cannot be loaded.
     pub fn diesel_derives_decorator(
         &self,
@@ -480,19 +482,19 @@ impl Table {
     }
 
     /// Returns the Syn `TokenStream` for the struct definition and associated methods.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `TokenStream` representing the struct definition and associated methods.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the number of columns exceeds 128.
-    /// 
+    ///
     pub fn to_syn(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         if self.columns(conn)?.len() > 128 {
             return Err(WebCodeGenError::ExcessiveNumberOfColumns(
@@ -653,21 +655,21 @@ impl Table {
     }
 
     /// Returns the Syn `TokenStream` for the delete method of the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `TokenStream` representing the delete method.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the snake case name cannot be generated.
     /// * If the primary key columns cannot be loaded from the database.
     /// * If the diesel feature flag name cannot be generated.
-    /// 
+    ///
     pub fn delete_method(&self, conn: &mut PgConnection) -> Result<TokenStream, WebCodeGenError> {
         let sanitized_table_name =
             Ident::new(&self.snake_case_name()?, proc_macro2::Span::call_site());
@@ -701,36 +703,40 @@ impl Table {
     }
 
     /// Returns whether the table has user-associated columns.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A boolean indicating whether the table has user-associated columns.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the columns cannot be loaded from the database.
-    pub fn has_session_user_generated_columns(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
-        Ok(self.columns(conn)?
+    pub fn has_session_user_generated_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        Ok(self
+            .columns(conn)?
             .iter()
             .any(|column| column.is_session_user_generated(conn)))
     }
 
     /// Returns the Syn `TokenStream` for the implementation of the `InsertableVariant` trait.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A `TokenStream` representing the implementation of the `InsertableVariant` trait.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the struct name cannot be generated.
     pub fn insert_trait_impls(
         &self,
@@ -840,17 +846,17 @@ impl Table {
     }
 
     /// Returns the primary key columns for the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of columns.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the primary key columns cannot be loaded from the database.
     pub fn update_trait_impls(
         &self,
@@ -996,19 +1002,19 @@ impl Table {
     }
 
     /// Returns the UNIQUE constraint indices for the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of indices.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the indices cannot be loaded from the database.
-    /// 
+    ///
     pub fn unique_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
         use crate::schema::pg_indexes;
         pg_indexes::table
@@ -1019,17 +1025,17 @@ impl Table {
     }
 
     /// Returns the GIN constraint indices for the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of indices.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the indices cannot be loaded from the database.
     pub fn gin_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
         use crate::schema::pg_indexes;
@@ -1041,17 +1047,17 @@ impl Table {
     }
 
     /// Returns the GIST constraint indices for the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of indices.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the indices cannot be loaded from the database.
     pub fn gist_indexes(&self, conn: &mut PgConnection) -> Result<Vec<Index>, DieselError> {
         use crate::schema::pg_indexes;
@@ -1063,19 +1069,19 @@ impl Table {
     }
 
     /// Returns the primary key columns for the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
     /// * `table_catalog` - The table catalog.
     /// * `table_schema` - The table schema.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of all tables in the database.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the tables cannot be loaded from the database.
     pub fn load_all(
         conn: &mut PgConnection,
@@ -1107,17 +1113,17 @@ impl Table {
     }
 
     /// Returns the columns of the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of columns.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the columns cannot be loaded from the database.
     pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
         use crate::schema::columns;
@@ -1129,18 +1135,18 @@ impl Table {
     }
 
     /// Returns the column by name.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
     /// * `column_name` - The name of the column.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// The column.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the column cannot be loaded from the database.
     pub fn column_by_name(
         &self,
@@ -1157,17 +1163,17 @@ impl Table {
     }
 
     /// Returns the groups of columns defining unique constraints.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of vectors of columns.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the provided database connection is invalid.
     pub fn unique_columns(
         &self,
@@ -1249,38 +1255,38 @@ impl Table {
     }
 
     /// Returns whether the table has primary keys.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A boolean indicating whether the table has primary keys.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the primary key columns cannot be loaded from the database.
-    /// 
+    ///
     pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         self.primary_key_columns(conn)
             .map(|columns| !columns.is_empty())
     }
 
     /// Returns the columns composing the primary keys.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of columns.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the primary key columns cannot be loaded from the database.
-    /// 
+    ///
     pub fn primary_key_columns(
         &self,
         conn: &mut PgConnection,
@@ -1348,17 +1354,17 @@ impl Table {
     }
 
     /// Returns the check constraints for the table.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Returns
-    /// 
+    ///
     /// A vector of check constraints.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the check constraints cannot be loaded from the database.
     pub fn check_constraints(
         &self,
@@ -1385,5 +1391,30 @@ impl Table {
             .filter(table_constraints::table_catalog.eq(&self.table_catalog))
             .select(CheckConstraint::as_select())
             .load::<CheckConstraint>(conn)
+    }
+
+    /// Returns the list of Triggers associates to the current table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A vector of triggers.
+    ///
+    /// # Errors
+    ///
+    /// * If the triggers cannot be loaded from the database.
+    ///
+    pub fn triggers(&self, conn: &mut PgConnection) -> Result<Vec<PgTrigger>, DieselError> {
+        use crate::schema::{pg_class, pg_namespace, pg_trigger};
+        pg_trigger::table
+            .inner_join(pg_class::table.on(pg_trigger::tgrelid.eq(pg_class::oid)))
+            .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
+            .filter(pg_class::relname.eq(&self.table_name))
+            .filter(pg_namespace::nspname.eq(&self.table_schema))
+            .select(PgTrigger::as_select())
+            .load::<PgTrigger>(conn)
     }
 }

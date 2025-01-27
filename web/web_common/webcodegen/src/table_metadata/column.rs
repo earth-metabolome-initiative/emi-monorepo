@@ -250,12 +250,19 @@ impl Column {
             || self.is_identity.as_ref().map_or(false, |i| i == "YES")
     }
 
+    /// Returns whether the column contains the update user and is defined by the SESSION user
     pub fn is_updated_by(&self, conn: &mut PgConnection) -> bool {
         self.column_name == "updated_by" && self.is_session_user_generated(conn)
     }
 
+    /// Returns whether the column contains the creation user and is defined by the SESSION user
     pub fn is_created_by(&self, conn: &mut PgConnection) -> bool {
         self.column_name == "created_by" && self.is_session_user_generated(conn)
+    }
+
+    /// Returns whether the a timestamp which has to be updated at each update operation
+    pub fn is_updated_at(&self) -> bool {
+        self.column_name == "updated_at" && self.data_type == "timestamp without time zone"
     }
 
     pub fn is_session_user_generated(&self, conn: &mut PgConnection) -> bool {

@@ -16,6 +16,7 @@ mod pg_type;
 mod pg_attribute;
 mod pg_class;
 mod pg_enum;
+mod pg_trigger;
 
 pub use check_constraint::CheckConstraint;
 pub use column::Column;
@@ -33,3 +34,4 @@ pub use pg_type::PgType;
 pub use pg_attribute::PgAttribute;
 pub use pg_class::PGClass;
 pub use pg_enum::PgEnum;
+pub use pg_trigger::PgTrigger;

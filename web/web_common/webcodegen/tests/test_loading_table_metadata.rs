@@ -2,18 +2,18 @@ use diesel::connection::SimpleConnection;
 use diesel::pg::PgConnection;
 use diesel::Connection;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use std::path::Path;
 use testcontainers::{
     core::{IntoContainerPort, WaitFor},
     runners::AsyncRunner,
     ContainerAsync, GenericImage, ImageExt,
 };
-use std::path::Path;
 
 mod utils;
 
+use utils::add_main_to_file;
 use webcodegen::errors::WebCodeGenError;
 use webcodegen::*;
-use utils::add_main_to_file;
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./test_migrations");
 const DATABASE_NAME: &str = "test_db";
@@ -124,11 +124,46 @@ async fn test_user_table() {
     test_code_generation_methods(&mut conn).await.unwrap();
     test_create_roles_tables(&mut conn).await.unwrap();
 
+    // We attempt to create the update triggers for the tables
+    // that have an `updated_at` column
+    let create_updated_at_triggers_sql =
+        Table::create_update_triggers(&mut conn, DATABASE_NAME, None).unwrap();
+
+    assert!(
+        !create_updated_at_triggers_sql.is_empty(),
+        "Expected non-empty query string"
+    );
+
+    conn.batch_execute(&create_updated_at_triggers_sql).unwrap();
+
     // We try to load all elements of each type, so to ensure
     // that the structs are actually compatible with the schema
     // of PostgreSQL
     let all_tables = Table::load_all(&mut conn, DATABASE_NAME, None).unwrap();
     assert!(!all_tables.is_empty());
+
+    // We check that all tables that have the `updated_at` column also have the
+    // trigger to update the column
+    all_tables.iter().for_each(|table| {
+        if table.has_updated_at_column(&mut conn).unwrap() {
+            assert!(
+                table.updated_at_trigger_exists(&mut conn).unwrap(),
+                "Table {table_name} does not have the updated_at trigger",
+                table_name = table.table_name
+            );
+        }
+    });
+
+    // We check specifically that the `teams` table has the `updated_at` column
+    // and the trigger to update it
+    let teams = Table::load(&mut conn, "teams", None, DATABASE_NAME).unwrap();
+    assert!(
+        teams.has_updated_at_column(&mut conn).unwrap(),
+        "Table teams does not have the updated_at column, but has columns: {:?}",
+        teams.columns(&mut conn).unwrap()
+    );
+    assert!(teams.updated_at_trigger_exists(&mut conn).unwrap());
+
     let _all_columns = Column::load_all(&mut conn);
 
     let all_unique_indexes = Index::load_all_unique(&mut conn, None).unwrap();

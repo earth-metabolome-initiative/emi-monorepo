@@ -18,6 +18,7 @@ pub enum WebCodeGenError {
     CodeGenerationError(CodeGenerationError),
     IllegalTableCodegen(String, String, Box<Table>),
     ExcessiveNumberOfColumns(Box<Table>, usize),
+    MissingUpdateAtColumn(Box<Table>),
 }
 
 impl From<DieselError> for WebCodeGenError {
