@@ -13,17 +13,29 @@ use crate::errors::WebCodeGenError;
 
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Debug)]
 #[diesel(table_name = crate::schema::table_constraints)]
+/// A struct representing a table constraint
 pub struct TableConstraint {
+    /// The name of the constraint catalog
     pub constraint_catalog: String,
+    /// The name of the constraint schema
     pub constraint_schema: String,
+    /// The name of the constraint
     pub constraint_name: String,
+    /// The name of the table catalog the constraint is associated with
     pub table_catalog: String,
+    /// The name of the table schema the constraint is associated with
     pub table_schema: String,
+    /// The name of the table the constraint is associated with
     pub table_name: String,
+    /// The type of the constraint
     pub constraint_type: ConstraintType,
+    /// Whether the constraint is deferrable
     pub is_deferrable: String,
+    /// Whether the constraint is initially deferred
     pub initially_deferred: String,
+    /// Whether the constraint is enforced
     pub enforced: String,
+    /// The name of the column the constraint is associated with
     pub nulls_distinct: Option<String>,
 }
 
@@ -41,10 +53,15 @@ pub struct TableConstraint {
     Deserialize,
 )]
 #[diesel(sql_type = diesel::sql_types::Text)]
+/// An enum representing the type of a constraint
 pub enum ConstraintType {
+    /// A primary key constraint
     PrimaryKey,
+    /// A foreign key constraint
     ForeignKey,
+    /// A unique constraint
     Unique,
+    /// A check constraint
     Check,
 }
 
@@ -167,21 +184,25 @@ impl TableConstraint {
     }
 
     #[must_use]
+    /// Returns whether the constraint is a primary key constraint
     pub fn is_primary_key(&self) -> bool {
         self.constraint_type.is_primary_key()
     }
 
     #[must_use]
+    /// Returns whether the constraint is a foreign key constraint
     pub fn is_foreign_key(&self) -> bool {
         self.constraint_type.is_foreign_key()
     }
 
     #[must_use]
+    /// Returns whether the constraint is a unique constraint
     pub fn is_unique(&self) -> bool {
         self.constraint_type.is_unique()
     }
 
     #[must_use]
+    /// Returns whether the constraint is a check constraint
     pub fn is_check(&self) -> bool {
         self.constraint_type.is_check()
     }

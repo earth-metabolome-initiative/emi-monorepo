@@ -4,6 +4,7 @@ use diesel::{Queryable, QueryableByName, Selectable};
 
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Hash, Clone)]
 #[diesel(table_name = crate::schema::pg_trigger)]
+/// A struct representing a postgres trigger
 pub struct PgTrigger {
     pub oid: u32,
     pub tgrelid: u32,

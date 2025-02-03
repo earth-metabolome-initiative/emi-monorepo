@@ -6,8 +6,11 @@ use diesel::pg::PgConnection;
 use super::ConstraintError;
 
 #[derive(Debug)]
+/// A constraint that checks if a column is a foreign key column
 pub struct IsForeignKeyConstraint {
+    /// The name of the table
     table_name: String,
+    /// The name of the column
     column_name: String,
 }
 

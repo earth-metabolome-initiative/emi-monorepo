@@ -4,8 +4,11 @@ use diesel::pg::PgConnection;
 
 use super::ConstraintError;
 
+/// Check that a column has a sibling column
 pub struct CompulsorySiblingColumnConstraint {
+    /// The name of the column
     column_name: String,
+    /// The name of the mandatory sibling column
     sibling_column_name: String,
 }
 

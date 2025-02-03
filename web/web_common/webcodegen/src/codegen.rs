@@ -19,8 +19,11 @@ pub enum CodeGenerationError {
 }
 
 #[derive(Debug, Default)]
+/// Struct for code generation.
 pub struct Codegen<'a> {
+    /// List of tables to ignore when generating code.
     tables_deny_list: Vec<&'a Table>,
+    /// The output path for the generated code.
     output_path: Option<&'a Path>,
 }
 

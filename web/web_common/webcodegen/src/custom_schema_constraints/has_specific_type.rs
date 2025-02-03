@@ -5,8 +5,11 @@ use diesel::pg::PgConnection;
 
 use super::ConstraintError;
 
+/// Check that a column has a specific type
 pub struct HasSpecificTypeConstraint {
+    /// The name of the column
     column_name: String,
+    /// The expected type of the column
     column_type: String,
 }
 

@@ -2,22 +2,37 @@
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
+/// Error type for custom schema constraints.
 pub enum ConstraintError {
+    /// The column is unexpectedly nullable.
     UnexpectedNullableColumn(String),
+    /// The column name is unexpectedly uppercase.
     UnexpectedUppercaseColumn(String),
+    /// The table name is unexpectedly uppercase.
     UnexpectedUppercaseTable(String),
+    /// The column is not a foreign key column.
     NotForeignKeyColumn {
+        /// The name of the table
         table_name: String,
+        /// The name of the column
         column_name: String,
     },
+    /// The column is not of the expected type.
     NotOfCorrectType {
+        /// The name of the column
         column_name: String,
+        /// The type of the column
         column_type: String,
+        /// The expected type of the column
         expected_column_type: String,
     },
+    /// The column does not have a sibling column.
     DoesNotHaveSiblingColumn {
+        /// The name of the table
         table_name: String,
+        /// The name of the column
         column_name: String,
+        /// The name of the sibling column
         sibling_column_name: String,
     },
 }

@@ -3,17 +3,31 @@ use diesel::{ExpressionMethods, QueryDsl, Queryable, QueryableByName, RunQueryDs
 
 use crate::errors::WebCodeGenError;
 
+/// Represents a row in the `key_column_usage` table, which contains information about 
+/// columns that are constrained by a unique or primary key constraint.
+///
+/// For more details, see the PostgreSQL documentation:
+/// https://www.postgresql.org/docs/current/infoschema-key-column-usage.html
 #[derive(Queryable, QueryableByName, Selectable, Debug)]
 #[diesel(table_name = crate::schema::key_column_usage)]
 pub struct KeyColumnUsage {
+    /// The name of the database that contains the constraint.
     pub constraint_catalog: String,
+    /// The name of the schema that contains the constraint.
     pub constraint_schema: String,
+    /// The name of the constraint.
     pub constraint_name: String,
+    /// The name of the database that contains the table.
     pub table_catalog: String,
+    /// The name of the schema that contains the table.
     pub table_schema: String,
+    /// The name of the table that contains the column.
     pub table_name: String,
+    /// The name of the column that is constrained.
     pub column_name: String,
+    /// The position of the column within the constraint.
     pub ordinal_position: i32,
+    /// The position of the column within the unique constraint, if applicable.
     pub position_in_unique_constraint: Option<i32>,
 }
 

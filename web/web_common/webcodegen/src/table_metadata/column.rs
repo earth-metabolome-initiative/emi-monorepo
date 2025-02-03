@@ -19,53 +19,102 @@ use super::table::{RESERVED_DIESEL_WORDS, RESERVED_RUST_WORDS};
 #[derive(Queryable, QueryableByName, Selectable, PartialEq, Eq, Debug, Clone)]
 #[diesel(table_name = crate::schema::columns)]
 pub struct Column {
+    /// Name of the database containing the table (always the current database)
     pub table_catalog: String,
+    /// Name of the schema containing the table
     pub table_schema: String,
+    /// Name of the table containing the column
     pub table_name: String,
+    /// Name of the column
     pub column_name: String,
+    /// Ordinal position of the column within the table (count starts at 1)
     pub ordinal_position: i32,
+    /// Default expression of the column
     pub column_default: Option<String>,
+    /// Indicates if the column is nullable ("YES" or "NO")
     __is_nullable: String,
+    /// Data type of the column
     data_type: String,
+    /// Maximum length of the character data type
     pub character_maximum_length: Option<i32>,
+    /// Maximum length in bytes of the character data type
     pub character_octet_length: Option<i32>,
+    /// Precision of the numeric data type
     pub numeric_precision: Option<i32>,
+    /// Radix (base) of the numeric data type
     pub numeric_precision_radix: Option<i32>,
+    /// Scale of the numeric data type
     pub numeric_scale: Option<i32>,
+    /// Precision of the datetime data type
     pub datetime_precision: Option<i32>,
+    /// Interval type of the interval data type
     pub interval_type: Option<String>,
+    /// Precision of the interval data type
     pub interval_precision: Option<i32>,
+    /// Catalog name of the character set
     pub character_set_catalog: Option<String>,
+    /// Schema name of the character set
     pub character_set_schema: Option<String>,
+    /// Name of the character set
     pub character_set_name: Option<String>,
+    /// Catalog name of the collation
     pub collation_catalog: Option<String>,
+    /// Schema name of the collation
     pub collation_schema: Option<String>,
+    /// Name of the collation
     pub collation_name: Option<String>,
+    /// Catalog name of the domain
     pub domain_catalog: Option<String>,
+    /// Schema name of the domain
     pub domain_schema: Option<String>,
+    /// Name of the domain
     pub domain_name: Option<String>,
+    /// Catalog name of the underlying type of the column
     pub udt_catalog: Option<String>,
+    /// Schema name of the underlying type of the column
     pub udt_schema: Option<String>,
+    /// Name of the underlying type of the column
     pub udt_name: Option<String>,
+    /// Catalog name of the scope of the column
     pub scope_catalog: Option<String>,
+    /// Schema name of the scope of the column
     pub scope_schema: Option<String>,
+    /// Name of the scope of the column
     pub scope_name: Option<String>,
+    /// Maximum cardinality of the column
     pub maximum_cardinality: Option<i32>,
+    /// Identifier of the data type descriptor
     pub dtd_identifier: Option<String>,
+    /// Indicates if the column is self-referencing
     pub is_self_referencing: Option<String>,
+    /// Indicates if the column is an identity column
     pub is_identity: Option<String>,
+    /// Generation expression of the identity column
     pub identity_generation: Option<String>,
+    /// Start value of the identity column
     pub identity_start: Option<String>,
+    /// Increment value of the identity column
     pub identity_increment: Option<String>,
+    /// Maximum value of the identity column
     pub identity_maximum: Option<String>,
+    /// Minimum value of the identity column
     pub identity_minimum: Option<String>,
+    /// Indicates if the identity column cycles
     pub identity_cycle: Option<String>,
+    /// Indicates if the column is generated ("ALWAYS" or "NEVER")
     pub is_generated: String,
+    /// Generation expression of the column
     pub generation_expression: Option<String>,
+    /// Indicates if the column is updatable ("YES" or "NO")
     pub is_updatable: String,
 }
 
 impl Column {
+    /// Returns the raw data type of the column
+    pub fn raw_data_type(&self) -> &str {
+        &self.data_type
+    }
+
     /// Returns the data type associated with the column as repo
     /// 
     /// # Arguments
@@ -265,6 +314,7 @@ impl Column {
         self.column_name == "updated_at" && self.data_type == "timestamp without time zone"
     }
 
+    /// Returns whether the column is a session user generated column
     pub fn is_session_user_generated(&self, conn: &mut PgConnection) -> bool {
         // A column is associated to the user section if:
         // - it is a foreign key of the users table

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use diesel::pg::PgConnection;
 use diesel::result::Error as DieselError;
 use diesel::{
@@ -31,21 +33,33 @@ pub const RESERVED_RUST_WORDS: [&str; 49] = [
 /// Diesel collisions that need to be handled.
 pub const RESERVED_DIESEL_WORDS: [&str; 1] = ["columns"];
 
-/// Struct defining the `information_schema.tables` table.
-#[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug, Clone)]
+#[derive(Queryable, QueryableByName, PartialEq, Eq, Selectable, Debug, Clone, Hash)]
 #[diesel(table_name = crate::schema::tables)]
+/// Struct defining the `information_schema.tables` table.
 pub struct Table {
+    /// The catalog name of the table.
     pub table_catalog: String,
+    /// The schema name of the table.
     pub table_schema: String,
+    /// The name of the table.
     pub table_name: String,
+    /// The type of the table, e.g. `BASE TABLE` or `VIEW`.
     pub table_type: String,
+    /// The name of the table that the current table is a temporary table for.
     pub self_referencing_column_name: Option<String>,
+    /// The name of the column that is a foreign key to the current table.
     pub reference_generation: Option<String>,
+    /// The user-defined type catalog.
     pub user_defined_type_catalog: Option<String>,
+    /// The user-defined type schema.
     pub user_defined_type_schema: Option<String>,
+    /// The user-defined type name.
     pub user_defined_type_name: Option<String>,
+    /// The user-defined type name that the current table is a temporary table for.
     pub is_insertable_into: String,
+    /// Whether the table is typed.
     pub is_typed: String,
+    /// Whether the table is updatable.
     pub commit_action: Option<String>,
 }
 
@@ -574,15 +588,29 @@ impl Table {
         Ok(built_table_syn)
     }
 
+    /// Returns the foreign keys of the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A vector of columns representing the foreign keys of the table.
+    pub fn foreign_keys(&self, conn: &mut PgConnection) -> Result<Vec<Column>, WebCodeGenError> {
+        Ok(self
+            .columns(conn)?
+            .into_iter()
+            .filter(|column| column.is_foreign_key(conn))
+            .collect::<Vec<Column>>())
+    }
+
     fn foreign_key_methods<'a>(
         &'a self,
         conn: &'a mut PgConnection,
     ) -> Result<Vec<TokenStream>, WebCodeGenError> {
         self
-            .columns(conn)?
-            .into_iter()
-            .filter(|column| column.is_foreign_key(conn))
-            .collect::<Vec<Column>>()
+            .foreign_keys(conn)?
             .into_iter()
             .map(|column| {
                 let (foreign_key_table, foreign_key_column) = column.foreign_table(conn).unwrap().unwrap();
@@ -1068,7 +1096,7 @@ impl Table {
             .load::<Index>(conn)
     }
 
-    /// Returns the primary key columns for the table.
+    /// Returns all tables in the database.
     ///
     /// # Arguments
     ///
@@ -1096,12 +1124,80 @@ impl Table {
             .load::<Table>(conn)
     }
 
+    /// Returns all tables in the database sorted topologically.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    /// * `table_catalog` - The table catalog.
+    /// * `table_schema` - The table schema.
+    ///
+    /// # Returns
+    ///
+    /// A vector of all tables in the database sorted topologically, i.e.
+    /// such that tables that depend on other tables are listed after the
+    /// tables they depend on.
+    pub fn load_all_topologically(
+        conn: &mut PgConnection,
+        table_catalog: &str,
+        table_schema: Option<&str>,
+    ) -> Result<Vec<Self>, WebCodeGenError> {
+        let mut tables = Self::load_all(conn, table_catalog, table_schema)?;
+
+        let mut table_priority: HashMap<Table, usize> =
+            tables.iter().cloned().map(|table| (table, 0)).collect();
+
+        // We determine the priority of each table by setting the priority of a table
+        // to the maximum priority of the tables it depends on plus one.
+        loop {
+            let mut changed = false;
+            for table in tables.iter() {
+                for column in table.columns(conn)? {
+                    if let Some((foreign_table, _)) = column.foreign_table(conn)? {
+                        if foreign_table == *table {
+                            continue;
+                        }
+                        let priority = table_priority.get(&foreign_table).unwrap() + 1;
+                        table_priority.entry(table.clone()).and_modify(|e| {
+                            if *e < priority {
+                                *e = priority;
+                                changed = true;
+                            }
+                        });
+                    }
+                }
+            }
+            if !changed {
+                break;
+            }
+        }
+
+        // We sort the tables by their priority.
+        tables.sort_by(|a, b| {
+            table_priority
+                .get(a)
+                .unwrap()
+                .cmp(table_priority.get(b).unwrap())
+        });
+
+        Ok(tables)
+    }
+
+    /// Returns the table by name.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    /// * `table_name` - The name of the table.
+    /// * `table_schema` - The schema of the table.
+    /// * `table_catalog` - The catalog of the table.
+    ///
     pub fn load(
         conn: &mut PgConnection,
         table_name: &str,
         table_schema: Option<&str>,
         table_catalog: &str,
-    ) -> Option<Self> {
+    ) -> Result<Self, DieselError> {
         use crate::schema::tables;
         let table_schema = table_schema.unwrap_or("public");
         tables::table
@@ -1109,7 +1205,6 @@ impl Table {
             .filter(tables::table_schema.eq(table_schema))
             .filter(tables::table_catalog.eq(table_catalog))
             .first::<Table>(conn)
-            .ok()
     }
 
     /// Returns the columns of the table.

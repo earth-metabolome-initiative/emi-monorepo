@@ -5,10 +5,15 @@ use crate::errors::WebCodeGenError;
 
 #[derive(Queryable, QueryableByName, Debug, Selectable)]
 #[diesel(table_name = crate::schema::check_constraints)]
+/// A struct representing a check constraint
 pub struct CheckConstraint {
+    /// The name of the constraint catalog
     pub constraint_catalog: String,
+    /// The name of the constraint schema
     pub constraint_schema: String,
+    /// The name of the constraint
     pub constraint_name: String,
+    /// The check clause of the constraint
     pub check_clause: String,
 }
 

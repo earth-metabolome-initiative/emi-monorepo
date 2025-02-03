@@ -7,6 +7,7 @@ use quote::quote;
 use syn::{File, Ident, Type};
 use crate::errors::WebCodeGenError;
 
+/// The list of unsupported data types
 pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
     "internal",
     "anyelement",
@@ -50,9 +51,13 @@ pub const UNSUPPORTED_DATA_TYPES: &[&str] = &[
 ];
 
 
+/// A struct representing a SQL function
 pub struct SQLFunction {
+    /// The name of the function
     name: String,
+    /// The return type of the function
     return_type: Option<Type>,
+    /// The arguments of the function and their types
     arguments: Vec<(String, Type)>,
 }
 

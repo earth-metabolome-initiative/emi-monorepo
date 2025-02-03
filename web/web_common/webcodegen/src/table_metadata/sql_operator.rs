@@ -9,11 +9,17 @@ use crate::errors::WebCodeGenError;
 
 use crate::table_metadata::sql_function::UNSUPPORTED_DATA_TYPES;
 
+/// A struct representing a SQL operator
 pub struct SQLOperator {
+    /// The symbol of the operator
     pub symbol: String,
+    /// The type of the left operand
     pub left_operand_type: Type,
+    /// The type of the right operand
     pub right_operand_type: Type,
+    /// The type of the result
     pub result_type: Type,
+    /// The name of the operator
     pub name: String,
 }
 

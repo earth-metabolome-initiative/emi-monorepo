@@ -8,11 +8,17 @@ use diesel::{
 /// Represents a row in the `pg_indexes` view
 #[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq)]
 #[diesel(table_name = crate::schema::pg_indexes)]
+/// Represents a PostgreSQL index in the database.
 pub struct Index {
+    /// The name of the schema containing the index.
     pub schemaname: String,
+    /// The name of the table associated with the index.
     pub tablename: String,
+    /// The name of the index.
     pub indexname: String,
+    /// The name of the tablespace containing the index.
     pub tablespace: Option<String>,
+    /// The definition of the index.
     pub indexdef: String,
 }
 
