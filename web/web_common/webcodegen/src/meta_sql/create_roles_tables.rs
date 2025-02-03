@@ -8,8 +8,52 @@ use crate::errors::WebCodeGenError;
 use crate::Table;
 
 impl Table {
-    fn requires_roles_table(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+    /// Returns whether all tables required for the roles mechanism are present.
+    pub fn has_all_roles_mechanism_tables(&self, conn: &mut PgConnection) -> bool {
+        self.has_user_roles_table(conn)
+            && self.has_team_roles_table(conn)
+            && Table::load(conn, "roles", Some(&self.table_schema), &self.table_catalog).is_ok()
+            && Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog).is_ok()
+            && Table::load(conn, "teams", Some(&self.table_schema), &self.table_catalog).is_ok()
+            && Table::load(conn, "teams_users", Some(&self.table_schema), &self.table_catalog).is_ok()
+    }
+
+    /// Returns whether the table is expected to have a roles table.
+    pub fn requires_roles_table(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         Ok(self.columns(conn)?.iter().any(|c| c.is_created_by(conn)))
+    }
+
+    /// Returns whether the table currently has a users_role table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    pub fn has_user_roles_table(&self, conn: &mut PgConnection) -> bool {
+        let expected_user_roles_table_name = format!("{}_users_roles", self.table_name);
+        Table::load(
+            conn,
+            &expected_user_roles_table_name,
+            Some(&self.table_schema),
+            &self.table_catalog,
+        )
+        .is_ok()
+    }
+
+    /// Returns whether the table currently has a teams_roles table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    pub fn has_team_roles_table(&self, conn: &mut PgConnection) -> bool {
+        let expected_team_roles_table_name = format!("{}_teams_roles", self.table_name);
+        Table::load(
+            conn,
+            &expected_team_roles_table_name,
+            Some(&self.table_schema),
+            &self.table_catalog,
+        )
+        .is_ok()
     }
 
     fn create_roles_table(
@@ -30,15 +74,14 @@ impl Table {
             self.table_name, reference_table.table_name, roles_table_type
         );
 
-        let Some(roles_table) =
+        let Ok(roles_table) =
             Table::load(conn, "roles", Some(&self.table_schema), &self.table_catalog)
         else {
             return Err(WebCodeGenError::MissingTable("roles".to_string()));
         };
 
-        let Some(users) =
-            Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog)
-         else {
+        let Ok(users) = Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog)
+        else {
             return Err(WebCodeGenError::MissingTable("users".to_string()));
         };
         let mut primary_key_names = Vec::new();
@@ -119,7 +162,7 @@ impl Table {
 
         let role_table_types = ["roles", "role_requests", "role_invitations"];
         let mut reference_tables = Vec::new();
-        if let Some(reference_table) =
+        if let Ok(reference_table) =
             Table::load(conn, "users", Some(&self.table_schema), &self.table_catalog)
         {
             reference_tables.push(reference_table);
@@ -127,7 +170,7 @@ impl Table {
             return Err(WebCodeGenError::MissingTable("users".to_string()));
         }
 
-        if let Some(reference_table) =
+        if let Ok(reference_table) =
             Table::load(conn, "teams", Some(&self.table_schema), &self.table_catalog)
         {
             reference_tables.push(reference_table);
