@@ -1,0 +1,14 @@
+[package]
+name = "molecule-occurence"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+downloader = { path = "../downloader" }
+indicatif.workspace = true
+rayon.workspace = true
+tokio.workspace = true
+
+[profile.release]
+debug = false # Include debug info.
+opt-level = 3
