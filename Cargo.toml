@@ -19,6 +19,7 @@ members = [
 ]
 
 [workspace.dependencies]
+regex = "1.11.1"
 rayon = "1.10.0"
 url = "2.5.4"
 indicatif = "0.17.9"

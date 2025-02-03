@@ -7,6 +7,7 @@ edition = "2021"
 downloader = { path = "../downloader" }
 indicatif.workspace = true
 rayon.workspace = true
+regex.workspace = true
 tokio.workspace = true
 
 [profile.release]
