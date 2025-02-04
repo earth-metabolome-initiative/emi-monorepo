@@ -14,7 +14,7 @@ pub struct Migration {
 
 impl PartialOrd for Migration {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.number.partial_cmp(&other.number)
+        Some(self.cmp(other))
     }
 }
 
@@ -100,6 +100,7 @@ impl<'a> TryFrom<&'a str> for Migration {
 }
 
 impl Migration {
+    #[must_use]
     /// Returns the name of the migration.
     ///
     /// # Returns
@@ -109,6 +110,7 @@ impl Migration {
         &self.name
     }
 
+    #[must_use]
     /// Returns the number of the migration.
     ///
     /// # Returns
@@ -118,6 +120,7 @@ impl Migration {
         self.number
     }
 
+    #[must_use]
     /// Returns the name of the directory containing the migration.
     pub fn directory(&self) -> String {
         format!("{:014}_{}", self.number, self.name)
@@ -135,7 +138,7 @@ impl Migration {
     /// * `number` - The new number of the migration.
     /// * `parent` - The parent path of the migration.
     ///
-    pub(crate) fn move_to<'a>(self, number: u64, parent: &'a Path) -> Self {
+    pub(crate) fn move_to(self, number: u64, parent: &Path) -> Self {
         let current_migration_directory = parent.join(self.directory());
         let updated_migration = Migration {
             name: self.name.clone(),

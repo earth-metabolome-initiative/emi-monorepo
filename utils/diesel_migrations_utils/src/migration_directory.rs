@@ -64,18 +64,18 @@ impl MigrationDirectory {
         self.migrations.iter()
     }
 
+    #[must_use]
     /// Returns whether the migrations have dense identifiers.
     pub fn is_dense(&self) -> bool {
-        let mut number = 0;
-        for migration in self.migrations.iter() {
-            if migration.number() != number {
+        for (number, migration) in self.migrations.iter().enumerate() {
+            if migration.number() != number as u64 {
                 return false;
             }
-            number += 1;
         }
         true
     }
 
+    #[must_use]
     /// Redensifies the migrations and returns the newly densified migrations.
     pub fn redensify(self) -> Self {
         let path = Path::new(&self.directory);
