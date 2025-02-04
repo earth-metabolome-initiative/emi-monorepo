@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS nameplates(
     barcode TEXT NOT NULL UNIQUE,
     project_id INTEGER NOT NULL,
     category_id INTEGER NOT NULL DEFAULT 1,
-    geolocation POINT NOT NULL,
+    geolocation geometry(POINT, 4326) NOT NULL,
     created_by INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_by INTEGER NOT NULL,

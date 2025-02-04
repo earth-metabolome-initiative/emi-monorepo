@@ -21,5 +21,6 @@ CREATE TABLE IF NOT EXISTS teams (
     FOREIGN KEY (state_id) REFERENCES team_states(id),
     FOREIGN KEY (parent_team_id) REFERENCES teams(id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT parent_team_circularity CHECK (parent_team_id != id)
 );
