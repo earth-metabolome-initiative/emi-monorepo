@@ -76,6 +76,18 @@ impl MigrationDirectory {
     }
 
     #[must_use]
+    /// Returns the number of migrations.
+    pub fn len(&self) -> usize {
+        self.migrations.len()
+    }
+
+    #[must_use]
+    /// Returns whether the migrations are empty.
+    pub fn is_empty(&self) -> bool {
+        self.migrations.is_empty()
+    }
+
+    #[must_use]
     /// Redensifies the migrations and returns the newly densified migrations.
     pub fn redensify(self) -> Self {
         let path = Path::new(&self.directory);

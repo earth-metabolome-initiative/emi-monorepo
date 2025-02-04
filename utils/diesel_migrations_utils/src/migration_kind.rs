@@ -3,8 +3,8 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Enumeration on the kind of migration.
 pub enum MigrationKind {
-	/// Up migration.
-	Up,
-	/// Down migration.
-	Down
+    /// Up migration.
+    Up,
+    /// Down migration.
+    Down,
 }
