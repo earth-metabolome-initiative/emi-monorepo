@@ -11,3 +11,17 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (organization_id) REFERENCES organizations(id)
 );
+
+CREATE FUNCTION concat_users_name(
+  first_name text,
+  last_name text
+) RETURNS text AS $$
+BEGIN
+  RETURN first_name || ' ' || last_name;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
+
+
+CREATE INDEX users_name_trgm_idx ON users USING gin (
+  concat_users_name(first_name, last_name) gin_trgm_ops
+);

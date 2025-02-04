@@ -13,3 +13,7 @@ CREATE TABLE IF NOT EXISTS nameplates(
     FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (updated_by) REFERENCES users(id)
 );
+
+CREATE INDEX nameplates_barcode_trgm_idx ON nameplates USING gin (
+    barcode gin_trgm_ops
+);

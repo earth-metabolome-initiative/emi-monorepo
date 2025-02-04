@@ -21,5 +21,24 @@ CREATE TABLE IF NOT EXISTS projects (
     FOREIGN KEY (color_id) REFERENCES colors(id),
     FOREIGN KEY (parent_project_id) REFERENCES projects(id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES users(id),
-    FOREIGN KEY (updated_by) REFERENCES users(id)
+    FOREIGN KEY (updated_by) REFERENCES users(id),
+    CONSTRAINT project_parent CHECK (id != parent_project_id)
+);
+
+CREATE FUNCTION concat_projects_name_description(
+  name text,
+  description text
+) RETURNS text AS $$
+BEGIN
+  CASE
+    WHEN description IS NULL THEN
+      RETURN name;
+    ELSE
+      RETURN name || ' ' || description;
+  END CASE;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE STRICT PARALLEL SAFE;
+
+CREATE INDEX projects_name_description_trgm_idx ON projects USING gin (
+  concat_projects_name_description(name, description) gin_trgm_ops
 );

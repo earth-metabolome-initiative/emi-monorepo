@@ -12,3 +12,7 @@ CREATE TABLE IF NOT EXISTS sample_containers(
     FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (updated_by) REFERENCES users(id)
 );
+
+CREATE INDEX sample_containers_barcode_trgm_idx ON sample_containers USING gin (
+    barcode gin_trgm_ops
+);
