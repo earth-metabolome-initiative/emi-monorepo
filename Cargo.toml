@@ -12,7 +12,7 @@ members = [
     "web/data_migration/directus_migration",
     "web/web_common/snake-case-sanitizer", 
     "data-retrieval/taxonomy-fetcher",
-    "data-retrieval/downloader", "web/core_structures", "utils/font_awesome",
+    "data-retrieval/downloader", "web/core_structures", "utils/font_awesome", "utils/diesel_migrations_utils",
 ]
 
 [workspace.dependencies]
@@ -26,6 +26,7 @@ flate2 = "1.0.35"
 tar = "0.4.43"
 infer = "0.16.0"
 csv = "1.3.1"
+sqlparser = "0.54.0"
 diesel = { version = "2.2.5", features = ["serde_json", "postgres", "r2d2", "chrono", "uuid", "extras"] } # uuidv07
 diesel-async = {version="0.5.1", features = ["postgres", "pool"]}
 chrono = {version="0.4.38", features = ["serde"]}
