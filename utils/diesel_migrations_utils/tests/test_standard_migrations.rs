@@ -47,7 +47,7 @@ pub fn test_densification() {
 	assert!(!migrations.is_dense());
 
 	// We densify the migrations.
-	migrations = migrations.redensify();
+	migrations = migrations.redensify().unwrap();
 	assert_eq!(migrations.len(), 2);
 	assert!(migrations.is_dense());
 

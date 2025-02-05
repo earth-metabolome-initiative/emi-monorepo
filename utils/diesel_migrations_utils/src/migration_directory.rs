@@ -89,16 +89,16 @@ impl MigrationDirectory {
 
     #[must_use]
     /// Redensifies the migrations and returns the newly densified migrations.
-    pub fn redensify(self) -> Self {
+    pub fn redensify(self) -> Result<Self, Error> {
         let path = Path::new(&self.directory);
-        MigrationDirectory {
+        Ok(MigrationDirectory {
             migrations: self
                 .migrations
                 .into_iter()
                 .enumerate()
                 .map(|(number, migration)| migration.move_to(number as u64, path))
-                .collect(),
+                .collect::<Result<Vec<Migration>, Error>>()?,
             directory: self.directory,
-        }
+        })
     }
 }

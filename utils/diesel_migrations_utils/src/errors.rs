@@ -6,7 +6,7 @@ use crate::prelude::MigrationKind;
 /// Enumeration of errors that may occour with the migrations utility.
 pub enum Error {
     /// Error raised when the directory is not a valid migration.
-    InvalidMigration,
+    InvalidMigration(String),
     /// Missing up migration.
     MissingUpMigration(u64),
     /// Missing down migration.
@@ -18,7 +18,7 @@ pub enum Error {
 }
 
 impl From<std::io::Error> for Error {
-    fn from(_error: std::io::Error) -> Self {
-        Error::InvalidMigration
+    fn from(error: std::io::Error) -> Self {
+        Error::InvalidMigration(error.to_string())
     }
 }

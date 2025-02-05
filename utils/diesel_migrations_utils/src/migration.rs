@@ -29,15 +29,15 @@ impl<'a> TryFrom<&'a Path> for Migration {
 
     fn try_from(path: &'a Path) -> Result<Self, Self::Error> {
         // We get the name of the migration.
-        let name = path.file_name().ok_or(Error::InvalidMigration)?;
-        let name = name.to_str().ok_or(Error::InvalidMigration)?;
-        let name = name.split('_').nth(1).ok_or(Error::InvalidMigration)?;
+        let name = path.file_name().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let name = name.to_str().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let name = name.split('_').nth(1).ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
 
         // We get the number of the migration.
-        let number = path.file_name().ok_or(Error::InvalidMigration)?;
-        let number = number.to_str().ok_or(Error::InvalidMigration)?;
-        let number = number.split('_').nth(0).ok_or(Error::InvalidMigration)?;
-        let number = number.parse::<u64>().map_err(|_| Error::InvalidMigration)?;
+        let number = path.file_name().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let number = number.to_str().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let number = number.split('_').nth(0).ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let number = number.parse::<u64>().map_err(|_| Error::InvalidMigration(path.to_string_lossy().to_string()))?;
 
         // We check whether the provided path contains the up and down migrations.
         let up = path.join("up.sql");
@@ -138,14 +138,14 @@ impl Migration {
     /// * `number` - The new number of the migration.
     /// * `parent` - The parent path of the migration.
     ///
-    pub(crate) fn move_to(self, number: u64, parent: &Path) -> Self {
+    pub(crate) fn move_to(self, number: u64, parent: &Path) -> Result<Self, Error> {
         let current_migration_directory = parent.join(self.directory());
         let updated_migration = Migration {
             name: self.name.clone(),
             number,
         };
         let updated_migration_directory = parent.join(updated_migration.directory());
-        std::fs::rename(current_migration_directory, updated_migration_directory).unwrap();
-        updated_migration
+        std::fs::rename(current_migration_directory, updated_migration_directory)?;
+        Ok(updated_migration)
     }
 }
