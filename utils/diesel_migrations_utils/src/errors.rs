@@ -15,6 +15,13 @@ pub enum Error {
     DuplicateMigrationNumber(u64),
     /// SQL within migration is invalid.
     InvalidSql(u64, MigrationKind, String),
+    /// When moving a migration fails
+    MovingMigrationFailed {
+        /// Source directory.
+        source: String,
+        /// Destination directory.
+        destination: String,
+    }
 }
 
 impl From<std::io::Error> for Error {

@@ -11,11 +11,11 @@ pub fn test_standard_migrations() {
     assert!(!standard.is_dense());
     let migrations = standard.migrations().collect::<Vec<&Migration>>();
     assert_eq!(migrations[0].number(), 1);
-    assert_eq!(migrations[0].name(), "first");
-    assert_eq!(migrations[0].directory(), "00000000000001_first");
+    assert_eq!(migrations[0].name(), "first_migration");
+    assert_eq!(migrations[0].directory(), "00000000000001_first_migration");
     assert_eq!(migrations[1].number(), 3);
-    assert_eq!(migrations[1].name(), "second");
-    assert_eq!(migrations[1].directory(), "00000000000003_second");
+    assert_eq!(migrations[1].name(), "second_migration");
+    assert_eq!(migrations[1].directory(), "00000000000003_second_migration");
 }
 
 fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> std::io::Result<()> {

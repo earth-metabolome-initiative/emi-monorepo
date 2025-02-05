@@ -29,15 +29,20 @@ impl<'a> TryFrom<&'a Path> for Migration {
 
     fn try_from(path: &'a Path) -> Result<Self, Self::Error> {
         // We get the name of the migration.
-        let name = path.file_name().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
-        let name = name.to_str().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
-        let name = name.split('_').nth(1).ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let name = path
+            .file_name()
+            .ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let name = name
+            .to_str()
+            .ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let mut fragmented_name = name.split('_');
+        let number = fragmented_name
+            .next()
+            .ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?
+            .parse::<u64>()
+            .map_err(|_| Error::InvalidMigration(path.to_string_lossy().to_string()))?;
 
-        // We get the number of the migration.
-        let number = path.file_name().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
-        let number = number.to_str().ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
-        let number = number.split('_').nth(0).ok_or(Error::InvalidMigration(path.to_string_lossy().to_string()))?;
-        let number = number.parse::<u64>().map_err(|_| Error::InvalidMigration(path.to_string_lossy().to_string()))?;
+        let name = fragmented_name.collect::<Vec<&str>>().join("_");
 
         // We check whether the provided path contains the up and down migrations.
         let up = path.join("up.sql");
@@ -145,7 +150,12 @@ impl Migration {
             number,
         };
         let updated_migration_directory = parent.join(updated_migration.directory());
-        std::fs::rename(current_migration_directory, updated_migration_directory)?;
+        std::fs::rename(&current_migration_directory, &updated_migration_directory).map_err(
+            |_| Error::MovingMigrationFailed {
+                source: current_migration_directory.to_string_lossy().to_string(),
+                destination: updated_migration_directory.to_string_lossy().to_string(),
+            },
+        )?;
         Ok(updated_migration)
     }
 }
