@@ -3,6 +3,7 @@ use csqlv::{CSVSchema, CSVSchemaBuilder};
 use diesel::connection::SimpleConnection;
 use diesel::pg::PgConnection;
 use diesel::Connection;
+use diesel_migrations_utils::prelude::*;
 use std::env;
 use std::path::Path;
 use taxonomy_fetcher::impls::ncbi::{NCBIRank, NCBITaxonomy, NCBITaxonomyBuilder};
@@ -71,6 +72,16 @@ async fn setup_postgres() -> ContainerAsync<GenericImage> {
 
 #[tokio::main]
 pub async fn main() {
+    // We ensure that the migrations directory has all expected properties.
+    let mut extension_migrations = MigrationDirectory::try_from("extensions_migrations").unwrap();
+    if !extension_migrations.is_dense() {
+        extension_migrations = extension_migrations.redensify().unwrap();
+    }
+    let mut migrations = MigrationDirectory::try_from("migrations").unwrap();
+    if !migrations.is_dense() {
+        migrations = migrations.redensify().unwrap();
+    }
+
     // First, we create the CSV for the font-awesome icons
     font_awesome::Icon::to_csv("csvs/icons.csv").unwrap();
 

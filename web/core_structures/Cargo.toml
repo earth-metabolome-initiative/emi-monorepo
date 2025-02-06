@@ -16,6 +16,7 @@ font_awesome.workspace = true
 diesel.workspace = true
 testcontainers.workspace = true
 webcodegen.workspace = true
+diesel_migrations_utils.workspace = true
 
 [features]
 default = ["diesel", "serde"]
