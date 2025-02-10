@@ -468,6 +468,18 @@ table! {
     }
 }
 
+table! {
+    geography_columns (f_table_catalog, f_table_schema, f_table_name, f_geography_column) {
+        f_table_catalog -> Text,
+        f_table_schema -> Text,
+        f_table_name -> Text,
+        f_geography_column -> Text,
+        coord_dimension -> Integer,
+        srid -> Integer,
+        r#type -> Text
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     columns,
     key_column_usage,
@@ -487,5 +499,6 @@ allow_tables_to_appear_in_same_query!(
     pg_operator,
     pg_attribute,
     pg_namespace,
-    geometry_columns
+    geometry_columns,
+    geography_columns
 );

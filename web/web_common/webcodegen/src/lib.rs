@@ -21,7 +21,7 @@ mod table_metadata;
 mod codegen;
 mod postgis;
 
-pub use postgis::GeometryColumn;
+pub use postgis::{GeometryColumn, GeographyColumn};
 pub use table_metadata::{
     CheckConstraint, Column, ConstraintColumnUsage, ConstraintTableUsage, DomainConstraint, Index,
     KeyColumnUsage, ReferentialConstraint, SQLFunction, SQLOperator, Table,

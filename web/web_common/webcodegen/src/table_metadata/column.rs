@@ -145,7 +145,7 @@ impl Column {
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn data_type_str(&self, conn: &mut PgConnection) -> Result<&str, WebCodeGenError> {
+    pub fn data_type_str(&self, _conn: &mut PgConnection) -> Result<&str, WebCodeGenError> {
         Ok(if self.has_custom_type() {
             if let Some(udt_name) = &self.udt_name {
                 udt_name
