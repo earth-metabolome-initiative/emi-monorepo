@@ -131,6 +131,28 @@ impl Migration {
         format!("{:014}_{}", self.number, self.name)
     }
 
+    #[must_use]
+    /// Returns the SQL content of the up migration.
+    pub fn up(&self, parent: &Path) -> Result<String, Error> {
+        let path = parent.join(self.directory()).join("up.sql");
+        std::fs::read_to_string(path).map_err(|error| Error::ReadingMigrationFailed (
+            self.number,
+            crate::prelude::MigrationKind::Up,
+            error.to_string(),
+        ))
+    }
+
+    #[must_use]
+    /// Returns the SQL content of the down migration.
+    pub fn down(&self, parent: &Path) -> Result<String, Error> {
+        let path = parent.join(self.directory()).join("down.sql");
+        std::fs::read_to_string(path).map_err(|error| Error::ReadingMigrationFailed (
+            self.number,
+            crate::prelude::MigrationKind::Down,
+            error.to_string(),
+        ))
+    }
+
     /// Moves the up and down migrations to the newly provided number and returns the new migration.
     ///
     /// # Implementation details

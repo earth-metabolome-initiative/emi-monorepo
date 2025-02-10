@@ -21,7 +21,9 @@ pub enum Error {
         source: String,
         /// Destination directory.
         destination: String,
-    }
+    },
+    /// When reading a migration fails
+    ReadingMigrationFailed(u64, MigrationKind, String),
 }
 
 impl From<std::io::Error> for Error {

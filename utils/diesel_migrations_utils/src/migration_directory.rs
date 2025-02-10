@@ -64,6 +64,26 @@ impl MigrationDirectory {
         self.migrations.iter()
     }
 
+    /// Iterates on the up migrations.
+    pub fn ups(&self) -> Result<Vec<String>, Error> {
+        let path: &Path = Path::new(&self.directory);
+        self
+            .migrations
+            .iter()
+            .map(|migration| migration.up(path))
+            .collect::<Result<Vec<String>, Error>>()
+    }
+
+    /// Iterates on the down migrations.
+    pub fn downs(&self) -> Result<Vec<String>, Error> {
+        let path: &Path = Path::new(&self.directory);
+        self
+            .migrations
+            .iter()
+            .map(|migration| migration.down(path))
+            .collect::<Result<Vec<String>, Error>>()
+    }
+
     #[must_use]
     /// Returns whether the migrations have dense identifiers.
     pub fn is_dense(&self) -> bool {
