@@ -25,7 +25,7 @@ chrono.workspace = true
 ipnetwork = "0.20.0"
 diesel_full_text_search = "2.2.0"
 diesel-async = {version="0.5.1", features = ["postgres", "pool"]}
-uuid = {version="1.11.0", features = ["serde", "v4"]}
+uuid.workspace = true
 macaddr = "1.0.1"
 postgis_diesel = "2.4.1"
 
